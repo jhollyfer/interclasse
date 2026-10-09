@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { CalendarBlankIcon, TrashIcon, TrophyIcon } from '@phosphor-icons/react'
+import {
+  ArrowCounterClockwiseIcon,
+  CalendarBlankIcon,
+  TrashIcon,
+  TrophyIcon,
+} from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 import {
@@ -15,6 +20,7 @@ import {
 } from '#/components/common/confirm-dialog'
 import {
   MatchScheduleDialog,
+  MatchUnscoreDialog,
   MatchScoreDialog,
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
@@ -78,6 +84,7 @@ export function BracketDetailView(): React.JSX.Element {
   const navigate = useNavigate()
   const [scoring, setScoring] = React.useState<MatchRef | null>(null)
   const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
+  const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
 
   const invalidate = () =>
     Promise.all(
@@ -96,6 +103,11 @@ export function BracketDetailView(): React.JSX.Element {
   })
 
   const champion = championName(bracket)
+  // O servidor recusa apagar chave com placar (`BRACKET_HAS_RESULTS`): o alerta
+  // já diz isso, em vez de oferecer um "Apagar" que vai dar erro.
+  const hasResults = bracket.matches.some(
+    (match) => match.status === 'FINISHED',
+  )
 
   return (
     <div className="flex flex-col gap-4">
@@ -120,17 +132,36 @@ export function BracketDetailView(): React.JSX.Element {
               </Button>
             }
           >
-            <ConfirmDialogHeader>
-              <ConfirmDialogTitle>Apagar a chave?</ConfirmDialogTitle>
-              <ConfirmDialogDescription>
-                Times, partidas e placares somem, e as inscrições da modalidade
-                reabrem. É assim que se refaz um sorteio.
-              </ConfirmDialogDescription>
-            </ConfirmDialogHeader>
-            <ConfirmDialogFooter>
-              <ConfirmDialogCancel />
-              <ConfirmDialogConfirm>Apagar chave</ConfirmDialogConfirm>
-            </ConfirmDialogFooter>
+            {hasResults && (
+              <React.Fragment>
+                <ConfirmDialogHeader>
+                  <ConfirmDialogTitle>A chave já tem placar</ConfirmDialogTitle>
+                  <ConfirmDialogDescription>
+                    Apagar levaria embora resultados que aconteceram em quadra.
+                    Para refazer o sorteio, desfaça os placares antes, da final
+                    para a primeira fase.
+                  </ConfirmDialogDescription>
+                </ConfirmDialogHeader>
+                <ConfirmDialogFooter>
+                  <ConfirmDialogCancel>Entendi</ConfirmDialogCancel>
+                </ConfirmDialogFooter>
+              </React.Fragment>
+            )}
+            {!hasResults && (
+              <React.Fragment>
+                <ConfirmDialogHeader>
+                  <ConfirmDialogTitle>Apagar a chave?</ConfirmDialogTitle>
+                  <ConfirmDialogDescription>
+                    Times e partidas somem, e as inscrições da modalidade
+                    reabrem. É assim que se refaz um sorteio.
+                  </ConfirmDialogDescription>
+                </ConfirmDialogHeader>
+                <ConfirmDialogFooter>
+                  <ConfirmDialogCancel />
+                  <ConfirmDialogConfirm>Apagar chave</ConfirmDialogConfirm>
+                </ConfirmDialogFooter>
+              </React.Fragment>
+            )}
           </ConfirmDialog>
         </PageHeaderActions>
       </PageHeader>
@@ -186,6 +217,17 @@ export function BracketDetailView(): React.JSX.Element {
                 >
                   Placar
                 </Button>
+                {match.status === 'FINISHED' && (
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    aria-label="Desfazer placar"
+                    title="Desfazer placar"
+                    onClick={() => setUnscoring(match)}
+                  >
+                    <ArrowCounterClockwiseIcon />
+                  </Button>
+                )}
               </div>
             ))}
           </CardContent>
@@ -198,6 +240,14 @@ export function BracketDetailView(): React.JSX.Element {
           match={scoring}
           open
           onOpenChange={() => setScoring(null)}
+        />
+      )}
+      {unscoring && (
+        <MatchUnscoreDialog
+          key={unscoring.id}
+          match={unscoring}
+          open
+          onOpenChange={() => setUnscoring(null)}
         />
       )}
       {scheduling && (

@@ -1,10 +1,15 @@
 import * as React from 'react'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { CalendarBlankIcon, NumberSquareOneIcon } from '@phosphor-icons/react'
+import {
+  ArrowCounterClockwiseIcon,
+  CalendarBlankIcon,
+  NumberSquareOneIcon,
+} from '@phosphor-icons/react'
 
 import {
   MatchScheduleDialog,
+  MatchUnscoreDialog,
   MatchScoreDialog,
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
@@ -129,6 +134,7 @@ export function MatchesTable(): React.JSX.Element {
   )
   const [scoring, setScoring] = React.useState<MatchRef | null>(null)
   const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
+  const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
 
   const table = useTable({
     rows: data?.data ?? [],
@@ -150,6 +156,15 @@ export function MatchesTable(): React.JSX.Element {
           <NumberSquareOneIcon />
           Lançar placar
         </DropdownMenuItem>
+        {match.status === 'FINISHED' && (
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setUnscoring(toRef(match))}
+          >
+            <ArrowCounterClockwiseIcon />
+            Desfazer placar
+          </DropdownMenuItem>
+        )}
       </RowActions>
     ),
   })
@@ -225,6 +240,14 @@ export function MatchesTable(): React.JSX.Element {
           match={scheduling}
           open
           onOpenChange={() => setScheduling(null)}
+        />
+      )}
+      {unscoring && (
+        <MatchUnscoreDialog
+          key={unscoring.id}
+          match={unscoring}
+          open
+          onOpenChange={() => setUnscoring(null)}
         />
       )}
     </Table>

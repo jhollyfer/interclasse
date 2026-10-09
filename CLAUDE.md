@@ -41,8 +41,8 @@ O MinIO vem do fork `pgsty/*` - as imagens `minio/*` saíram do Docker Hub.
 `main.yml` no push para `main`: checa o backend, builda o frontend, publica
 `interclasse-api` e `interclasse-app` no Docker Hub e dispara o Coolify
 (`coolify.maiyu.com.br`). Site em `https://interclass.maiyu.com.br`, API em
-`https://api-interclass.maiyu.com.br`. Falta criar no repositório os secrets
-`DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COOLIFY_TOKEN` e as variáveis
-`COOLIFY_UUID_API`, `COOLIFY_UUID_APP` (uuid da aplicação no painel).
+`https://api-interclass.maiyu.com.br`. Secrets do repositório:
+`DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` e `COOLIFY_TOKEN`; os uuids das
+aplicações ficam em `main-deploy-coolify.yml`.
 Na API: `CORS_ORIGIN=https://interclass.maiyu.com.br` e
 `COOKIE_DOMAIN=.maiyu.com.br`.

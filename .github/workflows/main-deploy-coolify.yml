@@ -9,15 +9,12 @@ on:
 # Os valores que mudam de projeto para projeto, num lugar só.
 #
 # Os uuids são das APLICAÇÕES no Coolify, e não da instância nem do projeto:
-# estão na URL do painel, em `/project/<projeto>/application/<UUID>`. Ficam em
-# variáveis do repositório (Settings > Secrets and variables > Actions >
-# Variables), `COOLIFY_UUID_API` e `COOLIFY_UUID_APP`, porque as aplicações
-# ainda não existiam quando este arquivo foi escrito. Ausentes, o job reprova
-# dizendo isso - e não implanta o projeto errado.
+# estão na URL do painel, em `/project/<projeto>/application/<UUID>`. Uuid de
+# outro projeto não é recusado pelo Coolify - redeploya o projeto errado.
 env:
   COOLIFY_URL: https://coolify.maiyu.com.br
-  UUID_API: ${{ vars.COOLIFY_UUID_API }}
-  UUID_APP: ${{ vars.COOLIFY_UUID_APP }}
+  UUID_API: kyjyk4ahdpscxmvurpzcohpg
+  UUID_APP: sqrom3vusao6bwh1fq5du0hs
   URL_API: https://api-interclass.maiyu.com.br
   URL_APP: https://interclass.maiyu.com.br
 
@@ -37,11 +34,6 @@ jobs:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
         run: |
           set -euo pipefail
-
-          if [ -z "${UUID_API}" ] || [ -z "${UUID_APP}" ]; then
-            echo "Faltam as variáveis COOLIFY_UUID_API e/ou COOLIFY_UUID_APP no repositório."
-            exit 1
-          fi
 
           disparar() {
             rotulo="$1"

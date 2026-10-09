@@ -18,8 +18,18 @@ import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import {
   useMatchScore,
+  useMatchUnscore,
   useMatchUpdate,
 } from '#/integrations/tanstack-query/mutations'
+import {
+  ConfirmDialog,
+  ConfirmDialogCancel,
+  ConfirmDialogConfirm,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+} from '#/components/common/confirm-dialog'
 
 /** O mínimo de uma partida que os dois diálogos precisam. */
 export type MatchRef = {
@@ -230,5 +240,45 @@ export function MatchScheduleDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/**
+ * Desfazer o placar lançado errado. O servidor recusa quando a partida
+ * seguinte já tem placar, e o motivo chega por toast.
+ */
+export function MatchUnscoreDialog({
+  match,
+  open,
+  onOpenChange,
+}: DialogProps): React.JSX.Element {
+  const invalidate = useInvalidateGames()
+  const unscore = useMatchUnscore({
+    onSuccess: async () => {
+      toast.success('Placar desfeito.')
+      await invalidate()
+    },
+    onError: (error) => toast.error(error.message, { id: 'match-unscore' }),
+  })
+
+  return (
+    <ConfirmDialog
+      destructive
+      open={open}
+      onOpenChange={onOpenChange}
+      onConfirm={() => unscore.mutate(match.id)}
+    >
+      <ConfirmDialogHeader>
+        <ConfirmDialogTitle>Desfazer o placar?</ConfirmDialogTitle>
+        <ConfirmDialogDescription>
+          {`${match.homeName ?? 'A definir'} ${match.homeScore ?? '-'} x ${match.awayScore ?? '-'} ${match.awayName ?? 'A definir'}`}
+          {' volta para "a jogar", e o vencedor sai da partida seguinte.'}
+        </ConfirmDialogDescription>
+      </ConfirmDialogHeader>
+      <ConfirmDialogFooter>
+        <ConfirmDialogCancel />
+        <ConfirmDialogConfirm>Desfazer</ConfirmDialogConfirm>
+      </ConfirmDialogFooter>
+    </ConfirmDialog>
   )
 }

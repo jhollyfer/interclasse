@@ -355,5 +355,106 @@ test.group('jogos > sorteio e placar', (group) => {
     // mas não o adversário - por isso não entra na tabela de jogos.
     assert.lengthOf(body(response).data, 1)
     assert.isString(body(response).data[0].homeTeam.classroom.name)
+    // Conta de conselheiro e de representante não sai no site anônimo.
+    assert.notProperty(body(response).data[0].homeTeam.classroom, 'advisorId')
+    assert.notProperty(body(response).data[0].homeTeam.classroom, 'representativeId')
+  })
+
+  test('placar errado se desfaz, e a final desfeita reabre a chave', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const sport = await createSport(client, admin)
+    await enrolledClassrooms(client, admin, sport.id, 4)
+    const bracket = await draw(client, admin, sport.id)
+    await scoreAll(client, admin, bracket.id, MatchPhases.SEMI)
+    await scoreAll(client, admin, bracket.id, MatchPhases.FINAL)
+
+    const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
+    const semi = jogada.matches.find((match: { phase: string }) => match.phase === MatchPhases.SEMI)
+    const final = jogada.matches.find(
+      (match: { phase: string }) => match.phase === MatchPhases.FINAL
+    )
+
+    // A semifinal não sai enquanto a final, que depende dela, tem placar.
+    const cedo = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    cedo.assertStatus(409)
+    assert.equal(body(cedo).code, 'NEXT_MATCH_PLAYED')
+
+    const desfazFinal = await client
+      .delete(`/administrator/matches/${final.id}/score`)
+      .cookies(admin)
+    desfazFinal.assertStatus(200)
+    assert.equal(body(desfazFinal).status, 'SCHEDULED')
+
+    const desfazSemi = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    desfazSemi.assertStatus(200)
+
+    const depois = body(await client.get(`/storefront/brackets/${bracket.id}`))
+    const finalDepois = depois.matches.find(
+      (match: { phase: string }) => match.phase === MatchPhases.FINAL
+    )
+    assert.equal(depois.status, 'KNOCKOUT')
+    assert.isNull(depois.championTeamId)
+    // O vencedor da semifinal desfeita saiu da vaga dele na final.
+    assert.isTrue(finalDepois.homeTeamId === null || finalDepois.awayTeamId === null)
+
+    const deNovo = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    deNovo.assertStatus(409)
+    assert.equal(body(deNovo).code, 'MATCH_NOT_PLAYED')
+  })
+
+  test('chave com placar não se apaga; sem placar, sim', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const sport = await createSport(client, admin)
+    await enrolledClassrooms(client, admin, sport.id, 4)
+    const bracket = await draw(client, admin, sport.id)
+    await scoreAll(client, admin, bracket.id, MatchPhases.SEMI)
+
+    const recusa = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    recusa.assertStatus(409)
+    assert.equal(body(recusa).code, 'BRACKET_HAS_RESULTS')
+
+    const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
+    for (const match of jogada.matches) {
+      if (match.status !== 'FINISHED') continue
+      const desfaz = await client.delete(`/administrator/matches/${match.id}/score`).cookies(admin)
+      desfaz.assertStatus(200)
+    }
+
+    const apaga = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    apaga.assertStatus(204)
+  })
+
+  test('o máximo não desce abaixo de uma lista já inscrita', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const sport = await createSport(client, admin)
+    const classroom = await client
+      .post('/administrator/classrooms')
+      .cookies(admin)
+      .json({ name: '8º Z', grade: 8 })
+    const ids: string[] = []
+    for (const name of ['Ana', 'Bia', 'Caio']) {
+      const student = await client
+        .post('/advisor/students')
+        .cookies(admin)
+        .json({ classroomId: body(classroom).id, name })
+      ids.push(body(student).id)
+    }
+    await client
+      .put('/advisor/enrollments')
+      .cookies(admin)
+      .json({ classroomId: body(classroom).id, sportId: sport.id, studentIds: ids })
+
+    const abaixo = await client
+      .put(`/administrator/sports/${sport.id}`)
+      .cookies(admin)
+      .json({ maxAthletes: 2 })
+    abaixo.assertStatus(409)
+    assert.equal(body(abaixo).code, 'SPORT_ROSTER_ABOVE_LIMIT')
+
+    const igual = await client
+      .put(`/administrator/sports/${sport.id}`)
+      .cookies(admin)
+      .json({ maxAthletes: 3 })
+    igual.assertStatus(200)
   })
 })

@@ -1054,6 +1054,16 @@
               }
             }
           },
+          "409": {
+            "description": "A chave já tem placar lançado: desfaça os placares antes de apagá-la",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409BracketHasResults"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Dados inválidos",
             "content": {
@@ -1075,7 +1085,7 @@
             }
           }
         },
-        "description": "**Irreversível**: apaga a chave com todos os times, partidas e placares, e reabre as inscrições da modalidade naquela categoria. É o caminho para refazer um sorteio.",
+        "description": "**Irreversível**: apaga a chave com todos os times, partidas e placares, e reabre as inscrições da modalidade naquela categoria. É o caminho para refazer um sorteio.\n\nChave com placar lançado responde `409`: desfaça os placares antes.",
         "security": [
           {
             "cookieAuth": []
@@ -2004,6 +2014,105 @@
             }
           }
         }
+      },
+      "delete": {
+        "operationId": "administratorMatchesUnscore",
+        "summary": "Desfazer placar",
+        "tags": [
+          "Painel · Partidas"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorMatchesUnscoreResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Partida não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404MatchNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A partida ainda não tem placar · A partida seguinte já tem placar: desfaça-a antes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409MatchNotPlayedNextMatchPlayed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500MatchUnscoreError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Apaga o placar e devolve a partida para \"a jogar\". O vencedor sai da vaga da partida seguinte, e uma final desfeita reabre a chave. Recusado com `409` quando a partida seguinte já tem placar: desfaça-a antes.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
       }
     },
     "/administrator/sports": {
@@ -2368,11 +2477,11 @@
             }
           },
           "409": {
-            "description": "Modalidade já existe",
+            "description": "Há turma com mais atletas inscritos que o novo máximo · Modalidade já existe",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409SportAlreadyExists"
+                  "$ref": "#/components/schemas/Error409SportAlreadyExistsSportRosterAboveLimit"
                 }
               }
             }
@@ -7434,6 +7543,366 @@
           "winnerTeamId"
         ]
       },
+      "AdministratorMatchesUnscoreResponse200": {
+        "type": "object",
+        "properties": {
+          "awayScore": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "awayTeamId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bracketId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "homeScore": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "homeTeamId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "ROUND_OF_16",
+              "QUARTER",
+              "SEMI",
+              "FINAL"
+            ]
+          },
+          "position": {
+            "type": "number"
+          },
+          "round": {
+            "type": "number"
+          },
+          "scheduledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SCHEDULED",
+              "FINISHED"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "winnerTeamId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "homeTeam": {
+            "type": "object",
+            "properties": {
+              "bracketId": {
+                "type": "string"
+              },
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "classroom": {
+                "type": "object",
+                "properties": {
+                  "advisorId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "grade": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "representativeId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "advisorId",
+                  "category",
+                  "createdAt",
+                  "grade",
+                  "id",
+                  "name",
+                  "representativeId",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "bracketId",
+              "classroomId",
+              "createdAt",
+              "id",
+              "updatedAt"
+            ]
+          },
+          "awayTeam": {
+            "type": "object",
+            "properties": {
+              "bracketId": {
+                "type": "string"
+              },
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "classroom": {
+                "type": "object",
+                "properties": {
+                  "advisorId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "grade": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "representativeId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "advisorId",
+                  "category",
+                  "createdAt",
+                  "grade",
+                  "id",
+                  "name",
+                  "representativeId",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "bracketId",
+              "classroomId",
+              "createdAt",
+              "id",
+              "updatedAt"
+            ]
+          },
+          "bracket": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "F1",
+                  "F2"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "sportId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "KNOCKOUT",
+                  "FINISHED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "sport": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "maxAthletes": {
+                    "type": "number"
+                  },
+                  "minAthletes": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "createdAt",
+                  "id",
+                  "maxAthletes",
+                  "minAthletes",
+                  "name",
+                  "slug",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "category",
+              "createdAt",
+              "id",
+              "sportId",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "awayScore",
+          "awayTeamId",
+          "bracketId",
+          "createdAt",
+          "homeScore",
+          "homeTeamId",
+          "id",
+          "location",
+          "phase",
+          "position",
+          "round",
+          "scheduledAt",
+          "status",
+          "updatedAt",
+          "winnerTeamId"
+        ]
+      },
       "AdministratorMatchesUpdateBody": {
         "type": "object",
         "properties": {
@@ -9755,6 +10224,40 @@
           "code"
         ]
       },
+      "Error409BracketHasResults": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "BRACKET_HAS_RESULTS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error409ClassroomAlreadyExistsClassroomInCompetitionRepresentativeTaken": {
         "type": "object",
         "properties": {
@@ -9894,6 +10397,41 @@
           "code"
         ]
       },
+      "Error409MatchNotPlayedNextMatchPlayed": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "MATCH_NOT_PLAYED",
+              "NEXT_MATCH_PLAYED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error409MatchTeamsPendingNextMatchPlayed": {
         "type": "object",
         "properties": {
@@ -9947,6 +10485,41 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "SPORT_ALREADY_EXISTS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409SportAlreadyExistsSportRosterAboveLimit": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SPORT_ALREADY_EXISTS",
+              "SPORT_ROSTER_ABOVE_LIMIT"
             ]
           },
           "errors": {
@@ -11125,6 +11698,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "MATCH_SCORE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500MatchUnscoreError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "MATCH_UNSCORE_ERROR"
             ]
           },
           "errors": {

@@ -25,9 +25,10 @@ do codigo, sao elas que envelheceram.
 | 401 | `UNAUTHORIZED` | Não autorizado |
 | 403 | `ACCESS_DENIED` | Acesso negado. Exige um destes papéis: ADMINISTRATOR. |
 | 404 | `SPORT_NOT_FOUND` | Modalidade não encontrada |
-| 409 | `SPORT_ALREADY_EXISTS` | Modalidade já existe |
+| 409 | `SPORT_ALREADY_EXISTS` | Há turma com mais atletas inscritos que o novo máximo |
 | 409 | `SPORT_IN_USE` | A modalidade tem inscrições |
-| 422 | `SPORT_INVALID_LIMITS` | — |
+| 409 | `SPORT_ROSTER_ABOVE_LIMIT` | Modalidade já existe |
+| 422 | `SPORT_INVALID_LIMITS` | Dados inválidos |
 | 422 | `VALIDATION_ERROR` | Dados inválidos |
 | 500 | `SPORT_CREATE_ERROR` | Erro interno do servidor |
 | 500 | `SPORT_DELETE_ERROR` | Erro interno do servidor |

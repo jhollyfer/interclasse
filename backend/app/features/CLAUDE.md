@@ -17,14 +17,14 @@ diz e nao repete nada.
 | Modulo | Rota base | Controllers | O que e |
 |---|---|---|---|
 | `account/` | `/account` | 2 | A propria conta de quem esta autenticado. Escopo de sessao, nao de papel. |
-| `administrator/` | `/administrator` | 29 | A organizacao dos jogos: turmas, modalidades, contas, sorteio, placar, avisos. |
+| `administrator/` | `/administrator` | 30 | A organizacao dos jogos: turmas, modalidades, contas, sorteio, placar, avisos. |
 | `advisor/` | `/advisor` | 7 | O professor conselheiro: alunos e inscricoes das proprias turmas. |
 | `authentication/` | `/authentication` | 3 | Entrar, sair, renovar. Nao ha auto-cadastro: toda conta nasce no painel. |
 | `representative/` | `/representative` | 2 | O aluno representante: a lista de atletas da propria turma. |
 | `storages/` | `/storages` | 7 | Arquivos. Upload em tres passos, com o binario indo direto para o bucket. |
 | `storefront/` | `/storefront` | 5 | O site publico. Leitura anonima, nenhuma escrita. |
 
-55 controllers, 55 operacoes no `openapi.json`. A contagem sai do documento
+56 controllers, 56 operacoes no `openapi.json`. A contagem sai do documento
 gerado, e nao desta tabela: se as duas divergirem, a tabela e que envelheceu.
 
 ## Recursos por modulo
@@ -42,6 +42,9 @@ tem dependencia ou estado e service, nao entra aqui - o criterio esta na secao
 
 - `_shared.tournament.ts` — sorteio, folgas e avanco do vencedor no mata-mata.
   Coberto por `tests/functional/torneio.spec.ts`, sem banco.
+- `_shared.database.ts` — `isUniqueViolation`: o `23505` do Postgres vira 409 no
+  caso de uso, e não 500, quando dois pedidos simultâneos passam pela checagem
+  de duplicado.
 
 ## O que nao existe aqui
 
