@@ -1,0 +1,80 @@
+name: Build Frontend
+
+# Reusable: quem chama é o `main.yml`, no push para `main`. O gatilho de push
+# direto que este arquivo tinha existia enquanto a cadeia de deploy não existia
+# neste projeto; agora ela existe, e dois gatilhos para o mesmo build rodariam o
+# mesmo trabalho duas vezes.
+on:
+  workflow_call:
+
+jobs:
+  build:
+    name: Compile & Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11.21.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      # O carimbo da revisão: vira `https://interclass.maiyu.com.br/revision.txt`
+      # e é o que o smoke test do deploy confere. Antes do build e em `public/`:
+      # o Nitro serve `public/` por um manifesto congelado no build, e arquivo
+      # escrito depois cai no catch-all de SSR (200 com HTML). Lição do
+      # maiyu.com.br.
+      - name: Carimba a revisão antes do build
+        run: echo "${{ github.sha }}" > frontend/public/revision.txt
+
+      - name: Build
+        working-directory: ./frontend
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+        run: pnpm build
+
+      - name: O carimbo entrou no manifesto do Nitro
+        working-directory: ./frontend
+        run: |
+          set -euo pipefail
+          if ! grep -q '"/revision.txt"' .output/server/index.mjs; then
+            echo 'revision.txt não está no manifesto de assets do Nitro.'
+            echo 'O carimbo precisa ser escrito ANTES do build, em public/.'
+            exit 1
+          fi
+
+      # Sobe antes da conferência, e não depois: quando o guarda abaixo reprova,
+      # o `.output/` é justamente o que se precisa abrir para achar a leitura
+      # culpada. Reprovar sem artifact deixa a investigação sem material.
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frontend-build
+          retention-days: 1
+          include-hidden-files: true
+          path: |
+            frontend/.output/
+
+      # O job falha aqui, então o artifact existe mas nenhuma imagem sai dele:
+      # `docker-frontend` depende deste job, e não do artifact.
+      #
+      # O que se recusa não é o ciclo — o router do TanStack sai em dois chunks
+      # que se reexportam, e isso é inerte —, é a **leitura antecipada** de um
+      # binding que vem de um chunk em ciclo. Essa passa o build verde e só
+      # quebra no primeiro SSR em produção.
+      - name: Check chunk cycles
+        working-directory: ./frontend
+        run: pnpm check-cycles

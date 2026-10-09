@@ -1,0 +1,17 @@
+# O build roda dentro da imagem, então aqui só se exclui o que atrapalha: árvore
+# de dependência da máquina local (arquitetura errada), saída de build anterior e
+# segredo.
+node_modules
+build
+
+.git
+.github
+
+.env
+.env.*
+
+tmp
+*.md
+.vscode
+.idea
+.DS_Store

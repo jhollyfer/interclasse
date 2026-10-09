@@ -1,0 +1,7 @@
+.adonisjs
+node_modules
+build
+
+# Autogerado por `node ace migration:run` e marcado "DO NOT EDIT manually".
+# Formatá-lo cria um diff que a próxima migration desfaz.
+database/schema.ts

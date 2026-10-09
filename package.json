@@ -1,0 +1,14 @@
+{
+  "name": "interclasse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Jogos Estudantis do CMEI Cosme Jean: turmas, inscrições, sorteio, placar e classificação",
+  "license": "ISC",
+  "scripts": {
+    "dev:backend": "pnpm --dir backend dev",
+    "dev:frontend": "pnpm --dir frontend dev"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

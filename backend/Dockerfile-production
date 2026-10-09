@@ -1,0 +1,81 @@
+# Imagem de produção da API.
+#
+# Multi-stage, e o build acontece aqui dentro - não no runner de CI. O motivo é
+# a imagem ser multi-arquitetura (amd64 e arm64) e o projeto ter dependência com
+# binário nativo (`@swc/core`): um `node_modules` compilado no runner amd64 não
+# roda na variante arm64. Compilando por estágio, cada arquitetura instala o
+# binário dela.
+
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@11.21.0 --activate
+
+# `pnpm-workspace.yaml` entra junto do manifesto: é ele que carrega o
+# `allowBuilds`, e sem ele o install decide sozinho o que compila - ou recusa o
+# install e para o build.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+# `node ace build` boota a aplicação (`bin/console.ts` importa `#start/env` no
+# `app.booting`), então a validação de `start/env.ts` roda durante o build.
+# Estes valores existem só para satisfazer o schema: nenhum deles sobrevive ao
+# estágio, e em produção quem injeta as variáveis reais é a plataforma.
+ENV NODE_ENV=development \
+    PORT=3333 \
+    HOST=0.0.0.0 \
+    LOG_LEVEL=info \
+    APP_SERVER_URL=http://localhost:3333 \
+    SESSION_DRIVER=cookie \
+    DATABASE_URL=postgres://build:build@localhost:5432/build \
+    UPLOAD_MAX_SIZE=209715200
+
+# APP_KEY fica na linha do comando, e não em ENV: em ENV ela viraria metadado da
+# imagem, e o próprio buildkit avisa. Placeholder também não precisa sobreviver
+# ao comando que o exige.
+RUN APP_KEY=build-time-placeholder-nao-usada-em-runtime node ace build
+
+# O assembler escreve `package.json` e lockfile próprios dentro de `build/`. O
+# install de produção roda lá, e não aqui: é o que separa a árvore que vai para
+# a imagem final da árvore com assembler, eslint e typescript.
+#
+# O `pnpm-workspace.yaml` é copiado para dentro de `build/` por dois motivos, e
+# os dois quebram o build sem ele. Primeiro: sendo `build/` a raiz de workspace
+# mais próxima, o install cria `build/node_modules` - sem isso o pnpm sobe até
+# /app, instala lá, e a imagem final sai sem node_modules nenhum. Segundo: é
+# esse arquivo que carrega o `allowBuilds`, e sem a política o pnpm interrompe o
+# install para perguntar sobre o script de build do `better-sqlite3`.
+RUN cp pnpm-workspace.yaml build/ && cd build && pnpm install --prod --frozen-lockfile
+
+
+FROM node:24-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache curl
+
+# `build/` já traz `bin/`, `config/`, `database/`, `node_modules/` e o
+# `openapi.json` declarado em `metaFiles` - a rota `GET /openapi.json` lê esse
+# arquivo do disco.
+COPY --from=builder --chown=node:node /app/build ./
+
+# A imagem `node` já traz o usuário `node` (uid 1000). Não há diretório de
+# upload para ajustar permissão: todo arquivo vai para o bucket S3-compatível.
+USER node
+
+EXPOSE 3333
+
+ENV NODE_ENV=production \
+    PORT=3333 \
+    HOST=0.0.0.0
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:3333/health || exit 1
+
+# Sem ENTRYPOINT: migration não roda no start do container. Quem migra é o
+# comando de pré-deploy da plataforma (`node ace migration:run --force`), para
+# que subir uma réplica não seja o mesmo evento que alterar o schema.
+CMD ["node", "bin/server.js"]

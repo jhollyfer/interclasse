@@ -1,0 +1,27 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# curl para healthcheck
+RUN apk add --no-cache curl
+
+# Copia .output pronto (vem do artifact)
+COPY .output/ ./.output/
+
+# Usuario nao-root
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nitro && \
+    chown -R nitro:nodejs /app/.output
+
+USER nitro
+
+# O `curl` instalado lá em cima existia sem consumidor. O orquestrador precisa
+# saber se o Nitro subiu, e não só se o processo está de pé: um SSR que morreu
+# no boot deixa o container vivo e a página em branco.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:3000/ || exit 1
+
+EXPOSE 3000
+ENV PORT=3000
+
+CMD ["node", ".output/server/index.mjs"]

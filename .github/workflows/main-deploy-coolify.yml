@@ -1,0 +1,100 @@
+name: Deploy to Coolify
+
+on:
+  workflow_call:
+    secrets:
+      COOLIFY_TOKEN:
+        required: true
+
+# Os valores que mudam de projeto para projeto, num lugar só.
+#
+# Os uuids são das APLICAÇÕES no Coolify, e não da instância nem do projeto:
+# estão na URL do painel, em `/project/<projeto>/application/<UUID>`. Ficam em
+# variáveis do repositório (Settings > Secrets and variables > Actions >
+# Variables), `COOLIFY_UUID_API` e `COOLIFY_UUID_APP`, porque as aplicações
+# ainda não existiam quando este arquivo foi escrito. Ausentes, o job reprova
+# dizendo isso - e não implanta o projeto errado.
+env:
+  COOLIFY_URL: https://coolify.maiyu.com.br
+  UUID_API: ${{ vars.COOLIFY_UUID_API }}
+  UUID_APP: ${{ vars.COOLIFY_UUID_APP }}
+  URL_API: https://api-interclass.maiyu.com.br
+  URL_APP: https://interclass.maiyu.com.br
+
+jobs:
+  deploy:
+    name: Trigger Coolify Deploy
+    runs-on: ubuntu-latest
+    steps:
+      # `-f` reprova quando o Coolify responde erro; sem ele o curl sai 0 em
+      # 401 ou 404. POST, e não GET: desde o Coolify v4.2 o GET responde 405.
+      #
+      # E o código HTTP sozinho não basta: uuid que não casa com aplicação
+      # visível ao token volta **200 com a lista vazia**. Por isso o corpo é
+      # lido e cobrado.
+      - name: Dispara o deploy no Coolify
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${UUID_API}" ] || [ -z "${UUID_APP}" ]; then
+            echo "Faltam as variáveis COOLIFY_UUID_API e/ou COOLIFY_UUID_APP no repositório."
+            exit 1
+          fi
+
+          disparar() {
+            rotulo="$1"
+            uuid="$2"
+
+            resposta=$(curl -fsS -X POST \
+              "${COOLIFY_URL}/api/v1/deploy" \
+              -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"uuid\":\"${uuid}\",\"force\":false}")
+
+            echo "${rotulo}: ${resposta}"
+
+            if ! printf '%s' "${resposta}" | grep -q 'deployment_uuid'; then
+              echo "O Coolify aceitou o pedido de ${rotulo} e não enfileirou implantação nenhuma."
+              exit 1
+            fi
+          }
+
+          disparar "API" "${UUID_API}"
+          disparar "App" "${UUID_APP}"
+
+      # O disparo é assíncrono. A API é cobrada pela vitalidade (`/health`, o
+      # mesmo do HEALTHCHECK); o App pela REVISÃO, porque o container antigo
+      # também responde 200 e o job fecharia verde contra a versão velha.
+      # A revisão é conferida pelo corpo: o Nitro responde 200 com HTML para
+      # arquivo ausente.
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+
+          for tentativa in $(seq 1 20); do
+            if curl -fsS --max-time 10 "${URL_API}/health" > /dev/null; then
+              echo "API respondeu na tentativa ${tentativa}."
+              break
+            fi
+            if [ "${tentativa}" = 20 ]; then
+              echo "A API não respondeu em cinco minutos."
+              exit 1
+            fi
+            echo "API ainda subindo (tentativa ${tentativa})..."
+            sleep 15
+          done
+
+          for tentativa in $(seq 1 20); do
+            corpo=$(curl -sS --max-time 10 "${URL_APP}/revision.txt" | tr -d '\000' || true)
+            if printf '%s' "${corpo}" | grep -q "${GITHUB_SHA}"; then
+              echo "App na revisão ${GITHUB_SHA} (tentativa ${tentativa})."
+              exit 0
+            fi
+            echo "App ainda sem a revisão (tentativa ${tentativa}): $(printf '%s' "${corpo}" | head -c 80)"
+            sleep 15
+          done
+
+          echo "O App não chegou na revisão ${GITHUB_SHA} em cinco minutos."
+          exit 1

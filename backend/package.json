@@ -1,0 +1,98 @@
+{
+  "name": "backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    "./data": "./.adonisjs/client/data.d.ts",
+    "./registry": "./.adonisjs/client/registry/index.ts"
+  },
+  "scripts": {
+    "start": "node bin/server.js",
+    "build": "node ace build",
+    "dev": "node ace serve --hmr",
+    "test": "node ace test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "openapi:check": "node ace openapi:generate --check --strict",
+    "check": "pnpm lint && pnpm typecheck && pnpm openapi:check && pnpm pattern:check && pnpm sync:check && pnpm authz:check",
+    "prepare": "cd .. && husky backend/.husky || true",
+    "sync:check": "node --import @poppinss/ts-exec scripts/sync-check.ts",
+    "pattern:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts",
+    "authz:check": "node --import @poppinss/ts-exec scripts/authz-check.ts",
+    "di:check": "node ace di:check"
+  },
+  "imports": {
+    "#features/*": "./app/features/*.js",
+    "#core/*": "./app/core/*.js",
+    "#exceptions/*": "./app/exceptions/*.js",
+    "#models/*": "./app/models/*.js",
+    "#policies/*": "./app/policies/*.js",
+    "#services/*": "./app/services/*.js",
+    "#generated/*": "./.adonisjs/server/*.js",
+    "#middleware/*": "./app/middleware/*.js",
+    "#guards/*": "./app/guards/*.js",
+    "#providers/*": "./providers/*.js",
+    "#database/*": "./database/*.js",
+    "#tests/*": "./tests/*.js",
+    "#start/*": "./start/*.js",
+    "#config/*": "./config/*.js"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^8.5.1",
+    "@adonisjs/eslint-config": "^3.1.0",
+    "@adonisjs/prettier-config": "^1.5.0",
+    "@adonisjs/tsconfig": "^2.0.0",
+    "@japa/api-client": "^3.2.1",
+    "@japa/assert": "^4.2.0",
+    "@japa/plugin-adonisjs": "^5.2.0",
+    "@japa/runner": "^5.3.0",
+    "@poppinss/ts-exec": "^1.4.4",
+    "@types/json-schema": "^7.0.15",
+    "@types/luxon": "^3.7.5",
+    "@types/node": "~26.4.1",
+    "eslint": "^10.10.0",
+    "hot-hook": "^1.0.0",
+    "husky": "^9.1.7",
+    "pino-pretty": "^13.1.3",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "youch": "^4.1.1"
+  },
+  "dependencies": {
+    "@adonisjs/auth": "^10.1.0",
+    "@adonisjs/core": "^7.5.0",
+    "@adonisjs/cors": "^3.0.0",
+    "@adonisjs/drive": "^4.0.0",
+    "@adonisjs/limiter": "^3.0.1",
+    "@adonisjs/lucid": "^22.4.2",
+    "@adonisjs/session": "^8.1.0",
+    "@adonisjs/shield": "^9.0.0",
+    "@aws-sdk/client-s3": "^3.1127.0",
+    "@aws-sdk/s3-request-presigner": "^3.1127.0",
+    "@tuyau/core": "^1.2.2",
+    "@vinejs/vine": "^4.4.0",
+    "luxon": "^3.7.2",
+    "pg": "^8.23.0",
+    "reflect-metadata": "^0.2.2"
+  },
+  "hotHook": {
+    "boundaries": [
+      "./app/features/**/*.controller.ts",
+      "./app/middleware/*.ts"
+    ]
+  },
+  "allowScripts": {
+    "@swc/core": true,
+    "better-sqlite3": true,
+    "esbuild": true,
+    "fsevents": true
+  },
+  "prettier": "@adonisjs/prettier-config"
+}

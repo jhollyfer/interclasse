@@ -1,0 +1,38 @@
+name: Build, Docker and Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-backend:
+    uses: ./.github/workflows/main-check-backend.yml
+
+  build-frontend:
+    uses: ./.github/workflows/main-build-frontend.yml
+
+  docker-backend:
+    needs: check-backend
+    uses: ./.github/workflows/main-docker-backend.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  docker-frontend:
+    needs: build-frontend
+    uses: ./.github/workflows/main-docker-frontend.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  # Depois das duas imagens no Docker Hub, e não antes: implantar o frontend
+  # contra uma API que falhou o build é publicar meia versão.
+  deploy-to-coolify:
+    needs: [docker-backend, docker-frontend]
+    uses: ./.github/workflows/main-deploy-coolify.yml
+    secrets:
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}

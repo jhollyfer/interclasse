@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Mesma definição que o push em main usa, para o PR não passar por uma régua
+  # diferente da do deploy.
+  backend-check:
+    uses: ./.github/workflows/main-check-backend.yml
+
+  frontend-lint-build:
+    name: Frontend - Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11.21.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        working-directory: ./frontend
+        run: pnpm lint
+
+      # `pnpm build` é transpile-only: apaga tipo sem checar nada. Sem este
+      # passo, nenhum erro de tipo reprova PR.
+      - name: Typecheck
+        working-directory: ./frontend
+        run: pnpm typecheck
+
+      - name: Test
+        working-directory: ./frontend
+        run: pnpm test
+
+      - name: Build
+        working-directory: ./frontend
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+        run: pnpm build

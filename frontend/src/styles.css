@@ -1,0 +1,422 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow-condensed/700-italic.css';
+@import '@fontsource/barlow-condensed/800-italic.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ============================================================================
+ * PALETA DOS JOGOS
+ * ============================================================================
+ *
+ * Vem do site anterior (`site-jogos-estudantis/codigo-fonte/base.html`): o verde
+ * da quadra, o verde-noite do cabeçalho e o amarelo do placar.
+ *
+ *   --brand      o amarelo do placar e dos destaques
+ *   --brand-ink  o verde-noite do cabeçalho e do rodapé
+ *
+ * O amarelo é cor de ACENTO: anel de foco, item ativo, placar. A ação primária
+ * é o verde da quadra.
+ * ============================================================================
+ */
+
+:root {
+  --brand: #ffd400;
+  --brand-ink: #04260f;
+  /* #12873a do site antigo dava 4,4:1 sobre o fundo claro; este é o mesmo
+     verde um tom abaixo, e passa de 4,5:1 para texto. */
+  --field: #0f7a34;
+
+  --background: #f6fbf7;
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  /* O escuro institucional, e não o âmbar: botão, link ativo e checkbox marcado
+     herdam daqui, e são o que mais se repete numa tela de catálogo. */
+  --primary: var(--field);
+  --primary-foreground: oklch(0.985 0.003 85);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --accent: var(--brand);
+  --accent-foreground: var(--brand-ink);
+  /* Um tom abaixo do vermelho do shadcn: o botão de excluir é texto vermelho
+     sobre fundo vermelho a 10%, e o original dava 3,8:1. */
+  --destructive: oklch(0.5 0.21 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --ring: var(--brand);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.982 0.004 85);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-ink);
+  --sidebar-accent: var(--brand);
+  --sidebar-accent-foreground: var(--brand-ink);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: var(--brand);
+
+  /*
+   * A escala semântica de badge: cor por **significado**, não por estética.
+   *
+   * Cada par é fundo pálido com tinta escura do mesmo matiz, calibrado para
+   * texto pequeno - o que um `bg-success/10 text-success` não garante, porque
+   * ali a tinta é a mesma cor cheia do fundo e o contraste vira acaso. Como par
+   * nomeado, os dois lados andam juntos e o `Badge` só recebe um nome de
+   * variante.
+   *
+   * `bg-badge-*-foreground` também é a bolinha sólida do formulário
+   * (`*_DOTS` em `lib/labels.ts`): o fundo pálido em 8px não se enxerga.
+   */
+  --badge-neutral: oklch(0.95 0.008 150);
+  --badge-neutral-fg: oklch(0.4 0.02 150);
+  --badge-info: oklch(0.94 0.04 235);
+  --badge-info-fg: oklch(0.42 0.1 245);
+  --badge-success: oklch(0.94 0.05 165);
+  --badge-success-fg: oklch(0.4 0.1 168);
+  --badge-warning: oklch(0.94 0.06 95);
+  --badge-warning-fg: oklch(0.4 0.09 95);
+
+  /*
+   * Os tokens de acabamento.
+   *
+   * `--surface-warm` é o creme de um degrau abaixo do branco, para separar um
+   * bloco do fundo sem desenhar borda; `--surface-elevated` é o branco do card.
+   *
+   * As sombras se chamam `--elevation-*` aqui e viram `--shadow-card*` dentro
+   * do `@theme inline`. O desvio de nome não é enfeite: o Tailwind gera o
+   * utilitário a partir da chave do tema, e um token de `:root` chamado
+   * `--shadow-card` colidiria com a variável que o próprio `@theme` declara.
+   * Cada uma das três soma um anel de 1px à sombra, que é o que dá contorno ao
+   * card sem uma segunda borda.
+   */
+  --surface-warm: oklch(0.98 0.005 60);
+  --surface-elevated: oklch(1 0 0);
+  --elevation-card:
+    0 1px 4px oklch(0 0 0 / 0.04), 0 0 0 1px oklch(0 0 0 / 0.02);
+  --elevation-card-hover:
+    0 4px 20px oklch(0 0 0 / 0.06), 0 0 0 1px oklch(0 0 0 / 0.03);
+  --elevation-card-elevated:
+    0 8px 32px oklch(0 0 0 / 0.08), 0 0 0 1px oklch(0 0 0 / 0.04);
+
+  /* O respiro entre seções da vitrine, em `clamp` porque é a única medida que
+     atravessa do celular ao desktop sem virar dois valores. */
+  --space-section: clamp(5rem, 8vw, 8rem);
+
+  /*
+   * Curvas e tracking, consumidos por `var()` dentro de componente - não viram
+   * utilitário. `ease-out-expo` e `ease-out-quart` já são os nomes que o
+   * frontend anterior usava, e `--heading-tight`/`--heading-tighter` são o
+   * tracking negativo dos dois degraus de título: corpo grande com tracking
+   * neutro parece texto esticado.
+   */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.32, 0.72, 0, 1);
+  --heading-tight: -0.025em;
+  --heading-tighter: -0.04em;
+}
+
+.dark {
+  /* O amarelo do placar segura o contraste nos dois temas; o verde-noite também. */
+  --background: #08150d;
+
+  --foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  /* A inversão de papel: no escuro a ação primária é a superfície clara, com o
+     texto escuro por cima. O escuro institucional aqui sumiria no fundo. */
+  --primary: #3fb866;
+  --primary-foreground: #04260f;
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --accent: var(--brand);
+  --accent-foreground: var(--brand-ink);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.145 0 0);
+  --ring: var(--brand);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.16 0.008 60);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-ink);
+  --sidebar-accent: var(--brand);
+  --sidebar-accent-foreground: var(--brand-ink);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: var(--brand);
+
+  /* No escuro o par inverte a luminosidade e mantém o matiz: fundo escuro
+     saturado com tinta clara do mesmo tom. */
+  --badge-neutral: oklch(0.28 0.014 150);
+  --badge-neutral-fg: oklch(0.85 0.02 150);
+  --badge-info: oklch(0.28 0.05 235);
+  --badge-info-fg: oklch(0.85 0.09 240);
+  --badge-success: oklch(0.28 0.06 165);
+  --badge-success-fg: oklch(0.85 0.11 168);
+  --badge-warning: oklch(0.28 0.06 95);
+  --badge-warning-fg: oklch(0.85 0.11 95);
+
+  /* No escuro a profundidade não vem da sombra, que quase não aparece: vem do
+     anel claro de 1px que cada uma das três carrega. */
+  --surface-warm: oklch(0.16 0.005 60);
+  --surface-elevated: oklch(0.205 0 0);
+  --elevation-card: 0 1px 4px oklch(0 0 0 / 0.2), 0 0 0 1px oklch(1 0 0 / 0.04);
+  --elevation-card-hover:
+    0 4px 20px oklch(0 0 0 / 0.3), 0 0 0 1px oklch(1 0 0 / 0.06);
+  --elevation-card-elevated:
+    0 8px 32px oklch(0 0 0 / 0.4), 0 0 0 1px oklch(1 0 0 / 0.06);
+}
+
+@theme inline {
+  --font-sans: 'Barlow', system-ui, sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow', sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* A marca com nome de cor, para `text-brand`, `bg-brand` e `border-brand`
+     existirem sem ninguém precisar escrever a literal de novo. */
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+
+  --color-badge-neutral: var(--badge-neutral);
+  --color-badge-neutral-foreground: var(--badge-neutral-fg);
+  --color-badge-info: var(--badge-info);
+  --color-badge-info-foreground: var(--badge-info-fg);
+  --color-badge-success: var(--badge-success);
+  --color-badge-success-foreground: var(--badge-success-fg);
+  --color-badge-warning: var(--badge-warning);
+  --color-badge-warning-foreground: var(--badge-warning-fg);
+
+  --color-surface-warm: var(--surface-warm);
+  --color-surface-elevated: var(--surface-elevated);
+
+  --shadow-card: var(--elevation-card);
+  --shadow-card-hover: var(--elevation-card-hover);
+  --shadow-card-elevated: var(--elevation-card-elevated);
+
+  /* Vira `p-section`, `py-section`, `gap-section` - o espaçamento entre blocos
+     de uma página da vitrine. */
+  --spacing-section: var(--space-section);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply scroll-smooth;
+    font-feature-settings: 'ss01', 'cv01', 'cv11';
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+   * A barra de rolagem de 4px.
+   *
+   * Só o WebKit/Blink a atende, e é de propósito que não há um
+   * `scrollbar-width: thin` ao lado: o padrão do Firefox já é discreto, e os
+   * dois juntos davam espessuras visivelmente diferentes na mesma tela. Quando
+   * a barra some, a régua continua sendo a borda do painel.
+   */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+/*
+ * O brilho que atravessa um esqueleto de carregamento.
+ *
+ * Fica fora do `@theme` porque é animação de superfície, não token: quem a usa
+ * é a casca cinza que espera a listagem chegar, e ela precisa da faixa clara
+ * viajando por cima - `background-size: 200%` com a posição indo de -200% a
+ * 200% é o que faz a faixa cruzar a peça inteira.
+ */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.95 0.005 60 / 0) 0%,
+    oklch(0.95 0.005 60 / 0.4) 50%,
+    oklch(0.95 0.005 60 / 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* No escuro a faixa é mais escura que o claro e menos opaca: sobre o cinza do
+   esqueleto escuro, a faixa clara do tema claro vira um flash. */
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.3 0.005 60 / 0) 0%,
+    oklch(0.3 0.005 60 / 0.3) 50%,
+    oklch(0.3 0.005 60 / 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/*
+ * Movimento reduzido, para o app inteiro.
+ *
+ * O que se escreve à mão pode guardar o movimento uma classe por vez, com
+ * `motion-reduce:`. Os componentes de `components/ui/` não: são arquivos
+ * gerados pelo shadcn, somam dezenas de animações - dialog, sheet, dropdown,
+ * accordion, tooltip, popover - e anotar cada uma os tiraria do caminho do
+ * `shadcn diff`, que é como eles se atualizam. Uma regra alcança todos e também
+ * o próximo componente que for gerado. Alcança o `.animate-shimmer` acima
+ * junto.
+ *
+ * `0.01ms` e **não** `0s`: o Base UI desmonta o popup quando a transição de
+ * saída termina, e escuta `transitionend` para saber disso. Duração zero em
+ * alguns navegadores não dispara o evento, e o popup ficaria montado para
+ * sempre - invisível, capturando clique. Um centésimo de milissegundo é
+ * imperceptível e ainda é uma transição que acaba.
+ *
+ * `!important` porque o que se sobrescreve aqui é utilitário do Tailwind com a
+ * mesma especificidade, e a preferência do sistema tem de ganhar de todos.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * ============================================================================
+ * PEÇAS DO SITE PÚBLICO
+ * ============================================================================
+ *
+ * As três marcas do site anterior que não são utilitário do Tailwind: o placar
+ * (caixa preta, dígitos amarelos), o herói verde e o botão inclinado.
+ */
+@layer components {
+  .scoreboard {
+    @apply bg-brand-ink font-display text-brand font-extrabold italic;
+  }
+
+  .hero {
+    background:
+      radial-gradient(
+        circle at 80% 20%,
+        rgb(255 212 0 / 0.18),
+        transparent 40%
+      ),
+      linear-gradient(135deg, var(--field), var(--brand-ink));
+  }
+
+  /*
+   * A faixa de resultados. Rola sozinha só para quem não pediu movimento
+   * reduzido; para os demais é uma faixa com rolagem lateral comum.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .ticker {
+      overflow: hidden;
+    }
+
+    .ticker-track {
+      animation: ticker 40s linear infinite;
+    }
+
+    .ticker:hover .ticker-track {
+      animation-play-state: paused;
+    }
+  }
+
+  .skew-button {
+    @apply font-display inline-flex -skew-x-10 items-center rounded-md px-5 py-2 text-lg font-extrabold uppercase italic transition-opacity hover:opacity-90 motion-reduce:transition-none;
+  }
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}

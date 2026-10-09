@@ -1,0 +1,95 @@
+import type * as React from 'react'
+import { createLazyFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { TrophyIcon } from '@phosphor-icons/react'
+
+import { Section } from '../-components/section'
+import { formatWhen } from '../-components/match-row'
+import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries'
+import type { BracketMatch } from '#/integrations/response'
+import { MatchStatuses } from '#/lib/entity'
+import { CATEGORY_LABELS, MATCH_PHASE_LABELS, championName } from '#/lib/labels'
+
+export const Route = createLazyFileRoute('/_public/classificacao/$id')({
+  component: Bracket,
+})
+
+/** Uma linha de jogo da chave: os dois times, o vencedor em destaque. */
+function Row({ match }: { match: BracketMatch }): React.JSX.Element {
+  const finished = match.status === MatchStatuses.FINISHED
+  const loser = 'text-muted-foreground'
+  let homeClass = ''
+  let awayClass = ''
+  if (finished && match.winnerTeamId === match.homeTeamId) awayClass = loser
+  if (finished && match.winnerTeamId === match.awayTeamId) homeClass = loser
+
+  return (
+    <li className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-2">
+      <span className={`truncate text-right font-medium ${homeClass}`}>
+        {match.homeName ?? 'A definir'}
+      </span>
+      {/* A caixa de placar é só para resultado: com a data dentro, jogo por
+          disputar parecia jogo encerrado. */}
+      {finished && (
+        <span className="scoreboard rounded px-2 py-0.5 text-sm tabular-nums">
+          {match.homeScore} x {match.awayScore}
+        </span>
+      )}
+      {!finished && (
+        <span className="text-muted-foreground text-center text-xs">
+          {formatWhen(match.scheduledAt)}
+        </span>
+      )}
+      <span className={`truncate font-medium ${awayClass}`}>
+        {match.awayName ?? 'A definir'}
+      </span>
+    </li>
+  )
+}
+
+function Bracket(): React.JSX.Element {
+  const { id } = Route.useParams()
+  const { data: bracket } = useSuspenseQuery(storefrontBracketQueryOptions(id))
+
+  const champion = championName(bracket)
+  const ordered = [...bracket.matches].sort(
+    (a, b) => a.round - b.round || a.position - b.position,
+  )
+  const phases = [...new Set(ordered.map((match) => match.phase))]
+
+  return (
+    <Section
+      as="h1"
+      title={`${bracket.sport.name} · ${CATEGORY_LABELS[bracket.category]}`}
+    >
+      {champion && (
+        <p className="bg-accent text-accent-foreground flex items-center gap-3 rounded-lg p-4 text-lg font-extrabold uppercase italic">
+          <TrophyIcon className="size-7" weight="fill" />
+          Campeã: {champion}
+        </p>
+      )}
+
+      <p className="text-muted-foreground text-sm">
+        Mata-mata: quem vence avança, quem perde está fora. Empate se decide nos
+        pênaltis.
+      </p>
+
+      <div className="grid gap-4 md:grid-cols-[repeat(auto-fit,minmax(16rem,1fr))]">
+        {phases.map((phase) => (
+          <div key={phase} className="bg-card rounded-lg border p-4">
+            <h2 className="font-display mb-2 text-xl font-extrabold uppercase italic">
+              {MATCH_PHASE_LABELS[phase]}
+            </h2>
+            <ul className="divide-y text-sm">
+              {ordered
+                .filter((match) => match.phase === phase)
+                .map((match) => (
+                  <Row key={match.id} match={match} />
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}

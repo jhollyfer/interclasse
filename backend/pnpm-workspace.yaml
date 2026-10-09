@@ -1,0 +1,10 @@
+# Scripts de build de dependência rodam só quando listados aqui: o pnpm 11 não
+# executa nenhum por padrão e interrompe o install enquanto a decisão não for
+# tomada explicitamente.
+allowBuilds:
+  # Compila binding nativo; sem o build o @adonisjs/assembler cai no fallback e
+  # o HMR fica visivelmente mais lento.
+  '@swc/core': true
+  # Não é usado: a conexão é PostgreSQL (T6). Compilar o binding do SQLite seria
+  # minutos de build a cada install para um driver que ninguém abre.
+  better-sqlite3: false

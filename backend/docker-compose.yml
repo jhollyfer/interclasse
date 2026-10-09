@@ -1,0 +1,91 @@
+name: interclasse-backend
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: interclasse-backend-database
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_PASSWORD: interclasse
+      POSTGRES_DB: interclasse
+      POSTGRES_USER: interclasse
+    # 5434 no host por default, e não 5432: os backends irmãos
+    # roda nesta mesma máquina e ocupa a porta padrão. Porta própria deixa os
+    # dois projetos convivendo sem ninguém ter de derrubar o container do outro
+    # . Dentro da rede do compose o Postgres segue em 5432.
+    ports:
+      - "${DB_PORT:-5434}:5432"
+    volumes:
+      - interclasse-backend-database-volume:/var/lib/postgresql/data
+    # networks:
+    #   - interclasse-backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interclasse -d interclasse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Bucket S3-compatível para desenvolvimento e testes. `pgsty/*` é o fork
+  # comunitário do MinIO: as imagens `minio/minio` e `minio/mc` saíram do Docker
+  # Hub, e o comportamento de API (multipart, URL assinada) é o mesmo. Existe porque o upload
+  # passou a ser presigned multipart, e multipart é uma API do S3 que o disco
+  # `local` (driver `fs`) não tem. Sem isto, dev exercitaria um caminho de
+  # código que produção não usa - que é justamente o que RNF-20 quer evitar.
+  storage:
+    image: pgsty/minio:latest
+    container_name: interclasse-backend-storage
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_KEY:-interclasse}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET:-interclasse-secret}
+      # O navegador envia cada parte direto para cá: sem CORS liberado, o
+      # preflight do PUT morre antes de qualquer byte sair.
+      MINIO_API_CORS_ALLOW_ORIGIN: ${STORAGE_CORS_ORIGIN:-*}
+    # 9004/9005 por default, pelo mesmo motivo do 5434 acima . Console
+    # em http://localhost:9005.
+    ports:
+      - "${STORAGE_PORT:-9004}:9000"
+      - "${STORAGE_CONSOLE_PORT:-9005}:9001"
+    volumes:
+      - interclasse-backend-storage-volume:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Cria os dois buckets (dev e teste, separados pelo mesmo motivo do
+  # DATABASE_URL) e libera leitura anônima: a `url` de um anexo é pública
+  # (RF-63) porque a vitrine é pública (RF-35). Roda uma vez e sai.
+  storage-bootstrap:
+    image: pgsty/mc:latest
+    container_name: interclasse-backend-storage-bootstrap
+    depends_on:
+      storage:
+        condition: service_healthy
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        mc alias set target http://storage:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        for bucket in "$${STORAGE_BUCKET}" "$${STORAGE_BUCKET}-test"; do
+          mc mb --ignore-existing "target/$${bucket}"
+          mc anonymous set none "target/$${bucket}"
+        done
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_KEY:-interclasse}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET:-interclasse-secret}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-interclasse}
+
+# networks:
+#   interclasse-backend-network:
+#     driver: bridge
+
+volumes:
+  interclasse-backend-database-volume:
+    driver: local
+  interclasse-backend-storage-volume:
+    driver: local

@@ -1,0 +1,28 @@
+import { inject } from '@adonisjs/core'
+import { HttpContext } from '@adonisjs/core/http'
+import { defineDocs } from '#core/openapi/types'
+import AdministratorAnnouncementPaginateUseCase from './paginate.use-case.ts'
+import {
+  ANNOUNCEMENT_SORT_COLUMNS,
+  AdministratorAnnouncementPaginationValidator,
+} from '#core/validator'
+
+@inject()
+export default class AdministratorAnnouncementPaginateController {
+  static docs = defineDocs({
+    description:
+      `\`?sort\` aceita ${ANNOUNCEMENT_SORT_COLUMNS.join(', ')}. ` +
+      'Padrão: fixados primeiro, depois do mais novo ao mais antigo.',
+  })
+
+  constructor(private readonly useCase: AdministratorAnnouncementPaginateUseCase) {}
+
+  async handle(context: HttpContext) {
+    const payload = await AdministratorAnnouncementPaginationValidator.validate(
+      context.request.qs()
+    )
+    const result = await this.useCase.execute(payload)
+    if (result.isLeft()) throw result.value
+    return context.response.ok(result.value)
+  }
+}

@@ -1,0 +1,138 @@
+import { indexEntities } from '@adonisjs/core'
+import { defineConfig } from '@adonisjs/core/app'
+import { generateRegistry } from '@tuyau/core/hooks'
+
+export default defineConfig({
+  /*
+  |--------------------------------------------------------------------------
+  | Experimental flags
+  |--------------------------------------------------------------------------
+  |
+  | The following features will be enabled by default in the next major release
+  | of AdonisJS. You can opt into them today to avoid any breaking changes
+  | during upgrade.
+  |
+  */
+  experimental: {},
+
+  /*
+  |--------------------------------------------------------------------------
+  | Commands
+  |--------------------------------------------------------------------------
+  |
+  | List of ace commands to register from packages. The application commands
+  | will be scanned automatically from the "./commands" directory.
+  |
+  */
+  commands: [
+    () => import('@adonisjs/core/commands'),
+    () => import('@adonisjs/lucid/commands'),
+    () => import('@adonisjs/session/commands'),
+  ],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Service providers
+  |--------------------------------------------------------------------------
+  |
+  | List of service providers to import and register when booting the
+  | application
+  |
+  */
+  providers: [
+    () => import('@adonisjs/core/providers/app_provider'),
+    () => import('@adonisjs/core/providers/hash_provider'),
+    {
+      file: () => import('@adonisjs/core/providers/repl_provider'),
+      environment: ['repl', 'test'],
+    },
+    () => import('@adonisjs/core/providers/vinejs_provider'),
+    () => import('@adonisjs/session/session_provider'),
+    () => import('@adonisjs/shield/shield_provider'),
+    () => import('@adonisjs/lucid/database_provider'),
+    () => import('@adonisjs/cors/cors_provider'),
+    () => import('@adonisjs/auth/auth_provider'),
+    () => import('@adonisjs/drive/drive_provider'),
+    () => import('@adonisjs/limiter/limiter_provider'),
+    () => import('#providers/storage_provider'),
+  ],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Preloads
+  |--------------------------------------------------------------------------
+  |
+  | List of modules to import before starting the application.
+  |
+  */
+  preloads: [
+    () => import('#start/limiter'),
+    () => import('#start/routes'),
+    () => import('#start/kernel'),
+    () => import('#start/validator'),
+  ],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Tests
+  |--------------------------------------------------------------------------
+  |
+  | List of test suites to organize tests by their type. Feel free to remove
+  | and add additional suites.
+  |
+  */
+  tests: {
+    // Suíte única: sem repositório injetável não há o que dublar num teste
+    // unitário. Testar por HTTP exercita rota, middleware, validator, use-case e
+    // serialização de uma vez (AD-009).
+    suites: [
+      {
+        files: ['tests/functional/**/*.spec.{ts,js}'],
+        name: 'functional',
+        timeout: 30000,
+      },
+    ],
+    forceExit: false,
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Metafiles
+  |--------------------------------------------------------------------------
+  |
+  | A collection of files you want to copy to the build folder when creating
+  | the production build.
+  |
+  */
+  metaFiles: [
+    // `openapi.json` é gerado por `node ace openapi:generate` e servido em
+    // `/openapi.json`. Sem esta entrada o build de produção não o copia, e a rota
+    // responde 500 no servidor buildado - mas funciona em desenvolvimento.
+    { pattern: 'openapi.json', reloadServer: false },
+
+    // O recorte de produção que `database/seeders/demo_seeder.ts` lê por caminho
+    // relativo a si mesmo (`import.meta.url`). Como o seeder agora também roda em
+    // produção, o JSON precisa existir dentro de `build/` - sem esta entrada o
+    // assembler copia só o `.js` compilado, e `db:seed` quebra com ENOENT no
+    // servidor buildado, mas funciona em desenvolvimento.
+    { pattern: 'database/data/**/*.json', reloadServer: false },
+  ],
+
+  hooks: {
+    init: [
+      indexEntities({
+        transformers: { enabled: true },
+        controllers: {
+          source: 'app/features',
+          glob: ['**/*.controller.ts'],
+          importAlias: '#features',
+        },
+      }),
+      generateRegistry(),
+    ],
+  },
+
+  directories: {
+    httpControllers: 'app/features',
+  },
+})

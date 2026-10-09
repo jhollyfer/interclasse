@@ -1,0 +1,10 @@
+# Segredos: `.env.example` é o que fica versionado, com valores de exemplo.
+.env
+.env.local
+
+# Configuração de IDE, que é de cada pessoa e não do projeto. Já vazou para um
+# commit uma vez por estar fora daqui.
+.idea/
+.vscode/
+
+node_modules/

@@ -1,0 +1,21 @@
+import { inject } from '@adonisjs/core'
+import { HttpContext } from '@adonisjs/core/http'
+import { defineDocs } from '#core/openapi/types'
+import AdministratorSportPaginateUseCase from './paginate.use-case.ts'
+import { AdministratorSportPaginationValidator, SPORT_SORT_COLUMNS } from '#core/validator'
+
+@inject()
+export default class AdministratorSportPaginateController {
+  static docs = defineDocs({
+    description: `\`?sort\` aceita ${SPORT_SORT_COLUMNS.join(', ')}. Padrão: ordenada por nome.`,
+  })
+
+  constructor(private readonly useCase: AdministratorSportPaginateUseCase) {}
+
+  async handle(context: HttpContext) {
+    const payload = await AdministratorSportPaginationValidator.validate(context.request.qs())
+    const result = await this.useCase.execute(payload)
+    if (result.isLeft()) throw result.value
+    return context.response.ok(result.value)
+  }
+}
