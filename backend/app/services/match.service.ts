@@ -1,4 +1,4 @@
-import Classroom from '#models/classroom'
+import type Classroom from '#models/classroom'
 import Match from '#models/match'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import type { Category, MatchPhase, MatchStatus } from '#core/entity'

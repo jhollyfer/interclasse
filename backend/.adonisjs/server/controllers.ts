@@ -32,8 +32,8 @@ export const controllers = {
     matches: {
       Paginate: () => import('#features/administrator/matches/paginate.controller'),
       Score: () => import('#features/administrator/matches/score.controller'),
-      Update: () => import('#features/administrator/matches/update.controller'),
       Unscore: () => import('#features/administrator/matches/unscore.controller'),
+      Update: () => import('#features/administrator/matches/update.controller'),
     },
     sports: {
       Create: () => import('#features/administrator/sports/create.controller'),

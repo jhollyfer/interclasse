@@ -512,6 +512,18 @@ export function useMatchScore(
   })
 }
 
+/** Desfaz o placar: a partida volta a "a jogar" e o vencedor sai da seguinte. */
+export function useMatchUnscore(options?: MutationProps<Match, string>) {
+  return useMutation<Match, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<Match>('/administrator/matches/'.concat(id, '/score'), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
 // ---------------------------------------------------------------------------
 // /advisor e /representative
 // ---------------------------------------------------------------------------

@@ -18,6 +18,7 @@
   "GET /administrator/matches": "ADMINISTRATOR",
   "PUT /administrator/matches/{id}": "ADMINISTRATOR",
   "PUT /administrator/matches/{id}/score": "ADMINISTRATOR",
+  "DELETE /administrator/matches/{id}/score": "ADMINISTRATOR",
   "GET /administrator/sports": "ADMINISTRATOR",
   "POST /administrator/sports": "ADMINISTRATOR",
   "GET /administrator/sports/{id}": "ADMINISTRATOR",
