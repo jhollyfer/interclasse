@@ -134,9 +134,14 @@ jobs:
       # banco e o bucket já estão de pé. Constrói todo service e policy pelo
       # container - a dependência que ele não sabe resolver aparece no boot, e
       # não na primeira requisição que a usa.
+      #
+      # `NODE_ENV: test` é o que faz o Adonis carregar o `.env.test` (banco,
+      # bucket, sessão). O `pnpm test` o define sozinho; este passo não, e sem
+      # ele o boot reprovava por `DATABASE_URL` ausente.
       - name: Injeção de dependência
         working-directory: ./backend
         env:
+          NODE_ENV: test
           PORT: "3333"
           HOST: 0.0.0.0
           LOG_LEVEL: info
