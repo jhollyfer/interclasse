@@ -3,7 +3,8 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import { PAGINATION, TrashedModes, sortOrder, type Paginated } from '#core/entity'
+import { PAGINATION, sortOrder, type Paginated } from '#core/entity'
+import { applyTrashed } from '#features/_shared.trashed'
 import type { AdministratorUserPaginationPayload } from '#core/validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
@@ -27,10 +28,7 @@ export default class AdministratorUserPaginateUseCase {
       // usuário da página.
       const query = User.query().preload('avatar')
 
-      // Sem `?trashed` a listagem é a de sempre: só os vivos. Quem não pediu
-      // lixeira não vê a resposta mudar.
-      if (!payload.trashed) query.withScopes((scopes) => scopes.notDeleted())
-      if (payload.trashed === TrashedModes.ONLY) query.whereNotNull('deletedAt')
+      applyTrashed(query, payload.trashed)
 
       // Os dois recortes da tela: quem administra contra quem edita, e quem
       // entra contra quem foi desativado sem ser arquivado.

@@ -22,7 +22,10 @@ type Response = Either<HTTPException, User>
 export default class AdministratorUserUnarchiveUseCase {
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const user = await User.query().where('id', id).whereNotNull('deletedAt').first()
+      const user = await User.query()
+        .where('id', id)
+        .withScopes((scopes) => scopes.onlyDeleted())
+        .first()
 
       if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
 

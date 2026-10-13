@@ -14,7 +14,7 @@ export default class AdvisorStudentCreateController {
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(AdvisorStudentCreateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.user! })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)
   }

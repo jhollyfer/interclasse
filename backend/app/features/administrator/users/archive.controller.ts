@@ -24,7 +24,7 @@ export default class AdministratorUserArchiveController {
     const payload = await IdentifierValidator.validate(context.params)
     // O ator vem da sessão, e não do payload: quem faz a requisição não é dado
     // que o cliente informa.
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.user! })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }

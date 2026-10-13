@@ -158,8 +158,14 @@ export async function issueSessionTokens(user: User) {
     expiresIn: COOKIE_TOKEN.REFRESH_EXPIRY,
   })
 
+  // `value` só é opcional no tipo porque o mesmo `AccessToken` representa o
+  // token lido do banco, sem o segredo. Recém-criado, ele sempre vem.
+  if (!accessToken.value || !refreshToken.value) {
+    throw new Error('token de sessão criado sem o valor em claro')
+  }
+
   return {
-    accessToken: accessToken.value!.release(),
-    refreshToken: refreshToken.value!.release(),
+    accessToken: accessToken.value.release(),
+    refreshToken: refreshToken.value.release(),
   }
 }

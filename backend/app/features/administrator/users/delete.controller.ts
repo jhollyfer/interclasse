@@ -22,7 +22,7 @@ export default class AdministratorUserDeleteController {
   async handle(context: HttpContext) {
     const payload = await IdentifierValidator.validate(context.params)
     // O ator vem da sessão, e não do payload.
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.user! })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }
