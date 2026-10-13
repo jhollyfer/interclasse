@@ -48,8 +48,7 @@ const corsConfig = defineConfig({
    * Os headers que o preflight libera, e não `true`.
    *
    * `true` reflete de volta o que o navegador pediu, seja o que for. A lista
-   * explícita é o que faz um header novo entrar por decisão e não por acidente
-   * — e é a mesma forma que o lowcodejs usa (`start/kernel.ts:103-125`).
+   * explícita é o que faz um header novo entrar por decisão e não por acidente.
    *
    * `content-type` e `accept` são o mínimo de qualquer requisição JSON;
    * `x-request-id` é o que o log correlaciona.

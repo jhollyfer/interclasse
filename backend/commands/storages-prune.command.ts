@@ -8,7 +8,7 @@ const DEFAULT_HOURS = 24
 /**
  * Apaga os uploads que começaram e nunca terminaram.
  *
- * O upload tem três passos e o binário não passa por aqui (AD-006):
+ * O upload tem três passos e o binário não passa por aqui:
  * `POST /storages` grava a linha `PENDING` e assina as URLs, o cliente sobe as
  * partes direto no bucket, e `POST /storages/:id/complete` confirma. Quem fecha
  * a aba no meio nunca chega no terceiro passo, e nada mais volta àquela linha -

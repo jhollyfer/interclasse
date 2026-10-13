@@ -12,7 +12,7 @@ import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 export default class extends BaseSeeder {
   /**
    * Fora de produção: lá os administradores reais vêm do recorte de produção
-   * (`demo.seed.ts`), e este registro seria só uma credencial padrão
+   * (`dev/demo.ts`), e este registro seria só uma credencial padrão
    * conhecida com poder de administrador.
    */
   static override environment = ['development', 'test']

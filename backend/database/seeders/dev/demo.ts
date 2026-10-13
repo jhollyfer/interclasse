@@ -23,7 +23,10 @@ import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '
  *
  * Só em desenvolvimento, e só roda à mão:
  *
- *   SEED_DEMO_PASSWORD=<senha> node ace db:seed --files database/seeders/demo.seed.ts
+ *   SEED_DEMO_PASSWORD=<senha> pnpm db:seed:demo
+ *
+ * Mora em `dev/`, sem o sufixo `.seed.ts`, por ser seed manual de demonstração
+ * (_padroes/backend.md §3).
  *
  * Banco que já tem chave sorteada é deixado em paz: o seeder não sabe distinguir
  * demonstração de campeonato real, e apagar o segundo não tem volta.
