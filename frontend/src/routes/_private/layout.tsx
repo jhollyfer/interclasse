@@ -1,6 +1,9 @@
 import type * as React from 'react'
+import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { ErrorBoundary } from 'react-error-boundary'
 
+import { NotFoundPageServerError } from '#/components/common/not-found-page'
 import { UploadingProvider } from '#/components/common/uploading-context'
 import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
@@ -135,7 +138,25 @@ function RouteComponent(): React.JSX.Element {
             inteiro em vez de terem o conteúdo recortado.
           */}
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-auto p-4">
-            <Outlet />
+            {/*
+              Erro de query que escapa de uma tela (`useSuspenseQuery`) para
+              aqui, e não para a fronteira do router: o painel continua de pé,
+              e "Tentar de novo" limpa o erro guardado no cache do Query antes
+              de remontar - sem isso a query refaria e a fronteira seguiria
+              mostrando o erro antigo (`frontend.md` §5).
+            */}
+            <QueryErrorResetBoundary>
+              {({ reset }) => (
+                <ErrorBoundary
+                  onReset={reset}
+                  fallbackRender={({ resetErrorBoundary }) => (
+                    <NotFoundPageServerError onRetry={resetErrorBoundary} />
+                  )}
+                >
+                  <Outlet />
+                </ErrorBoundary>
+              )}
+            </QueryErrorResetBoundary>
           </div>
         </UploadingProvider>
 
