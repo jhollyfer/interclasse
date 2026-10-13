@@ -5,7 +5,7 @@ import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/que
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { SITE_TITLE } from '#/lib/constant'
 
-export const Route = createFileRoute('/_public/classificacao/$id')({
+export const Route = createFileRoute('/_public/classificacao/$id/')({
   loader: async ({ context, params }) => {
     try {
       return await context.queryClient.query({

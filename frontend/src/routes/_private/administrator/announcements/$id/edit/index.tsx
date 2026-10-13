@@ -1,15 +1,15 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
-import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
+import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
 
 export const Route = createFileRoute(
-  '/_private/administrator/classrooms/$id/edit',
+  '/_private/administrator/announcements/$id/edit/',
 )({
   loader: async ({ context, params }) => {
     try {
       return await context.queryClient.query({
-        ...classroomQueryOptions(params.id),
+        ...announcementQueryOptions(params.id),
         staleTime: 'static',
       })
     } catch (error) {

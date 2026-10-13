@@ -24,7 +24,7 @@ import { useResourceForm } from '#/hooks/use-resource-form'
 import type { ClassroomFormType } from './form-fields'
 import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/classrooms/$id/edit')
+const route = getRouteApi('/_private/administrator/classrooms/$id/edit/')
 
 /** Valida com o schema de criação: nome e ano não podem ser apagados. */
 export function ClassroomFormEdit(): React.JSX.Element {

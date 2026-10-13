@@ -8,7 +8,7 @@ import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
  * Mesma `queryOptions` da ficha e do guard do layout, com a mesma chave: chegar
  * aqui pelo botão "Editar perfil" não dispara requisição nova.
  */
-export const Route = createFileRoute('/_private/profile/edit')({
+export const Route = createFileRoute('/_private/profile/edit/')({
   loader: ({ context }) =>
     context.queryClient.query({
       ...accountQueryOptions(),
