@@ -23,74 +23,74 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 
-const RAIZ = resolve(dirname(new URL(import.meta.url).pathname), '..')
-const DOCUMENTO = join(RAIZ, 'openapi.json')
-const BASELINE = join(RAIZ, 'app/core/openapi/authz-baseline.json')
+const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
+const DOCUMENT = join(ROOT, 'openapi.json')
+const BASELINE = join(ROOT, 'app/core/openapi/authz-baseline.json')
 
-type Operacao = {
+type Operation = {
   'security'?: Array<Record<string, string[]>>
   'x-roles'?: string[]
 }
 
-type Documento = {
-  paths: Record<string, Record<string, Operacao>>
+type OpenapiDocument = {
+  paths: Record<string, Record<string, Operation>>
 }
 
 /** `anonima`, `autenticada`, ou os papeis em ordem. */
-function protecaoDe(operacao: Operacao): string {
-  const papeis = operacao['x-roles'] ?? []
-  if (papeis.length > 0) return [...papeis].sort().join(', ')
+function protectionOf(operation: Operation): string {
+  const roles = operation['x-roles'] ?? []
+  if (roles.length > 0) return [...roles].sort().join(', ')
 
-  if (operacao.security && operacao.security.length > 0) return 'autenticada'
+  if (operation.security && operation.security.length > 0) return 'autenticada'
 
   return 'anonima'
 }
 
-async function atual(): Promise<Record<string, string>> {
-  const documento: Documento = JSON.parse(await readFile(DOCUMENTO, 'utf8'))
-  const mapa: Record<string, string> = {}
+async function current(): Promise<Record<string, string>> {
+  const document: OpenapiDocument = JSON.parse(await readFile(DOCUMENT, 'utf8'))
+  const map: Record<string, string> = {}
 
-  for (const [caminho, metodos] of Object.entries(documento.paths)) {
-    for (const [metodo, operacao] of Object.entries(metodos)) {
-      mapa[`${metodo.toUpperCase()} ${caminho}`] = protecaoDe(operacao)
+  for (const [routePath, methods] of Object.entries(document.paths)) {
+    for (const [method, operation] of Object.entries(methods)) {
+      map[`${method.toUpperCase()} ${routePath}`] = protectionOf(operation)
     }
   }
 
-  return mapa
+  return map
 }
 
-function relatar(baseline: Record<string, string>, agora: Record<string, string>): number {
-  const rotas = new Set([...Object.keys(baseline), ...Object.keys(agora)])
-  const novas: string[] = []
-  const sumidas: string[] = []
-  const mudadas: string[] = []
+function report(baseline: Record<string, string>, now: Record<string, string>): number {
+  const routes = new Set([...Object.keys(baseline), ...Object.keys(now)])
+  const added: string[] = []
+  const removed: string[] = []
+  const changed: string[] = []
 
-  for (const rota of [...rotas].sort()) {
-    const antes = baseline[rota]
-    const depois = agora[rota]
+  for (const route of [...routes].sort()) {
+    const before = baseline[route]
+    const after = now[route]
 
-    if (antes === undefined) {
-      novas.push(`  + ${rota}  ->  ${depois}`)
+    if (before === undefined) {
+      added.push(`  + ${route}  ->  ${after}`)
       continue
     }
 
-    if (depois === undefined) {
-      sumidas.push(`  - ${rota}  (era ${antes})`)
+    if (after === undefined) {
+      removed.push(`  - ${route}  (era ${before})`)
       continue
     }
 
-    if (antes !== depois) mudadas.push(`  ~ ${rota}  ${antes}  ->  ${depois}`)
+    if (before !== after) changed.push(`  ~ ${route}  ${before}  ->  ${after}`)
   }
 
-  const total = novas.length + sumidas.length + mudadas.length
+  const total = added.length + removed.length + changed.length
 
   if (total === 0) {
-    console.log(`authz:check: ${Object.keys(agora).length} rotas, nenhuma mudanca.`)
+    console.log(`authz:check: ${Object.keys(now).length} rotas, nenhuma mudanca.`)
     return 0
   }
 
   console.log(`authz:check: ${total} mudancas na cadeia de autorizacao\n`)
-  for (const linha of [...novas, ...sumidas, ...mudadas]) console.log(linha)
+  for (const line of [...added, ...removed, ...changed]) console.log(line)
   console.log('\n  Intencional? `pnpm authz:check -- --write` e commite o baseline junto.')
 
   return total
@@ -98,25 +98,25 @@ function relatar(baseline: Record<string, string>, agora: Record<string, string>
 
 async function main(): Promise<void> {
   const flags = new Set(process.argv.slice(2))
-  const agora = await atual()
+  const now = await current()
 
   if (flags.has('--write')) {
-    await writeFile(BASELINE, `${JSON.stringify(agora, null, 2)}\n`, 'utf8')
-    console.log(`authz:check --write: ${Object.keys(agora).length} rotas gravadas.`)
+    await writeFile(BASELINE, `${JSON.stringify(now, null, 2)}\n`, 'utf8')
+    console.log(`authz:check --write: ${Object.keys(now).length} rotas gravadas.`)
     return
   }
 
-  const bruto = await readFile(BASELINE, 'utf8').catch(() => '')
+  const raw = await readFile(BASELINE, 'utf8').catch(() => '')
 
-  if (bruto === '') {
+  if (raw === '') {
     console.error('authz:check: baseline ausente. Rode com `--write` uma vez e commite.')
     process.exitCode = 1
     return
   }
 
-  const baseline: Record<string, string> = JSON.parse(bruto)
+  const baseline: Record<string, string> = JSON.parse(raw)
 
-  if (relatar(baseline, agora) > 0) process.exitCode = 1
+  if (report(baseline, now) > 0) process.exitCode = 1
 }
 
 await main()

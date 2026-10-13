@@ -22,9 +22,9 @@ import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
 const BACKEND = resolve(dirname(new URL(import.meta.url).pathname), '..')
-const RAIZ = resolve(BACKEND, '..')
+const ROOT = resolve(BACKEND, '..')
 
-const upstream = process.env.MAIYU_PATTERN_DIR ?? resolve(RAIZ, '..', 'maiyu-pattern')
+const upstream = process.env.MAIYU_PATTERN_DIR ?? resolve(ROOT, '..', 'maiyu-pattern')
 const script = join(upstream, 'scripts', 'sync-to-project.mjs')
 
 if (!existsSync(script)) {
@@ -32,5 +32,5 @@ if (!existsSync(script)) {
   process.exit(0)
 }
 
-const resultado = spawnSync(process.execPath, [script, RAIZ, '--check'], { stdio: 'inherit' })
-process.exitCode = resultado.status ?? 1
+const result = spawnSync(process.execPath, [script, ROOT, '--check'], { stdio: 'inherit' })
+process.exitCode = result.status ?? 1
