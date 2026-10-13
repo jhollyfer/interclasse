@@ -61,23 +61,23 @@ export type Merge<A, B> = { [K in keyof (A & B)]: (A & B)[K] }
  *
  * Sem `OWNER`: o purge fica com o administrador.
  */
-export const UserRoles = {
+export const USER_ROLE = {
   ADMINISTRATOR: 'ADMINISTRATOR',
   ADVISOR: 'ADVISOR',
   REPRESENTATIVE: 'REPRESENTATIVE',
 } as const
 
-export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
+export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE]
 
-export const USER_ROLES = Object.values(UserRoles)
+export const USER_ROLES = Object.values(USER_ROLE)
 
 /**
  * Quem opera o painel administrativo, e não só a própria turma.
  *
  * Existe à parte de `USER_ROLES` para que papel novo nasça **de fora**: entraria
- * em `UserRoles` sem entrar aqui, e ficaria de fora das checagens por omissão.
+ * em `USER_ROLE` sem entrar aqui, e ficaria de fora das checagens por omissão.
  */
-export const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [UserRoles.ADMINISTRATOR]
+export const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [USER_ROLE.ADMINISTRATOR]
 
 /**
  * Se a conta pode entrar. Nome genérico: é o par ativo/inativo, e nada nele é
@@ -86,14 +86,14 @@ export const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [UserRoles.ADMINISTRATO
  * Chave e valor em caixa alta: o valor do enum é identificador, não texto de
  * interface - o rótulo em português é do frontend.
  */
-export const ActiveStatuses = {
+export const ACTIVE_STATUS = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
 } as const
 
-export type ActiveStatus = (typeof ActiveStatuses)[keyof typeof ActiveStatuses]
+export type ActiveStatus = (typeof ACTIVE_STATUS)[keyof typeof ACTIVE_STATUS]
 
-export const ACTIVE_STATUSES = Object.values(ActiveStatuses)
+export const ACTIVE_STATUSES = Object.values(ACTIVE_STATUS)
 
 // ---------------------------------------------------------------------------
 // Jogos
@@ -103,29 +103,19 @@ export const ACTIVE_STATUSES = Object.values(ActiveStatuses)
  * A categoria de uma turma. Turmas de categorias diferentes nunca se enfrentam:
  * cada modalidade tem uma chave por categoria.
  */
-export const Categories = {
+export const CATEGORY = {
   /** Fundamental 1: do 3º ao 5º ano. */
   F1: 'F1',
   /** Fundamental 2: do 6º ao 9º ano. */
   F2: 'F2',
 } as const
 
-export type Category = (typeof Categories)[keyof typeof Categories]
+export type Category = (typeof CATEGORY)[keyof typeof CATEGORY]
 
-export const CATEGORIES = Object.values(Categories)
+export const CATEGORIES = Object.values(CATEGORY)
 
 /** Os anos que a escola tem. Fora daqui não há turma. */
 export const GRADES = { MIN: 3, MAX: 9 } as const
-
-/**
- * A categoria que o ano determina. Derivada, e nunca enviada pelo cliente: um
- * 9º ano gravado como `F1` jogaria contra crianças de 8 anos.
- */
-export function categoryOf(grade: number): Category {
-  if (grade <= 5) return Categories.F1
-
-  return Categories.F2
-}
 
 /**
  * Onde a competição de uma modalidade numa categoria está: em disputa ou
@@ -134,36 +124,36 @@ export function categoryOf(grade: number): Category {
  * Não existe chave "aberta": antes do sorteio a linha simplesmente não existe,
  * e é a ausência dela que deixa as inscrições abertas.
  */
-export const BracketStatuses = {
+export const BRACKET_STATUS = {
   KNOCKOUT: 'KNOCKOUT',
   FINISHED: 'FINISHED',
 } as const
 
-export type BracketStatus = (typeof BracketStatuses)[keyof typeof BracketStatuses]
+export type BracketStatus = (typeof BRACKET_STATUS)[keyof typeof BRACKET_STATUS]
 
-export const BRACKET_STATUSES = Object.values(BracketStatuses)
+export const BRACKET_STATUSES = Object.values(BRACKET_STATUS)
 
 /** A fase de uma partida, nomeada pelo número de times que entram nela. */
-export const MatchPhases = {
+export const MATCH_PHASE = {
   ROUND_OF_16: 'ROUND_OF_16',
   QUARTER: 'QUARTER',
   SEMI: 'SEMI',
   FINAL: 'FINAL',
 } as const
 
-export type MatchPhase = (typeof MatchPhases)[keyof typeof MatchPhases]
+export type MatchPhase = (typeof MATCH_PHASE)[keyof typeof MATCH_PHASE]
 
-export const MATCH_PHASES = Object.values(MatchPhases)
+export const MATCH_PHASES = Object.values(MATCH_PHASE)
 
 /** Uma partida está marcada ou tem placar. Não há "em andamento": o placar entra ao final. */
-export const MatchStatuses = {
+export const MATCH_STATUS = {
   SCHEDULED: 'SCHEDULED',
   FINISHED: 'FINISHED',
 } as const
 
-export type MatchStatus = (typeof MatchStatuses)[keyof typeof MatchStatuses]
+export type MatchStatus = (typeof MATCH_STATUS)[keyof typeof MATCH_STATUS]
 
-export const MATCH_STATUSES = Object.values(MatchStatuses)
+export const MATCH_STATUSES = Object.values(MATCH_STATUS)
 
 // ---------------------------------------------------------------------------
 // Arquivos
@@ -179,14 +169,14 @@ export const MATCH_STATUSES = Object.values(MatchStatuses)
  * Só `UPLOADED` pode ser anexado a alguma coisa - `StorageService.assertExist`
  * recusa o resto, para nada apontar para um arquivo pela metade.
  */
-export const UploadStatuses = {
+export const UPLOAD_STATUS = {
   PENDING: 'PENDING',
   UPLOADED: 'UPLOADED',
 } as const
 
-export type UploadStatus = (typeof UploadStatuses)[keyof typeof UploadStatuses]
+export type UploadStatus = (typeof UPLOAD_STATUS)[keyof typeof UPLOAD_STATUS]
 
-export const UPLOAD_STATUSES = Object.values(UploadStatuses)
+export const UPLOAD_STATUSES = Object.values(UPLOAD_STATUS)
 
 // ---------------------------------------------------------------------------
 // Listagem
@@ -198,115 +188,26 @@ export const UPLOAD_STATUSES = Object.values(UploadStatuses)
  *
  * Aqui é `deletedAt`, a remoção lógica.
  */
-export const TrashedModes = {
+export const TRASHED_MODE = {
   /** Só o que está na lixeira. É a listagem da tela de restauração. */
   ONLY: 'only',
   /** Ativos e removidos juntos. */
   WITH: 'with',
 } as const
 
-export type TrashedMode = (typeof TrashedModes)[keyof typeof TrashedModes]
+export type TrashedMode = (typeof TRASHED_MODE)[keyof typeof TRASHED_MODE]
 
-export const TRASHED_MODES = Object.values(TrashedModes)
+export const TRASHED_MODES = Object.values(TRASHED_MODE)
 
 /**
  * O sentido da ordenação de uma listagem. Ausente é `asc`, que é a ordem que
  * as listagens já tinham antes de aceitarem o parâmetro.
  */
-export const SortDirections = {
+export const SORT_DIRECTION = {
   ASC: 'asc',
   DESC: 'desc',
 } as const
 
-export type SortDirection = (typeof SortDirections)[keyof typeof SortDirections]
+export type SortDirection = (typeof SORT_DIRECTION)[keyof typeof SORT_DIRECTION]
 
-export const SORT_DIRECTIONS = Object.values(SortDirections)
-
-/**
- * A ordem que a consulta vai usar: o que o payload pediu, ou o padrão do
- * recurso. Feito para ser espalhado - `query.orderBy(...sortOrder(payload,
- * 'createdAt'))`.
- *
- * O `fallback` é obrigatório porque é a ordem que a listagem já tinha antes de
- * aceitar o parâmetro: quem não manda `?sort` recebe exatamente a mesma
- * resposta de antes.
- *
- * A coluna não é conferida aqui - quem fecha a lista é o `sortFields()` do
- * validator, antes de o payload chegar ao use-case.
- *
- * Só serve a listagem cujo padrão é **crescente** - catálogo, cadastro, tudo
- * que se lê em ordem alfabética. Feed cronológico usa `recentFirst()`.
- */
-export function sortOrder<TColumn extends string>(
-  payload: { sort?: TColumn; direction?: SortDirection },
-  fallback: TColumn,
-): [TColumn, SortDirection] {
-  return [payload.sort ?? fallback, payload.direction ?? SortDirections.ASC]
-}
-
-/**
- * A ordem de uma listagem cronológica: `createdAt` **decrescente**, ao
- * contrário de todas as outras. Espalhado como o irmão -
- * `query.orderBy(...recentFirst(payload))`.
- *
- * Existe porque `sortOrder()` assume `asc`, e num feed o que interessa é o
- * último registro, não o primeiro.
- *
- * Função com nome próprio, e não um parâmetro de direção em `sortOrder()`: a
- * exceção fica visível na chamada, em vez de escondida atrás de um argumento
- * que ninguém lê ao passar os olhos pela consulta.
- */
-export function recentFirst<TColumn extends string>(payload: {
-  sort?: TColumn
-  direction?: SortDirection
-}): [TColumn | 'createdAt', SortDirection] {
-  return [payload.sort ?? 'createdAt', payload.direction ?? SortDirections.DESC]
-}
-
-// ---------------------------------------------------------------------------
-// Paginação
-// ---------------------------------------------------------------------------
-
-/**
- * A resposta paginada como ela sai no fio, tipada.
- *
- * O paginator do Lucid não serve para isso: `ModelPaginatorContract.toJSON()`
- * devolve `{ meta: any; data: ModelObject[] }` - perde o tipo do item e ainda
- * traz um `any`. Devolver o paginator cru também não serve: o registry do Tuyau
- * infere a resposta do retorno do controller, e o front receberia o tipo da
- * classe (com `serialize`, `toJSON` e mais 55 membros) em vez do JSON.
- *
- * Montar `{ meta: paginator.getMeta(), data: paginator.all() }` resolve os dois:
- * `all()` mantém `T[]`, e o `any` de `getMeta()` morre nesta fronteira.
- */
-export type PaginationMeta = {
-  total: number
-  perPage: number
-  currentPage: number
-  lastPage: number
-  firstPage: number
-  firstPageUrl: string
-  lastPageUrl: string
-  nextPageUrl: string | null
-  previousPageUrl: string | null
-}
-
-export type Paginated<T> = {
-  meta: PaginationMeta
-  data: T[]
-}
-
-/**
- * A mensagem de um erro qualquer, para log.
- *
- * `catch` entrega `unknown`, e quem loga precisa de texto. A guarda com retorno
- * cedo em vez de ternário: `error instanceof Error ? error.message : error`
- * apareceu igual em cada `catch` de comando, e ainda interpolava um `unknown`
- * direto no template - que sai como `[object Object]` quando o erro não é um
- * `Error`.
- */
-export function messageOf(error: unknown): string {
-  if (error instanceof Error) return error.message
-
-  return String(error)
-}
+export const SORT_DIRECTIONS = Object.values(SORT_DIRECTION)

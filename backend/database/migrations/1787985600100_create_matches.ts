@@ -1,6 +1,6 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
-import { MATCH_PHASES, MATCH_STATUSES, MatchStatuses } from '#core/entity'
+import { MATCH_PHASES, MATCH_STATUSES, MATCH_STATUS } from '#core/entity'
 
 export default class extends BaseSchema {
   protected tableName = 'matches'
@@ -29,7 +29,7 @@ export default class extends BaseSchema {
       // Preenchido em toda partida terminada, inclusive empate decidido nos
       // pênaltis.
       table.uuid('winner_team_id').nullable().references('id').inTable('teams').onDelete('CASCADE')
-      table.enum('status', MATCH_STATUSES).notNullable().defaultTo(MatchStatuses.SCHEDULED)
+      table.enum('status', MATCH_STATUSES).notNullable().defaultTo(MATCH_STATUS.SCHEDULED)
       table.timestamp('scheduled_at').nullable()
       table.string('location', 120).nullable()
       table.timestamp('created_at').notNullable()

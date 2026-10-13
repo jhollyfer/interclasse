@@ -5,7 +5,8 @@ import type { ModelObject } from '@adonisjs/lucid/types/model'
 import Announcement from '#models/announcement'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION, type Paginated } from '#core/entity'
+import { PAGINATION } from '#core/entity'
+import { type Paginated } from '#core/response'
 import type { PaginationPayload } from '#core/validator'
 
 type Payload = PaginationPayload

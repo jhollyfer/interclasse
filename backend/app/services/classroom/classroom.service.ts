@@ -4,7 +4,7 @@ import Classroom from '#models/classroom'
 import User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { UserRoles, type UserRole } from '#core/entity'
+import { USER_ROLE, type UserRole } from '#core/entity'
 
 type People = { advisorId?: string | null; representativeId?: string | null }
 
@@ -29,7 +29,7 @@ export default class ClassroomService {
     // aceito quando entrou, e recusá-lo agora travaria até renomear a turma.
     const classroomId = current?.id
     if (people.advisorId && people.advisorId !== current?.advisorId) {
-      const advisor = await this.person(people.advisorId, UserRoles.ADVISOR)
+      const advisor = await this.person(people.advisorId, USER_ROLE.ADVISOR)
 
       if (!advisor)
         return left(
@@ -40,7 +40,7 @@ export default class ClassroomService {
     }
 
     if (people.representativeId && people.representativeId !== current?.representativeId) {
-      const representative = await this.person(people.representativeId, UserRoles.REPRESENTATIVE)
+      const representative = await this.person(people.representativeId, USER_ROLE.REPRESENTATIVE)
 
       if (!representative)
         return left(

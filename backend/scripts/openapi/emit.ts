@@ -2,8 +2,7 @@ import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import { middlewareInfo } from '@adonisjs/core/http/helpers'
 
-import { FIELD_PATCHES } from './field-patches.ts'
-
+import { FIELD_PATCHES } from '#core/openapi/field-patches'
 import openapi, {
   ACTION_OVERRIDES,
   SECURITY_COOKIE,
@@ -15,14 +14,14 @@ import {
   introspect,
   loadResponseSchema,
   type Introspection,
-} from '#core/openapi/introspect'
+} from '#scripts/openapi/introspect'
 import {
   AUTOMATIC_CODES,
   errorComponentName,
   errorResponse,
   errorSchema,
   forbiddenDescription,
-} from '#core/openapi/errors'
+} from '#scripts/openapi/errors'
 import {
   PAGINATION_META_REF,
   PAGINATION_META_SCHEMA,
@@ -31,7 +30,7 @@ import {
   paginatedSchema,
   toParameters,
   toSchema,
-} from '#core/openapi/schema'
+} from '#core/openapi/vine-schema'
 import { isListResource, isModelResource, paginated } from '#core/openapi/types'
 import { modelSchema, typeIndex } from '#core/openapi/model-schema'
 import type { TypeIndex } from '#core/openapi/model-schema'

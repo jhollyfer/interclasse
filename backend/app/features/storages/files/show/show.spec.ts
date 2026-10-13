@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import { storageRow } from '#tests/storages-fixtures'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
 /**
@@ -36,7 +36,7 @@ test.group('storages > detalhe', (group) => {
 
   test('alcança o upload ainda PENDING', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const storage = await storageRow({ status: UploadStatuses.PENDING })
+    const storage = await storageRow({ status: UPLOAD_STATUS.PENDING })
 
     // A tela de detalhe é onde se descobre que um upload ficou pela metade.
     // Quem exige `UPLOADED` é o anexo, não a leitura.

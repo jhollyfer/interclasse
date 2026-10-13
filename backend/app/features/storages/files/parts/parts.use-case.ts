@@ -14,7 +14,7 @@ import {
   type UploadedPart,
 } from '#services/multipart/multipart-contract.service'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -57,7 +57,7 @@ export default class StoragesFilePartsUseCase {
       // Já confirmado: nada a subir. Devolver a mesma forma com as listas
       // vazias, e não um erro, porque quem pergunta é um cliente retomando -
       // ele lê o `status` e para, que é o desfecho certo.
-      if (storage.status === UploadStatuses.UPLOADED) {
+      if (storage.status === UPLOAD_STATUS.UPLOADED) {
         return right(this.#envelope(storage, partSize, totalParts, [], []))
       }
 

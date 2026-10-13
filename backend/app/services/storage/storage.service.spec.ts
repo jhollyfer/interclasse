@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import Storage from '#models/storage'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 import type { UploadStatus } from '#core/entity'
 
@@ -40,7 +40,7 @@ test.group('storages > anexar', (group) => {
 
   test('recusa com 422 anexar um arquivo ainda PENDING', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const storage = await record(UploadStatuses.PENDING)
+    const storage = await record(UPLOAD_STATUS.PENDING)
 
     const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
 
@@ -54,7 +54,7 @@ test.group('storages > anexar', (group) => {
    */
   test('aceita o mesmo arquivo depois de ele estar UPLOADED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const storage = await record(UploadStatuses.UPLOADED)
+    const storage = await record(UPLOAD_STATUS.UPLOADED)
 
     const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
 

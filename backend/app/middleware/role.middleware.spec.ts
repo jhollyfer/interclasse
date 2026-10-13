@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { UserRoles } from '#core/entity'
+import { USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   authenticateAsAdministrator,
@@ -30,7 +30,7 @@ const USUARIO = {
   email: 'matriz@mail.com',
   password: 'Demo1234!',
   passwordConfirmation: 'Demo1234!',
-  role: UserRoles.ADVISOR,
+  role: USER_ROLE.ADVISOR,
 }
 
 test.group('papéis > sem sessão', (group) => {

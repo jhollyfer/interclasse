@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StorefrontBracketShowUseCase from './show.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketDetailResponse } from '#core/response'
+import { BracketDetailResponse } from '#core/openapi/response'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

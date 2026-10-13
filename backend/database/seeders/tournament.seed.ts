@@ -3,7 +3,7 @@ import string from '@adonisjs/core/helpers/string'
 
 import Classroom from '#models/classroom'
 import Sport from '#models/sport'
-import { categoryOf } from '#core/entity'
+import { categoryOf } from '#features/administrator/_shared.classroom'
 
 /**
  * As modalidades e as turmas da escola, como estavam no site anterior.

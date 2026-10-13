@@ -3,7 +3,7 @@ import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
 import type Classroom from '#models/classroom'
 import type User from '#models/user'
-import { UserRoles } from '#core/entity'
+import { USER_ROLE } from '#core/entity'
 
 /**
  * Quem cuida de qual turma.
@@ -22,7 +22,7 @@ import { UserRoles } from '#core/entity'
  */
 export default class ClassroomPolicy extends BasePolicy {
   manage(actor: User, classroom: Classroom | null): AuthorizerResponse {
-    if (classroom && actor.role === UserRoles.ADMINISTRATOR) return true
+    if (classroom && actor.role === USER_ROLE.ADMINISTRATOR) return true
     if (classroom && classroom.advisorId === actor.id) return true
 
     return AuthorizationResponse.deny('Turma não encontrada', 404).t('CLASSROOM_NOT_FOUND')
@@ -33,7 +33,7 @@ export default class ClassroomPolicy extends BasePolicy {
     actor: User,
     student: { readonly classroom: Classroom } | null,
   ): AuthorizerResponse {
-    if (student && actor.role === UserRoles.ADMINISTRATOR) return true
+    if (student && actor.role === USER_ROLE.ADMINISTRATOR) return true
     if (student && student.classroom.advisorId === actor.id) return true
 
     return AuthorizationResponse.deny('Aluno não encontrado', 404).t('STUDENT_NOT_FOUND')

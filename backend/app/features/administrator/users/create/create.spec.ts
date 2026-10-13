@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 
 import User from '#models/user'
-import { ActiveStatuses, UserRoles } from '#core/entity'
+import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -21,7 +21,7 @@ const payload = {
   email: 'nova.pessoa@mail.com',
   password: 'Demo1234!',
   passwordConfirmation: 'Demo1234!',
-  role: UserRoles.ADVISOR,
+  role: USER_ROLE.ADVISOR,
 }
 
 test.group('administrador > users > criação', (group) => {
@@ -33,9 +33,9 @@ test.group('administrador > users > criação', (group) => {
     const response = await client.post('/administrator/users').cookies(session).json(payload)
 
     response.assertStatus(201)
-    assert.equal(body(response).role, UserRoles.ADVISOR)
+    assert.equal(body(response).role, USER_ROLE.ADVISOR)
     // A coluna tem `DEFAULT 'ACTIVE'` e o payload não escreve a chave ausente.
-    assert.equal(body(response).status, ActiveStatuses.ACTIVE)
+    assert.equal(body(response).status, ACTIVE_STATUS.ACTIVE)
     assert.notProperty(body(response), 'password')
   })
 

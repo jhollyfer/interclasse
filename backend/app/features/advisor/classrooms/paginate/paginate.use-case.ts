@@ -6,7 +6,8 @@ import Classroom from '#models/classroom'
 import type User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION, UserRoles, type Merge, type Paginated } from '#core/entity'
+import { PAGINATION, USER_ROLE, type Merge } from '#core/entity'
+import { type Paginated } from '#core/response'
 import type { PaginationPayload } from '#core/validator'
 
 type Payload = Merge<PaginationPayload, { actor: User }>
@@ -18,7 +19,7 @@ export default class AdvisorClassroomPaginateUseCase {
     try {
       const query = Classroom.query()
 
-      if (actor.role !== UserRoles.ADMINISTRATOR) query.where('advisorId', actor.id)
+      if (actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', actor.id)
       if (payload.search) query.whereILike('name', `%${payload.search}%`)
 
       const classrooms = await query

@@ -7,7 +7,7 @@ import Match from '#models/match'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { BracketStatuses, MatchPhases, MatchStatuses, type Merge } from '#core/entity'
+import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS, type Merge } from '#core/entity'
 import type { MatchScorePayload } from '#features/administrator/matches/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -70,14 +70,14 @@ export default class AdministratorMatchScoreUseCase {
         // resultado que aconteceu em quadra.
         if (
           next &&
-          next.status === MatchStatuses.FINISHED &&
+          next.status === MATCH_STATUS.FINISHED &&
           match.winnerTeamId !== null &&
           match.winnerTeamId !== winner
         )
           return 'next-played'
 
         match.useTransaction(trx)
-        match.merge({ homeScore, awayScore, winnerTeamId: winner, status: MatchStatuses.FINISHED })
+        match.merge({ homeScore, awayScore, winnerTeamId: winner, status: MATCH_STATUS.FINISHED })
         await match.save()
 
         if (next) {
@@ -87,9 +87,9 @@ export default class AdministratorMatchScoreUseCase {
           await next.save()
         }
 
-        if (match.phase === MatchPhases.FINAL) {
+        if (match.phase === MATCH_PHASE.FINAL) {
           bracket.useTransaction(trx)
-          bracket.status = BracketStatuses.FINISHED
+          bracket.status = BRACKET_STATUS.FINISHED
           await bracket.save()
         }
 

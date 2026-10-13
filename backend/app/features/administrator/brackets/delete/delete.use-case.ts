@@ -5,7 +5,7 @@ import Bracket from '#models/bracket'
 import Match from '#models/match'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { MatchStatuses } from '#core/entity'
+import { MATCH_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -28,7 +28,7 @@ export default class AdministratorBracketDeleteUseCase {
 
       const played = await Match.query()
         .where('bracketId', bracket.id)
-        .where('status', MatchStatuses.FINISHED)
+        .where('status', MATCH_STATUS.FINISHED)
         .first()
 
       if (played)

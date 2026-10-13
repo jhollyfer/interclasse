@@ -6,7 +6,7 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import { MultipartContract } from '#services/multipart/multipart-contract.service'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -45,7 +45,7 @@ export default class StoragesFileDeleteUseCase {
       if (!storage)
         return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
 
-      if (storage.status === UploadStatuses.PENDING) {
+      if (storage.status === UPLOAD_STATUS.PENDING) {
         await this.#cancel(storage)
 
         return right(null)

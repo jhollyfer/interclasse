@@ -2,8 +2,6 @@ import { BaseCommand, flags } from '@adonisjs/core/ace'
 import { DateTime } from 'luxon'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
-import { messageOf } from '#core/entity'
-
 /** Quantas horas um `PENDING` pode ficar de pé antes de ser considerado abandonado. */
 const DEFAULT_HOURS = 24
 
@@ -54,14 +52,14 @@ export default class StoragesPrune extends BaseCommand {
     const { default: Storage } = await import('#models/storage')
     const { default: StoragesFileDeleteUseCase } =
       await import('#features/storages/files/delete/delete.use-case')
-    const { UploadStatuses } = await import('#core/entity')
+    const { UPLOAD_STATUS } = await import('#core/entity')
 
     const hours = this.hours ?? DEFAULT_HOURS
     const cutoff = DateTime.now().minus({ hours })
 
     // A ordem das colunas é a do índice `storages_status_created_at_index`.
     const abandoned = await Storage.query()
-      .where('status', UploadStatuses.PENDING)
+      .where('status', UPLOAD_STATUS.PENDING)
       .where('createdAt', '<', cutoff.toSQL() ?? '')
       .orderBy('createdAt', 'asc')
 
@@ -100,12 +98,22 @@ export default class StoragesPrune extends BaseCommand {
         removed += 1
       } catch (error) {
         failed += 1
-        this.logger.warning(`${storage.id}: ${messageOf(error)}`)
+        this.logger.warning(`${storage.id}: ${this.messageOf(error)}`)
       }
     }
 
     this.logger.success(`${removed} upload(s) apagados, ${failed} com erro.`)
 
     if (failed > 0) this.exitCode = 1
+  }
+
+  /**
+   * A mensagem de um erro qualquer, para log: `catch` entrega `unknown`, e
+   * interpolar um não-`Error` direto no template sairia `[object Object]`.
+   */
+  private messageOf(error: unknown): string {
+    if (error instanceof Error) return error.message
+
+    return String(error)
   }
 }

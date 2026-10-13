@@ -38,7 +38,7 @@ export default class OpenapiGenerate extends BaseCommand {
   declare strict: boolean
 
   override async run() {
-    const { buildDocument } = await import('#core/openapi/document')
+    const { buildDocument } = await import('#scripts/openapi/emit')
     const { document, warnings, documented, total } = await buildDocument()
 
     const serialized = `${JSON.stringify(document, null, 2)}\n`

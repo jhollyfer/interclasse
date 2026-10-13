@@ -1,16 +1,14 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
 
+import type { ErrorEnvelope } from '#core/response'
+
 /**
  * O corpo JSON que toda falha da API devolve. Segue a convenção do AdonisJS:
  * `status` é o número HTTP e `code` é o código de máquina.
  */
-export type HTTPExceptionPayload = {
-  message: string
-  status: number
-  code: string
-  errors?: Record<string, string>
-}
+/** O envelope de erro da API, definido uma vez em `core/response.ts`. */
+export type HTTPExceptionPayload = ErrorEnvelope
 
 /**
  * Falha de negócio pronta para virar resposta HTTP.
@@ -49,11 +47,9 @@ export default class HTTPException extends Exception {
       code: this.code,
     }
 
-    if (this.errors) {
-      body.errors = this.errors
-    }
+    if (!this.errors) return body
 
-    return body
+    return { ...body, errors: this.errors }
   }
 
   handle(error: this, { response }: HttpContext) {
@@ -209,21 +205,4 @@ export default class HTTPException extends Exception {
   ): HTTPException {
     return new HTTPException({ message, status: 504, code })
   }
-}
-
-/**
- * Qual campo recebe o erro de endereço duplicado.
- *
- * A busca é sempre por `slug`, mas o `slug` pode ter saído do título ou do
- * nome. Marcar o campo que a pessoa não preencheu poria a mensagem sob um
- * input vazio, e quem digitou só o título não veria o que corrigir.
- *
- * Guarda com retorno cedo em vez de `[provided ? 'slug' : 'title']`: a mesma
- * chave computada aparecia em oito use-cases, cada um repetindo a regra em vez
- * de nomeá-la.
- */
-export function slugErrorField<T extends string>(provided: unknown, fallback: T): 'slug' | T {
-  if (provided) return 'slug'
-
-  return fallback
 }

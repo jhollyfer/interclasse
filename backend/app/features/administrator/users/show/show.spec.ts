@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 import Storage from '#models/storage'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -18,7 +18,7 @@ function upload() {
     mimetype: 'image/png',
     size: 1024,
     path: `${id}.png`,
-    status: UploadStatuses.UPLOADED,
+    status: UPLOAD_STATUS.UPLOADED,
   })
 }
 

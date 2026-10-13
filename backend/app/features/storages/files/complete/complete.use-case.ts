@@ -7,7 +7,7 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import { MultipartContract } from '#services/multipart/multipart-contract.service'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import type { Merge } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 import type { FileCompletePayload } from '#features/storages/files/files.validator'
@@ -47,7 +47,7 @@ export default class StoragesFileCompleteUseCase {
       if (!storage)
         return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
 
-      if (storage.status === UploadStatuses.UPLOADED) return right(storage)
+      if (storage.status === UPLOAD_STATUS.UPLOADED) return right(storage)
 
       if (storage.uploadId) {
         await this.multipart.complete(storage.path, storage.uploadId, payload.parts ?? [])
@@ -65,7 +65,7 @@ export default class StoragesFileCompleteUseCase {
         )
       }
 
-      storage.status = UploadStatuses.UPLOADED
+      storage.status = UPLOAD_STATUS.UPLOADED
       // O upload acabou: guardar o identificador dele só manteria vivo um
       // ponteiro para uma conversa que o bucket já encerrou.
       storage.uploadId = null

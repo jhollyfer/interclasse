@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { Categories } from '#core/entity'
+import { CATEGORY } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 
 /**
@@ -33,8 +33,8 @@ test.group('jogos > turmas', (group) => {
       .cookies(admin)
       .json({ name: '6º A', grade: 6 })
 
-    assert.equal(body(quinto).category, Categories.F1)
-    assert.equal(body(sexto).category, Categories.F2)
+    assert.equal(body(quinto).category, CATEGORY.F1)
+    assert.equal(body(sexto).category, CATEGORY.F2)
     repetido.assertStatus(409)
     assert.equal(body(repetido).code, 'CLASSROOM_ALREADY_EXISTS')
   })

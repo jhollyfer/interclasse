@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
 import type { Infer } from '@vinejs/vine/types'
 
-import env from '#start/env'
 import {
   ACTIVE_STATUSES,
   CATEGORIES,
@@ -219,13 +218,6 @@ export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
   'audio/ogg': 'ogg',
   'audio/wav': 'wav',
 }
-
-/**
- * O teto por arquivo, em bytes. Vem do ambiente e não tem default: sem a
- * variável a aplicação nem sobe (`start/env.ts`). A coluna `size` é
- * `bigint` justamente para não impor aqui um teto que o operador não pediu.
- */
-export const UPLOAD_MAX_SIZE = env.get('UPLOAD_MAX_SIZE')
 
 /** Os filtros da tabela de jogos, iguais no painel e no site. */
 export function matchFilterFields() {

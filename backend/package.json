@@ -20,6 +20,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
+    "openapi:generate": "node ace openapi:generate",
     "openapi:check": "node ace openapi:generate --check --strict",
     "check": "pnpm lint && pnpm typecheck && pnpm openapi:check && pnpm pattern:check && pnpm sync:check && pnpm authz:check",
     "prepare": "cd .. && husky backend/.husky || true",
@@ -44,7 +45,8 @@
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
     "#config/*": "./config/*.js",
-    "#commands/*": "./commands/*.js"
+    "#commands/*": "./commands/*.js",
+    "#scripts/*": "./scripts/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^8.5.2",

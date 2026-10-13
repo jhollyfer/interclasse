@@ -2,10 +2,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 import HTTPException from '#exceptions/http.exception'
-import { UserRoles } from '#core/entity'
+import { USER_ROLE } from '#core/entity'
 
 /** Quem opera o painel. */
-const STAFF: ReadonlyArray<string> = [UserRoles.ADMINISTRATOR]
+const STAFF: ReadonlyArray<string> = [USER_ROLE.ADMINISTRATOR]
 
 /**
  * A referência da API só existe para quem opera a instalação.

@@ -1,6 +1,6 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
-import { ACTIVE_STATUSES, ActiveStatuses, USER_ROLES } from '#core/entity'
+import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#core/entity'
 
 export default class extends BaseSchema {
   protected tableName = 'users'
@@ -15,7 +15,7 @@ export default class extends BaseSchema {
       // caía em `ADMINISTRATOR` por omissão, e um caminho de criação esquecido
       // gravava o papel mais poderoso em silêncio.
       table.enum('role', USER_ROLES).notNullable()
-      table.enum('status', ACTIVE_STATUSES).notNullable().defaultTo(ActiveStatuses.ACTIVE)
+      table.enum('status', ACTIVE_STATUSES).notNullable().defaultTo(ACTIVE_STATUS.ACTIVE)
       // Quem anexa guarda a referência, nunca o contrário - é o que permite uma
       // tabela de arquivos só, sem coluna de "tipo de dono". `SET NULL` e não
       // `CASCADE` como em `backend-old`: lá, apagar a imagem do avatar apagava

@@ -8,7 +8,7 @@ import {
   nextPhase,
   shuffle,
 } from '#features/_shared.tournament'
-import { MatchPhases } from '#core/entity'
+import { MATCH_PHASE } from '#core/entity'
 
 /**
  * As regras puras do mata-mata, sem banco nem HTTP.
@@ -64,13 +64,13 @@ test.group('torneio > sorteio', () => {
 
 test.group('torneio > mata-mata', () => {
   test('a fase sai do número de vagas', ({ assert }) => {
-    assert.equal(knockoutPhase(2), MatchPhases.FINAL)
-    assert.equal(knockoutPhase(4), MatchPhases.SEMI)
-    assert.equal(knockoutPhase(8), MatchPhases.QUARTER)
-    assert.equal(knockoutPhase(16), MatchPhases.ROUND_OF_16)
+    assert.equal(knockoutPhase(2), MATCH_PHASE.FINAL)
+    assert.equal(knockoutPhase(4), MATCH_PHASE.SEMI)
+    assert.equal(knockoutPhase(8), MATCH_PHASE.QUARTER)
+    assert.equal(knockoutPhase(16), MATCH_PHASE.ROUND_OF_16)
     assert.isUndefined(knockoutPhase(6))
-    assert.equal(nextPhase(MatchPhases.QUARTER), MatchPhases.SEMI)
-    assert.isUndefined(nextPhase(MatchPhases.FINAL))
+    assert.equal(nextPhase(MATCH_PHASE.QUARTER), MATCH_PHASE.SEMI)
+    assert.isUndefined(nextPhase(MATCH_PHASE.FINAL))
   })
 
   test('o vencedor da posição par vai como mandante, o da ímpar como visitante', ({ assert }) => {

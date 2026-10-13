@@ -4,10 +4,9 @@ import { basename, dirname, relative, resolve } from 'node:path'
 
 import ts from 'typescript'
 
-import type { DocumentedValidator, FeatureResponse } from './types.ts'
-
+import type { DocumentedValidator, FeatureResponse } from '#core/openapi/types'
 import HTTPException from '#exceptions/http.exception'
-import { RESPONSES } from '#core/response'
+import { RESPONSES } from '#core/openapi/response'
 
 /**
  * Lê o contrato que o código já declara.

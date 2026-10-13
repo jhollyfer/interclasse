@@ -9,7 +9,7 @@ import { URL_TTL } from '#config/drive'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { STORAGE_EXTENSIONS, type StorageMimetype } from '#core/validator'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
@@ -194,7 +194,7 @@ export default class StorageService extends StorageContract {
 
     const storages = await Storage.query()
       .whereIn('id', ids)
-      .where('status', UploadStatuses.UPLOADED)
+      .where('status', UPLOAD_STATUS.UPLOADED)
       .withScopes((scopes) => scopes.notDeleted())
 
     // A contagem só bate quando todos os ids deduplicados casam com um arquivo

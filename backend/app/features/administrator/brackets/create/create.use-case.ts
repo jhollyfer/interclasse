@@ -18,7 +18,7 @@ import {
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { BracketStatuses, MatchPhases, type MatchPhase } from '#core/entity'
+import { BRACKET_STATUS, MATCH_PHASE, type MatchPhase } from '#core/entity'
 import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
 
 type Payload = BracketCreatePayload
@@ -92,7 +92,7 @@ export default class AdministratorBracketCreateUseCase {
 
         const pairings = drawKnockout(eligible.map((classroom) => classroom.id))
         const created = await Bracket.create(
-          { sportId: sport.id, category: payload.category, status: BracketStatuses.KNOCKOUT },
+          { sportId: sport.id, category: payload.category, status: BRACKET_STATUS.KNOCKOUT },
           { client: trx },
         )
 
@@ -168,7 +168,7 @@ export default class AdministratorBracketCreateUseCase {
       await Match.create(
         {
           bracketId,
-          phase: phase ?? MatchPhases.FINAL,
+          phase: phase ?? MATCH_PHASE.FINAL,
           round,
           position,
           homeTeamId: home,
