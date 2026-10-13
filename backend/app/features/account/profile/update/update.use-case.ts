@@ -1,11 +1,14 @@
+import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
+import SessionService from '#services/session/session.service'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { isUniqueViolation } from '#features/_shared.database'
 import type { Merge } from '#core/entity'
 import type { ProfileUpdatePayload } from '#features/account/profile/profile.validator'
 
@@ -14,7 +17,10 @@ type Response = Either<HTTPException, User>
 
 @inject()
 export default class AccountProfileUpdateUseCase {
-  constructor(private readonly storage: StorageService) {}
+  constructor(
+    private readonly storage: StorageService,
+    private readonly session: SessionService,
+  ) {}
 
   // `currentPassword` sai do payload aqui: ele é prova de identidade, não
   // coluna, e deixá-lo passar faria o `merge()` lá embaixo tentar gravá-lo.
@@ -87,11 +93,14 @@ export default class AccountProfileUpdateUseCase {
 
       // `merge` só escreve as chaves presentes: campo ausente no payload não
       // vira `undefined` na linha. É o que faz o `PUT` ser parcial de verdade.
-      user.merge(payload)
-      await user.save()
+      await db.transaction(async (trx) => {
+        user.useTransaction(trx)
+        user.merge(payload)
+        await user.save()
 
-      // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
-      if (shouldRevoke) await User.accessTokens.deleteAll(user)
+        // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
+        if (shouldRevoke) await this.session.revokeAll(user, trx)
+      })
 
       // Recarrega o avatar depois do save: quem acabou de trocar a foto tem de
       // receber a `url` nova na mesma resposta, sem uma leitura a mais.
@@ -99,10 +108,19 @@ export default class AccountProfileUpdateUseCase {
 
       return right(user)
     } catch (error) {
-      logger.error({ err: error }, '[account > update][error]')
+      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
+      // pedidos simultâneos esbarra no `unique` do banco (_padroes/backend.md §4.4).
+      if (isUniqueViolation(error))
+        return left(
+          HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
+            email: 'Usuário já existe',
+          }),
+        )
+
+      logger.error({ err: error }, '[profile > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ACCOUNT_UPDATE_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'PROFILE_UPDATE_ERROR'),
       )
     }
   }

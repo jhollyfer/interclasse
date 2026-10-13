@@ -30,9 +30,14 @@ export default class StorefrontMatchPaginateUseCase {
 
       return right({ meta: matches.getMeta(), data: matches.all() })
     } catch (error) {
-      logger.error({ err: error }, '[storefront matches > list][error]')
+      logger.error({ err: error }, '[matches > paginate][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_LIST_ERROR'))
+      return left(
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'STOREFRONT_MATCH_PAGINATE_ERROR',
+        ),
+      )
     }
   }
 }

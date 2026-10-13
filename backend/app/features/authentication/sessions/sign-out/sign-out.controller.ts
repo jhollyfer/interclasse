@@ -25,10 +25,10 @@ export default class AuthenticationSessionSignOutController {
   ) {}
 
   async handle(context: HttpContext) {
-    const user = context.auth.getUserOrFail()
+    const actor = context.auth.getUserOrFail()
     const refreshToken = context.request.cookie(COOKIE_TOKEN.REFRESH)
 
-    const result = await this.useCase.execute({ user, refreshToken })
+    const result = await this.useCase.execute({ actor, refreshToken })
 
     if (result.isLeft()) throw result.value
 

@@ -30,10 +30,13 @@ export default class RepresentativeEnrollmentUpdateUseCase {
 
       return right(board.value)
     } catch (error) {
-      logger.error({ err: error }, '[representative enrollments > update][error]')
+      logger.error({ err: error }, '[enrollments > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR',
+        ),
       )
     }
   }

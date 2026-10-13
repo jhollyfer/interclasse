@@ -8,35 +8,31 @@ import { ActiveStatuses } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import SessionService, { type SessionTokens } from '#services/session/session.service'
 
 type Payload = {
   refreshToken?: string
 }
 
-type Response = Either<HTTPException, User>
+type Response = Either<HTTPException, SessionTokens>
 
 @inject()
 export default class AuthenticationSessionRefreshUseCase {
+  constructor(private readonly session: SessionService) {}
+
   async execute(payload: Payload): Promise<Response> {
     if (!payload.refreshToken) {
       return left(HTTPException.Unauthorized('Sessão não encontrada', 'REFRESH_TOKEN_MISSING'))
     }
 
-    let refreshToken: AccessToken | null = null
-
-    // Um token ilegível faz o `verify` LANÇAR em vez de devolver null. Os dois
-    // casos são a mesma coisa para quem chama: sessão inválida, não erro 500.
+    // O `try` global começa antes da primeira ida ao banco (_padroes/backend.md §4.2).
     try {
-      refreshToken = await User.accessTokens.verify(new Secret(payload.refreshToken))
-    } catch (error) {
-      logger.debug({ err: error }, '[authentication > refresh] token ilegível')
-    }
+      const refreshToken = await this.verify(payload.refreshToken)
 
-    if (!refreshToken || refreshToken.name !== COOKIE_TOKEN.REFRESH) {
-      return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
-    }
+      if (!refreshToken || refreshToken.name !== COOKIE_TOKEN.REFRESH) {
+        return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
+      }
 
-    try {
       // A mesma query do guard, e não `User.find`: renovar sem o filtro
       // prorrogaria por escrito uma sessão que já foi encerrada.
       const user = await User.query()
@@ -59,13 +55,26 @@ export default class AuthenticationSessionRefreshUseCase {
         return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
       }
 
-      return right(user)
+      return right(await this.session.issue(user))
     } catch (error) {
-      logger.error({ err: error }, '[authentication > refresh][error]')
+      logger.error({ err: error }, '[sessions > refresh][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'REFRESH_TOKEN_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'SESSION_REFRESH_ERROR'),
       )
+    }
+  }
+
+  /**
+   * Um token ilegível faz o `verify` LANÇAR em vez de devolver null. Os dois
+   * casos são a mesma coisa para quem chama: sessão inválida, não erro 500.
+   */
+  private async verify(value: string): Promise<AccessToken | null> {
+    try {
+      return await User.accessTokens.verify(new Secret(value))
+    } catch (error) {
+      logger.debug({ err: error }, '[sessions > refresh][verify] token ilegível')
+      return null
     }
   }
 }

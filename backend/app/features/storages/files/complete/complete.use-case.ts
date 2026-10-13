@@ -74,10 +74,10 @@ export default class StoragesFileCompleteUseCase {
 
       return right(storage)
     } catch (error) {
-      logger.error({ err: error }, '[storages > complete][error]')
+      logger.error({ err: error }, '[files > complete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_COMPLETE_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_COMPLETE_ERROR'),
       )
     }
   }
@@ -93,7 +93,7 @@ export default class StoragesFileCompleteUseCase {
     try {
       await this.storage.remove(storage)
     } catch (error) {
-      logger.error({ err: error }, '[storages > complete][discard][error]')
+      logger.error({ err: error }, '[files > complete][discard][error]')
     }
   }
 }

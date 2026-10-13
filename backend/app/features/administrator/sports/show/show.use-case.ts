@@ -22,7 +22,12 @@ export default class AdministratorSportShowUseCase {
     } catch (error) {
       logger.error({ err: error }, '[sports > show][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_SHOW_ERROR'))
+      return left(
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_SPORT_SHOW_ERROR',
+        ),
+      )
     }
   }
 }

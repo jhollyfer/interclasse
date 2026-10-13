@@ -95,7 +95,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AccountShowError"
+                  "$ref": "#/components/schemas/Error500ProfileShowError"
                 }
               }
             }
@@ -160,7 +160,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AccountUpdateError"
+                  "$ref": "#/components/schemas/Error500ProfileUpdateError"
                 }
               }
             }
@@ -252,7 +252,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementListError"
+                  "$ref": "#/components/schemas/Error500AdministratorAnnouncementPaginateError"
                 }
               }
             }
@@ -372,7 +372,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorAnnouncementCreateError"
                 }
               }
             }
@@ -462,7 +462,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorAnnouncementShowError"
                 }
               }
             }
@@ -550,7 +550,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorAnnouncementUpdateError"
                 }
               }
             }
@@ -642,7 +642,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorAnnouncementDeleteError"
                 }
               }
             }
@@ -738,7 +738,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketListError"
+                  "$ref": "#/components/schemas/Error500AdministratorBracketPaginateError"
                 }
               }
             }
@@ -868,7 +868,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorBracketCreateError"
                 }
               }
             }
@@ -958,7 +958,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorBracketShowError"
                 }
               }
             }
@@ -1050,7 +1050,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorBracketDeleteError"
                 }
               }
             }
@@ -1146,7 +1146,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomListError"
+                  "$ref": "#/components/schemas/Error500AdministratorClassroomPaginateError"
                 }
               }
             }
@@ -1289,7 +1289,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorClassroomCreateError"
                 }
               }
             }
@@ -1379,7 +1379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorClassroomShowError"
                 }
               }
             }
@@ -1477,7 +1477,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorClassroomUpdateError"
                 }
               }
             }
@@ -1579,7 +1579,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorClassroomDeleteError"
                 }
               }
             }
@@ -1675,7 +1675,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500MatchListError"
+                  "$ref": "#/components/schemas/Error500AdministratorMatchPaginateError"
                 }
               }
             }
@@ -1829,7 +1829,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500MatchUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorMatchUpdateError"
                 }
               }
             }
@@ -1906,11 +1906,11 @@
             }
           },
           "404": {
-            "description": "Partida não encontrada",
+            "description": "Partida não encontrada · Chave não encontrada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error404MatchNotFound"
+                  "$ref": "#/components/schemas/Error404BracketNotFoundMatchNotFound"
                 }
               }
             }
@@ -1940,7 +1940,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500MatchScoreError"
+                  "$ref": "#/components/schemas/Error500AdministratorMatchScoreError"
                 }
               }
             }
@@ -2015,11 +2015,11 @@
             }
           },
           "404": {
-            "description": "Partida não encontrada",
+            "description": "Partida não encontrada · Chave não encontrada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error404MatchNotFound"
+                  "$ref": "#/components/schemas/Error404BracketNotFoundMatchNotFound"
                 }
               }
             }
@@ -2049,7 +2049,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500MatchUnscoreError"
+                  "$ref": "#/components/schemas/Error500AdministratorMatchUnscoreError"
                 }
               }
             }
@@ -2145,7 +2145,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportListError"
+                  "$ref": "#/components/schemas/Error500AdministratorSportPaginateError"
                 }
               }
             }
@@ -2275,7 +2275,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorSportCreateError"
                 }
               }
             }
@@ -2365,7 +2365,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorSportShowError"
                 }
               }
             }
@@ -2463,7 +2463,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorSportUpdateError"
                 }
               }
             }
@@ -2565,7 +2565,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorSportDeleteError"
                 }
               }
             }
@@ -2661,7 +2661,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserListError"
+                  "$ref": "#/components/schemas/Error500UserPaginateError"
                 }
               }
             }
@@ -3383,7 +3383,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ClassroomListError"
+                  "$ref": "#/components/schemas/Error500AdvisorClassroomPaginateError"
                 }
               }
             }
@@ -3494,7 +3494,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentShowError"
+                  "$ref": "#/components/schemas/Error500AdvisorEnrollmentShowError"
                 }
               }
             }
@@ -3594,7 +3594,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentUpdateError"
+                  "$ref": "#/components/schemas/Error500AdvisorEnrollmentUpdateError"
                 }
               }
             }
@@ -3690,7 +3690,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentListError"
+                  "$ref": "#/components/schemas/Error500StudentPaginateError"
                 }
               }
             }
@@ -4057,7 +4057,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500RefreshTokenError"
+                  "$ref": "#/components/schemas/Error500SessionRefreshError"
                 }
               }
             }
@@ -4102,7 +4102,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SignInError"
+                  "$ref": "#/components/schemas/Error500SessionSignInError"
                 }
               }
             }
@@ -4147,7 +4147,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SignOutError"
+                  "$ref": "#/components/schemas/Error500SessionSignOutError"
                 }
               }
             }
@@ -4214,7 +4214,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentShowError"
+                  "$ref": "#/components/schemas/Error500RepresentativeEnrollmentShowError"
                 }
               }
             }
@@ -4302,7 +4302,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentUpdateError"
+                  "$ref": "#/components/schemas/Error500RepresentativeEnrollmentUpdateError"
                 }
               }
             }
@@ -4387,7 +4387,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageListError"
+                  "$ref": "#/components/schemas/Error500FilePaginateError"
                 }
               }
             }
@@ -4525,7 +4525,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageCreateError"
+                  "$ref": "#/components/schemas/Error500FileCreateError"
                 }
               }
             }
@@ -4602,7 +4602,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageShowError"
+                  "$ref": "#/components/schemas/Error500FileShowError"
                 }
               }
             }
@@ -4681,7 +4681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageDeleteError"
+                  "$ref": "#/components/schemas/Error500FileDeleteError"
                 }
               }
             }
@@ -4759,7 +4759,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageCompleteError"
+                  "$ref": "#/components/schemas/Error500FileCompleteError"
                 }
               }
             }
@@ -4840,7 +4840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StorageDownloadError"
+                  "$ref": "#/components/schemas/Error500FileDownloadError"
                 }
               }
             }
@@ -4918,7 +4918,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StoragePartsError"
+                  "$ref": "#/components/schemas/Error500FilePartsError"
                 }
               }
             }
@@ -4991,7 +4991,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500AnnouncementListError"
+                  "$ref": "#/components/schemas/Error500StorefrontAnnouncementPaginateError"
                 }
               }
             }
@@ -5078,7 +5078,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketListError"
+                  "$ref": "#/components/schemas/Error500StorefrontBracketPaginateError"
                 }
               }
             }
@@ -5171,7 +5171,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500BracketShowError"
+                  "$ref": "#/components/schemas/Error500StorefrontBracketShowError"
                 }
               }
             }
@@ -5239,7 +5239,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500MatchListError"
+                  "$ref": "#/components/schemas/Error500StorefrontMatchPaginateError"
                 }
               }
             }
@@ -5370,7 +5370,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SportListError"
+                  "$ref": "#/components/schemas/Error500StorefrontSportPaginateError"
                 }
               }
             }
@@ -9928,6 +9928,41 @@
           "code"
         ]
       },
+      "Error404BracketNotFoundMatchNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "BRACKET_NOT_FOUND",
+              "MATCH_NOT_FOUND"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error404ClassroomNotFound": {
         "type": "object",
         "properties": {
@@ -10978,7 +11013,7 @@
           "errors"
         ]
       },
-      "Error500AccountShowError": {
+      "Error500AdministratorAnnouncementCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -10995,7 +11030,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ACCOUNT_SHOW_ERROR"
+              "ADMINISTRATOR_ANNOUNCEMENT_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -11012,7 +11047,7 @@
           "code"
         ]
       },
-      "Error500AccountUpdateError": {
+      "Error500AdministratorAnnouncementDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11029,7 +11064,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ACCOUNT_UPDATE_ERROR"
+              "ADMINISTRATOR_ANNOUNCEMENT_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -11046,7 +11081,7 @@
           "code"
         ]
       },
-      "Error500AnnouncementCreateError": {
+      "Error500AdministratorAnnouncementPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11063,7 +11098,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ANNOUNCEMENT_CREATE_ERROR"
+              "ADMINISTRATOR_ANNOUNCEMENT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11080,7 +11115,7 @@
           "code"
         ]
       },
-      "Error500AnnouncementDeleteError": {
+      "Error500AdministratorAnnouncementShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11097,7 +11132,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ANNOUNCEMENT_DELETE_ERROR"
+              "ADMINISTRATOR_ANNOUNCEMENT_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -11114,7 +11149,7 @@
           "code"
         ]
       },
-      "Error500AnnouncementListError": {
+      "Error500AdministratorAnnouncementUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11131,7 +11166,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ANNOUNCEMENT_LIST_ERROR"
+              "ADMINISTRATOR_ANNOUNCEMENT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -11148,7 +11183,7 @@
           "code"
         ]
       },
-      "Error500AnnouncementShowError": {
+      "Error500AdministratorBracketCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11165,7 +11200,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ANNOUNCEMENT_SHOW_ERROR"
+              "ADMINISTRATOR_BRACKET_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -11182,7 +11217,7 @@
           "code"
         ]
       },
-      "Error500AnnouncementUpdateError": {
+      "Error500AdministratorBracketDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11199,7 +11234,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ANNOUNCEMENT_UPDATE_ERROR"
+              "ADMINISTRATOR_BRACKET_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -11216,7 +11251,7 @@
           "code"
         ]
       },
-      "Error500BracketCreateError": {
+      "Error500AdministratorBracketPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11233,7 +11268,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "BRACKET_CREATE_ERROR"
+              "ADMINISTRATOR_BRACKET_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11250,7 +11285,7 @@
           "code"
         ]
       },
-      "Error500BracketDeleteError": {
+      "Error500AdministratorBracketShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11267,7 +11302,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "BRACKET_DELETE_ERROR"
+              "ADMINISTRATOR_BRACKET_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -11284,7 +11319,7 @@
           "code"
         ]
       },
-      "Error500BracketListError": {
+      "Error500AdministratorClassroomCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11301,7 +11336,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "BRACKET_LIST_ERROR"
+              "ADMINISTRATOR_CLASSROOM_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -11318,7 +11353,7 @@
           "code"
         ]
       },
-      "Error500BracketShowError": {
+      "Error500AdministratorClassroomDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11335,7 +11370,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "BRACKET_SHOW_ERROR"
+              "ADMINISTRATOR_CLASSROOM_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -11352,7 +11387,7 @@
           "code"
         ]
       },
-      "Error500ClassroomCreateError": {
+      "Error500AdministratorClassroomPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11369,7 +11404,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "CLASSROOM_CREATE_ERROR"
+              "ADMINISTRATOR_CLASSROOM_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11386,7 +11421,7 @@
           "code"
         ]
       },
-      "Error500ClassroomDeleteError": {
+      "Error500AdministratorClassroomShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11403,7 +11438,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "CLASSROOM_DELETE_ERROR"
+              "ADMINISTRATOR_CLASSROOM_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -11420,7 +11455,7 @@
           "code"
         ]
       },
-      "Error500ClassroomListError": {
+      "Error500AdministratorClassroomUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11437,7 +11472,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "CLASSROOM_LIST_ERROR"
+              "ADMINISTRATOR_CLASSROOM_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -11454,7 +11489,7 @@
           "code"
         ]
       },
-      "Error500ClassroomShowError": {
+      "Error500AdministratorMatchPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11471,7 +11506,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "CLASSROOM_SHOW_ERROR"
+              "ADMINISTRATOR_MATCH_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11488,7 +11523,7 @@
           "code"
         ]
       },
-      "Error500ClassroomUpdateError": {
+      "Error500AdministratorMatchScoreError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11505,7 +11540,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "CLASSROOM_UPDATE_ERROR"
+              "ADMINISTRATOR_MATCH_SCORE_ERROR"
             ]
           },
           "errors": {
@@ -11522,7 +11557,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentShowError": {
+      "Error500AdministratorMatchUnscoreError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11539,7 +11574,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_SHOW_ERROR"
+              "ADMINISTRATOR_MATCH_UNSCORE_ERROR"
             ]
           },
           "errors": {
@@ -11556,7 +11591,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentUpdateError": {
+      "Error500AdministratorMatchUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11573,7 +11608,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_UPDATE_ERROR"
+              "ADMINISTRATOR_MATCH_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -11590,7 +11625,7 @@
           "code"
         ]
       },
-      "Error500MatchListError": {
+      "Error500AdministratorSportCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11607,7 +11642,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "MATCH_LIST_ERROR"
+              "ADMINISTRATOR_SPORT_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -11624,7 +11659,7 @@
           "code"
         ]
       },
-      "Error500MatchScoreError": {
+      "Error500AdministratorSportDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11641,7 +11676,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "MATCH_SCORE_ERROR"
+              "ADMINISTRATOR_SPORT_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -11658,7 +11693,7 @@
           "code"
         ]
       },
-      "Error500MatchUnscoreError": {
+      "Error500AdministratorSportPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11675,7 +11710,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "MATCH_UNSCORE_ERROR"
+              "ADMINISTRATOR_SPORT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11692,7 +11727,7 @@
           "code"
         ]
       },
-      "Error500MatchUpdateError": {
+      "Error500AdministratorSportShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11709,7 +11744,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "MATCH_UPDATE_ERROR"
+              "ADMINISTRATOR_SPORT_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -11726,7 +11761,7 @@
           "code"
         ]
       },
-      "Error500RefreshTokenError": {
+      "Error500AdministratorSportUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11743,7 +11778,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "REFRESH_TOKEN_ERROR"
+              "ADMINISTRATOR_SPORT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -11760,7 +11795,7 @@
           "code"
         ]
       },
-      "Error500SignInError": {
+      "Error500AdvisorClassroomPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11777,7 +11812,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SIGN_IN_ERROR"
+              "ADVISOR_CLASSROOM_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11794,7 +11829,7 @@
           "code"
         ]
       },
-      "Error500SignOutError": {
+      "Error500AdvisorEnrollmentShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11811,7 +11846,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SIGN_OUT_ERROR"
+              "ADVISOR_ENROLLMENT_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -11828,7 +11863,7 @@
           "code"
         ]
       },
-      "Error500SportCreateError": {
+      "Error500AdvisorEnrollmentUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11845,7 +11880,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SPORT_CREATE_ERROR"
+              "ADVISOR_ENROLLMENT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -11862,7 +11897,7 @@
           "code"
         ]
       },
-      "Error500SportDeleteError": {
+      "Error500FileCompleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11879,7 +11914,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SPORT_DELETE_ERROR"
+              "FILE_COMPLETE_ERROR"
             ]
           },
           "errors": {
@@ -11896,7 +11931,7 @@
           "code"
         ]
       },
-      "Error500SportListError": {
+      "Error500FileCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11913,7 +11948,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SPORT_LIST_ERROR"
+              "FILE_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -11930,7 +11965,7 @@
           "code"
         ]
       },
-      "Error500SportShowError": {
+      "Error500FileDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11947,7 +11982,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SPORT_SHOW_ERROR"
+              "FILE_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -11964,7 +11999,7 @@
           "code"
         ]
       },
-      "Error500SportUpdateError": {
+      "Error500FileDownloadError": {
         "type": "object",
         "properties": {
           "message": {
@@ -11981,7 +12016,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SPORT_UPDATE_ERROR"
+              "FILE_DOWNLOAD_ERROR"
             ]
           },
           "errors": {
@@ -11998,7 +12033,7 @@
           "code"
         ]
       },
-      "Error500StorageCompleteError": {
+      "Error500FilePaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12015,7 +12050,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_COMPLETE_ERROR"
+              "FILE_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -12032,7 +12067,7 @@
           "code"
         ]
       },
-      "Error500StorageCreateError": {
+      "Error500FilePartsError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12049,7 +12084,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_CREATE_ERROR"
+              "FILE_PARTS_ERROR"
             ]
           },
           "errors": {
@@ -12066,7 +12101,7 @@
           "code"
         ]
       },
-      "Error500StorageDeleteError": {
+      "Error500FileShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12083,7 +12118,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_DELETE_ERROR"
+              "FILE_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -12100,7 +12135,7 @@
           "code"
         ]
       },
-      "Error500StorageDownloadError": {
+      "Error500ProfileShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12117,7 +12152,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_DOWNLOAD_ERROR"
+              "PROFILE_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -12134,7 +12169,7 @@
           "code"
         ]
       },
-      "Error500StorageListError": {
+      "Error500ProfileUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12151,7 +12186,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_LIST_ERROR"
+              "PROFILE_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -12168,7 +12203,7 @@
           "code"
         ]
       },
-      "Error500StoragePartsError": {
+      "Error500RepresentativeEnrollmentShowError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12185,7 +12220,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_PARTS_ERROR"
+              "REPRESENTATIVE_ENROLLMENT_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -12202,7 +12237,7 @@
           "code"
         ]
       },
-      "Error500StorageShowError": {
+      "Error500RepresentativeEnrollmentUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12219,7 +12254,279 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_SHOW_ERROR"
+              "REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500SessionRefreshError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SESSION_REFRESH_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500SessionSignInError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SESSION_SIGN_IN_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500SessionSignOutError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SESSION_SIGN_OUT_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontAnnouncementPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_ANNOUNCEMENT_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontBracketPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_BRACKET_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontBracketShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_BRACKET_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontMatchPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_MATCH_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontSportPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_SPORT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -12304,7 +12611,7 @@
           "code"
         ]
       },
-      "Error500StudentListError": {
+      "Error500StudentPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12321,7 +12628,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STUDENT_LIST_ERROR"
+              "STUDENT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -12474,7 +12781,7 @@
           "code"
         ]
       },
-      "Error500UserListError": {
+      "Error500UserPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -12491,7 +12798,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "USER_LIST_ERROR"
+              "USER_PAGINATE_ERROR"
             ]
           },
           "errors": {

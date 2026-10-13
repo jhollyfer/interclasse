@@ -24,7 +24,10 @@ export default class AdministratorBracketShowUseCase {
       logger.error({ err: error }, '[brackets > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_BRACKET_SHOW_ERROR',
+        ),
       )
     }
   }

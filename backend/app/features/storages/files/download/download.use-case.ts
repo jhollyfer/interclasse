@@ -50,10 +50,10 @@ export default class StoragesFileDownloadUseCase {
 
       return right(await this.storage.signedDownload(storage))
     } catch (error) {
-      logger.error({ err: error }, '[storages > download][error]')
+      logger.error({ err: error }, '[files > download][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DOWNLOAD_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_DOWNLOAD_ERROR'),
       )
     }
   }

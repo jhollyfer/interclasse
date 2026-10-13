@@ -6,13 +6,16 @@ import User from '#models/user'
 import { ActiveStatuses } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import SessionService, { type SessionTokens } from '#services/session/session.service'
 import type { SessionSignInPayload } from '#features/authentication/sessions/sessions.validator'
 
 type Payload = SessionSignInPayload
-type Response = Either<HTTPException, User>
+type Response = Either<HTTPException, SessionTokens>
 
 @inject()
 export default class AuthenticationSessionSignInUseCase {
+  constructor(private readonly session: SessionService) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
       const user = await User.verifyCredentials(payload.email, payload.password)
@@ -28,7 +31,7 @@ export default class AuthenticationSessionSignInUseCase {
         )
       }
 
-      return right(user)
+      return right(await this.session.issue(user))
     } catch (error) {
       // Só credencial errada vira 401. Qualquer outra falha (banco fora, por
       // exemplo) continua sendo erro de servidor - não vale mentir 401.
@@ -43,9 +46,11 @@ export default class AuthenticationSessionSignInUseCase {
         )
       }
 
-      logger.error({ err: error }, '[authentication > sign-in][error]')
+      logger.error({ err: error }, '[sessions > sign-in][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'SIGN_IN_ERROR'))
+      return left(
+        HTTPException.InternalServerError('Erro interno do servidor', 'SESSION_SIGN_IN_ERROR'),
+      )
     }
   }
 }

@@ -26,7 +26,10 @@ export default class AdministratorAnnouncementDeleteUseCase {
       logger.error({ err: error }, '[announcements > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_ANNOUNCEMENT_DELETE_ERROR',
+        ),
       )
     }
   }

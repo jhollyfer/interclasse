@@ -64,10 +64,10 @@ export default class StoragesFileDeleteUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[storages > delete][error]')
+      logger.error({ err: error }, '[files > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DELETE_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_DELETE_ERROR'),
       )
     }
   }

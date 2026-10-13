@@ -3,7 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 import HTTPException from '#exceptions/http.exception'
-import env from '#start/env'
+import { corsOrigins } from '#config/cors'
 
 /**
  * Os content-types que **não** disparam preflight.
@@ -16,16 +16,6 @@ import env from '#start/env'
 const SIMPLE_CONTENT_TYPES = ['multipart/form-data', 'application/x-www-form-urlencoded']
 
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
-
-/** A allowlist de `CORS_ORIGIN`, a mesma que o CORS usa. */
-function allowlist(): Array<string> {
-  const configured = env.get('CORS_ORIGIN') ?? ''
-
-  return configured
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean)
-}
 
 /**
  * A barreira de CSRF dos content-types que não disparam preflight.
@@ -64,7 +54,7 @@ export default class OriginMiddleware {
 
     if (!origin) return next()
 
-    if (allowlist().includes(origin)) return next()
+    if (corsOrigins.includes(origin)) return next()
 
     throw HTTPException.Forbidden('Origem não permitida', 'ORIGIN_NOT_ALLOWED')
   }

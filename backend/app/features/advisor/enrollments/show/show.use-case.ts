@@ -23,10 +23,13 @@ export default class AdvisorEnrollmentShowUseCase {
 
       return right(await this.enrollments.board(classroom))
     } catch (error) {
-      logger.error({ err: error }, '[advisor enrollments > show][error]')
+      logger.error({ err: error }, '[enrollments > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADVISOR_ENROLLMENT_SHOW_ERROR',
+        ),
       )
     }
   }

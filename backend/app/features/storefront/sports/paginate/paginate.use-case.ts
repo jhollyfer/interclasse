@@ -25,9 +25,14 @@ export default class StorefrontSportPaginateUseCase {
 
       return right({ meta: sports.getMeta(), data: sports.all() })
     } catch (error) {
-      logger.error({ err: error }, '[storefront sports > list][error]')
+      logger.error({ err: error }, '[sports > paginate][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_LIST_ERROR'))
+      return left(
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'STOREFRONT_SPORT_PAGINATE_ERROR',
+        ),
+      )
     }
   }
 }

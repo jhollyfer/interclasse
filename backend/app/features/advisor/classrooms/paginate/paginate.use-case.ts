@@ -27,10 +27,13 @@ export default class AdvisorClassroomPaginateUseCase {
 
       return right({ meta: classrooms.getMeta(), data: classrooms.all() })
     } catch (error) {
-      logger.error({ err: error }, '[advisor classrooms > list][error]')
+      logger.error({ err: error }, '[classrooms > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_LIST_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADVISOR_CLASSROOM_PAGINATE_ERROR',
+        ),
       )
     }
   }

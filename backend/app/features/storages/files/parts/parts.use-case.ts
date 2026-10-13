@@ -70,11 +70,9 @@ export default class StoragesFilePartsUseCase {
 
       return right(this.#envelope(storage, partSize, totalParts, parts, uploaded))
     } catch (error) {
-      logger.error({ err: error }, '[storages > parts][error]')
+      logger.error({ err: error }, '[files > parts][error]')
 
-      return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_PARTS_ERROR'),
-      )
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'FILE_PARTS_ERROR'))
     }
   }
 

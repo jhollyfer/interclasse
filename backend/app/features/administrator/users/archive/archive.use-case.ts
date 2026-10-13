@@ -1,8 +1,10 @@
+import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
 
 import User from '#models/user'
+import SessionService from '#services/session/session.service'
 import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
@@ -30,7 +32,10 @@ type Response = Either<HTTPException, User>
  */
 @inject()
 export default class AdministratorUserArchiveUseCase {
-  constructor(private readonly classrooms: ClassroomService) {}
+  constructor(
+    private readonly classrooms: ClassroomService,
+    private readonly session: SessionService,
+  ) {}
 
   async execute({ id }: Payload): Promise<Response> {
     try {
@@ -41,12 +46,17 @@ export default class AdministratorUserArchiveUseCase {
 
       if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
 
-      user.deletedAt = DateTime.now()
-      await user.save()
+      // Arquivar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
+      // falha do segundo passo deixaria a conta arquivada com sessão viva.
+      await db.transaction(async (trx) => {
+        user.useTransaction(trx)
+        user.deletedAt = DateTime.now()
+        await user.save()
 
-      await User.accessTokens.deleteAll(user)
-      // Conta arquivada não aconselha nem representa turma nenhuma.
-      await this.classrooms.detach(user)
+        await this.session.revokeAll(user, trx)
+        // Conta arquivada não aconselha nem representa turma nenhuma.
+        await this.classrooms.detach(user, trx)
+      })
 
       return right(user)
     } catch (error) {

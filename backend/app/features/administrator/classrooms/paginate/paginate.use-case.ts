@@ -26,10 +26,13 @@ export default class AdministratorClassroomPaginateUseCase {
 
       return right({ meta: classrooms.getMeta(), data: classrooms.all() })
     } catch (error) {
-      logger.error({ err: error }, '[classrooms > list][error]')
+      logger.error({ err: error }, '[classrooms > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_LIST_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_CLASSROOM_PAGINATE_ERROR',
+        ),
       )
     }
   }

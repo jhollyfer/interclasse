@@ -1,11 +1,14 @@
+import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
+import SessionService from '#services/session/session.service'
 import ClassroomService from '#services/classroom/classroom.service'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { isUniqueViolation } from '#features/_shared.database'
 import { ActiveStatuses, type Merge } from '#core/entity'
 import type { UserUpdatePayload } from '#features/administrator/users/users.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -30,6 +33,7 @@ export default class AdministratorUserUpdateUseCase {
   constructor(
     private readonly storage: StorageService,
     private readonly classrooms: ClassroomService,
+    private readonly session: SessionService,
   ) {}
 
   async execute({ id, ...payload }: Payload): Promise<Response> {
@@ -79,12 +83,15 @@ export default class AdministratorUserUpdateUseCase {
       // `merge` só escreve as chaves presentes: campo ausente no payload não
       // vira `undefined` na linha. É o que faz o `PUT` ser parcial de verdade
       //.
-      user.merge(payload)
-      await user.save()
+      await db.transaction(async (trx) => {
+        user.useTransaction(trx)
+        user.merge(payload)
+        await user.save()
 
-      // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
-      if (shouldRevoke) await User.accessTokens.deleteAll(user)
-      if (roleChanged) await this.classrooms.detach(user)
+        // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
+        if (shouldRevoke) await this.session.revokeAll(user, trx)
+        if (roleChanged) await this.classrooms.detach(user, trx)
+      })
 
       // Recarrega antes de responder: quem acabou de editar recebe a linha como
       // ela ficou no banco, com `updated_at` e a foto nova, sem uma segunda
@@ -94,6 +101,15 @@ export default class AdministratorUserUpdateUseCase {
 
       return right(user)
     } catch (error) {
+      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
+      // pedidos simultâneos esbarra no `unique` do banco (_padroes/backend.md §4.4).
+      if (isUniqueViolation(error))
+        return left(
+          HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
+            email: 'Usuário já existe',
+          }),
+        )
+
       logger.error({ err: error }, '[users > update][error]')
 
       return left(

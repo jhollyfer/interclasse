@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import AuthenticationSessionRefreshUseCase from './refresh.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie/cookie.service'
+import CookieService, { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 
 @inject()
 export default class AuthenticationSessionRefreshController {
@@ -33,9 +33,7 @@ export default class AuthenticationSessionRefreshController {
 
     if (result.isLeft()) throw result.value
 
-    const tokens = await issueSessionTokens(result.value)
-
-    this.cookie.set(context, tokens)
+    this.cookie.set(context, result.value)
 
     return context.response.noContent()
   }

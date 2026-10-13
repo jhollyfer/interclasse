@@ -27,7 +27,10 @@ export default class AdministratorClassroomShowUseCase {
       logger.error({ err: error }, '[classrooms > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_CLASSROOM_SHOW_ERROR',
+        ),
       )
     }
   }

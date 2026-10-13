@@ -11,28 +11,24 @@ import env from '#start/env'
  */
 
 /**
- * A allowlist vem de `CORS_ORIGIN`, separada por vírgula.
+ * A allowlist vem de `CORS_ORIGIN`, separada por vírgula, lida uma vez aqui e
+ * exportada: o middleware de origem e o cookie de sessão leem a mesma lista em
+ * vez de cada um refazer o parse.
  *
  * Ela precisa ser explícita: com `credentials: true` abaixo, o protocolo recusa
  * `*` - o navegador não envia cookie para uma origem curinga. Então ou a origem
  * do frontend está listada, ou não existe sessão entre os dois.
  */
-function allowlist() {
-  const configured = env.get('CORS_ORIGIN') ?? ''
-
-  return configured
-    .split(',')
-    .map(function (origin) {
-      return origin.trim()
-    })
-    .filter(Boolean)
-}
+export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGIN') ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 
 /**
  * Em desenvolvimento libera qualquer origem, para não exigir configuração de
  * quem só quer subir front e back na própria máquina.
  */
-let origin: boolean | string[] = allowlist()
+let origin: boolean | string[] = [...corsOrigins]
 if (app.inDev) origin = true
 
 const corsConfig = defineConfig({

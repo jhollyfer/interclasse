@@ -5,6 +5,7 @@ import User from '#models/user'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { isUniqueViolation } from '#features/_shared.database'
 import type { UserCreatePayload } from '#features/administrator/users/users.validator'
 
 type Payload = UserCreatePayload
@@ -61,6 +62,15 @@ export default class AdministratorUserCreateUseCase {
 
       return right(user)
     } catch (error) {
+      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
+      // pedidos simultâneos esbarra no `unique` do banco (_padroes/backend.md §4.4).
+      if (isUniqueViolation(error))
+        return left(
+          HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
+            email: 'Já existe um usuário com este e-mail',
+          }),
+        )
+
       logger.error({ err: error }, '[users > create][error]')
 
       return left(

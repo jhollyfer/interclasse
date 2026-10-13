@@ -1,3 +1,4 @@
+import app from '@adonisjs/core/services/app'
 import { Secret } from '@adonisjs/core/helpers'
 import { errors, symbols } from '@adonisjs/auth'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -6,7 +7,8 @@ import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 
 import User from '#models/user'
 import { ActiveStatuses } from '#core/entity'
-import { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import SessionService from '#services/session/session.service'
 
 /**
  * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.
@@ -105,7 +107,10 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
    * spec teria de fazer o sign-in por HTTP antes de cada requisição.
    */
   async authenticateAsClient(user: User): Promise<AuthClientResponse> {
-    const tokens = await issueSessionTokens(user)
+    // O guard nasce fora do container (factory de `config/auth.ts`); o service
+    // é pedido a ele, nunca construído com `new`.
+    const session = await app.container.make(SessionService)
+    const tokens = await session.issue(user)
 
     return {
       cookies: {
