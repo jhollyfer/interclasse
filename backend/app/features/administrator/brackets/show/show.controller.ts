@@ -1,8 +1,10 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
+
+import AdministratorBracketShowUseCase from './show.use-case.ts'
+
 import { defineDocs } from '#core/openapi/types'
 import { BracketDetailResponse } from '#core/response'
-import AdministratorBracketShowUseCase from './show.use-case.ts'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

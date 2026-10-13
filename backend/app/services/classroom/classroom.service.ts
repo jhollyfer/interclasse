@@ -33,7 +33,7 @@ export default class ClassroomService {
         return left(
           HTTPException.UnprocessableEntity('Conselheiro não encontrado', 'ADVISOR_NOT_FOUND', {
             advisorId: 'Selecione um professor conselheiro',
-          })
+          }),
         )
     }
 
@@ -45,8 +45,8 @@ export default class ClassroomService {
           HTTPException.UnprocessableEntity(
             'Representante não encontrado',
             'REPRESENTATIVE_NOT_FOUND',
-            { representativeId: 'Selecione um aluno representante' }
-          )
+            { representativeId: 'Selecione um aluno representante' },
+          ),
         )
 
       const taken = Classroom.query().where('representativeId', people.representativeId)
@@ -57,8 +57,8 @@ export default class ClassroomService {
           HTTPException.Conflict(
             'Representante já vinculado a outra turma',
             'REPRESENTATIVE_TAKEN',
-            { representativeId: 'Este representante já está em outra turma' }
-          )
+            { representativeId: 'Este representante já está em outra turma' },
+          ),
         )
     }
 

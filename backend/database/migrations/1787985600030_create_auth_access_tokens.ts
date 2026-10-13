@@ -3,7 +3,7 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 export default class extends BaseSchema {
   protected tableName = 'auth_access_tokens'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       // Único `CASCADE` do esquema, e de propósito: o token não é dado de
@@ -27,7 +27,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

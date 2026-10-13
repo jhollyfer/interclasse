@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import { ADMINISTRATOR, body, resetDatabase } from '#tests/helpers'
 

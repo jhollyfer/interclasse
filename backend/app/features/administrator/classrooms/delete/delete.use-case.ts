@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import Team from '#models/team'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -26,7 +27,7 @@ export default class AdministratorClassroomDeleteUseCase {
 
       if (team)
         return left(
-          HTTPException.Conflict('A turma já está numa chave sorteada', 'CLASSROOM_IN_COMPETITION')
+          HTTPException.Conflict('A turma já está numa chave sorteada', 'CLASSROOM_IN_COMPETITION'),
         )
 
       await classroom.delete()
@@ -36,7 +37,7 @@ export default class AdministratorClassroomDeleteUseCase {
       logger.error({ err: error }, '[classrooms > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_DELETE_ERROR'),
       )
     }
   }

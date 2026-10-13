@@ -1,6 +1,7 @@
-import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig, syncDestination, targets } from '@adonisjs/core/logger'
+
+import env from '#start/env'
 
 /**
  * O destino síncrono, só fora de produção.

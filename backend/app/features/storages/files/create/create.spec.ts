@@ -1,10 +1,11 @@
 import { test } from '@japa/runner'
+import type { ApiClient } from '@japa/api-client'
+
 import Storage from '#models/storage'
 import { PART_SIZE } from '#services/multipart/multipart.service'
 import { FileCreateValidator } from '#features/storages/files/files.validator'
 import { UPLOAD_MAX_SIZE, type StorageMimetype } from '#core/validator'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
-import type { ApiClient } from '@japa/api-client'
+import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 import type { Session } from '#tests/helpers'
 
 /**
@@ -17,8 +18,8 @@ import type { Session } from '#tests/helpers'
 async function open(
   client: ApiClient,
   session: Session,
-  payload: { fileName: string; mimetype: StorageMimetype; size: number }
-): Promise<Record<string, any>> {
+  payload: { fileName: string; mimetype: StorageMimetype; size: number },
+): Promise<ResponseBody> {
   const response = await client.post('/storages').cookies(session).json(payload)
 
   response.assertStatus(201)
@@ -46,7 +47,7 @@ test.group('storages > validator', () => {
         fileName: 'script.sh',
         mimetype: 'application/x-sh',
         size: 128,
-      })
+      }),
     )
   })
 
@@ -61,7 +62,7 @@ test.group('storages > validator', () => {
         fileName: 'gigante.pdf',
         mimetype: 'application/pdf',
         size: UPLOAD_MAX_SIZE + 1,
-      })
+      }),
     )
   })
 
@@ -114,7 +115,7 @@ test.group('storages > create', (group) => {
     assert.equal(opened.partSize, PART_SIZE)
     assert.deepEqual(
       opened.parts.map((part: { partNumber: number }) => part.partNumber),
-      [1, 2, 3]
+      [1, 2, 3],
     )
   })
 

@@ -1,8 +1,9 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Student from '#models/student'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { StudentUpdatePayload } from '#features/advisor/students/students.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -26,7 +27,7 @@ export default class AdvisorStudentUpdateUseCase {
       logger.error({ err: error }, '[advisor students > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_UPDATE_ERROR'),
       )
     }
   }

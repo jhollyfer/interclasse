@@ -1,8 +1,9 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Announcement from '#models/announcement'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -22,7 +23,7 @@ export default class AdministratorAnnouncementShowUseCase {
       logger.error({ err: error }, '[announcements > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_SHOW_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_SHOW_ERROR'),
       )
     }
   }

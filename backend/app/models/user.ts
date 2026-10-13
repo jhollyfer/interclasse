@@ -1,11 +1,12 @@
-import { UserSchema } from '#database/schema'
-import Storage from '#models/storage'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { belongsTo, scope } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { type AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+
+import Storage from '#models/storage'
+import { UserSchema } from '#database/schema'
 import type { ActiveStatus, UserRole } from '#core/entity'
 
 /**

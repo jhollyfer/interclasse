@@ -1,6 +1,9 @@
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import { middlewareInfo } from '@adonisjs/core/http/helpers'
+
+import { FIELD_PATCHES } from './field-patches.ts'
+
 import openapi, {
   ACTION_OVERRIDES,
   SECURITY_COOKIE,
@@ -20,7 +23,6 @@ import {
   errorSchema,
   forbiddenDescription,
 } from '#core/openapi/errors'
-import { FIELD_PATCHES } from './field-patches.ts'
 import {
   PAGINATION_META_REF,
   PAGINATION_META_SCHEMA,
@@ -389,7 +391,7 @@ async function buildContract(
   docs: OperationDocs | undefined,
   intro: Introspection | undefined,
   method: string,
-  rule: TagRule | undefined
+  rule: TagRule | undefined,
 ): Promise<Contract> {
   const errors = new Map<number, Map<string, string>>()
 
@@ -482,7 +484,7 @@ function bodySchema(
   body: DocumentedValidator | ModelResource | ListResource,
   types: TypeIndex,
   context: string,
-  warnings: string[]
+  warnings: string[],
 ): SchemaObject {
   if (isModelResource(body)) return modelSchema(types, body)
   if (isListResource(body)) return { type: 'array', items: modelSchema(types, body.item) }
@@ -495,7 +497,7 @@ function buildSuccessResponses(
   operationId: string,
   components: Components,
   types: TypeIndex,
-  warnings: string[]
+  warnings: string[],
 ): Record<string, OpenAPIResponse> {
   const responses: Record<string, OpenAPIResponse> = {}
   const prefix = pascalize(operationId)
@@ -544,7 +546,7 @@ function buildSuccessResponses(
 function buildErrorResponses(
   contract: Contract,
   protection: Protection,
-  components: Components
+  components: Components,
 ): Record<string, OpenAPIResponse> {
   const codes = new Map<number, Map<string, string>>()
 
@@ -600,7 +602,7 @@ function buildParameters(
   contract: Contract,
   pathParams: string[],
   operationId: string,
-  warnings: string[]
+  warnings: string[],
 ): OpenAPIParameter[] {
   const parameters: OpenAPIParameter[] = []
 
@@ -644,14 +646,14 @@ function buildOperation(
   },
   components: Components,
   types: TypeIndex,
-  warnings: string[]
+  warnings: string[],
 ): OpenAPIOperation {
   const { method, operationId, path, pathParams, protection } = input
 
   if (!contract.tag) {
     warnings.push(
       `${method.toUpperCase()} ${path}: nenhum prefixo de \`config/openapi.ts\` casa com este ` +
-        'caminho. A operação cai em "Sem grupo" na barra lateral.'
+        'caminho. A operação cai em "Sem grupo" na barra lateral.',
     )
   }
 
@@ -700,7 +702,7 @@ function buildOperation(
     }
     warnings.push(
       `${method.toUpperCase()} ${path}: sem corpo de resposta. Registre a feature em ` +
-        '`app/core/response.ts`, apontando o model e as relações que o use-case precarrega.'
+        '`app/core/response.ts`, apontando o model e as relações que o use-case precarrega.',
     )
   }
 
@@ -776,13 +778,15 @@ export async function buildDocument(): Promise<BuildResult> {
         { method: verb, operationId, path, pathParams: params, protection },
         components,
         types,
-        warnings
+        warnings,
       )
 
-      usedTags.add(operation.tags[0])
+      const tag = operation.tags[0]
+      if (tag !== undefined) usedTags.add(tag)
 
-      paths[path] = paths[path] ?? {}
-      paths[path][verb] = operation
+      const operations = paths[path] ?? {}
+      operations[verb] = operation
+      paths[path] = operations
     }
   }
 
@@ -820,17 +824,19 @@ export async function buildDocument(): Promise<BuildResult> {
  * tudo que vem depois dela no arquivo.
  */
 function sortPaths(
-  paths: Record<string, Record<string, OpenAPIOperation>>
+  paths: Record<string, Record<string, OpenAPIOperation>>,
 ): Record<string, Record<string, OpenAPIOperation>> {
   const sorted: Record<string, Record<string, OpenAPIOperation>> = {}
 
-  for (const path of Object.keys(paths).sort()) {
+  for (const [path, byMethod] of Object.entries(paths).sort(
+    ([left], [right]) => Number(left > right) - Number(left < right),
+  )) {
     const operations: Record<string, OpenAPIOperation> = {}
-    const methods = Object.keys(paths[path]).sort(function (left, right) {
+    const methods = Object.entries(byMethod).sort(function ([left], [right]) {
       return METHOD_ORDER.indexOf(left) - METHOD_ORDER.indexOf(right)
     })
 
-    for (const method of methods) operations[method] = paths[path][method]
+    for (const [method, operation] of methods) operations[method] = operation
 
     sorted[path] = operations
   }
@@ -841,7 +847,11 @@ function sortPaths(
 function sortKeys(components: Components): Components {
   const sorted: Components = {}
 
-  for (const key of Object.keys(components).sort()) sorted[key] = components[key]
+  for (const [key, schema] of Object.entries(components).sort(
+    ([left], [right]) => Number(left > right) - Number(left < right),
+  )) {
+    sorted[key] = schema
+  }
 
   return sorted
 }

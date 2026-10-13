@@ -241,7 +241,7 @@ export const SORT_DIRECTIONS = Object.values(SortDirections)
  */
 export function sortOrder<TColumn extends string>(
   payload: { sort?: TColumn; direction?: SortDirection },
-  fallback: TColumn
+  fallback: TColumn,
 ): [TColumn, SortDirection] {
   return [payload.sort ?? fallback, payload.direction ?? SortDirections.ASC]
 }

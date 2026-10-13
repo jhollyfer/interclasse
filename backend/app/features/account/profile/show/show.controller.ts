@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
-import { defineDocs } from '#core/openapi/types'
+
 import AccountProfileShowUseCase from './show.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 
 @inject()
 export default class AccountProfileShowController {

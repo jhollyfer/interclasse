@@ -1,7 +1,9 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
+
 import ts from 'typescript'
 import type { LucidModel } from '@adonisjs/lucid/types/model'
+
 import type { ModelResource, RelationMap, SchemaObject } from './types.ts'
 
 /**
@@ -120,7 +122,7 @@ async function indexFile(file: string, index: TypeIndex): Promise<void> {
     file,
     await readFile(file, 'utf-8'),
     ts.ScriptTarget.Latest,
-    true
+    true,
   )
 
   for (const statement of source.statements) {
@@ -244,7 +246,7 @@ export function modelSchema(index: TypeIndex, resource: ModelResource): SchemaOb
 
     properties[column.serializeAs] = withEnum(
       withDateFormat(propertySchema(index, model, name), column.meta?.type === 'date'),
-      enums?.[name]
+      enums?.[name],
     )
     required.push(column.serializeAs)
   }

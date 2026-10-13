@@ -3,7 +3,7 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 export default class extends BaseSchema {
   protected tableName = 'sports'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table.string('name', 60).notNullable().unique()
@@ -18,7 +18,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

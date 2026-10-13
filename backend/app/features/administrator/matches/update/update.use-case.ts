@@ -1,8 +1,9 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Match from '#models/match'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { MatchUpdatePayload } from '#features/administrator/matches/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -23,16 +24,22 @@ export default class AdministratorMatchUpdateUseCase {
       if (location !== undefined) match.location = location
 
       await match.save()
-      await match.load('homeTeam', (team) => team.preload('classroom'))
-      await match.load('awayTeam', (team) => team.preload('classroom'))
-      await match.load('bracket', (bracket) => bracket.preload('sport'))
+      await match.load('homeTeam', (team) => {
+        team.preload('classroom')
+      })
+      await match.load('awayTeam', (team) => {
+        team.preload('classroom')
+      })
+      await match.load('bracket', (bracket) => {
+        bracket.preload('sport')
+      })
 
       return right(match)
     } catch (error) {
       logger.error({ err: error }, '[matches > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_UPDATE_ERROR'),
       )
     }
   }

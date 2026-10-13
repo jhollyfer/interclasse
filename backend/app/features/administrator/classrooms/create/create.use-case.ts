@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
-import logger from '@adonisjs/core/services/logger'
 import { categoryOf } from '#core/entity'
 import type { ClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
 
@@ -23,7 +24,7 @@ export default class AdministratorClassroomCreateUseCase {
         return left(
           HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
             name: 'Já existe uma turma com este nome',
-          })
+          }),
         )
 
       const people = await this.classrooms.assertPeople(payload)
@@ -48,13 +49,13 @@ export default class AdministratorClassroomCreateUseCase {
         return left(
           HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
             name: 'Já existe uma turma com este nome',
-          })
+          }),
         )
 
       logger.error({ err: error }, '[classrooms > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_CREATE_ERROR'),
       )
     }
   }

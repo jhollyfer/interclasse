@@ -1,8 +1,9 @@
+import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
+import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+
 import type Classroom from '#models/classroom'
 import type User from '#models/user'
 import { UserRoles } from '#core/entity'
-import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
-import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
 /**
  * Quem cuida de qual turma.
@@ -30,7 +31,7 @@ export default class ClassroomPolicy extends BasePolicy {
   /** O aluno é alcançado pela turma dele; ausente ou alheio, `404` do aluno. */
   manageStudent(
     actor: User,
-    student: { readonly classroom: Classroom } | null
+    student: { readonly classroom: Classroom } | null,
   ): AuthorizerResponse {
     if (student && actor.role === UserRoles.ADMINISTRATOR) return true
     if (student && student.classroom.advisorId === actor.id) return true

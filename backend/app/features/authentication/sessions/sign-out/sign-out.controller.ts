@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
+
+import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
+
 import { defineDocs } from '#core/openapi/types'
 import CookieService, { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
 
 @inject()
 export default class AuthenticationSessionSignOutController {
@@ -19,7 +21,7 @@ export default class AuthenticationSessionSignOutController {
 
   constructor(
     private readonly cookie: CookieService,
-    private readonly useCase: AuthenticationSessionSignOutUseCase
+    private readonly useCase: AuthenticationSessionSignOutUseCase,
   ) {}
 
   async handle(context: HttpContext) {

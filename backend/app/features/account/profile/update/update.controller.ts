@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
-import { defineDocs } from '#core/openapi/types'
+
 import AccountProfileUpdateUseCase from './update.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { ProfileUpdateValidator } from '#features/account/profile/profile.validator'
 
 @inject()

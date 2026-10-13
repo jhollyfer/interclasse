@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdministratorSportUpdateUseCase from './update.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { SportUpdateValidator } from '#features/administrator/sports/sports.validator'
 import { IdentifierValidator } from '#core/validator'
 

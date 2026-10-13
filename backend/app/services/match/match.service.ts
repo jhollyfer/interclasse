@@ -1,6 +1,7 @@
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+
 import type Classroom from '#models/classroom'
 import Match from '#models/match'
-import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import type { Category, MatchPhase, MatchStatus } from '#core/entity'
 
 export type MatchFilters = {
@@ -39,9 +40,15 @@ export default class MatchService {
     const query = Match.query()
       .whereNotNull('homeTeamId')
       .whereNotNull('awayTeamId')
-      .preload('homeTeam', (team) => team.preload('classroom', publicClassroom))
-      .preload('awayTeam', (team) => team.preload('classroom', publicClassroom))
-      .preload('bracket', (bracket) => bracket.preload('sport'))
+      .preload('homeTeam', (team) => {
+        team.preload('classroom', publicClassroom)
+      })
+      .preload('awayTeam', (team) => {
+        team.preload('classroom', publicClassroom)
+      })
+      .preload('bracket', (bracket) => {
+        bracket.preload('sport')
+      })
 
     if (filters.bracketId) query.where('bracketId', filters.bracketId)
     if (filters.phase) query.where('phase', filters.phase)

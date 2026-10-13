@@ -1,8 +1,9 @@
+import { belongsTo } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+
 import { EnrollmentSchema } from '#database/schema'
 import Sport from '#models/sport'
 import Student from '#models/student'
-import { belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 /** O aluno inscrito como atleta numa modalidade. */
 export default class Enrollment extends EnrollmentSchema {

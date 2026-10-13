@@ -1,8 +1,9 @@
-import env from '#start/env'
 import app from '@adonisjs/core/services/app'
-import HTTPException from '#exceptions/http.exception'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+
+import HTTPException from '#exceptions/http.exception'
+import env from '#start/env'
 
 /**
  * Os content-types que **não** disparam preflight.

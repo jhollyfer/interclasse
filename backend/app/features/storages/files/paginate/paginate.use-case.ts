@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, recentFirst, type Paginated } from '#core/entity'
 import type { FilePaginatePayload } from '#features/storages/files/files.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = FilePaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
@@ -63,7 +64,7 @@ export default class StoragesFilePaginateUseCase {
       logger.error({ err: error }, '[storages > list][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_LIST_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_LIST_ERROR'),
       )
     }
   }

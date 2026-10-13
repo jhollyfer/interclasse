@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import { DateTime } from 'luxon'
+
 import User from '#models/user'
 import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
-import { DateTime } from 'luxon'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -52,7 +53,7 @@ export default class AdministratorUserArchiveUseCase {
       logger.error({ err: error }, '[users > archive][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_ARCHIVE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'USER_ARCHIVE_ERROR'),
       )
     }
   }

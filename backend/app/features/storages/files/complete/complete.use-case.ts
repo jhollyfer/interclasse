@@ -1,13 +1,14 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import StorageService from '#services/storage/storage.service'
 import MultipartService from '#services/multipart/multipart.service'
 import { UploadStatuses } from '#core/entity'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 import type { IdentifierPayload } from '#core/validator'
 import type { FileCompletePayload } from '#features/storages/files/files.validator'
 
@@ -36,7 +37,7 @@ type Response = Either<HTTPException, ModelObject>
 export default class StoragesFileCompleteUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly multipart: MultipartService
+    private readonly multipart: MultipartService,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
@@ -60,7 +61,7 @@ export default class StoragesFileCompleteUseCase {
         return left(
           HTTPException.UnprocessableEntity('Arquivo incompleto', 'STORAGE_SIZE_MISMATCH', {
             size: `O arquivo enviado tem ${metadata.contentLength} bytes, e ${storage.size} foram declarados.`,
-          })
+          }),
         )
       }
 
@@ -76,7 +77,7 @@ export default class StoragesFileCompleteUseCase {
       logger.error({ err: error }, '[storages > complete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_COMPLETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_COMPLETE_ERROR'),
       )
     }
   }

@@ -1,6 +1,7 @@
-import type User from '#models/user'
 import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+
+import type User from '#models/user'
 
 /**
  * Quem pode operar qual conta no painel.
@@ -33,13 +34,13 @@ export default class UserPolicy extends BasePolicy {
   update(
     actor: User,
     targetId: string,
-    changes: { readonly role?: unknown; readonly status?: unknown }
+    changes: { readonly role?: unknown; readonly status?: unknown },
   ): AuthorizerResponse {
     if (actor.id !== targetId) return true
     if (changes.role === undefined && changes.status === undefined) return true
 
     return AuthorizationResponse.deny('Você não pode alterar o próprio papel ou status', 403).t(
-      'SELF_ACCESS_FORBIDDEN'
+      'SELF_ACCESS_FORBIDDEN',
     )
   }
 
@@ -47,7 +48,7 @@ export default class UserPolicy extends BasePolicy {
     if (actor.id !== targetId) return true
 
     return AuthorizationResponse.deny('Você não pode arquivar a própria conta', 403).t(
-      'SELF_ARCHIVE_FORBIDDEN'
+      'SELF_ARCHIVE_FORBIDDEN',
     )
   }
 
@@ -55,7 +56,7 @@ export default class UserPolicy extends BasePolicy {
     if (actor.id !== targetId) return true
 
     return AuthorizationResponse.deny('Você não pode apagar a própria conta', 403).t(
-      'SELF_DELETE_FORBIDDEN'
+      'SELF_DELETE_FORBIDDEN',
     )
   }
 }

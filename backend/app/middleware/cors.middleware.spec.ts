@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { body } from '#tests/helpers'
 
 /**

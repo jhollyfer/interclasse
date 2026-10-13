@@ -1,8 +1,10 @@
-import { test } from '@japa/runner'
-import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
 import { readFile } from 'node:fs/promises'
+
+import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
+
+import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
 import openapi from '#config/openapi'
 
 /**
@@ -65,7 +67,7 @@ test.group('documentação > o documento descreve o roteador', () => {
   test('toda rota registrada está no documento', async ({ assert }) => {
     const { paths } = await lerDocumento()
     const faltando = operacoesRegistradas().filter(
-      ({ caminho, metodo }) => !paths[caminho]?.[metodo]
+      ({ caminho, metodo }) => !paths[caminho]?.[metodo],
     )
 
     // A mensagem lista o que falta em vez de só falhar: quem quebrar isto
@@ -76,14 +78,14 @@ test.group('documentação > o documento descreve o roteador', () => {
       [],
       `operações registradas e ausentes do openapi.json: ${faltando
         .map(({ metodo, caminho }) => `${metodo.toUpperCase()} ${caminho}`)
-        .join(', ')}. Rode \`node ace openapi:generate\`.`
+        .join(', ')}. Rode \`node ace openapi:generate\`.`,
     )
   })
 
   test('o documento não descreve rota que não existe', async ({ assert }) => {
     const { paths } = await lerDocumento()
     const registradas = new Set(
-      operacoesRegistradas().map(({ caminho, metodo }) => `${metodo} ${caminho}`)
+      operacoesRegistradas().map(({ caminho, metodo }) => `${metodo} ${caminho}`),
     )
 
     const sobrando: string[] = []

@@ -1,12 +1,13 @@
+import { inject } from '@adonisjs/core'
+import { Secret } from '@adonisjs/core/helpers'
+import logger from '@adonisjs/core/services/logger'
+import type { AccessToken } from '@adonisjs/auth/access_tokens'
+
 import User from '#models/user'
 import { ActiveStatuses } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import { inject } from '@adonisjs/core'
-import { Secret } from '@adonisjs/core/helpers'
-import logger from '@adonisjs/core/services/logger'
-import type { AccessToken } from '@adonisjs/auth/access_tokens'
 
 type Payload = {
   refreshToken?: string
@@ -63,7 +64,7 @@ export default class AuthenticationSessionRefreshUseCase {
       logger.error({ err: error }, '[authentication > refresh][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'REFRESH_TOKEN_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'REFRESH_TOKEN_ERROR'),
       )
     }
   }

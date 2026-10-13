@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Bracket from '#models/bracket'
 import Match from '#models/match'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { MatchStatuses } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -34,8 +35,8 @@ export default class AdministratorBracketDeleteUseCase {
         return left(
           HTTPException.Conflict(
             'A chave já tem placar lançado: desfaça os placares antes de apagá-la',
-            'BRACKET_HAS_RESULTS'
-          )
+            'BRACKET_HAS_RESULTS',
+          ),
         )
 
       await bracket.delete()
@@ -45,7 +46,7 @@ export default class AdministratorBracketDeleteUseCase {
       logger.error({ err: error }, '[brackets > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_DELETE_ERROR'),
       )
     }
   }

@@ -11,7 +11,7 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 export default class extends BaseSchema {
   protected tableName = 'rate_limits'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.string('key', 255).notNullable().primary()
       table.integer('points', 9).notNullable().defaultTo(0)
@@ -19,7 +19,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

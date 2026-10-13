@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import User from '#models/user'
 import ClassroomService from '#services/classroom/classroom.service'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { ActiveStatuses, type Merge } from '#core/entity'
 import type { UserUpdatePayload } from '#features/administrator/users/users.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -28,7 +29,7 @@ type Response = Either<HTTPException, User>
 export default class AdministratorUserUpdateUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly classrooms: ClassroomService
+    private readonly classrooms: ClassroomService,
   ) {}
 
   async execute({ id, ...payload }: Payload): Promise<Response> {
@@ -50,7 +51,7 @@ export default class AdministratorUserUpdateUseCase {
           return left(
             HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
               email: 'Já existe um usuário com este e-mail',
-            })
+            }),
           )
       }
 
@@ -96,7 +97,7 @@ export default class AdministratorUserUpdateUseCase {
       logger.error({ err: error }, '[users > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'USER_UPDATE_ERROR'),
       )
     }
   }

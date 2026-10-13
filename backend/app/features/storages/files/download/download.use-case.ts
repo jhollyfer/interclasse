@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import StorageService from '#services/storage/storage.service'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 import type { Merge } from '#core/entity'
 import type User from '#models/user'
@@ -52,7 +53,7 @@ export default class StoragesFileDownloadUseCase {
       logger.error({ err: error }, '[storages > download][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DOWNLOAD_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DOWNLOAD_ERROR'),
       )
     }
   }

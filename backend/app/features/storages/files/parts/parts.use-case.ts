@@ -1,3 +1,8 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
+import type { StorageUpload } from '../create/create.use-case.ts'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
@@ -10,10 +15,7 @@ import MultipartService, {
   type UploadedPart,
 } from '#services/multipart/multipart.service'
 import { UploadStatuses } from '#core/entity'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
-import type { StorageUpload } from '../create/create.use-case.ts'
 
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, StorageUpload>
@@ -39,7 +41,7 @@ type Response = Either<HTTPException, StorageUpload>
 export default class StoragesFilePartsUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly multipart: MultipartService
+    private readonly multipart: MultipartService,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
@@ -62,7 +64,7 @@ export default class StoragesFilePartsUseCase {
       const uploaded = await this.#uploaded(storage)
       const missing = pendingParts(
         totalParts,
-        uploaded.map((part) => part.partNumber)
+        uploaded.map((part) => part.partNumber),
       )
       const parts = await this.#sign(storage, missing)
 
@@ -71,7 +73,7 @@ export default class StoragesFilePartsUseCase {
       logger.error({ err: error }, '[storages > parts][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_PARTS_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_PARTS_ERROR'),
       )
     }
   }
@@ -112,7 +114,7 @@ export default class StoragesFilePartsUseCase {
     partSize: number,
     totalParts: number,
     parts: Array<PresignedPart>,
-    uploaded: Array<UploadedPart>
+    uploaded: Array<UploadedPart>,
   ): StorageUpload {
     return {
       storage,

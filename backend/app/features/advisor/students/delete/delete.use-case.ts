@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Bracket from '#models/bracket'
 import Enrollment from '#models/enrollment'
 import Student from '#models/student'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -22,7 +23,7 @@ export default class AdvisorStudentDeleteUseCase {
         .where('studentId', student.id)
         .whereIn(
           'sportId',
-          Bracket.query().where('category', student.classroom.category).select('sportId')
+          Bracket.query().where('category', student.classroom.category).select('sportId'),
         )
         .first()
 
@@ -30,8 +31,8 @@ export default class AdvisorStudentDeleteUseCase {
         return left(
           HTTPException.Conflict(
             'O aluno está inscrito numa modalidade já sorteada',
-            'STUDENT_IN_COMPETITION'
-          )
+            'STUDENT_IN_COMPETITION',
+          ),
         )
 
       await student.delete()
@@ -41,7 +42,7 @@ export default class AdvisorStudentDeleteUseCase {
       logger.error({ err: error }, '[advisor students > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_DELETE_ERROR'),
       )
     }
   }

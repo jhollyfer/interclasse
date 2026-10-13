@@ -1,6 +1,7 @@
-import HTTPException from '#exceptions/http.exception'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+
+import HTTPException from '#exceptions/http.exception'
 import { UserRoles } from '#core/entity'
 
 /** Quem opera o painel. */

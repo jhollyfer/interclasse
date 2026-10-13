@@ -29,21 +29,24 @@ const IMPORTER = function (filePath: string) {
   return import(filePath)
 }
 
-new Ignitor(APP_ROOT, { importer: IMPORTER })
-  .tap(function (app) {
-    app.booting(async function () {
-      await import('#start/env')
+try {
+  await new Ignitor(APP_ROOT, { importer: IMPORTER })
+    .tap(function (app) {
+      app.booting(async function () {
+        await import('#start/env')
+      })
+      // O emissor de sinal não aguarda o retorno: `void` diz que o encerramento
+      // corre por conta própria, e a falha dele cai no handler do processo.
+      app.listen('SIGTERM', function () {
+        void app.terminate()
+      })
+      app.listenIf(app.managedByPm2, 'SIGINT', function () {
+        void app.terminate()
+      })
     })
-    app.listen('SIGTERM', function () {
-      return app.terminate()
-    })
-    app.listenIf(app.managedByPm2, 'SIGINT', function () {
-      return app.terminate()
-    })
-  })
-  .httpServer()
-  .start()
-  .catch(function (error) {
-    process.exitCode = 1
-    prettyPrintError(error)
-  })
+    .httpServer()
+    .start()
+} catch (error) {
+  process.exitCode = 1
+  await prettyPrintError(error)
+}

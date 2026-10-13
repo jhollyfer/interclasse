@@ -1,7 +1,8 @@
 import app from '@adonisjs/core/services/app'
+import type { HttpContext } from '@adonisjs/core/http'
+
 import env from '#start/env'
 import User from '#models/user'
-import type { HttpContext } from '@adonisjs/core/http'
 
 /**
  * Os nomes e as validades da sessão, num lugar só.
@@ -55,7 +56,7 @@ function parentDomain(hostname: string): string {
  */
 export function resolveSameSite(
   clientUrl: string | undefined,
-  serverUrl: string | undefined
+  serverUrl: string | undefined,
 ): 'lax' | 'none' {
   const client = hostnameOf(clientUrl)
   const server = hostnameOf(serverUrl)
@@ -80,7 +81,7 @@ export function resolveSameSite(
 function clientOrigin(): string | undefined {
   const [first] = (env.get('CORS_ORIGIN') ?? '').split(',')
 
-  return first.trim() || undefined
+  return first?.trim() || undefined
 }
 
 export default class CookieService {

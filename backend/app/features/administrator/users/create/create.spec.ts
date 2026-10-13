@@ -1,7 +1,9 @@
-import { test } from '@japa/runner'
 import { randomUUID } from 'node:crypto'
+
+import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
+
 import User from '#models/user'
 import { ActiveStatuses, UserRoles } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'

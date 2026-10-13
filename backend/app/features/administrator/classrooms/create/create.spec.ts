@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { Categories } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 

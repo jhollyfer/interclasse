@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import RepresentativeEnrollmentShowUseCase from './show.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 
 @inject()
 export default class RepresentativeEnrollmentShowController {

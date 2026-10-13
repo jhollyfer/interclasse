@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+
 import User from '#models/user'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 

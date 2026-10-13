@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Announcement from '#models/announcement'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, recentFirst, type Paginated } from '#core/entity'
 import type { AnnouncementPaginatePayload } from '#features/administrator/announcements/announcements.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = AnnouncementPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
@@ -31,7 +32,7 @@ export default class AdministratorAnnouncementPaginateUseCase {
       logger.error({ err: error }, '[announcements > list][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_LIST_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_LIST_ERROR'),
       )
     }
   }

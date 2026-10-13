@@ -1,8 +1,10 @@
-import Storage from '#models/storage'
-import type User from '#models/user'
+import { randomUUID } from 'node:crypto'
+
 import db from '@adonisjs/lucid/services/db'
 import drive from '@adonisjs/drive/services/main'
-import { randomUUID } from 'node:crypto'
+
+import Storage from '#models/storage'
+import type User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { STORAGE_EXTENSIONS, type StorageMimetype } from '#core/validator'
@@ -88,20 +90,20 @@ export default class StorageService {
    * um arquivo em uso que some sem aviso.
    */
   async references(storageId: string): Promise<string[]> {
+    // O rótulo viaja junto com a contagem, no mesmo objeto: casar dois arrays
+    // pelo índice é o defeito que _padroes/backend.md §5.2 proíbe.
     const counts = await Promise.all(
-      REFERENCES.map((reference) =>
-        db.from(reference.table).where(reference.column, storageId).count('* as total')
-      )
+      REFERENCES.map(async (reference) => {
+        const rows = await db
+          .from(reference.table)
+          .where(reference.column, storageId)
+          .count('* as total')
+        // `count` do Postgres é `bigint`, e o driver o entrega como string.
+        return { label: reference.label, total: Number(rows[0]?.total ?? 0) }
+      }),
     )
 
-    const found: string[] = []
-
-    for (const [index, rows] of counts.entries()) {
-      // `count` do Postgres é `bigint`, e o driver o entrega como string.
-      if (Number(rows[0]?.total ?? 0) > 0) found.push(REFERENCES[index].label)
-    }
-
-    return found
+    return counts.filter((count) => count.total > 0).map((count) => count.label)
   }
 
   /**
@@ -225,7 +227,7 @@ export default class StorageService {
       return left(
         HTTPException.UnprocessableEntity('Arquivo não encontrado', 'STORAGE_NOT_FOUND', {
           [field]: 'Arquivo não encontrado',
-        })
+        }),
       )
 
     return right(ids)

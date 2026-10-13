@@ -1,8 +1,9 @@
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import string from '@adonisjs/core/helpers/string'
+
 import Classroom from '#models/classroom'
 import Sport from '#models/sport'
 import { categoryOf } from '#core/entity'
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import string from '@adonisjs/core/helpers/string'
 
 /**
  * As modalidades e as turmas da escola, como estavam no site anterior.
@@ -12,9 +13,9 @@ import string from '@adonisjs/core/helpers/string'
  * duplica, só reafirma.
  */
 export default class extends BaseSeeder {
-  static environment = ['development', 'production']
+  static override environment = ['development', 'production']
 
-  async run() {
+  override async run() {
     const sports = [
       { name: 'Futsal', minAthletes: 5, maxAthletes: 12 },
       { name: 'Vôlei', minAthletes: 6, maxAthletes: 12 },

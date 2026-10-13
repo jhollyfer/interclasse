@@ -1,4 +1,5 @@
 import { configApp } from '@adonisjs/eslint-config'
+import importX from 'eslint-plugin-import-x'
 
 /**
  * Arquivo gerado não se linta: a correção some na próxima geração.
@@ -9,66 +10,74 @@ import { configApp } from '@adonisjs/eslint-config'
  *   `generateRegistry()` no hook de init.
  * - `build/` é a saída do `node ace build`.
  *
- * Os três já estão no `.prettierignore`; esta é a mesma lista, para o ESLint.
- * Sem ela, as regras de estilo apontam 234 erros no registry do Tuyau, que é
- * exatamente o tipo de ruído que faz um lint parar de ser lido.
- *
  * Precisa ser um objeto próprio no array: no flat config, um objeto só com
- * `ignores` é ignore global. Dentro de `configApp({ ignores })` valeria apenas
- * para aquele bloco de configuração, e o arquivo continuaria sendo verificado.
+ * `ignores` é ignore global.
  */
-const gerados = { ignores: ['database/schema.ts', '.adonisjs/**', 'build/**'] }
+const generated = { ignores: ['database/schema.ts', '.adonisjs/**', 'build/**'] }
 
 /**
- * As quatro regras de estilo do `code-pattern`, cobradas por lint em vez de por
- * leitura de diff. São as mesmas quatro que `lowcodejs/backend/eslint.config.js`
- * já enforça; trazê-las para cá é o que faz os quatro projetos falharem pelo
- * mesmo motivo.
- *
- * As regras 5, 6 e 7 do `code-pattern` (`Merge` em vez de `&`, lookup object no
- * lugar de cadeia de `if/else if`, `async/await` em vez de `.then`) não têm
- * regra nativa equivalente e continuam cobradas na revisão do diff.
+ * As regras de escrita da régua (_padroes/tooling.md §4, backend.md §2), cobradas
+ * por lint em vez de por leitura de diff. `Merge` em vez de `&`, lookup object e
+ * `async/await` não têm regra nativa e ficam na revisão.
  */
-const estilo = {
+const style = {
   files: ['**/*.ts'],
   rules: {
-    /**
-     * Regra 1: ternário não é control flow. `??`, `?.` e `&&` seguem livres —
-     * não são ternários. Uso legítimo inline pede `eslint-disable-next-line`
-     * com a razão.
-     */
+    // Sem ternário: `if` clássico. `??`, `?.` e `&&` seguem livres.
     'no-ternary': 'error',
-
-    /** Regra 2: sem `any` desnecessário. */
+    // Sem `any` desnecessário: `unknown` + narrowing.
     '@typescript-eslint/no-explicit-any': 'error',
-
-    /** Regra 3: sem `as`. `as const` continua permitido. */
+    // Sem `as`; `as const` continua permitido.
     '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
-
-    /**
-     * Regra 4: sempre `type`, nunca `interface`. Declaration merging é limite
-     * da linguagem, não escolha de estilo — por isso `.d.ts` fica de fora
-     * abaixo, e um `declare module` dentro de `.ts` pede disable pontual.
-     */
+    // Sempre `type`, nunca `interface` (declaration merging fica no bloco abaixo).
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-
-    /** Sem `!` non-null: o tipo se estreita com guarda (_padroes/typescript.md §1). */
+    // Sem `!` non-null: o tipo se estreita com guarda (_padroes/typescript.md §1).
     '@typescript-eslint/no-non-null-assertion': 'error',
   },
 }
 
 /**
- * O container do AdonisJS resolve o colaborador; instanciar à mão devolve um
- * objeto que ninguém pode dublar num teste e que não recebe as dependências
- * que o próprio construtor declara.
+ * Regras que dependem de tipo. `no-floating-promises` pega a rejeição sem dono -
+ * a causa mais comum de processo caindo sem log - e `no-misused-promises` a
+ * promise onde se espera `void`. `projectService` deixa o parser achar o
+ * `tsconfig.json` de cada arquivo sozinho.
  *
- * O seletor pega só o que é colaborador pelo nome. Fica de fora, de propósito:
- * stdlib (`Map`, `Set`, `Date`, `URL`, `Error`), value object (`Secret`,
- * `Left`/`Right`), entidade Lucid (`new User()` é criar registro, não injetar),
- * comando de SDK (`PutObjectCommand`) e o composition root — que tem seu
- * próprio bloco de exceção adiante.
+ * O query builder do Lucid estende `Promise` só para poder ser aguardado, e é
+ * montado por mutação (`query.where(...)` sem `await`): ele é declarado como
+ * thenable seguro em vez de a regra virar ruído.
  */
-const injecao = {
+const LUCID_BUILDERS = [
+  'ModelQueryBuilderContract',
+  'DatabaseQueryBuilderContract',
+  'ExcutableQueryBuilderContract',
+  'RelationQueryBuilderContract',
+  'RelationSubQueryBuilderContract',
+  'HasManyQueryBuilderContract',
+  'HasManyThroughQueryBuilderContract',
+  'ManyToManyQueryBuilderContract',
+  'ManyToManySubQueryBuilderContract',
+].map((name) => ({ from: 'package', package: '@adonisjs/lucid', name }))
+
+const typed = {
+  files: ['**/*.ts'],
+  languageOptions: {
+    parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+  },
+  rules: {
+    '@typescript-eslint/no-floating-promises': [
+      'error',
+      { allowForKnownSafePromises: LUCID_BUILDERS },
+    ],
+    '@typescript-eslint/no-misused-promises': 'error',
+  },
+}
+
+/**
+ * Colaborador vem do container, nunca de `new` (_padroes/backend.md §2.1). O
+ * seletor pega só o que é colaborador pelo nome; stdlib, value object, entidade
+ * Lucid e comando de SDK ficam de fora de propósito.
+ */
+const injection = {
   files: ['**/*.ts'],
   rules: {
     'no-restricted-syntax': [
@@ -78,38 +87,25 @@ const injecao = {
           'NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]',
         message:
           'Colaborador vem do container, não de `new`. Injete por construtor com @inject(). ' +
-          'Se este é o composition root (provider, config, bootstrap), mova para lá.',
+          'Composition root de verdade: mova para lá com um override de `files`.',
       },
     ],
   },
 }
 
-/**
- * Onde `new` de colaborador é o certo: é aqui que o grafo é montado, e não há
- * container ainda para pedir a instância.
- */
-const composicao = {
-  files: [
-    'providers/**/*.ts',
-    'config/**/*.ts',
-    'start/**/*.ts',
-  ],
+/** O composition root nomeado: único lugar onde o grafo é montado sem container. */
+const compositionRoot = {
+  files: ['start/**/*.ts', 'providers/**/*.ts', 'config/**/*.ts'],
   rules: {
     'no-restricted-syntax': 'off',
   },
 }
 
 /**
- * Regra 4 não alcança declaration merging: `declare module '@adonisjs/...'`
- * exige `interface`, porque `type` não funde declaração. É limite da
- * linguagem, não escolha de estilo.
- *
- * O AdonisJS concentra a augmentation em lugares previsíveis — `config/*.ts`
- * (guards, hashers, disks, limiters, mailers), `providers/*.ts` (o que o
- * provider pendura no `HttpContext`), `app/core/validator.ts` (transform de data
- * do VineJS), `tests/bootstrap.ts` (registry do Japa) e o middleware que
- * inicializa o Bouncer. Nenhum deles é código de feature; o alvo da regra é
- * `app/features`, `app/services` e `app/models`, onde ela continua valendo.
+ * Declaration merging exige `interface` - limite da linguagem, não estilo. O
+ * Adonis concentra a augmentation em lugares previsíveis: `config/*.ts`,
+ * `providers/*.ts`, `app/core/validator.ts` (transform de data do VineJS),
+ * `tests/bootstrap.ts` e o middleware que inicializa o Bouncer.
  */
 const augmentation = {
   files: [
@@ -126,38 +122,35 @@ const augmentation = {
 }
 
 /**
- * Regra 2 fica de fora dos testes por uma razão de origem, não de conveniência.
- *
- * O registry do Tuyau casa a rota pelo caminho e não pelo método, então
- * `response.body()` é a união de todas as respostas daquele caminho — as de
- * erro inclusive. `tests/helpers.ts::body()` desfaz isso com
- * `Record<string, any>`, e cada spec que lê um corpo herda o mesmo `any`.
- *
- * A causa é uma só, e está no registry. Trocar por `unknown` empurraria uma
- * asserção para cada leitura de campo em centenas de asserts, o que é pior. A
- * exceção sai daqui no dia em que o registry casar rota por método.
+ * Ordem de import: externo → alias interno (`#…`) → relativo, com linha em
+ * branco entre os grupos (_padroes/tooling.md §4).
  */
-const testes = {
-  files: ['tests/**/*.ts', '**/*.spec.ts'],
+const imports = {
+  files: ['**/*.ts'],
+  plugins: { 'import-x': importX },
   rules: {
-    '@typescript-eslint/no-explicit-any': 'off',
+    'import-x/order': [
+      'error',
+      {
+        'groups': ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
+        'pathGroups': [{ pattern: '#**', group: 'internal' }],
+        'pathGroupsExcludedImportTypes': ['builtin'],
+        'newlines-between': 'always',
+      },
+    ],
   },
 }
 
 export default [
-  gerados,
+  generated,
   ...configApp({
     rules: {
       '@unicorn/filename-case': 'off',
 
       /**
        * A mesma configuração de `@adonisjs/eslint-config`, com uma adição: variável
-       * não usada pode começar com `_`.
-       *
-       * É o idioma para descartar uma chave no destructuring - `const { role:
-       * _papelIgnorado, ...dados } = payload` diz, no próprio nome, que o valor foi
-       * jogado fora de propósito. Sem a exceção, a regra empurra para um nome pior
-       * ou para o descarte deixar de ser explícito.
+       * não usada pode começar com `_` - o idioma para descartar uma chave no
+       * destructuring.
        */
       '@typescript-eslint/naming-convention': [
         'error',
@@ -178,9 +171,10 @@ export default [
       ],
     },
   }),
-  estilo,
-  injecao,
-  composicao,
+  style,
+  typed,
+  injection,
+  compositionRoot,
   augmentation,
-  testes,
+  imports,
 ]

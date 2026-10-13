@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import StoragesFileCompleteUseCase from './complete.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
 import { FileCompleteValidator } from '#features/storages/files/files.validator'
 

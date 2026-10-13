@@ -1,10 +1,11 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+
 import { CATEGORIES } from '#core/entity'
 
 export default class extends BaseSchema {
   protected tableName = 'classrooms'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       // "9º A". Único: é o nome que aparece no placar, e duas turmas com o mesmo
@@ -37,7 +38,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

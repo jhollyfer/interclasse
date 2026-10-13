@@ -1,8 +1,9 @@
-import { linha } from '#tests/storages-fixtures'
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+
+import { linha } from '#tests/storages-fixtures'
 import { UploadStatuses } from '#core/entity'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -44,8 +45,8 @@ test.group('storages > listagem', (group) => {
 
     response.assertStatus(200)
     assert.deepEqual(
-      body(response).data.map((item: Record<string, any>) => item.id),
-      [recente.id, antigo.id]
+      body(response).data.map((item: ResponseBody) => item.id),
+      [recente.id, antigo.id],
     )
     // A página 1 com 20 itens é o padrão de todo recurso do painel.
     assert.equal(body(response).meta.currentPage, 1)

@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
+import logger from '@adonisjs/core/services/logger'
+
 import Sport from '#models/sport'
 import SlugService from '#services/slug/slug.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import db from '@adonisjs/lucid/services/db'
 import { isUniqueViolation } from '#features/_shared.database'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { SportUpdatePayload } from '#features/administrator/sports/sports.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -31,8 +32,8 @@ export default class AdministratorSportUpdateUseCase {
             'SPORT_INVALID_LIMITS',
             {
               minAthletes: 'O mínimo não pode passar do máximo',
-            }
-          )
+            },
+          ),
         )
 
       // Baixar o teto abaixo de uma lista já inscrita deixava a turma acima do
@@ -54,8 +55,8 @@ export default class AdministratorSportUpdateUseCase {
               'SPORT_ROSTER_ABOVE_LIMIT',
               {
                 maxAthletes: `Uma turma já tem ${Number(largest.total)} atletas inscritos; reduza a lista antes`,
-              }
-            )
+              },
+            ),
           )
       }
 
@@ -72,7 +73,7 @@ export default class AdministratorSportUpdateUseCase {
           return left(
             HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
               name: 'Já existe uma modalidade com este nome',
-            })
+            }),
           )
 
         sport.slug = slug
@@ -89,13 +90,13 @@ export default class AdministratorSportUpdateUseCase {
         return left(
           HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
             name: 'Já existe uma modalidade com este nome',
-          })
+          }),
         )
 
       logger.error({ err: error }, '[sports > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_UPDATE_ERROR'),
       )
     }
   }

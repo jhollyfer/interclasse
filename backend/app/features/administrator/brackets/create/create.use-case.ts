@@ -1,8 +1,12 @@
+import db from '@adonisjs/lucid/services/db'
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+
 import Bracket from '#models/bracket'
 import Match from '#models/match'
 import Sport from '#models/sport'
 import Team from '#models/team'
-import db from '@adonisjs/lucid/services/db'
 import {
   MAX_TEAMS,
   advanceSlot,
@@ -13,12 +17,9 @@ import {
 } from '#features/_shared.tournament'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
-import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchPhases, type MatchPhase } from '#core/entity'
 import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
-import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 type Payload = BracketCreatePayload
 type Response = Either<HTTPException, Bracket>
@@ -42,7 +43,7 @@ export default class AdministratorBracketCreateUseCase {
         return left(
           HTTPException.UnprocessableEntity('Modalidade não encontrada', 'SPORT_NOT_FOUND', {
             sportId: 'Modalidade não encontrada',
-          })
+          }),
         )
 
       // Tudo na mesma transação, com a linha da modalidade travada: a
@@ -61,8 +62,8 @@ export default class AdministratorBracketCreateUseCase {
           return left(
             HTTPException.Conflict(
               'Esta modalidade já foi sorteada nesta categoria',
-              'BRACKET_ALREADY_DRAWN'
-            )
+              'BRACKET_ALREADY_DRAWN',
+            ),
           )
 
         // As turmas da categoria com inscritos suficientes para formar time.
@@ -80,19 +81,19 @@ export default class AdministratorBracketCreateUseCase {
           return left(
             HTTPException.Conflict(
               `São necessárias ao menos ${MIN_TEAMS} turmas com ${sport.minAthletes} atletas inscritos`,
-              'NOT_ENOUGH_TEAMS'
-            )
+              'NOT_ENOUGH_TEAMS',
+            ),
           )
 
         if (eligible.length > MAX_TEAMS)
           return left(
-            HTTPException.Conflict(`A chave comporta até ${MAX_TEAMS} turmas`, 'TOO_MANY_TEAMS')
+            HTTPException.Conflict(`A chave comporta até ${MAX_TEAMS} turmas`, 'TOO_MANY_TEAMS'),
           )
 
         const pairings = drawKnockout(eligible.map((classroom) => classroom.id))
         const created = await Bracket.create(
           { sportId: sport.id, category: payload.category, status: BracketStatuses.KNOCKOUT },
-          { client: trx }
+          { client: trx },
         )
 
         await this.createMatches(created.id, pairings, trx)
@@ -113,14 +114,14 @@ export default class AdministratorBracketCreateUseCase {
         return left(
           HTTPException.Conflict(
             'Esta modalidade já foi sorteada nesta categoria',
-            'BRACKET_ALREADY_DRAWN'
-          )
+            'BRACKET_ALREADY_DRAWN',
+          ),
         )
 
       logger.error({ err: error }, '[brackets > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_CREATE_ERROR'),
       )
     }
   }
@@ -133,7 +134,7 @@ export default class AdministratorBracketCreateUseCase {
   private async createMatches(
     bracketId: string,
     pairings: Array<{ home: string; away: string | null }>,
-    trx: TransactionClientContract
+    trx: TransactionClientContract,
   ): Promise<void> {
     const teams = new Map<string, string>()
     const classrooms = pairings.flatMap((pairing) => {
@@ -143,7 +144,7 @@ export default class AdministratorBracketCreateUseCase {
     })
     const created = await Team.createMany(
       classrooms.map((classroomId) => ({ bracketId, classroomId })),
-      { client: trx }
+      { client: trx },
     )
     for (const team of created) teams.set(team.classroomId, team.id)
 
@@ -170,7 +171,7 @@ export default class AdministratorBracketCreateUseCase {
           homeTeamId: home,
           awayTeamId: teams.get(pairing.away),
         },
-        { client: trx }
+        { client: trx },
       )
     }
 
@@ -190,7 +191,7 @@ export default class AdministratorBracketCreateUseCase {
             homeTeamId: filled?.home ?? null,
             awayTeamId: filled?.away ?? null,
           },
-          { client: trx }
+          { client: trx },
         )
       }
 

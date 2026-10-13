@@ -1,5 +1,6 @@
-import Storage from '#models/storage'
 import factory from '@adonisjs/lucid/factories'
+
+import Storage from '#models/storage'
 import { UploadStatuses } from '#core/entity'
 
 /**

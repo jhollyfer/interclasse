@@ -8,8 +8,10 @@
 */
 
 import { readFile } from 'node:fs/promises'
+
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
+
 import { signInAccountThrottle, signInThrottle, uploadThrottle } from '#start/limiter'
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'

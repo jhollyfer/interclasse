@@ -1,5 +1,8 @@
-import env from '#start/env'
 import app from '@adonisjs/core/services/app'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import { DateTime } from 'luxon'
+
+import env from '#start/env'
 import Announcement from '#models/announcement'
 import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
@@ -11,8 +14,6 @@ import User from '#models/user'
 import JogosSeeder from '#database/seeders/jogos.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import { DateTime } from 'luxon'
 import { ActiveStatuses, Categories, MatchPhases, UserRoles, type Category } from '#core/entity'
 
 /**
@@ -33,9 +34,9 @@ import { ActiveStatuses, Categories, MatchPhases, UserRoles, type Category } fro
 type Stage = 'final' | 'semi' | 'first' | 'drawn'
 
 export default class extends BaseSeeder {
-  static environment = ['development']
+  static override environment = ['development']
 
-  async run() {
+  override async run() {
     const password = env.get('SEED_DEMO_PASSWORD')
 
     // Sem senha a demonstração é pulada, e não o `db:seed` inteiro: quem só
@@ -60,8 +61,10 @@ export default class extends BaseSeeder {
 
     for (const [index, classroom] of classrooms.entries()) {
       const representative = await this.representative(classroom, password)
+      const advisor = advisors[index % advisors.length]
+      if (!advisor) throw new Error('[demo] nenhum conselheiro para distribuir as turmas')
       classroom.merge({
-        advisorId: advisors[index % advisors.length].id,
+        advisorId: advisor.id,
         representativeId: representative.id,
       })
       await classroom.save()
@@ -96,8 +99,8 @@ export default class extends BaseSeeder {
             password,
             role: UserRoles.ADVISOR,
             status: ActiveStatuses.ACTIVE,
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -116,7 +119,7 @@ export default class extends BaseSeeder {
         password,
         role: UserRoles.REPRESENTATIVE,
         status: ActiveStatuses.ACTIVE,
-      }
+      },
     )
   }
 
@@ -187,7 +190,7 @@ export default class extends BaseSeeder {
 
       for (let seat = 0; names.size < total; seat++) {
         names.add(
-          `${first[(index * 7 + seat * 3) % first.length]} ${last[(index * 3 + seat * 5) % last.length]}`
+          `${first[(index * 7 + seat * 3) % first.length]} ${last[(index * 3 + seat * 5) % last.length]}`,
         )
       }
 
@@ -279,7 +282,7 @@ export default class extends BaseSeeder {
 
   /** Placar plausível e variado, com empates decididos nos pênaltis. */
   private result(index: number): { homeScore: number; awayScore: number } {
-    const scores = [
+    const scores: ReadonlyArray<readonly [number, number]> = [
       [3, 1],
       [2, 2],
       [0, 1],
@@ -289,7 +292,9 @@ export default class extends BaseSeeder {
       [2, 3],
       [5, 1],
     ]
-    const [homeScore, awayScore] = scores[index % scores.length]
+    const score = scores[index % scores.length]
+    if (!score) throw new Error('[demo] lista de placares vazia')
+    const [homeScore, awayScore] = score
 
     return { homeScore, awayScore }
   }
@@ -301,7 +306,7 @@ export default class extends BaseSeeder {
   private async play(
     bracketId: string,
     stage: Stage,
-    score: AdministratorMatchScoreUseCase
+    score: AdministratorMatchScoreUseCase,
   ): Promise<void> {
     if (stage === 'drawn') return
 
@@ -360,12 +365,12 @@ export default class extends BaseSeeder {
     let day = startDay
 
     for (const match of matches) {
-      const [hour, minute] = hours[slot % hours.length].split(':').map(Number)
+      const [hour, minute] = (hours[slot % hours.length] ?? '00:00').split(':').map(Number)
       match.scheduledAt = DateTime.fromObject(
         { year: 2026, month: 12, day: 1 + (day % 12), hour, minute },
-        { zone: 'America/Manaus' }
+        { zone: 'America/Manaus' },
       )
-      match.location = places[slot % places.length]
+      match.location = places[slot % places.length] ?? null
       await match.save()
 
       slot += 1

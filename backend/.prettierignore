@@ -5,3 +5,6 @@ build
 # Autogerado por `node ace migration:run` e marcado "DO NOT EDIT manually".
 # Formatá-lo cria um diff que a próxima migration desfaz.
 database/schema.ts
+
+# Gerado por `node ace openapi:generate`; a forma é a do gerador.
+openapi.json

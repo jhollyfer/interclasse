@@ -1,8 +1,9 @@
 import { test } from '@japa/runner'
+import type { ApiClient } from '@japa/api-client'
+
 import { PART_SIZE } from '#services/multipart/multipart.service'
 import { type StorageMimetype } from '#core/validator'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
-import type { ApiClient } from '@japa/api-client'
+import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 import type { Session } from '#tests/helpers'
 
 /**
@@ -23,8 +24,8 @@ const SMALL = new Uint8Array(1024).fill(66)
 async function open(
   client: ApiClient,
   session: Session,
-  payload: { fileName: string; mimetype: StorageMimetype; size: number }
-): Promise<Record<string, any>> {
+  payload: { fileName: string; mimetype: StorageMimetype; size: number },
+): Promise<ResponseBody> {
   const response = await client.post('/storages').cookies(session).json(payload)
 
   response.assertStatus(201)
@@ -46,7 +47,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
-async function upload(client: ApiClient, session: Session): Promise<Record<string, any>> {
+async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -93,11 +94,11 @@ test.group('storages > parts', (group) => {
 
     assert.deepEqual(
       resumed.uploaded.map((part: { partNumber: number }) => part.partNumber),
-      [1, 2]
+      [1, 2],
     )
     assert.deepEqual(
       resumed.parts.map((part: { partNumber: number }) => part.partNumber),
-      [3]
+      [3],
     )
     assert.equal(resumed.totalParts, 3)
     assert.equal(resumed.partSize, PART_SIZE)

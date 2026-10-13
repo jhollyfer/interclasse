@@ -1,8 +1,9 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -39,7 +40,7 @@ export default class AdministratorUserDeleteUseCase {
         return left(
           HTTPException.Conflict('Usuário não está arquivado', 'USER_NOT_ARCHIVED', {
             id: 'Arquive o usuário antes de apagá-lo',
-          })
+          }),
         )
 
       await user.delete()
@@ -49,7 +50,7 @@ export default class AdministratorUserDeleteUseCase {
       logger.error({ err: error }, '[users > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'USER_DELETE_ERROR'),
       )
     }
   }

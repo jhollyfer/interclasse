@@ -37,7 +37,7 @@ export const FileCompleteValidator = vine.create({
       vine.object({
         partNumber: vine.number().min(1).max(10_000).withoutDecimals(),
         etag: vine.string().trim().maxLength(64).minLength(1),
-      })
+      }),
     )
     .optional(),
 })

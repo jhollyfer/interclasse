@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import User from '#models/user'
 import { ActiveStatuses, UserRoles } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'

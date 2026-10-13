@@ -1,13 +1,14 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Classroom from '#models/classroom'
 import Student from '#models/student'
 import type User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, UserRoles, type Merge, type Paginated } from '#core/entity'
 import type { StudentPaginatePayload } from '#features/advisor/students/students.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = Merge<StudentPaginatePayload, { actor: User }>
 type Response = Either<HTTPException, Paginated<ModelObject>>
@@ -35,7 +36,7 @@ export default class AdvisorStudentPaginateUseCase {
       logger.error({ err: error }, '[advisor students > list][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_LIST_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_LIST_ERROR'),
       )
     }
   }

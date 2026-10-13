@@ -1,6 +1,7 @@
-import { StorageSchema } from '#database/schema'
 import { afterFetch, afterFind, column, computed, scope } from '@adonisjs/lucid/orm'
 import drive from '@adonisjs/drive/services/main'
+
+import { StorageSchema } from '#database/schema'
 import { URL_TTL } from '#config/drive'
 import type { UploadStatus } from '#core/entity'
 
