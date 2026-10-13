@@ -36,7 +36,7 @@ export function SportFormCreate(): React.JSX.Element {
     defaults: SPORT_FORM_DEFAULTS,
     fields: SPORT_FIELDS,
     mutation: useSportCreate,
-    invalidate: queryKeys.sports.all,
+    invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',
     success: (sport) => `Modalidade ${sport.name} criada.`,

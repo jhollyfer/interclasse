@@ -5,7 +5,13 @@ import type { UseFormReturn } from 'react-hook-form'
 
 import { HTTPError, HTTPErrorCode } from '#/integrations/tanstack-query/http'
 
-import { applyHTTPErrorToForm, applyMutationError } from './form-errors'
+import {
+  applyHTTPErrorToForm,
+  applyMutationError,
+  httpErrorMessage,
+  isRetrySafe,
+  notifyError,
+} from './form-errors'
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
 
@@ -22,6 +28,9 @@ function formStub() {
     form: fromPartial<UseFormReturn<FormValues>>({ setError }),
   }
 }
+
+/** O texto de 5xx: a mensagem do servidor é para o log, não para a tela. */
+const SERVER_MESSAGE = 'O servidor não conseguiu concluir. Tente de novo.'
 
 function httpError(errors?: Record<string, string>, status = 422) {
   return new HTTPError({
@@ -146,7 +155,7 @@ describe('applyMutationError', () => {
     })
 
     expect(setError).not.toHaveBeenCalled()
-    expect(toast.error).toHaveBeenCalledWith('Dados inválidos', {
+    expect(toast.error).toHaveBeenCalledWith(SERVER_MESSAGE, {
       id: 'testimonial-update-error',
       action: { label: 'Tentar de novo', onClick },
     })
@@ -165,9 +174,7 @@ describe('applyMutationError', () => {
     })
 
     expect(toast.error).not.toHaveBeenCalled()
-    expect(setError).toHaveBeenCalledWith('root', {
-      message: 'Dados inválidos',
-    })
+    expect(setError).toHaveBeenCalledWith('root', { message: SERVER_MESSAGE })
   })
 
   it('`retry` não vale para erro que não é do servidor', () => {
@@ -207,5 +214,57 @@ describe('applyMutationError', () => {
       'Não foi possível conectar ao servidor. Tente novamente.',
       expect.objectContaining({ id: 'testimonial-update-error' }),
     )
+  })
+})
+
+describe('httpErrorMessage', () => {
+  it('passa o texto do 4xx, que o backend escreve para a tela', () => {
+    expect(httpErrorMessage(httpError(undefined, 409))).toBe('Dados inválidos')
+  })
+
+  it('troca o texto do 5xx pelo genérico', () => {
+    expect(httpErrorMessage(httpError(undefined, 500))).toBe(SERVER_MESSAGE)
+  })
+
+  it('erro que não veio da API mantém o próprio texto', () => {
+    expect(httpErrorMessage(new Error('arquivo.zip não é aceito'))).toBe(
+      'arquivo.zip não é aceito',
+    )
+  })
+})
+
+describe('isRetrySafe', () => {
+  it('409, 5xx e rede podem ser reenviados', () => {
+    expect(isRetrySafe(httpError(undefined, 409))).toBe(true)
+    expect(isRetrySafe(httpError(undefined, 503))).toBe(true)
+    expect(isRetrySafe(httpError(undefined, 0))).toBe(true)
+  })
+
+  it('422, 403 e erro fora da API não', () => {
+    expect(isRetrySafe(httpError(undefined, 422))).toBe(false)
+    expect(isRetrySafe(httpError(undefined, 403))).toBe(false)
+    expect(isRetrySafe(new Error('x'))).toBe(false)
+  })
+})
+
+describe('notifyError', () => {
+  beforeEach(() => {
+    vi.mocked(toast.error).mockClear()
+  })
+
+  it('oferece "Tentar de novo" só quando o erro é retry-seguro', () => {
+    const retry = vi.fn()
+
+    notifyError(httpError(undefined, 409), { id: 'a', retry })
+    expect(toast.error).toHaveBeenLastCalledWith('Dados inválidos', {
+      id: 'a',
+      action: { label: 'Tentar de novo', onClick: retry },
+    })
+
+    notifyError(httpError(undefined, 422), { id: 'b', retry })
+    expect(toast.error).toHaveBeenLastCalledWith('Dados inválidos', {
+      id: 'b',
+      action: undefined,
+    })
   })
 })

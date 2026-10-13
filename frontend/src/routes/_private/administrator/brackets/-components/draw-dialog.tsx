@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { ShuffleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 import { Button } from '#/components/ui/button'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { notifyError } from '#/lib/form-errors'
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,7 @@ import {
 } from '#/components/ui/dialog'
 import { Field, FieldLabel } from '#/components/ui/field'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
-import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useBracketCreate } from '#/integrations/tanstack-query/mutations'
 import { sportsQueryOptions } from '#/integrations/tanstack-query/queries'
 import { CATEGORIES } from '#/lib/entity'
@@ -31,24 +33,20 @@ export function DrawDialog(): React.JSX.Element {
   const [sportId, setSportId] = React.useState('')
   const [category, setCategory] = React.useState('')
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const invalidate = useInvalidate()
   const { data: sports } = useQuery(sportsQueryOptions({ perPage: 100 }))
 
   const draw = useBracketCreate({
     onSuccess: async (bracket) => {
       toast.success('Chave sorteada.')
-      await Promise.all(
-        [queryKeys.games.all, ...DEPENDENTS.games].map((queryKey) =>
-          queryClient.invalidateQueries({ queryKey }),
-        ),
-      )
+      await invalidate([...GAME_KEYS, ...DEPENDENTS.games])
       setOpen(false)
       await navigate({
         to: '/administrator/brackets/$id',
         params: { id: bracket.id },
       })
     },
-    onError: (error) => toast.error(error.message, { id: 'bracket-draw' }),
+    onError: (error) => notifyError(error, { id: 'bracket-draw' }),
   })
 
   return (

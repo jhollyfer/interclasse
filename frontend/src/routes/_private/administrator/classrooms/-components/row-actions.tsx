@@ -1,6 +1,5 @@
 import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
-import { useQueryClient } from '@tanstack/react-query'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -9,6 +8,8 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { RowActions, RowActionsDelete } from '#/components/common/row-actions'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { notifyError } from '#/lib/form-errors'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -26,17 +27,16 @@ export function ClassroomRowActions({
 }: {
   classroom: IClassroom
 }): React.JSX.Element {
-  const queryClient = useQueryClient()
+  const invalidate = useInvalidate()
 
   const remove = useClassroomDelete({
-    onError: (error) => toast.error(error.message, { id: 'classroom-delete' }),
+    onError: (error) => notifyError(error, { id: 'classroom-delete' }),
     onSuccess: () => {
       toast.success('Turma removida.')
-      return Promise.all(
-        [queryKeys.classrooms.all, ...DEPENDENTS.classrooms].map((queryKey) =>
-          queryClient.invalidateQueries({ queryKey }),
-        ),
-      )
+      return invalidate([
+        queryKeys.administrator.classrooms.all,
+        ...DEPENDENTS.classrooms,
+      ])
     },
   })
 

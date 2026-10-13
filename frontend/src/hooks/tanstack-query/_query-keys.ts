@@ -1,102 +1,126 @@
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
 
 /**
- * As chaves de cache, num lugar só.
+ * As chaves de cache, num lugar só, com uma seção por módulo da API
+ * (`queryKeys.<módulo>.<recurso>`), como os validators e as rotas do backend.
  *
  * `list` é a tabela (paginação clássica, filtro na URL) e `detail` é um
- * registro só. São formatos diferentes de cache para o mesmo recurso, e todos
- * começam pelo mesmo prefixo - invalidar por ele cobre os dois de uma vez.
+ * registro só. Todo recurso começa pelo prefixo `all`, e invalidar por ele
+ * cobre lista e detalhe de uma vez; o `all` do módulo cobre o módulo inteiro.
  *
- * O arquivo é seccionado por comentário. Todo recurso tem o mesmo bloco de três
- * linhas - `all`, `list` e `detail` -, e é de propósito: um formato por recurso
- * é onde um deles ganha uma chave que a invalidação do vizinho não alcança.
+ * Módulo sem leitura em cache (`authentication`, `storages`) não tem seção:
+ * chave que ninguém lê nem invalida é só nome a mais.
  */
 export const queryKeys = {
-  // Sessão
-
   account: {
-    all: ['account'] as const,
+    profile: {
+      all: ['account', 'profile'] as const,
+    },
   },
 
-  // Painel
-
-  users: {
-    all: ['users'] as const,
-    list: (params: ListSearch) => ['users', 'list', params] as const,
-    detail: (id: string) => ['users', 'detail', id] as const,
+  administrator: {
+    all: ['administrator'] as const,
+    users: {
+      all: ['administrator', 'users'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'users', 'list', params] as const,
+      detail: (id: string) => ['administrator', 'users', 'detail', id] as const,
+    },
+    classrooms: {
+      all: ['administrator', 'classrooms'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'classrooms', 'list', params] as const,
+      detail: (id: string) =>
+        ['administrator', 'classrooms', 'detail', id] as const,
+    },
+    sports: {
+      all: ['administrator', 'sports'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'sports', 'list', params] as const,
+      detail: (id: string) =>
+        ['administrator', 'sports', 'detail', id] as const,
+    },
+    announcements: {
+      all: ['administrator', 'announcements'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'announcements', 'list', params] as const,
+      detail: (id: string) =>
+        ['administrator', 'announcements', 'detail', id] as const,
+    },
+    brackets: {
+      all: ['administrator', 'brackets'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'brackets', 'list', params] as const,
+      detail: (id: string) =>
+        ['administrator', 'brackets', 'detail', id] as const,
+    },
+    matches: {
+      all: ['administrator', 'matches'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'matches', 'list', params] as const,
+    },
   },
 
-  classrooms: {
-    all: ['classrooms'] as const,
-    list: (params: ListSearch) => ['classrooms', 'list', params] as const,
-    detail: (id: string) => ['classrooms', 'detail', id] as const,
+  advisor: {
+    all: ['advisor'] as const,
+    classrooms: {
+      all: ['advisor', 'classrooms'] as const,
+      list: (params: ListSearch) =>
+        ['advisor', 'classrooms', 'list', params] as const,
+    },
+    students: {
+      all: ['advisor', 'students'] as const,
+      list: (params: ListSearch) =>
+        ['advisor', 'students', 'list', params] as const,
+    },
+    enrollments: {
+      all: ['advisor', 'enrollments'] as const,
+      board: (classroomId: string) =>
+        ['advisor', 'enrollments', 'board', classroomId] as const,
+    },
   },
 
-  sports: {
-    all: ['sports'] as const,
-    list: (params: ListSearch) => ['sports', 'list', params] as const,
-    detail: (id: string) => ['sports', 'detail', id] as const,
+  representative: {
+    all: ['representative'] as const,
+    enrollments: {
+      all: ['representative', 'enrollments'] as const,
+      /** A turma sai da sessão: não há parâmetro. */
+      board: ['representative', 'enrollments', 'board'] as const,
+    },
   },
-
-  announcements: {
-    all: ['announcements'] as const,
-    list: (params: ListSearch) => ['announcements', 'list', params] as const,
-    detail: (id: string) => ['announcements', 'detail', id] as const,
-  },
-
-  /**
-   * Chave e partida invalidam juntas: placar muda a classificação, e sorteio
-   * cria partidas. Por isso as duas moram sob `games`.
-   */
-  brackets: {
-    all: ['games', 'brackets'] as const,
-    list: (params: ListSearch) =>
-      ['games', 'brackets', 'list', params] as const,
-    detail: (id: string) => ['games', 'brackets', 'detail', id] as const,
-  },
-
-  matches: {
-    all: ['games', 'matches'] as const,
-    list: (params: ListSearch) => ['games', 'matches', 'list', params] as const,
-  },
-
-  games: {
-    all: ['games'] as const,
-  },
-
-  // Conselheiro e representante
-
-  advisorClassrooms: {
-    all: ['advisorClassrooms'] as const,
-    list: (params: ListSearch) =>
-      ['advisorClassrooms', 'list', params] as const,
-  },
-
-  students: {
-    all: ['students'] as const,
-    list: (params: ListSearch) => ['students', 'list', params] as const,
-  },
-
-  enrollments: {
-    all: ['enrollments'] as const,
-    board: (classroomId: string | null) =>
-      ['enrollments', 'board', classroomId] as const,
-  },
-
-  // Site
 
   storefront: {
     all: ['storefront'] as const,
-    sports: ['storefront', 'sports'] as const,
-    announcements: (params: StorefrontSearch) =>
-      ['storefront', 'announcements', params] as const,
-    matches: (params: StorefrontSearch) =>
-      ['storefront', 'matches', params] as const,
-    brackets: (params: StorefrontSearch) =>
-      ['storefront', 'brackets', params] as const,
-    bracket: (id: string) => ['storefront', 'bracket', id] as const,
+    sports: {
+      all: ['storefront', 'sports'] as const,
+    },
+    announcements: {
+      all: ['storefront', 'announcements'] as const,
+      list: (params: StorefrontSearch) =>
+        ['storefront', 'announcements', 'list', params] as const,
+    },
+    matches: {
+      all: ['storefront', 'matches'] as const,
+      list: (params: StorefrontSearch) =>
+        ['storefront', 'matches', 'list', params] as const,
+    },
+    brackets: {
+      all: ['storefront', 'brackets'] as const,
+      list: (params: StorefrontSearch) =>
+        ['storefront', 'brackets', 'list', params] as const,
+      detail: (id: string) => ['storefront', 'brackets', 'detail', id] as const,
+    },
   },
 }
+
+/**
+ * Chave e partida invalidam juntas: placar muda a classificação, e sorteio
+ * cria partidas.
+ */
+export const GAME_KEYS = [
+  queryKeys.administrator.brackets.all,
+  queryKeys.administrator.matches.all,
+] as const
 
 /**
  * O que mais muda quando um recurso muda, além dele mesmo.
@@ -108,17 +132,21 @@ export const queryKeys = {
  */
 export const DEPENDENTS = {
   classrooms: [
-    queryKeys.games.all,
-    queryKeys.advisorClassrooms.all,
-    queryKeys.enrollments.all,
-    queryKeys.students.all,
+    ...GAME_KEYS,
+    queryKeys.advisor.all,
+    queryKeys.representative.all,
     queryKeys.storefront.all,
   ],
   sports: [
-    queryKeys.games.all,
-    queryKeys.enrollments.all,
+    ...GAME_KEYS,
+    queryKeys.advisor.enrollments.all,
+    queryKeys.representative.enrollments.all,
     queryKeys.storefront.all,
   ],
   announcements: [queryKeys.storefront.all],
-  games: [queryKeys.enrollments.all, queryKeys.storefront.all],
+  games: [
+    queryKeys.advisor.enrollments.all,
+    queryKeys.representative.enrollments.all,
+    queryKeys.storefront.all,
+  ],
 } as const

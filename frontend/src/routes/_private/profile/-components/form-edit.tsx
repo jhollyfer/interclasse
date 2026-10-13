@@ -119,7 +119,9 @@ export function ProfileFormEdit(): React.JSX.Element {
       }),
     async onSuccess(updated, payload) {
       // Por prefixo: o guard do layout e o cabeçalho leem a mesma chave.
-      await queryClient.invalidateQueries({ queryKey: queryKeys.account.all })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.account.profile.all,
+      })
 
       // Trocar e-mail ou senha derruba **todas** as sessões, inclusive esta. O
       // redirecionamento para o login não é efeito colateral a evitar: é o que

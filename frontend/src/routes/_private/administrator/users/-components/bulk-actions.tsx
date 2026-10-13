@@ -1,7 +1,7 @@
 import type * as React from 'react'
-import { toast } from 'sonner'
 
 import { BulkArchive } from '#/components/common/bulk-archive'
+import { notifyError } from '#/lib/form-errors'
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
@@ -22,14 +22,14 @@ export function UserBulkActions({
   users: Array<IUser>
 }): React.JSX.Element {
   const archive = useUserArchive({
-    onError: (error) => toast.error(error.message, { id: 'users-archive' }),
+    onError: (error) => notifyError(error, { id: 'users-archive' }),
   })
 
   return (
     <BulkArchive
       items={users}
       action={(item) => archive.mutateAsync(item.id)}
-      queryKey={queryKeys.users.all}
+      queryKey={queryKeys.administrator.users.all}
       verb="arquivados"
     >
       <ConfirmDialogTitle>Arquivar usuários</ConfirmDialogTitle>

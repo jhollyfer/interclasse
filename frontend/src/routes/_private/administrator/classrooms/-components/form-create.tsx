@@ -36,7 +36,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     defaults: CLASSROOM_FORM_DEFAULTS,
     fields: CLASSROOM_FIELDS,
     mutation: useClassroomCreate,
-    invalidate: queryKeys.classrooms.all,
+    invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',
     success: (classroom) => `Turma ${classroom.name} criada.`,

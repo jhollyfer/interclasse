@@ -3,7 +3,6 @@ import type * as React from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { vineResolver } from '@hookform/resolvers/vine'
-import { toast } from 'sonner'
 
 import {
   Field,
@@ -18,7 +17,7 @@ import { SubmitButton } from '#/components/common/submit-button'
 import { SITE_DESCRIPTION } from '#/lib/constant'
 import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { applyHTTPErrorToForm } from '#/lib/form-errors'
+import { applyMutationError } from '#/lib/form-errors'
 import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
 import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 
@@ -61,36 +60,26 @@ export function SignInForm(): React.JSX.Element {
     onError(error, payload) {
       // O 401 chega em `root` - o canal do backend para "a mensagem é do
       // formulário, não de um campo", e ele o usa porque não revela se falhou
-      // o e-mail, a senha, a conta inativa ou a arquivada. O 422 chega por
-      // campo, vindo do VineJS pelo `toFieldErrors` do handler. O helper marca
-      // os dois e devolve `false` quando não havia nada a marcar na tela.
-      if (applyHTTPErrorToForm({ form, error, fields: FIELDS })) return
-
-      // 5xx e rede: nada que o usuário possa corrigir no formulário. O toast
-      // some em 4 segundos, então leva a ação junto - sem ela o usuário lê
-      // "falhou" e fica sem o que fazer. `id` fixo para tentativas seguidas
-      // substituírem o toast anterior em vez de empilharem.
-      if (error.isServerError) {
-        toast.error(error.message, {
+      // o e-mail, a senha, a conta inativa ou a arquivada. 5xx e rede viram
+      // aviso com "Tentar de novo": entrar não cria nada, reenviar é seguro.
+      applyMutationError({
+        form,
+        error,
+        fields: FIELDS,
+        retry: {
           id: 'sign-in-error',
-          action: {
-            label: 'Tentar de novo',
-            onClick: () => mutation.mutate(payload),
-          },
-        })
-        return
-      }
-
-      // 4xx sem `errors`: `message` é o fallback para as rotas que ainda não
-      // mandam `root`.
-      form.setError('root', { message: error.message })
+          onClick: () => mutation.mutate(payload),
+        },
+      })
     },
     async onSuccess() {
       // O sign-in responde 204 e não diz quem entrou - quem sabe é o
       // `GET /account`. Sem invalidar, o cache desta mesma tela ainda guarda a
       // ausência de sessão de um segundo atrás, e o guard do painel a reusaria
       // para mandar de volta ao login.
-      await queryClient.invalidateQueries({ queryKey: queryKeys.account.all })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.account.profile.all,
+      })
 
       // `href` e não `to`: o destino veio da URL como string, e `to` é o campo
       // tipado contra a árvore de rotas - ele não aceita, e com razão. Tem

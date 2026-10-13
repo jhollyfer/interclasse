@@ -45,7 +45,7 @@ export function SportFormEdit(): React.JSX.Element {
     },
     fields: SPORT_FIELDS,
     mutation: useSportUpdate,
-    invalidate: queryKeys.sports.all,
+    invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',
     success: (updated) => `Modalidade ${updated.name} salva.`,

@@ -36,7 +36,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     defaults: ANNOUNCEMENT_FORM_DEFAULTS,
     fields: ANNOUNCEMENT_FIELDS,
     mutation: useAnnouncementCreate,
-    invalidate: queryKeys.announcements.all,
+    invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
     success: () => 'Aviso publicado.',

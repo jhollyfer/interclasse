@@ -74,7 +74,7 @@ export function UserFormEdit(): React.JSX.Element {
     },
     fields: USER_FIELDS,
     mutation: useUserUpdate,
-    invalidate: queryKeys.users.all,
+    invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users/$id',
     backParams: { id },
     success: (updated) => `Conta de ${updated.name} salva.`,

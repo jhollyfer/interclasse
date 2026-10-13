@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
@@ -24,6 +24,8 @@ import {
   MatchScoreDialog,
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderActions,
@@ -34,7 +36,7 @@ import {
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries'
 import type { IBracketMatch } from '#/lib/interfaces'
@@ -80,18 +82,13 @@ function bySection(matches: ReadonlyArray<IBracketMatch>) {
 export function BracketDetailView(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: bracket } = useSuspenseQuery(bracketQueryOptions(id))
-  const queryClient = useQueryClient()
+  const invalidateKeys = useInvalidate()
   const navigate = useNavigate()
   const [scoring, setScoring] = React.useState<MatchRef | null>(null)
   const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
   const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
 
-  const invalidate = () =>
-    Promise.all(
-      [queryKeys.games.all, ...DEPENDENTS.games].map((queryKey) =>
-        queryClient.invalidateQueries({ queryKey }),
-      ),
-    )
+  const invalidate = () => invalidateKeys([...GAME_KEYS, ...DEPENDENTS.games])
 
   const remove = useBracketDelete({
     onSuccess: async () => {
@@ -99,7 +96,7 @@ export function BracketDetailView(): React.JSX.Element {
       await invalidate()
       await navigate({ to: '/administrator/brackets' })
     },
-    onError: (error) => toast.error(error.message, { id: 'bracket-delete' }),
+    onError: (error) => notifyError(error, { id: 'bracket-delete' }),
   })
 
   const champion = championName(bracket)

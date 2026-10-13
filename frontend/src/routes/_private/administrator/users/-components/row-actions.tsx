@@ -9,6 +9,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { CopyIdMenuItem } from '#/components/common/copy-id-menu-item'
+import { notifyError } from '#/lib/form-errors'
 import {
   RowActions,
   RowActionsArchive,
@@ -62,25 +63,27 @@ export function UserRowActions({
   // A chave é a raiz do recurso, e não a página corrente: arquivar muda a
   // contagem de toda página e de todo recorte, não só do que está na tela.
   async function invalidate(): Promise<void> {
-    await queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+    await queryClient.invalidateQueries({
+      queryKey: queryKeys.administrator.users.all,
+    })
   }
 
   const archive = useUserArchive({
-    onError: (error) => toast.error(error.message, { id: 'user-archive' }),
+    onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
       toast.success(`Conta de ${user.name} arquivada.`)
       return invalidate()
     },
   })
   const unarchive = useUserUnarchive({
-    onError: (error) => toast.error(error.message, { id: 'user-archive' }),
+    onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
       toast.success(`Conta de ${user.name} restaurada.`)
       return invalidate()
     },
   })
   const remove = useUserDelete({
-    onError: (error) => toast.error(error.message, { id: 'user-delete' }),
+    onError: (error) => notifyError(error, { id: 'user-delete' }),
     onSuccess: () => {
       toast.success(`Conta de ${user.name} removida.`)
       return invalidate()

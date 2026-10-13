@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
+import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -32,11 +33,13 @@ function RepresentativeBoard(): React.JSX.Element {
 
   const save = useRepresentativeEnrollmentUpdate({
     onSuccess: (updated) => {
-      queryClient.setQueryData(queryKeys.enrollments.board(null), updated)
+      queryClient.setQueryData(
+        queryKeys.representative.enrollments.board,
+        updated,
+      )
       toast.success('Atletas salvos.')
     },
-    onError: (failure) =>
-      toast.error(failure.message, { id: 'enrollment-save' }),
+    onError: (failure) => notifyError(failure, { id: 'enrollment-save' }),
   })
 
   let title = 'Atletas da turma'

@@ -1,7 +1,6 @@
 import type * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { vineResolver } from '@hookform/resolvers/vine'
-import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import type {
@@ -18,6 +17,7 @@ import type {
 import type { LinkProps } from '@tanstack/react-router'
 
 import type { HTTPError } from '#/integrations/tanstack-query/http'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { applyMutationError } from '#/lib/form-errors'
 
 /**
@@ -157,7 +157,7 @@ export function useResourceForm<
   TPayload
 > {
   const router = useRouter()
-  const queryClient = useQueryClient()
+  const invalidateKeys = useInvalidate()
 
   const form = useForm<TValues>({
     resolver: vineResolver(validator),
@@ -177,11 +177,7 @@ export function useResourceForm<
       applyMutationError({ form, error, fields, retry: retryOption(sent) })
     },
     async onSuccess(record) {
-      await Promise.all(
-        [invalidate, ...alsoInvalidate].map((queryKey) =>
-          queryClient.invalidateQueries({ queryKey }),
-        ),
-      )
+      await invalidateKeys([invalidate, ...alsoInvalidate])
 
       if (typeof success === 'string') toast.success(success)
       else toast.success(success(record))

@@ -14,6 +14,8 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderBack,
@@ -58,12 +60,12 @@ export function ClassroomPage(): React.JSX.Element {
   const save = useAdvisorEnrollmentUpdate({
     onSuccess: (updated) => {
       queryClient.setQueryData(
-        queryKeys.enrollments.board(classroomId),
+        queryKeys.advisor.enrollments.board(classroomId),
         updated,
       )
       toast.success('Atletas salvos.')
     },
-    onError: (error) => toast.error(error.message, { id: 'enrollment-save' }),
+    onError: (error) => notifyError(error, { id: 'enrollment-save' }),
   })
 
   return (
@@ -105,14 +107,14 @@ function Students({ classroomId }: { classroomId: string }): React.JSX.Element {
   const { data } = useSuspenseQuery(
     studentsQueryOptions(studentsOf(classroomId)),
   )
-  const queryClient = useQueryClient()
+  const invalidateKeys = useInvalidate()
   const [name, setName] = React.useState('')
 
   // Aluno novo ou removido muda a matriz de inscrições também.
-  async function invalidate() {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: queryKeys.students.all }),
-      queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all }),
+  async function invalidate(): Promise<void> {
+    await invalidateKeys([
+      queryKeys.advisor.students.all,
+      queryKeys.advisor.enrollments.all,
     ])
   }
 
@@ -121,7 +123,7 @@ function Students({ classroomId }: { classroomId: string }): React.JSX.Element {
       setName('')
       await invalidate()
     },
-    onError: (error) => toast.error(error.message, { id: 'student-create' }),
+    onError: (error) => notifyError(error, { id: 'student-create' }),
   })
 
   return (
@@ -180,12 +182,12 @@ function StudentRow({
       setEditing(false)
       await onChange()
     },
-    onError: (error) => toast.error(error.message, { id: 'student-update' }),
+    onError: (error) => notifyError(error, { id: 'student-update' }),
   })
   const remove = useStudentDelete({
     onSuccess: onChange,
     // Aluno inscrito numa modalidade já sorteada: `409 STUDENT_IN_COMPETITION`.
-    onError: (error) => toast.error(error.message, { id: 'student-delete' }),
+    onError: (error) => notifyError(error, { id: 'student-delete' }),
   })
 
   if (editing) {
