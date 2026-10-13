@@ -180,4 +180,19 @@ test.group('classrooms > update', (group) => {
     const intacta = await Classroom.findOrFail(classroom.id)
     assert.equal(intacta.name, classroom.name)
   })
+
+  test('nome vazio responde 422 e não grava', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const classroom = await ClassroomFactory.create()
+
+    const response = await client
+      .put(`/administrator/classrooms/${classroom.id}`)
+      .cookies(session)
+      .json({ name: '' })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'name')
+    const stored = await Classroom.findOrFail(classroom.id)
+    assert.equal(stored.name, classroom.name)
+  })
 })

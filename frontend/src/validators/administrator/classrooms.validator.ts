@@ -1,4 +1,4 @@
-import { vine } from '#/lib/validator'
+import { vine, notNull } from '#/lib/validator'
 import type { Infer } from '#/lib/validator'
 import { GRADES } from '#/lib/entity'
 
@@ -21,8 +21,14 @@ export const ClassroomCreateValidator = vine.create({
 })
 
 export const ClassroomUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(20).optional(),
-  grade: grade().optional(),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(20)
+    .optional()
+    .use(notNull()),
+  grade: grade().optional().use(notNull()),
   advisorId: vine.string().uuid().nullable().optional(),
   representativeId: vine.string().uuid().nullable().optional(),
 })

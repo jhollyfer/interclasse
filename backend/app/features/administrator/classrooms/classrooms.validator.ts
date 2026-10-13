@@ -1,4 +1,4 @@
-import { vine, paginationFields, sortFields } from '#core/validator'
+import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 import { CATEGORIES, GRADES } from '#core/entity'
 
@@ -24,8 +24,8 @@ export const ClassroomCreateValidator = vine.create({
 
 /** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
 export const ClassroomUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(20).optional(),
-  grade: grade().optional(),
+  name: vine.string().trim().minLength(1).maxLength(20).optional().use(notNull()),
+  grade: grade().optional().use(notNull()),
   advisorId: vine.string().uuid().nullable().optional(),
   representativeId: vine.string().uuid().nullable().optional(),
 })

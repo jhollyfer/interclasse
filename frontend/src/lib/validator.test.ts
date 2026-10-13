@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { email, vine } from './validator'
+import { email, notNull, vine } from './validator'
 
 /**
  * O que é de todo validator: o `vine` configurado no topo de `validator.ts`.
@@ -51,6 +51,19 @@ describe('convertEmptyStringsToNull', () => {
       .tryValidate({ name: '' })
 
     expect(error).toBeNull()
+    expect(payload?.name).toBeUndefined()
+  })
+
+  it('com notNull, o campo apagado é recusado em vez de sumir', async () => {
+    const validator = vine.create({
+      name: vine.string().trim().minLength(1).optional().use(notNull()),
+    })
+
+    const [blank] = await validator.tryValidate({ name: '' })
+    const [absent, payload] = await validator.tryValidate({})
+
+    expect(blank?.messages[0]?.field).toBe('name')
+    expect(absent).toBeNull()
     expect(payload?.name).toBeUndefined()
   })
 })

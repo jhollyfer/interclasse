@@ -1,4 +1,4 @@
-import { vine, email, password } from '#/lib/validator'
+import { vine, notNull, email, password } from '#/lib/validator'
 import type { Infer } from '#/lib/validator'
 
 /**
@@ -11,8 +11,14 @@ import type { Infer } from '#/lib/validator'
  * administrador, e ninguém muda o próprio.
  */
 export const ProfileUpdateValidator = vine.create({
-  name: vine.string().trim().maxLength(120).optional(),
-  email: email().optional(),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(120)
+    .optional()
+    .use(notNull()),
+  email: email().optional().use(notNull()),
   password: password().optional(),
   /**
    * `passwordConfirmation` precisa ser declarado por dois motivos, e o segundo

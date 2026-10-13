@@ -1,4 +1,4 @@
-import { vine, paginationFields, sortFields } from '#core/validator'
+import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 export const ANNOUNCEMENT_SORT_COLUMNS = ['title', 'createdAt'] as const
@@ -10,9 +10,9 @@ export const AnnouncementCreateValidator = vine.create({
 })
 
 export const AnnouncementUpdateValidator = vine.create({
-  title: vine.string().trim().minLength(1).maxLength(160).optional(),
-  body: vine.string().trim().minLength(1).maxLength(5000).optional(),
-  pinned: vine.boolean().optional(),
+  title: vine.string().trim().minLength(1).maxLength(160).optional().use(notNull()),
+  body: vine.string().trim().minLength(1).maxLength(5000).optional().use(notNull()),
+  pinned: vine.boolean().optional().use(notNull()),
 })
 
 export const AnnouncementPaginateValidator = vine.create({

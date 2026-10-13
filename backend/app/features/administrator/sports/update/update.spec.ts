@@ -125,4 +125,21 @@ test.group('sports > update', (group) => {
     forbidden.assertStatus(403)
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
   })
+
+  test('nome vazio ou limite nulo responde 422 e não grava', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const sport = await SportFactory.create()
+
+    for (const payload of [{ name: '' }, { maxAthletes: null }]) {
+      const response = await client
+        .put(`/administrator/sports/${sport.id}`)
+        .cookies(session)
+        .json(payload)
+
+      response.assertStatus(422)
+    }
+    const stored = await Sport.findOrFail(sport.id)
+    assert.equal(stored.name, sport.name)
+    assert.equal(stored.maxAthletes, sport.maxAthletes)
+  })
 })

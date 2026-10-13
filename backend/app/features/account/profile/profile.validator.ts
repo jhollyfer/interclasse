@@ -1,4 +1,4 @@
-import { vine, email, password } from '#core/validator'
+import { vine, notNull, email, password } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
@@ -14,9 +14,9 @@ import type { Infer } from '#core/validator'
  * convidaria alguém a tentar.
  */
 export const ProfileUpdateValidator = vine.create({
-  name: vine.string().trim().maxLength(120).optional(),
-  email: email().optional(),
-  password: password().optional(),
+  name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
+  email: email().optional().use(notNull()),
+  password: password().optional().use(notNull()),
   /**
    * A senha atual, exigida **só** quando `password` vem no payload.
    *

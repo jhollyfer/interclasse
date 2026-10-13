@@ -1,5 +1,5 @@
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
-import type { Infer } from '@vinejs/vine/types'
+import type { FieldContext, Infer } from '@vinejs/vine/types'
 
 import { FIELD_LABELS, RULE_MESSAGES } from './validator-messages'
 import { SORT_DIRECTIONS, TRASHED_MODES } from './entity'
@@ -108,6 +108,24 @@ export const LIST_LIMITS = {
  */
 export function wireDate() {
   return vine.string().trim().maxLength(40)
+}
+
+/**
+ * `null` explícito recusado num campo `optional()` que não é `nullable()`,
+ * espelho do `notNull()` do backend. Com `convertEmptyStringsToNull`, o `""`
+ * de um campo apagado vira `null`, e o `optional()` o tiraria do payload em
+ * silêncio. Não vale para a senha da edição: ali `""` é "não trocar", e o
+ * formulário tira a chave antes de enviar.
+ */
+const notNullRule = vine.createRule(
+  (value: unknown, _options: undefined, field: FieldContext) => {
+    if (value === null) field.report('Informe {{ field }}', 'required', field)
+  },
+  { implicit: true },
+)
+
+export function notNull() {
+  return notNullRule()
 }
 
 export function email() {
