@@ -1,10 +1,10 @@
 import type * as React from 'react'
 
-import { useTableContext } from './table-context'
-import { Pagination } from './table-pagination-nav'
-
 import { PageShellFooter } from '#/components/common/page-shell'
 import type { PaginationMeta } from '#/integrations/response'
+
+import { useTableContext } from './table-context'
+import { Pagination } from './table-pagination-nav'
 
 /**
  * O rodapé fixo com a paginação.

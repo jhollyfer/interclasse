@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
+
 import { fieldsOf } from '#/lib/validator.test-utils'
-import {
-  UserCreateValidator,
-  UserUpdateValidator,
-} from './users.validator'
+
+import { UserCreateValidator, UserUpdateValidator } from './users.validator'
 
 const USER = {
   name: 'Ana Lima',
@@ -37,8 +36,7 @@ describe('UserCreateValidator', () => {
 
   it('exige a confirmação de senha', async () => {
     const { passwordConfirmation: _omitida, ...semConfirmacao } = USER
-    const [error] =
-      await UserCreateValidator.tryValidate(semConfirmacao)
+    const [error] = await UserCreateValidator.tryValidate(semConfirmacao)
 
     expect(fieldsOf(error)).toContain('passwordConfirmation')
   })
@@ -82,14 +80,12 @@ describe('UserUpdateValidator', () => {
   // Senha em branco significa "não trocar", e o formulário omite a chave. O
   // validator precisa aceitar o payload sem ela.
   it('aceita a edição sem senha nenhuma', async () => {
-    const [error, payload] = await UserUpdateValidator.tryValidate(
-      {
-        name: 'Ana Lima',
-        email: 'ana@mail.com',
-        role: 'ADVISOR',
-        status: 'ACTIVE',
-      },
-    )
+    const [error, payload] = await UserUpdateValidator.tryValidate({
+      name: 'Ana Lima',
+      email: 'ana@mail.com',
+      role: 'ADVISOR',
+      status: 'ACTIVE',
+    })
 
     expect(error).toBeNull()
     expect(payload?.password).toBeUndefined()

@@ -2,9 +2,9 @@ import type * as React from 'react'
 import { FlexRender } from '@tanstack/react-table'
 import type { RowData } from '@tanstack/react-table'
 
-import type { TableInstance } from './use-table'
-
 import { cn } from '#/lib/utils'
+
+import type { TableInstance } from './use-table'
 
 type TableMobileCardsProps<TRow extends RowData> = {
   table: TableInstance<TRow>

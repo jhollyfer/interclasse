@@ -13,8 +13,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
-import type { AnnouncementFormType } from './form-fields'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
 import type { Announcement } from '#/lib/validator'
 import type { AnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
@@ -24,6 +22,9 @@ import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { AnnouncementFormType } from './form-fields'
+import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
+
 const route = getRouteApi('/_private/administrator/announcements/$id/edit')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
@@ -31,7 +32,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: announcement } = useSuspenseQuery(announcementQueryOptions(id))
 
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
     Announcement,
     Merge<AnnouncementUpdatePayload, { id: string }>
@@ -64,7 +65,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <AnnouncementFormFields form={form} idPrefix="edit-announcement" />

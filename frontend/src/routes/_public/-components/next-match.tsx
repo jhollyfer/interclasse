@@ -1,8 +1,9 @@
 import type * as React from 'react'
 
-import { formatWhen, phaseLabel, scoreOf } from './match-row'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import type { Match } from '#/lib/validator'
+
+import { formatWhen, phaseLabel, scoreOf } from './match-row'
 
 /**
  * O placar do herói: o próximo jogo, ou o último resultado quando não há jogo

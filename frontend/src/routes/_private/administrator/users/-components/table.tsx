@@ -1,10 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { UserBulkActions } from './bulk-actions'
-import { userColumns } from './columns'
-import { UserFilters } from './filters'
-import { UserRowActions } from './row-actions'
+
 import {
   Table,
   TableActions,
@@ -27,6 +24,11 @@ import {
 } from '#/components/common/table'
 import { UserRoles } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
+
+import { UserBulkActions } from './bulk-actions'
+import { userColumns } from './columns'
+import { UserFilters } from './filters'
+import { UserRowActions } from './row-actions'
 
 const route = getRouteApi('/_private/administrator/users/')
 

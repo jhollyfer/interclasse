@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 
-import { AUTHENTICATION, NAVIGATION } from './menu'
-
 import { BrandMark } from '#/components/common/brand-mark'
 import { cn } from '#/lib/utils'
+
+import { AUTHENTICATION, NAVIGATION } from './menu'
 import type { MenuItem } from './menu'
 
 /** A pílula de cada destino, no topo e no menu móvel. */

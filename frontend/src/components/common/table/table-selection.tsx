@@ -2,11 +2,11 @@ import type * as React from 'react'
 import { XIcon } from '@phosphor-icons/react'
 import type { ColumnDef, RowData } from '@tanstack/react-table'
 
-import type { TableFeatures, TableInstance } from './use-table'
-
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'
 import { Checkbox } from '#/components/ui/checkbox'
+
+import type { TableFeatures, TableInstance } from './use-table'
 
 /**
  * A coluna de caixas de seleção, para espalhar antes das colunas da tela.

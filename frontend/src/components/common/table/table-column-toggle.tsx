@@ -2,8 +2,6 @@ import type * as React from 'react'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import type { RowData } from '@tanstack/react-table'
 
-import type { TableInstance } from './use-table'
-
 import { Button } from '#/components/ui/button'
 import {
   DropdownMenu,
@@ -14,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+
+import type { TableInstance } from './use-table'
 
 /**
  * Quais colunas aparecem.

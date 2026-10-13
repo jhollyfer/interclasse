@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import { ConfirmDialogProvider } from './confirm-dialog-context'
-
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+
+import { ConfirmDialogProvider } from './confirm-dialog-context'
 
 type ConfirmDialogProps = {
   /**

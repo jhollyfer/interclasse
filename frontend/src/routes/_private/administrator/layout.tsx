@@ -1,7 +1,8 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import { requireRole } from '../-components/require-role'
 import { UserRoles } from '#/lib/entity'
+
+import { requireRole } from '../-components/require-role'
 
 const ROLES = [UserRoles.ADMINISTRATOR]
 

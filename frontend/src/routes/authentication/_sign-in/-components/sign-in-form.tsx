@@ -1,19 +1,27 @@
 import { getRouteApi, useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { Controller, useForm } from 'react-hook-form'
+import { vineResolver } from '@hookform/resolvers/vine'
+import { toast } from 'sonner'
+
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from '#/components/ui/field'
-import { Controller, useForm } from 'react-hook-form'
-import { vineResolver } from '@hookform/resolvers/vine'
-import { toast } from 'sonner'
 import { Input } from '#/components/ui/input'
 import { Alert, AlertDescription } from '#/components/ui/alert'
 import { InputPassword } from '#/components/common/input-password'
 import { SubmitButton } from '#/components/common/submit-button'
+import { SITE_DESCRIPTION } from '#/lib/site'
+import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
+import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { applyHTTPErrorToForm } from '#/lib/form-errors'
+import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
+import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
+
 import {
   AuthShell,
   AuthShellAside,
@@ -23,12 +31,6 @@ import {
   AuthShellHeader,
   AuthShellTagline,
 } from '../../-components/auth-shell'
-import { SITE_DESCRIPTION } from '#/lib/site'
-import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
-import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { applyHTTPErrorToForm } from '#/lib/form-errors'
-import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
-import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 
 const route = getRouteApi('/authentication/_sign-in/')
 
@@ -95,11 +97,11 @@ export function SignInForm(): React.JSX.Element {
       // prioridade sobre o painel: quem foi barrado no meio volta para onde
       // estava, não para a tela inicial.
       if (search.redirect) {
-        router.navigate({ href: search.redirect })
+        await router.navigate({ href: search.redirect })
         return
       }
 
-      router.navigate({ to: '/painel' })
+      await router.navigate({ to: '/painel' })
     },
   })
 
@@ -127,7 +129,7 @@ export function SignInForm(): React.JSX.Element {
             nativo, e com GET a senha iria parar na URL e no histórico. */}
         <form
           method="post"
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
           className="flex flex-col gap-6"
         >
           <AuthShellHeader title="Entre na sua conta">

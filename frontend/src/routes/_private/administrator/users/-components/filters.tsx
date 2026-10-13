@@ -34,7 +34,7 @@ export function UserFilters({
         value={search.role ?? ''}
         clearable
         onValueChange={(value) =>
-          navigate({
+          void navigate({
             to: '/administrator/users',
             search: { ...search, role: value || undefined, page: undefined },
           })
@@ -54,7 +54,7 @@ export function UserFilters({
         value={search.status ?? ''}
         clearable
         onValueChange={(value) =>
-          navigate({
+          void navigate({
             to: '/administrator/users',
             search: { ...search, status: value || undefined, page: undefined },
           })

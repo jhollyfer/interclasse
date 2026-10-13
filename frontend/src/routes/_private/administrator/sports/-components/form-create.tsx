@@ -11,12 +11,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import {
-  SPORT_FIELDS,
-  SPORT_FORM_DEFAULTS,
-  SportFormFields,
-} from './form-fields'
-import type { SportFormType } from './form-fields'
 import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { Sport } from '#/lib/validator'
 import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
@@ -24,8 +18,15 @@ import { useSportCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { SportFormType } from './form-fields'
+import {
+  SPORT_FIELDS,
+  SPORT_FORM_DEFAULTS,
+  SportFormFields,
+} from './form-fields'
+
 export function SportFormCreate(): React.JSX.Element {
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     SportFormType,
     Sport,
     SportCreatePayload
@@ -55,7 +56,7 @@ export function SportFormCreate(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <SportFormFields form={form} idPrefix="sport" />

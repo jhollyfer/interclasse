@@ -2,10 +2,11 @@ import type * as React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
+import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+
 import { BRACKETS_INDEX } from './index'
 import { BracketIndex } from '../-components/bracket-index'
 import { Section } from '../-components/section'
-import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries'
 
 export const Route = createLazyFileRoute('/_public/classificacao/')({
   component: Standings,

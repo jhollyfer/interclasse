@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArchiveIcon } from '@phosphor-icons/react'
 
-import { useTableContext } from './table-context'
-import { InputSearch } from './table-search-input'
-
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
 import { TrashedModes } from '#/lib/entity'
+
+import { InputSearch } from './table-search-input'
+import { useTableContext } from './table-context'
 
 /**
  * A faixa de controles entre o cabeçalho e a tabela: busca, filtros do recurso,
@@ -66,7 +66,10 @@ export function TableSearch({
       onSearch={(term) =>
         // `page` some junto: a página 3 do filtro anterior quase nunca existe no
         // novo, e a tela abriria vazia sem dizer por quê.
-        navigate({ to, search: { ...search, search: term, page: undefined } })
+        void navigate({
+          to,
+          search: { ...search, search: term, page: undefined },
+        })
       }
     />
   )
@@ -91,7 +94,7 @@ export function TableTrashToggle(): React.JSX.Element {
     <Button
       variant={variant}
       onClick={() =>
-        navigate({
+        void navigate({
           to,
           search: { ...search, trashed: nextTrashed, page: undefined },
         })

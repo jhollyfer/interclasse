@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+
 import { Button } from '#/components/ui/button'
 import {
   PageHeader,
@@ -77,7 +78,7 @@ export function UserDetail(): React.JSX.Element {
       await invalidate()
       // Arquivado, o detalhe responde 404 (o backend esconde o arquivado
       // fora da lixeira): ficar aqui deixava a tela parada no estado antigo.
-      await router.navigate({ to: '/administrator/users' })
+      await await router.navigate({ to: '/administrator/users' })
     },
   })
   const unarchive = useUserUnarchive({
@@ -90,7 +91,7 @@ export function UserDetail(): React.JSX.Element {
       await invalidate()
       // O registro não existe mais: ficar na tela dele daria 404 no próximo
       // refetch.
-      router.navigate({ to: '/administrator/users' })
+      await router.navigate({ to: '/administrator/users' })
     },
   })
 

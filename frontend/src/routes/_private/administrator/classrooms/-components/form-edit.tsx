@@ -13,8 +13,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
-import type { ClassroomFormType } from './form-fields'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
 import type { Classroom } from '#/lib/validator'
 import type { ClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
@@ -24,6 +22,9 @@ import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { ClassroomFormType } from './form-fields'
+import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
+
 const route = getRouteApi('/_private/administrator/classrooms/$id/edit')
 
 /** Valida com o schema de criação: nome e ano não podem ser apagados. */
@@ -31,7 +32,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: classroom } = useSuspenseQuery(classroomQueryOptions(id))
 
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
     Classroom,
     Merge<ClassroomUpdatePayload, { id: string }>
@@ -65,7 +66,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <ClassroomFormFields form={form} idPrefix="edit-classroom" />

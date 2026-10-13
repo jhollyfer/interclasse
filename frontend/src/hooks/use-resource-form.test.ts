@@ -3,15 +3,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { toast } from 'sonner'
-
 import type {
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
 
-import { useResourceForm } from './use-resource-form'
 import { applyMutationError } from '#/lib/form-errors'
 import { HTTPError } from '#/integrations/tanstack-query/http'
+
+import { useResourceForm } from './use-resource-form'
 
 /**
  * O que este teste cobra é a **fiação**, que é tudo o que o hook faz.

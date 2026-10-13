@@ -5,7 +5,6 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 
-import { useCloseRowActions } from './row-actions'
 import {
   ConfirmDialog,
   ConfirmDialogCancel,
@@ -15,6 +14,8 @@ import {
 } from '#/components/common/confirm-dialog'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import type { Merge } from '#/lib/interfaces'
+
+import { useCloseRowActions } from './row-actions'
 
 type RowActionsItemProps = {
   /** A mutation da linha, já com o id: `() => archive.mutate(row.id)`. */

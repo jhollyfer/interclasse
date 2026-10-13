@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+
 import { fieldsOf } from '#/lib/validator.test-utils'
+
 import { ProfileUpdateValidator } from './profile.validator'
 
 describe('ProfileUpdateValidator', () => {

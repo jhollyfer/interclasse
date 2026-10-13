@@ -2,12 +2,6 @@ import * as React from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 import { getRouteApi, Link, useMatches } from '@tanstack/react-router'
 
-import {
-  SignOutConfirm,
-  SignOutConfirmFooter,
-  SignOutConfirmHeader,
-} from './sign-out-confirm'
-import { ThemeToggle } from './theme-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import {
   Breadcrumb,
@@ -29,6 +23,13 @@ import { Separator } from '#/components/ui/separator'
 import { SidebarTrigger } from '#/components/ui/sidebar'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { initials } from '#/lib/labels'
+
+import { ThemeToggle } from './theme-toggle'
+import {
+  SignOutConfirm,
+  SignOutConfirmFooter,
+  SignOutConfirmHeader,
+} from './sign-out-confirm'
 
 const route = getRouteApi('/_private')
 

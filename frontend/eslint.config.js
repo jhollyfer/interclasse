@@ -3,6 +3,7 @@
 import { tanstackConfig } from '@tanstack/eslint-config'
 import pluginQuery from '@tanstack/eslint-plugin-query'
 import pluginRouter from '@tanstack/eslint-plugin-router'
+import importX from 'eslint-plugin-import-x'
 
 export default [
   ...tanstackConfig,
@@ -14,6 +15,37 @@ export default [
   // que falha só no tipo, em silêncio.
   ...pluginQuery.configs['flat/recommended'],
   ...pluginRouter.configs['flat/recommended'],
+  {
+    // `projectService` no lugar do `project: true` do `tanstackConfig`: é o que
+    // `_padroes/tooling.md` §4 pede para as regras que dependem de tipo.
+    files: ['**/*.{js,ts,tsx}'],
+    languageOptions: {
+      parserOptions: { project: null, projectService: true },
+    },
+  },
+  {
+    // A ordem de import da régua (`tooling.md` §4): externo, alias `#/`,
+    // relativo, com linha em branco entre os grupos. O `import/order` do
+    // `tanstackConfig` sai para não brigar com este. `components/ui/**` fica
+    // de fora: é saída do shadcn, e o próximo `shadcn add` desfaria a ordem.
+    files: ['**/*.{js,ts,tsx}'],
+    ignores: ['src/components/ui/**'],
+    plugins: { 'import-x': importX },
+    rules: {
+      'import-x/order': [
+        'error',
+        {
+          groups: [
+            ['builtin', 'external'],
+            'internal',
+            ['parent', 'sibling', 'index'],
+          ],
+          pathGroups: [{ pattern: '#/**', group: 'internal' }],
+          'newlines-between': 'always',
+        },
+      ],
+    },
+  },
   {
     rules: {
       'import/no-cycle': 'off',
@@ -57,10 +89,7 @@ export default [
     // `components/ui/**` vem do registry do shadcn — o próximo `shadcn add`
     // reescreve o arquivo e desfaz qualquer correção.
     files: ['**/*.{ts,tsx}'],
-    ignores: [
-      'src/routeTree.gen.ts',
-      'src/components/ui/**',
-    ],
+    ignores: ['src/routeTree.gen.ts', 'src/components/ui/**'],
     rules: {
       // regra 1: sem ternário como control flow. `??`, `?.` e `&&` seguem livres.
       'no-ternary': 'error',
@@ -76,6 +105,24 @@ export default [
       // dispara aqui porque é limite da linguagem, não escolha de estilo - o
       // bloco de `.d.ts` abaixo cobre o caso.
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      // sem `!`: o narrowing (`if (!x) return`) é quem prova o não-nulo.
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      // promessa solta e promessa onde se espera `void` (`tooling.md` §4).
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      // colaborador vem do container, nunca de `new` (`tooling.md` §4). O
+      // `AbortController` sai do seletor: é API da plataforma, não colaborador,
+      // e o sufixo casaria por acaso.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]:not([callee.name='AbortController'])",
+          message:
+            'Colaborador vem do container, não de `new`. Injete por construtor. ' +
+            'Composition root de verdade: mova para lá com um override de `files`.',
+        },
+      ],
     },
   },
   {

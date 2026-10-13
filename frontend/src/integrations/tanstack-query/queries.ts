@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { request } from './http'
+
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type { Merge } from '#/lib/interfaces'
 import type {
@@ -17,6 +17,8 @@ import type {
   Student,
   User,
 } from '#/lib/validator'
+
+import { request } from './http'
 
 /**
  * Os filtros próprios de cada listagem, por cima dos que toda listagem tem.

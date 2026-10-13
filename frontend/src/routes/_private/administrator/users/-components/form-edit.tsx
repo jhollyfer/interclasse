@@ -1,3 +1,7 @@
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+
 import {
   FormShell,
   FormShellActions,
@@ -8,14 +12,8 @@ import {
   FormShellSubmit,
   FormShellTitle,
 } from '#/components/common/form-shell'
-import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { USER_FIELDS, UserFormFields } from './form-fields'
-import type { UserFormType } from './form-fields'
 import { UserUpdateValidator } from '#/validators/administrator/users.validator'
 import type { User } from '#/lib/validator'
 import type { UserUpdatePayload } from '#/validators/administrator/users.validator'
@@ -24,6 +22,9 @@ import { userQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useUserUpdate } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+
+import type { UserFormType } from './form-fields'
+import { USER_FIELDS, UserFormFields } from './form-fields'
 
 const route = getRouteApi('/_private/administrator/users/$id/edit')
 
@@ -39,7 +40,7 @@ export function UserFormEdit(): React.JSX.Element {
   // Os três parâmetros explícitos, como na criação. O payload é o da
   // **atualização** com o `id` no caminho, que é a forma que `useUserUpdate`
   // recebe.
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     User,
     Merge<UserUpdatePayload, { id: string }>
@@ -106,7 +107,7 @@ export function UserFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <FieldSet>

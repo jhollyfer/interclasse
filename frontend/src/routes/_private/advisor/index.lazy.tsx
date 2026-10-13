@@ -2,7 +2,6 @@ import type * as React from 'react'
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import { ADVISOR_CLASSROOMS } from './index'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -16,6 +15,8 @@ import {
 } from '#/components/ui/card'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries'
 import { CATEGORY_LABELS } from '#/lib/labels'
+
+import { ADVISOR_CLASSROOMS } from './index'
 
 export const Route = createLazyFileRoute('/_private/advisor/')({
   component: AdvisorClassrooms,

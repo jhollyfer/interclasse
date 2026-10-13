@@ -11,12 +11,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import {
-  CLASSROOM_FIELDS,
-  CLASSROOM_FORM_DEFAULTS,
-  ClassroomFormFields,
-} from './form-fields'
-import type { ClassroomFormType } from './form-fields'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
 import type { Classroom } from '#/lib/validator'
 import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
@@ -24,8 +18,15 @@ import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { ClassroomFormType } from './form-fields'
+import {
+  CLASSROOM_FIELDS,
+  CLASSROOM_FORM_DEFAULTS,
+  ClassroomFormFields,
+} from './form-fields'
+
 export function ClassroomFormCreate(): React.JSX.Element {
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
     Classroom,
     ClassroomCreatePayload
@@ -55,7 +56,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <ClassroomFormFields form={form} idPrefix="classroom" />

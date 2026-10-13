@@ -3,12 +3,13 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { TrophyIcon } from '@phosphor-icons/react'
 
-import { Section } from '../-components/section'
-import { formatWhen } from '../-components/match-row'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries'
 import type { BracketMatch } from '#/integrations/response'
 import { MatchStatuses } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_PHASE_LABELS, championName } from '#/lib/labels'
+
+import { formatWhen } from '../-components/match-row'
+import { Section } from '../-components/section'
 
 export const Route = createLazyFileRoute('/_public/classificacao/$id')({
   component: Bracket,

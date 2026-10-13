@@ -1,8 +1,6 @@
 import type * as React from 'react'
 import { ArrowClockwiseIcon, WarningCircleIcon } from '@phosphor-icons/react'
 
-import { useTableContext } from './table-context'
-
 import { Button } from '#/components/ui/button'
 import {
   Empty,
@@ -13,6 +11,8 @@ import {
   EmptyTitle,
 } from '#/components/ui/empty'
 import { PageShellContent } from '#/components/common/page-shell'
+
+import { useTableContext } from './table-context'
 
 /**
  * A área que rola: a tabela, o estado vazio e a barra de seleção.

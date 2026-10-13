@@ -3,7 +3,6 @@ import type { Infer } from '@vinejs/vine/types'
 
 import { FIELD_LABELS, RULE_MESSAGES } from './validator-messages'
 import type { Merge } from './interfaces'
-
 import { SORT_DIRECTIONS, TRASHED_MODES } from './entity'
 import type {
   ActiveStatus,

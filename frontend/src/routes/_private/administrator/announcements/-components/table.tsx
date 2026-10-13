@@ -2,8 +2,6 @@ import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { announcementColumns } from './columns'
-import { AnnouncementRowActions } from './row-actions'
 import {
   Table,
   TableActions,
@@ -23,6 +21,9 @@ import {
   useTable,
 } from '#/components/common/table'
 import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries'
+
+import { announcementColumns } from './columns'
+import { AnnouncementRowActions } from './row-actions'
 
 const route = getRouteApi('/_private/administrator/announcements/')
 

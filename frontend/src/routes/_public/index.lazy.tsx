@@ -3,6 +3,12 @@ import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
 import {
+  storefrontAnnouncementsQueryOptions,
+  storefrontBracketsQueryOptions,
+  storefrontMatchesQueryOptions,
+} from '#/integrations/tanstack-query/queries'
+
+import {
   HOME_ANNOUNCEMENTS,
   HOME_BRACKETS,
   HOME_NEXT,
@@ -14,11 +20,6 @@ import { Agenda } from './-components/match-row'
 import { NextMatch } from './-components/next-match'
 import { ResultsTicker } from './-components/results-ticker'
 import { Empty, Section } from './-components/section'
-import {
-  storefrontAnnouncementsQueryOptions,
-  storefrontBracketsQueryOptions,
-  storefrontMatchesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
 
 export const Route = createLazyFileRoute('/_public/')({
   component: Home,

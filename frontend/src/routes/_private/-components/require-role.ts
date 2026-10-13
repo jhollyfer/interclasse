@@ -1,7 +1,8 @@
 import { redirect } from '@tanstack/react-router'
 
-import { HOME_BY_ROLE } from './menu'
 import type { UserRole } from '#/lib/entity'
+
+import { HOME_BY_ROLE } from './menu'
 
 /**
  * Manda para a própria tela inicial quem abriu a área de outro papel.

@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
+
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
 

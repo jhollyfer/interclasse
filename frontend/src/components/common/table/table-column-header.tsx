@@ -9,9 +9,6 @@ import {
 } from '@phosphor-icons/react'
 import type { Column, RowData } from '@tanstack/react-table'
 
-import { useTableContext } from './table-context'
-import type { TableFeatures } from './use-table'
-
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'
 import {
@@ -23,6 +20,9 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { SortDirections } from '#/lib/entity'
 import type { SortDirection } from '#/lib/entity'
+
+import type { TableFeatures } from './use-table'
+import { useTableContext } from './table-context'
 
 type TableColumnHeaderProps<TRow extends RowData> = {
   /** O rótulo da coluna. */
@@ -66,7 +66,7 @@ export function TableColumnHeader<TRow extends RowData>({
   if (sortKey && search.sort === sortKey) direction = search.direction
 
   function sort(next: SortDirection): void {
-    navigate({
+    void navigate({
       to,
       // A ordem muda a página 1 tanto quanto o filtro: manter `page` levaria a
       // uma página que não existe mais na ordem nova.

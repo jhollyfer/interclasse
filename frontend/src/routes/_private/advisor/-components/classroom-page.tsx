@@ -4,7 +4,6 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
-import { studentsOf } from '../$classroomId/index'
 import {
   ConfirmDialog,
   ConfirmDialogDescription,
@@ -38,6 +37,8 @@ import {
 } from '#/integrations/tanstack-query/queries'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import type { Student } from '#/lib/validator'
+
+import { studentsOf } from '../$classroomId/index'
 
 const route = getRouteApi('/_private/advisor/$classroomId/')
 

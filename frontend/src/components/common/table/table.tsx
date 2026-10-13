@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-import { TableProvider } from './table-context'
-
 import { PageShell } from '#/components/common/page-shell'
 import type { ListSearch } from '#/lib/list-search'
 import type { Merge } from '#/lib/interfaces'
+
+import { TableProvider } from './table-context'
 
 type TableProps = Merge<
   React.ComponentProps<typeof PageShell>,

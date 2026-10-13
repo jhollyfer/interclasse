@@ -1,9 +1,9 @@
 import type * as React from 'react'
 import type { Header, RowData } from '@tanstack/react-table'
 
-import type { TableFeatures } from './use-table'
-
 import { cn } from '#/lib/utils'
+
+import type { TableFeatures } from './use-table'
 
 /**
  * A alça de redimensionar, na borda direita do cabeçalho.
