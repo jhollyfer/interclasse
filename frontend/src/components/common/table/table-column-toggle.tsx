@@ -30,6 +30,7 @@ export function TableColumnToggle<TRow extends RowData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        data-slot="table-column-toggle"
         render={
           <Button
             data-test-id="column-toggle"

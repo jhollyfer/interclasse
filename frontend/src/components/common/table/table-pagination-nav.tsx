@@ -72,7 +72,7 @@ export function Pagination<TSearch extends ListSearch>({
 
   return (
     <section
-      data-slot="pagination"
+      data-slot="table-pagination-nav"
       data-test-id="pagination"
       className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >

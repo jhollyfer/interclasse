@@ -170,7 +170,7 @@ export function PageHeader({
       className={cn(
         // Sem o "voltar", a coluna 1 fica vazia e o `gap-x` ainda a separava do
         // título: 12px de recuo que nenhum outro bloco da tela tinha.
-        'grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-0 gap-y-0.5 has-data-[slot=page-header-back]:gap-x-3',
+        'grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
         className,
       )}
       {...props}
@@ -189,16 +189,19 @@ type PageHeaderBackProps = {
    */
   to: LinkProps['to']
   params?: LinkProps['params']
+  /** A parte de outro compound que é esta seta (`form-shell-back`). */
+  'data-slot'?: `${string}-back`
 }
 
 /** A seta de voltar. A tela que não veio de lugar nenhum simplesmente não a escreve. */
 export function PageHeaderBack({
   to,
   params,
+  'data-slot': slot = 'page-header-back',
 }: PageHeaderBackProps): React.JSX.Element {
   return (
     <Button
-      data-slot="page-header-back"
+      data-slot={slot}
       variant="ghost"
       size="icon"
       type="button"

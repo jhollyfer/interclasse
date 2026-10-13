@@ -36,7 +36,7 @@ export function TableContent({
 
   if (isError) {
     return (
-      <PageShellContent>
+      <PageShellContent data-slot="table-content">
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">

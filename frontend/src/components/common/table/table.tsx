@@ -50,7 +50,9 @@ export function Table({
 
   return (
     <TableProvider value={value}>
-      <PageShell {...rest}>{children}</PageShell>
+      <PageShell data-slot="table" {...rest}>
+        {children}
+      </PageShell>
     </TableProvider>
   )
 }

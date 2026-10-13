@@ -46,7 +46,7 @@ export function TableSkeleton({
   ))
 
   return (
-    <PageShell>
+    <PageShell data-slot="table-skeleton">
       <PageShellHeader>
         <div className="flex flex-col gap-2">
           <Skeleton className="h-8 w-48" />

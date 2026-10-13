@@ -92,6 +92,7 @@ export function TableTrashToggle(): React.JSX.Element {
 
   return (
     <Button
+      data-slot="table-trash-toggle"
       variant={variant}
       onClick={() =>
         void navigate({
