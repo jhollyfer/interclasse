@@ -5,101 +5,213 @@
 
 export const controllers = {
   account: {
-    Show: () => import('#features/account/show.controller'),
-    Update: () => import('#features/account/update.controller'),
+    show: {
+      Show: () => import('#features/account/show/show.controller'),
+    },
+    update: {
+      Update: () => import('#features/account/update/update.controller'),
+    },
   },
   administrator: {
     announcements: {
-      Create: () => import('#features/administrator/announcements/create.controller'),
-      Delete: () => import('#features/administrator/announcements/delete.controller'),
-      Paginate: () => import('#features/administrator/announcements/paginate.controller'),
-      Show: () => import('#features/administrator/announcements/show.controller'),
-      Update: () => import('#features/administrator/announcements/update.controller'),
+      create: {
+        Create: () => import('#features/administrator/announcements/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/announcements/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/announcements/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/announcements/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/announcements/update/update.controller'),
+      },
     },
     brackets: {
-      Create: () => import('#features/administrator/brackets/create.controller'),
-      Delete: () => import('#features/administrator/brackets/delete.controller'),
-      Paginate: () => import('#features/administrator/brackets/paginate.controller'),
-      Show: () => import('#features/administrator/brackets/show.controller'),
+      create: {
+        Create: () => import('#features/administrator/brackets/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/brackets/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/brackets/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/brackets/show/show.controller'),
+      },
     },
     classrooms: {
-      Create: () => import('#features/administrator/classrooms/create.controller'),
-      Delete: () => import('#features/administrator/classrooms/delete.controller'),
-      Paginate: () => import('#features/administrator/classrooms/paginate.controller'),
-      Show: () => import('#features/administrator/classrooms/show.controller'),
-      Update: () => import('#features/administrator/classrooms/update.controller'),
+      create: {
+        Create: () => import('#features/administrator/classrooms/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/classrooms/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/classrooms/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/classrooms/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/classrooms/update/update.controller'),
+      },
     },
     matches: {
-      Paginate: () => import('#features/administrator/matches/paginate.controller'),
-      Score: () => import('#features/administrator/matches/score.controller'),
-      Unscore: () => import('#features/administrator/matches/unscore.controller'),
-      Update: () => import('#features/administrator/matches/update.controller'),
+      paginate: {
+        Paginate: () => import('#features/administrator/matches/paginate/paginate.controller'),
+      },
+      score: {
+        Score: () => import('#features/administrator/matches/score/score.controller'),
+      },
+      unscore: {
+        Unscore: () => import('#features/administrator/matches/unscore/unscore.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/matches/update/update.controller'),
+      },
     },
     sports: {
-      Create: () => import('#features/administrator/sports/create.controller'),
-      Delete: () => import('#features/administrator/sports/delete.controller'),
-      Paginate: () => import('#features/administrator/sports/paginate.controller'),
-      Show: () => import('#features/administrator/sports/show.controller'),
-      Update: () => import('#features/administrator/sports/update.controller'),
+      create: {
+        Create: () => import('#features/administrator/sports/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/sports/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/sports/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/sports/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/sports/update/update.controller'),
+      },
     },
     users: {
-      Archive: () => import('#features/administrator/users/archive.controller'),
-      Create: () => import('#features/administrator/users/create.controller'),
-      Delete: () => import('#features/administrator/users/delete.controller'),
-      Paginate: () => import('#features/administrator/users/paginate.controller'),
-      Show: () => import('#features/administrator/users/show.controller'),
-      Unarchive: () => import('#features/administrator/users/unarchive.controller'),
-      Update: () => import('#features/administrator/users/update.controller'),
+      archive: {
+        Archive: () => import('#features/administrator/users/archive/archive.controller'),
+      },
+      create: {
+        Create: () => import('#features/administrator/users/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/users/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/users/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/users/show/show.controller'),
+      },
+      unarchive: {
+        Unarchive: () => import('#features/administrator/users/unarchive/unarchive.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/users/update/update.controller'),
+      },
     },
   },
   advisor: {
     classrooms: {
-      Paginate: () => import('#features/advisor/classrooms/paginate.controller'),
+      paginate: {
+        Paginate: () => import('#features/advisor/classrooms/paginate/paginate.controller'),
+      },
     },
     enrollments: {
-      Show: () => import('#features/advisor/enrollments/show.controller'),
-      Update: () => import('#features/advisor/enrollments/update.controller'),
+      show: {
+        Show: () => import('#features/advisor/enrollments/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/advisor/enrollments/update/update.controller'),
+      },
     },
     students: {
-      Create: () => import('#features/advisor/students/create.controller'),
-      Delete: () => import('#features/advisor/students/delete.controller'),
-      Paginate: () => import('#features/advisor/students/paginate.controller'),
-      Update: () => import('#features/advisor/students/update.controller'),
+      create: {
+        Create: () => import('#features/advisor/students/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/advisor/students/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/advisor/students/paginate/paginate.controller'),
+      },
+      update: {
+        Update: () => import('#features/advisor/students/update/update.controller'),
+      },
     },
   },
   authentication: {
-    Refresh: () => import('#features/authentication/refresh.controller'),
-    SignIn: () => import('#features/authentication/sign-in.controller'),
-    SignOut: () => import('#features/authentication/sign-out.controller'),
+    refresh: {
+      Refresh: () => import('#features/authentication/refresh/refresh.controller'),
+    },
+    signIn: {
+      SignIn: () => import('#features/authentication/sign-in/sign-in.controller'),
+    },
+    signOut: {
+      SignOut: () => import('#features/authentication/sign-out/sign-out.controller'),
+    },
   },
   representative: {
     enrollments: {
-      Show: () => import('#features/representative/enrollments/show.controller'),
-      Update: () => import('#features/representative/enrollments/update.controller'),
+      show: {
+        Show: () => import('#features/representative/enrollments/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/representative/enrollments/update/update.controller'),
+      },
     },
   },
   storages: {
-    Complete: () => import('#features/storages/complete.controller'),
-    Create: () => import('#features/storages/create.controller'),
-    Delete: () => import('#features/storages/delete.controller'),
-    Download: () => import('#features/storages/download.controller'),
-    Paginate: () => import('#features/storages/paginate.controller'),
-    Parts: () => import('#features/storages/parts.controller'),
-    Show: () => import('#features/storages/show.controller'),
+    complete: {
+      Complete: () => import('#features/storages/complete/complete.controller'),
+    },
+    create: {
+      Create: () => import('#features/storages/create/create.controller'),
+    },
+    delete: {
+      Delete: () => import('#features/storages/delete/delete.controller'),
+    },
+    download: {
+      Download: () => import('#features/storages/download/download.controller'),
+    },
+    paginate: {
+      Paginate: () => import('#features/storages/paginate/paginate.controller'),
+    },
+    parts: {
+      Parts: () => import('#features/storages/parts/parts.controller'),
+    },
+    show: {
+      Show: () => import('#features/storages/show/show.controller'),
+    },
   },
   storefront: {
     announcements: {
-      Paginate: () => import('#features/storefront/announcements/paginate.controller'),
+      paginate: {
+        Paginate: () => import('#features/storefront/announcements/paginate/paginate.controller'),
+      },
     },
     brackets: {
-      Paginate: () => import('#features/storefront/brackets/paginate.controller'),
-      Show: () => import('#features/storefront/brackets/show.controller'),
+      paginate: {
+        Paginate: () => import('#features/storefront/brackets/paginate/paginate.controller'),
+      },
+      show: {
+        Show: () => import('#features/storefront/brackets/show/show.controller'),
+      },
     },
     matches: {
-      Paginate: () => import('#features/storefront/matches/paginate.controller'),
+      paginate: {
+        Paginate: () => import('#features/storefront/matches/paginate/paginate.controller'),
+      },
     },
     sports: {
-      Paginate: () => import('#features/storefront/sports/paginate.controller'),
+      paginate: {
+        Paginate: () => import('#features/storefront/sports/paginate/paginate.controller'),
+      },
     },
   },
 }

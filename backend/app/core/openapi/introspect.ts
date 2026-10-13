@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
-import { dirname, relative, resolve } from 'node:path'
+import { basename, dirname, relative, resolve } from 'node:path'
 import ts from 'typescript'
 import HTTPException from '#exceptions/http.exception'
 import { RESPONSES } from '#core/response'
@@ -321,11 +321,13 @@ export async function introspect(file: string): Promise<Introspection | undefine
   }
 
   const imports = collectImports(source)
-  const found: Introspection = {
-    errors: [],
-    action: file.split('/').pop()?.replace('.controller.ts', '') ?? '',
-    directory: dirname(file),
-  }
+  // A ação é uma pasta (`users/archive/archive.controller.ts`), e o recurso é
+  // a pasta acima dela - é a chave de `RESPONSES`.
+  const action = file.split('/').pop()?.replace('.controller.ts', '') ?? ''
+  let directory = dirname(file)
+  if (basename(directory) === action) directory = dirname(directory)
+
+  const found: Introspection = { errors: [], action, directory }
 
   const pending: Array<{ slot: 'body' | 'query' | 'params'; name: string }> = []
 
