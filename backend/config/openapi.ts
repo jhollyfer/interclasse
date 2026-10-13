@@ -173,7 +173,7 @@ const openapi = {
   servers: [{ url: env.get('APP_SERVER_URL'), description: 'Servidor atual' }],
 
   /** Caminhos que nunca entram no documento: não são operação de API. */
-  ignore: ['/', '/documentation', '/openapi.json', '/health'],
+  ignore: ['/', '/documentation', '/openapi.json', '/health-check'],
 
   tags,
 }

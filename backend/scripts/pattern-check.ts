@@ -334,6 +334,8 @@ function conferirNomeDeClasse(relativo: string, fonte: string): Achado[] {
  */
 function conferirPastaDaAcao(relativo: string): Achado[] {
   if (!relativo.startsWith('app/features/')) return []
+  // A sonda de vida e infra pura, sem modulo nem recurso (arquitetura.md §7).
+  if (relativo === 'app/features/health-check.controller.ts') return []
   const casado = /([a-z-]+)\.(?:controller|use-case)\.ts$/.exec(relativo)
   if (casado === null) return []
   if (basename(dirname(relativo)) === casado[1]) return []

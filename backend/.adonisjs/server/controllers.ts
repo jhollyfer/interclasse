@@ -156,6 +156,7 @@ export const controllers = {
       SignOut: () => import('#features/authentication/sign-out/sign-out.controller'),
     },
   },
+  HealthCheck: () => import('#features/health-check.controller'),
   representative: {
     enrollments: {
       show: {

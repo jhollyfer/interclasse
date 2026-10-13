@@ -73,7 +73,7 @@ ENV NODE_ENV=production \
     HOST=0.0.0.0
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:3333/health || exit 1
+    CMD curl -fsS http://127.0.0.1:3333/health-check || exit 1
 
 # Sem ENTRYPOINT: migration não roda no start do container. Quem migra é o
 # comando de pré-deploy da plataforma (`node ace migration:run --force`), para
