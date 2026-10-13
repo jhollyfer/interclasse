@@ -1,16 +1,12 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
 
-import { Alert, AlertDescription } from '#/components/ui/alert'
+import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import { Input } from '#/components/ui/input'
 import { OptionCombobox } from '#/components/common/option-combobox'
 import { USER_ROLE } from '#/lib/entity'
@@ -50,111 +46,98 @@ function usePeople(role: UserRole) {
   ]
 }
 
+type ClassroomFormFieldsProps = Readonly<{
+  form: UseFormReturn<ClassroomFormType>
+  idPrefix: string
+}>
+
 export function ClassroomFormFields({
   form,
   idPrefix,
-}: {
-  form: UseFormReturn<ClassroomFormType>
-  idPrefix: string
-}): React.JSX.Element {
-  const { errors } = form.formState
+}: ClassroomFormFieldsProps): React.JSX.Element {
   const advisors = usePeople(USER_ROLE.ADVISOR)
   const representatives = usePeople(USER_ROLE.REPRESENTATIVE)
 
   return (
     <FieldGroup>
-      {errors.root && (
-        <Alert variant="destructive">
-          <AlertDescription>{errors.root.message}</AlertDescription>
-        </Alert>
-      )}
+      <AppFormRootError form={form} />
 
-      <Controller
+      <AppField
+        control={form.control}
         name="name"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-name`}>Nome</FieldLabel>
-            <Input
-              {...field}
-              id={`${idPrefix}-name`}
-              aria-invalid={fieldState.invalid}
-              placeholder="9º A"
-            />
+        id={`${idPrefix}-name`}
+        label="Nome"
+      >
+        {({ field, control }) => (
+          <>
+            <Input {...field} {...control} placeholder="9º A" />
             <FieldDescription>É o nome que aparece no placar.</FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="grade"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-grade`}>Ano</FieldLabel>
+        name="grade"
+        id={`${idPrefix}-grade`}
+        label="Ano"
+      >
+        {({ field, control }) => (
+          <>
             <OptionCombobox
-              id={`${idPrefix}-grade`}
+              {...control}
               // Na criação o ano nasce ausente: `String(undefined)` não casa
               // com opção nenhuma, e o combobox mostra o vazio.
               value={String(field.value)}
               onValueChange={(value) => field.onChange(Number(value))}
               onBlur={field.onBlur}
-              aria-invalid={fieldState.invalid}
               options={GRADE_OPTIONS}
             />
             <FieldDescription>
               Do 3º ao 5º é Fundamental 1; do 6º ao 9º, Fundamental 2.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
 
-      <Controller
+      <AppField
+        control={form.control}
         name="advisorId"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-advisor`}>
-              Professor conselheiro
-            </FieldLabel>
-            <OptionCombobox
-              id={`${idPrefix}-advisor`}
-              value={field.value ?? ''}
-              onValueChange={(value) => field.onChange(value || null)}
-              onBlur={field.onBlur}
-              aria-invalid={fieldState.invalid}
-              options={advisors}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+        id={`${idPrefix}-advisor`}
+        label="Professor conselheiro"
+      >
+        {({ field, control }) => (
+          <OptionCombobox
+            {...control}
+            value={field.value ?? ''}
+            onValueChange={(value) => field.onChange(value || null)}
+            onBlur={field.onBlur}
+            options={advisors}
+          />
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="representativeId"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-representative`}>
-              Aluno representante
-            </FieldLabel>
+        name="representativeId"
+        id={`${idPrefix}-representative`}
+        label="Aluno representante"
+      >
+        {({ field, control }) => (
+          <>
             <OptionCombobox
-              id={`${idPrefix}-representative`}
+              {...control}
               value={field.value ?? ''}
               onValueChange={(value) => field.onChange(value || null)}
               onBlur={field.onBlur}
-              aria-invalid={fieldState.invalid}
               options={representatives}
             />
             <FieldDescription>
               As contas saem de Usuários, com o papel de representante.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
     </FieldGroup>
   )
 }

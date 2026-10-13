@@ -1,12 +1,9 @@
-import * as React from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { ShuffleIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
 import {
   Dialog,
   DialogContent,
@@ -16,13 +13,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import { Field, FieldLabel } from '#/components/ui/field'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
+import { useMutationForm } from '#/hooks/use-mutation-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import { useBracketCreate } from '#/integrations/tanstack-query/mutations'
 import { sportsQueryOptions } from '#/integrations/tanstack-query/queries'
 import { CATEGORIES } from '#/lib/entity'
+import type { IBracket } from '#/lib/interfaces'
 import { CATEGORY_LABELS } from '#/lib/labels'
+import { BracketCreateValidator } from '#/validators/administrator/brackets.validator'
+import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
+
+const FIELDS = ['sportId', 'category'] as const
 
 /**
  * O sorteio. Escolhe modalidade e categoria; o resto - quem entra, os confrontos,
@@ -30,23 +36,28 @@ import { CATEGORY_LABELS } from '#/lib/labels'
  */
 export function DrawDialog(): React.JSX.Element {
   const [open, setOpen] = React.useState(false)
-  const [sportId, setSportId] = React.useState('')
-  const [category, setCategory] = React.useState('')
   const navigate = useNavigate()
-  const invalidate = useInvalidate()
   const { data: sports } = useQuery(sportsQueryOptions({ perPage: 100 }))
 
-  const draw = useBracketCreate({
-    onSuccess: async (bracket) => {
-      toast.success('Chave sorteada.')
-      await invalidate([...GAME_KEYS, ...DEPENDENTS.games])
+  const { form, mutation, onSubmit } = useMutationForm<
+    BracketCreatePayload,
+    IBracket,
+    BracketCreatePayload
+  >({
+    validator: BracketCreateValidator,
+    defaults: { sportId: '' },
+    fields: FIELDS,
+    mutation: useBracketCreate,
+    invalidate: [...GAME_KEYS, ...DEPENDENTS.games],
+    success: 'Chave sorteada.',
+    payload: (values) => values,
+    async onSuccess(bracket) {
       setOpen(false)
       await navigate({
         to: '/administrator/brackets/$id',
         params: { id: bracket.id },
       })
     },
-    onError: (error) => notifyError(error, { id: 'bracket-draw' }),
   })
 
   return (
@@ -60,16 +71,7 @@ export function DrawDialog(): React.JSX.Element {
         }
       />
       <DialogContent>
-        <form
-          method="post"
-          className="grid gap-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            const chosen = CATEGORIES.find((value) => value === category)
-            if (!sportId || !chosen) return
-            draw.mutate({ sportId, category: chosen })
-          }}
-        >
+        <form method="post" className="grid gap-4" onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>Sortear chave</DialogTitle>
             <DialogDescription>
@@ -79,44 +81,58 @@ export function DrawDialog(): React.JSX.Element {
             </DialogDescription>
           </DialogHeader>
 
-          <Field>
-            <FieldLabel htmlFor="draw-sport">Modalidade</FieldLabel>
-            {/* `select` nativo: dentro do diálogo o popup do combobox abre
-                atrás do overlay. */}
-            <NativeSelect
-              id="draw-sport"
-              value={sportId}
-              onChange={(event) => setSportId(event.target.value)}
-            >
-              <NativeSelectOption value="">Selecione</NativeSelectOption>
-              {(sports?.data ?? []).map((sport) => (
-                <NativeSelectOption key={sport.id} value={sport.id}>
-                  {sport.name}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="draw-category">Categoria</FieldLabel>
-            <NativeSelect
-              id="draw-category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              <NativeSelectOption value="">Selecione</NativeSelectOption>
-              {CATEGORIES.map((value) => (
-                <NativeSelectOption key={value} value={value}>
-                  {CATEGORY_LABELS[value]}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </Field>
+          <AppField
+            control={form.control}
+            name="sportId"
+            id="draw-sport"
+            label="Modalidade"
+          >
+            {({ field, control }) => (
+              // `select` nativo: dentro do diálogo o popup do combobox abre
+              // atrás do overlay.
+              <NativeSelect {...field} {...control}>
+                <NativeSelectOption value="">Selecione</NativeSelectOption>
+                {(sports?.data ?? []).map((sport) => (
+                  <NativeSelectOption key={sport.id} value={sport.id}>
+                    {sport.name}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            )}
+          </AppField>
+          <AppField
+            control={form.control}
+            name="category"
+            id="draw-category"
+            label="Categoria"
+          >
+            {({ field, control }) => (
+              <NativeSelect
+                {...control}
+                // A categoria nasce ausente: `String(undefined)` não casa com
+                // opção nenhuma, e o select mostra o "Selecione".
+                value={String(field.value)}
+                onChange={(event) =>
+                  field.onChange(
+                    CATEGORIES.find((value) => value === event.target.value),
+                  )
+                }
+                onBlur={field.onBlur}
+              >
+                <NativeSelectOption value="">Selecione</NativeSelectOption>
+                {CATEGORIES.map((value) => (
+                  <NativeSelectOption key={value} value={value}>
+                    {CATEGORY_LABELS[value]}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            )}
+          </AppField>
+
+          <AppFormRootError form={form} />
 
           <DialogFooter>
-            <Button
-              type="submit"
-              disabled={draw.isPending || !sportId || !category}
-            >
+            <Button type="submit" disabled={mutation.isPending}>
               Sortear
             </Button>
           </DialogFooter>

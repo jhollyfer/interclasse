@@ -2,17 +2,19 @@ import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
 
-import { Alert, AlertDescription } from '#/components/ui/alert'
 import { Checkbox } from '#/components/ui/checkbox'
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 
 export type AnnouncementFormType = AnnouncementCreatePayload
@@ -25,57 +27,41 @@ export const ANNOUNCEMENT_FORM_DEFAULTS: DefaultValues<AnnouncementFormType> = {
 
 export const ANNOUNCEMENT_FIELDS = ['title', 'body', 'pinned'] as const
 
+type AnnouncementFormFieldsProps = Readonly<{
+  form: UseFormReturn<AnnouncementFormType>
+  idPrefix: string
+}>
+
 export function AnnouncementFormFields({
   form,
   idPrefix,
-}: {
-  form: UseFormReturn<AnnouncementFormType>
-  idPrefix: string
-}): React.JSX.Element {
-  const { errors } = form.formState
-
+}: AnnouncementFormFieldsProps): React.JSX.Element {
   return (
     <FieldGroup>
-      {errors.root && (
-        <Alert variant="destructive">
-          <AlertDescription>{errors.root.message}</AlertDescription>
-        </Alert>
-      )}
+      <AppFormRootError form={form} />
 
-      <Controller
+      <AppField
+        control={form.control}
         name="title"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-title`}>Título</FieldLabel>
-            <Input
-              {...field}
-              id={`${idPrefix}-title`}
-              aria-invalid={fieldState.invalid}
-              placeholder="Troca de horário"
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+        id={`${idPrefix}-title`}
+        label="Título"
+      >
+        {({ field, control }) => (
+          <Input {...field} {...control} placeholder="Troca de horário" />
         )}
-      />
+      </AppField>
 
-      <Controller
+      <AppField
+        control={form.control}
         name="body"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-body`}>Texto</FieldLabel>
-            <Textarea
-              {...field}
-              id={`${idPrefix}-body`}
-              rows={5}
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
+        id={`${idPrefix}-body`}
+        label="Texto"
+      >
+        {({ field, control }) => <Textarea {...field} {...control} rows={5} />}
+      </AppField>
 
+      {/* Caixa de marcar: o rótulo vem depois do controle, então fica fora do
+          `AppField`, que desenha rótulo, controle e erro nessa ordem. */}
       <Controller
         name="pinned"
         control={form.control}

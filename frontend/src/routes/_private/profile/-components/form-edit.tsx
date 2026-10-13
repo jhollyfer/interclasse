@@ -1,8 +1,6 @@
-import type * as React from 'react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { Controller, useForm } from 'react-hook-form'
-import { vineResolver } from '@hookform/resolvers/vine'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -26,25 +24,20 @@ import {
   ImageFieldUpload,
 } from '#/components/common/image-field'
 import { InputPassword } from '#/components/common/input-password'
-import { Alert, AlertDescription } from '#/components/ui/alert'
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from '#/components/ui/field'
+import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { useResourceForm } from '#/hooks/use-resource-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import { useAccountUpdate } from '#/integrations/tanstack-query/mutations'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
-import { applyMutationError } from '#/lib/form-errors'
+import type { IUser } from '#/lib/interfaces'
 import { initials } from '#/lib/labels'
 import { ProfileUpdateValidator } from '#/validators/account/profile.validator'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
-
-const FORM_ID = 'profile'
 
 /**
  * Os campos que o backend pode acusar.
@@ -64,27 +57,43 @@ const FIELDS = [
 ] as const
 
 /**
+ * As três chaves de senha **saem** do corpo quando não há troca, e é a
+ * armadilha desta tela: o `requiredIfExists` do backend olha a **chave**, não
+ * o valor. `password: ''` vira `null` e ainda conta como presente, e a API
+ * passaria a exigir `currentPassword` de quem não quis trocar senha.
+ */
+function toPayload(values: ProfileUpdatePayload): ProfileUpdatePayload {
+  const { password, passwordConfirmation, currentPassword, ...rest } = values
+
+  if (!password) return rest
+
+  return { ...rest, password, passwordConfirmation, currentPassword }
+}
+
+/**
  * A edição da própria conta. Quem só quer conferir os dados fica na ficha, em
  * `-components/profile.tsx`.
  *
- * Escrita à mão, e não sobre o `useResourceForm`: o `onSuccess` daquele hook
- * sempre volta para `backTo`, e aqui o destino depende do que mudou - trocar
- * e-mail ou senha derruba **todas** as sessões no servidor, inclusive esta, e o
- * lugar certo depois disso é o login.
+ * O `onSuccess` é próprio: trocar e-mail ou senha derruba **todas** as sessões
+ * no servidor, inclusive esta, e o lugar certo depois disso é o login, não a
+ * ficha.
  */
 export function ProfileFormEdit(): React.JSX.Element {
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   // O `loader` da rota já garantiu o dado; aqui é leitura de cache.
   const { data: account } = useSuspenseQuery(accountQueryOptions())
 
-  const form = useForm<ProfileUpdatePayload>({
-    resolver: vineResolver(ProfileUpdateValidator),
-    mode: 'onTouched',
+  const { form, onSubmit, shell } = useResourceForm<
+    ProfileUpdatePayload,
+    IUser,
+    ProfileUpdatePayload
+  >({
+    formId: 'profile',
+    validator: ProfileUpdateValidator,
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
-    defaultValues: {
+    defaults: {
       name: '',
       email: '',
       password: '',
@@ -92,8 +101,6 @@ export function ProfileFormEdit(): React.JSX.Element {
       currentPassword: '',
       avatarId: null,
     },
-    // `values`, e não `defaultValues`: a conta chega depois do primeiro render,
-    // quando `defaultValues` já congelou.
     values: {
       name: account.name,
       email: account.email,
@@ -102,71 +109,32 @@ export function ProfileFormEdit(): React.JSX.Element {
       currentPassword: '',
       avatarId: account.avatarId,
     },
-  })
-
-  const mutation = useAccountUpdate({
-    onError: (error, payload) =>
-      applyMutationError({
-        form,
-        error,
-        fields: FIELDS,
-        // Edição sempre pode reenviar: o `PUT` escreve o mesmo estado final e
-        // não cria nada.
-        retry: {
-          id: 'account-update-error',
-          onClick: () => mutation.mutate(payload),
-        },
-      }),
+    fields: FIELDS,
+    mutation: useAccountUpdate,
+    // Por prefixo: o guard do layout e o cabeçalho leem a mesma chave.
+    invalidate: queryKeys.account.profile.all,
+    backTo: '/profile',
+    // Edição sempre pode reenviar: o `PUT` escreve o mesmo estado final.
+    retry: 'account-update-error',
+    payload: toPayload,
     async onSuccess(updated, payload) {
-      // Por prefixo: o guard do layout e o cabeçalho leem a mesma chave.
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.account.profile.all,
-      })
-
-      // Trocar e-mail ou senha derruba **todas** as sessões, inclusive esta. O
-      // redirecionamento para o login não é efeito colateral a evitar: é o que
-      // já aconteceu do lado do servidor, e mandar a pessoa de volta ao painel
-      // só a faria descobrir isso no próximo 401.
+      // O redirecionamento para o login não é efeito colateral a evitar: é o
+      // que já aconteceu do lado do servidor.
       if (payload.email !== account.email || payload.password) {
         toast.success('Acesso atualizado. Entre de novo.')
         await router.navigate({ to: '/authentication' })
         return
       }
 
-      // Volta para a ficha, e não para o painel: quem salvou veio de lá, e é lá
-      // que o nome e o e-mail novos aparecem para conferência.
+      // Volta para a ficha: é lá que o nome e o e-mail novos aparecem para
+      // conferência.
       toast.success(`${updated.name} salvo.`)
       await router.navigate({ to: '/profile' })
     },
   })
 
-  function onValid(values: ProfileUpdatePayload): void {
-    // Sem isto, a mensagem da tentativa anterior fica na tela durante a nova.
-    form.clearErrors('root')
-
-    // As três chaves de senha **saem** do corpo quando não há troca, e é a
-    // armadilha desta tela: o `requiredIfExists` do backend olha a **chave**,
-    // não o valor. `password: ''` vira `null` e ainda conta como presente, e a
-    // API passaria a exigir `currentPassword` de quem não quis trocar senha.
-    const { password, passwordConfirmation, currentPassword, ...rest } = values
-
-    const body: ProfileUpdatePayload = { ...rest }
-
-    if (password) {
-      body.password = password
-      body.passwordConfirmation = passwordConfirmation
-      body.currentPassword = currentPassword
-    }
-
-    mutation.mutate(body)
-  }
-
   return (
-    <FormShell
-      formId={FORM_ID}
-      backTo="/profile"
-      isPending={mutation.isPending}
-    >
+    <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
         <FormShellTitle>Editar perfil</FormShellTitle>
@@ -176,19 +144,20 @@ export function ProfileFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent
-        onSubmit={(event) => void form.handleSubmit(onValid)(event)}
-      >
+      <FormShellContent onSubmit={onSubmit}>
         <FormShellCard>
           <FieldSet>
             <FieldLegend>Identidade</FieldLegend>
 
-            <Controller
-              name="avatarId"
+            <AppField
               control={form.control}
-              render={({ field }) => (
+              name="avatarId"
+              id="account-avatar"
+              label="Foto"
+            >
+              {({ field, control }) => (
                 <ImageField
-                  id="account-avatar"
+                  id={control.id}
                   value={field.value ?? null}
                   onValueChange={field.onChange}
                   previewUrl={account.avatar?.url}
@@ -205,124 +174,99 @@ export function ProfileFormEdit(): React.JSX.Element {
                   </ImageFieldContent>
                 </ImageField>
               )}
-            />
+            </AppField>
 
-            <Controller
+            <AppField
+              control={form.control}
               name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-name">Nome</FieldLabel>
-                  <Input
-                    {...field}
-                    value={field.value ?? ''}
-                    id="account-name"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="name"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              id="account-name"
+              label="Nome"
+            >
+              {({ field, control }) => (
+                <Input
+                  {...field}
+                  {...control}
+                  value={field.value ?? ''}
+                  autoComplete="name"
+                />
               )}
-            />
+            </AppField>
 
-            <Controller
-              name="email"
+            <AppField
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-email">E-mail</FieldLabel>
-                  <Input
-                    {...field}
-                    value={field.value ?? ''}
-                    id="account-email"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="email"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              name="email"
+              id="account-email"
+              label="E-mail"
+            >
+              {({ field, control }) => (
+                <Input
+                  {...field}
+                  {...control}
+                  value={field.value ?? ''}
+                  autoComplete="email"
+                />
               )}
-            />
+            </AppField>
           </FieldSet>
 
           <FieldSet>
             <FieldLegend>Senha</FieldLegend>
 
-            <Controller
+            <AppField
+              control={form.control}
               name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-password">
-                    Nova senha (deixe em branco para manter)
-                  </FieldLabel>
-                  <InputPassword
-                    {...field}
-                    value={field.value ?? ''}
-                    id="account-password"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="new-password"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              id="account-password"
+              label="Nova senha (deixe em branco para manter)"
+            >
+              {({ field, control }) => (
+                <InputPassword
+                  {...field}
+                  {...control}
+                  value={field.value ?? ''}
+                  autoComplete="new-password"
+                />
               )}
-            />
+            </AppField>
 
-            <Controller
+            <AppField
+              control={form.control}
               name="passwordConfirmation"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-password-confirmation">
-                    Confirme a nova senha
-                  </FieldLabel>
-                  <InputPassword
-                    {...field}
-                    value={field.value ?? ''}
-                    id="account-password-confirmation"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="new-password"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              id="account-password-confirmation"
+              label="Confirme a nova senha"
+            >
+              {({ field, control }) => (
+                <InputPassword
+                  {...field}
+                  {...control}
+                  value={field.value ?? ''}
+                  autoComplete="new-password"
+                />
               )}
-            />
+            </AppField>
 
-            <Controller
-              name="currentPassword"
+            <AppField
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="account-current-password">
-                    Senha atual
-                  </FieldLabel>
+              name="currentPassword"
+              id="account-current-password"
+              label="Senha atual"
+            >
+              {({ field, control }) => (
+                <>
                   <InputPassword
                     {...field}
+                    {...control}
                     value={field.value ?? ''}
-                    id="account-current-password"
-                    aria-invalid={fieldState.invalid}
                     autoComplete="current-password"
                   />
                   {/* A regra é do validator - `requiredIfExists('password')` -,
-                      e o texto está aqui para quem lê antes de digitar. Sem
-                      ele, a exigência só aparece como erro depois do envio. */}
+                      e o texto está aqui para quem lê antes de digitar. */}
                   <FieldDescription>
                     Exigida só para trocar a senha. É prova de identidade: quem
                     sequestra uma sessão tem o cookie, mas não sabe a senha.
                   </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+                </>
               )}
-            />
+            </AppField>
 
             <FieldDescription>
               Trocar o e-mail ou a senha encerra todas as sessões desta conta, e
@@ -330,13 +274,7 @@ export function ProfileFormEdit(): React.JSX.Element {
             </FieldDescription>
           </FieldSet>
 
-          {form.formState.errors.root && (
-            <Alert variant="destructive">
-              <AlertDescription>
-                {form.formState.errors.root.message}
-              </AlertDescription>
-            </Alert>
-          )}
+          <AppFormRootError form={form} />
         </FormShellCard>
       </FormShellContent>
     </FormShell>

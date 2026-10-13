@@ -14,7 +14,21 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
+import { useMutationForm } from '#/hooks/use-mutation-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations'
+import {
+  StudentCreateValidator,
+  StudentUpdateValidator,
+} from '#/validators/advisor/students.validator'
+import type {
+  StudentCreatePayload,
+  StudentUpdatePayload,
+} from '#/validators/advisor/students.validator'
 import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
@@ -102,28 +116,38 @@ export function ClassroomPage(): React.JSX.Element {
   )
 }
 
+/** Aluno novo, renomeado ou removido muda a matriz de inscrições também. */
+const STUDENT_CHANGE = [
+  queryKeys.advisor.students.all,
+  queryKeys.advisor.enrollments.all,
+]
+
+const STUDENT_FIELDS = ['name'] as const
+
+/** O rótulo do campo de nome: só para leitor de tela, a linha já diz o que é. */
+const NAME_LABEL = <span className="sr-only">Nome do aluno</span>
+
 /** O cadastro de alunos: um campo para adicionar, e editar e tirar por linha. */
-function Students({ classroomId }: { classroomId: string }): React.JSX.Element {
+function Students({
+  classroomId,
+}: Readonly<{ classroomId: string }>): React.JSX.Element {
   const { data } = useSuspenseQuery(
     studentsQueryOptions(studentsOf(classroomId)),
   )
-  const invalidateKeys = useInvalidate()
-  const [name, setName] = React.useState('')
+  const invalidate = useInvalidate()
 
-  // Aluno novo ou removido muda a matriz de inscrições também.
-  async function invalidate(): Promise<void> {
-    await invalidateKeys([
-      queryKeys.advisor.students.all,
-      queryKeys.advisor.enrollments.all,
-    ])
-  }
-
-  const create = useStudentCreate({
-    onSuccess: async () => {
-      setName('')
-      await invalidate()
-    },
-    onError: (error) => notifyError(error, { id: 'student-create' }),
+  const { form, mutation, onSubmit } = useMutationForm<
+    StudentCreatePayload,
+    IStudent,
+    StudentCreatePayload
+  >({
+    validator: StudentCreateValidator,
+    defaults: { classroomId, name: '' },
+    fields: STUDENT_FIELDS,
+    mutation: useStudentCreate,
+    invalidate: STUDENT_CHANGE,
+    payload: (values) => values,
+    onSuccess: (): void => form.reset({ classroomId, name: '' }),
   })
 
   return (
@@ -134,31 +158,37 @@ function Students({ classroomId }: { classroomId: string }): React.JSX.Element {
       <CardContent className="flex flex-col gap-4">
         <form
           method="post"
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault()
-            if (name.trim()) create.mutate({ classroomId, name: name.trim() })
-          }}
+          className="flex items-start gap-2"
+          onSubmit={onSubmit}
         >
-          <Input
-            aria-label="Nome do aluno"
-            placeholder="Nome do aluno"
-            maxLength={120}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <Button type="submit" disabled={create.isPending || !name.trim()}>
+          <AppField
+            control={form.control}
+            name="name"
+            id="student-create-name"
+            label={NAME_LABEL}
+          >
+            {({ field, control }) => (
+              <Input
+                {...field}
+                {...control}
+                placeholder="Nome do aluno"
+                maxLength={120}
+              />
+            )}
+          </AppField>
+          <Button type="submit" disabled={mutation.isPending}>
             <PlusIcon />
             Adicionar
           </Button>
         </form>
+        <AppFormRootError form={form} />
 
         <ul className="divide-y">
           {data.data.map((student) => (
             <StudentRow
               key={student.id}
               student={student}
-              onChange={invalidate}
+              onChange={() => invalidate(STUDENT_CHANGE)}
             />
           ))}
         </ul>
@@ -167,22 +197,28 @@ function Students({ classroomId }: { classroomId: string }): React.JSX.Element {
   )
 }
 
-function StudentRow({
-  student,
-  onChange,
-}: {
+type StudentRowProps = Readonly<{
   student: IStudent
   onChange: () => Promise<void>
-}): React.JSX.Element {
-  const [editing, setEditing] = React.useState(false)
-  const [name, setName] = React.useState(student.name)
+}>
 
-  const update = useStudentUpdate({
-    onSuccess: async () => {
-      setEditing(false)
-      await onChange()
-    },
-    onError: (error) => notifyError(error, { id: 'student-update' }),
+function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
+  const [editing, setEditing] = React.useState(false)
+
+  const { form, mutation, onSubmit } = useMutationForm<
+    StudentUpdatePayload,
+    IStudent,
+    StudentUpdateVariables
+  >({
+    validator: StudentUpdateValidator,
+    values: { name: student.name },
+    fields: STUDENT_FIELDS,
+    mutation: useStudentUpdate,
+    invalidate: STUDENT_CHANGE,
+    // Renomear é escrita idempotente: reenviar grava o mesmo nome.
+    retry: 'student-update',
+    payload: (values) => ({ ...values, id: student.id }),
+    onSuccess: () => setEditing(false),
   })
   const remove = useStudentDelete({
     onSuccess: onChange,
@@ -195,24 +231,20 @@ function StudentRow({
       <li className="py-2">
         <form
           method="post"
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault()
-            update.mutate({ id: student.id, name: name.trim() })
-          }}
+          className="flex items-start gap-2"
+          onSubmit={onSubmit}
         >
-          <Input
-            aria-label="Nome do aluno"
-            autoFocus
-            maxLength={120}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <Button
-            type="submit"
-            size="sm"
-            disabled={update.isPending || !name.trim()}
+          <AppField
+            control={form.control}
+            name="name"
+            id={`student-${student.id}-name`}
+            label={NAME_LABEL}
           >
+            {({ field, control }) => (
+              <Input {...field} {...control} autoFocus maxLength={120} />
+            )}
+          </AppField>
+          <Button type="submit" size="sm" disabled={mutation.isPending}>
             Salvar
           </Button>
           <Button
@@ -224,6 +256,7 @@ function StudentRow({
             Cancelar
           </Button>
         </form>
+        <AppFormRootError form={form} />
       </li>
     )
   }

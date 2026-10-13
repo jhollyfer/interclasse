@@ -185,6 +185,29 @@ describe('useResourceForm', () => {
     expect(toast.success).toHaveBeenCalledWith('Depoimento salvo.')
   })
 
+  it('onSuccess próprio substitui a volta para backTo', async () => {
+    const onSuccess = vi.fn()
+    const { stub } = setup({ onSuccess })
+
+    await stub
+      .options()
+      ?.onSuccess?.(
+        { id: '7', name: 'Ana' },
+        { name: 'Ana' },
+        undefined,
+        CONTEXT,
+      )
+
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['testimonials'],
+    })
+    expect(onSuccess).toHaveBeenCalledWith(
+      { id: '7', name: 'Ana' },
+      { name: 'Ana' },
+    )
+    expect(navigate).not.toHaveBeenCalled()
+  })
+
   it('oferece "Tentar de novo" reenviando o mesmo payload, quando há id de aviso', () => {
     const { stub } = setup({ retry: 'testimonial-update-error' })
     const sent = { name: 'Ana' }

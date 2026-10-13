@@ -1,15 +1,11 @@
 import type * as React from 'react'
-import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
 
-import { Alert, AlertDescription } from '#/components/ui/alert'
+import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import { Input } from '#/components/ui/input'
 import {
   ImageField,
@@ -71,7 +67,7 @@ export const USER_FIELDS = [
   'avatarId',
 ] as const
 
-type UserFormFieldsProps = {
+type UserFormFieldsProps = Readonly<{
   form: UseFormReturn<UserFormType>
   /** Prefixo dos `id`, para o mesmo formulário poder aparecer duas vezes na página. */
   idPrefix: string
@@ -88,14 +84,14 @@ type UserFormFieldsProps = {
    * para ela seria mais peça do que texto.
    */
   passwordLabel?: string
-}
+}>
 
 /**
  * Os campos da conta, compartilhados pela criação e pela edição. Cada tela é
  * dona da própria mutation e do próprio `onSuccess` - o que se repete é a
  * marcação, e é só ela que mora aqui, um nível acima das duas.
  *
- * Campo a campo é `Controller`, nunca `register`: os componentes vêm do Base UI
+ * Campo a campo é `AppField` (um `Controller`), nunca `register`: os componentes vêm do Base UI
  * e não expõem o `<input>` para receber `ref`.
  *
  * A senha atual não aparece: `currentPassword` é exigência de `PUT /account`,
@@ -109,83 +105,69 @@ export function UserFormFields({
   previewUrl,
   passwordLabel = 'Senha',
 }: UserFormFieldsProps): React.JSX.Element {
-  // Desestruturado no corpo do render, e não dentro de callback: `formState` é
-  // um Proxy, e ler dentro de um `onClick` não assina nada - o valor chega
-  // velho e o componente não re-renderiza quando ele muda.
-  const { errors } = form.formState
   const name = form.watch('name')
 
   return (
     <FieldGroup>
-      {errors.root && (
-        <Alert variant="destructive">
-          <AlertDescription>{errors.root.message}</AlertDescription>
-        </Alert>
-      )}
+      <AppFormRootError form={form} />
 
-      <Controller
+      <AppField
+        control={form.control}
         name="avatarId"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-avatar`}>
-              Foto (opcional)
-            </FieldLabel>
-            <ImageField
-              id={`${idPrefix}-avatar`}
-              value={field.value ?? null}
-              onValueChange={field.onChange}
-              previewUrl={previewUrl}
-            >
-              {/* Sem foto e sem nome, o espaço reservado fica vazio, e é o que
-                  se quer: `initials('')` é `''` e o `AvatarFallback` sabe ficar
-                  em branco. */}
-              <ImageFieldPreview alt="Foto da conta">
-                {initials(name)}
-              </ImageFieldPreview>
-              <ImageFieldContent>
-                <ImageFieldActions>
-                  <ImageFieldUpload>Enviar foto</ImageFieldUpload>
-                  <ImageFieldRemove />
-                </ImageFieldActions>
-                <ImageFieldDescription />
-              </ImageFieldContent>
-            </ImageField>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+        id={`${idPrefix}-avatar`}
+        label="Foto (opcional)"
+      >
+        {({ field, control }) => (
+          <ImageField
+            id={control.id}
+            value={field.value ?? null}
+            onValueChange={field.onChange}
+            previewUrl={previewUrl}
+          >
+            {/* Sem foto e sem nome, o espaço reservado fica vazio, e é o que
+                se quer: `initials('')` é `''` e o `AvatarFallback` sabe ficar
+                em branco. */}
+            <ImageFieldPreview alt="Foto da conta">
+              {initials(name)}
+            </ImageFieldPreview>
+            <ImageFieldContent>
+              <ImageFieldActions>
+                <ImageFieldUpload>Enviar foto</ImageFieldUpload>
+                <ImageFieldRemove />
+              </ImageFieldActions>
+              <ImageFieldDescription />
+            </ImageFieldContent>
+          </ImageField>
         )}
-      />
+      </AppField>
 
-      <Controller
+      <AppField
+        control={form.control}
         name="name"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-name`}>Nome</FieldLabel>
-            <Input
-              {...field}
-              id={`${idPrefix}-name`}
-              // `aria-invalid` vai à mão: `Field` e `FieldError` dão o
-              // `aria-describedby` de graça, este não.
-              aria-invalid={fieldState.invalid}
-              autoComplete="name"
-              placeholder="Nome de quem usa a conta"
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+        id={`${idPrefix}-name`}
+        label="Nome"
+      >
+        {({ field, control }) => (
+          <Input
+            {...field}
+            {...control}
+            autoComplete="name"
+            placeholder="Nome de quem usa a conta"
+          />
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="email"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-email`}>E-mail</FieldLabel>
+        name="email"
+        id={`${idPrefix}-email`}
+        label="E-mail"
+      >
+        {({ field, control }) => (
+          <>
             <Input
               {...field}
-              id={`${idPrefix}-email`}
-              aria-invalid={fieldState.invalid}
+              {...control}
               autoComplete="email"
               placeholder="pessoa@exemplo.org"
             />
@@ -194,94 +176,84 @@ export function UserFormFields({
             <FieldDescription>
               É por ele que a pessoa entra no painel.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="password"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-password`}>
-              {passwordLabel}
-            </FieldLabel>
-            {/* Sem `?? ''`: o tipo do formulário é o payload de **criação**, onde
-                a senha e a confirmação são obrigatórias. Na edição as duas
+        name="password"
+        id={`${idPrefix}-password`}
+        label={passwordLabel}
+      >
+        {({ field, control }) => (
+          <>
+            {/* Sem `?? ''`: o tipo do formulário é o payload de **criação**,
+                onde a senha e a confirmação são obrigatórias. Na edição as duas
                 começam `''` e em branco significa "não trocar" - quem descarta
                 as chaves antes de enviar é o `payload` de `form-edit.tsx`. */}
             <InputPassword
               {...field}
-              id={`${idPrefix}-password`}
-              aria-invalid={fieldState.invalid}
+              {...control}
               autoComplete="new-password"
             />
             <FieldDescription>
               De 8 a 32 caracteres, com minúscula, maiúscula, número e um
               caractere especial.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
 
-      <Controller
+      <AppField
+        control={form.control}
         name="passwordConfirmation"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-password-confirmation`}>
-              Confirme a senha
-            </FieldLabel>
-            <InputPassword
-              {...field}
-              id={`${idPrefix}-password-confirmation`}
-              aria-invalid={fieldState.invalid}
-              autoComplete="new-password"
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+        id={`${idPrefix}-password-confirmation`}
+        label="Confirme a senha"
+      >
+        {({ field, control }) => (
+          <InputPassword {...field} {...control} autoComplete="new-password" />
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="role"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-role`}>Papel</FieldLabel>
+        name="role"
+        id={`${idPrefix}-role`}
+        label="Papel"
+      >
+        {({ field, control }) => (
+          <>
             <OptionCombobox
+              {...control}
               // Sem `?? algum papel`: o campo não tem partida, e forçar uma
               // aqui gravaria em silêncio um papel que ninguém escolheu.
               value={field.value}
               onValueChange={field.onChange}
               onBlur={field.onBlur}
-              id={`${idPrefix}-role`}
-              aria-invalid={fieldState.invalid}
               options={toOptions(USER_ROLES, USER_ROLE_LABELS)}
             />
             <FieldDescription>
               Administrador organiza os jogos. Conselheiro cuida dos alunos das
               próprias turmas. Representante monta a lista de atletas da turma.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
 
-      <Controller
-        name="status"
+      <AppField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={`${idPrefix}-status`}>Situação</FieldLabel>
+        name="status"
+        id={`${idPrefix}-status`}
+        label="Situação"
+      >
+        {({ field, control }) => (
+          <>
             <OptionCombobox
+              {...control}
               value={field.value ?? ACTIVE_STATUS.ACTIVE}
               onValueChange={field.onChange}
               onBlur={field.onBlur}
-              id={`${idPrefix}-status`}
-              aria-invalid={fieldState.invalid}
               options={toOptions(
                 ACTIVE_STATUSES,
                 ACCOUNT_STATUS_LABELS,
@@ -293,10 +265,9 @@ export function UserFormFields({
             <FieldDescription>
               Conta inativa não entra no painel, e continua na listagem.
             </FieldDescription>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
+          </>
         )}
-      />
+      </AppField>
     </FieldGroup>
   )
 }
