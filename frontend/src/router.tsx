@@ -6,10 +6,9 @@ import {
   NotFoundPageActions,
   NotFoundPageDescription,
   NotFoundPageHomeButton,
-  NotFoundPageSubtitle,
+  NotFoundPageServerError,
   NotFoundPageTitle,
 } from '#/components/common/not-found-page'
-import { Button } from '#/components/ui/button'
 import { HTTPError } from '#/integrations/tanstack-query/http'
 
 import { getContext } from './integrations/tanstack-query/query-context'
@@ -70,22 +69,7 @@ export function getRouter() {
           </NotFoundPage>
         )
 
-      return (
-        <NotFoundPage code="500">
-          <NotFoundPageTitle>Algo quebrou aqui</NotFoundPageTitle>
-          <NotFoundPageSubtitle>A falha é nossa, não sua</NotFoundPageSubtitle>
-          <NotFoundPageDescription>
-            Esta tela não conseguiu carregar. Tentar de novo costuma bastar; se
-            insistir, volte ao início.
-          </NotFoundPageDescription>
-          <NotFoundPageActions>
-            <Button className="w-fit rounded-md" onClick={reset}>
-              Tentar de novo
-            </Button>
-            <NotFoundPageHomeButton />
-          </NotFoundPageActions>
-        </NotFoundPage>
-      )
+      return <NotFoundPageServerError onRetry={reset} />
     },
   })
 
