@@ -21,40 +21,40 @@
 import { access, readdir, readFile } from 'node:fs/promises'
 import { basename, dirname, join, relative, resolve } from 'node:path'
 
-type Achado = {
-  arquivo: string
-  linha: number
-  regra: string
-  secao: string
-  mensagem: string
+type Finding = {
+  file: string
+  line: number
+  rule: string
+  section: string
+  message: string
 }
 
-const RAIZ = resolve(dirname(new URL(import.meta.url).pathname), '..')
+const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 /** Uma entrada de `newAllowlist` da config. */
-type EntradaNew = {
+type NewEntry = {
   /** O simbolo construido com `new`. */
-  simbolo: string
+  symbol: string
   /** Onde o uso vive. Aceita `**` e `*`. */
-  arquivo: string
+  file: string
   /** Por que aquele `new` e legitimo. */
-  motivo: string
+  reason: string
 }
 
 type Config = {
   /** Chave que nunca passa por `env.get()`, com o motivo. Secao 6. */
-  envForaDoLeitor: Record<string, string>
-  newAllowlist: EntradaNew[]
+  envOutsideReader: Record<string, string>
+  newAllowlist: NewEntry[]
   softDeleteExempt: string[]
-  forma: string[]
+  shape: string[]
 }
 
 const CONFIG: Config = JSON.parse(
-  await readFile(join(RAIZ, 'scripts/pattern-check.config.json'), 'utf8'),
+  await readFile(join(ROOT, 'scripts/pattern-check.config.json'), 'utf8'),
 )
 
 /** Diretorios que a regua exige mesmo vazios. Secao 1.1. */
-const DIRETORIOS_OBRIGATORIOS = [
+const REQUIRED_DIRECTORIES = [
   'app/core',
   'app/features',
   'app/exceptions',
@@ -65,63 +65,63 @@ const DIRETORIOS_OBRIGATORIOS = [
   'app/policies',
 ]
 
-const IGNORADOS = new Set(['node_modules', 'build', '.adonisjs', 'tmp', '.git', 'coverage'])
+const IGNORED = new Set(['node_modules', 'build', '.adonisjs', 'tmp', '.git', 'coverage'])
 
-async function arquivosTs(dir: string): Promise<string[]> {
-  const encontrados: string[] = []
-  let entradas
+async function tsFiles(dir: string): Promise<string[]> {
+  const found: string[] = []
+  let entries
   try {
-    entradas = await readdir(dir, { withFileTypes: true })
+    entries = await readdir(dir, { withFileTypes: true })
   } catch {
-    return encontrados
+    return found
   }
 
-  for (const entrada of entradas) {
-    if (IGNORADOS.has(entrada.name)) continue
-    const caminho = join(dir, entrada.name)
-    if (entrada.isDirectory()) {
-      encontrados.push(...(await arquivosTs(caminho)))
+  for (const entry of entries) {
+    if (IGNORED.has(entry.name)) continue
+    const filePath = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      found.push(...(await tsFiles(filePath)))
       continue
     }
-    if (entrada.name.endsWith('.ts')) encontrados.push(caminho)
+    if (entry.name.endsWith('.ts')) found.push(filePath)
   }
 
-  return encontrados
+  return found
 }
 
 /**
  * Remove comentario de linha e de bloco antes de casar padrao. Sem isto, todo
  * exemplo dentro de um JSDoc — e este projeto tem muitos — viraria violacao.
  */
-function semComentarios(fonte: string): string {
-  const semBloco = fonte.replace(/\/\*[\s\S]*?\*\//g, (trecho) => trecho.replace(/[^\n]/g, ' '))
-  return semBloco.replace(/(^|[^:])\/\/.*$/gm, (_casado, prefixo: string) => prefixo)
+function withoutComments(source: string): string {
+  const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, (chunk) => chunk.replace(/[^\n]/g, ' '))
+  return withoutBlocks.replace(/(^|[^:])\/\/.*$/gm, (_match, prefix: string) => prefix)
 }
 
-function linhaDe(fonte: string, indice: number): number {
-  return fonte.slice(0, indice).split('\n').length
+function lineOf(source: string, index: number): number {
+  return source.slice(0, index).split('\n').length
 }
 
 /** `paginate.controller.ts` -> `Paginate`. */
-function verboDoArquivo(arquivo: string): string {
-  const nome = basename(arquivo).replace(/\.(controller|use-case)\.ts$/, '')
-  return nome
+function verbOf(file: string): string {
+  const name = basename(file).replace(/\.(controller|use-case)\.ts$/, '')
+  return name
     .split('-')
-    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
 }
 
 /** `certification-grants` -> `certificationGrants`. */
-function camel(segmento: string): string {
-  const partes = segmento.split('-')
-  return partes[0] + partes.slice(1).map(pascal).join('')
+function camel(segment: string): string {
+  const parts = segment.split('-')
+  return parts[0] + parts.slice(1).map(pascal).join('')
 }
 
 /** `course-modules` -> `CourseModules`. */
-function pascal(segmento: string): string {
-  return segmento
+function pascal(segment: string): string {
+  return segment
     .split('-')
-    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
 }
 
@@ -131,11 +131,11 @@ function pascal(segmento: string): string {
  * Heuristica, e assumida como tal: e por isso que ela nao decide sozinha - a
  * regra aceita o segmento com e sem ela.
  */
-function singular(segmento: string): string {
-  if (segmento.endsWith('ies')) return `${segmento.slice(0, -3)}y`
-  if (/(sses|shes|ches)$/.test(segmento)) return segmento.slice(0, -2)
-  if (segmento.endsWith('s') && !segmento.endsWith('ss')) return segmento.slice(0, -1)
-  return segmento
+function singular(segment: string): string {
+  if (segment.endsWith('ies')) return `${segment.slice(0, -3)}y`
+  if (/(sses|shes|ches)$/.test(segment)) return segment.slice(0, -2)
+  if (segment.endsWith('s') && !segment.endsWith('ss')) return segment.slice(0, -1)
+  return segment
 }
 
 /**
@@ -143,145 +143,145 @@ function singular(segmento: string): string {
  * outro com ele no singular. Fora de `app/features/` nao ha caminho de onde
  * derivar, e a regra nao se aplica.
  */
-function nomesDerivados(relativo: string, sufixo: string): string[] {
-  const dentro = relativo.split('app/features/')[1]
-  if (dentro === undefined) return []
+function derivedNames(relativePath: string, suffix: string): string[] {
+  const inside = relativePath.split('app/features/')[1]
+  if (inside === undefined) return []
 
-  const partes = dentro.split('/')
+  const parts = inside.split('/')
   // A pasta da acao repete o verbo e nao entra no nome da classe:
   // `administrator/users/archive/archive.controller.ts` -> `AdministratorUserArchiveController`.
-  const pasta = partes[partes.length - 2]
-  const arquivo = basename(relativo).replace(/\.(controller|use-case)\.ts$/, '')
-  let dirs = partes.slice(0, -1)
-  if (pasta === arquivo) dirs = partes.slice(0, -2)
+  const folder = parts[parts.length - 2]
+  const file = basename(relativePath).replace(/\.(controller|use-case)\.ts$/, '')
+  let dirs = parts.slice(0, -1)
+  if (folder === file) dirs = parts.slice(0, -2)
   if (dirs.length === 0) return []
 
-  const verbo = verboDoArquivo(relativo)
+  const verb = verbOf(relativePath)
   const literal = dirs.map(pascal).join('')
-  const ultimo = dirs.length - 1
-  const comSingular = dirs
+  const last = dirs.length - 1
+  const withSingular = dirs
     .map((d, i) => {
-      if (i === ultimo) return pascal(singular(d))
+      if (i === last) return pascal(singular(d))
       return pascal(d)
     })
     .join('')
 
-  return [...new Set([`${literal}${verbo}${sufixo}`, `${comSingular}${verbo}${sufixo}`])]
+  return [...new Set([`${literal}${verb}${suffix}`, `${withSingular}${verb}${suffix}`])]
 }
 
-type Regra = {
-  nome: string
-  secao: string
+type Rule = {
+  name: string
+  section: string
   /** Casa no fonte ja sem comentarios. */
-  padrao: RegExp
-  mensagem: string
+  pattern: RegExp
+  message: string
   /** Quando presente, a regra so roda nos arquivos cujo caminho casa. */
-  escopo?: RegExp
+  scope?: RegExp
 }
 
-const REGRAS: Regra[] = [
+const RULES: Rule[] = [
   {
-    nome: 'policy-fora-do-bouncer',
-    secao: '4.6',
+    name: 'policy-fora-do-bouncer',
+    section: '4.6',
     // A policy e checada pelo controller com `ctx.bouncer.with(Policy)`; o caso
     // de uso recebe o registro ja autorizado e nao conhece policy nenhuma.
-    escopo: /\.use-case\.ts$/,
-    padrao: /from\s+'#policies\//,
-    mensagem:
+    scope: /\.use-case\.ts$/,
+    pattern: /from\s+'#policies\//,
+    message:
       'policy nao entra no caso de uso: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
   },
   {
-    nome: 'policy-injetada',
-    secao: '4.6',
-    escopo: /app\/(?:features|services|middleware)\//,
-    padrao: /\bprivate\s+readonly\s+\w+\s*:\s*\w+Policy\b/,
-    mensagem:
+    name: 'policy-injetada',
+    section: '4.6',
+    scope: /app\/(?:features|services|middleware)\//,
+    pattern: /\bprivate\s+readonly\s+\w+\s*:\s*\w+Policy\b/,
+    message:
       'policy nao se injeta nem se chama direto; o unico caminho e `ctx.bouncer` (authorize/allows/denies/execute)',
   },
   {
-    nome: 'vine-fora-do-core',
-    secao: '4.4',
+    name: 'vine-fora-do-core',
+    section: '4.4',
     // O `vine` configurado (mensagens pt-BR, transform de data) sai de
     // `#core/validator`; importar a lib direto pula essa configuracao.
-    escopo: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
-    padrao: /from\s+'@vinejs\/vine'/,
-    mensagem: 'importe `vine` (e `Infer`) de `#core/validator`, nunca de `@vinejs/vine`',
+    scope: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
+    pattern: /from\s+'@vinejs\/vine'/,
+    message: 'importe `vine` (e `Infer`) de `#core/validator`, nunca de `@vinejs/vine`',
   },
   {
-    nome: 'validator-fora-do-recurso',
-    secao: '4.4',
+    name: 'validator-fora-do-recurso',
+    section: '4.4',
     // `app/core/` fica de fora: `response.ts` declara em VineJS o contrato de
     // resposta que nao deriva de model, e isso nao e validator de entrada.
-    escopo: /^app\/(?!core\/).*(?<!\.validator)\.ts$/,
-    padrao: /\bvine\.create\(/,
-    mensagem:
+    scope: /^app\/(?!core\/).*(?<!\.validator)\.ts$/,
+    pattern: /\bvine\.create\(/,
+    message:
       'validator mora em `app/features/<modulo>/<recurso>/<recurso>.validator.ts` (ou e global em `app/core/validator.ts`)',
   },
   {
-    nome: 'serializer-de-contexto',
-    secao: '4.5',
-    padrao: /\b(?:ctx|context)\.serialize\b/,
-    mensagem:
+    name: 'serializer-de-contexto',
+    section: '4.5',
+    pattern: /\b(?:ctx|context)\.serialize\b/,
+    message:
       '`context.serialize` foi removido junto com o `api_provider`; o envelope e `{ meta, data }` montado no caso de uso',
   },
   {
-    nome: 'paginacao-constante-local',
-    secao: '4.5',
-    escopo: /app\/features\//,
-    padrao: /^\s*const\s+(?:PAGE|PER_PAGE)\s*=/m,
-    mensagem: 'default de paginacao nao se redeclara por caso de uso',
+    name: 'paginacao-constante-local',
+    section: '4.5',
+    scope: /app\/features\//,
+    pattern: /^\s*const\s+(?:PAGE|PER_PAGE)\s*=/m,
+    message: 'default de paginacao nao se redeclara por caso de uso',
   },
   {
-    nome: 'actor-como-id',
-    secao: '4.3',
-    escopo: /\.use-case\.ts$/,
-    padrao: /\bactor\s*:\s*string\b/,
-    mensagem: '`actor` e o objeto `User`, nao o id — a policy recebe (actor, target)',
+    name: 'actor-como-id',
+    section: '4.3',
+    scope: /\.use-case\.ts$/,
+    pattern: /\bactor\s*:\s*string\b/,
+    message: '`actor` e o objeto `User`, nao o id — a policy recebe (actor, target)',
   },
   {
-    nome: 'throw-em-use-case',
-    secao: '4.2',
-    escopo: /\.use-case\.ts$/,
-    padrao: /^(?!.*\/\/).*?\bthrow\s+HTTPException\./m,
-    mensagem: 'falha de negocio e `left(HTTPException...)`, nunca `throw`',
+    name: 'throw-em-use-case',
+    section: '4.2',
+    scope: /\.use-case\.ts$/,
+    pattern: /^(?!.*\/\/).*?\bthrow\s+HTTPException\./m,
+    message: 'falha de negocio e `left(HTTPException...)`, nunca `throw`',
   },
   {
-    nome: 'core-importa-camada-acima',
-    secao: '1.3',
-    escopo: /app\/core\//,
-    padrao: /from\s+'#(?:features|services)\//,
-    mensagem: '`app/core/` nao importa de features nem de services',
+    name: 'core-importa-camada-acima',
+    section: '1.3',
+    scope: /app\/core\//,
+    pattern: /from\s+'#(?:features|services)\//,
+    message: '`app/core/` nao importa de features nem de services',
   },
   {
-    nome: 'service-importa-feature',
-    secao: '1.3',
-    escopo: /app\/services\//,
+    name: 'service-importa-feature',
+    section: '1.3',
+    scope: /app\/services\//,
     // `#features/_shared.<tema>` fica de fora: e o lugar declarado da funcao pura
     // compartilhada, e importa-la nao acopla o service a nenhuma feature. O que a
     // regra recusa e depender de um modulo — `#features/administrator/...`.
-    padrao: /from\s+'#features\/(?!_shared\.)/,
-    mensagem: '`app/services/` nao importa de um modulo de features (so de `_shared.<tema>`)',
+    pattern: /from\s+'#features\/(?!_shared\.)/,
+    message: '`app/services/` nao importa de um modulo de features (so de `_shared.<tema>`)',
   },
 ]
 
-function aplicarRegras(relativo: string, fonte: string): Achado[] {
-  const achados: Achado[] = []
-  const limpo = semComentarios(fonte)
+function applyRules(relativePath: string, source: string): Finding[] {
+  const findings: Finding[] = []
+  const clean = withoutComments(source)
 
-  for (const regra of REGRAS) {
-    if (regra.escopo !== undefined && !regra.escopo.test(relativo)) continue
-    const casado = regra.padrao.exec(limpo)
-    if (casado === null) continue
-    achados.push({
-      arquivo: relativo,
-      linha: linhaDe(limpo, casado.index),
-      regra: regra.nome,
-      secao: regra.secao,
-      mensagem: regra.mensagem,
+  for (const rule of RULES) {
+    if (rule.scope !== undefined && !rule.scope.test(relativePath)) continue
+    const match = rule.pattern.exec(clean)
+    if (match === null) continue
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, match.index),
+      rule: rule.name,
+      section: rule.section,
+      message: rule.message,
     })
   }
 
-  return achados
+  return findings
 }
 
 /**
@@ -298,31 +298,31 @@ function aplicarRegras(relativo: string, fonte: string): Achado[] {
  * As duas derivam do caminho de forma deterministica; qual das duas o projeto usa
  * e escolha de estilo, e nenhuma delas permite esquecer o modulo.
  */
-function conferirNomeDeClasse(relativo: string, fonte: string): Achado[] {
-  const ehController = relativo.endsWith('.controller.ts')
-  const ehUseCase = relativo.endsWith('.use-case.ts')
-  if (!ehController && !ehUseCase) return []
-  if (relativo.includes('.spec.')) return []
+function checkClassName(relativePath: string, source: string): Finding[] {
+  const isController = relativePath.endsWith('.controller.ts')
+  const isUseCase = relativePath.endsWith('.use-case.ts')
+  if (!isController && !isUseCase) return []
+  if (relativePath.includes('.spec.')) return []
 
-  const limpo = semComentarios(fonte)
-  const declaracao = /export\s+default\s+class\s+([A-Za-z0-9_]+)/.exec(limpo)
-  if (declaracao === null) return []
+  const clean = withoutComments(source)
+  const declaration = /export\s+default\s+class\s+([A-Za-z0-9_]+)/.exec(clean)
+  if (declaration === null) return []
 
-  const nome = declaracao[1] ?? ''
-  let sufixo = 'UseCase'
-  if (ehController) sufixo = 'Controller'
+  const name = declaration[1] ?? ''
+  let suffix = 'UseCase'
+  if (isController) suffix = 'Controller'
 
-  const aceitos = nomesDerivados(relativo, sufixo)
-  if (aceitos.length === 0) return []
-  if (aceitos.includes(nome)) return []
+  const accepted = derivedNames(relativePath, suffix)
+  if (accepted.length === 0) return []
+  if (accepted.includes(name)) return []
 
   return [
     {
-      arquivo: relativo,
-      linha: linhaDe(limpo, declaracao.index),
-      regra: 'nome-de-classe',
-      secao: '3',
-      mensagem: `classe \`${nome}\` deveria ser \`${aceitos.join('` ou `')}\`, derivado do caminho`,
+      file: relativePath,
+      line: lineOf(clean, declaration.index),
+      rule: 'nome-de-classe',
+      section: '3',
+      message: `classe \`${name}\` deveria ser \`${accepted.join('` ou `')}\`, derivado do caminho`,
     },
   ]
 }
@@ -332,21 +332,21 @@ function conferirNomeDeClasse(relativo: string, fonte: string): Achado[] {
  * (_padroes/arquitetura.md §3). E onde a spec da acao mora e onde quem procura
  * "arquivar usuario" encontra tudo.
  */
-function conferirPastaDaAcao(relativo: string): Achado[] {
-  if (!relativo.startsWith('app/features/')) return []
+function checkActionFolder(relativePath: string): Finding[] {
+  if (!relativePath.startsWith('app/features/')) return []
   // A sonda de vida e infra pura, sem modulo nem recurso (arquitetura.md §7).
-  if (relativo === 'app/features/health-check.controller.ts') return []
-  const casado = /([a-z-]+)\.(?:controller|use-case)\.ts$/.exec(relativo)
-  if (casado === null) return []
-  if (basename(dirname(relativo)) === casado[1]) return []
+  if (relativePath === 'app/features/health-check.controller.ts') return []
+  const match = /([a-z-]+)\.(?:controller|use-case)\.ts$/.exec(relativePath)
+  if (match === null) return []
+  if (basename(dirname(relativePath)) === match[1]) return []
 
   return [
     {
-      arquivo: relativo,
-      linha: 1,
-      regra: 'acao-fora-de-pasta',
-      secao: 'arquitetura 3',
-      mensagem: `mova para \`${dirname(relativo)}/${casado[1]}/${basename(relativo)}\``,
+      file: relativePath,
+      line: 1,
+      rule: 'acao-fora-de-pasta',
+      section: 'arquitetura 3',
+      message: `mova para \`${dirname(relativePath)}/${match[1]}/${basename(relativePath)}\``,
     },
   ]
 }
@@ -357,32 +357,32 @@ function conferirPastaDaAcao(relativo: string): Achado[] {
  * `administrator/users` -, ou o modulo quando ele e o proprio recurso
  * (`account`, `storages`).
  */
-function conferirImportEntreFeatures(relativo: string, fonte: string): Achado[] {
-  if (!relativo.startsWith('app/features/')) return []
-  const partes = relativo.slice('app/features/'.length).split('/')
-  if (partes.length < 2) return []
+function checkCrossFeatureImport(relativePath: string, source: string): Finding[] {
+  if (!relativePath.startsWith('app/features/')) return []
+  const parts = relativePath.slice('app/features/'.length).split('/')
+  if (parts.length < 2) return []
 
-  let dono = partes.slice(0, -1)
-  const pasta = dono[dono.length - 1]
-  const arquivo = basename(relativo).replace(/\.(controller|use-case|validator|spec)\.ts$/, '')
-  if (pasta === arquivo && !relativo.endsWith('.validator.ts')) dono = dono.slice(0, -1)
-  const prefixo = `${dono.join('/')}/`
+  let owner = parts.slice(0, -1)
+  const folder = owner[owner.length - 1]
+  const file = basename(relativePath).replace(/\.(controller|use-case|validator|spec)\.ts$/, '')
+  if (folder === file && !relativePath.endsWith('.validator.ts')) owner = owner.slice(0, -1)
+  const prefix = `${owner.join('/')}/`
 
-  const achados: Achado[] = []
-  const limpo = semComentarios(fonte)
-  for (const casado of limpo.matchAll(/from\s+'#features\/([^']+)'/g)) {
-    const alvo = casado[1] ?? ''
-    if (alvo.includes('_shared.')) continue
-    if (`${alvo}/`.startsWith(prefixo)) continue
-    achados.push({
-      arquivo: relativo,
-      linha: linhaDe(limpo, casado.index),
-      regra: 'feature-importa-feature',
-      secao: '1.3',
-      mensagem: `\`${dono.join('/')}\` importa \`#features/${alvo}\`; o compartilhado vai para \`_shared.<tema>\` ou service`,
+  const findings: Finding[] = []
+  const clean = withoutComments(source)
+  for (const match of clean.matchAll(/from\s+'#features\/([^']+)'/g)) {
+    const target = match[1] ?? ''
+    if (target.includes('_shared.')) continue
+    if (`${target}/`.startsWith(prefix)) continue
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, match.index),
+      rule: 'feature-importa-feature',
+      section: '1.3',
+      message: `\`${owner.join('/')}\` importa \`#features/${target}\`; o compartilhado vai para \`_shared.<tema>\` ou service`,
     })
   }
-  return achados
+  return findings
 }
 
 /**
@@ -390,24 +390,24 @@ function conferirImportEntreFeatures(relativo: string, fonte: string): Achado[] 
  * singular e termina na acao - `UserCreateValidator` em `users/users.validator.ts`
  * (_padroes/backend.md §3 e §4.4).
  */
-function conferirNomeDeValidator(relativo: string, fonte: string): Achado[] {
-  const casado = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativo)
-  if (casado === null) return []
-  const recurso = pascal(singular(casado[1] ?? ''))
-  const limpo = semComentarios(fonte)
-  const achados: Achado[] = []
-  for (const exportado of limpo.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
-    const nome = exportado[1] ?? ''
-    if (nome.startsWith(recurso)) continue
-    achados.push({
-      arquivo: relativo,
-      linha: linhaDe(limpo, exportado.index),
-      regra: 'validator-sem-recurso',
-      secao: '4.4',
-      mensagem: `\`${nome}\` deveria ser \`${recurso}<Acao>Validator\``,
+function checkValidatorName(relativePath: string, source: string): Finding[] {
+  const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativePath)
+  if (match === null) return []
+  const resource = pascal(singular(match[1] ?? ''))
+  const clean = withoutComments(source)
+  const findings: Finding[] = []
+  for (const exported of clean.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+    const name = exported[1] ?? ''
+    if (name.startsWith(resource)) continue
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, exported.index),
+      rule: 'validator-sem-recurso',
+      section: '4.4',
+      message: `\`${name}\` deveria ser \`${resource}<Acao>Validator\``,
     })
   }
-  return achados
+  return findings
 }
 
 /**
@@ -417,56 +417,56 @@ function conferirNomeDeValidator(relativo: string, fonte: string): Achado[] {
  * frontend existe no backend - o frontend nao valida o que a API nao conhece.
  * Sem o frontend ao lado (clone so do backend), a regra nao roda.
  */
-async function conferirParidadeDeValidators(fontes: Map<string, string>): Promise<Achado[]> {
-  const raizFront = resolve(RAIZ, '../frontend/src/validators')
-  if (!(await existe(raizFront))) return []
+async function checkValidatorParity(sources: Map<string, string>): Promise<Finding[]> {
+  const frontRoot = resolve(ROOT, '../frontend/src/validators')
+  if (!(await exists(frontRoot))) return []
 
-  const achados: Achado[] = []
-  for (const arquivo of await arquivosTs(raizFront)) {
-    if (!arquivo.endsWith('.validator.ts')) continue
-    const logico = relative(raizFront, arquivo)
-    const partes = logico.replace('.validator.ts', '').split('/')
-    const recurso = partes[partes.length - 1] ?? ''
-    const espelho = `app/features/${partes.join('/')}/${recurso}.validator.ts`
-    const back = fontes.get(espelho)
-    const front = semComentarios(await readFile(arquivo, 'utf8'))
-    if (back === undefined) {
-      achados.push({
-        arquivo: `../frontend/src/validators/${logico}`,
-        linha: 1,
-        regra: 'validator-sem-espelho',
-        secao: 'arquitetura 4',
-        mensagem: `nao ha \`${espelho}\` no backend`,
+  const findings: Finding[] = []
+  for (const file of await tsFiles(frontRoot)) {
+    if (!file.endsWith('.validator.ts')) continue
+    const logical = relative(frontRoot, file)
+    const parts = logical.replace('.validator.ts', '').split('/')
+    const resource = parts[parts.length - 1] ?? ''
+    const mirror = `app/features/${parts.join('/')}/${resource}.validator.ts`
+    const backSource = sources.get(mirror)
+    const frontSource = withoutComments(await readFile(file, 'utf8'))
+    if (backSource === undefined) {
+      findings.push({
+        file: `../frontend/src/validators/${logical}`,
+        line: 1,
+        rule: 'validator-sem-espelho',
+        section: 'arquitetura 4',
+        message: `nao ha \`${mirror}\` no backend`,
       })
       continue
     }
-    for (const exportado of front.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
-      const nome = exportado[1] ?? ''
-      if (new RegExp(`export\\s+const\\s+${nome}\\b`).test(back)) continue
-      achados.push({
-        arquivo: `../frontend/src/validators/${logico}`,
-        linha: linhaDe(front, exportado.index),
-        regra: 'validator-sem-espelho',
-        secao: 'arquitetura 4',
-        mensagem: `\`${nome}\` nao existe em \`${espelho}\``,
+    for (const exported of frontSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+      const name = exported[1] ?? ''
+      if (new RegExp(`export\\s+const\\s+${name}\\b`).test(backSource)) continue
+      findings.push({
+        file: `../frontend/src/validators/${logical}`,
+        line: lineOf(frontSource, exported.index),
+        rule: 'validator-sem-espelho',
+        section: 'arquitetura 4',
+        message: `\`${name}\` nao existe em \`${mirror}\``,
       })
     }
   }
-  return achados
+  return findings
 }
 
 /** Model em `app/models/` usa kebab-case. Secao 3. */
-function conferirNomeDeModel(relativo: string): Achado[] {
-  if (!relativo.startsWith('app/models/')) return []
-  if (!basename(relativo).includes('_')) return []
-  const sugerido = basename(relativo).replace(/_/g, '-')
+function checkModelName(relativePath: string): Finding[] {
+  if (!relativePath.startsWith('app/models/')) return []
+  if (!basename(relativePath).includes('_')) return []
+  const suggested = basename(relativePath).replace(/_/g, '-')
   return [
     {
-      arquivo: relativo,
-      linha: 1,
-      regra: 'model-snake-case',
-      secao: '3',
-      mensagem: `model usa kebab-case: renomeie para \`${sugerido}\``,
+      file: relativePath,
+      line: 1,
+      rule: 'model-snake-case',
+      section: '3',
+      message: `model usa kebab-case: renomeie para \`${suggested}\``,
     },
   ]
 }
@@ -476,77 +476,77 @@ function conferirNomeDeModel(relativo: string): Achado[] {
  *
  * Chave declarada que nenhum codigo le e chave morta, e sai. A excecao e o que
  * nunca passa pelo leitor - `PORT` e `HOST` (lidas por `@adonisjs/core`),
- * `NODE_ENV` e `TZ` -, listado em `envForaDoLeitor` da config com o motivo.
+ * `NODE_ENV` e `TZ` -, listado em `envOutsideReader` da config com o motivo.
  *
  * A leitura ignora comentario: um bloco de driver comentado em `config/` nao e
  * uma chave de verdade.
  */
-async function conferirEnv(arquivos: string[]): Promise<Achado[]> {
-  const schema = await readFile(join(RAIZ, 'start/env.ts'), 'utf8').catch(() => '')
+async function checkEnv(files: string[]): Promise<Finding[]> {
+  const schema = await readFile(join(ROOT, 'start/env.ts'), 'utf8').catch(() => '')
   if (schema === '') return []
-  const schemaLimpo = semComentarios(schema)
+  const cleanSchema = withoutComments(schema)
 
-  const declaradas = new Set<string>()
-  for (const casado of schemaLimpo.matchAll(/^\s*([A-Z][A-Z0-9_]*)\s*:/gm)) {
-    const chave = casado[1]
-    if (chave !== undefined) declaradas.add(chave)
+  const declared = new Set<string>()
+  for (const match of cleanSchema.matchAll(/^\s*([A-Z][A-Z0-9_]*)\s*:/gm)) {
+    const key = match[1]
+    if (key !== undefined) declared.add(key)
   }
 
-  const achados: Achado[] = []
-  const lidas = new Set<string>()
+  const findings: Finding[] = []
+  const readKeys = new Set<string>()
 
-  for (const arquivo of arquivos) {
-    const relativo = relative(RAIZ, arquivo)
-    if (relativo === 'start/env.ts') continue
-    const limpo = semComentarios(await readFile(arquivo, 'utf8'))
+  for (const file of files) {
+    const relativePath = relative(ROOT, file)
+    if (relativePath === 'start/env.ts') continue
+    const clean = withoutComments(await readFile(file, 'utf8'))
 
-    for (const casado of limpo.matchAll(/env\.get\(\s*'([A-Z][A-Z0-9_]*)'/g)) {
-      const chave = casado[1]
-      if (chave === undefined) continue
-      if (!lidas.has(chave) && !declaradas.has(chave)) {
-        achados.push({
-          arquivo: relativo,
-          linha: linhaDe(limpo, casado.index),
-          regra: 'env-sem-schema',
-          secao: '6',
-          mensagem: `\`${chave}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
+    for (const match of clean.matchAll(/env\.get\(\s*'([A-Z][A-Z0-9_]*)'/g)) {
+      const key = match[1]
+      if (key === undefined) continue
+      if (!readKeys.has(key) && !declared.has(key)) {
+        findings.push({
+          file: relativePath,
+          line: lineOf(clean, match.index),
+          rule: 'env-sem-schema',
+          section: '6',
+          message: `\`${key}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
         })
       }
-      lidas.add(chave)
+      readKeys.add(key)
     }
   }
 
-  for (const chave of declaradas) {
-    if (lidas.has(chave)) continue
-    if (chave in CONFIG.envForaDoLeitor) continue
-    achados.push({
-      arquivo: 'start/env.ts',
-      linha: linhaDe(schemaLimpo, schemaLimpo.indexOf(chave)),
-      regra: 'env-sem-leitor',
-      secao: '6',
-      mensagem: `\`${chave}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envForaDoLeitor\` com o motivo`,
+  for (const key of declared) {
+    if (readKeys.has(key)) continue
+    if (key in CONFIG.envOutsideReader) continue
+    findings.push({
+      file: 'start/env.ts',
+      line: lineOf(cleanSchema, cleanSchema.indexOf(key)),
+      rule: 'env-sem-leitor',
+      section: '6',
+      message: `\`${key}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envForaDoLeitor\` com o motivo`,
     })
   }
 
-  return achados
+  return findings
 }
 
-async function conferirDiretorios(): Promise<Achado[]> {
-  const achados: Achado[] = []
-  for (const dir of DIRETORIOS_OBRIGATORIOS) {
+async function checkDirectories(): Promise<Finding[]> {
+  const findings: Finding[] = []
+  for (const dir of REQUIRED_DIRECTORIES) {
     try {
-      await readdir(join(RAIZ, dir))
+      await readdir(join(ROOT, dir))
     } catch {
-      achados.push({
-        arquivo: dir,
-        linha: 1,
-        regra: 'diretorio-obrigatorio',
-        secao: '1.1',
-        mensagem: 'diretorio transversal nasce presente, mesmo vazio',
+      findings.push({
+        file: dir,
+        line: 1,
+        rule: 'diretorio-obrigatorio',
+        section: '1.1',
+        message: 'diretorio transversal nasce presente, mesmo vazio',
       })
     }
   }
-  return achados
+  return findings
 }
 
 /**
@@ -557,12 +557,12 @@ async function conferirDiretorios(): Promise<Achado[]> {
  * nenhuma; uma estrela sozinha casa dentro de um segmento so. E o minimo que os
  * tres caminhos da lista pedem.
  */
-function padraoDeCaminho(glob: string): RegExp {
-  const corpo = glob
+function pathPattern(glob: string): RegExp {
+  const body = glob
     .split('**/')
-    .map((trecho) => trecho.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*'))
+    .map((chunk) => chunk.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*'))
     .join('(?:.*/)?')
-  return new RegExp(`^${corpo}$`)
+  return new RegExp(`^${body}$`)
 }
 
 /**
@@ -577,32 +577,32 @@ function padraoDeCaminho(glob: string): RegExp {
  * a regua acredita nela. Foi assim que `Bouncer` ficou anos na lista descrevendo
  * uma chamada que nenhum caso de uso fazia.
  */
-async function conferirNewAllowlist(fontes: Map<string, string>): Promise<Achado[]> {
-  const achados: Achado[] = []
+async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[]> {
+  const findings: Finding[] = []
 
-  for (const entrada of CONFIG.newAllowlist) {
-    const alvo = padraoDeCaminho(entrada.arquivo)
-    const uso = new RegExp(`\\bnew\\s+${entrada.simbolo}\\s*\\(`)
+  for (const entry of CONFIG.newAllowlist) {
+    const target = pathPattern(entry.file)
+    const usage = new RegExp(`\\bnew\\s+${entry.symbol}\\s*\\(`)
 
-    let usada = false
-    for (const [relativo, fonte] of fontes) {
-      if (!alvo.test(relativo)) continue
-      if (!uso.test(fonte)) continue
-      usada = true
+    let used = false
+    for (const [relativePath, source] of sources) {
+      if (!target.test(relativePath)) continue
+      if (!usage.test(source)) continue
+      used = true
       break
     }
 
-    if (usada) continue
-    achados.push({
-      arquivo: 'scripts/pattern-check.config.json',
-      linha: 1,
-      regra: 'allowlist-de-new-sem-uso',
-      secao: '2.1',
-      mensagem: `\`newAllowlist\` isenta \`new ${entrada.simbolo}\` em \`${entrada.arquivo}\`, e nao ha esse uso; tire a entrada ou corrija o caminho`,
+    if (used) continue
+    findings.push({
+      file: 'scripts/pattern-check.config.json',
+      line: 1,
+      rule: 'allowlist-de-new-sem-uso',
+      section: '2.1',
+      message: `\`newAllowlist\` isenta \`new ${entry.symbol}\` em \`${entry.file}\`, e nao ha esse uso; tire a entrada ou corrija o caminho`,
     })
   }
 
-  return achados
+  return findings
 }
 
 /**
@@ -619,30 +619,30 @@ async function conferirNewAllowlist(fontes: Map<string, string>): Promise<Achado
  * `softDeleteExempt` no config, e sao sempre a mesma situacao: consulta sobre
  * `LucidModel` generico, tipo em que scope nomeado nao existe.
  */
-async function conferirSoftDelete(fontes: Map<string, string>): Promise<Achado[]> {
-  const isentos = new Set(CONFIG.softDeleteExempt)
-  const achados: Achado[] = []
-  const padrao = /whereNull\(\s*'(?:deletedAt|deleted_at)'\s*\)/
+async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]> {
+  const exempt = new Set(CONFIG.softDeleteExempt)
+  const findings: Finding[] = []
+  const pattern = /whereNull\(\s*'(?:deletedAt|deleted_at)'\s*\)/
 
-  for (const [relativo, fonte] of fontes) {
-    if (relativo.startsWith('app/models/')) continue
-    if (isentos.has(relativo)) continue
+  for (const [relativePath, source] of sources) {
+    if (relativePath.startsWith('app/models/')) continue
+    if (exempt.has(relativePath)) continue
 
-    const casado = padrao.exec(fonte)
+    const match = pattern.exec(source)
 
-    if (casado === null) continue
+    if (match === null) continue
 
-    achados.push({
-      arquivo: relativo,
-      linha: linhaDe(fonte, casado.index),
-      regra: 'soft-delete-sem-scope',
-      secao: '4.8',
-      mensagem:
+    findings.push({
+      file: relativePath,
+      line: lineOf(source, match.index),
+      rule: 'soft-delete-sem-scope',
+      section: '4.8',
+      message:
         'troque por `withScopes((scopes) => scopes.notDeleted())`; se a consulta e sobre `LucidModel` generico, nomeie o arquivo em `softDeleteExempt`',
     })
   }
 
-  return achados
+  return findings
 }
 
 /**
@@ -657,31 +657,31 @@ async function conferirSoftDelete(fontes: Map<string, string>): Promise<Achado[]
  * sumir de um dos tres, a regra aponta em vez de a diferenca aparecer no dia em
  * que alguem for procurar o service que os irmaos tem.
  */
-async function existe(caminho: string): Promise<boolean> {
+async function exists(filePath: string): Promise<boolean> {
   try {
-    await access(caminho)
+    await access(filePath)
     return true
   } catch {
     return false
   }
 }
 
-async function conferirForma(): Promise<Achado[]> {
-  const achados: Achado[] = []
+async function checkShape(): Promise<Finding[]> {
+  const findings: Finding[] = []
 
-  for (const caminho of CONFIG.forma) {
-    if (await existe(join(RAIZ, caminho))) continue
+  for (const filePath of CONFIG.shape) {
+    if (await exists(join(ROOT, filePath))) continue
 
-    achados.push({
-      arquivo: 'scripts/pattern-check.config.json',
-      linha: 1,
-      regra: 'forma-ausente',
-      secao: '5',
-      mensagem: `\`${caminho}\` e FORMA no config e nao existe aqui; crie o arquivo ou tire o caminho de \`forma\``,
+    findings.push({
+      file: 'scripts/pattern-check.config.json',
+      line: 1,
+      rule: 'forma-ausente',
+      section: '5',
+      message: `\`${filePath}\` e FORMA no config e nao existe aqui; crie o arquivo ou tire o caminho de \`shape\``,
     })
   }
 
-  return achados
+  return findings
 }
 
 /**
@@ -699,40 +699,40 @@ async function conferirForma(): Promise<Achado[]> {
  *
  * Nao coberto por `_doc-lib/` - e convencao deste padrao, secao 4.2.
  */
-function conferirFormaDoUseCase(relativo: string, fonte: string): Achado[] {
-  if (!relativo.endsWith('.use-case.ts')) return []
-  if (!relativo.includes('app/features/')) return []
+function checkUseCaseShape(relativePath: string, source: string): Finding[] {
+  if (!relativePath.endsWith('.use-case.ts')) return []
+  if (!relativePath.includes('app/features/')) return []
 
-  const limpo = semComentarios(fonte)
-  const achados: Achado[] = []
+  const clean = withoutComments(source)
+  const findings: Finding[] = []
 
-  const execute = /async execute\(([^)]*)\)/.exec(limpo)
-  const recebeAlgo = execute !== null && (execute[1] ?? '').trim().length > 0
+  const execute = /async execute\(([^)]*)\)/.exec(clean)
+  const receivesInput = execute !== null && (execute[1] ?? '').trim().length > 0
 
-  if (recebeAlgo && !/^type Payload\b/m.test(limpo)) {
-    achados.push({
-      arquivo: relativo,
-      linha: linhaDe(limpo, execute.index),
-      regra: 'use-case-sem-payload',
-      secao: '4.2',
-      mensagem:
+  if (receivesInput && !/^type Payload\b/m.test(clean)) {
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, execute.index),
+      rule: 'use-case-sem-payload',
+      section: '4.2',
+      message:
         'declare `type Payload` no topo e use-o na assinatura; o tipo do validator direto nao tem onde receber `actor`',
     })
   }
 
-  const response = /^type Response = Either</m.exec(limpo)
+  const response = /^type Response = Either</m.exec(clean)
 
   if (response === null) {
-    achados.push({
-      arquivo: relativo,
-      linha: 1,
-      regra: 'use-case-sem-response',
-      secao: '4.2',
-      mensagem: 'declare `type Response = Either<HTTPException, T>` no topo',
+    findings.push({
+      file: relativePath,
+      line: 1,
+      rule: 'use-case-sem-response',
+      section: '4.2',
+      message: 'declare `type Response = Either<HTTPException, T>` no topo',
     })
   }
 
-  return achados
+  return findings
 }
 
 /**
@@ -751,93 +751,93 @@ function conferirFormaDoUseCase(relativo: string, fonte: string): Achado[] {
  * ninguem via - usava `userId: string` onde a secao 4.3 pede o objeto `User` -,
  * e um dia ressurgiria parecendo pronto.
  */
-async function conferirRota(arquivos: string[]): Promise<Achado[]> {
-  const rotas = await readFile(join(RAIZ, 'start/routes.ts'), 'utf8')
-  const achados: Achado[] = []
+async function checkRoute(files: string[]): Promise<Finding[]> {
+  const routes = await readFile(join(ROOT, 'start/routes.ts'), 'utf8')
+  const findings: Finding[] = []
 
-  for (const arquivo of arquivos) {
-    const relativo = relative(RAIZ, arquivo)
-    if (!relativo.endsWith('.controller.ts')) continue
+  for (const file of files) {
+    const relativePath = relative(ROOT, file)
+    if (!relativePath.endsWith('.controller.ts')) continue
 
-    const dentro = relativo.split('app/features/')[1]
-    if (dentro === undefined) continue
+    const inside = relativePath.split('app/features/')[1]
+    if (inside === undefined) continue
 
-    const partes = dentro.split('/')
-    const verbo = pascal((partes[partes.length - 1] ?? '').replace('.controller.ts', ''))
-    const chave = ['controllers', ...partes.slice(0, -1).map(camel), verbo].join('.')
+    const parts = inside.split('/')
+    const verb = pascal((parts[parts.length - 1] ?? '').replace('.controller.ts', ''))
+    const key = ['controllers', ...parts.slice(0, -1).map(camel), verb].join('.')
 
     // Limite de identificador, e nao `includes`: `controllers.account.profile.Show`
     // casaria dentro de `controllers.account.profile.ShowX`, e a regra daria verde para
     // um controller que nenhuma rota alcanca. Foi o que o sensor pegou na
     // primeira versao desta funcao.
-    const referencia = new RegExp(`${chave.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`)
+    const reference = new RegExp(`${key.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`)
 
-    if (referencia.test(rotas)) continue
+    if (reference.test(routes)) continue
 
-    achados.push({
-      arquivo: relativo,
-      linha: 1,
-      regra: 'controller-sem-rota',
-      secao: '1.2',
-      mensagem: `nenhuma rota referencia \`${chave}\`; registre a rota ou apague o arquivo e o caso de uso irmao`,
+    findings.push({
+      file: relativePath,
+      line: 1,
+      rule: 'controller-sem-rota',
+      section: '1.2',
+      message: `nenhuma rota referencia \`${key}\`; registre a rota ou apague o arquivo e o caso de uso irmao`,
     })
   }
 
-  return achados
+  return findings
 }
 
-function relatar(achados: Achado[]): void {
-  if (achados.length === 0) {
+function report(findings: Finding[]): void {
+  if (findings.length === 0) {
     console.log('pattern:check: nenhuma violacao.')
     return
   }
 
-  const porRegra = new Map<string, number>()
-  for (const a of achados) porRegra.set(a.regra, (porRegra.get(a.regra) ?? 0) + 1)
+  const byRule = new Map<string, number>()
+  for (const a of findings) byRule.set(a.rule, (byRule.get(a.rule) ?? 0) + 1)
 
-  console.log(`pattern:check: ${achados.length} violacoes\n`)
-  for (const a of achados) {
-    console.log(`  ${a.arquivo}:${a.linha}`)
-    console.log(`      [${a.regra}] ${a.mensagem}  (_padroes/backend.md ${a.secao})`)
+  console.log(`pattern:check: ${findings.length} violacoes\n`)
+  for (const a of findings) {
+    console.log(`  ${a.file}:${a.line}`)
+    console.log(`      [${a.rule}] ${a.message}  (_padroes/backend.md ${a.section})`)
   }
 
   console.log('\n  Por regra:')
-  for (const [regra, total] of [...porRegra].sort((a, b) => b[1] - a[1])) {
-    console.log(`    ${String(total).padStart(4)}  ${regra}`)
+  for (const [rule, total] of [...byRule].sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${String(total).padStart(4)}  ${rule}`)
   }
 }
 
 async function main(): Promise<void> {
   const flags = new Set(process.argv.slice(2))
-  const arquivos = await arquivosTs(RAIZ)
-  const achados: Achado[] = [...(await conferirDiretorios())]
+  const files = await tsFiles(ROOT)
+  const findings: Finding[] = [...(await checkDirectories())]
 
-  const fontes = new Map<string, string>()
+  const sources = new Map<string, string>()
 
-  for (const arquivo of arquivos) {
-    const relativo = relative(RAIZ, arquivo)
-    if (relativo.startsWith('scripts/')) continue
-    const fonte = await readFile(arquivo, 'utf8')
-    fontes.set(relativo, semComentarios(fonte))
-    achados.push(...aplicarRegras(relativo, fonte))
-    achados.push(...conferirNomeDeClasse(relativo, fonte))
-    achados.push(...conferirNomeDeModel(relativo))
-    achados.push(...conferirPastaDaAcao(relativo))
-    achados.push(...conferirNomeDeValidator(relativo, fonte))
-    achados.push(...conferirImportEntreFeatures(relativo, fonte))
-    achados.push(...conferirFormaDoUseCase(relativo, fonte))
+  for (const file of files) {
+    const relativePath = relative(ROOT, file)
+    if (relativePath.startsWith('scripts/')) continue
+    const source = await readFile(file, 'utf8')
+    sources.set(relativePath, withoutComments(source))
+    findings.push(...applyRules(relativePath, source))
+    findings.push(...checkClassName(relativePath, source))
+    findings.push(...checkModelName(relativePath))
+    findings.push(...checkActionFolder(relativePath))
+    findings.push(...checkValidatorName(relativePath, source))
+    findings.push(...checkCrossFeatureImport(relativePath, source))
+    findings.push(...checkUseCaseShape(relativePath, source))
   }
 
-  achados.push(...(await conferirEnv(arquivos)))
-  achados.push(...(await conferirNewAllowlist(fontes)))
-  achados.push(...(await conferirSoftDelete(fontes)))
-  achados.push(...(await conferirForma()))
-  achados.push(...(await conferirRota(arquivos)))
-  achados.push(...(await conferirParidadeDeValidators(fontes)))
-  relatar(achados)
+  findings.push(...(await checkEnv(files)))
+  findings.push(...(await checkNewAllowlist(sources)))
+  findings.push(...(await checkSoftDelete(sources)))
+  findings.push(...(await checkShape()))
+  findings.push(...(await checkRoute(files)))
+  findings.push(...(await checkValidatorParity(sources)))
+  report(findings)
 
   if (flags.has('--report')) return
-  if (achados.length > 0) process.exitCode = 1
+  if (findings.length > 0) process.exitCode = 1
 }
 
 await main()

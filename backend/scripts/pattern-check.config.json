@@ -1,5 +1,5 @@
 {
-  "envForaDoLeitor": {
+  "envOutsideReader": {
     "NODE_ENV": "lida como `process.env.NODE_ENV` pelo carregador do Adonis e por `bin/test.ts`, antes de existir serviço de env",
     "PORT": "lida como `process.env.PORT` por `@adonisjs/core` ao subir o servidor HTTP",
     "HOST": "lida como `process.env.HOST` por `@adonisjs/core` ao subir o servidor HTTP",
@@ -7,18 +7,18 @@
   },
   "newAllowlist": [
     {
-      "simbolo": "CookieAccessTokensGuard",
-      "arquivo": "app/guards/cookie-access-tokens.guard.ts",
-      "motivo": "factory exigida por config/auth.ts; recebe o HttpContext da requisição"
+      "symbol": "CookieAccessTokensGuard",
+      "file": "app/guards/cookie-access-tokens.guard.ts",
+      "reason": "factory exigida por config/auth.ts; recebe o HttpContext da requisição"
     },
     {
-      "simbolo": "SimpleMessagesProvider",
-      "arquivo": "app/core/validator.ts",
-      "motivo": "API do VineJS, atribuída a vine.messagesProvider no boot"
+      "symbol": "SimpleMessagesProvider",
+      "file": "app/core/validator.ts",
+      "reason": "API do VineJS, atribuída a vine.messagesProvider no boot"
     }
   ],
   "softDeleteExempt": [],
-  "forma": [
+  "shape": [
     "app/core/entity.ts",
     "app/core/validator.ts",
     "app/core/response.ts",
