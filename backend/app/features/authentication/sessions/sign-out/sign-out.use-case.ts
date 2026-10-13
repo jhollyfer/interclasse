@@ -8,8 +8,8 @@ import HTTPException from '#exceptions/http.exception'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 
 type Payload = {
-  actor: User
-  refreshToken?: string
+  readonly actor: User
+  readonly refreshToken?: string
 }
 
 type Response = Either<HTTPException, null>

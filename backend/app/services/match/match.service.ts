@@ -5,11 +5,11 @@ import Match from '#models/match'
 import type { Category, MatchPhase, MatchStatus } from '#core/entity'
 
 export type MatchFilters = {
-  bracketId?: string
-  sportId?: string
-  category?: Category
-  phase?: MatchPhase
-  status?: MatchStatus
+  readonly bracketId?: string
+  readonly sportId?: string
+  readonly category?: Category
+  readonly phase?: MatchPhase
+  readonly status?: MatchStatus
 }
 
 /**

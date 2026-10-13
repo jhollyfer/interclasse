@@ -1,5 +1,7 @@
 import db from '@adonisjs/lucid/services/db'
 
+import type { Infer } from '#core/validator'
+import { type EnrollmentBoardResponse } from '#core/openapi/response'
 import Bracket from '#models/bracket'
 import type Classroom from '#models/classroom'
 import Enrollment from '#models/enrollment'
@@ -7,19 +9,9 @@ import Sport from '#models/sport'
 import Student from '#models/student'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import type { Category } from '#core/entity'
 
-export type EnrollmentBoard = {
-  classroom: { id: string; name: string; category: Category }
-  sports: Array<{
-    id: string
-    name: string
-    minAthletes: number
-    maxAthletes: number
-    locked: boolean
-  }>
-  students: Array<{ id: string; name: string; sportIds: string[] }>
-}
+/** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_padroes/typescript.md §2). */
+export type EnrollmentBoard = Infer<typeof EnrollmentBoardResponse>
 
 /**
  * As inscrições de uma turma: quem joga o quê.
