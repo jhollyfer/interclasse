@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import Team from '#models/team'
 import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
-import logger from '@adonisjs/core/services/logger'
 import { categoryOf, type Merge } from '#core/entity'
 import type { ClassroomUpdatePayload } from '#features/administrator/classrooms/classrooms.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -31,7 +32,7 @@ export default class AdministratorClassroomUpdateUseCase {
           return left(
             HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
               name: 'Já existe uma turma com este nome',
-            })
+            }),
           )
       }
 
@@ -50,8 +51,8 @@ export default class AdministratorClassroomUpdateUseCase {
             HTTPException.Conflict(
               'A turma já está numa chave sorteada',
               'CLASSROOM_IN_COMPETITION',
-              { grade: 'Não é possível mudar a categoria de uma turma já sorteada' }
-            )
+              { grade: 'Não é possível mudar a categoria de uma turma já sorteada' },
+            ),
           )
       }
 
@@ -69,13 +70,13 @@ export default class AdministratorClassroomUpdateUseCase {
         return left(
           HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
             name: 'Já existe uma turma com este nome',
-          })
+          }),
         )
 
       logger.error({ err: error }, '[classrooms > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_UPDATE_ERROR'),
       )
     }
   }

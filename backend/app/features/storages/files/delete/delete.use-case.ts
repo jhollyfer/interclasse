@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import StorageService from '#services/storage/storage.service'
 import MultipartService from '#services/multipart/multipart.service'
 import { UploadStatuses } from '#core/entity'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -34,7 +35,7 @@ type Response = Either<HTTPException, null>
 export default class StoragesFileDeleteUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly multipart: MultipartService
+    private readonly multipart: MultipartService,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
@@ -56,7 +57,7 @@ export default class StoragesFileDeleteUseCase {
         return left(
           HTTPException.Conflict('Arquivo em uso', 'STORAGE_IN_USE', {
             id: `Arquivo em uso em: ${references.join(', ')}. Desvincule-o antes de apagá-lo.`,
-          })
+          }),
         )
 
       await this.storage.remove(storage)
@@ -66,7 +67,7 @@ export default class StoragesFileDeleteUseCase {
       logger.error({ err: error }, '[storages > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_DELETE_ERROR'),
       )
     }
   }

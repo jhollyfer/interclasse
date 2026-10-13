@@ -1,4 +1,5 @@
 import type { JSONSchema7Definition, JSONSchema7TypeName } from 'json-schema'
+
 import type { FieldPatch } from './field-patches.ts'
 import type { DocumentedValidator, OpenAPIParameter, SchemaObject } from './types.ts'
 
@@ -141,7 +142,7 @@ function patch(
   node: VineNode | undefined,
   context: string,
   path: string,
-  warnings: string[]
+  warnings: string[],
 ): SchemaObject {
   if (isUninformative(schema)) {
     const fallback = fallbackFor(node)
@@ -150,7 +151,7 @@ function patch(
 
     warnings.push(
       `${context}: o campo \`${path || '(raiz)'}\` saiu sem tipo do VineJS. ` +
-        'Descreva-o em `overrides` para ele não ir ao documento como "qualquer coisa".'
+        'Descreva-o em `overrides` para ele não ir ao documento como "qualquer coisa".',
     )
 
     return schema
@@ -193,7 +194,7 @@ function patch(
 export function toSchema(
   validator: DocumentedValidator,
   context: string,
-  warnings: string[]
+  warnings: string[],
 ): SchemaObject {
   return patch(validator.toJSONSchema(), rootNode(validator), context, '', warnings)
 }
@@ -231,7 +232,7 @@ export function mergeSchema(base: SchemaObject, override: SchemaObject | undefin
  */
 export function applyFieldPatches(
   schema: SchemaObject,
-  patches: Record<string, FieldPatch>
+  patches: Record<string, FieldPatch>,
 ): SchemaObject {
   if (!schema.properties) return schema
 

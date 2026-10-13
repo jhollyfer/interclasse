@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { resolveSameSite } from '#services/cookie/cookie.service'
 
 /**
@@ -14,7 +15,7 @@ test.group('cookie > resolveSameSite', () => {
   test('mesmo host é lax', ({ assert }) => {
     assert.equal(
       resolveSameSite('https://app.interclasse.com.br', 'https://app.interclasse.com.br'),
-      'lax'
+      'lax',
     )
   })
 
@@ -22,14 +23,14 @@ test.group('cookie > resolveSameSite', () => {
     // O caso desta instalação: o `api-` na frente não muda o site.
     assert.equal(
       resolveSameSite('https://app.interclasse.com.br', 'https://api-app.interclasse.com.br'),
-      'lax'
+      'lax',
     )
   })
 
   test('domínios diferentes são none', ({ assert }) => {
     assert.equal(
       resolveSameSite('https://app.interclasse.com.br', 'https://api.outro.com.br'),
-      'none'
+      'none',
     )
   })
 

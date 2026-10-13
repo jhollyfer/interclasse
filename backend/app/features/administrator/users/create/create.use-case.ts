@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import User from '#models/user'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { UserCreatePayload } from '#features/administrator/users/users.validator'
 
 type Payload = UserCreatePayload
@@ -40,7 +41,7 @@ export default class AdministratorUserCreateUseCase {
         return left(
           HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
             email: 'Já existe um usuário com este e-mail',
-          })
+          }),
         )
 
       // Como em notices: `email` é `UNIQUE` global e a remoção é lógica, então
@@ -63,7 +64,7 @@ export default class AdministratorUserCreateUseCase {
       logger.error({ err: error }, '[users > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'USER_CREATE_ERROR'),
       )
     }
   }

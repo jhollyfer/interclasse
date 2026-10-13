@@ -1,10 +1,11 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+
 import { MATCH_PHASES, MATCH_STATUSES, MatchStatuses } from '#core/entity'
 
 export default class extends BaseSchema {
   protected tableName = 'matches'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table
@@ -43,7 +44,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

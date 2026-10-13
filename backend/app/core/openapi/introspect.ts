@@ -1,10 +1,13 @@
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { basename, dirname, relative, resolve } from 'node:path'
+
 import ts from 'typescript'
+
+import type { DocumentedValidator, FeatureResponse } from './types.ts'
+
 import HTTPException from '#exceptions/http.exception'
 import { RESPONSES } from '#core/response'
-import type { DocumentedValidator, FeatureResponse } from './types.ts'
 
 /**
  * Lê o contrato que o código já declara.
@@ -200,7 +203,7 @@ function isValidator(value: unknown): value is DocumentedValidator {
 async function loadValidator(
   name: string,
   specifier: string,
-  from: string
+  from: string,
 ): Promise<DocumentedValidator | undefined> {
   let target = specifier
 
@@ -303,7 +306,7 @@ export function controllerPath(importExpression: string, appRoot: string): strin
  */
 export function loadResponseSchema(
   directory: string,
-  appRoot: string
+  appRoot: string,
 ): FeatureResponse | undefined {
   const features = resolve(appRoot, 'app/features')
   const key = relative(features, directory)

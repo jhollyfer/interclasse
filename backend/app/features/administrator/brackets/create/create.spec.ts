@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
+
 import { Categories, MatchPhases } from '#core/entity'
 import {
   authenticateAsAdministrator,
@@ -34,7 +35,7 @@ async function enrolledClassrooms(
   client: ApiClient,
   admin: Session,
   sportId: string,
-  total: number
+  total: number,
 ) {
   const ids: string[] = []
 
@@ -160,7 +161,7 @@ test.group('jogos > sorteio e placar', (group) => {
 
     const antes = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
     const final = body(antes).matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL
+      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
     )
     assert.isString(final.homeTeamId)
     assert.isString(final.awayTeamId)
@@ -186,7 +187,7 @@ test.group('jogos > sorteio e placar', (group) => {
     // Trocar o vencedor de uma semifinal depois da final jogada reescreveria a final.
     const semi = body(depois).matches.find(
       (match: { phase: string; winnerTeamId: string; homeTeamId: string }) =>
-        match.phase === MatchPhases.SEMI && match.winnerTeamId === match.homeTeamId
+        match.phase === MatchPhases.SEMI && match.winnerTeamId === match.homeTeamId,
     )
     const virada = await client
       .put(`/administrator/matches/${semi.id}/score`)
@@ -261,7 +262,7 @@ test.group('jogos > sorteio e placar', (group) => {
     const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
     const semi = jogada.matches.find((match: { phase: string }) => match.phase === MatchPhases.SEMI)
     const final = jogada.matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL
+      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
     )
 
     // A semifinal não sai enquanto a final, que depende dela, tem placar.
@@ -280,7 +281,7 @@ test.group('jogos > sorteio e placar', (group) => {
 
     const depois = body(await client.get(`/storefront/brackets/${bracket.id}`))
     const finalDepois = depois.matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL
+      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
     )
     assert.equal(depois.status, 'KNOCKOUT')
     assert.isNull(depois.championTeamId)

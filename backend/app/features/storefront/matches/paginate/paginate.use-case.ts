@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import MatchService from '#services/match/match.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { MatchStatuses, PAGINATION, type Paginated } from '#core/entity'
 import type { MatchPaginatePayload } from '#features/storefront/matches/matches.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = MatchPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
@@ -24,7 +25,7 @@ export default class StorefrontMatchPaginateUseCase {
 
       const matches = await query.paginate(
         payload.page ?? PAGINATION.PAGE,
-        payload.perPage ?? PAGINATION.PER_PAGE
+        payload.perPage ?? PAGINATION.PER_PAGE,
       )
 
       return right({ meta: matches.getMeta(), data: matches.all() })

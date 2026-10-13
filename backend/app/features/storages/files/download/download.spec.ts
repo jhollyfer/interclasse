@@ -1,5 +1,7 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
+import type { ApiClient } from '@japa/api-client'
+
 import StorageService from '#services/storage/storage.service'
 import { type StorageMimetype } from '#core/validator'
 import {
@@ -7,8 +9,8 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
+  type ResponseBody,
 } from '#tests/helpers'
-import type { ApiClient } from '@japa/api-client'
 import type { Session } from '#tests/helpers'
 
 /**
@@ -23,8 +25,8 @@ const SMALL = new Uint8Array(1024).fill(66)
 async function open(
   client: ApiClient,
   session: Session,
-  payload: { fileName: string; mimetype: StorageMimetype; size: number }
-): Promise<Record<string, any>> {
+  payload: { fileName: string; mimetype: StorageMimetype; size: number },
+): Promise<ResponseBody> {
   const response = await client.post('/storages').cookies(session).json(payload)
 
   response.assertStatus(201)
@@ -46,7 +48,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
-async function upload(client: ApiClient, session: Session): Promise<Record<string, any>> {
+async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',

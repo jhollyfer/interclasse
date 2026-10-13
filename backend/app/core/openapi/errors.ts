@@ -14,10 +14,13 @@ import type { OpenAPIResponse, SchemaObject } from './types.ts'
  * string livre. Enum vazio seria mentira, e enum inventado seria pior.
  */
 
+/** Nomeada porque `forbiddenDescription` a compõe sem passar pelo índice. */
+const FORBIDDEN_DESCRIPTION = 'Acesso negado'
+
 const DESCRIPTIONS: Record<number, string> = {
   400: 'Requisição inválida',
   401: 'Não autenticado',
-  403: 'Acesso negado',
+  403: FORBIDDEN_DESCRIPTION,
   404: 'Recurso não encontrado',
   409: 'Conflito com o estado atual',
   422: 'Payload recusado pela validação',
@@ -49,7 +52,7 @@ export function errorComponentName(status: number, codes: string[]): string {
         .map(function (part) {
           return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
         })
-        .join('')
+        .join(''),
     )
     .join('')
 
@@ -86,7 +89,7 @@ export function errorSchema(status: number, codes: string[]): SchemaObject {
 export function errorResponse(
   status: number,
   reference: string,
-  description?: string
+  description?: string,
 ): OpenAPIResponse {
   return {
     description: description ?? DESCRIPTIONS[status] ?? 'Falha',
@@ -113,7 +116,7 @@ export const AUTOMATIC_CODES = {
 } as const
 
 export function forbiddenDescription(roles: string[]): string {
-  if (roles.length === 0) return DESCRIPTIONS[403]
+  if (roles.length === 0) return FORBIDDEN_DESCRIPTION
 
-  return `${DESCRIPTIONS[403]}. Exige um destes papéis: ${roles.join(', ')}.`
+  return `${FORBIDDEN_DESCRIPTION}. Exige um destes papéis: ${roles.join(', ')}.`
 }

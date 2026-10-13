@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import type User from '#models/user'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { EnrollmentUpdatePayload } from '#features/representative/enrollments/enrollments.validator'
 
@@ -32,7 +33,7 @@ export default class RepresentativeEnrollmentUpdateUseCase {
       logger.error({ err: error }, '[representative enrollments > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_UPDATE_ERROR'),
       )
     }
   }

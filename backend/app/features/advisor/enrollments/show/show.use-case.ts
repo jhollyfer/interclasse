@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { EnrollmentShowPayload } from '#features/advisor/enrollments/enrollments.validator'
 
 type Payload = EnrollmentShowPayload
@@ -25,7 +26,7 @@ export default class AdvisorEnrollmentShowUseCase {
       logger.error({ err: error }, '[advisor enrollments > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_SHOW_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_SHOW_ERROR'),
       )
     }
   }

@@ -1,10 +1,11 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+
 import { BRACKET_STATUSES, CATEGORIES } from '#core/entity'
 
 export default class extends BaseSchema {
   protected tableName = 'brackets'
 
-  async up(): Promise<void> {
+  override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table.uuid('sport_id').notNullable().references('id').inTable('sports').onDelete('RESTRICT')
@@ -18,7 +19,7 @@ export default class extends BaseSchema {
     })
   }
 
-  async down(): Promise<void> {
+  override async down(): Promise<void> {
     this.schema.dropTable(this.tableName)
   }
 }

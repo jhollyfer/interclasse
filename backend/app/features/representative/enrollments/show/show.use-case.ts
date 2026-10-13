@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import type User from '#models/user'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 
 type Payload = { actor: User }
 type Response = Either<HTTPException, EnrollmentBoard>
@@ -25,7 +26,7 @@ export default class RepresentativeEnrollmentShowUseCase {
       logger.error({ err: error }, '[representative enrollments > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_SHOW_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_SHOW_ERROR'),
       )
     }
   }

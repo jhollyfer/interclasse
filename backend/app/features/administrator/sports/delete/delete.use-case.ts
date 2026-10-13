@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Bracket from '#models/bracket'
 import Enrollment from '#models/enrollment'
 import Sport from '#models/sport'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -34,7 +35,7 @@ export default class AdministratorSportDeleteUseCase {
       logger.error({ err: error }, '[sports > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_DELETE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_DELETE_ERROR'),
       )
     }
   }

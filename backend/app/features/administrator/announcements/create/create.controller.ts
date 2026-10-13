@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdministratorAnnouncementCreateUseCase from './create.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { AnnouncementCreateValidator } from '#features/administrator/announcements/announcements.validator'
 
 @inject()

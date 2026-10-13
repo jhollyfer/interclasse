@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { body } from '#tests/helpers'
 import { RULE_MESSAGES } from '#core/validator'
 
@@ -53,8 +54,8 @@ test.group('mensagens > provider de validação', () => {
     // busca, senão toda mensagem que nomeia o campo seria acusada de inglesa.
     const suspeitas = Object.entries(RULE_MESSAGES).filter(([, message]) =>
       /\b(the|must|field|should|at least|at most|invalid|value)\b/i.test(
-        message.replace(/\{\{.*?\}\}/g, '')
-      )
+        message.replace(/\{\{.*?\}\}/g, ''),
+      ),
     )
 
     assert.deepEqual(suspeitas, [])

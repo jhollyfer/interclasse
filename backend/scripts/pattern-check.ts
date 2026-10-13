@@ -50,7 +50,7 @@ type Config = {
 }
 
 const CONFIG: Config = JSON.parse(
-  await readFile(join(RAIZ, 'scripts/pattern-check.config.json'), 'utf8')
+  await readFile(join(RAIZ, 'scripts/pattern-check.config.json'), 'utf8'),
 )
 
 /** Diretorios que a regua exige mesmo vazios. Secao 1.1. */
@@ -308,7 +308,7 @@ function conferirNomeDeClasse(relativo: string, fonte: string): Achado[] {
   const declaracao = /export\s+default\s+class\s+([A-Za-z0-9_]+)/.exec(limpo)
   if (declaracao === null) return []
 
-  const nome = declaracao[1]
+  const nome = declaracao[1] ?? ''
   let sufixo = 'UseCase'
   if (ehController) sufixo = 'Controller'
 
@@ -707,7 +707,7 @@ function conferirFormaDoUseCase(relativo: string, fonte: string): Achado[] {
   const achados: Achado[] = []
 
   const execute = /async execute\(([^)]*)\)/.exec(limpo)
-  const recebeAlgo = execute !== null && execute[1].trim().length > 0
+  const recebeAlgo = execute !== null && (execute[1] ?? '').trim().length > 0
 
   if (recebeAlgo && !/^type Payload\b/m.test(limpo)) {
     achados.push({
@@ -763,7 +763,7 @@ async function conferirRota(arquivos: string[]): Promise<Achado[]> {
     if (dentro === undefined) continue
 
     const partes = dentro.split('/')
-    const verbo = pascal(partes[partes.length - 1].replace('.controller.ts', ''))
+    const verbo = pascal((partes[partes.length - 1] ?? '').replace('.controller.ts', ''))
     const chave = ['controllers', ...partes.slice(0, -1).map(camel), verbo].join('.')
 
     // Limite de identificador, e nao `includes`: `controllers.account.profile.Show`

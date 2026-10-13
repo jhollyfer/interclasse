@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import Storage from '#models/storage'
 import { UploadStatuses } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'

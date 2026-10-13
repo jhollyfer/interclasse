@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Sport from '#models/sport'
 import SlugService from '#services/slug/slug.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
-import logger from '@adonisjs/core/services/logger'
 import type { SportCreatePayload } from '#features/administrator/sports/sports.validator'
 
 type Payload = SportCreatePayload
@@ -23,8 +24,8 @@ export default class AdministratorSportCreateUseCase {
             'SPORT_INVALID_LIMITS',
             {
               minAthletes: 'O mínimo não pode passar do máximo',
-            }
-          )
+            },
+          ),
         )
 
       const slug = this.slug.normalize(payload.name)
@@ -34,7 +35,7 @@ export default class AdministratorSportCreateUseCase {
         return left(
           HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
             name: 'Já existe uma modalidade com este nome',
-          })
+          }),
         )
 
       const sport = await Sport.create({ ...payload, slug })
@@ -47,13 +48,13 @@ export default class AdministratorSportCreateUseCase {
         return left(
           HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
             name: 'Já existe uma modalidade com este nome',
-          })
+          }),
         )
 
       logger.error({ err: error }, '[sports > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_CREATE_ERROR'),
       )
     }
   }

@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto'
+
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
+
 import MultipartService from '#services/multipart/multipart.service'
-import { randomUUID } from 'node:crypto'
 
 /**
  * O multipart contra o bucket de verdade (o MinIO do `docker-compose.yml`).
@@ -38,6 +40,13 @@ async function put(url: string, body: Uint8Array): Promise<string> {
   return etag
 }
 
+/** O item na posição, ou falha o teste: lista mais curta que o esperado é o defeito. */
+function item<T>(list: ReadonlyArray<T>, index: number): T {
+  const found = list[index]
+  if (found === undefined) throw new Error(`lista sem a posição ${index}`)
+  return found
+}
+
 test.group('multipart', () => {
   test('sobe em partes, remonta, e o objeto final tem a soma dos tamanhos', async ({ assert }) => {
     const multipart = await app.container.make(MultipartService)
@@ -49,12 +58,12 @@ test.group('multipart', () => {
     assert.lengthOf(urls, 2)
     assert.deepEqual(
       urls.map((part) => part.partNumber),
-      [1, 2]
+      [1, 2],
     )
 
     const parts = [
-      { partNumber: 1, etag: await put(urls[0].url, FIRST_PART) },
-      { partNumber: 2, etag: await put(urls[1].url, LAST_PART) },
+      { partNumber: 1, etag: await put(item(urls, 0).url, FIRST_PART) },
+      { partNumber: 2, etag: await put(item(urls, 1).url, LAST_PART) },
     ]
 
     // Antes do complete, nada existe na chave final: o que o bucket tem são as
@@ -64,8 +73,8 @@ test.group('multipart', () => {
     const received = await multipart.listParts(key, uploadId)
 
     assert.lengthOf(received, 2)
-    assert.equal(received[0].size, FIRST_PART.byteLength)
-    assert.equal(received[1].size, LAST_PART.byteLength)
+    assert.equal(item(received, 0).size, FIRST_PART.byteLength)
+    assert.equal(item(received, 1).size, LAST_PART.byteLength)
 
     await multipart.complete(key, uploadId, parts)
 
@@ -81,7 +90,7 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const [first] = await multipart.signParts(key, uploadId, [1])
+    const first = item(await multipart.signParts(key, uploadId, [1]), 0)
 
     await put(first.url, FIRST_PART)
 
@@ -89,7 +98,7 @@ test.group('multipart', () => {
 
     assert.deepEqual(
       received.map((part) => part.partNumber),
-      [1]
+      [1],
     )
 
     await multipart.abort(key, uploadId)
@@ -100,7 +109,7 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const [first] = await multipart.signParts(key, uploadId, [1])
+    const first = item(await multipart.signParts(key, uploadId, [1]), 0)
 
     await put(first.url, FIRST_PART)
     await multipart.abort(key, uploadId)
@@ -116,7 +125,7 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const [expiring] = await multipart.signParts(key, uploadId, [1], 1)
+    const expiring = item(await multipart.signParts(key, uploadId, [1], 1), 0)
 
     await new Promise((resolve) => setTimeout(resolve, 1_500))
 
@@ -126,7 +135,7 @@ test.group('multipart', () => {
 
     // E o upload continua aberto: uma URL nova sobe a mesma parte. É o que
     // `GET /storages/:id/parts` faz por quem ficou horas fora do ar.
-    const [renewed] = await multipart.signParts(key, uploadId, [1])
+    const renewed = item(await multipart.signParts(key, uploadId, [1]), 0)
 
     await put(renewed.url, LAST_PART)
 

@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises'
+
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
@@ -21,10 +22,10 @@ const OUTPUT = 'openapi.json'
  * router nem controllers para inspecionar.
  */
 export default class OpenapiGenerate extends BaseCommand {
-  static commandName = 'openapi:generate'
-  static description = 'Gera o documento OpenAPI a partir das rotas e dos schemas VineJS'
+  static override commandName = 'openapi:generate'
+  static override description = 'Gera o documento OpenAPI a partir das rotas e dos schemas VineJS'
 
-  static options: CommandOptions = { startApp: true }
+  static override options: CommandOptions = { startApp: true }
 
   @flags.boolean({
     description: 'Não escreve nada: compara com o arquivo em disco e falha se divergir',
@@ -36,7 +37,7 @@ export default class OpenapiGenerate extends BaseCommand {
   })
   declare strict: boolean
 
-  async run() {
+  override async run() {
     const { buildDocument } = await import('#core/openapi/document')
     const { document, warnings, documented, total } = await buildDocument()
 
@@ -83,7 +84,7 @@ export default class OpenapiGenerate extends BaseCommand {
     }
 
     this.logger.error(
-      `${OUTPUT} está desatualizado. Rode \`node ace openapi:generate\` e commite o resultado.`
+      `${OUTPUT} está desatualizado. Rode \`node ace openapi:generate\` e commite o resultado.`,
     )
     this.exitCode = 1
   }

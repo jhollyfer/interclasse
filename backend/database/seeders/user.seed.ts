@@ -1,7 +1,8 @@
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+
 import env from '#start/env'
 import User from '#models/user'
 import { ActiveStatuses, UserRoles } from '#core/entity'
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 /**
  * O primeiro administrador. Nenhum endpoint cria conta sem sessão - o painel é
@@ -14,9 +15,9 @@ export default class extends BaseSeeder {
    * (`demo.seed.ts`), e este registro seria só uma credencial padrão
    * conhecida com poder de administrador.
    */
-  static environment = ['development', 'test']
+  static override environment = ['development', 'test']
 
-  async run() {
+  override async run() {
     const email = env.get('SEED_OWNER_EMAIL') ?? 'administrator@mail.com'
     const password = env.get('SEED_OWNER_PASSWORD')
 
@@ -34,7 +35,7 @@ export default class extends BaseSeeder {
     if (!password) {
       throw new Error(
         'SEED_OWNER_PASSWORD ausente. Defina uma senha no ambiente antes de rodar o seeder: ' +
-          'SEED_OWNER_PASSWORD=<senha> node ace db:seed'
+          'SEED_OWNER_PASSWORD=<senha> node ace db:seed',
       )
     }
 
@@ -55,7 +56,7 @@ export default class extends BaseSeeder {
         role: UserRoles.ADMINISTRATOR,
         status: ActiveStatuses.ACTIVE,
         deletedAt: null,
-      }
+      },
     )
   }
 }

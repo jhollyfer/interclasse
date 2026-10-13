@@ -1,11 +1,12 @@
+import db from '@adonisjs/lucid/services/db'
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Bracket from '#models/bracket'
 import Match from '#models/match'
-import db from '@adonisjs/lucid/services/db'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchStatuses } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -80,20 +81,26 @@ export default class AdministratorMatchUnscoreUseCase {
         return left(
           HTTPException.Conflict(
             'A partida seguinte já tem placar: desfaça-a antes',
-            'NEXT_MATCH_PLAYED'
-          )
+            'NEXT_MATCH_PLAYED',
+          ),
         )
 
-      await match.load('homeTeam', (team) => team.preload('classroom'))
-      await match.load('awayTeam', (team) => team.preload('classroom'))
-      await match.load('bracket', (bracket) => bracket.preload('sport'))
+      await match.load('homeTeam', (team) => {
+        team.preload('classroom')
+      })
+      await match.load('awayTeam', (team) => {
+        team.preload('classroom')
+      })
+      await match.load('bracket', (bracket) => {
+        bracket.preload('sport')
+      })
 
       return right(match)
     } catch (error) {
       logger.error({ err: error }, '[matches > unscore][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_UNSCORE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_UNSCORE_ERROR'),
       )
     }
   }

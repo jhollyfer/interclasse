@@ -1,11 +1,12 @@
+import db from '@adonisjs/lucid/services/db'
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Bracket from '#models/bracket'
 import Match from '#models/match'
-import db from '@adonisjs/lucid/services/db'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchPhases, MatchStatuses, type Merge } from '#core/entity'
 import type { MatchScorePayload } from '#features/administrator/matches/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
@@ -29,8 +30,8 @@ export default class AdministratorMatchScoreUseCase {
         return left(
           HTTPException.Conflict(
             'A partida ainda não tem os dois times definidos',
-            'MATCH_TEAMS_PENDING'
-          )
+            'MATCH_TEAMS_PENDING',
+          ),
         )
 
       const winner = this.winnerOf(match, homeScore, awayScore, winnerTeamId)
@@ -39,7 +40,7 @@ export default class AdministratorMatchScoreUseCase {
         return left(
           HTTPException.UnprocessableEntity('Informe quem venceu', 'MATCH_WINNER_REQUIRED', {
             winnerTeamId: 'Empate: selecione quem venceu nos pênaltis',
-          })
+          }),
         )
 
       const phase = nextPhase(match.phase)
@@ -95,8 +96,8 @@ export default class AdministratorMatchScoreUseCase {
         return left(
           HTTPException.Conflict(
             'A partida seguinte já tem placar: corrija-a antes',
-            'NEXT_MATCH_PLAYED'
-          )
+            'NEXT_MATCH_PLAYED',
+          ),
         )
 
       return right(await this.loaded(match))
@@ -104,7 +105,7 @@ export default class AdministratorMatchScoreUseCase {
       logger.error({ err: error }, '[matches > score][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_SCORE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_SCORE_ERROR'),
       )
     }
   }
@@ -114,7 +115,7 @@ export default class AdministratorMatchScoreUseCase {
     match: Match,
     homeScore: number,
     awayScore: number,
-    winnerTeamId?: string
+    winnerTeamId?: string,
   ): string | null {
     if (homeScore > awayScore) return match.homeTeamId
     if (awayScore > homeScore) return match.awayTeamId
@@ -125,9 +126,15 @@ export default class AdministratorMatchScoreUseCase {
   }
 
   private async loaded(match: Match): Promise<Match> {
-    await match.load('homeTeam', (team) => team.preload('classroom'))
-    await match.load('awayTeam', (team) => team.preload('classroom'))
-    await match.load('bracket', (bracket) => bracket.preload('sport'))
+    await match.load('homeTeam', (team) => {
+      team.preload('classroom')
+    })
+    await match.load('awayTeam', (team) => {
+      team.preload('classroom')
+    })
+    await match.load('bracket', (bracket) => {
+      bracket.preload('sport')
+    })
 
     return match
   }

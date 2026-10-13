@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
 import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
-import env from '#start/env'
 import type { Infer } from '@vinejs/vine/types'
+
+import env from '#start/env'
 import {
   ACTIVE_STATUSES,
   CATEGORIES,
@@ -147,7 +148,7 @@ export function trashedField() {
  * colunas que metade das listagens não conhece.
  */
 export function sortFields<const TColumns extends readonly [string, ...string[]]>(
-  columns: TColumns
+  columns: TColumns,
 ) {
   return {
     sort: vine.enum(columns).optional(),

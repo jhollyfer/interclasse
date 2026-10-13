@@ -1,10 +1,11 @@
+import { inject } from '@adonisjs/core'
+import hash from '@adonisjs/core/services/hash'
+import logger from '@adonisjs/core/services/logger'
+
 import User from '#models/user'
 import StorageService from '#services/storage/storage.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import hash from '@adonisjs/core/services/hash'
-import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { ProfileUpdatePayload } from '#features/account/profile/profile.validator'
 
@@ -36,7 +37,7 @@ export default class AccountProfileUpdateUseCase {
           return left(
             HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
               email: 'Usuário já existe',
-            })
+            }),
           )
       }
 
@@ -66,7 +67,7 @@ export default class AccountProfileUpdateUseCase {
         return left(
           HTTPException.UnprocessableEntity('Senha atual inválida', 'CURRENT_PASSWORD_INVALID', {
             currentPassword: 'Senha atual inválida',
-          })
+          }),
         )
 
       if (payload.password && (await hash.verify(user.password, payload.password)))
@@ -74,8 +75,8 @@ export default class AccountProfileUpdateUseCase {
           HTTPException.UnprocessableEntity(
             'A nova senha deve ser diferente da atual',
             'PASSWORD_SAME_AS_CURRENT',
-            { password: 'A nova senha deve ser diferente da atual' }
-          )
+            { password: 'A nova senha deve ser diferente da atual' },
+          ),
         )
 
       // Trocar e-mail ou senha derruba todas as sessões: sem isso um token
@@ -101,7 +102,7 @@ export default class AccountProfileUpdateUseCase {
       logger.error({ err: error }, '[account > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ACCOUNT_UPDATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'ACCOUNT_UPDATE_ERROR'),
       )
     }
   }

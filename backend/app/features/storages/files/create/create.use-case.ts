@@ -1,3 +1,7 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
@@ -9,9 +13,6 @@ import MultipartService, {
   type PresignedPart,
 } from '#services/multipart/multipart.service'
 import { UploadStatuses } from '#core/entity'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 import type { FileCreatePayload } from '#features/storages/files/files.validator'
 
 type Payload = FileCreatePayload
@@ -60,7 +61,7 @@ type Response = Either<HTTPException, StorageUpload>
 export default class StoragesFileCreateUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly multipart: MultipartService
+    private readonly multipart: MultipartService,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
@@ -112,7 +113,7 @@ export default class StoragesFileCreateUseCase {
       if (uploadId) await this.#abortQuietly(key, uploadId)
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_CREATE_ERROR'),
       )
     }
   }

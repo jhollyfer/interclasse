@@ -154,7 +154,7 @@ export const StorageUploadResponse = vine.create({
       size: vine.number(),
       /** O que o `complete` exige de volta para conferir que a parte chegou. */
       etag: vine.string(),
-    })
+    }),
   ),
 })
 
@@ -216,14 +216,14 @@ export const EnrollmentBoardResponse = vine.create({
       minAthletes: vine.number(),
       maxAthletes: vine.number(),
       locked: vine.boolean(),
-    })
+    }),
   ),
   students: vine.array(
     vine.object({
       id: vine.string().uuid(),
       name: vine.string(),
       sportIds: vine.array(vine.string().uuid()),
-    })
+    }),
   ),
 })
 

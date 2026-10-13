@@ -1,12 +1,13 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, sortOrder, type Paginated } from '#core/entity'
 import { applyTrashed } from '#features/_shared.trashed'
 import type { UserPaginatePayload } from '#features/administrator/users/users.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = UserPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

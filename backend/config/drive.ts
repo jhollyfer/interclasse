@@ -1,7 +1,8 @@
-import env from '#start/env'
 import { defineConfig, services } from '@adonisjs/drive'
 import type { InferDriveDisks } from '@adonisjs/drive/types'
 import type { S3ClientConfig } from '@aws-sdk/client-s3'
+
+import env from '#start/env'
 
 /**
  * Armazenamento de arquivos: um bucket S3-compatível, o mesmo em todo ambiente.

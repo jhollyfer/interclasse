@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdministratorBracketCreateUseCase from './create.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { BracketCreateValidator } from '#features/administrator/brackets/brackets.validator'
 
 @inject()

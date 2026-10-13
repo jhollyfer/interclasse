@@ -1,8 +1,10 @@
-import UserPolicy from '#policies/user.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdministratorUserDeleteUseCase from './delete.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
+import UserPolicy from '#policies/user.policy'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

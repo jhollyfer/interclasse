@@ -1,16 +1,22 @@
 import type { ApiClient, ApiResponse } from '@japa/api-client'
 import testUtils from '@adonisjs/core/services/test_utils'
+
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import type User from '#models/user'
 
 /**
- * Lê o JSON da resposta sem brigar com o tipo. O registry do client casa a rota
- * pelo caminho e não pelo método, então `response.body()` vem como a união de
- * todas as respostas daquele caminho - inclusive as de erro. Nos testes o que
- * importa é o conteúdo.
+ * O corpo como as specs o leem: objeto de campos livres.
+ *
+ * O `any` é forçado pelo `@japa/api-client` com o registry do `@tuyau/core`:
+ * a rota casa pelo caminho e não pelo método, então `response.body()` é a
+ * união de todas as respostas daquele caminho - as de erro inclusive. É o único
+ * `any` da suíte, e toda spec herda o tipo daqui (`ResponseBody`).
  */
-export function body(response: ApiResponse): Record<string, any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- registry do @tuyau/core une as respostas do caminho
+export type ResponseBody = Record<string, any>
+
+export function body(response: ApiResponse): ResponseBody {
   return response.body()
 }
 
@@ -40,7 +46,7 @@ export type Session = {
 export async function authenticate(
   client: ApiClient,
   email: string,
-  password: string
+  password: string,
 ): Promise<Session> {
   const response = await client.post('/authentication/sign-in').json({ email, password })
 
@@ -78,7 +84,7 @@ export async function authenticateAsAdvisor(client: ApiClient): Promise<Session>
  */
 export async function signInWithFactory(
   client: ApiClient,
-  state?: 'administrator' | 'representative'
+  state?: 'administrator' | 'representative',
 ): Promise<{ user: User; session: Session }> {
   const factory = UserFactory.query()
   if (state) factory.apply(state)

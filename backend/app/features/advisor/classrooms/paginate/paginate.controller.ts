@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdvisorClassroomPaginateUseCase from './paginate.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
 import { PaginationValidator } from '#core/validator'
 
 @inject()

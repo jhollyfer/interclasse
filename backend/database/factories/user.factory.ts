@@ -1,6 +1,7 @@
+import factory from '@adonisjs/lucid/factories'
+
 import User from '#models/user'
 import { ActiveStatuses, UserRoles } from '#core/entity'
-import factory from '@adonisjs/lucid/factories'
 
 /**
  * Senha de todo usuário criado por factory. Passa na política de

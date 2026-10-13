@@ -1,9 +1,11 @@
-import { SessionSignInValidator } from '#features/authentication/sessions/sessions.validator'
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
+
+import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
+
+import { SessionSignInValidator } from '#features/authentication/sessions/sessions.validator'
 import { defineDocs } from '#core/openapi/types'
 import CookieService, { issueSessionTokens } from '#services/cookie/cookie.service'
-import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
 @inject()
 export default class AuthenticationSessionSignInController {
@@ -19,7 +21,7 @@ export default class AuthenticationSessionSignInController {
 
   constructor(
     private readonly cookie: CookieService,
-    private readonly useCase: AuthenticationSessionSignInUseCase
+    private readonly useCase: AuthenticationSessionSignInUseCase,
   ) {}
 
   async handle(context: HttpContext) {

@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+
 import { ActiveStatuses, UserRoles } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import {

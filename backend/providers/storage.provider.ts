@@ -1,6 +1,7 @@
-import { clientConfig } from '#config/drive'
 import { S3Client } from '@aws-sdk/client-s3'
 import type { ApplicationService } from '@adonisjs/core/types'
+
+import { clientConfig } from '#config/drive'
 
 /**
  * Registra o cliente S3 no container.

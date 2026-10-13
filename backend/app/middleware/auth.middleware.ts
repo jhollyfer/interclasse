@@ -12,7 +12,7 @@ export default class AuthMiddleware {
     next: NextFn,
     options: {
       guards?: (keyof Authenticators)[]
-    } = {}
+    } = {},
   ) {
     await ctx.auth.authenticateUsing(options.guards)
     return next()

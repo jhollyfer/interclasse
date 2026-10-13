@@ -1,4 +1,5 @@
 import { randomInt } from 'node:crypto'
+
 import { MatchPhases, type MatchPhase } from '#core/entity'
 
 /**
@@ -26,7 +27,10 @@ export function shuffle<T>(items: ReadonlyArray<T>, random: Random = secureRando
   for (let index = result.length - 1; index > 0; index--) {
     const other = random(index + 1)
     const current = result[index]
-    result[index] = result[other]
+    const swapped = result[other]
+    // Índices dentro da lista por construção; a guarda só estreita o tipo.
+    if (current === undefined || swapped === undefined) continue
+    result[index] = swapped
     result[other] = current
   }
 
@@ -67,7 +71,7 @@ export type Pairing<T> = { home: T; away: T | null }
  */
 export function drawKnockout<T>(
   teams: ReadonlyArray<T>,
-  random: Random = secureRandom
+  random: Random = secureRandom,
 ): Pairing<T>[] {
   const shuffled = shuffle(teams, random)
   const size = bracketSize(teams.length)
@@ -77,13 +81,15 @@ export function drawKnockout<T>(
   let next = 0
   for (let position = 0; position < size / 2; position++) {
     const home = shuffled[next++]
+    // `size` é a menor potência de dois que cabe os times: toda posição tem mandante.
+    if (home === undefined) break
 
     if (position < byes) {
       pairings.push({ home, away: null })
       continue
     }
 
-    pairings.push({ home, away: shuffled[next++] })
+    pairings.push({ home, away: shuffled[next++] ?? null })
   }
 
   return pairings

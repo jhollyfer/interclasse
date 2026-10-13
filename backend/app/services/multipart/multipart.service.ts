@@ -1,4 +1,3 @@
-import { bucket } from '#config/drive'
 import { inject } from '@adonisjs/core'
 import {
   AbortMultipartUploadCommand,
@@ -10,6 +9,8 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+
+import { bucket } from '#config/drive'
 
 /** Uma parte que o cliente ainda vai enviar, e o endereço para onde enviá-la. */
 export type PresignedPart = {
@@ -110,7 +111,7 @@ export default class MultipartService {
    */
   async initiate(key: string, contentType: string): Promise<string> {
     const response = await this.client.send(
-      new CreateMultipartUploadCommand({ Bucket: bucket, Key: key, ContentType: contentType })
+      new CreateMultipartUploadCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
     )
 
     // O S3 sempre devolve `UploadId` num `CreateMultipartUpload` bem-sucedido; o
@@ -134,7 +135,7 @@ export default class MultipartService {
     key: string,
     uploadId: string,
     partNumbers: Array<number>,
-    expiresIn: number = URL_EXPIRES_IN
+    expiresIn: number = URL_EXPIRES_IN,
   ): Promise<Array<PresignedPart>> {
     return Promise.all(
       partNumbers.map(async (partNumber) => {
@@ -146,11 +147,11 @@ export default class MultipartService {
             UploadId: uploadId,
             PartNumber: partNumber,
           }),
-          { expiresIn }
+          { expiresIn },
         )
 
         return { partNumber, url }
-      })
+      }),
     )
   }
 
@@ -164,12 +165,12 @@ export default class MultipartService {
   async signSingle(
     key: string,
     contentType: string,
-    expiresIn: number = URL_EXPIRES_IN
+    expiresIn: number = URL_EXPIRES_IN,
   ): Promise<string> {
     return getSignedUrl(
       this.client,
       new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
-      { expiresIn }
+      { expiresIn },
     )
   }
 
@@ -194,7 +195,7 @@ export default class MultipartService {
           Key: key,
           UploadId: uploadId,
           PartNumberMarker: marker,
-        })
+        }),
       )
 
       for (const part of response.Parts ?? []) {
@@ -224,7 +225,7 @@ export default class MultipartService {
   async complete(
     key: string,
     uploadId: string,
-    parts: Array<{ partNumber: number; etag: string }>
+    parts: Array<{ partNumber: number; etag: string }>,
   ): Promise<void> {
     await this.client.send(
       new CompleteMultipartUploadCommand({
@@ -237,7 +238,7 @@ export default class MultipartService {
             .sort((a, b) => a.partNumber - b.partNumber)
             .map((part) => ({ PartNumber: part.partNumber, ETag: part.etag })),
         },
-      })
+      }),
     )
   }
 
@@ -250,7 +251,7 @@ export default class MultipartService {
    */
   async abort(key: string, uploadId: string): Promise<void> {
     await this.client.send(
-      new AbortMultipartUploadCommand({ Bucket: bucket, Key: key, UploadId: uploadId })
+      new AbortMultipartUploadCommand({ Bucket: bucket, Key: key, UploadId: uploadId }),
     )
   }
 }

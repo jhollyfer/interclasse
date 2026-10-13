@@ -37,8 +37,12 @@ export default class BracketService {
     const bracket = await Bracket.query()
       .where('id', id)
       .preload('sport')
-      .preload('teams', (teams) => teams.preload('classroom'))
-      .preload('matches', (matches) => matches.orderBy('round', 'asc').orderBy('position', 'asc'))
+      .preload('teams', (teams) => {
+        teams.preload('classroom')
+      })
+      .preload('matches', (matches) => {
+        matches.orderBy('round', 'asc').orderBy('position', 'asc')
+      })
       .first()
 
     if (!bracket) return null

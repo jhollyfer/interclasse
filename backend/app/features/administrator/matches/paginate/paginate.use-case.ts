@@ -1,11 +1,12 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import MatchService from '#services/match/match.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, type Paginated } from '#core/entity'
 import type { MatchPaginatePayload } from '#features/administrator/matches/matches.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = MatchPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

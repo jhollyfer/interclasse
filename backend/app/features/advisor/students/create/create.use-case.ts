@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+
 import Classroom from '#models/classroom'
 import Student from '#models/student'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import type { StudentCreatePayload } from '#features/advisor/students/students.validator'
 
 type Payload = StudentCreatePayload
@@ -27,7 +28,7 @@ export default class AdvisorStudentCreateUseCase {
       logger.error({ err: error }, '[advisor students > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_CREATE_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_CREATE_ERROR'),
       )
     }
   }

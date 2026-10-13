@@ -1,9 +1,10 @@
+import db from '@adonisjs/lucid/services/db'
+
 import Bracket from '#models/bracket'
 import type Classroom from '#models/classroom'
 import Enrollment from '#models/enrollment'
 import Sport from '#models/sport'
 import Student from '#models/student'
-import db from '@adonisjs/lucid/services/db'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { Category } from '#core/entity'
@@ -77,7 +78,7 @@ export default class EnrollmentService {
     classroom: Classroom,
     sportId: string,
     studentIds: string[],
-    { canRemove }: { canRemove: boolean }
+    { canRemove }: { canRemove: boolean },
   ): Promise<Either<HTTPException, EnrollmentBoard>> {
     const sport = await Sport.find(sportId)
 
@@ -85,7 +86,7 @@ export default class EnrollmentService {
       return left(
         HTTPException.UnprocessableEntity('Modalidade não encontrada', 'SPORT_NOT_FOUND', {
           sportId: 'Modalidade não encontrada',
-        })
+        }),
       )
 
     // O representante só acrescenta: tirar atleta da lista é decisão do
@@ -101,8 +102,8 @@ export default class EnrollmentService {
         return left(
           HTTPException.Forbidden(
             'Só o professor conselheiro tira atleta da lista',
-            'ENROLLMENT_REMOVAL_FORBIDDEN'
-          )
+            'ENROLLMENT_REMOVAL_FORBIDDEN',
+          ),
         )
     }
 
@@ -110,7 +111,7 @@ export default class EnrollmentService {
       return left(
         HTTPException.UnprocessableEntity('Atletas demais', 'ENROLLMENT_LIMIT_EXCEEDED', {
           studentIds: `Inscreva no máximo ${sport.maxAthletes} atletas`,
-        })
+        }),
       )
 
     // Todo aluno da lista tem que ser desta turma. Sem isto, um representante
@@ -124,7 +125,7 @@ export default class EnrollmentService {
       return left(
         HTTPException.UnprocessableEntity('Aluno não encontrado na turma', 'STUDENT_NOT_FOUND', {
           studentIds: 'Selecione apenas alunos desta turma',
-        })
+        }),
       )
 
     const saved = await db.transaction(async (trx) => {
@@ -151,7 +152,7 @@ export default class EnrollmentService {
       if (studentIds.length > 0)
         await Enrollment.createMany(
           studentIds.map((studentId) => ({ studentId, sportId: sport.id })),
-          { client: trx }
+          { client: trx },
         )
 
       return true
@@ -161,8 +162,8 @@ export default class EnrollmentService {
       return left(
         HTTPException.Conflict(
           'As inscrições desta modalidade estão encerradas: o sorteio já aconteceu',
-          'ENROLLMENT_LOCKED'
-        )
+          'ENROLLMENT_LOCKED',
+        ),
       )
 
     return right(await this.board(classroom))

@@ -1,8 +1,10 @@
-import UserPolicy from '#policies/user.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { defineDocs } from '#core/openapi/types'
+
 import AdministratorUserUpdateUseCase from './update.use-case.ts'
+
+import { defineDocs } from '#core/openapi/types'
+import UserPolicy from '#policies/user.policy'
 import { UserUpdateValidator } from '#features/administrator/users/users.validator'
 import { IdentifierValidator } from '#core/validator'
 

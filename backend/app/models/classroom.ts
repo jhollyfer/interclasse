@@ -1,8 +1,9 @@
+import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+
 import { ClassroomSchema } from '#database/schema'
 import Student from '#models/student'
 import User from '#models/user'
-import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { Category } from '#core/entity'
 
 /** A turma: a unidade que compete. Cada modalidade forma um time por turma. */

@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
+
 import {
   authenticateAsAdministrator,
   body,
@@ -92,9 +93,9 @@ test.group('jogos > conselheiro e representante', (group) => {
     dentro.assertStatus(200)
     assert.lengthOf(
       body(dentro).students.filter((student: { sportIds: string[] }) =>
-        student.sportIds.includes(sport.id)
+        student.sportIds.includes(sport.id),
       ),
-      3
+      3,
     )
     acima.assertStatus(422)
     assert.equal(body(acima).code, 'ENROLLMENT_LIMIT_EXCEEDED')

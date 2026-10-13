@@ -1,6 +1,7 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import { DateTime } from 'luxon'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
+
 import { messageOf } from '#core/entity'
 
 /** Quantas horas um `PENDING` pode ficar de pé antes de ser considerado abandonado. */
@@ -33,10 +34,11 @@ const DEFAULT_HOURS = 24
  * como ausente.
  */
 export default class StoragesPrune extends BaseCommand {
-  static commandName = 'storages:prune'
-  static description = 'Apaga os uploads PENDING abandonados e aborta o multipart de cada um'
+  static override commandName = 'storages:prune'
+  static override description =
+    'Apaga os uploads PENDING abandonados e aborta o multipart de cada um'
 
-  static options: CommandOptions = { startApp: true }
+  static override options: CommandOptions = { startApp: true }
 
   @flags.number({
     description: `Idade mínima, em horas, para considerar um PENDING abandonado (padrão: ${DEFAULT_HOURS})`,
@@ -48,7 +50,7 @@ export default class StoragesPrune extends BaseCommand {
   })
   declare dryRun: boolean
 
-  async run() {
+  override async run() {
     const { default: Storage } = await import('#models/storage')
     const { default: StoragesFileDeleteUseCase } =
       await import('#features/storages/files/delete/delete.use-case')

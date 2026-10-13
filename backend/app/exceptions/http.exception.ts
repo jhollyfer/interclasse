@@ -73,7 +73,7 @@ export default class HTTPException extends Exception {
   static BadRequest(
     message = 'Requisição inválida',
     code = 'INVALID_PARAMETERS',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 400, code, errors })
   }
@@ -81,7 +81,7 @@ export default class HTTPException extends Exception {
   static Unauthorized(
     message = 'Não autorizado',
     code = 'AUTHENTICATION_REQUIRED',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 401, code, errors })
   }
@@ -89,7 +89,7 @@ export default class HTTPException extends Exception {
   static Forbidden(
     message = 'Acesso negado',
     code = 'ACCESS_DENIED',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 403, code, errors })
   }
@@ -97,7 +97,7 @@ export default class HTTPException extends Exception {
   static NotFound(
     message = 'Recurso não encontrado',
     code = 'RESOURCE_NOT_FOUND',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 404, code, errors })
   }
@@ -105,7 +105,7 @@ export default class HTTPException extends Exception {
   static Conflict(
     message = 'Conflito na requisição',
     code = 'CONFLICT_IN_REQUEST',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 409, code, errors })
   }
@@ -119,7 +119,7 @@ export default class HTTPException extends Exception {
   static PreconditionFailed(
     message = 'Condição prévia não atendida',
     code = 'PRECONDITION_NOT_MET',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 412, code, errors })
   }
@@ -132,7 +132,7 @@ export default class HTTPException extends Exception {
    */
   static PayloadTooLarge(
     message = 'Conteúdo excede o tamanho permitido',
-    code = 'PAYLOAD_TOO_LARGE'
+    code = 'PAYLOAD_TOO_LARGE',
   ): HTTPException {
     return new HTTPException({ message, status: 413, code })
   }
@@ -140,7 +140,7 @@ export default class HTTPException extends Exception {
   /** O `Content-Type` não é um dos que a rota aceita. */
   static UnsupportedMediaType(
     message = 'Formato de conteúdo não suportado',
-    code = 'UNSUPPORTED_MEDIA_TYPE'
+    code = 'UNSUPPORTED_MEDIA_TYPE',
   ): HTTPException {
     return new HTTPException({ message, status: 415, code })
   }
@@ -158,7 +158,7 @@ export default class HTTPException extends Exception {
    */
   static TooManyRequests(
     message = 'Tentativas em excesso. Tente novamente mais tarde',
-    code = 'TOO_MANY_REQUESTS'
+    code = 'TOO_MANY_REQUESTS',
   ): HTTPException {
     return new HTTPException({ message, status: 429, code })
   }
@@ -166,7 +166,7 @@ export default class HTTPException extends Exception {
   static UnprocessableEntity(
     message = 'Dados inválidos',
     code = 'UNPROCESSABLE_ENTITY',
-    errors?: Record<string, string>
+    errors?: Record<string, string>,
   ): HTTPException {
     return new HTTPException({ message, status: 422, code, errors })
   }
@@ -175,21 +175,21 @@ export default class HTTPException extends Exception {
 
   static InternalServerError(
     message = 'Erro interno do servidor',
-    code = 'SERVER_ERROR'
+    code = 'SERVER_ERROR',
   ): HTTPException {
     return new HTTPException({ message, status: 500, code })
   }
 
   static ServiceUnavailable(
     message = 'Serviço indisponível',
-    code = 'SERVICE_UNAVAILABLE'
+    code = 'SERVICE_UNAVAILABLE',
   ): HTTPException {
     return new HTTPException({ message, status: 503, code })
   }
   /** A rota existe e o caminho ainda não foi construído. */
   static NotImplemented(
     message = 'Funcionalidade não implementada',
-    code = 'NOT_IMPLEMENTED'
+    code = 'NOT_IMPLEMENTED',
   ): HTTPException {
     return new HTTPException({ message, status: 501, code })
   }
@@ -197,7 +197,7 @@ export default class HTTPException extends Exception {
   /** O terceiro respondeu, e respondeu errado. */
   static BadGateway(
     message = 'Resposta inválida do serviço externo',
-    code = 'BAD_GATEWAY'
+    code = 'BAD_GATEWAY',
   ): HTTPException {
     return new HTTPException({ message, status: 502, code })
   }
@@ -205,7 +205,7 @@ export default class HTTPException extends Exception {
   /** O terceiro não respondeu a tempo. */
   static GatewayTimeout(
     message = 'O serviço externo não respondeu a tempo',
-    code = 'GATEWAY_TIMEOUT'
+    code = 'GATEWAY_TIMEOUT',
   ): HTTPException {
     return new HTTPException({ message, status: 504, code })
   }

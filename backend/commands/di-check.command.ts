@@ -1,6 +1,7 @@
-import { BaseCommand } from '@adonisjs/core/ace'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+
+import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
 /**
@@ -19,10 +20,11 @@ import type { CommandOptions } from '@adonisjs/core/types/ace'
  * bucket e SMTP, e este comando roda no CI, onde nada disso existe.
  */
 export default class DiCheck extends BaseCommand {
-  static commandName = 'di:check'
-  static description = 'Constroi todo service e policy pelo container e reprova o que nao sobe'
+  static override commandName = 'di:check'
+  static override description =
+    'Constroi todo service e policy pelo container e reprova o que nao sobe'
 
-  static options: CommandOptions = { startApp: true }
+  static override options: CommandOptions = { startApp: true }
 
   private async classesDe(diretorio: string, sufixo: string): Promise<string[]> {
     const caminho = join(this.app.appRoot.pathname, 'app', diretorio)
@@ -36,7 +38,7 @@ export default class DiCheck extends BaseCommand {
     })
   }
 
-  async run() {
+  override async run() {
     const alvos: Array<{ diretorio: string; arquivo: string }> = []
 
     for (const arquivo of await this.classesDe('services', '.service.ts')) {

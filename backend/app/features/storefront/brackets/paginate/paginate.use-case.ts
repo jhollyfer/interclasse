@@ -1,12 +1,13 @@
+import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+
 import Bracket from '#models/bracket'
 import Sport from '#models/sport'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, type Paginated } from '#core/entity'
 import type { BracketPaginatePayload } from '#features/storefront/brackets/brackets.validator'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = BracketPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
@@ -31,7 +32,7 @@ export default class StorefrontBracketPaginateUseCase {
       logger.error({ err: error }, '[storefront brackets > list][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_LIST_ERROR')
+        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_LIST_ERROR'),
       )
     }
   }
