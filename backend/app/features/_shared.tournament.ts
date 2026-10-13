@@ -6,7 +6,7 @@ import { MatchPhases, type MatchPhase } from '#core/entity'
  *
  * Funções sobre dados em mãos, sem banco - é o que as deixa em `_shared` e não
  * num service (_padroes/backend.md §4.9), e o que permite testá-las sem
- * subir nada: `tests/functional/torneio.spec.ts`.
+ * subir nada: `_shared.tournament.spec.ts`, ao lado.
  *
  * O formato é o da escola: mata-mata direto, do sorteio à final. Quando o
  * número de turmas não fecha uma potência de dois, as que sobram ficam de

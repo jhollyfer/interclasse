@@ -11,9 +11,8 @@ import { FIELD_LABELS } from '#core/validator'
  * A lista de campos sai dos próprios validators, e não de uma segunda lista
  * para manter em dia - campo novo em desacordo nasce vermelho.
  *
- * Está em `tests/functional/` pelo mesmo critério do resto da suíte: o que se
- * testa é um limite que o banco ou a resposta da API impõem e a aplicação
- * precisa antecipar.
+ * Ao lado de `validator.ts` porque é spec transversal: cobre todo validator do
+ * projeto, e não uma ação (_padroes/backend.md §7).
  */
 
 type Introspectable = { toJSONSchema: () => unknown }

@@ -364,7 +364,7 @@ function conferirImportEntreFeatures(relativo: string, fonte: string): Achado[] 
 
   let dono = partes.slice(0, -1)
   const pasta = dono[dono.length - 1]
-  const arquivo = basename(relativo).replace(/\.(controller|use-case|validator)\.ts$/, '')
+  const arquivo = basename(relativo).replace(/\.(controller|use-case|validator|spec)\.ts$/, '')
   if (pasta === arquivo && !relativo.endsWith('.validator.ts')) dono = dono.slice(0, -1)
   const prefixo = `${dono.join('/')}/`
 
