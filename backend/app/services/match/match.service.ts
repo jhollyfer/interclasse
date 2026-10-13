@@ -19,16 +19,16 @@ export type MatchFilters = {
  * (_padroes/backend.md §4.9): os dois lados pedem o mesmo recorte e a mesma
  * ordem, e duas cópias divergiriam na primeira coluna nova.
  */
-/**
- * Só o que a tabela de jogos mostra. Sem o `select`, a lista pública levava o
- * `advisorId` e o `representativeId` de cada turma - ids de conta que o site
- * anônimo não tem por que conhecer.
- */
-function publicClassroom(query: ModelQueryBuilderContract<typeof Classroom>) {
-  query.select('id', 'name', 'category')
-}
-
 export default class MatchService {
+  /**
+   * Só o que a tabela de jogos mostra. Sem o `select`, a lista pública levava o
+   * `advisorId` e o `representativeId` de cada turma - ids de conta que o site
+   * anônimo não tem por que conhecer.
+   */
+  private static publicClassroom(query: ModelQueryBuilderContract<typeof Classroom>) {
+    query.select('id', 'name', 'category')
+  }
+
   /**
    * Partidas com os dois times definidos, na ordem em que acontecem: as
    * marcadas por horário, depois as sem horário por rodada.
@@ -41,10 +41,10 @@ export default class MatchService {
       .whereNotNull('homeTeamId')
       .whereNotNull('awayTeamId')
       .preload('homeTeam', (team) => {
-        team.preload('classroom', publicClassroom)
+        team.preload('classroom', MatchService.publicClassroom)
       })
       .preload('awayTeam', (team) => {
-        team.preload('classroom', publicClassroom)
+        team.preload('classroom', MatchService.publicClassroom)
       })
       .preload('bracket', (bracket) => {
         bracket.preload('sport')

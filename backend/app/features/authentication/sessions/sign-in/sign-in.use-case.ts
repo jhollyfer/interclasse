@@ -3,7 +3,7 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
-import { ActiveStatuses } from '#core/entity'
+import { ACTIVE_STATUS } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import SessionService, { type SessionTokens } from '#services/session/session.service'
@@ -23,7 +23,7 @@ export default class AuthenticationSessionSignInUseCase {
       // `verifyCredentials` não conhece `deleted_at` nem `status`. Conta
       // arquivada e conta inativa recebem o mesmo 401 da senha errada: a
       // resposta não confirma que a conta existiu nem por que foi recusada.
-      if (user.deletedAt || user.status === ActiveStatuses.INACTIVE) {
+      if (user.deletedAt || user.status === ACTIVE_STATUS.INACTIVE) {
         return left(
           HTTPException.Unauthorized('Credenciais inválidas', 'INVALID_CREDENTIALS', {
             root: 'Dados de acesso inválidos',

@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
-import { ActiveStatuses, UserRoles } from '#core/entity'
+import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
@@ -23,7 +23,7 @@ const payload = {
   email: 'nova.pessoa@mail.com',
   password: 'Demo1234!',
   passwordConfirmation: 'Demo1234!',
-  role: UserRoles.ADVISOR,
+  role: USER_ROLE.ADVISOR,
 }
 
 test.group('administrador > users > listagem', (group) => {
@@ -50,7 +50,7 @@ test.group('administrador > users > listagem', (group) => {
 
     const response = await client
       .get('/administrator/users')
-      .qs({ role: UserRoles.ADVISOR })
+      .qs({ role: USER_ROLE.ADVISOR })
       .cookies(session)
 
     response.assertStatus(200)
@@ -66,7 +66,7 @@ test.group('administrador > users > listagem', (group) => {
 
     const response = await client
       .get('/administrator/users')
-      .qs({ status: ActiveStatuses.INACTIVE })
+      .qs({ status: ACTIVE_STATUS.INACTIVE })
       .cookies(session)
 
     response.assertStatus(200)

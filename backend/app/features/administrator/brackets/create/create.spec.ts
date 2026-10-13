@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 
-import { Categories, MatchPhases } from '#core/entity'
+import { CATEGORY, MATCH_PHASE } from '#core/entity'
 import {
   authenticateAsAdministrator,
   body,
@@ -73,7 +73,7 @@ async function draw(client: ApiClient, admin: Session, sportId: string) {
   const response = await client
     .post('/administrator/brackets')
     .cookies(admin)
-    .json({ sportId, category: Categories.F2 })
+    .json({ sportId, category: CATEGORY.F2 })
 
   response.assertStatus(201)
 
@@ -109,7 +109,7 @@ test.group('jogos > sorteio e placar', (group) => {
     const response = await client
       .post('/administrator/brackets')
       .cookies(admin)
-      .json({ sportId: sport.id, category: Categories.F2 })
+      .json({ sportId: sport.id, category: CATEGORY.F2 })
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'NOT_ENOUGH_TEAMS')
@@ -125,8 +125,8 @@ test.group('jogos > sorteio e placar', (group) => {
     const matches: Array<{ phase: string; homeTeamId: string | null; awayTeamId: string | null }> =
       body(detail).matches
 
-    const semis = matches.filter((match) => match.phase === MatchPhases.SEMI)
-    const final = matches.find((match) => match.phase === MatchPhases.FINAL)
+    const semis = matches.filter((match) => match.phase === MATCH_PHASE.SEMI)
+    const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
 
     assert.equal(body(detail).status, 'KNOCKOUT')
     // Chave de 4 com uma folga: só uma semifinal de verdade.
@@ -157,11 +157,11 @@ test.group('jogos > sorteio e placar', (group) => {
     await enrolledClassrooms(client, admin, sport.id, 4)
 
     const bracket = await draw(client, admin, sport.id)
-    await scoreAll(client, admin, bracket.id, MatchPhases.SEMI)
+    await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
 
     const antes = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
     const final = body(antes).matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
+      (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
     assert.isString(final.homeTeamId)
     assert.isString(final.awayTeamId)
@@ -187,7 +187,7 @@ test.group('jogos > sorteio e placar', (group) => {
     // Trocar o vencedor de uma semifinal depois da final jogada reescreveria a final.
     const semi = body(depois).matches.find(
       (match: { phase: string; winnerTeamId: string; homeTeamId: string }) =>
-        match.phase === MatchPhases.SEMI && match.winnerTeamId === match.homeTeamId,
+        match.phase === MATCH_PHASE.SEMI && match.winnerTeamId === match.homeTeamId,
     )
     const virada = await client
       .put(`/administrator/matches/${semi.id}/score`)
@@ -256,13 +256,13 @@ test.group('jogos > sorteio e placar', (group) => {
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 4)
     const bracket = await draw(client, admin, sport.id)
-    await scoreAll(client, admin, bracket.id, MatchPhases.SEMI)
-    await scoreAll(client, admin, bracket.id, MatchPhases.FINAL)
+    await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
+    await scoreAll(client, admin, bracket.id, MATCH_PHASE.FINAL)
 
     const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
-    const semi = jogada.matches.find((match: { phase: string }) => match.phase === MatchPhases.SEMI)
+    const semi = jogada.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
     const final = jogada.matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
+      (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
 
     // A semifinal não sai enquanto a final, que depende dela, tem placar.
@@ -281,7 +281,7 @@ test.group('jogos > sorteio e placar', (group) => {
 
     const depois = body(await client.get(`/storefront/brackets/${bracket.id}`))
     const finalDepois = depois.matches.find(
-      (match: { phase: string }) => match.phase === MatchPhases.FINAL,
+      (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
     assert.equal(depois.status, 'KNOCKOUT')
     assert.isNull(depois.championTeamId)
@@ -298,7 +298,7 @@ test.group('jogos > sorteio e placar', (group) => {
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 4)
     const bracket = await draw(client, admin, sport.id)
-    await scoreAll(client, admin, bracket.id, MatchPhases.SEMI)
+    await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
 
     const recusa = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
     recusa.assertStatus(409)

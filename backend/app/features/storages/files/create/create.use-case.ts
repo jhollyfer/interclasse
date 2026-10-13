@@ -12,7 +12,7 @@ import {
   type PresignedPart,
 } from '#services/multipart/multipart-contract.service'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import type { FileCreatePayload } from '#features/storages/files/files.validator'
 
 type Payload = FileCreatePayload
@@ -89,7 +89,7 @@ export default class StoragesFileCreateUseCase {
         mimetype: payload.mimetype,
         size: payload.size,
         path: key,
-        status: UploadStatuses.PENDING,
+        status: UPLOAD_STATUS.PENDING,
         uploadId,
         partSize: PART_SIZE,
       })

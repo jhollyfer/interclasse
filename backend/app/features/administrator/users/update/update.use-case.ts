@@ -9,7 +9,7 @@ import { StorageContract } from '#services/storage/storage-contract.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { ActiveStatuses, type Merge } from '#core/entity'
+import { ACTIVE_STATUS, type Merge } from '#core/entity'
 import type { UserUpdatePayload } from '#features/administrator/users/users.validator'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -78,7 +78,7 @@ export default class AdministratorUserUpdateUseCase {
         Boolean(payload.email && payload.email !== user.email) ||
         Boolean(payload.password) ||
         roleChanged ||
-        payload.status === ActiveStatuses.INACTIVE
+        payload.status === ACTIVE_STATUS.INACTIVE
 
       // `merge` só escreve as chaves presentes: campo ausente no payload não
       // vira `undefined` na linha. É o que faz o `PUT` ser parcial de verdade

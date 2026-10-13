@@ -1,4 +1,4 @@
-import type { OpenAPIResponse, SchemaObject } from './types.ts'
+import type { OpenAPIResponse, SchemaObject } from '#core/openapi/types'
 
 /**
  * As respostas de falha.

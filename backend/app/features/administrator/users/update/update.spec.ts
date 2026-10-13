@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 
-import { UserRoles } from '#core/entity'
+import { USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -23,7 +23,7 @@ test.group('administrador > users > atualização', (group) => {
     response.assertStatus(200)
     assert.equal(body(response).name, 'Editado')
     assert.equal(body(response).email, user.email)
-    assert.equal(body(response).role, UserRoles.ADVISOR)
+    assert.equal(body(response).role, USER_ROLE.ADVISOR)
     assert.notProperty(body(response), 'password')
   })
 
@@ -34,10 +34,10 @@ test.group('administrador > users > atualização', (group) => {
     const response = await client
       .put(`/administrator/users/${user.id}`)
       .cookies(session)
-      .json({ role: UserRoles.ADMINISTRATOR })
+      .json({ role: USER_ROLE.ADMINISTRATOR })
 
     response.assertStatus(200)
-    assert.equal(body(response).role, UserRoles.ADMINISTRATOR)
+    assert.equal(body(response).role, USER_ROLE.ADMINISTRATOR)
   })
 
   test('e-mail de outra conta responde 409', async ({ client, assert }) => {

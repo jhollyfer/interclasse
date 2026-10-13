@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 import { storageRow } from '#tests/storages-fixtures'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 
 /**
@@ -57,7 +57,7 @@ test.group('storages > listagem', (group) => {
     const session = await authenticateAsAdministrator(client)
 
     await storageRow()
-    const pendente = await storageRow({ status: UploadStatuses.PENDING })
+    const pendente = await storageRow({ status: UPLOAD_STATUS.PENDING })
 
     const response = await client.get('/storages').qs({ status: 'PENDING' }).cookies(session)
 
@@ -94,7 +94,7 @@ test.group('storages > listagem', (group) => {
     await storageRow({
       originalName: 'sem-o-termo-no-nome.png',
       mimetype: 'application/pdf',
-      status: UploadStatuses.PENDING,
+      status: UPLOAD_STATUS.PENDING,
     })
 
     const response = await client

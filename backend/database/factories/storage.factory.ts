@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
 
 import Storage from '#models/storage'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Registro de arquivo. A factory grava só a linha na tabela: nada vai para o
@@ -28,7 +28,7 @@ export const StorageFactory = factory
       mimetype: 'image/png',
       size: 1024,
       path: filename,
-      status: UploadStatuses.UPLOADED,
+      status: UPLOAD_STATUS.UPLOADED,
     }
   })
   .build()

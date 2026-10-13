@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { MatchPhases, type MatchPhase } from '#core/entity'
+import { MATCH_PHASE, type MatchPhase } from '#core/entity'
 
 /**
  * As regras do torneio, puras: sorteio e avanço no mata-mata.
@@ -39,10 +39,10 @@ export function shuffle<T>(items: ReadonlyArray<T>, random: Random = secureRando
 
 /** A fase pelo número de vagas que ela tem. */
 const PHASE_BY_SIZE: Record<number, MatchPhase> = {
-  2: MatchPhases.FINAL,
-  4: MatchPhases.SEMI,
-  8: MatchPhases.QUARTER,
-  16: MatchPhases.ROUND_OF_16,
+  2: MATCH_PHASE.FINAL,
+  4: MATCH_PHASE.SEMI,
+  8: MATCH_PHASE.QUARTER,
+  16: MATCH_PHASE.ROUND_OF_16,
 }
 
 /** A maior chave que existe: oitavas de final. A escola tem até 13 turmas por categoria. */
@@ -97,9 +97,9 @@ export function drawKnockout<T>(
 
 /** A fase seguinte do mata-mata. A final não tem. */
 const NEXT_PHASE: Partial<Record<MatchPhase, MatchPhase>> = {
-  [MatchPhases.ROUND_OF_16]: MatchPhases.QUARTER,
-  [MatchPhases.QUARTER]: MatchPhases.SEMI,
-  [MatchPhases.SEMI]: MatchPhases.FINAL,
+  [MATCH_PHASE.ROUND_OF_16]: MATCH_PHASE.QUARTER,
+  [MATCH_PHASE.QUARTER]: MATCH_PHASE.SEMI,
+  [MATCH_PHASE.SEMI]: MATCH_PHASE.FINAL,
 }
 
 export function nextPhase(phase: MatchPhase): MatchPhase | undefined {

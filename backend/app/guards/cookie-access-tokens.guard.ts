@@ -6,7 +6,7 @@ import type { AccessToken } from '@adonisjs/auth/access_tokens'
 import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 
 import User from '#models/user'
-import { ActiveStatuses } from '#core/entity'
+import { ACTIVE_STATUS } from '#core/entity'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import SessionService from '#services/session/session.service'
 
@@ -79,7 +79,7 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
       // auth, e o query builder não aceita `BigInt`. Aqui a chave é sempre uuid.
       .where('id', String(accessToken.tokenableId))
       .withScopes((scopes) => scopes.notDeleted())
-      .where('status', ActiveStatuses.ACTIVE)
+      .where('status', ACTIVE_STATUS.ACTIVE)
       .first()
 
     if (!user) throw this.#authenticationFailed()

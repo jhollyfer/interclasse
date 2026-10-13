@@ -5,9 +5,10 @@ import StoragesFileCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { FileCreateValidator } from '#features/storages/files/files.validator'
-import { STORAGE_MIMETYPES, UPLOAD_MAX_SIZE } from '#core/validator'
+import { STORAGE_MIMETYPES } from '#core/validator'
+import { UPLOAD_MAX_SIZE } from '#features/storages/files/files.validator'
 import { PART_SIZE } from '#services/multipart/multipart-contract.service'
-import { StorageUploadResponse } from '#core/response'
+import { StorageUploadResponse } from '#core/openapi/response'
 
 @inject()
 export default class StoragesFileCreateController {

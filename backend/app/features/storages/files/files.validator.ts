@@ -1,12 +1,7 @@
-import {
-  vine,
-  paginationFields,
-  sortFields,
-  STORAGE_MIMETYPES,
-  UPLOAD_MAX_SIZE,
-} from '#core/validator'
+import { vine, paginationFields, sortFields, STORAGE_MIMETYPES } from '#core/validator'
 import type { Infer } from '#core/validator'
 import { UPLOAD_STATUSES } from '#core/entity'
+import env from '#start/env'
 
 /**
  * O que `POST /storages` recebe: metadados, nunca bytes.
@@ -17,6 +12,13 @@ import { UPLOAD_STATUSES } from '#core/entity'
  * arquivo proibido de chegar ao bucket; conferir depois é o que impede que o
  * declarado tenha sido mentira.
  */
+/**
+ * O teto por arquivo, em bytes. Vem do ambiente e não tem default: sem a
+ * variável a aplicação nem sobe (`start/env.ts`). A coluna `size` é
+ * `bigint` justamente para não impor aqui um teto que o operador não pediu.
+ */
+export const UPLOAD_MAX_SIZE = env.get('UPLOAD_MAX_SIZE')
+
 export const FileCreateValidator = vine.create({
   fileName: vine.string().trim().minLength(1).maxLength(255),
   mimetype: vine.enum(STORAGE_MIMETYPES),

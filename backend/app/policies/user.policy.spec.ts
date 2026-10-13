@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import User from '#models/user'
-import { ActiveStatuses, UserRoles } from '#core/entity'
+import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -49,13 +49,13 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     const response = await client
       .put(`/administrator/users/${eu.id}`)
       .cookies(session)
-      .json({ role: UserRoles.ADVISOR })
+      .json({ role: USER_ROLE.ADVISOR })
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'SELF_ACCESS_FORBIDDEN')
 
     await eu.refresh()
-    assert.equal(eu.role, UserRoles.ADMINISTRATOR)
+    assert.equal(eu.role, USER_ROLE.ADMINISTRATOR)
   })
 
   test('desativar a própria conta responde 403 e não escreve', async ({ client, assert }) => {
@@ -65,13 +65,13 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     const response = await client
       .put(`/administrator/users/${eu.id}`)
       .cookies(session)
-      .json({ status: ActiveStatuses.INACTIVE })
+      .json({ status: ACTIVE_STATUS.INACTIVE })
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'SELF_ACCESS_FORBIDDEN')
 
     await eu.refresh()
-    assert.equal(eu.status, ActiveStatuses.ACTIVE)
+    assert.equal(eu.status, ACTIVE_STATUS.ACTIVE)
   })
 
   test('a guarda é só sobre papel e status: o próprio nome segue editável', async ({
@@ -95,7 +95,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const outro = await UserFactory.merge({ role: UserRoles.ADMINISTRATOR }).create()
+    const outro = await UserFactory.merge({ role: USER_ROLE.ADMINISTRATOR }).create()
 
     const response = await client.patch(`/administrator/users/${outro.id}/archive`).cookies(session)
 

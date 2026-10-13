@@ -5,7 +5,7 @@ import db from '@adonisjs/lucid/services/db'
 
 import Storage from '#models/storage'
 import User from '#models/user'
-import { UploadStatuses, UserRoles } from '#core/entity'
+import { UPLOAD_STATUS, USER_ROLE } from '#core/entity'
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import { authenticate, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -19,7 +19,7 @@ function upload() {
     mimetype: 'image/png',
     size: 1024,
     path: `${id}.png`,
-    status: UploadStatuses.UPLOADED,
+    status: UPLOAD_STATUS.UPLOADED,
   })
 }
 
@@ -33,7 +33,7 @@ const payload = {
   email: 'nova.pessoa@mail.com',
   password: 'Demo1234!',
   passwordConfirmation: 'Demo1234!',
-  role: UserRoles.ADVISOR,
+  role: USER_ROLE.ADVISOR,
 }
 
 /**

@@ -6,7 +6,7 @@ import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { categoryOf } from '#core/entity'
+import { categoryOf } from '#features/administrator/_shared.classroom'
 import type { ClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
 
 type Payload = ClassroomCreatePayload

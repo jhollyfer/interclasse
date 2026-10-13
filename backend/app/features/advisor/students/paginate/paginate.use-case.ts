@@ -7,7 +7,8 @@ import Student from '#models/student'
 import type User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION, UserRoles, type Merge, type Paginated } from '#core/entity'
+import { PAGINATION, USER_ROLE, type Merge } from '#core/entity'
+import { type Paginated } from '#core/response'
 import type { StudentPaginatePayload } from '#features/advisor/students/students.validator'
 
 type Payload = Merge<StudentPaginatePayload, { actor: User }>
@@ -21,7 +22,7 @@ export default class AdvisorStudentPaginateUseCase {
 
       // O recorte de escopo é uma subconsulta, e não uma checagem antes: turma
       // alheia responde lista vazia em vez de confirmar que existe.
-      if (actor.role !== UserRoles.ADMINISTRATOR)
+      if (actor.role !== USER_ROLE.ADMINISTRATOR)
         query.whereIn('classroomId', Classroom.query().where('advisorId', actor.id).select('id'))
 
       if (payload.classroomId) query.where('classroomId', payload.classroomId)

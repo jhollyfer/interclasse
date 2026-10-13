@@ -4,7 +4,7 @@ import logger from '@adonisjs/core/services/logger'
 import type { AccessToken } from '@adonisjs/auth/access_tokens'
 
 import User from '#models/user'
-import { ActiveStatuses } from '#core/entity'
+import { ACTIVE_STATUS } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
@@ -38,7 +38,7 @@ export default class AuthenticationSessionRefreshUseCase {
       const user = await User.query()
         .where('id', String(refreshToken.tokenableId))
         .withScopes((scopes) => scopes.notDeleted())
-        .where('status', ActiveStatuses.ACTIVE)
+        .where('status', ACTIVE_STATUS.ACTIVE)
         .first()
 
       if (!user) {

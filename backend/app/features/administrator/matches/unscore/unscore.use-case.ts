@@ -7,7 +7,7 @@ import Match from '#models/match'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { BracketStatuses, MatchStatuses } from '#core/entity'
+import { BRACKET_STATUS, MATCH_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -28,7 +28,7 @@ export default class AdministratorMatchUnscoreUseCase {
 
       if (!match) return left(HTTPException.NotFound('Partida não encontrada', 'MATCH_NOT_FOUND'))
 
-      if (match.status !== MatchStatuses.FINISHED)
+      if (match.status !== MATCH_STATUS.FINISHED)
         return left(HTTPException.Conflict('A partida ainda não tem placar', 'MATCH_NOT_PLAYED'))
 
       const phase = nextPhase(match.phase)
@@ -53,7 +53,7 @@ export default class AdministratorMatchUnscoreUseCase {
             .where('position', slot.position)
             .first()
 
-        if (next && next.status === MatchStatuses.FINISHED) return 'next-played'
+        if (next && next.status === MATCH_STATUS.FINISHED) return 'next-played'
 
         if (next) {
           next.useTransaction(trx)
@@ -67,14 +67,14 @@ export default class AdministratorMatchUnscoreUseCase {
           homeScore: null,
           awayScore: null,
           winnerTeamId: null,
-          status: MatchStatuses.SCHEDULED,
+          status: MATCH_STATUS.SCHEDULED,
         })
         await match.save()
 
         // Sem final jogada, não há campeã: a chave volta a estar em disputa.
-        if (bracket.status === BracketStatuses.FINISHED) {
+        if (bracket.status === BRACKET_STATUS.FINISHED) {
           bracket.useTransaction(trx)
-          bracket.status = BracketStatuses.KNOCKOUT
+          bracket.status = BRACKET_STATUS.KNOCKOUT
           await bracket.save()
         }
 

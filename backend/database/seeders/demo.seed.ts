@@ -14,7 +14,7 @@ import User from '#models/user'
 import TournamentSeeder from '#database/seeders/tournament.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
-import { ActiveStatuses, Categories, MatchPhases, UserRoles, type Category } from '#core/entity'
+import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '#core/entity'
 
 /**
  * Um campeonato de demonstração, no meio do caminho: contas dos três papéis,
@@ -97,8 +97,8 @@ export default class extends BaseSeeder {
             name,
             email: `${login}@escola.demo`,
             password,
-            role: UserRoles.ADVISOR,
-            status: ActiveStatuses.ACTIVE,
+            role: USER_ROLE.ADVISOR,
+            status: ACTIVE_STATUS.ACTIVE,
           },
         ),
       )
@@ -117,8 +117,8 @@ export default class extends BaseSeeder {
         name: `Representante do ${classroom.name}`,
         email: `${login}@escola.demo`,
         password,
-        role: UserRoles.REPRESENTATIVE,
-        status: ActiveStatuses.ACTIVE,
+        role: USER_ROLE.REPRESENTATIVE,
+        status: ACTIVE_STATUS.ACTIVE,
       },
     )
   }
@@ -262,10 +262,10 @@ export default class extends BaseSeeder {
 
     const sport = async (slug: string) => Sport.findByOrFail('slug', slug)
     const plan: Array<{ slug: string; category: Category; stage: Stage }> = [
-      { slug: 'futsal', category: Categories.F2, stage: 'semi' },
-      { slug: 'queimada', category: Categories.F1, stage: 'final' },
-      { slug: 'volei', category: Categories.F2, stage: 'first' },
-      { slug: 'futsal', category: Categories.F1, stage: 'drawn' },
+      { slug: 'futsal', category: CATEGORY.F2, stage: 'semi' },
+      { slug: 'queimada', category: CATEGORY.F1, stage: 'final' },
+      { slug: 'volei', category: CATEGORY.F2, stage: 'first' },
+      { slug: 'futsal', category: CATEGORY.F1, stage: 'drawn' },
     ]
 
     let day = 0
@@ -313,12 +313,12 @@ export default class extends BaseSeeder {
     let first = true
 
     for (const phase of [
-      MatchPhases.ROUND_OF_16,
-      MatchPhases.QUARTER,
-      MatchPhases.SEMI,
-      MatchPhases.FINAL,
+      MATCH_PHASE.ROUND_OF_16,
+      MATCH_PHASE.QUARTER,
+      MATCH_PHASE.SEMI,
+      MATCH_PHASE.FINAL,
     ]) {
-      if (phase === MatchPhases.FINAL && stage === 'semi') return
+      if (phase === MATCH_PHASE.FINAL && stage === 'semi') return
 
       const matches = await Match.query()
         .where('bracketId', bracketId)

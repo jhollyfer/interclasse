@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
 
 import User from '#models/user'
-import { ActiveStatuses, UserRoles } from '#core/entity'
+import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 
 /**
  * Senha de todo usuário criado por factory. Passa na política de
@@ -24,10 +24,10 @@ export const UserFactory = factory
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
     password: FACTORY_PASSWORD,
-    role: UserRoles.ADVISOR,
-    status: ActiveStatuses.ACTIVE,
+    role: USER_ROLE.ADVISOR,
+    status: ACTIVE_STATUS.ACTIVE,
   }))
-  .state('administrator', (user) => (user.role = UserRoles.ADMINISTRATOR))
-  .state('representative', (user) => (user.role = UserRoles.REPRESENTATIVE))
-  .state('inactive', (user) => (user.status = ActiveStatuses.INACTIVE))
+  .state('administrator', (user) => (user.role = USER_ROLE.ADMINISTRATOR))
+  .state('representative', (user) => (user.role = USER_ROLE.REPRESENTATIVE))
+  .state('inactive', (user) => (user.status = ACTIVE_STATUS.INACTIVE))
   .build()

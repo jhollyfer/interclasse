@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
 import Storage from '#models/storage'
-import { UploadStatuses } from '#core/entity'
+import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Uma linha com os metadados escolhidos, para os testes de listagem.
@@ -20,7 +20,7 @@ export function storageRow(attributes: Partial<Storage> = {}) {
     mimetype: 'image/png',
     size: 1024,
     path: filename,
-    status: UploadStatuses.UPLOADED,
+    status: UPLOAD_STATUS.UPLOADED,
     ...attributes,
   })
 }

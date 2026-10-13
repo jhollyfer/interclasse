@@ -5,7 +5,8 @@ import type { ModelObject } from '@adonisjs/lucid/types/model'
 import MatchService from '#services/match/match.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { MatchStatuses, PAGINATION, type Paginated } from '#core/entity'
+import { MATCH_STATUS, PAGINATION } from '#core/entity'
+import { type Paginated } from '#core/response'
 import type { MatchPaginatePayload } from '#features/storefront/matches/matches.validator'
 
 type Payload = MatchPaginatePayload
@@ -21,7 +22,7 @@ export default class StorefrontMatchPaginateUseCase {
 
       // Resultado se lê do mais recente para trás: troca a ordem de agenda do
       // service, em vez de só acrescentar um critério depois dela.
-      if (payload.status === MatchStatuses.FINISHED) query.clearOrder().orderBy('updatedAt', 'desc')
+      if (payload.status === MATCH_STATUS.FINISHED) query.clearOrder().orderBy('updatedAt', 'desc')
 
       const matches = await query.paginate(
         payload.page ?? PAGINATION.PAGE,

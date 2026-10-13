@@ -1,4 +1,4 @@
-import { TrashedModes, type TrashedMode } from '#core/entity'
+import { TRASHED_MODE, type TrashedMode } from '#core/entity'
 
 /**
  * Consulta de um model com o par de scopes de soft delete (_padroes/backend.md
@@ -21,5 +21,5 @@ export function applyTrashed(query: TrashableQuery, mode: TrashedMode | undefine
     query.withScopes((scopes) => scopes.notDeleted())
     return
   }
-  if (mode === TrashedModes.ONLY) query.withScopes((scopes) => scopes.onlyDeleted())
+  if (mode === TRASHED_MODE.ONLY) query.withScopes((scopes) => scopes.onlyDeleted())
 }

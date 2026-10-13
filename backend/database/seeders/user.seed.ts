@@ -2,7 +2,7 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 import env from '#start/env'
 import User from '#models/user'
-import { ActiveStatuses, UserRoles } from '#core/entity'
+import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 
 /**
  * O primeiro administrador. Nenhum endpoint cria conta sem sessão - o painel é
@@ -53,8 +53,8 @@ export default class extends BaseSeeder {
         name: 'Administrador',
         email,
         password,
-        role: UserRoles.ADMINISTRATOR,
-        status: ActiveStatuses.ACTIVE,
+        role: USER_ROLE.ADMINISTRATOR,
+        status: ACTIVE_STATUS.ACTIVE,
         deletedAt: null,
       },
     )

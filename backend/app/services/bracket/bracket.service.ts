@@ -1,6 +1,6 @@
 import Bracket from '#models/bracket'
 import type Match from '#models/match'
-import { BracketStatuses, MatchPhases, type BracketStatus, type Category } from '#core/entity'
+import { BRACKET_STATUS, MATCH_PHASE, type BracketStatus, type Category } from '#core/entity'
 
 export type BracketDetail = {
   id: string
@@ -61,9 +61,9 @@ export default class BracketService {
 
   /** O campeão de uma chave terminada: o vencedor da final. */
   private champion(bracket: Bracket): string | null {
-    if (bracket.status !== BracketStatuses.FINISHED) return null
+    if (bracket.status !== BRACKET_STATUS.FINISHED) return null
 
-    const final = bracket.matches.find((match) => match.phase === MatchPhases.FINAL)
+    const final = bracket.matches.find((match) => match.phase === MATCH_PHASE.FINAL)
 
     return final?.winnerTeamId ?? null
   }
