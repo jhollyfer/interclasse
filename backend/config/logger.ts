@@ -11,7 +11,7 @@ import env from '#start/env'
  * dentro do literal de configuração para um valor que metade dos ambientes
  * descarta.
  */
-async function destinoDeDesenvolvimento() {
+async function developmentDestination() {
   if (app.inProduction) return undefined
 
   return syncDestination()
@@ -81,7 +81,7 @@ const loggerConfig = defineConfig({
       /**
        * Use sync destination in non-production for immediate flush.
        */
-      destination: await destinoDeDesenvolvimento(),
+      destination: await developmentDestination(),
 
       /**
        * Configure where logs are written.
