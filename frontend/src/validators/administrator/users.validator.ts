@@ -1,5 +1,6 @@
 import {
   vine,
+  notNull,
   email,
   paginationFields,
   password,
@@ -82,8 +83,14 @@ export const UserCreateValidator = vine.create({
  * papel por `/account`.
  */
 export const UserUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120).optional(),
-  email: email().optional(),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(120)
+    .optional()
+    .use(notNull()),
+  email: email().optional().use(notNull()),
   password: password().optional(),
   /**
    * Declarado pela mesma razão da criação. Opcional como a senha, e pelo mesmo
@@ -91,8 +98,8 @@ export const UserUpdateValidator = vine.create({
    * transforma o `''` em `null`.
    */
   passwordConfirmation: vine.string().maxLength(32).optional(),
-  role: manageableRole().optional(),
-  status: activeStatus().optional(),
+  role: manageableRole().optional().use(notNull()),
+  status: activeStatus().optional().use(notNull()),
   avatarId: vine.string().uuid().nullable().optional(),
 })
 

@@ -1,4 +1,4 @@
-import { vine, LIST_LIMITS, paginationFields, sortFields } from '#core/validator'
+import { vine, notNull, LIST_LIMITS, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 export const SPORT_SORT_COLUMNS = ['name', 'createdAt'] as const
@@ -15,9 +15,9 @@ export const SportCreateValidator = vine.create({
 })
 
 export const SportUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(60).optional(),
-  minAthletes: athletes().optional(),
-  maxAthletes: athletes().optional(),
+  name: vine.string().trim().minLength(1).maxLength(60).optional().use(notNull()),
+  minAthletes: athletes().optional().use(notNull()),
+  maxAthletes: athletes().optional().use(notNull()),
 })
 
 export const SportPaginateValidator = vine.create({

@@ -1,5 +1,6 @@
 import {
   vine,
+  notNull,
   email,
   password,
   activeStatus,
@@ -66,11 +67,11 @@ export const UserCreateValidator = vine.create({
  * papel por `/account`.
  */
 export const UserUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120).optional(),
-  email: email().optional(),
-  password: password().optional(),
-  role: manageableRole().optional(),
-  status: activeStatus().optional(),
+  name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
+  email: email().optional().use(notNull()),
+  password: password().optional().use(notNull()),
+  role: manageableRole().optional().use(notNull()),
+  status: activeStatus().optional().use(notNull()),
   avatarId: vine.string().uuid().nullable().optional(),
 })
 

@@ -141,4 +141,15 @@ test.group('conta > atualização', (group) => {
     response.assertStatus(422)
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
+
+  test('nome vazio responde 422 e não grava', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.put('/account').cookies(session).json({ name: '   ' })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'name')
+    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    assert.notEqual(user.name.trim(), '')
+  })
 })

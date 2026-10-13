@@ -89,4 +89,21 @@ test.group('administrador > users > atualização', (group) => {
 
     response.assertStatus(404)
   })
+
+  test('papel nulo ou nome vazio responde 422 e não grava', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const user = await UserFactory.merge({ name: 'Original' }).create()
+
+    for (const payload of [{ role: null }, { name: '' }]) {
+      const response = await client
+        .put(`/administrator/users/${user.id}`)
+        .cookies(session)
+        .json(payload)
+
+      response.assertStatus(422)
+    }
+    await user.refresh()
+    assert.equal(user.name, 'Original')
+    assert.equal(user.role, USER_ROLE.ADVISOR)
+  })
 })

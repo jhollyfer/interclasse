@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
-import type { Infer } from '@vinejs/vine/types'
+import type { FieldContext, Infer } from '@vinejs/vine/types'
 
 import {
   ACTIVE_STATUSES,
@@ -62,6 +62,25 @@ export const LIST_LIMITS = {
   /** Atletas de uma turma numa modalidade. Nenhuma modalidade escolar inscreve mais. */
   ATHLETES: 40,
 } as const
+
+/**
+ * `null` explícito recusado num campo `optional()` que não é `nullable()`.
+ *
+ * O `optional()` do VineJS 4 trata `null` como ausente e o tira do payload, e o
+ * bodyparser converte `""` em `null` (`convertEmptyStringsToNull`). Juntos, um
+ * `title: ""` num update virava "não mexer" e respondia 200 com o valor antigo.
+ * `implicit` porque a regra precisa rodar justamente quando o valor é `null`.
+ */
+const notNullRule = vine.createRule(
+  (value: unknown, _options: undefined, field: FieldContext) => {
+    if (value === null) field.report('Informe {{ field }}', 'required', field)
+  },
+  { implicit: true },
+)
+
+export function notNull() {
+  return notNullRule()
+}
 
 export function email() {
   return vine.string().email().maxLength(254)
@@ -356,6 +375,7 @@ export const RULE_MESSAGES = {
   'positive': 'Informe um valor maior que zero',
   'withoutDecimals': 'Informe um número inteiro',
   'array.maxLength': 'Informe no máximo {{ max }} itens',
+  'isoDateTime': 'Informe data e hora em ISO 8601 com fuso',
 
   // Senha
   // Os quatro `.regex()` de `password()` reportam todos a chave

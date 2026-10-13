@@ -77,26 +77,27 @@ test.group('announcements > update', (group) => {
     assert.equal(stored.title, announcement.title)
   })
 
-  test('título vazio ou só de espaços é "não mexer", e não 422', async ({ client, assert }) => {
+  test('título vazio, só de espaços ou nulo responde 422 e não grava', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
-    // O bodyparser apara e converte `''` em `null` (`trimWhitespaces` e
-    // `convertEmptyStringsToNull`), e o campo opcional nulo sai do payload: o
-    // título gravado fica, e o `minLength(1)` do validator nem chega a rodar.
-    const empty = await client
-      .put(`/administrator/announcements/${announcement.id}`)
-      .cookies(session)
-      .json({ title: '' })
-    const blank = await client
-      .put(`/administrator/announcements/${announcement.id}`)
-      .cookies(session)
-      .json({ title: '   ' })
+    // O bodyparser apara e converte `''` em `null`; sem `notNull()`, o
+    // `optional()` tirava o `null` do payload e a resposta era 200 com o
+    // título antigo.
+    for (const title of ['', '   ', null]) {
+      const response = await client
+        .put(`/administrator/announcements/${announcement.id}`)
+        .cookies(session)
+        .json({ title })
 
-    empty.assertStatus(200)
-    assert.equal(body(empty).title, announcement.title)
-    blank.assertStatus(200)
-    assert.equal(body(blank).title, announcement.title)
+      response.assertStatus(422)
+      assert.property(body(response).errors, 'title')
+    }
+    const stored = await Announcement.findOrFail(announcement.id)
+    assert.equal(stored.title, announcement.title)
   })
 
   test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
