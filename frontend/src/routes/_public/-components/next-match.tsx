@@ -1,9 +1,9 @@
 import type * as React from 'react'
 
-import { CATEGORY_LABELS } from '#/lib/labels'
+import { CATEGORY_LABELS, formatWhen  } from '#/lib/labels'
 import type { IMatch } from '#/lib/interfaces'
 
-import { formatWhen, phaseLabel, scoreOf } from './match-row'
+import { phaseLabel, scoreOf } from './match-row'
 
 /**
  * O placar do herói: o próximo jogo, ou o último resultado quando não há jogo
@@ -21,8 +21,8 @@ export function NextMatch({
 
   if (!match) {
     return (
-      <div className="rounded-lg border border-white/15 bg-black/20 p-6 text-white/80">
-        <p className="font-display text-2xl font-extrabold uppercase italic text-white">
+      <div className="rounded-lg border border-brand-ink-foreground/15 bg-brand-ink-shade/20 p-6 text-brand-ink-foreground/80">
+        <p className="font-display text-2xl font-extrabold uppercase italic text-brand-ink-foreground">
           Sorteio em breve
         </p>
         <p className="mt-2">
@@ -36,9 +36,9 @@ export function NextMatch({
   if (!next) title = 'Último resultado'
 
   return (
-    <div className="rounded-lg border border-white/15 bg-black/25 p-6 text-white">
+    <div className="rounded-lg border border-brand-ink-foreground/15 bg-brand-ink-shade/25 p-6 text-brand-ink-foreground">
       <p className="text-brand font-semibold">{title}</p>
-      <p className="mt-1 text-sm text-white/70">
+      <p className="mt-1 text-sm text-brand-ink-foreground/70">
         {match.bracket?.sport?.name},{' '}
         {CATEGORY_LABELS[match.bracket?.category ?? '']}, {phaseLabel(match)}
       </p>
@@ -55,7 +55,7 @@ export function NextMatch({
         </span>
       </div>
 
-      <p className="mt-6 text-sm text-white/70">
+      <p className="mt-6 text-sm text-brand-ink-foreground/70">
         {formatWhen(match.scheduledAt)}
         {match.location && `, ${match.location}`}
       </p>

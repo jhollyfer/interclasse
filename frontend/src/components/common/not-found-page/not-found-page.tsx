@@ -62,7 +62,7 @@ export function NotFoundPage({
 
       {/* O placar do site, e não um painel preto genérico: o troféu em cima,
           o código embaixo, sem um cobrir o outro. */}
-      <div className="hero relative flex h-[40dvh] flex-col items-center justify-center gap-4 overflow-hidden text-white md:h-auto md:rounded-l-3xl">
+      <div className="hero relative flex h-[40dvh] flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
         <TrophyIcon className="text-brand size-16 md:size-20" weight="fill" />
         <span className="font-display text-brand text-[7rem] leading-none font-extrabold italic select-none md:text-[9rem]">
           {code}

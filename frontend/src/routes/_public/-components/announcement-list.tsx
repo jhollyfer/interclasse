@@ -2,9 +2,9 @@ import type * as React from 'react'
 import { PushPinIcon } from '@phosphor-icons/react'
 
 import type { IAnnouncement } from '#/lib/interfaces'
+import { formatWhen } from '#/lib/labels'
 
 import { Empty } from './section'
-import { formatWhen } from './match-row'
 
 export function AnnouncementList({
   announcements,

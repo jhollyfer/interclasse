@@ -1,6 +1,9 @@
 import { describe, expect, it, test } from 'vitest'
 
 import {
+  formatDayKey,
+  formatTime,
+  formatWhen,
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_DOTS,
   ACTIVE_STATUS_LABELS,
@@ -189,4 +192,23 @@ test('agenda no relógio da escola, qualquer que seja o fuso do navegador', () =
     '2026-12-01T07:30',
   )
   expect(toSchoolInput(null)).toBe('')
+})
+
+describe('datas da agenda, no fuso da escola', () => {
+  // 12:30 UTC é 08:30 em Manaus (UTC-4), seja qual for o fuso de quem roda.
+  const INSTANT = '2026-10-16T12:30:00.000Z'
+
+  it('formatTime mostra a hora da escola, ou o relógio vazio', () => {
+    expect(formatTime(INSTANT)).toBe('08:30')
+    expect(formatTime(null)).toBe('--:--')
+  })
+
+  it('formatDayKey agrupa pelo dia da escola, e não pelo UTC', () => {
+    expect(formatDayKey('2026-10-17T02:00:00.000Z')).toBe('2026-10-16')
+  })
+
+  it('formatWhen avisa quando o horário ainda não saiu', () => {
+    expect(formatWhen(null)).toBe('Horário a definir')
+    expect(formatWhen(INSTANT)).toContain('08:30')
+  })
 })

@@ -195,6 +195,57 @@ export function formatDate(value: string | null): string {
   return DATE_FORMAT.format(new Date(value))
 }
 
+const TIME_FORMAT = new Intl.DateTimeFormat('pt-BR', {
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: SCHOOL_TIME_ZONE,
+})
+
+/** "08:30", ou o relógio vazio de quem ainda não tem horário. */
+export function formatTime(value: string | null): string {
+  if (!value) return '--:--'
+
+  return TIME_FORMAT.format(new Date(value))
+}
+
+const DAY_FORMAT = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  timeZone: SCHOOL_TIME_ZONE,
+})
+
+/** "sexta-feira, 16 de outubro": o título de um dia da agenda. */
+export function formatDay(value: string): string {
+  return DAY_FORMAT.format(new Date(value))
+}
+
+/** `en-CA` porque escreve a data como `2026-10-16`, que serve de chave. */
+const DAY_KEY_FORMAT = new Intl.DateTimeFormat('en-CA', {
+  timeZone: SCHOOL_TIME_ZONE,
+})
+
+/** O dia no relógio da escola, `AAAA-MM-DD`: agrupa jogos do mesmo dia. */
+export function formatDayKey(value: string): string {
+  return DAY_KEY_FORMAT.format(new Date(value))
+}
+
+const WHEN_FORMAT = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'short',
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: SCHOOL_TIME_ZONE,
+})
+
+/** "sex., 16/10, 08:30", ou o aviso de que o horário ainda não saiu. */
+export function formatWhen(value: string | null): string {
+  if (!value) return 'Horário a definir'
+
+  return WHEN_FORMAT.format(new Date(value))
+}
+
 const ZONE_PARTS = new Intl.DateTimeFormat('en-US', {
   timeZone: SCHOOL_TIME_ZONE,
   hourCycle: 'h23',

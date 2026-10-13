@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
+import { cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { cn } from '#/lib/utils'
@@ -7,23 +9,43 @@ import { cn } from '#/lib/utils'
 import { AUTHENTICATION, NAVIGATION } from './menu'
 import type { MenuItem } from './menu'
 
-/** A pílula de cada destino, no topo e no menu móvel. */
-const LINK =
-  'rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-200 motion-reduce:transition-none'
+/**
+ * A pílula de cada destino: na faixa do topo (`bar`) ou no painel do celular
+ * (`panel`). Variante de estilo do próprio link, via `cva`, e não prop
+ * booleana de estrutura.
+ */
+const navigationLinkVariants = cva(
+  'font-medium transition-colors duration-200 motion-reduce:transition-none',
+  {
+    variants: {
+      variant: {
+        bar: 'rounded-full px-4 py-1.5 text-sm',
+        panel: 'block rounded-lg px-4 py-3 text-base',
+      },
+    },
+    defaultVariants: { variant: 'bar' },
+  },
+)
 
-const MOBILE_LINK =
-  'block rounded-lg px-4 py-3 text-base font-medium transition-colors duration-200 motion-reduce:transition-none'
+type NavigationLinkVariant = NonNullable<
+  VariantProps<typeof navigationLinkVariants>['variant']
+>
 
 /**
- * O item ativo é o âmbar da marca, e o inativo é o branco esmaecido sobre o
- * escuro institucional. Não é `text-foreground`: esta faixa não inverte com o
- * tema - ela é escura nos dois -, então a tinta é declarada aqui e não herdada.
+ * O item ativo é o âmbar da marca, e o inativo é a tinta clara esmaecida sobre
+ * o verde-noite. Não é `text-foreground`: esta faixa não inverte com o tema -
+ * ela é escura nos dois -, então a tinta é o token da faixa.
  */
-const ACTIVE = 'bg-brand text-brand-ink font-semibold'
-const INACTIVE = 'text-white/70 hover:bg-white/10 hover:text-white'
+const ACTIVE = {
+  bar: 'bg-brand text-brand-ink font-semibold',
+  panel: 'text-brand font-semibold',
+} satisfies Record<NavigationLinkVariant, string>
 
-const MOBILE_ACTIVE = 'text-brand font-semibold'
-const MOBILE_INACTIVE = 'text-white/70 hover:bg-white/5 hover:text-white'
+const INACTIVE = {
+  bar: 'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground',
+  panel:
+    'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/5 hover:text-brand-ink-foreground',
+} satisfies Record<NavigationLinkVariant, string>
 
 /** Um destino da navegação, na faixa do topo ou no painel do celular. */
 /** O rótulo do botão do menu, pelo estado dele. */
@@ -38,28 +60,17 @@ const MENU_PANEL: Record<string, string> = {
   false: 'invisible',
 }
 
+type NavigationLinkProps = Readonly<{
+  item: MenuItem
+  variant?: NavigationLinkVariant
+  onNavigate?: () => void
+}>
+
 function NavigationLink({
   item,
-  mobile = false,
+  variant = 'bar',
   onNavigate,
-}: {
-  item: MenuItem
-  mobile?: boolean
-  onNavigate?: () => void
-}): React.JSX.Element {
-  // Um `if` para os três, e não três ternários: a decisão é uma só - qual jogo
-  // de classes vale nesta faixa - e escrevê-la em cada linha convida a que uma
-  // delas fique para trás no dia em que a faixa mudar.
-  let base = LINK
-  let inactive = INACTIVE
-  let active = ACTIVE
-
-  if (mobile) {
-    base = MOBILE_LINK
-    inactive = MOBILE_INACTIVE
-    active = MOBILE_ACTIVE
-  }
-
+}: NavigationLinkProps): React.JSX.Element {
   return (
     <Link
       data-slot="public-header-link"
@@ -70,9 +81,9 @@ function NavigationLink({
       // `inactiveProps` e não `className`: o Router soma `className` com
       // `activeProps`, e as duas cores juntas deixavam o texto branco sobre o
       // amarelo no item ativo.
-      className={base}
-      activeProps={{ className: active }}
-      inactiveProps={{ className: inactive }}
+      className={navigationLinkVariants({ variant })}
+      activeProps={{ className: ACTIVE[variant] }}
+      inactiveProps={{ className: INACTIVE[variant] }}
       onClick={onNavigate}
     >
       {item.label}
@@ -112,16 +123,19 @@ export function Header(): React.JSX.Element {
   return (
     <header
       data-slot="public-header"
-      className="fixed top-0 left-0 z-50 w-full border-b border-white/5 bg-brand-ink/95 backdrop-blur-md"
+      className="fixed top-0 left-0 z-50 w-full border-b border-brand-ink-foreground/5 bg-brand-ink/95 backdrop-blur-md"
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex shrink-0 items-center text-white">
+        <Link
+          to="/"
+          className="flex shrink-0 items-center text-brand-ink-foreground"
+        >
           <BrandMark />
         </Link>
 
         <nav
           data-slot="public-header-navigation"
-          className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1.5 md:flex"
+          className="hidden items-center gap-1 rounded-full border border-brand-ink-foreground/10 bg-brand-ink-foreground/5 px-2 py-1.5 md:flex"
         >
           {NAVIGATION.map((item) => (
             <NavigationLink key={item.label} item={item} />
@@ -130,7 +144,7 @@ export function Header(): React.JSX.Element {
           <Link
             to={AUTHENTICATION.to}
             className={cn(
-              LINK,
+              navigationLinkVariants({ variant: 'bar' }),
               'ml-2 bg-brand font-semibold text-brand-ink active:scale-[0.97]',
             )}
           >
@@ -150,7 +164,7 @@ export function Header(): React.JSX.Element {
           aria-expanded={open}
           aria-label={MENU_LABEL[String(open)]}
           onClick={() => setOpen((previous) => !previous)}
-          className="group flex size-8 flex-col items-center justify-center gap-[5px] text-white md:hidden"
+          className="group flex size-8 flex-col items-center justify-center gap-[5px] text-brand-ink-foreground md:hidden"
         >
           <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:translate-y-[7px] group-data-open:rotate-45 motion-reduce:transition-none" />
           <span className="block h-px w-5 origin-center bg-current transition-transform duration-200 group-data-open:scale-x-0 motion-reduce:transition-none" />
@@ -167,7 +181,7 @@ export function Header(): React.JSX.Element {
       <div
         data-slot="public-header-mobile"
         data-open={open || undefined}
-        className="grid grid-rows-[0fr] overflow-hidden border-white/10 opacity-0 transition-[grid-template-rows,opacity] duration-300 data-open:grid-rows-[1fr] data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
+        className="grid grid-rows-[0fr] overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-[grid-template-rows,opacity] duration-300 data-open:grid-rows-[1fr] data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
         aria-hidden={!open}
       >
         <nav
@@ -180,7 +194,7 @@ export function Header(): React.JSX.Element {
             <NavigationLink
               key={item.label}
               item={item}
-              mobile
+              variant="panel"
               onNavigate={close}
             />
           ))}
@@ -189,7 +203,7 @@ export function Header(): React.JSX.Element {
             to={AUTHENTICATION.to}
             onClick={close}
             className={cn(
-              MOBILE_LINK,
+              navigationLinkVariants({ variant: 'panel' }),
               'mt-3 rounded-full bg-brand text-center font-semibold text-brand-ink active:scale-[0.97]',
             )}
           >

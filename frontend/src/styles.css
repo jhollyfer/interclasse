@@ -16,8 +16,11 @@
  * Vem do site anterior (`site-jogos-estudantis/codigo-fonte/base.html`): o verde
  * da quadra, o verde-noite do cabeçalho e o amarelo do placar.
  *
- *   --brand      o amarelo do placar e dos destaques
- *   --brand-ink  o verde-noite do cabeçalho e do rodapé
+ *   --brand              o amarelo do placar e dos destaques
+ *   --brand-ink          o verde-noite do cabeçalho e do rodapé
+ *   --brand-ink-foreground  a tinta clara sobre o verde-noite (texto, filete,
+ *                        véu translúcido com `/opacidade`)
+ *   --brand-ink-shade    a sombra sobre o verde-noite (cartão afundado)
  *
  * O amarelo é cor de ACENTO: anel de foco, item ativo, placar. A ação primária
  * é o verde da quadra.
@@ -27,6 +30,10 @@
 :root {
   --brand: #ffd400;
   --brand-ink: #04260f;
+  /* A faixa verde-noite não inverte com o tema: as duas tintas dela também
+     não, e por isso só existem aqui. */
+  --brand-ink-foreground: #ffffff;
+  --brand-ink-shade: #000000;
   /* #12873a do site antigo dava 4,4:1 sobre o fundo claro; este é o mesmo
      verde um tom abaixo, e passa de 4,5:1 para texto. */
   --field: #0f7a34;
@@ -233,6 +240,8 @@
      existirem sem ninguém precisar escrever a literal de novo. */
   --color-brand: var(--brand);
   --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-foreground: var(--brand-ink-foreground);
+  --color-brand-ink-shade: var(--brand-ink-shade);
 
   --color-badge-neutral: var(--badge-neutral);
   --color-badge-neutral-foreground: var(--badge-neutral-fg);
