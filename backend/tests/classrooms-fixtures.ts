@@ -4,6 +4,8 @@ import type Classroom from '#models/classroom'
 import type Sport from '#models/sport'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { TeamFactory } from '#database/factories/team.factory'
+import { categoryOf } from '#features/administrator/_shared.classroom'
 import { signInWithFactory } from '#tests/helpers'
 
 /**
@@ -35,4 +37,20 @@ export async function signInAsRepresentativeOfClassroom(client: ApiClient) {
  */
 export function drawSport(sport: Sport, classroom: Classroom) {
   return BracketFactory.merge({ sportId: sport.id, category: classroom.category }).create()
+}
+
+/**
+ * Uma turma já numa chave sorteada: a linha de `teams` que a liga a uma chave.
+ *
+ * É o estado que trava `delete` e a troca de categoria em `update`. Não passa
+ * pelo sorteio, que exige modalidade, inscrições e outras turmas: para a guarda
+ * basta a turma ter um time.
+ */
+export async function drawnClassroom(grade = 7) {
+  const classroom = await ClassroomFactory.merge({ grade, category: categoryOf(grade) }).create()
+  const bracket = await BracketFactory.with('sport').create()
+
+  await TeamFactory.merge({ bracketId: bracket.id, classroomId: classroom.id }).create()
+
+  return classroom
 }
