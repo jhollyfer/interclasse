@@ -1,6 +1,6 @@
 import type * as React from 'react'
 
-import { CATEGORY_LABELS, formatWhen  } from '#/lib/labels'
+import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import type { IMatch } from '#/lib/interfaces'
 
 import { phaseLabel, scoreOf } from './match-row'

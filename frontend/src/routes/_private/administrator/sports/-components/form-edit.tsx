@@ -24,7 +24,7 @@ import { useResourceForm } from '#/hooks/use-resource-form'
 import type { SportFormType } from './form-fields'
 import { SPORT_FIELDS, SportFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/sports/$id/edit')
+const route = getRouteApi('/_private/administrator/sports/$id/edit/')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
 export function SportFormEdit(): React.JSX.Element {

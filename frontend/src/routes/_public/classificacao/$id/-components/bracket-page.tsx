@@ -1,5 +1,5 @@
+import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
-import { createLazyFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { TrophyIcon } from '@phosphor-icons/react'
 
@@ -14,11 +14,9 @@ import {
 } from '#/lib/labels'
 import { cn } from '#/lib/utils'
 
-import { Section } from '../-components/section'
+import { Section } from '../../../-components/section'
 
-export const Route = createLazyFileRoute('/_public/classificacao/$id')({
-  component: Bracket,
-})
+const route = getRouteApi('/_public/classificacao/$id/')
 
 /** Uma linha de jogo da chave: os dois times, o vencedor em destaque. */
 function Row({ match }: { match: IBracketMatch }): React.JSX.Element {
@@ -60,8 +58,8 @@ function Row({ match }: { match: IBracketMatch }): React.JSX.Element {
   )
 }
 
-function Bracket(): React.JSX.Element {
-  const { id } = Route.useParams()
+export function BracketPage(): React.JSX.Element {
+  const { id } = route.useParams()
   const { data: bracket } = useSuspenseQuery(storefrontBracketQueryOptions(id))
 
   const champion = championName(bracket)

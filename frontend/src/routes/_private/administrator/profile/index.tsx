@@ -13,7 +13,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
  * qualquer coisa, então não pisca uma tela vazia no caminho. Sem `component`
  * porque nada chega a renderizar.
  */
-export const Route = createFileRoute('/_private/administrator/profile')({
+export const Route = createFileRoute('/_private/administrator/profile/')({
   beforeLoad: () => {
     throw redirect({ to: '/profile' })
   },
