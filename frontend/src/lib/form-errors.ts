@@ -1,7 +1,11 @@
 import { toast } from 'sonner'
 import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
-import type { HTTPError } from '#/integrations/tanstack-query/http'
+import {
+  HTTPError,
+  HTTPErrorCode,
+  HTTPStatus,
+} from '#/integrations/tanstack-query/http'
 
 /**
  * Leva o erro da API para os campos do formulário.
@@ -97,13 +101,66 @@ export function applyMutationError<TValues extends FieldValues>({
 }): void {
   if (applyHTTPErrorToForm({ form, error, fields })) return
 
-  if (retry && error.isServerError) {
-    toast.error(error.message, {
-      id: retry.id,
-      action: { label: 'Tentar de novo', onClick: retry.onClick },
-    })
+  if (retry && isRetrySafe(error)) {
+    notifyError(error, { id: retry.id, retry: retry.onClick })
     return
   }
 
-  form.setError('root', { message: error.message })
+  form.setError('root', { message: httpErrorMessage(error) })
+}
+
+/**
+ * O texto que a tela mostra para um erro da API, escolhido pelo `code`.
+ *
+ * O `message` de um 4xx é escrito pelo backend para quem lê a tela ("Turma
+ * já existe") e passa como veio. O de um 5xx é do servidor para o log: a tela
+ * mostra o texto daqui, sem detalhe de implementação.
+ */
+const HTTP_ERROR_MESSAGES: Record<string, string | undefined> = {
+  [HTTPErrorCode.NETWORK_ERROR]:
+    'Não foi possível conectar ao servidor. Tente novamente.',
+  [HTTPErrorCode.UNKNOWN_ERROR]: 'Erro inesperado. Tente novamente.',
+}
+
+const SERVER_ERROR_MESSAGE = 'O servidor não conseguiu concluir. Tente de novo.'
+
+export function httpErrorMessage(error: Error): string {
+  // Erro que não veio de `request` (o upload recusando o tipo do arquivo, por
+  // exemplo) já traz o texto da tela.
+  if (!(error instanceof HTTPError)) return error.message
+
+  const known = HTTP_ERROR_MESSAGES[error.code]
+  if (known) return known
+  if (error.isServerError) return SERVER_ERROR_MESSAGE
+
+  return error.message
+}
+
+/**
+ * Se reenviar o mesmo pedido pode dar certo: conflito (409), servidor ou
+ * rede. Um 422 de validação ou um 403 de autorização voltam iguais, e o botão
+ * de "Tentar de novo" só confundiria quem clica (`frontend.md` §4).
+ */
+export function isRetrySafe(error: Error): boolean {
+  if (!(error instanceof HTTPError)) return false
+
+  return error.status === HTTPStatus.CONFLICT || error.isServerError
+}
+
+/**
+ * O aviso de erro de uma ação fora de formulário, para todo `onError` de
+ * mutation que não cai num campo (remover, arquivar, salvar
+ * inscrições). `id` fixo para tentativas seguidas substituírem o aviso em vez
+ * de empilharem; `retry` vira a ação "Tentar de novo" só quando o erro é
+ * retry-seguro.
+ */
+export function notifyError(
+  error: Error,
+  { id, retry }: { readonly id: string; readonly retry?: () => void },
+): void {
+  let action: { label: string; onClick: () => void } | undefined
+  if (retry && isRetrySafe(error))
+    action = { label: 'Tentar de novo', onClick: retry }
+
+  toast.error(httpErrorMessage(error), { id, action })
 }

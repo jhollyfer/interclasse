@@ -20,7 +20,7 @@ type BulkArchiveProps<TItem> = {
   /** O que arquivar um item. Quase sempre `(item) => archive.mutateAsync(item.id)`. */
   action: (item: TItem) => Promise<unknown>
   /**
-   * O prefixo do recurso no cache - `queryKeys.notices.all`.
+   * O prefixo do recurso no cache - `queryKeys.administrator.users.all`.
    *
    * A invalidação é **uma**, depois do laço inteiro, e não uma por item: com N
    * itens o `onSuccess` da mutation dispararia N refetches da mesma listagem,

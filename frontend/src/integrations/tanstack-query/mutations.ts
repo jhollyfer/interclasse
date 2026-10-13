@@ -30,7 +30,9 @@ import type {
   ISport,
   IStorage,
   IStudent,
-  IUser, IEnrollmentBoard , Merge 
+  IUser,
+  IEnrollmentBoard,
+  Merge,
 } from '#/lib/interfaces'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 import type {

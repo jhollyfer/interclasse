@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Button } from '#/components/ui/button'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { notifyError } from '#/lib/form-errors'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +15,7 @@ import {
 import { Field, FieldLabel } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
-import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import {
   useMatchScore,
@@ -52,16 +53,11 @@ type DialogProps = {
   onOpenChange: (open: boolean) => void
 }
 
-/** Placar e agenda mexem na chave inteira: invalida `games`, que cobre as duas. */
-function useInvalidateGames() {
-  const queryClient = useQueryClient()
+/** Placar e agenda mexem na chave inteira, e ela no site e nas inscrições. */
+function useInvalidateGames(): () => Promise<void> {
+  const invalidate = useInvalidate()
 
-  return () =>
-    Promise.all(
-      [queryKeys.games.all, ...DEPENDENTS.games].map((queryKey) =>
-        queryClient.invalidateQueries({ queryKey }),
-      ),
-    )
+  return () => invalidate([...GAME_KEYS, ...DEPENDENTS.games])
 }
 
 /**
@@ -87,7 +83,7 @@ export function MatchScoreDialog({
       await invalidate()
       onOpenChange(false)
     },
-    onError: (error) => toast.error(error.message, { id: 'match-score' }),
+    onError: (error) => notifyError(error, { id: 'match-score' }),
   })
 
   const tied = home !== '' && home === away
@@ -189,7 +185,7 @@ export function MatchScheduleDialog({
       await invalidate()
       onOpenChange(false)
     },
-    onError: (error) => toast.error(error.message, { id: 'match-update' }),
+    onError: (error) => notifyError(error, { id: 'match-update' }),
   })
 
   function submit(event: React.FormEvent) {
@@ -258,7 +254,7 @@ export function MatchUnscoreDialog({
       toast.success('Placar desfeito.')
       await invalidate()
     },
-    onError: (error) => toast.error(error.message, { id: 'match-unscore' }),
+    onError: (error) => notifyError(error, { id: 'match-unscore' }),
   })
 
   return (

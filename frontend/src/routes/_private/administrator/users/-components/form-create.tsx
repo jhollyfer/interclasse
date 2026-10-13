@@ -44,7 +44,7 @@ export function UserFormCreate(): React.JSX.Element {
     defaults: USER_FORM_DEFAULTS,
     fields: USER_FIELDS,
     mutation: useUserCreate,
-    invalidate: queryKeys.users.all,
+    invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users',
     success: (user) => `Conta de ${user.name} criada.`,
     // Com `retry`, ao contrário dos depoimentos: o `create.use-case.ts` recusa

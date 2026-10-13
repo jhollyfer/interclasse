@@ -2,6 +2,24 @@ import { QueryClient } from '@tanstack/react-query'
 
 import { HTTPError } from './http'
 
+/** Quantas vezes uma query que falhou por servidor ou rede é repetida. */
+const MAX_QUERY_RETRIES = 3
+
+/**
+ * O `retry` padrão das queries: repete 5xx e falha de rede, e nunca 4xx.
+ *
+ * 401, 403, 404 e 422 não mudam de resposta na terceira tentativa - só atrasam
+ * a mensagem de erro na tela. O `instanceof` fica mesmo com
+ * `Register.defaultError` declarado em `register.d.ts`: aquilo é promessa de
+ * compilação, e um throw que não venha de `request` (um bug, um `TypeError`)
+ * chega mesmo assim.
+ */
+export function shouldRetryQuery(failures: number, error: unknown): boolean {
+  if (error instanceof HTTPError && !error.isServerError) return false
+
+  return failures < MAX_QUERY_RETRIES
+}
+
 /**
  * O `QueryClient` que vai para o contexto do router.
  *
@@ -34,19 +52,7 @@ export function getContext() {
         // cache a guarda junto - `staleTime` acima daquele prazo serve imagem
         // com URL vencida, e a falha aparece como imagem quebrada, sem erro.
         staleTime: 60 * 1000,
-        retry: (failures, error) => {
-          // 401, 403, 404 e 422 não mudam de resposta na terceira tentativa -
-          // só atrasam a mensagem de erro na tela. 5xx e falha de rede, que é o
-          // que `isServerError` cobre, ainda merecem outra chance.
-          //
-          // O `instanceof` continua aqui mesmo com `Register.defaultError`
-          // declarado em `register.d.ts`: aquilo é promessa de compilação, e um throw
-          // que não venha de `request` - um bug, um `TypeError` - chega mesmo
-          // assim.
-          if (error instanceof HTTPError && !error.isServerError) return false
-
-          return failures < 3
-        },
+        retry: shouldRetryQuery,
       },
     },
   })

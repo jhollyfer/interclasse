@@ -45,7 +45,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
     },
     fields: ANNOUNCEMENT_FIELDS,
     mutation: useAnnouncementUpdate,
-    invalidate: queryKeys.announcements.all,
+    invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
     success: () => 'Aviso salvo.',

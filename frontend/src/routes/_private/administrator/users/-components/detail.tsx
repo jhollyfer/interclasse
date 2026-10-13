@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner'
 
 import { Button } from '#/components/ui/button'
+import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderActions,
@@ -68,25 +69,27 @@ export function UserDetail(): React.JSX.Element {
   const { data: user } = useSuspenseQuery(userQueryOptions(id))
 
   async function invalidate(): Promise<void> {
-    await queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+    await queryClient.invalidateQueries({
+      queryKey: queryKeys.administrator.users.all,
+    })
   }
 
   const archive = useUserArchive({
-    onError: (error) => toast.error(error.message, { id: 'user-archive' }),
+    onError: (error) => notifyError(error, { id: 'user-archive' }),
     async onSuccess() {
       toast.success(`Conta de ${user.name} arquivada.`)
       await invalidate()
       // Arquivado, o detalhe responde 404 (o backend esconde o arquivado
       // fora da lixeira): ficar aqui deixava a tela parada no estado antigo.
-      await await router.navigate({ to: '/administrator/users' })
+      await router.navigate({ to: '/administrator/users' })
     },
   })
   const unarchive = useUserUnarchive({
-    onError: (error) => toast.error(error.message, { id: 'user-archive' }),
+    onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: invalidate,
   })
   const remove = useUserDelete({
-    onError: (error) => toast.error(error.message, { id: 'user-delete' }),
+    onError: (error) => notifyError(error, { id: 'user-delete' }),
     async onSuccess() {
       await invalidate()
       // O registro não existe mais: ficar na tela dele daria 404 no próximo

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { toast } from 'sonner'
 
 import { Field } from '#/components/ui/field'
+import { notifyError } from '#/lib/form-errors'
 import {
   useStorageCreate,
   useStorageDelete,
@@ -95,7 +96,7 @@ export function ImageField({
       // teto é o `UPLOAD_MAX_SIZE` dele -, então a mensagem que vem é a que diz
       // o limite real; repetir o número aqui seria garantir que os dois
       // divergissem.
-      toast.error(error.message, { id: 'storage-create-error' })
+      notifyError(error, { id: 'storage-create-error' })
     },
   })
 

@@ -1,7 +1,8 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type { Merge,
+import type {
+  Merge,
   IBracketDetail,
   IEnrollmentBoard,
   IPaginated,
@@ -11,7 +12,8 @@ import type { Merge,
   IMatch,
   ISport,
   IStudent,
-  IUser } from '#/lib/interfaces'
+  IUser,
+} from '#/lib/interfaces'
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
 
 import { request } from './http'
@@ -87,7 +89,7 @@ function search(params: Record<string, unknown>): string {
  */
 export const accountQueryOptions = () =>
   queryOptions({
-    queryKey: queryKeys.account.all,
+    queryKey: queryKeys.account.profile.all,
     // O `signal` vem da própria biblioteca e é repassado ao `fetch`: sem ele,
     // query que desmonta antes de resolver não cancela nada, e a resposta
     // atrasada de uma sessão anterior chega depois da atual.
@@ -109,7 +111,7 @@ export const accountQueryOptions = () =>
  */
 export const usersQueryOptions = (params: UserListSearch) =>
   queryOptions({
-    queryKey: queryKeys.users.list(params),
+    queryKey: queryKeys.administrator.users.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IUser>>(
         '/administrator/users'.concat(search(params)),
@@ -123,14 +125,14 @@ export const usersQueryOptions = (params: UserListSearch) =>
 /** O corpo vem nu, sem envelope - é o que o controller devolve. */
 export const userQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.users.detail(id),
+    queryKey: queryKeys.administrator.users.detail(id),
     queryFn: ({ signal }) =>
       request<IUser>('/administrator/users/'.concat(id), { signal }),
   })
 
 export const classroomsQueryOptions = (params: ClassroomListSearch) =>
   queryOptions({
-    queryKey: queryKeys.classrooms.list(params),
+    queryKey: queryKeys.administrator.classrooms.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IClassroom>>(
         '/administrator/classrooms'.concat(search(params)),
@@ -141,14 +143,14 @@ export const classroomsQueryOptions = (params: ClassroomListSearch) =>
 
 export const classroomQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.classrooms.detail(id),
+    queryKey: queryKeys.administrator.classrooms.detail(id),
     queryFn: ({ signal }) =>
       request<IClassroom>('/administrator/classrooms/'.concat(id), { signal }),
   })
 
 export const sportsQueryOptions = (params: ListSearch) =>
   queryOptions({
-    queryKey: queryKeys.sports.list(params),
+    queryKey: queryKeys.administrator.sports.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<ISport>>(
         '/administrator/sports'.concat(search(params)),
@@ -159,14 +161,14 @@ export const sportsQueryOptions = (params: ListSearch) =>
 
 export const sportQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.sports.detail(id),
+    queryKey: queryKeys.administrator.sports.detail(id),
     queryFn: ({ signal }) =>
       request<ISport>('/administrator/sports/'.concat(id), { signal }),
   })
 
 export const announcementsQueryOptions = (params: ListSearch) =>
   queryOptions({
-    queryKey: queryKeys.announcements.list(params),
+    queryKey: queryKeys.administrator.announcements.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IAnnouncement>>(
         '/administrator/announcements'.concat(search(params)),
@@ -177,7 +179,7 @@ export const announcementsQueryOptions = (params: ListSearch) =>
 
 export const announcementQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.announcements.detail(id),
+    queryKey: queryKeys.administrator.announcements.detail(id),
     queryFn: ({ signal }) =>
       request<IAnnouncement>('/administrator/announcements/'.concat(id), {
         signal,
@@ -186,7 +188,7 @@ export const announcementQueryOptions = (id: string) =>
 
 export const bracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
-    queryKey: queryKeys.brackets.list(params),
+    queryKey: queryKeys.administrator.brackets.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IBracket>>(
         '/administrator/brackets'.concat(search(params)),
@@ -198,7 +200,7 @@ export const bracketsQueryOptions = (params: BracketListSearch) =>
 /** A chave inteira, com a classificação calculada do placar. */
 export const bracketQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.brackets.detail(id),
+    queryKey: queryKeys.administrator.brackets.detail(id),
     queryFn: ({ signal }) =>
       request<IBracketDetail>('/administrator/brackets/'.concat(id), {
         signal,
@@ -207,7 +209,7 @@ export const bracketQueryOptions = (id: string) =>
 
 export const matchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
-    queryKey: queryKeys.matches.list(params),
+    queryKey: queryKeys.administrator.matches.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IMatch>>(
         '/administrator/matches'.concat(search(params)),
@@ -223,7 +225,7 @@ export const matchesQueryOptions = (params: MatchListSearch) =>
 /** As turmas do conselheiro. O administrador recebe todas. */
 export const advisorClassroomsQueryOptions = (params: ListSearch) =>
   queryOptions({
-    queryKey: queryKeys.advisorClassrooms.list(params),
+    queryKey: queryKeys.advisor.classrooms.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IClassroom>>(
         '/advisor/classrooms'.concat(search(params)),
@@ -234,7 +236,7 @@ export const advisorClassroomsQueryOptions = (params: ListSearch) =>
 
 export const studentsQueryOptions = (params: StudentListSearch) =>
   queryOptions({
-    queryKey: queryKeys.students.list(params),
+    queryKey: queryKeys.advisor.students.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IStudent>>(
         '/advisor/students'.concat(search(params)),
@@ -248,7 +250,7 @@ export const studentsQueryOptions = (params: StudentListSearch) =>
 /** A matriz aluno x modalidade de uma turma do conselheiro. */
 export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
   queryOptions({
-    queryKey: queryKeys.enrollments.board(classroomId),
+    queryKey: queryKeys.advisor.enrollments.board(classroomId),
     queryFn: ({ signal }) =>
       request<IEnrollmentBoard>(
         '/advisor/enrollments'.concat(search({ classroomId })),
@@ -259,7 +261,7 @@ export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
 /** A matriz da turma do representante. A turma sai da sessão: chave `null`. */
 export const representativeEnrollmentsQueryOptions = () =>
   queryOptions({
-    queryKey: queryKeys.enrollments.board(null),
+    queryKey: queryKeys.representative.enrollments.board,
     queryFn: ({ signal }) =>
       request<IEnrollmentBoard>('/representative/enrollments', { signal }),
     retry: false,
@@ -281,7 +283,7 @@ const LIVE = 60 * 1000
 
 export const storefrontSportsQueryOptions = () =>
   queryOptions({
-    queryKey: queryKeys.storefront.sports,
+    queryKey: queryKeys.storefront.sports.all,
     queryFn: ({ signal }) =>
       request<IPaginated<ISport>>('/storefront/sports?perPage=100', { signal }),
     staleTime: 5 * 60 * 1000,
@@ -289,7 +291,7 @@ export const storefrontSportsQueryOptions = () =>
 
 export const storefrontAnnouncementsQueryOptions = (params: StorefrontSearch) =>
   queryOptions({
-    queryKey: queryKeys.storefront.announcements(params),
+    queryKey: queryKeys.storefront.announcements.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IAnnouncement>>(
         '/storefront/announcements'.concat(search(params)),
@@ -300,7 +302,7 @@ export const storefrontAnnouncementsQueryOptions = (params: StorefrontSearch) =>
 
 export const storefrontMatchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
-    queryKey: queryKeys.storefront.matches(params),
+    queryKey: queryKeys.storefront.matches.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IMatch>>(
         '/storefront/matches'.concat(search(params)),
@@ -314,7 +316,7 @@ export const storefrontMatchesQueryOptions = (params: MatchListSearch) =>
 
 export const storefrontBracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
-    queryKey: queryKeys.storefront.brackets(params),
+    queryKey: queryKeys.storefront.brackets.list(params),
     queryFn: ({ signal }) =>
       request<IPaginated<IBracket>>(
         '/storefront/brackets'.concat(search(params)),
@@ -324,7 +326,7 @@ export const storefrontBracketsQueryOptions = (params: BracketListSearch) =>
 
 export const storefrontBracketQueryOptions = (id: string) =>
   queryOptions({
-    queryKey: queryKeys.storefront.bracket(id),
+    queryKey: queryKeys.storefront.brackets.detail(id),
     queryFn: ({ signal }) =>
       request<IBracketDetail>('/storefront/brackets/'.concat(id), { signal }),
     refetchInterval: LIVE,

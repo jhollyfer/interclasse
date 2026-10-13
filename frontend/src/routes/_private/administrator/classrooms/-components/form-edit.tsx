@@ -46,7 +46,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
     },
     fields: CLASSROOM_FIELDS,
     mutation: useClassroomUpdate,
-    invalidate: queryKeys.classrooms.all,
+    invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',
     success: (updated) => `Turma ${updated.name} salva.`,
