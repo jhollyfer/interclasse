@@ -8,7 +8,6 @@ import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { CopyIdMenuItem } from '#/components/common/copy-id-menu-item'
 import { notifyError } from '#/lib/form-errors'
 import {
   RowActions,
@@ -27,6 +26,8 @@ import {
   useUserUnarchive,
 } from '#/integrations/tanstack-query/mutations'
 import type { IUser } from '#/lib/interfaces'
+
+import { CopyIdMenuItem } from './copy-id-menu-item'
 
 type UserRowActionsProps = {
   user: IUser
