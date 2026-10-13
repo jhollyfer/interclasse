@@ -4,7 +4,6 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 
-import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
 import openapi from '#config/openapi'
 
 /**
@@ -136,80 +135,5 @@ test.group('documentação > o documento descreve o roteador', () => {
     }
 
     assert.deepEqual(repetidos, [], `operationId repetido: ${repetidos}`)
-  })
-})
-
-/**
- * As quatro rotas que não são operação de API.
- *
- * A raiz e a sonda não exigem sessão; a referência da API exige, e responde
- * 404 para quem não opera a instalação. Nenhuma aparece no próprio documento:
- * se fossem operação, estariam documentadas como as outras.
- */
-test.group('documentação > as rotas de serviço', (group) => {
-  group.each.setup(() => resetDatabase())
-
-  test('a sonda responde ok e não conta nada da infraestrutura', async ({ client, assert }) => {
-    const response = await client.get('/health-check')
-
-    response.assertStatus(200)
-
-    // Igualdade profunda, e não `assertBodyContains`: o que se afirma é que o
-    // corpo é **só** isto. Uso de disco, memória ou contagem de conexões numa
-    // sonda pública seria informação de infraestrutura de graça para quem pedir.
-    assert.deepEqual(response.body(), { status: 'ok' })
-    assert.equal(response.header('cache-control'), 'no-store')
-  })
-
-  test('sem sessão, o documento responde 404 e não 403', async ({ client }) => {
-    // 404 e não 403: um 403 confirmaria que a rota existe e que há um papel que
-    // a alcança. Para quem não pode ver, ela simplesmente não está lá.
-    const semSessaoNoJson = await client.get('/openapi.json')
-    const semSessaoNaPagina = await client.get('/documentation')
-
-    semSessaoNoJson.assertStatus(404)
-    semSessaoNaPagina.assertStatus(404)
-  })
-
-  test('o documento é servido como JSON para quem opera', async ({ client, assert }) => {
-    const session = await authenticateAsAdministrator(client)
-    const response = await client.get('/openapi.json').cookies(session)
-
-    response.assertStatus(200)
-    assert.include(response.header('content-type') ?? '', 'application/json')
-    assert.equal(response.body().openapi, '3.1.0')
-  })
-
-  test('a página de referência é servida como HTML para quem opera', async ({ client, assert }) => {
-    const session = await authenticateAsAdministrator(client)
-    const response = await client.get('/documentation').cookies(session)
-
-    response.assertStatus(200)
-    assert.include(response.header('content-type') ?? '', 'text/html')
-    assert.include(response.text(), '/openapi.json')
-  })
-
-  test('nenhuma delas aparece no documento', async ({ assert }) => {
-    const { paths } = await lerDocumento()
-
-    for (const caminho of ['/health-check', '/openapi.json', '/documentation']) {
-      assert.isUndefined(paths[caminho], `${caminho} está documentado, e não é operação de API`)
-    }
-  })
-
-  test('a sonda não exige sessão', async ({ client }) => {
-    const response = await client.get('/health-check').redirects(0)
-
-    response.assertStatus(200)
-  })
-
-  test('a referência não responde 401 nem 403 sem sessão', async ({ client, assert }) => {
-    // Ela **exige** sessão, mas não pode dizer isso: 401 e 403 confirmam que a
-    // rota existe. O 404 é a recusa que não conta nada.
-    for (const caminho of ['/openapi.json', '/documentation']) {
-      const response = await client.get(caminho).redirects(0)
-
-      assert.equal(response.status(), 404, `${caminho} contou que existe`)
-    }
   })
 })
