@@ -218,12 +218,12 @@ export default class HTTPException extends Exception {
  * nome. Marcar o campo que a pessoa não preencheu poria a mensagem sob um
  * input vazio, e quem digitou só o título não veria o que corrigir.
  *
- * Guarda com retorno cedo em vez de `[informado ? 'slug' : 'title']`: a mesma
+ * Guarda com retorno cedo em vez de `[provided ? 'slug' : 'title']`: a mesma
  * chave computada aparecia em oito use-cases, cada um repetindo a regra em vez
  * de nomeá-la.
  */
-export function slugErrorField<T extends string>(informado: unknown, alternativo: T): 'slug' | T {
-  if (informado) return 'slug'
+export function slugErrorField<T extends string>(provided: unknown, fallback: T): 'slug' | T {
+  if (provided) return 'slug'
 
-  return alternativo
+  return fallback
 }
