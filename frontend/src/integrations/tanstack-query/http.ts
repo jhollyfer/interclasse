@@ -32,6 +32,7 @@ export type HTTPErrorBody = {
 export const HTTPStatus = {
   /** Não houve resposta: DNS, CORS, backend fora do ar, requisição abortada. */
   NETWORK: 0,
+  NO_CONTENT: 204,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -284,7 +285,7 @@ async function refresh(
 ): Promise<string | undefined> {
   let renewed: string | undefined
 
-  await request<void>(
+  await send(
     '/authentication/refresh',
     { method: 'POST' },
     {
@@ -308,12 +309,14 @@ async function refresh(
  * Não há token em `localStorage`, `sessionStorage` ou `document.cookie`: os
  * dois cookies do backend são `httpOnly` e assinados, e o JavaScript da página
  * não os lê nem os escreve. Quem está logado se descobre perguntando à API.
+ *
+ * Devolve a resposta já aprovada; ler (ou não) o corpo é com `request` e `send`.
  */
-export async function request<T>(
+async function perform(
   path: string,
   init?: RequestInit,
   retry?: RequestRetry,
-): Promise<T> {
+): Promise<Response> {
   const cookie = retry?.cookie ?? inboundCookie()
 
   /**
@@ -387,7 +390,7 @@ export async function request<T>(
       // Se o refresh também falhar, o `HTTPError` dele sobe daqui e o guard da
       // rota trata como não autenticado - que é exatamente o que é.
       const renewed = await renew(cookie)
-      return await request<T>(path, init, {
+      return await perform(path, init, {
         cookie: renewed,
         skipRefresh: true,
       })
@@ -401,10 +404,38 @@ export async function request<T>(
     })
   }
 
-  // 204 do sign-in, do sign-out, do arquivamento e do purge: `.json()`
-  // estouraria em corpo vazio.
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  if (response.status === 204) return undefined as T
+  return response
+}
+
+/** Requisição que devolve um registro: o corpo JSON tipado como `T`. */
+export async function request<T>(
+  path: string,
+  init?: RequestInit,
+  retry?: RequestRetry,
+): Promise<T> {
+  const response = await perform(path, init, retry)
+
+  // Quem pede um `T` e recebe 204 está chamando a rota errada - e `.json()`
+  // estouraria com um `SyntaxError`, fora do contrato de sempre `HTTPError`.
+  if (response.status === HTTPStatus.NO_CONTENT) {
+    throw new HTTPError({
+      message: 'A API respondeu sem corpo onde se esperava um registro.',
+      status: response.status,
+      code: HTTPErrorCode.UNKNOWN_ERROR,
+    })
+  }
 
   return await response.json()
+}
+
+/**
+ * Requisição sem retorno: sign-in, sign-out, arquivamento, exclusão e purge.
+ * Respondem 204, e o corpo nunca é lido - `.json()` estouraria em corpo vazio.
+ */
+export async function send(
+  path: string,
+  init?: RequestInit,
+  retry?: RequestRetry,
+): Promise<void> {
+  await perform(path, init, retry)
 }

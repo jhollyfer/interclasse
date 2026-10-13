@@ -42,6 +42,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     backTo: '/administrator/announcements',
     success: () => 'Aviso publicado.',
     // Nome repetido é `409 ANNOUNCEMENT_ALREADY_EXISTS`: reenviar é seguro.
+    payload: (values) => values,
   })
 
   return (

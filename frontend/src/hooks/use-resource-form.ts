@@ -77,8 +77,13 @@ type UseResourceFormOptions<TValues extends FieldValues, TRecord, TPayload> = {
    * use-case recusa a duplicata com 409.
    */
   retry?: string
-  /** O que vai para a API, quando não é o formulário cru - a edição acrescenta o id. */
-  payload?: (values: TValues) => TPayload
+  /**
+   * O que vai para a API. A edição acrescenta o id; o cadastro cujo campo bate
+   * um a um com o corpo passa `(values) => values`, e é essa identidade que faz
+   * o compilador conferir que o formulário **é** o payload - os dois generics
+   * soltos não provam isso sozinhos.
+   */
+  payload: (values: TValues) => TPayload
 }
 
 type UseResourceFormReturn<TValues extends FieldValues, TRecord, TPayload> = {
@@ -185,15 +190,7 @@ export function useResourceForm<
     // resolvido continua no rodapé enquanto a segunda tentativa está em voo.
     form.clearErrors('root')
 
-    if (toPayload) mutation.mutate(toPayload(submitted))
-    // Sem `toPayload`, quem chamou está dizendo que `TValues` **é** o payload -
-    // é o caso do formulário cujo campo bate um a um com o corpo da requisição.
-    // O compilador não tem como provar isso a partir dos dois generics soltos, e
-    // amarrá-los (`TPayload extends TValues`) quebraria quem converte de
-    // verdade. A alternativa honesta é exigir `toPayload` sempre, o que
-    // obrigaria uma função identidade em metade dos formulários.
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    else mutation.mutate(submitted as unknown as TPayload)
+    mutation.mutate(toPayload(submitted))
   }
 
   return {

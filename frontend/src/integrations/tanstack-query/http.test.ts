@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { HTTPError, HTTPErrorCode, HTTPStatus, request } from './http'
+import { HTTPError, HTTPErrorCode, HTTPStatus, request, send } from './http'
 import { runInRequestScope } from './http.server'
 
 /**
@@ -75,7 +75,15 @@ test('toda requisição leva o cookie da sessão', async () => {
 test('204 resolve sem tentar ler corpo vazio', async () => {
   respond(204)
 
-  await expect(request('/authentication/sign-in')).resolves.toBeUndefined()
+  await expect(send('/authentication/sign-in')).resolves.toBeUndefined()
+})
+
+test('204 onde se esperava registro vira HTTPError, não SyntaxError', async () => {
+  respond(204)
+
+  const error = await rejection(request('/account'))
+  expect(error.code).toBe(HTTPErrorCode.UNKNOWN_ERROR)
+  expect(error.status).toBe(204)
 })
 
 test('422 vira erro de campo', async () => {

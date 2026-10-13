@@ -39,8 +39,8 @@ export function SportFormCreate(): React.JSX.Element {
     backTo: '/administrator/sports',
     success: (sport) => `Modalidade ${sport.name} criada.`,
     // Nome repetido é `409 SPORT_ALREADY_EXISTS`: reenviar é seguro.
-    // Nome repetido é `409 SPORT_ALREADY_EXISTS`: reenviar é seguro.
     retry: 'sport-create-error',
+    payload: (values) => values,
   })
 
   return (

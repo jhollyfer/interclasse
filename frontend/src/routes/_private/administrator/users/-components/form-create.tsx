@@ -50,6 +50,7 @@ export function UserFormCreate(): React.JSX.Element {
     // de um 5xx que possa ter gravado não cria uma segunda conta - esbarra no
     // 409 e diz isso.
     retry: 'user-create-error',
+    payload: (values) => values,
   })
 
   return (

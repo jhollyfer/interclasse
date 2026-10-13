@@ -55,13 +55,16 @@ test('duas execuções concorrentes não compartilham escopo', async () => {
   async function visitor(marca: string) {
     return runInRequestScope(async () => {
       const scope = requestScope()
-      scope!.renewal = Promise.resolve(marca)
+      if (!scope) throw new Error('esperava escopo dentro de runInRequestScope')
+      scope.renewal = Promise.resolve(marca)
 
       // Cede o turno: sem o AsyncLocalStorage, é aqui que o outro visitante
       // sobrescreveria o estado deste.
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      return await requestScope()!.renewal
+      const after = requestScope()
+      if (!after) throw new Error('o escopo sumiu depois do await')
+      return await after.renewal
     })
   }
 
