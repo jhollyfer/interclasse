@@ -23,7 +23,7 @@ export default class RepresentativeEnrollmentUpdateController {
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(RepresentativeEnrollmentUpdateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.user! })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

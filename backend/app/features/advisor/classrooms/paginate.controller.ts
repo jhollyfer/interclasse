@@ -15,7 +15,7 @@ export default class AdvisorClassroomPaginateController {
 
   async handle(context: HttpContext) {
     const payload = await PaginationValidator.validate(context.request.qs())
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.user! })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

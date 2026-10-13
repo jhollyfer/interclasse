@@ -3,33 +3,25 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import type { IdentifierPayload } from '#core/validator'
 
-type Payload = IdentifierPayload
+type Payload = { actor: User }
 type Response = Either<HTTPException, User>
 
 /**
- * A leitura da própria conta, com o id vindo da sessão.
+ * A leitura da própria conta: o `actor` da sessão (_padroes/backend.md §4.3).
  *
- * O `deletedAt` é filtrado aqui: o token de quem foi arquivado continua válido
- * até expirar - o guard só confere assinatura e validade -, e sem este filtro a
- * conta seguiria legível depois de arquivada.
+ * Sem nova consulta por id: o guard já leu a conta nesta requisição, com o
+ * filtro de arquivado e de inativo - quem foi arquivado não chega até aqui.
  */
 @inject()
 export default class AccountShowUseCase {
   async execute(payload: Payload): Promise<Response> {
     try {
-      // `avatar` precarregado: é parte do recurso, e a `url` dele é derivada na
+      // `avatar` carregado: é parte do recurso, e a `url` dele é derivada na
       // serialização pelo model `Storage`.
-      const user = await User.query()
-        .where('id', payload.id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .preload('avatar')
-        .first()
+      await payload.actor.load('avatar')
 
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
-
-      return right(user)
+      return right(payload.actor)
     } catch (error) {
       logger.error({ err: error }, '[account > show][error]')
 

@@ -32,6 +32,11 @@ export default class User extends compose(UserSchema, AuthFinder) {
     query.whereNull('deletedAt')
   })
 
+  /** O espelho de `notDeleted`: só o que está na lixeira (`unarchive`, `?trashed=only`). */
+  static onlyDeleted = scope((query) => {
+    query.whereNotNull('deletedAt')
+  })
+
   static accessTokens = DbAccessTokensProvider.forModel(User)
 
   /**

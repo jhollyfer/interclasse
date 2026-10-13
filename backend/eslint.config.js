@@ -51,6 +51,9 @@ const estilo = {
      * abaixo, e um `declare module` dentro de `.ts` pede disable pontual.
      */
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+
+    /** Sem `!` non-null: o tipo se estreita com guarda (_padroes/typescript.md §1). */
+    '@typescript-eslint/no-non-null-assertion': 'error',
   },
 }
 
@@ -71,7 +74,8 @@ const injecao = {
     'no-restricted-syntax': [
       'error',
       {
-        selector: 'NewExpression[callee.name=/(Service|UseCase|Policy|Controller)$/]',
+        selector:
+          'NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]',
         message:
           'Colaborador vem do container, não de `new`. Injete por construtor com @inject(). ' +
           'Se este é o composition root (provider, config, bootstrap), mova para lá.',
@@ -89,9 +93,6 @@ const composicao = {
     'providers/**/*.ts',
     'config/**/*.ts',
     'start/**/*.ts',
-    'commands/**/*.ts',
-    'database/seeders/**/*.ts',
-    'app/middleware/*_middleware.ts',
   ],
   rules: {
     'no-restricted-syntax': 'off',

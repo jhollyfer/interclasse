@@ -90,16 +90,6 @@
               }
             }
           },
-          "404": {
-            "description": "Usuário não encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error404UserNotFound"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -141,16 +131,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error401Unauthorized"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Usuário não encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error404UserNotFound"
                 }
               }
             }

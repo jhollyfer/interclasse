@@ -29,7 +29,7 @@ export default class AccountUpdateController {
 
   async handle(context: HttpContext) {
     const payload = await AccountUpdateValidator.validate(context.request.body())
-    const result = await this.useCase.execute({ ...payload, id: context.auth.user!.id })
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

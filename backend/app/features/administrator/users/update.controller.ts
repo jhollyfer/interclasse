@@ -37,7 +37,7 @@ export default class AdministratorUserUpdateController {
     const result = await this.useCase.execute({
       ...body,
       ...params,
-      actor: context.auth.user!,
+      actor: context.auth.getUserOrFail(),
     })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

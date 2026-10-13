@@ -46,9 +46,13 @@ export async function authenticate(
 
   response.assertStatus(204)
 
+  const access = response.cookie(COOKIE_TOKEN.ACCESS)
+  const refresh = response.cookie(COOKIE_TOKEN.REFRESH)
+  if (!access || !refresh) throw new Error('cookie de sessão ausente na resposta do sign-in')
+
   return {
-    [COOKIE_TOKEN.ACCESS]: response.cookie(COOKIE_TOKEN.ACCESS)!.value,
-    [COOKIE_TOKEN.REFRESH]: response.cookie(COOKIE_TOKEN.REFRESH)!.value,
+    [COOKIE_TOKEN.ACCESS]: access.value,
+    [COOKIE_TOKEN.REFRESH]: refresh.value,
   }
 }
 

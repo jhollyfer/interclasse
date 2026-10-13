@@ -15,7 +15,11 @@ export default class AdvisorStudentUpdateController {
   async handle(context: HttpContext) {
     const body = await AdvisorStudentUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
-    const result = await this.useCase.execute({ ...body, ...params, actor: context.auth.user! })
+    const result = await this.useCase.execute({
+      ...body,
+      ...params,
+      actor: context.auth.getUserOrFail(),
+    })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

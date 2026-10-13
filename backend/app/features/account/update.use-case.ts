@@ -6,9 +6,9 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { AccountUpdatePayload, IdentifierPayload } from '#core/validator'
+import type { AccountUpdatePayload } from '#core/validator'
 
-type Payload = Merge<AccountUpdatePayload, IdentifierPayload>
+type Payload = Merge<AccountUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, User>
 
 @inject()
@@ -17,22 +17,20 @@ export default class AccountUpdateUseCase {
 
   // `currentPassword` sai do payload aqui: ele é prova de identidade, não
   // coluna, e deixá-lo passar faria o `merge()` lá embaixo tentar gravá-lo.
-  async execute({ id, currentPassword, ...payload }: Payload): Promise<Response> {
+  async execute({ actor: user, currentPassword, ...payload }: Payload): Promise<Response> {
     try {
-      // `whereNull` como em `show.use-case.ts`: o token de quem foi arquivado
-      // vale até vencer, e sem o filtro a conta seguiria editável.
-      const user = await User.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .first()
-
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
+      // A conta é o `actor` da sessão: o guard já a leu com os filtros de
+      // arquivado e inativo, e reconsultar por id pagaria a mesma pergunta duas
+      // vezes (_padroes/backend.md §4.3).
 
       if (payload.email && payload.email !== user.email) {
         // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
         // inteira, então sem esta checagem o save estouraria a constraint e
         // viraria 500.
-        const exist = await User.query().where('email', payload.email).whereNot('id', id).first()
+        const exist = await User.query()
+          .where('email', payload.email)
+          .whereNot('id', user.id)
+          .first()
 
         if (exist)
           return left(
@@ -60,8 +58,11 @@ export default class AccountUpdateUseCase {
       // saber a atual.
       //
       // Que `currentPassword` exista quando `password` existe é o validator que
-      // garante (`requiredIfExists`), então aqui só falta conferir o valor.
-      if (payload.password && !(await hash.verify(user.password, currentPassword!)))
+      // garante (`requiredIfExists`); a checagem de ausência aqui só estreita o tipo.
+      if (
+        payload.password &&
+        (!currentPassword || !(await hash.verify(user.password, currentPassword)))
+      )
         return left(
           HTTPException.UnprocessableEntity('Senha atual inválida', 'CURRENT_PASSWORD_INVALID', {
             currentPassword: 'Senha atual inválida',

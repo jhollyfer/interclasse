@@ -26,11 +26,11 @@ type Documento = {
 let documento: Documento | undefined
 
 async function lerDocumento(): Promise<Documento> {
-  if (!documento) {
-    documento = JSON.parse(await readFile(app.makePath('openapi.json'), 'utf-8'))
-  }
+  if (documento) return documento
 
-  return documento!
+  const lido: Documento = JSON.parse(await readFile(app.makePath('openapi.json'), 'utf-8'))
+  documento = lido
+  return lido
 }
 
 /**

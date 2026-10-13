@@ -50,7 +50,10 @@ export default class extends BaseSeeder {
       return
     }
 
-    await new JogosSeeder(this.client).run()
+    // Pelo container, não por `new` (_padroes/backend.md §2.1): o construtor do
+    // seeder ganha dependência e a chamada continua montando o objeto inteiro.
+    const jogos = await app.container.make(JogosSeeder, [this.client])
+    await jogos.run()
 
     const advisors = await this.advisors(password)
     const classrooms = await Classroom.query().orderBy('grade').orderBy('name')
