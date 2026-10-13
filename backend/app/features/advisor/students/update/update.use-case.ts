@@ -24,7 +24,7 @@ export default class AdvisorStudentUpdateUseCase {
 
       return right(student)
     } catch (error) {
-      logger.error({ err: error }, '[advisor students > update][error]')
+      logger.error({ err: error }, '[students > update][error]')
 
       return left(
         HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_UPDATE_ERROR'),

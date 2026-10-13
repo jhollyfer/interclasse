@@ -33,10 +33,10 @@ export default class AdvisorStudentPaginateUseCase {
 
       return right({ meta: students.getMeta(), data: students.all() })
     } catch (error) {
-      logger.error({ err: error }, '[advisor students > list][error]')
+      logger.error({ err: error }, '[students > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_LIST_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_PAGINATE_ERROR'),
       )
     }
   }

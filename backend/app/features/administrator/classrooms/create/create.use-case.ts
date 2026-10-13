@@ -55,7 +55,10 @@ export default class AdministratorClassroomCreateUseCase {
       logger.error({ err: error }, '[classrooms > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_CLASSROOM_CREATE_ERROR',
+        ),
       )
     }
   }

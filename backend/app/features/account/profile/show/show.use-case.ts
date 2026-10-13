@@ -24,10 +24,10 @@ export default class AccountProfileShowUseCase {
 
       return right(payload.actor)
     } catch (error) {
-      logger.error({ err: error }, '[account > show][error]')
+      logger.error({ err: error }, '[profile > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ACCOUNT_SHOW_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'PROFILE_SHOW_ERROR'),
       )
     }
   }

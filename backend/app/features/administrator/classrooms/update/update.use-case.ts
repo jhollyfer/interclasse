@@ -76,7 +76,10 @@ export default class AdministratorClassroomUpdateUseCase {
       logger.error({ err: error }, '[classrooms > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_CLASSROOM_UPDATE_ERROR',
+        ),
       )
     }
   }

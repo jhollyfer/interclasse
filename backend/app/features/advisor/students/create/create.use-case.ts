@@ -25,7 +25,7 @@ export default class AdvisorStudentCreateUseCase {
 
       return right(student)
     } catch (error) {
-      logger.error({ err: error }, '[advisor students > create][error]')
+      logger.error({ err: error }, '[students > create][error]')
 
       return left(
         HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_CREATE_ERROR'),

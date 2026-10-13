@@ -39,7 +39,10 @@ export default class AdministratorMatchUpdateUseCase {
       logger.error({ err: error }, '[matches > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_MATCH_UPDATE_ERROR',
+        ),
       )
     }
   }

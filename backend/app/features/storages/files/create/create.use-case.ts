@@ -105,7 +105,7 @@ export default class StoragesFileCreateUseCase {
         uploaded: [],
       })
     } catch (error) {
-      logger.error({ err: error }, '[storages > create][error]')
+      logger.error({ err: error }, '[files > create][error]')
 
       // O multipart pode ter sido aberto antes de a linha falhar. Sem este
       // aborto ele fica pendurado no bucket para sempre: partes órfãs não
@@ -113,7 +113,7 @@ export default class StoragesFileCreateUseCase {
       if (uploadId) await this.#abortQuietly(key, uploadId)
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_CREATE_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_CREATE_ERROR'),
       )
     }
   }
@@ -126,7 +126,7 @@ export default class StoragesFileCreateUseCase {
     try {
       await this.multipart.abort(key, uploadId)
     } catch (error) {
-      logger.error({ err: error }, '[storages > create][abort][error]')
+      logger.error({ err: error }, '[files > create][abort][error]')
     }
   }
 }

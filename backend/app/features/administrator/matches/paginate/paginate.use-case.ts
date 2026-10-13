@@ -23,9 +23,14 @@ export default class AdministratorMatchPaginateUseCase {
 
       return right({ meta: matches.getMeta(), data: matches.all() })
     } catch (error) {
-      logger.error({ err: error }, '[matches > list][error]')
+      logger.error({ err: error }, '[matches > paginate][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_LIST_ERROR'))
+      return left(
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_MATCH_PAGINATE_ERROR',
+        ),
+      )
     }
   }
 }

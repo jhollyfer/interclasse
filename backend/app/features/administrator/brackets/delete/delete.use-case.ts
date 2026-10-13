@@ -46,7 +46,10 @@ export default class AdministratorBracketDeleteUseCase {
       logger.error({ err: error }, '[brackets > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_BRACKET_DELETE_ERROR',
+        ),
       )
     }
   }

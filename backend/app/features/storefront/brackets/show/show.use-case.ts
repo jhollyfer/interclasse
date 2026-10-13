@@ -21,10 +21,13 @@ export default class StorefrontBracketShowUseCase {
 
       return right(detail)
     } catch (error) {
-      logger.error({ err: error }, '[storefront brackets > show][error]')
+      logger.error({ err: error }, '[brackets > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'STOREFRONT_BRACKET_SHOW_ERROR',
+        ),
       )
     }
   }

@@ -61,10 +61,10 @@ export default class StoragesFilePaginateUseCase {
       // para o tipo da resposta, e `toJSON()` perderia o tipo do item num `any`.
       return right({ meta: storages.getMeta(), data: storages.all() })
     } catch (error) {
-      logger.error({ err: error }, '[storages > list][error]')
+      logger.error({ err: error }, '[files > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_LIST_ERROR'),
+        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_PAGINATE_ERROR'),
       )
     }
   }

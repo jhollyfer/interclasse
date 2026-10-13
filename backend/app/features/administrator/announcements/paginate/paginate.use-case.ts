@@ -29,10 +29,13 @@ export default class AdministratorAnnouncementPaginateUseCase {
 
       return right({ meta: announcements.getMeta(), data: announcements.all() })
     } catch (error) {
-      logger.error({ err: error }, '[announcements > list][error]')
+      logger.error({ err: error }, '[announcements > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_LIST_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_ANNOUNCEMENT_PAGINATE_ERROR',
+        ),
       )
     }
   }

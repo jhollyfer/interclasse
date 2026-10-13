@@ -52,7 +52,11 @@ export default class AdministratorMatchScoreUseCase {
         const bracket = await Bracket.query({ client: trx })
           .where('id', match.bracketId)
           .forUpdate()
-          .firstOrFail()
+          .first()
+
+        // A partida aponta para a chave por FK; ausente, o caso de uso responde
+        // 404 de negócio em vez de cair no catch como 500 (`*OrFail` é `throw`).
+        if (!bracket) return 'bracket-missing'
 
         let next: Match | null = null
         if (phase)
@@ -92,6 +96,9 @@ export default class AdministratorMatchScoreUseCase {
         return 'saved'
       })
 
+      if (outcome === 'bracket-missing')
+        return left(HTTPException.NotFound('Chave não encontrada', 'BRACKET_NOT_FOUND'))
+
       if (outcome === 'next-played')
         return left(
           HTTPException.Conflict(
@@ -105,7 +112,10 @@ export default class AdministratorMatchScoreUseCase {
       logger.error({ err: error }, '[matches > score][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'MATCH_SCORE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_MATCH_SCORE_ERROR',
+        ),
       )
     }
   }

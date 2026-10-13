@@ -26,11 +26,9 @@ export default class StoragesFileShowUseCase {
 
       return right(storage)
     } catch (error) {
-      logger.error({ err: error }, '[storages > show][error]')
+      logger.error({ err: error }, '[files > show][error]')
 
-      return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STORAGE_SHOW_ERROR'),
-      )
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'FILE_SHOW_ERROR'))
     }
   }
 }

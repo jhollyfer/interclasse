@@ -29,10 +29,13 @@ export default class StorefrontBracketPaginateUseCase {
 
       return right({ meta: brackets.getMeta(), data: brackets.all() })
     } catch (error) {
-      logger.error({ err: error }, '[storefront brackets > list][error]')
+      logger.error({ err: error }, '[brackets > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_LIST_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'STOREFRONT_BRACKET_PAGINATE_ERROR',
+        ),
       )
     }
   }

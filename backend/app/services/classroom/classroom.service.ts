@@ -1,3 +1,5 @@
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+
 import Classroom from '#models/classroom'
 import User from '#models/user'
 import { left, right, type Either } from '#core/either'
@@ -74,9 +76,11 @@ export default class ClassroomService {
    * Arquivar é remoção lógica, então o `ON DELETE SET NULL` da coluna nunca
    * dispara - quem faz o papel dele é este método.
    */
-  async detach(user: User): Promise<void> {
-    await Classroom.query().where('advisorId', user.id).update({ advisorId: null })
-    await Classroom.query().where('representativeId', user.id).update({ representativeId: null })
+  async detach(user: User, client: TransactionClientContract): Promise<void> {
+    await Classroom.query({ client }).where('advisorId', user.id).update({ advisorId: null })
+    await Classroom.query({ client })
+      .where('representativeId', user.id)
+      .update({ representativeId: null })
   }
 
   private person(id: string, role: UserRole): Promise<User | null> {

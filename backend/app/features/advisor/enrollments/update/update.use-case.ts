@@ -28,10 +28,13 @@ export default class AdvisorEnrollmentUpdateUseCase {
 
       return right(board.value)
     } catch (error) {
-      logger.error({ err: error }, '[advisor enrollments > update][error]')
+      logger.error({ err: error }, '[enrollments > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ENROLLMENT_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADVISOR_ENROLLMENT_UPDATE_ERROR',
+        ),
       )
     }
   }

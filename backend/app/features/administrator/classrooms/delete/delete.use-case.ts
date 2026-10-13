@@ -37,7 +37,10 @@ export default class AdministratorClassroomDeleteUseCase {
       logger.error({ err: error }, '[classrooms > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'CLASSROOM_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_CLASSROOM_DELETE_ERROR',
+        ),
       )
     }
   }

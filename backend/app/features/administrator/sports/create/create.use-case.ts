@@ -54,7 +54,10 @@ export default class AdministratorSportCreateUseCase {
       logger.error({ err: error }, '[sports > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_SPORT_CREATE_ERROR',
+        ),
       )
     }
   }

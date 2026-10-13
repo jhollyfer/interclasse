@@ -58,9 +58,11 @@ export default class AdministratorUserPaginateUseCase {
       // para o tipo da resposta, e `toJSON()` perderia o tipo do item num `any`.
       return right({ meta: users.getMeta(), data: users.all() })
     } catch (error) {
-      logger.error({ err: error }, '[users > list][error]')
+      logger.error({ err: error }, '[users > paginate][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'USER_LIST_ERROR'))
+      return left(
+        HTTPException.InternalServerError('Erro interno do servidor', 'USER_PAGINATE_ERROR'),
+      )
     }
   }
 }

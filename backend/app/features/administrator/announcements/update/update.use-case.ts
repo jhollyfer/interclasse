@@ -28,7 +28,10 @@ export default class AdministratorAnnouncementUpdateUseCase {
       logger.error({ err: error }, '[announcements > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_ANNOUNCEMENT_UPDATE_ERROR',
+        ),
       )
     }
   }

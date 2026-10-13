@@ -23,7 +23,10 @@ export default class AdministratorAnnouncementCreateUseCase {
       logger.error({ err: error }, '[announcements > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'ANNOUNCEMENT_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_ANNOUNCEMENT_CREATE_ERROR',
+        ),
       )
     }
   }

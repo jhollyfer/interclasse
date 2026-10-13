@@ -121,7 +121,10 @@ export default class AdministratorBracketCreateUseCase {
       logger.error({ err: error }, '[brackets > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'BRACKET_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_BRACKET_CREATE_ERROR',
+        ),
       )
     }
   }

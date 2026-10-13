@@ -96,7 +96,10 @@ export default class AdministratorSportUpdateUseCase {
       logger.error({ err: error }, '[sports > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SPORT_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'ADMINISTRATOR_SPORT_UPDATE_ERROR',
+        ),
       )
     }
   }

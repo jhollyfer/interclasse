@@ -5,7 +5,7 @@ import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
 import { SessionSignInValidator } from '#features/authentication/sessions/sessions.validator'
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { issueSessionTokens } from '#services/cookie/cookie.service'
+import CookieService from '#services/cookie/cookie.service'
 
 @inject()
 export default class AuthenticationSessionSignInController {
@@ -30,8 +30,7 @@ export default class AuthenticationSessionSignInController {
 
     if (result.isLeft()) throw result.value
 
-    const tokens = await issueSessionTokens(result.value)
-    this.cookie.set(context, tokens)
+    this.cookie.set(context, result.value)
 
     return context.response.noContent()
   }
