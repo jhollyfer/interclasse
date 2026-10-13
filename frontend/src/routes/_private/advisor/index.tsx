@@ -7,7 +7,8 @@ export const ADVISOR_CLASSROOMS = { perPage: 100 }
 
 export const Route = createFileRoute('/_private/advisor/')({
   loader: ({ context }) =>
-    context.queryClient.ensureQueryData(
-      advisorClassroomsQueryOptions(ADVISOR_CLASSROOMS),
-    ),
+    context.queryClient.query({
+      ...advisorClassroomsQueryOptions(ADVISOR_CLASSROOMS),
+      staleTime: 'static',
+    }),
 })

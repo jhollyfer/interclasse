@@ -14,7 +14,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { SportCreateValidator } from '#/validators/administrator/sports.validator'
-import type { ISport, Merge  } from '#/lib/interfaces'
+import type { ISport, Merge } from '#/lib/interfaces'
 import type { SportUpdatePayload } from '#/validators/administrator/sports.validator'
 import { sportQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useSportUpdate } from '#/integrations/tanstack-query/mutations'

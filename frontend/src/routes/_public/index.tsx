@@ -14,24 +14,24 @@ export const HOME_ANNOUNCEMENTS = { perPage: 3 }
 export const HOME_BRACKETS = { perPage: 100 }
 
 /**
- * `prefetchQuery` e não `ensureQueryData`: a API fora do ar não derruba a home,
+ * Erro engolido (`.catch`): a API fora do ar não derruba a home,
  * cada seção desenha o próprio estado.
  */
 export const Route = createFileRoute('/_public/')({
   loader: ({ context }) =>
     Promise.all([
-      context.queryClient.prefetchQuery(
-        storefrontMatchesQueryOptions(HOME_NEXT),
-      ),
-      context.queryClient.prefetchQuery(
-        storefrontMatchesQueryOptions(HOME_RESULTS),
-      ),
-      context.queryClient.prefetchQuery(
-        storefrontAnnouncementsQueryOptions(HOME_ANNOUNCEMENTS),
-      ),
-      context.queryClient.prefetchQuery(
-        storefrontBracketsQueryOptions(HOME_BRACKETS),
-      ),
+      context.queryClient
+        .query(storefrontMatchesQueryOptions(HOME_NEXT))
+        .catch(() => undefined),
+      context.queryClient
+        .query(storefrontMatchesQueryOptions(HOME_RESULTS))
+        .catch(() => undefined),
+      context.queryClient
+        .query(storefrontAnnouncementsQueryOptions(HOME_ANNOUNCEMENTS))
+        .catch(() => undefined),
+      context.queryClient
+        .query(storefrontBracketsQueryOptions(HOME_BRACKETS))
+        .catch(() => undefined),
     ]),
   head: () => ({
     meta: [

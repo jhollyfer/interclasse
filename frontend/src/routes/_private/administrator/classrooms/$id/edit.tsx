@@ -8,9 +8,10 @@ export const Route = createFileRoute(
 )({
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(
-        classroomQueryOptions(params.id),
-      )
+      return await context.queryClient.query({
+        ...classroomQueryOptions(params.id),
+        staleTime: 'static',
+      })
     } catch (error) {
       if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {
         throw notFound()

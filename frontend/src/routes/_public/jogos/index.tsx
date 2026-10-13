@@ -28,6 +28,8 @@ export const Route = createFileRoute('/_public/jogos/')({
   validateSearch,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.prefetchQuery(storefrontMatchesQueryOptions(deps)),
+    context.queryClient
+      .query(storefrontMatchesQueryOptions(deps))
+      .catch(() => undefined),
   head: () => ({ meta: [{ title: `Jogos | ${SITE_TITLE}` }] }),
 })

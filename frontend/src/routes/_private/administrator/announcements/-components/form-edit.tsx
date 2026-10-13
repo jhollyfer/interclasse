@@ -14,7 +14,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
-import type { IAnnouncement, Merge  } from '#/lib/interfaces'
+import type { IAnnouncement, Merge } from '#/lib/interfaces'
 import type { AnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
 import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations'

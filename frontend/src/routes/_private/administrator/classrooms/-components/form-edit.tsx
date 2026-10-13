@@ -14,7 +14,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
-import type { IClassroom, Merge  } from '#/lib/interfaces'
+import type { IClassroom, Merge } from '#/lib/interfaces'
 import type { ClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations'

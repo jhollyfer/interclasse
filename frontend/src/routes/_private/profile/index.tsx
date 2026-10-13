@@ -16,5 +16,8 @@ import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
  */
 export const Route = createFileRoute('/_private/profile/')({
   loader: ({ context }) =>
-    context.queryClient.ensureQueryData(accountQueryOptions()),
+    context.queryClient.query({
+      ...accountQueryOptions(),
+      staleTime: 'static',
+    }),
 })

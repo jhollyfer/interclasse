@@ -8,8 +8,8 @@ export const Route = createFileRoute('/_public/avisos/')({
   validateSearch: validateStorefrontSearch,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.prefetchQuery(
-      storefrontAnnouncementsQueryOptions(deps),
-    ),
+    context.queryClient
+      .query(storefrontAnnouncementsQueryOptions(deps))
+      .catch(() => undefined),
   head: () => ({ meta: [{ title: `Avisos | ${SITE_TITLE}` }] }),
 })

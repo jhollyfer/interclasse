@@ -19,9 +19,12 @@ const validateSearch = withExtra(['role', 'status'] as const)
 export const Route = createFileRoute('/_private/administrator/users/')({
   validateSearch,
   pendingComponent: () => <TableSkeleton />,
-  // `ensureQueryData` e não `prefetchQuery`: o primeiro devolve o dado e
-  // propaga o erro. É o mesmo do guard em `_private/layout.tsx`.
+  // `query()` sem `.catch`: devolve o dado e propaga o erro, como o guard em
+  // `_private/layout.tsx`.
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(usersQueryOptions(deps)),
+    context.queryClient.query({
+      ...usersQueryOptions(deps),
+      staleTime: 'static',
+    }),
 })
