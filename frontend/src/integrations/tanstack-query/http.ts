@@ -9,6 +9,7 @@
 
 import { createIsomorphicFn } from '@tanstack/react-start'
 import * as server from './http.server'
+import { env } from '#/env'
 
 /**
  * O corpo de erro que toda rota da API devolve. Espelha
@@ -141,7 +142,7 @@ declare module '@tanstack/react-query' {
  * eles ficam nesta constante e não em `baseUrl()` abaixo: um `href` com o
  * endereço interno seria renderizado no servidor e daria link morto no cliente.
  */
-export const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+export const BASE_URL = env.VITE_API_URL
 
 /**
  * A raiz da API **para quem está fazendo a requisição agora**, que não é a mesma
