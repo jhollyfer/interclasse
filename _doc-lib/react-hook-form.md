@@ -2,6 +2,8 @@
 
 Formulário com estado fora do React, para o formulário inteiro não re-renderizar a cada tecla.
 
+> Conferido contra `react-hook-form@7.89.0` e `@hookform/resolvers@5.9.1` (latest).
+
 **O que é:** uma biblioteca de formulário que guarda o valor dos campos em `ref`, e não em estado do
 React. Digitar não re-renderiza: o componente só re-renderiza quando algo que ele **lê** muda — um
 erro, `isDirty`, o valor que ele pediu por `useWatch`. A validação é delegada a um *resolver*, que
@@ -59,6 +61,8 @@ num `SimpleMessagesProvider` global, num módulo de mensagens à parte, com chav
 novo sem entrada lá aparece com o nome cru na mensagem.
 
 **Links:** 48. Boa parte é âncora dentro de três páginas longas — `get-started`, `ts` e
+
+**Skills:** `maiyu-frontend`, `web-accessibility`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 `advanced-usage` — mais a referência de API, que é o que mais se abre depois da primeira semana.
 
 ---
@@ -456,6 +460,29 @@ const form = useForm<FormType>({
 })
 ```
 
+```tsx
+type TeamForm = { name: string; plan: 'free' | 'pro' }
+
+// Caso comum: formulário de edição, valor vindo de uma query — `values` (não
+// `defaultValues`) reage quando o dado chega depois do primeiro render.
+function EditTeamForm({ team }: { team: TeamForm | undefined }) {
+  const form = useForm<TeamForm>({
+    values: team, // substitui o form inteiro quando `team` muda de referência
+    mode: 'onTouched',
+  })
+  return form
+}
+```
+
+```ts
+// Pegadinha: `values` (acima) RESETA campos tocados sempre que a referência
+// muda — inclusive os que o usuário já editou e ainda não salvou. Se a query
+// por trás revalida em background (refetch de foco de janela, por exemplo),
+// o rascunho do usuário é substituído silenciosamente. Formulário onde o
+// usuário edita por um tempo quer `defaultValues` + `reset()` manual quando o
+// dado novo chegar, não `values` direto.
+```
+
 #### docs/useform/register
 [doc](https://react-hook-form.com/docs/useform/register)
 
@@ -556,6 +583,35 @@ onError(error) {
 }
 ```
 
+```tsx
+type TeamForm = { name: string }
+
+// Caso comum: erro de unicidade que só o servidor sabe (nome de time já existe).
+function useRenameTeam() {
+  const form = useForm<TeamForm>()
+
+  return useMutation({
+    mutationFn: renameTeam,
+    onError: (error: Error) => {
+      if (error.message === 'NAME_TAKEN') {
+        form.setError('name', { type: 'manual', message: 'Esse nome já está em uso' })
+      }
+    },
+  })
+}
+
+declare function renameTeam(data: TeamForm): Promise<Team>
+declare type Team = { id: string; name: string }
+declare function useMutation<T>(opts: { mutationFn: (d: T) => Promise<unknown>; onError: (e: Error) => void }): unknown
+```
+
+```ts
+// Pegadinha: `setError` sem `{ shouldFocus: true }` não move o foco para o
+// campo. Em formulário longo, o erro do servidor aparece FORA da área visível
+// e ninguém vê — parece que "o clique em salvar não fez nada". Para o erro de
+// servidor que precisa de atenção imediata, passe `{ shouldFocus: true }`.
+```
+
 #### docs/useform/reset
 [doc](https://react-hook-form.com/docs/useform/reset)
 
@@ -650,6 +706,32 @@ aqui, não a regra. Ele também isola o re-render, já que só o campo que mudou
     </Field>
   )}
 />
+```
+
+```tsx
+type TeamForm = { plan: 'free' | 'pro' }
+
+// Caso comum: usar o próprio hook `useController` em vez do componente, para
+// um campo customizado reutilizável que não precisa de render prop no JSX.
+function PlanField({ control }: { control: Control<TeamForm> }) {
+  const { field } = useController({ name: 'plan', control })
+  return (
+    <select value={field.value} onChange={(e) => field.onChange(e.target.value)}>
+      <option value="free">Free</option>
+      <option value="pro">Pro</option>
+    </select>
+  )
+}
+
+declare type Control<T extends Record<string, unknown>> = Parameters<typeof useController<T>>[0]['control']
+```
+
+```ts
+// Pegadinha: `render` do Controller roda a CADA tecla no campo controlado —
+// qualquer trabalho caro dentro dele (formatar, chamar API) roda na mesma
+// frequência. Separar o conteúdo pesado num componente memoizado FORA do
+// `render`, recebendo `field`/`fieldState` como props, evita recalcular o que
+// não depende da tecla atual.
 ```
 
 #### docs/usefieldarray
@@ -951,3 +1033,4 @@ Actions, que o projeto não adota.
 // O caminho desta stack continua sendo a mutação, não a action.
 const mutation = useAuthenticationSignUp({ onError, onSuccess })
 ```
+

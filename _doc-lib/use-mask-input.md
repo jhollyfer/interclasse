@@ -2,11 +2,12 @@
 
 Máscara de digitação em `<input>`, para React e para Vue 3, sobre o motor Inputmask.
 
-> Conferido contra `use-mask-input@3.13.0` instalado. **A doc oficial está atrás do pacote em três
+> Conferido contra `use-mask-input@3.14.2` (latest). **A doc oficial está atrás do pacote em três
 > pontos**, e os três enganam em silêncio: os hooks de Ant Design não moram no entry principal, mas
-> no subpath `use-mask-input/antd`; a lista de aliases do site tem 16 nomes e a da 3.13.0 tem 22;
-> e a página `shadcn` descreve um `Input` que é `React.forwardRef` sobre `<input>` nativo, o que
-> não vale para o shadcn em cima do Base UI. Cada um está anotado no link correspondente.
+> no subpath `use-mask-input/antd`; a lista de aliases do site tem 16 nomes e a da 3.14.2 tem 22
+> (faltam `cep`, `phone-br`, `date-br`, `time`, `credit-card`, `plate-br`); e a página `shadcn`
+> descreve um `Input` que é `React.forwardRef` sobre `<input>` nativo, o que não vale para o shadcn
+> em cima do Base UI. Cada um está anotado no link correspondente.
 
 **O que é:** um invólucro fino de React e de Vue sobre o **Inputmask** do Robin Herbots. A
 biblioteca não implementa máscara nenhuma: ela cuida do ciclo de vida — aplicar no elemento quando o
@@ -58,7 +59,9 @@ As três funções `with*` fazem o mesmo que os hooks equivalentes, e o README a
 `React.memo` no componente — sem hook, elas reconstroem o ref callback a cada render, e cada render
 reaplica a máscara.
 
-**Links:** 12.
+**Links:** 11.
+
+**Skills:** `maiyu-frontend`, `web-accessibility`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
 ---
 
@@ -119,6 +122,22 @@ import { formatWithMask, unformatWithMask } from 'use-mask-input'
 // exibir um valor que veio cru do banco, e preparar um valor para enviar.
 formatWithMask('12345678909', 'cpf') // '123.456.789-09'
 unformatWithMask('123.456.789-09', 'cpf') // '12345678909'
+```
+
+```tsx
+import { useForm } from 'react-hook-form'
+import { useHookFormMask } from 'use-mask-input'
+
+type TeamForm = { document: string }
+
+// Caso comum: embrulha o PRÓPRIO `register` — não é mais um hook à parte
+// chamado junto, e por isso preserva o `ref` que o React Hook Form espera.
+function DocumentField() {
+  const { register } = useForm<TeamForm>()
+  const registerWithMask = useHookFormMask(register)
+
+  return <input {...registerWithMask('document', 'cpf')} />
+}
 ```
 
 ## Tipos de máscara
@@ -202,9 +221,10 @@ em que o formato tem mais de um tamanho válido.
 **Quando usar:** **antes de escrever qualquer máscara estática** — metade das strings que se digita
 à mão já tem alias. E leia pela ressalva do valor: **o que está no input continua mascarado**, então
 `event.target.value` não é o valor cru. Confira também a lista contra o `.d.ts` instalado: seis
-aliases entraram na 3.13.0 e a página do site ainda não os traz.
+aliases (`cep`, `phone-br`, `date-br`, `time`, `credit-card`, `plate-br`) estão na 3.14.2 e a
+página do site ainda não os traz.
 
-> **O alias muda de forma entre versões, e o site não avisa.** O `cnpj` da 3.13.0 é
+> **O alias muda de forma entre versões, e o site não avisa.** O `cnpj` da 3.14.2 é
 > `A|9{2}.A|9{3}.A|9{3}/A|9{4}-9{2}` — `A|9` é letra **ou** dígito, então ele já aceita o CNPJ
 > alfanumérico em vigor desde julho/2026, e o `A` força a caixa alta. O site ainda descreve a forma
 > antiga, só numérica, e quem acreditar nela vai trocar o alias por uma máscara estática pior. A
@@ -225,6 +245,28 @@ const currency = useMaskInput({
   mask: 'currency',
   options: { prefix: 'R$ ', groupSeparator: '.', radixPoint: ',', digits: 2 },
 })
+```
+
+```tsx
+import { useForm } from 'react-hook-form'
+import { useHookFormMask } from 'use-mask-input'
+
+type TeamForm = { cnpj: string }
+
+// Caso comum: alias com o React Hook Form, documento enviado para a API.
+function CnpjField() {
+  const { register } = useForm<TeamForm>()
+  const registerWithMask = useHookFormMask(register)
+  return <input {...registerWithMask('cnpj', 'cnpj')} />
+}
+```
+
+```ts
+// Pegadinha: sem `autoUnmask` (ou sem ler via `unformatWithMask`/`getUnmaskedValue`),
+// o valor que chega ao `onSubmit` é o MASCARADO — "123.456.789-09", não
+// "12345678909". Um backend que espera só dígitos recusa silenciosamente, ou
+// pior, salva o texto com pontuação. `brl-currency` já embute `autoUnmask`;
+// os outros aliases, não.
 ```
 
 ```tsx
@@ -408,16 +450,3 @@ const documentMask = useMaskInputAntd({ mask: 'cpf' })
 return <Input ref={documentMask} />
 ```
 
-## Meta
-
-#### discoverability
-
-[doc](https://use-mask-input.eduardoborges.dev/discoverability)
-
-**O que é:** a página sobre a infraestrutura do **site** — `robots.txt` com `Content-Signal`,
-`/.well-known/api-catalog`, índice de skills de agente, negociação de conteúdo em markdown.
-**Para que serve:** consumir a documentação de forma automatizada, e saber quais URLs estáveis o
-site publica para isso.
-**Quando usar:** não abra esperando API da biblioteca, porque não há uma linha sobre máscara aqui.
-Vale quando se quer baixar a doc inteira em texto para leitura por ferramenta — e aí o atalho é o
-`llms-full.txt` que ela cataloga, não esta página.

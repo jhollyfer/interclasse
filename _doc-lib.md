@@ -1,7 +1,12 @@
 # Índice de documentação
 
-Referência anotada de 635 páginas de documentação, distribuídas em 15 bibliotecas, mais 13 páginas
-sobre uma ferramenta própria do repositório.
+Referência anotada de 1321 páginas de documentação, distribuídas em 24 bibliotecas. As regras da
+casa — o que fazer com elas — ficam em [`_padroes/`](_padroes/), e vencem o código existente.
+
+O Fastify é a única biblioteca com **dois** arquivos, e o motivo é que são duas perguntas: como o
+framework funciona, e que plugin resolve um problema. A segunda tem 298 respostas, e afogaria a
+primeira num arquivo só. O `fastify-decorators` não é um terceiro: é biblioteca à parte, de outro
+autor, e tem o próprio arquivo pela regra geral.
 
 **As páginas de biblioteca são genéricas, e isso é regra, não acaso:** valem para qualquer projeto
 React × Node com essa stack, não citam nome de repositório, e os exemplos usam entidades neutras
@@ -10,8 +15,8 @@ convenção sugerida, nunca como fato — quem copiar este pacote para outro pro
 e o resto continua valendo. A opinião forte que os arquivos carregam ("não use X nesta stack") se
 apoia na **stack**, não em decisão de repositório: mesma stack, mesma conclusão.
 
-A única exceção é [`_doc-lib/openapi.md`](_doc-lib/openapi.md), que documenta um gerador local e diz
-isso no próprio cabeçalho.
+O gerador de contrato da API, que antes morava aqui como exceção, é padrão da casa e está em
+[`_padroes/openapi.md`](_padroes/openapi.md).
 
 Cada biblioteca tem um arquivo próprio em `_doc-lib/`. Dentro dele, o cabeçalho responde **o que é**,
 **para que serve**, **como usar** e **quando adotar** a biblioteca, e cada link responde três coisas:
@@ -20,50 +25,55 @@ Cada biblioteca tem um arquivo próprio em `_doc-lib/`. Dentro dele, o cabeçalh
 - **Para que serve** o que ela ensina.
 - **Quando usar**, ou seja, o gatilho concreto que faz valer a pena abrir.
 
-O objetivo é escolher o link certo sem visitar os outros 647.
+O objetivo é escolher o link certo sem visitar os outros 1317.
 
 ---
 
 ## Backend
 
-| Biblioteca    | Arquivo                                        | O que resolve                                                              | Links |
-| ------------- | ---------------------------------------------- | -------------------------------------------------------------------------- | :---: |
-| **AdonisJS**  | [`_doc-lib/adonisjs.md`](_doc-lib/adonisjs.md) | Framework Node.js completo: rotas, controllers, auth, filas, testes, CLI   |  91   |
-| **Lucid ORM** | [`_doc-lib/lucid.md`](_doc-lib/lucid.md)       | ORM do AdonisJS: models, migrations, query builder, relacionamentos        |  35   |
-| **VineJS**    | [`_doc-lib/vinejs.md`](_doc-lib/vinejs.md)     | Validação de payload com tipo inferido do schema. Também usado no frontend |  26   |
-| **FlyDrive**  | [`_doc-lib/flydrive.md`](_doc-lib/flydrive.md) | Arquivos com uma API só sobre disco local, S3, R2 e GCS                    |  13   |
+| Biblioteca             | Arquivo                                                            | O que resolve                                                                     | Links |
+| ---------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------- | :---: |
+| **AdonisJS**           | [`_doc-lib/adonisjs.md`](_doc-lib/adonisjs.md)                     | Framework Node.js completo: rotas, controllers, auth, filas, testes, CLI          |   91  |
+| **Fastify**            | [`_doc-lib/fastify.md`](_doc-lib/fastify.md)                       | Servidor HTTP montado por plugin: ciclo de vida, schema, serialização             |   42  |
+| **Fastify (plugins)**  | [`_doc-lib/fastify-plugins.md`](_doc-lib/fastify-plugins.md)       | O ecossistema: 60 plugins oficiais anotados e 237 da comunidade em tabela         |  298  |
+| **fastify-decorators** | [`_doc-lib/fastify-decorators.md`](_doc-lib/fastify-decorators.md) | Controller, rota e injeção por decorator sobre o Fastify; bootstrap por diretório |   20  |
+| **Lucid ORM**          | [`_doc-lib/lucid.md`](_doc-lib/lucid.md)                           | ORM do AdonisJS: models, migrations, query builder, relacionamentos               |   35  |
+| **VineJS**             | [`_doc-lib/vinejs.md`](_doc-lib/vinejs.md)                         | Validação de payload com tipo inferido do schema. Também usado no frontend        |   26  |
+| **FlyDrive**           | [`_doc-lib/flydrive.md`](_doc-lib/flydrive.md)                     | Arquivos com uma API só sobre disco local, S3, R2 e GCS                           |   13  |
+| **MongoDB (driver)**   | [`_doc-lib/mongodb.md`](_doc-lib/mongodb.md)                       | O driver oficial sem ODM: CRUD, agregação, índices, transações, tipagem           |   48  |
+| **BullMQ**             | [`_doc-lib/bullmq.md`](_doc-lib/bullmq.md)                         | Fila de trabalho em Redis: retry, agendamento, flows, encerramento limpo          |   45  |
+| **Socket.IO**          | [`_doc-lib/socket-io.md`](_doc-lib/socket-io.md)                   | Tempo real com fallback: namespaces, rooms, auth no handshake, escala             |   44  |
+| **isolated-vm**        | [`_doc-lib/isolated-vm.md`](_doc-lib/isolated-vm.md)               | Isolate V8 separado para rodar código não confiável — o que `node:vm` não faz     |   35  |
+
+AdonisJS e Fastify ocupam a **mesma camada** e não se somam: um projeto tem um ou o outro. Lucid,
+VineJS e FlyDrive não dependem dessa escolha, e o frontend inteiro menos ainda. O que muda é de
+onde vem o resto — no Adonis, do próprio framework; no Fastify, do ecossistema, e é isso que o
+segundo arquivo cataloga. O `fastify-decorators` só existe do lado Fastify: é o que devolve a ele
+o container e a convenção de controller que o Adonis traz de fábrica.
 
 ## Frontend
 
 | Biblioteca          | Arquivo                                                      | O que resolve                                                                                    | Links |
 | ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | :---: |
-| **shadcn/ui**       | [`_doc-lib/shadcn.md`](_doc-lib/shadcn.md)                   | Componentes copiados para o repositório, sobre Tailwind e primitivas headless                    |  103  |
+| **shadcn/ui**       | [`_doc-lib/shadcn.md`](_doc-lib/shadcn.md)                   | Componentes copiados para o repositório, sobre Tailwind e primitivas headless                    |  107  |
 | **Base UI**         | [`_doc-lib/base-ui.md`](_doc-lib/base-ui.md)                 | A primitiva headless por baixo do shadcn: comportamento, teclado, acessibilidade, posicionamento |  53   |
 | **React Hook Form** | [`_doc-lib/react-hook-form.md`](_doc-lib/react-hook-form.md) | Formulário sem re-render a cada tecla: campo, validação por resolver, erro do servidor           |  48   |
-| **use-mask-input**  | [`_doc-lib/use-mask-input.md`](_doc-lib/use-mask-input.md)   | Máscara de digitação no campo, sobre o motor Inputmask                                           |  12   |
+| **use-mask-input**  | [`_doc-lib/use-mask-input.md`](_doc-lib/use-mask-input.md)   | Máscara de digitação no campo, sobre o motor Inputmask                                           |  11   |
 | **TanStack Query**  | [`_doc-lib/tanstack-query.md`](_doc-lib/tanstack-query.md)   | Estado de servidor: cache, revalidação, mutações, invalidação                                    |  57   |
-| **TanStack Router** | [`_doc-lib/tanstack-router.md`](_doc-lib/tanstack-router.md) | Roteamento com tipagem de ponta a ponta, incluindo search params                                 |  54   |
-| **TanStack Start**  | [`_doc-lib/tanstack-start.md`](_doc-lib/tanstack-start.md)   | Camada full-stack sobre o Router: SSR, server functions, deploy                                  |  43   |
-| **TanStack Table**  | [`_doc-lib/tanstack-table.md`](_doc-lib/tanstack-table.md)   | Motor de tabela headless (v9): features opt-in, ordenação, filtro, paginação, seleção            |  45   |
+| **TanStack Router** | [`_doc-lib/tanstack-router.md`](_doc-lib/tanstack-router.md) | Roteamento com tipagem de ponta a ponta, incluindo search params                                 |  61   |
+| **TanStack Start**  | [`_doc-lib/tanstack-start.md`](_doc-lib/tanstack-start.md)   | Camada full-stack sobre o Router: SSR, server functions, deploy                                  |  45   |
+| **TanStack Table**  | [`_doc-lib/tanstack-table.md`](_doc-lib/tanstack-table.md)   | Motor de tabela headless (v9): features opt-in, ordenação, filtro, paginação, seleção            |  46   |
 | **TanStack Store**  | [`_doc-lib/tanstack-store.md`](_doc-lib/tanstack-store.md)   | Estado de cliente que não é do servidor nem cabe na URL                                          |   4   |
+| **Tailwind CSS**    | [`_doc-lib/tailwindcss.md`](_doc-lib/tailwindcss.md)         | Utilitário sobre CSS, v4 configurada em CSS: tema por token, variantes, modo escuro              |  42   |
+| **Tiptap**          | [`_doc-lib/tiptap.md`](_doc-lib/tiptap.md)                   | Editor de texto rico headless sobre ProseMirror: schema, extensão própria, round-trip de HTML    |  45   |
 
 ## Build e ferramentas
 
 | Biblioteca | Arquivo                                    | O que resolve                                                        | Links |
 | ---------- | ------------------------------------------ | -------------------------------------------------------------------- | :---: |
 | **Vite**   | [`_doc-lib/vitejs.md`](_doc-lib/vitejs.md) | Dev server, build, plugins, variável de ambiente, HMR                |  25   |
-| **Nitro**  | [`_doc-lib/nitro.md`](_doc-lib/nitro.md)   | Servidor de produção do build: preset, runtime, storage, cache, task |  26   |
-
-## Ferramentas do repositório
-
-Não são bibliotecas de terceiro: é código do repositório que hospeda estas docs, documentado no
-mesmo formato porque a pergunta que se faz sobre ele é a mesma — qual arquivo abrir, e quando. **É a
-única seção que não se transporta para outro projeto**: quem reusar o pacote ignora esta linha, ou
-adapta os caminhos para o gerador equivalente que tiver.
-
-| Ferramenta  | Arquivo                                      | O que resolve                                                                                                             | Links |
-| ----------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | :---: |
-| **OpenAPI** | [`_doc-lib/openapi.md`](_doc-lib/openapi.md) | Documentação da API derivada das rotas, dos validators e do código dos controllers; referência Scalar em `/documentation` |  13   |
+| **Nitro**  | [`_doc-lib/nitro.md`](_doc-lib/nitro.md)   | Servidor de produção do build: preset, runtime, storage, cache, task |  30   |
+| **Vitest** | [`_doc-lib/vitest.md`](_doc-lib/vitest.md) | Suite de teste sobre o Vite: mock, cobertura, isolamento, projetos   |  50   |
 
 ---
 
@@ -121,16 +131,26 @@ variante são invenção do shadcn, e não existem no Base UI.
 
 **No backend, quem faz o quê**
 
-| A tarefa                                           | Onde ela fica            |
-| -------------------------------------------------- | ------------------------ |
-| Rota, middleware, resposta, injeção de dependência | AdonisJS                 |
-| Formato e regra do payload que entra               | VineJS                   |
-| Schema, consulta, relacionamento, transação        | Lucid                    |
-| Gravar e ler arquivo, em qualquer destino          | FlyDrive                 |
-| Publicar o contrato da API para quem consome       | OpenAPI (do repositório) |
+| A tarefa                                           | Onde ela fica                  |
+| -------------------------------------------------- | ------------------------------ |
+| Rota, middleware, resposta                         | AdonisJS ou Fastify            |
+| Injeção de dependência, convenção de controller    | AdonisJS ou fastify-decorators |
+| Formato e regra do payload que entra               | VineJS                         |
+| Schema, consulta, relacionamento, transação        | Lucid                          |
+| Gravar e ler arquivo, em qualquer destino          | FlyDrive                       |
+| Publicar o contrato da API para quem consome       | OpenAPI (do repositório)       |
 
 A última linha não acrescenta trabalho às outras: o gerador lê o que AdonisJS e VineJS já declararam.
 Rota nova em feature existente não exige documentação nenhuma.
+
+As duas primeiras linhas têm duas respostas porque a escolha do framework é do projeto, e a
+diferença é concreta: no AdonisJS a injeção vem do container e a estrutura vem da convenção; no
+Fastify as duas vêm do `fastify-decorators`, que as monta por cima de plugin comum — e por isso o
+que decide o que enxerga o quê continua sendo o encapsulamento: todo `register` cria um contexto
+filho, e o que o filho decora não sobe. Um guard registrado no lugar errado da árvore não roda, e
+não avisa. O `fastify-decorators` acrescenta uma segunda forma de silêncio, que é sua: a injeção
+por constructor só existe se o tipo do parâmetro sobreviver à compilação, e o serviço que chega
+`undefined` não avisa no boot.
 
 **VineJS nos dois lados**
 
@@ -194,13 +214,23 @@ formato passou a ser garantido por quem não segura o dado.
 
 ## Ordem de leitura sugerida
 
-Para quem está começando na stack e não quer ler 648 páginas:
+Para quem está começando na stack e não quer ler 1321 páginas:
 
 **Backend**: `adonisjs` (folder-structure, http-context, routing, dependency-injection),
 `vinejs` (schema_101, html_forms_and_surprises, types/object) e `lucid` (models, migrations,
 table-builder, model-query-builder, relationships). Antes de abrir a primeira pull request que
-mexa em rota, leia `openapi` (fluxo-de-trabalho, feature-nova) — são dois minutos e evitam um
+mexa em rota, leia `_padroes/openapi.md` (fluxo-de-trabalho, rota-nova) — são dois minutos e evitam um
 `--check` vermelho no CI.
+
+**Backend em Fastify**, no lugar do primeiro parágrafo e não além dele: `fastify`
+(Guides/Getting-Started, Reference/Plugins, Reference/Encapsulation, Reference/Lifecycle,
+Guides/Testing). `Encapsulation` **antes da primeira pull request que crie um plugin** — é a
+página que evita o guard que existe, passa no code review e não roda; e `Lifecycle` antes do
+primeiro hook, que é o que evita procurar `request.body` numa fase em que ele ainda não existe.
+Só depois de `Encapsulation`, `fastify-decorators` (README, Bootstrapping, Services and dependency
+injection) — nessa ordem porque tudo que o pacote registra é plugin, e a página do Fastify é a que
+explica onde o que ele registra fica visível. Depois, `fastify-plugins` não se lê: consulta-se,
+quando aparecer o problema.
 
 **Frontend**: `tanstack-query` (important-defaults, queries, query-keys, caching),
 `tanstack-router` (routing-concepts, search-params, data-loading, integrations/query) e
@@ -235,6 +265,24 @@ para os arquivos `.md` crus no GitHub, que é a forma mais estável de consumir 
 funciona melhor em leitura automatizada. O Nitro publica o cru no próprio site, trocando
 `nitro.build/x` por `nitro.build/raw/x.md`, e `nitro.md` aponta para os dois.
 
+O Fastify publica o cru como o Nitro, acrescentando `.md` à URL da página, e mantém a lista
+canônica em [`fastify.dev/llms.txt`](https://fastify.dev/llms.txt). Ela tem uma armadilha: lista
+`docs/latest` **e** `docs/v3.29.x`, e só a primeira metade vale para conferir link.
+
+`fastify-plugins.md` envelhece por outra regra, e é o único arquivo do pacote em que **link vivo
+não prova nada**: os destinos são README no `HEAD` de repositório de terceiro, então o conteúdo
+muda sem a URL quebrar, e o que morre primeiro é o pacote, não o link. A conferência ali é a data
+do último commit, não o status HTTP. É também por isso que os 237 da comunidade estão em tabela de
+uma linha, enquanto os 60 oficiais têm os três campos — a divergência está declarada no cabeçalho
+do arquivo.
+
+`fastify-decorators.md` envelhece em dois ritmos, e o arquivo separa os dois por seção. Os links
+de `blob/v3.16.1` apontam para uma **tag**, que não muda nunca: link vivo ali prova o conteúdo, e
+o cru está em `raw.githubusercontent.com/L2jLiga/fastify-decorators/v3.16.1/docs/<página>.md`. Os
+de `tree/v4` apontam para uma **branch**, e envelhecem pela regra de `fastify-plugins.md` — o
+conteúdo muda sem a URL quebrar, e a conferência é o último commit. Quando a v4 sair de `next`, a
+seção inteira muda de natureza: os links viram a referência, e os da 3.16.1 viram história.
+
 O Base UI publica o cru do mesmo jeito que o Nitro, acrescentando `.md` à URL, e mantém em
 [`base-ui.com/llms.txt`](https://base-ui.com/llms.txt) a lista canônica de páginas — é por ela que se
 confere link novo ou renomeado. O shadcn tem o equivalente em
@@ -252,9 +300,10 @@ maior parte dos links são **âncoras** dentro de três páginas longas (`get-st
 `advanced-usage`): link que não leva a lugar nenhum ali costuma ser âncora renomeada, com a página
 inteira de pé. Confira o `#Id` na página-mãe antes de sair procurando substituto.
 
-Em `openapi.md` os links apontam para arquivos deste repositório, e não para a web — é ferramenta
-própria, não tem doc oficial. Isso também significa que ele envelhece de um jeito diferente: link
-quebrado ali é arquivo renomeado, não site fora do ar.
+A auditoria de link é `node scripts/doc-lib/audit.mjs` (status, redirect, hash do conteúdo,
+último push de repositório, páginas oficiais sem entrada). O resultado vai para
+`_doc-lib/_audit/RELATORIO.md`, e a rodada seguinte compara com `links.json` para mostrar só o
+que mudou. Rode antes de mexer em qualquer arquivo daqui.
 
 **Quando a biblioteca lançar versão nova**, o link continuar respondendo 200 não quer dizer nada: o
 que envelhece de verdade são os trechos de código anotados aqui. A conferência que pega isso é

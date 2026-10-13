@@ -12,18 +12,13 @@
 import { Env } from '@adonisjs/core/env'
 
 /**
- * As mesmas chaves, na mesma ordem, nos três backends Adonis - inclusive as que
- * este projeto não usa hoje.
+ * O único leitor de ambiente (_padroes/backend.md §6), em blocos na ordem da
+ * casa. Toda chave declarada aqui é lida por algum `env.get()`, e vice-versa -
+ * `pattern:check` cobra os dois sentidos; chave que perdeu o leitor sai.
  *
- * Declarar só o que se usa parecia mais limpo e cobrava caro: quem copiava um
- * módulo de um projeto para outro descobria a variável faltando em produção, no
- * primeiro pedido que a lia. Com a lista fechada, `pattern:check` compara o
- * schema com `padrao.manifest.json` e reprova antes do commit; o que sobra é a
- * chave existir e ficar vazia, que não custa nada.
- *
- * Chave que este projeto ainda não lê é opcional. Obrigatória é só a que derruba
- * o boot quando falta - e derrubar o boot é o comportamento desejado: melhor a
- * aplicação não subir do que subir com um default escondido no código.
+ * Obrigatória é a que derruba o boot quando falta - e derrubar o boot é o
+ * comportamento desejado: melhor a aplicação não subir do que subir com um
+ * default escondido no código.
  */
 export default await Env.create(new URL('../', import.meta.url), {
   /*
@@ -136,92 +131,4 @@ export default await Env.create(new URL('../', import.meta.url), {
   SEED_OWNER_EMAIL: Env.schema.string.optional(),
   SEED_OWNER_PASSWORD: Env.schema.string.optional(),
   SEED_DEMO_PASSWORD: Env.schema.string.optional(),
-
-  /*
-  |----------------------------------------------------------------------------
-  | Envio de e-mail
-  |----------------------------------------------------------------------------
-  |
-  | Todas opcionais: sem `SMTP_HOST` a aplicação sobe igual e o que seria enviado
-  | vira uma linha de log. E-mail é notificação, não parte do fluxo - e nenhuma
-  | operação pode ser recusada porque o servidor de e-mail não foi configurado.
-  |
-  | `MAIL_FROM` precisa ser um endereço do domínio autenticado no SMTP;
-  | fornecedor nenhum entrega e-mail assinado como endereço de terceiro.
-  | `MAIL_TO` é a caixa que recebe os avisos internos, onde existirem.
-  |
-  | SMTP e não a API de um fornecedor: Gmail, Zoho, Brevo, Resend e o servidor da
-  | própria hospedagem falam SMTP, então trocar de fornecedor é trocar variável.
-  |
-  | `SMTP_HOST` não tem default: `'localhost'` fazia o mailer apontar para o
-  | próprio host em silêncio, e a falha só aparecia como e-mail que nunca chegou.
-  */
-  SMTP_HOST: Env.schema.string.optional(),
-  SMTP_PORT: Env.schema.number.optional(),
-  SMTP_USERNAME: Env.schema.string.optional(),
-  SMTP_PASSWORD: Env.schema.string.optional(),
-  MAIL_FROM: Env.schema.string.optional(),
-  MAIL_TO: Env.schema.string.optional(),
-
-  /*
-  |----------------------------------------------------------------------------
-  | Endereço do site
-  |----------------------------------------------------------------------------
-  |
-  | A base dos links que a API manda por e-mail. É o endereço do **frontend**, e
-  | não o da API (`APP_SERVER_URL`): quem clica precisa cair numa tela, não num JSON.
-  |
-  | Opcional pelo mesmo motivo do bloco acima: sem ela o link vira uma linha de
-  | log e a operação continua. Um link montado sobre um default errado seria pior
-  | que link nenhum - ele sai, chega, e não funciona.
-  */
-  APP_CLIENT_URL: Env.schema.string.optional(),
-
-  /*
-  |----------------------------------------------------------------------------
-  | Fila
-  |----------------------------------------------------------------------------
-  |
-  | `REDIS_URL` é o armazenamento da fila, numa URL só -
-  | `redis://[:senha@]host:porta[/db]`. Uma variável e não quatro: é assim que
-  | todo provedor entrega a credencial, e é o que o compose sobrescreve.
-  |
-  | Opcional, e não obrigatória como o instalador do pacote a escreve: a
-  | aplicação sobe sem infraestrutura acessória. Sem ela o `config/queue.ts` cai
-  | no adaptador `sync`. Exigir a variável transformaria Redis fora do ar em site
-  | fora do ar.
-  |
-  | Sem `format: 'url'`: o validador do Adonis só reconhece esquemas web, e
-  | recusa `redis://` como URL inválida.
-  |
-  | `QUEUE_DRIVER` é o adaptador. Com `REDIS_URL` o default é `redis`, o único
-  | que sobrevive a um restart - e a fila existe justamente para o trabalho que
-  | não pode se perder quando o processo cai. `sync` executa o job na hora,
-  | dentro da requisição: é o default sem `REDIS_URL`, e o que a suíte usa.
-  */
-  REDIS_URL: Env.schema.string.optional(),
-  QUEUE_DRIVER: Env.schema.enum.optional(['redis', 'database', 'sync'] as const),
-
-  /*
-  |----------------------------------------------------------------------------
-  | Pix
-  |----------------------------------------------------------------------------
-  |
-  | A chave que recebe o pagamento, e o nome e a cidade que aparecem no
-  | aplicativo do banco de quem paga.
-  |
-  | **Obrigatórias onde a cobrança existe**, e opcionais onde não existe - é a
-  | única diferença entre os três schemas. Tinham default escrito no serviço, e
-  | um deploy que esquecesse a variável emitiria todo BR Code apontando para a
-  | chave do repositório; o defeito só apareceria quando alguém reclamasse de um
-  | pagamento que não chegou. Sem default, a aplicação não sobe - que é o barulho
-  | certo para uma chave que recebe dinheiro.
-  |
-  | Nome e cidade não são enfeite: o manual do Bacen os exige no BR Code, com
-  | teto de 25 e 15 caracteres. Estourar o teto faz o aplicativo recusar o código
-  | inteiro, e o erro só aparece na hora de pagar.
-  */
-  PIX_KEY: Env.schema.string.optional(),
-  PIX_MERCHANT: Env.schema.string.optional(),
-  PIX_CITY: Env.schema.string.optional(),
 })

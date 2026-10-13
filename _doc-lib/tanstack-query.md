@@ -2,7 +2,7 @@
 
 Gerenciador de estado de servidor: cache, revalidação, deduplicação e sincronização.
 
-> Conferido contra `@tanstack/react-query@5.101.4` e `@tanstack/query-core@5.101.4` instalados. Duas
+> Conferido contra `@tanstack/react-query@5.104.1` e `@tanstack/query-core@5.104.1` (latest). Duas
 > coisas mudaram dentro da v5 e não quebram o build, então passam despercebidas: os callbacks de
 > mutação ganharam um **quarto parâmetro** (`context`, com `client` dentro) e o terceiro virou
 > `onMutateResult`; e existe agora um **`mutationOptions()`**, irmão do `queryOptions()`, que a doc
@@ -50,6 +50,8 @@ prefetch, `getQueryData`, invalidação. É o que a regra de ESLint `prefer-quer
 que impede a mesma chave de acabar com duas funções diferentes.
 
 **Links:** 57.
+
+**Skills:** `maiyu-frontend`, `react-data-fetching`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
 ---
 
@@ -249,6 +251,24 @@ const queryClient = new QueryClient({
 // É o que faz `useMemo` e `useEffect` sobre `data` não dispararem à toa.
 ```
 
+```ts
+import { useQuery } from '@tanstack/react-query'
+
+type Team = { id: string; name: string }
+
+// Default global é 60s (acima), mas esta query sabe que o próprio dado muda
+// pouco: sobrescreve só para ela, sem tocar no QueryClient.
+function useTeam(teamId: string) {
+  return useQuery({
+    queryKey: ['team', teamId] as const,
+    queryFn: () => fetchTeam(teamId),
+    staleTime: 10 * 60_000, // 10 min, porque times mudam de nome raramente
+  })
+}
+
+declare function fetchTeam(id: string): Promise<Team>
+```
+
 #### guides/queries
 [doc](https://tanstack.com/query/latest/docs/framework/react/guides/queries) | [markdown](https://raw.githubusercontent.com/tanstack/query/main/docs/framework/react/guides/queries.md)
 **O que é:** `status` e `fetchStatus` — dois estados, não um.
@@ -269,6 +289,42 @@ const { status, fetchStatus, data, error } = useQuery({ queryKey: ['posts'], que
 if (status === 'pending') return <span>Carregando…</span>
 if (status === 'error') return <span>Erro: {error.message}</span>
 return <ul>{data.map((p) => <li key={p.id}>{p.title}</li>)}</ul>
+```
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+
+type User = { id: string; name: string }
+
+// Caso comum: só revalidação em segundo plano merece indicador discreto, não
+// o spinner de tela cheia — e isso só dá para distinguir com `fetchStatus`.
+function UserBadge({ userId }: { userId: string }) {
+  const { data, status, fetchStatus } = useQuery({
+    queryKey: ['user', userId] as const,
+    queryFn: () => fetchUser(userId),
+  })
+
+  if (status === 'pending') return <span>Carregando…</span>
+  if (status === 'error') return <span>Falha ao carregar usuário</span>
+
+  return (
+    <span>
+      {data.name}
+      {fetchStatus === 'fetching' && <em> (atualizando)</em>}
+    </span>
+  )
+}
+
+declare function fetchUser(id: string): Promise<User>
+```
+
+```ts
+// Pegadinha: `isLoading` (atalho para `status === 'pending' && fetchStatus === 'fetching'`)
+// não cobre o caso `enabled: false`. Uma query desabilitada fica em `pending`,
+// `isLoading` fica `false`, e um `if (isLoading) return null` deixa a tela em
+// branco sem spinner e sem erro — pareceu que "não carregou nada".
+const query = useQuery({ queryKey: ['user', userId], queryFn: fetchUser, enabled: !!userId })
+// Correto: checar `status === 'pending'` quando a condição de habilitar pode ser falsa.
 ```
 
 #### guides/query-keys
@@ -293,6 +349,26 @@ useQuery({ queryKey: ['posts', page, status] })
 // A regra que resume tudo: TODA variável usada dentro da queryFn entra na chave.
 // Faltando, o cache devolve o dado do id anterior, sem erro nenhum.
 useQuery({ queryKey: ['post', postId], queryFn: () => api.posts.get(postId) })
+```
+
+```ts
+// Caso comum: uma "fábrica" de chaves por entidade, para não espalhar o
+// literal `['team', ...]` por vários arquivos e arriscar grafia diferente.
+type TeamFilters = { status: 'active' | 'archived' }
+
+const teamKeys = {
+  all: ['teams'] as const,
+  list: (filters: TeamFilters) => [...teamKeys.all, 'list', filters] as const,
+  detail: (teamId: string) => [...teamKeys.all, 'detail', teamId] as const,
+}
+
+useQuery({ queryKey: teamKeys.detail(teamId), queryFn: () => fetchTeam(teamId) })
+// invalidação por prefixo: mata lista E detalhe de uma vez
+queryClient.invalidateQueries({ queryKey: teamKeys.all })
+
+declare const teamId: string
+declare const queryClient: { invalidateQueries: (opts: { queryKey: readonly unknown[] }) => void }
+declare function fetchTeam(id: string): Promise<{ id: string }>
 ```
 
 #### guides/query-functions
@@ -345,13 +421,13 @@ export function postOptions(id: string) {
 // o mesmo objeto serve em todos estes lugares:
 useQuery(postOptions(id))
 useSuspenseQuery(postOptions(id))
-queryClient.prefetchQuery(postOptions(id))
+queryClient.query(postOptions(id))
 queryClient.setQueryData(postOptions(id).queryKey, novo) // e a chave sai TIPADA
 ```
 
 ```ts
 // Existem os irmãos `infiniteQueryOptions` e — novidade que a doc do site ainda
-// não cobre, mas está exportada na 5.101.4 — `mutationOptions`.
+// pouco cobre, mas está exportada desde a v5 — `mutationOptions`.
 import { mutationOptions } from '@tanstack/react-query'
 ```
 
@@ -813,19 +889,23 @@ Os quatro tipos, e o conserto de cada um:
 [`tanstack-router.md`](tanstack-router.md)) e no hover de um link.
 
 ```ts
-// prefetchQuery: devolve Promise<void>, respeita staleTime, ignora erro
-await queryClient.prefetchQuery(postOptions(id))
+// A partir da 5.102, `query()` substitui os três métodos abaixo. Devolve O
+// DADO (como `ensureQueryData`), aceita `staleTime` por chamada, e
+// `{ staleTime: 'static' }` reproduz o comportamento antigo do ensureQueryData
+// (busca só se não houver nada em cache, nunca por estar `stale`).
+const post = await queryClient.query({ ...postOptions(id), staleTime: 'static' })
 
-// ensureQueryData: devolve O DADO, e busca só se não houver nada em cache.
-// É o que se usa em loader de rota, porque o loader precisa do valor.
-const post = await queryClient.ensureQueryData(postOptions(id))
+// `fetchQuery`, `prefetchQuery` e `ensureQueryData` ficam **deprecated** (ainda
+// funcionam, saem só na próxima major), e eram assim:
+await queryClient.prefetchQuery(postOptions(id)) // Promise<void>, ignora erro
+const old = await queryClient.ensureQueryData(postOptions(id)) // busca só se faltar
 ```
 
 ```tsx
 // no hover: o dado costuma chegar antes do clique terminar
 <Link
-  onMouseEnter={() => queryClient.prefetchQuery(postOptions(id))}
-  onFocus={() => queryClient.prefetchQuery(postOptions(id))}
+  onMouseEnter={() => queryClient.query({ ...postOptions(id), staleTime: 'static' })}
+  onFocus={() => queryClient.query({ ...postOptions(id), staleTime: 'static' })}
 />
 
 // `usePrefetchQuery` existe para prefetch dentro de componente sem bloquear o
@@ -850,6 +930,45 @@ O ciclo:
   4. todos desmontam          → começa a contagem do gcTime
   5. remonta antes do fim     → cache ainda está lá, dado aparece instantâneo
   6. 5 min sem ninguém        → entrada apagada; a próxima montagem carrega do zero
+```
+
+```ts
+import { useQuery } from '@tanstack/react-query'
+
+type Post = { id: string; title: string }
+
+// Básico: staleTime curto (ou 0, o default) para dado que muda o tempo todo.
+function usePost(postId: string) {
+  return useQuery({
+    queryKey: ['post', postId] as const,
+    queryFn: () => fetchPost(postId),
+  })
+}
+
+declare function fetchPost(id: string): Promise<Post>
+```
+
+```ts
+// Caso comum: dado que some da tela (ex.: modal fechado) mas tende a reabrir
+// rápido. `gcTime` maior que o default evita recarregar do zero ao reabrir.
+useQuery({
+  queryKey: ['post', postId],
+  queryFn: () => fetchPost(postId),
+  gcTime: 30 * 60_000, // 30 min sem observador antes de apagar
+})
+
+declare const postId: string
+declare function fetchPost(id: string): Promise<{ id: string }>
+```
+
+```ts
+// Pegadinha: `gcTime: 0` não "desliga o cache" — apaga a entrada no instante
+// em que o último observador desmonta. Entre uma rota e a próxima (mesmo que
+// seja a mesma query), o dado já não está mais lá, e a navegação volta a
+// mostrar "carregando" onde antes era instantâneo.
+useQuery({ queryKey: ['post', postId], queryFn: () => fetchPost(postId), gcTime: 0 })
+// Se a intenção é "nunca ficar velho", o campo certo é `staleTime: Infinity`,
+// não `gcTime: 0`.
 ```
 
 #### guides/render-optimizations
@@ -929,7 +1048,9 @@ new QueryClient({ defaultOptions: { queries: { staleTime: 60_000 } } })
 
 ```tsx
 // Hidratação: prefetch no servidor, dehydrate, HydrationBoundary no cliente
-await queryClient.prefetchQuery(postsOptions())
+// `query()` substitui `prefetchQuery` desde a 5.102; `.catch(noop)` reproduz o
+// "ignora erro" do método antigo
+await queryClient.query(postsOptions()).catch(noop)
 const state = dehydrate(queryClient)
 
 <HydrationBoundary state={state}>
@@ -1277,3 +1398,10 @@ const queryClient = new QueryClient({
 // A diferença para o persistQueryClient: aqui a chave de gravação é o hash da
 // query, um item por query. Lá é um item só com tudo dentro.
 ```
+
+## Fora de escopo
+
+- community-resources
+- migrating-to-react-query-3
+- migrating-to-react-query-4
+- migrating-to-v5

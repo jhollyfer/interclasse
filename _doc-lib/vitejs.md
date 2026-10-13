@@ -1,5 +1,7 @@
 # Vite
 
+> Conferido contra `vite@8.3.4` (última publicada no npm).
+
 Servidor de desenvolvimento e ferramenta de build que roda por baixo de todo o frontend.
 
 **O que é:** duas ferramentas no mesmo pacote. Em desenvolvimento, um servidor que entrega os
@@ -48,6 +50,8 @@ de ambiente, asset e plugin são do **Vite**; e o formato do servidor de produç
 reescrever o que ele já faz — e é o erro que a seção "Integração" abaixo existe para evitar.
 
 **Links:** 25. Um terço deles é para quem escreve plugin ou framework, e não para quem escreve tela.
+
+**Skills:** `vite-bundle-optimization`, `perf-web-optimization`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 Estão marcados como tal.
 
 ---
@@ -115,6 +119,34 @@ pnpm dev
 pnpm build && pnpm preview
 ```
 
+```ts
+// vite.config.ts — a mesma assimetria, resolvida: em dev cada módulo é
+// servido sob demanda; em build o Rolldown agrupa tudo em chunks, e o
+// efeito de topo de um módulo passa a rodar na ordem real do bundle.
+export default defineConfig({
+  plugins: [
+    nitro({
+      rolldownConfig: { output: { strictExecutionOrder: true } },
+    }),
+  ],
+})
+```
+
+```ts
+// errado: import estático de um módulo com efeito de topo (toca `window`
+// ao importar, não ao usar). Em dev funciona, porque só a rota que usa
+// `DiagramEditor` carrega esse módulo; no build ele pode cair no mesmo
+// chunk de algo usado em toda tela, e o efeito passa a rodar sempre.
+import 'bpmn-js'
+
+// certo: import dinâmico isola o efeito de topo dentro do ponto que
+// de fato precisa dele, nos dois caminhos de código.
+async function loadDiagramEditor() {
+  const { default: BpmnViewer } = await import('bpmn-js')
+  return BpmnViewer
+}
+```
+
 #### features
 [doc](https://vite.dev/guide/features)
 
@@ -138,6 +170,27 @@ import urlDoIcone from './logo.svg?url' // caminho final, com hash
 import estiloInline from './print.css?inline' // CSS como string, sem injetar na página
 ```
 
+```tsx
+// src/components/common/brand-logo.tsx — `?url` numa tela real do stack.
+import logoUrl from '@/assets/logo.svg?url'
+
+type BrandLogoProps = {
+  className?: string
+}
+
+export function BrandLogo({ className }: BrandLogoProps) {
+  return <img src={logoUrl} alt="Maiyu" className={className} />
+}
+```
+
+```ts
+// errado: import default/nomeado de CSS — removido desde o Vite 5, vem undefined.
+import styles from './card.css'
+
+// certo: `?inline` devolve o CSS como string, sem injetar na página.
+import cardCss from './card.css?inline'
+```
+
 #### cli
 [doc](https://vite.dev/guide/cli)
 
@@ -151,14 +204,31 @@ não é um servidor de produção**: ele serve o build só para conferência loc
 roda em produção é o servidor gerado pelo Nitro (`node .output/server/index.mjs`).
 
 ```bash
-# O que costuma estar no package.json:
+# Uso direto, como a documentação mostra:
+vite [root]
+vite build [root]
+vite preview [root]
+```
+
+```bash
+# O que costuma estar no package.json de um app real do stack:
 vite dev --host --port 3000   # --host expõe na rede local, útil para testar no celular
 vite build
-vite preview
+vite build --mode staging     # troca qual .env é carregado (veja env-and-mode)
 
 # As duas flags de emergência:
-pnpm dev --force              # limpa node_modules/.vite e re-otimiza as dependências
-pnpm build --mode staging     # troca qual .env é carregado (veja env-and-mode)
+pnpm dev --force               # limpa node_modules/.vite e re-otimiza as dependências
+pnpm dev --debug hmr            # mostra só os logs de HMR, não a firehose inteira
+```
+
+```bash
+# errado: tratar `vite preview` como o servidor de produção.
+vite build && vite preview --host 0.0.0.0 --port 80
+
+# certo: preview é só conferência local do build; em produção (com SSR),
+# quem serve é o servidor gerado pelo Nitro.
+vite build
+node .output/server/index.mjs
 ```
 
 ## Configuração
@@ -190,6 +260,39 @@ export default defineConfig(({ command }) => ({
     ...(command === 'serve' ? [devtools()] : []),
   ],
 }))
+```
+
+```ts
+// vite.config.ts — alias real do stack: um módulo Node sem equivalente no
+// navegador recebe um stub em vez de o build falhar com "não resolvido".
+import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      'node:dns/promises': fileURLToPath(
+        new URL('./src/lib/stubs/node-dns-promises.ts', import.meta.url),
+      ),
+    },
+  },
+})
+```
+
+```ts
+// errado: comparação implícita — ferramentas que não suportam a flag
+// mandam `undefined`, que aqui se comporta igual a `false` sem avisar.
+export default defineConfig(({ isPreview }) => ({
+  define: { __IS_PREVIEW__: Boolean(isPreview) },
+}))
+
+// certo: comparação explícita contra `true`/`false`, como a doc recomenda —
+// separa "ferramenta não manda a flag" de "é build de preview".
+export default defineConfig(({ isPreview }) => {
+  if (isPreview === true) return { define: { __IS_PREVIEW__: true } }
+  return { define: { __IS_PREVIEW__: false } }
+})
 ```
 
 #### env-and-mode
@@ -226,6 +329,18 @@ VITE_APP_TITLE="Meu App (local)"   # público: aparece no bundle
 DATABASE_PASSWORD=...              # sem VITE_: some do cliente, e é isso que se quer
 ```
 
+```ts
+// errado: `process.env` não existe no navegador — fica `undefined` no
+// bundle do cliente. (Em `vite.config.ts`, que roda em Node, ele existe —
+// é por isso que o `apiOrigins()` da CSP lê `process.env.VITE_API_BASE_URL`
+// ali, mas essa leitura não serve de modelo para código de tela.)
+const apiUrl = process.env.VITE_API_BASE_URL
+
+// certo: no código de app, a variável vem de `import.meta.env`,
+// substituída estaticamente em tempo de build.
+const apiUrlCorreto = import.meta.env.VITE_API_BASE_URL
+```
+
 #### using-plugins
 [doc](https://vite.dev/guide/using-plugins)
 
@@ -238,6 +353,19 @@ estética: o Paraglide precisa gerar `src/paraglide` antes que alguém importe d
 Compiler vem por último porque opera sobre o JSX já processado. Plugin novo entra com a pergunta "o
 que ele precisa que já exista?", não no fim por comodidade.
 
+```js
+// Exatamente como a documentação mostra: instala e registra no array.
+// $ npm add -D @vitejs/plugin-legacy
+import legacy from '@vitejs/plugin-legacy'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    legacy({ targets: ['defaults', 'not IE 11'] }),
+  ],
+})
+```
+
 ```ts
 // Uma ordem real de app TanStack Start, com o motivo de cada posição:
 plugins: [
@@ -249,6 +377,17 @@ plugins: [
   viteReact(),        // depois do Start: transforma o JSX das rotas geradas
   babel({ presets: [reactCompilerPreset()] }), // por último, sobre o JSX já processado
 ]
+```
+
+```ts
+// errado: plugin de compatibilidade do Rollup sem `enforce`, contando só
+// com a posição no array — alguns plugins exigem rodar antes dos plugins
+// core do Vite, e a posição sozinha não garante isso.
+plugins: [tailwindcss(), tanstackStart(), rollupPluginImage()]
+
+// certo: `enforce: 'pre'` garante que esse plugin rode antes dos core,
+// independente de onde está escrito no array.
+plugins: [{ ...rollupPluginImage(), enforce: 'pre' }, tailwindcss(), tanstackStart()]
 ```
 
 #### dep-pre-bundling
@@ -275,6 +414,22 @@ pnpm dev --force
 // senão o cache congela a versão da primeira execução.
 export default defineConfig({
   optimizeDeps: { exclude: ['@acme/pacote-local'] },
+})
+```
+
+```ts
+// errado: um pacote do monorepo, linkado via workspace, só em CJS/UMD —
+// o Vite já o trata como código-fonte e não o pré-empacota; sem ESM ele
+// chega quebrado ao navegador, e `exclude` não resolve isso.
+export default defineConfig({
+  optimizeDeps: { exclude: ['@acme/pacote-workspace'] },
+})
+
+// certo: a doc recomenda `include` para o linked dep que não é ESM —
+// isso força o Vite a converter e empacotar esse pacote como qualquer
+// dependência de `node_modules`.
+export default defineConfig({
+  optimizeDeps: { include: ['@acme/pacote-workspace'] },
 })
 ```
 
@@ -344,6 +499,24 @@ Node que serve as rotas do TanStack Start, e o deploy é esse servidor (em conta
 conhecer para reconhecer o descompasso — quando um tutorial mandar subir a pasta `dist/` num bucket,
 é o cenário de SPA pura que ele assume.
 
+```ts
+// Exatamente como a doc mostra, para publicar fora da raiz do domínio
+// (ex.: https://usuario.github.io/repo/).
+export default defineConfig({
+  base: '/repo/',
+})
+```
+
+```bash
+# errado: seguir a receita de SPA estática com um app que faz SSR —
+# `dist/` nem existe; o build de um app Start gera `.output/`, um servidor.
+aws s3 sync dist/ s3://meu-bucket --delete
+
+# certo: reconhecer que SSR não é estático e publicar o servidor gerado.
+pnpm build
+node .output/server/index.mjs
+```
+
 ```dockerfile
 # Dockerfile de produção — o deploy real: servidor, não bucket.
 COPY .output/ ./.output/
@@ -388,12 +561,34 @@ quando um erro de servidor citar `ssrLoadModule` ou externalização e for preci
 aquilo veio.
 
 ```ts
+// Exatamente como a doc mostra: ramificar lógica entre servidor e cliente.
+// É estático em tempo de build, então o lado não usado é removido (tree-shaking).
+if (import.meta.env.SSR) {
+  // ... lógica só de servidor
+}
+```
+
+```ts
 // O que esta página ensina a fazer à mão...
 const { render } = await vite.ssrLoadModule('/src/entry-server.tsx')
 
 // ...e o que o repositório escreve, com o Start cuidando do resto.
 import { createServerFn } from '@tanstack/react-start'
 const listar = createServerFn({ method: 'GET' }).handler(async () => { /* ... */ })
+```
+
+```ts
+// errado: montar `entry-server.tsx` e chamar `ssrLoadModule` à mão num
+// app TanStack Start — o Start já roda seu próprio SSR; isso são dois
+// pipelines de renderização competindo pelo mesmo request.
+const { render } = await vite.ssrLoadModule('/src/entry-server.tsx')
+const html = await render(request.url)
+
+// certo: deixar o Start resolver SSR, e só escrever a função de servidor
+// que a tela precisa — sem montar servidor de renderização nenhum.
+const listarUsuarios = createServerFn({ method: 'GET' }).handler(async () => {
+  return []
+})
 ```
 
 #### backend-integration
@@ -425,9 +620,30 @@ funciona**. No **Vite 8, que usa Rolldown no lugar do Rollup**, resposta de Stac
 mexer em `rollupOptions` de um jeito muito específico, ou instalar plugin de Rollup, pode estar
 descrevendo um mundo que não existe mais. Confirme a versão antes de aplicar.
 
+```jsonc
+// Exatamente como a doc mostra, para quem vinha do preview `rolldown-vite`:
+{
+  "devDependencies": {
+    "vite": "^8.0.0"
+  }
+}
+```
+
 ```bash
 # Antes de aplicar qualquer receita achada na internet:
 pnpm vite --version   # 8.x — Rolldown, não Rollup
+```
+
+```bash
+# errado: instalar um plugin que é especificamente de Rollup (não de Vite)
+# pensando que "é tudo a mesma coisa por baixo" — no Vite 8 o bundler é o
+# Rolldown, e um plugin escrito contra a API interna do Rollup pode não existir.
+pnpm add -D rollup-plugin-visualizer
+
+# certo: procurar primeiro na lista de plugins oficiais/compatíveis com
+# Rolldown, e confirmar a versão do Vite antes de aplicar a receita.
+pnpm vite --version
+# https://vite.dev/plugins/
 ```
 
 #### troubleshooting
@@ -446,6 +662,27 @@ watchers no Linux, que aparece como "too many open files" sem falar em watcher n
 # Linux, projeto grande: o watcher estoura o limite e o erro não diz isso.
 cat /proc/sys/fs/inotify/max_user_watches
 sudo sysctl fs.inotify.max_user_watches=524288
+```
+
+```bash
+# Erro real: linkou um pacote local e o import "não existe" ou vem antigo.
+pnpm link ../pacote-local
+pnpm dev             # ainda serve a versão de antes do link
+
+# A doc chama isso de "Outdated pre-bundled deps" — a resposta é forçar a
+# reotimização, não investigar o código do pacote (veja dep-pre-bundling).
+pnpm dev --force
+```
+
+```bash
+# errado: tratar "Failed to fetch dynamically imported module" como bug de
+# código e sair debugando o componente. A causa mais comum é version skew:
+# o HTML em cache do navegador referencia um chunk que o deploy novo apagou.
+
+# certo: antes de debugar o componente, confirme se houve deploy recente —
+# a doc chama isso de "version skew", e a correção fica no reload do cliente,
+# não no componente.
+curl -I https://app.exemplo.com/assets/chunk-abc123.js   # 404 = chunk antigo
 ```
 
 ## APIs de extensão
@@ -612,3 +849,4 @@ por baixo dela.
 // A escolha de runtime, aqui, é uma linha do Nitro — não desta API.
 nitro({ preset: 'node-server' })
 ```
+

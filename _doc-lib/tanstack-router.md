@@ -22,7 +22,7 @@ pnpm add -D @tanstack/router-plugin
 ```tsx
 export const Route = createFileRoute('/posts/')({
   validateSearch: (s: Record<string, unknown>) => ({ page: Number(s.page ?? 1) }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery()),
+  loader: ({ context }) => context.queryClient.query({ ...postsQuery(), staleTime: 'static' }),
   component: PostList,
 })
 
@@ -38,7 +38,11 @@ nada resolvem com menos configuração.
 sobreviver ao F5 e funcionar com o botão voltar. Antes de criar um `useState` para um filtro, veja
 se ele não pertence à URL.
 
-**Links:** 54.
+**Links:** 61.
+
+**Skills:** `maiyu-frontend`, `server-side-rendering`, `streaming-ssr`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
+> Conferido contra `@tanstack/react-router@1.170.42` (`@tanstack/router-core@1.171.35`, latest).
 
 ---
 
@@ -308,6 +312,34 @@ export const Route = createFileRoute('/_authenticated')({
 // src/routes/_authenticated/dashboard.tsx  ->  URL /dashboard, já protegida
 ```
 
+```tsx
+// Caso comum: rota índex dentro de um grupo pathless. `index.tsx` é a URL do
+// próprio diretório pai, não uma sub-rota com nome.
+import { createFileRoute } from '@tanstack/react-router'
+
+type Team = { id: string; name: string }
+
+// src/routes/_authenticated/teams/index.tsx  ->  URL /teams
+export const Route = createFileRoute('/_authenticated/teams/')({
+  loader: (): Promise<Team[]> => fetchTeams(),
+  component: () => {
+    const teams = Route.useLoaderData()
+    return <ul>{teams.map((t) => <li key={t.id}>{t.name}</li>)}</ul>
+  },
+})
+
+declare function fetchTeams(): Promise<Team[]>
+```
+
+```ts
+// Pegadinha: rota curinga (`$.tsx`, "splat") e rota 404 (`__root.tsx` ->
+// `notFoundComponent`) resolvem problemas diferentes. O curinga CASA e entra
+// no loader normal; o 404 só aparece quando NENHUMA rota casa, nem o curinga.
+// Usar `$.tsx` esperando o comportamento de "não encontrado" faz o loader da
+// rota curinga rodar para toda URL desconhecida — inclusive para erro de
+// digitação, que deveria cair no 404.
+```
+
 #### routing/route-trees
 [doc](https://tanstack.com/router/latest/docs/routing/route-trees) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/routing/route-trees.md)
 **O que é:** como a árvore de rotas é montada e como o aninhamento de layout se reflete nela.
@@ -560,6 +592,39 @@ export const Route = createFileRoute('/posts/')({
 })
 ```
 
+```tsx
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { z } from 'zod'
+
+// Caso comum: schema com Zod, e herança — a página de lista lê `page`
+// E `status`, mesmo que `status` só exista para dar contexto ao breadcrumb.
+const teamListSearch = z.object({
+  page: z.number().min(1).default(1),
+  status: z.enum(['active', 'archived']).default('active'),
+})
+
+export const Route = createFileRoute('/teams/')({
+  validateSearch: teamListSearch,
+  component: () => {
+    const { page, status } = Route.useSearch()
+    return (
+      <Link to="/teams" search={(s) => ({ ...s, page: s.page + 1 })}>
+        Próxima página de {status}, atual {page}
+      </Link>
+    )
+  },
+})
+```
+
+```ts
+// Pegadinha: `validateSearch` tem que ser SÍNCRONO. Um schema cujo `.parseAsync`
+// (ou qualquer validador que devolva Promise) é passado direto aqui não lança
+// erro de tipo — o roteador aceita a função, mas trata o retorno (uma Promise)
+// como se já fosse o objeto de search. `useSearch()` então devolve a Promise
+// em vez de `{ page, status }`, e o componente lê `undefined` em tudo.
+// Resolve com uma função própria que valida sem await, ou um schema síncrono.
+```
+
 #### guide/custom-search-param-serialization
 [doc](https://tanstack.com/router/latest/docs/guide/custom-search-param-serialization) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/guide/custom-search-param-serialization.md)
 **O que é:** trocar o formato de serialização dos search params, por exemplo JSON comprimido ou
@@ -752,6 +817,31 @@ export const Route = createFileRoute('/users/')({
 })
 ```
 
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+
+type Post = { id: string; title: string }
+
+// Caso comum: loader que usa `params` da própria rota e o `context` herdado
+// do pai (ex.: um client de API injetado no beforeLoad da raiz).
+export const Route = createFileRoute('/posts/$postId')({
+  loader: ({ params, context }): Promise<Post> => context.api.posts.get(params.postId),
+  component: () => {
+    const post = Route.useLoaderData()
+    return <h1>{post.title}</h1>
+  },
+})
+```
+
+```ts
+// Pegadinha: o loader só RODA de novo se a rota for revisitada depois do
+// `staleTime` expirar, ou após `router.invalidate()`. Uma mutação que altera
+// o dado numa tela e volta para a lista NÃO revalida o loader da lista por
+// conta própria — ele serve o cache antigo até expirar. É preciso invalidar
+// explicitamente (`router.invalidate()`) ou integrar com TanStack Query
+// (`integrations/query`), que já tem `invalidateQueries` para isso.
+```
+
 #### guide/deferred-data-loading
 [doc](https://tanstack.com/router/latest/docs/guide/deferred-data-loading) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/guide/deferred-data-loading.md)
 **O que é:** adiar parte dos dados com `Await` e promessas, mostrando a página antes de tudo chegar.
@@ -788,7 +878,7 @@ export const Route = createFileRoute('/posts/')({
   // a decisão explícita: o CACHE é do Query, o loader só garante que o dado
   // exista antes do render. O loader não retorna dado, e por isso não há
   // segunda cópia para desatualizar.
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery()),
+  loader: ({ context }) => context.queryClient.query({ ...postsQuery(), staleTime: 'static' }),
 })
 ```
 
@@ -1079,7 +1169,7 @@ const trilha = useMatches().map((m) => m.staticData.titulo).filter(Boolean)
 #### integrations/query
 [doc](https://tanstack.com/router/latest/docs/integrations/query) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/integrations/query.md)
 **O que é:** a integração oficial com TanStack Query: `queryClient` no contexto do router,
-`ensureQueryData` no loader e SSR combinado.
+`query()` no loader e SSR combinado.
 **Para que serve:** o loader garante que o dado exista antes de renderizar, e o componente consome
 com `useSuspenseQuery` já do cache. Sem cascata e sem cache duplicado.
 **Quando usar:** **obrigatória se o projeto usa Router e Query juntos**. É a página que define quem
@@ -1092,11 +1182,48 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 const postsQuery = () => ({ queryKey: ['posts'], queryFn: listarPosts })
 
 export const Route = createFileRoute('/posts/')({
-  // loader: GARANTE que o dado existe (não devolve dado)
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery()),
+  // loader: GARANTE que o dado existe (não devolve dado). `staleTime: 'static'`
+  // reproduz o comportamento do antigo `ensureQueryData` (deprecated na 5.102+):
+  // busca só se faltar em cache, nunca por estar `stale`.
+  loader: ({ context }) => context.queryClient.query({ ...postsQuery(), staleTime: 'static' }),
   // componente: LÊ do cache do Query, já quente, sem suspender de verdade
   component: () => <p>{useSuspenseQuery(postsQuery()).data.length}</p>,
 })
+```
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+
+type Team = { id: string; name: string }
+
+// Caso comum: `queryOptions` reaproveitado entre o loader e o componente, com
+// `params` tipado da própria rota — a mesma chave em ambos os lugares é o que
+// faz o `query()` do loader "aquecer" exatamente o cache que o
+// `useSuspenseQuery` do componente vai ler.
+const teamQuery = (teamId: string) =>
+  queryOptions({ queryKey: ['team', teamId] as const, queryFn: () => fetchTeam(teamId) })
+
+export const Route = createFileRoute('/teams/$teamId')({
+  loader: ({ context, params }) =>
+    context.queryClient.query({ ...teamQuery(params.teamId), staleTime: 'static' }),
+  component: () => {
+    const { teamId } = Route.useParams()
+    const team = useSuspenseQuery(teamQuery(teamId)).data
+    return <h1>{team.name}</h1>
+  },
+})
+
+declare function fetchTeam(id: string): Promise<Team>
+```
+
+```ts
+// Pegadinha: sem `staleTime: 'static'`, `query()` segue o `staleTime` padrão
+// da query (0, se não houver outro default) e pode refazer a busca mesmo com
+// cache presente — reintroduzindo a cascata que a integração existe para
+// eliminar. Em versões anteriores à 5.102 (sem `query()`), o equivalente era
+// `ensureQueryData` (hoje deprecated), que já tinha esse comportamento de
+// "busca só se faltar" sem precisar da opção.
 ```
 
 ## ESLint
@@ -1139,3 +1266,252 @@ createFileRoute('/x')({
   loader: ({ context }) => context.user.id,
 })
 ```
+
+## How-to
+
+#### faq
+[doc](https://tanstack.com/router/latest/docs/faq) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/faq.md)
+**O que é:** quatro perguntas recorrentes, sem relação entre si, que o guia principal não resolve de
+cara.
+**Para que serve:** evitar decisão errada em dois pontos específicos: comitar ou não o
+`routeTree.gen.ts`, e como condicionar o conteúdo da rota raiz.
+**Quando usar:** ao configurar o `.gitignore` do projeto, e ao tentar renderizar a raiz
+condicionalmente.
+
+`routeTree.gen.ts` **não é artefato de build** — é gerado, mas faz parte do runtime da aplicação, e
+deve ir para o git como qualquer outro arquivo de código. A raiz, por sua vez, nunca é condicional:
+é o ponto de entrada e é sempre renderizada; conteúdo que varia por autenticação é um Layout Route
+(ou Pathless Layout Route) com um `beforeLoad` que restringe acesso, não um `if` dentro de
+`RootComponent`.
+
+#### how-to/arrays-objects-dates-search-params
+[doc](https://tanstack.com/router/latest/docs/how-to/arrays-objects-dates-search-params) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/arrays-objects-dates-search-params.md)
+**O que é:** como validar search params que não são string/number/boolean soltos: array, objeto
+aninhado e `Date`.
+**Para que serve:** o `guide/search-params` mostra o básico com um número; aqui é o filtro de
+listagem de verdade, com `tags: string[]`, range de preço e intervalo de datas.
+**Quando usar:** ao desenhar o schema de uma listagem com múltiplos filtros (categoria + tags +
+paginação), que é exatamente o formato de `ListSearch`/`StorefrontSearch` deste app.
+
+```tsx
+import { z } from 'zod'
+
+const searchSchema = z.object({
+  categories: z.array(z.string()).default([]),
+  priceRange: z.array(z.number()).length(2).optional(), // [min, max]
+})
+```
+
+`Date` **não serializa direto na URL** — vira string ISO na ida e precisa ser reconstruída
+(`new Date(str)`) na volta. Um schema que valida `z.date()` sem esse round-trip quebra em runtime:
+a URL nunca guarda um objeto `Date`, guarda uma string.
+
+#### how-to/validate-search-params
+[doc](https://tanstack.com/router/latest/docs/how-to/validate-search-params) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/validate-search-params.md)
+**O que é:** o que fazer quando `validateSearch` lança — o `errorComponent` da própria rota, em vez
+de deixar o erro subir para o `errorComponent` mais genérico do pai.
+**Para que serve:** URL adulterada na mão (ou link velho com formato antigo de parâmetro) não pode
+derrubar a tela inteira sem uma saída.
+**Quando usar:** em qualquer rota cujo search venha de fora do app (link compartilhado, favorito
+antigo). **Sem isso, um `?page=abc` colado na barra quebra a rota sem recuperação.**
+
+```tsx
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { z } from 'zod'
+
+export const Route = createFileRoute('/produtos')({
+  validateSearch: z.object({ page: z.number().min(1) }),
+  errorComponent: ({ error }) => {
+    const router = useRouter()
+    return (
+      <div>
+        <p>{error instanceof Error ? error.message : String(error)}</p>
+        <button onClick={() => router.navigate({ to: '/produtos', search: {} })}>
+          Limpar filtros
+        </button>
+      </div>
+    )
+  },
+  component: ProdutosPage,
+})
+```
+
+```tsx
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { z } from 'zod'
+
+// Caso comum: schema próprio, não `z.object` direto — permite registrar a
+// causa do erro (qual campo falhou) antes de devolver ao errorComponent.
+const teamSearchSchema = z.object({ status: z.enum(['active', 'archived']) })
+
+export const Route = createFileRoute('/teams/')({
+  validateSearch: (search: Record<string, unknown>) => {
+    const result = teamSearchSchema.safeParse(search)
+    if (!result.success) throw new Error(`status inválido: ${String(search.status)}`)
+    return result.data
+  },
+  errorComponent: ({ error }) => {
+    const router = useRouter()
+    return (
+      <button onClick={() => router.navigate({ to: '/teams', search: { status: 'active' } })}>
+        {error instanceof Error ? error.message : 'Erro'} — voltar para "active"
+      </button>
+    )
+  },
+  component: TeamsPage,
+})
+
+declare function TeamsPage(): JSX.Element
+```
+
+```ts
+// Pegadinha: sem `errorComponent` NESTA rota, o erro de validação sobe para o
+// `errorComponent` mais próximo no ancestral — que, se for o da raiz, derruba
+// a aplicação inteira (ou mostra uma tela de erro genérica) por causa de um
+// `?page=abc` na URL de uma única listagem. `errorComponent` é por rota: a
+// tela que sabe limpar o próprio search é a que deve declará-lo.
+```
+
+#### how-to/share-search-params-across-routes
+[doc](https://tanstack.com/router/latest/docs/how-to/share-search-params-across-routes) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/share-search-params-across-routes.md)
+**O que é:** search params validados num pai (inclusive na rota raiz) chegam automaticamente aos
+filhos via `Route.useSearch()`, somados aos próprios.
+**Para que serve:** parâmetro global (tema, idioma, flag de debug) sem repetir o schema em cada
+rota folha.
+**Quando usar:** quando dois ou mais níveis de rota precisam do mesmo parâmetro. **Valide uma vez no
+ancestral comum** — duplicar o schema em cada filho é como esse parâmetro diverge silenciosamente.
+
+```tsx
+// routes/__root.tsx
+export const Route = createRootRoute({
+  validateSearch: z.object({ debug: z.boolean().default(false) }),
+})
+
+// qualquer rota descendente:
+const { debug } = Route.useSearch() // herdado, sem revalidar
+```
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
+
+// Caso comum: um parâmetro validado só no pai (o filtro de time), e outro
+// local ao filho (a página da lista). `useSearch()` do filho devolve os dois.
+export const Route = createFileRoute('/_authenticated/teams/users/')({
+  validateSearch: z.object({ page: z.number().default(1) }),
+  component: () => {
+    // `teamStatus` vem do pai (/_authenticated/teams), `page` é local
+    const { teamStatus, page } = Route.useSearch()
+    return <p>time {teamStatus}, página {page}</p>
+  },
+})
+```
+
+```ts
+// Pegadinha: herança não é merge automático de TIPAGEM entre arquivos que não
+// se importam — o TypeScript só sabe que o filho herda `teamStatus` porque o
+// gerador de tipos (`routeTree.gen.ts`) enxerga a árvore completa. Mover uma
+// rota para fora da hierarquia do pai valida (TypeScript não reclama na hora),
+// mas em runtime `useSearch()` deixa de devolver `teamStatus`, porque o
+// ancestral que validava esse campo não está mais no caminho.
+```
+
+#### how-to/debug-router-issues
+[doc](https://tanstack.com/router/latest/docs/how-to/debug-router-issues) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/debug-router-issues.md)
+**O que é:** checklist de depuração para rota que não casa, navegação que não dispara e
+re-render fora do esperado, usando o próprio DevTools.
+**Para que serve:** primeiro lugar a olhar antes de abrir uma issue ou reescrever a rota.
+**Quando usar:** ao debugar "a rota não carrega" ou "o loader não roda de novo". O Devtools mostra
+a árvore de rotas e o match ativo em tempo real — geralmente mais rápido que `console.log`.
+
+```tsx
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+// só em desenvolvimento — este app já embute via `TanStackDevtools` em `routes/__root.tsx`
+```
+
+#### how-to/test-file-based-routing
+[doc](https://tanstack.com/router/latest/docs/how-to/test-file-based-routing) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/test-file-based-routing.md)
+**O que é:** testar uma rota gerada por arquivo (não código) exige configurar o plugin do router no
+`vitest.config.ts`, porque o `routeTree.gen.ts` precisa existir antes do teste rodar.
+**Para que serve:** evitar o erro de "rota não encontrada" em teste que na verdade é só árvore de
+rotas desatualizada, não bug de aplicação.
+**Quando usar:** ao escrever o primeiro teste de uma rota deste projeto — ele usa roteamento por
+arquivo (`tsr.config.json` + `vite.config.ts`), nunca `createRoute` manual.
+
+```ts
+import { defineConfig } from 'vitest/config'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+
+export default defineConfig({
+  plugins: [tanstackRouter({ target: 'react' }) /* , react() */],
+})
+```
+
+#### how-to/integrate-shadcn-ui
+[doc](https://tanstack.com/router/latest/docs/how-to/integrate-shadcn-ui) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/router/how-to/integrate-shadcn-ui.md)
+**O que é:** o ajuste de DOM que `Sheet`/`Dialog` do shadcn/ui precisam para a animação de
+abertura/fechamento funcionar dentro do router — um nó de portal fora do `<Outlet />`.
+**Para que serve:** resolver o sintoma "o modal fecha sem animar" ou "a folha pisca" quando o
+componente é montado dentro da árvore de rota em vez de um portal próprio.
+**Quando usar:** **antes de depurar a animação em si** — na maioria dos casos o problema é o
+`<div id="portal-root">` ausente na raiz, não o componente do shadcn.
+
+```tsx
+// routes/__root.tsx
+component: () => (
+  <>
+    <div id="root-content"><Outlet /></div>
+    <div id="portal-root" />
+  </>
+)
+```
+
+```tsx
+import { Dialog, DialogContent, DialogTrigger } from '#/components/ui/dialog'
+
+// Caso comum: um Dialog disparado a partir de um <Link>, não de um botão —
+// `asChild` no trigger evita aninhar <a> dentro de <button>, que é o erro de
+// HTML mais comum nessa combinação.
+function EditTeamDialog({ teamId }: { teamId: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button>Editar time {teamId}</button>
+      </DialogTrigger>
+      <DialogContent>{/* formulário */}</DialogContent>
+    </Dialog>
+  )
+}
+```
+
+```ts
+// Pegadinha: o `<div id="portal-root">` resolve a ANIMAÇÃO de abrir/fechar,
+// não o foco. Sheet/Dialog aberto a partir de uma rota que troca (ex.: clicar
+// num <Link> de dentro do próprio modal) pode deixar o foco perdido, porque o
+// Radix (base do shadcn) devolve o foco ao elemento que abriu o modal — que já
+// não existe mais depois da navegação. Fechar o modal explicitamente ANTES de
+// navegar evita o foco órfão.
+```
+
+## Fora de escopo
+
+- guide/parallel-routes
+- how-to/README
+- how-to/drafts/README
+- how-to/drafts/build-search-filtering-systems.draft
+- how-to/drafts/optimize-search-param-performance.draft
+- how-to/drafts/search-params-in-forms.draft
+- how-to/install
+- how-to/integrate-chakra-ui
+- how-to/integrate-framer-motion
+- how-to/integrate-material-ui
+- how-to/migrate-from-react-router
+- how-to/navigate-with-search-params
+- how-to/setup-auth-providers
+- how-to/setup-authentication
+- how-to/setup-basic-search-params
+- how-to/setup-rbac
+- how-to/setup-ssr
+- how-to/setup-testing
+- how-to/use-environment-variables
+- how-to/deploy-to-production

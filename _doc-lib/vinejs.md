@@ -2,6 +2,8 @@
 
 Biblioteca de validação de dados focada em requisição HTTP, com foco em velocidade.
 
+> Conferido contra `@vinejs/vine@4.4.0`
+
 **O que é:** o validador oficial do AdonisJS, também usável sozinho. Você declara um schema, chama
 `validate`, e recebe de volta um objeto **tipado** ou uma exceção com os erros. A diferença técnica
 para as alternativas é que ele **compila o schema para uma função JavaScript otimizada** na primeira
@@ -21,7 +23,7 @@ node ace add @vinejs/vine     # em AdonisJS
 ```ts
 import vine from '@vinejs/vine'
 
-const createUserValidator = vine.compile(
+const createUserValidator = vine.create(
   vine.object({
     name: vine.string().trim().minLength(3),
     email: vine.string().email().normalizeEmail(),
@@ -70,6 +72,8 @@ essa página cedo evita muita confusão.
 
 **Links:** 26.
 
+**Skills:** `maiyu-backend`, `maiyu-frontend`, `api-and-interface-design`, `security-best-practices`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
 ---
 
 ## Fundamentos
@@ -86,7 +90,7 @@ estratégia de compilar o schema.
 import vine from '@vinejs/vine'
 
 // O ciclo inteiro da biblioteca: declarar, compilar uma vez, validar muitas.
-const validator = vine.compile(
+const validator = vine.create(
   vine.object({
     email: vine.string().email(),
     password: vine.string().minLength(8),
@@ -109,7 +113,7 @@ otimização; compilar a cada requisição joga fora a principal vantagem da bib
 import vine, { errors } from '@vinejs/vine'
 
 // CERTO: compilado uma vez, no topo do módulo
-export const loginValidator = vine.compile(
+export const loginValidator = vine.create(
   vine.object({
     email: vine.string().email(),
     password: vine.string(),
@@ -129,6 +133,30 @@ async function login(body: unknown) {
 }
 
 // ERRADO: vine.compile() dentro do handler recompila a cada requisição
+```
+
+```ts
+// caso real da stack: validators vivem em app/core/validator.ts
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const UserCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2),
+  email: vine.string().trim().email(),
+})
+
+export type UserCreatePayload = Infer<typeof UserCreateValidator>
+```
+
+```ts
+// armadilha: vine.compile() está deprecado na versão atual
+import vine from '@vinejs/vine'
+
+// errado: "compile" ainda funciona, mas a doc da própria lib marca @deprecated
+const v1 = vine.compile(vine.object({ name: vine.string() }))
+
+// certo: "create" é o substituto, mesma otimização de pré-compilar uma vez
+const v2 = vine.create({ name: vine.string() })
 ```
 
 #### schema_101
@@ -169,6 +197,50 @@ const schema = vine.object({
 // nullable seria "apagar o valor". Trocar os dois apaga dado sem querer.
 ```
 
+```ts
+// básico: encadeamento mínimo
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  title: vine.string().trim().minLength(3),
+  views: vine.number().optional(),
+})
+```
+
+```ts
+// caso real da stack: schema reutilizável como função, não como constante
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+// função, não objeto: cada validator pega a SUA cópia de "name"
+function teamFields() {
+  return {
+    name: vine.string().trim().minLength(2),
+  }
+}
+
+export const TeamCreateValidator = vine.create(vine.object(teamFields()))
+export const TeamUpdateValidator = vine.create(
+  vine.object({ ...teamFields(), name: vine.string().trim().minLength(2).optional() })
+)
+export type TeamCreatePayload = Infer<typeof TeamCreateValidator>
+```
+
+```ts
+// armadilha: schema compartilhado como CONSTANTE vaza estado entre validators
+import vine from '@vinejs/vine'
+
+// errado: a mesma instância de VineString é mutada pelos dois .optional()/.nullable()
+const nameField = vine.string().trim().minLength(2)
+const createSchema = vine.object({ name: nameField })
+const updateSchema = vine.object({ name: nameField.optional() }) // muta "nameField" também
+
+// certo: uma função devolve uma instância NOVA a cada chamada
+const name = () => vine.string().trim().minLength(2)
+const createSchemaOk = vine.object({ name: name() })
+const updateSchemaOk = vine.object({ name: name().optional() })
+```
+
 #### html_forms_and_surprises
 [doc](https://vinejs.dev/docs/html_forms_and_surprises)
 
@@ -182,7 +254,7 @@ biblioteca para quem vem do Zod, e evita "por que ele aceitou uma string onde eu
 ```ts
 import vine from '@vinejs/vine'
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     age: vine.number(), // aceita "25" (string) e devolve 25 (number)
     active: vine.boolean(), // aceita "on", "true", "1", 1
@@ -205,6 +277,47 @@ console.log(typeof out.age) // "number"
 // liga à mão, para os dois lados recusarem as mesmas coisas.
 ```
 
+```ts
+// básico: optional vs nullable diante de um formulário real
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  // optional: campo pode faltar inteiro no payload do form
+  bio: vine.string().trim().optional(),
+  // nullable: o <select> manda "" para "nenhum", e isso convertido vira null
+  teamId: vine.string().uuid().nullable(),
+})
+```
+
+```ts
+// caso real da stack: validator de paginação lendo query string (tudo string)
+import vine from '@vinejs/vine'
+
+export const PostPaginationValidator = vine.create({
+  page: vine.number().withoutDecimals().min(1).optional(),
+  perPage: vine.number().withoutDecimals().range([1, 100]).optional(),
+  // "on"/"true"/"1" vindos de query string viram boolean de verdade
+  onlyPublished: vine.boolean().optional(),
+})
+```
+
+```ts
+// armadilha: compilar o schema a cada chamada perde a otimização
+import vine from '@vinejs/vine'
+
+// errado: cria um validator novo em toda requisição
+async function handleErrado(body: unknown) {
+  const validator = vine.create({ title: vine.string() })
+  return validator.validate(body)
+}
+
+// certo: compilado uma vez no topo do módulo, reaproveitado em toda chamada
+const postValidator = vine.create({ title: vine.string() })
+async function handleCerto(body: unknown) {
+  return postValidator.validate(body)
+}
+```
+
 #### conditional_validation
 [doc](https://vinejs.dev/docs/conditional_validation)
 
@@ -217,7 +330,7 @@ normalmente viraria `if` no controller.
 ```ts
 import vine from '@vinejs/vine'
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     personType: vine.enum(['individual', 'company']),
 
@@ -272,7 +385,7 @@ const priceLowerThan = vine.createRule(
   }
 )
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     price: vine.number().positive(),
     discountedPrice: vine.number().positive().optional().use(priceLowerThan('price')),
@@ -342,6 +455,46 @@ vine.messagesProvider = new SimpleMessagesProvider(
 )
 ```
 
+```ts
+// básico: mensagem por regra, sem nomes amigáveis
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
+
+vine.messagesProvider = new SimpleMessagesProvider({
+  required: 'O campo {{ field }} é obrigatório',
+  'email.email': 'Informe um e-mail válido',
+})
+```
+
+```ts
+// caso real da stack: validator de Post usando as chaves já registradas no boot
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+// as mensagens ("required", "post.title.minLength" etc.) vêm do messagesProvider
+// global, registrado uma única vez no boot da aplicação — não aqui.
+export const PostCreateValidator = vine.create({
+  title: vine.string().trim().minLength(3),
+})
+
+export type PostCreatePayload = Infer<typeof PostCreateValidator>
+```
+
+```ts
+// armadilha: messagesProvider não aceita um objeto solto, só um provider
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
+
+// errado: objeto puro não implementa MessagesProviderContact (erro de tipo)
+// vine.messagesProvider = { required: 'O campo {{ field }} é obrigatório' }
+
+// certo: sempre embrulhado numa classe que implementa a interface,
+// registrada uma vez no boot — mesmo quando o `validate()` permite passar
+// um `messagesProvider` por chamada, a stack evita o segundo caminho: um
+// provider por requisição esconde regra nova atrás de uma exceção local.
+vine.messagesProvider = new SimpleMessagesProvider({
+  required: 'O campo {{ field }} é obrigatório',
+})
+```
+
 #### error_reporter
 [doc](https://vinejs.dev/docs/error_reporter)
 
@@ -381,6 +534,35 @@ class FieldMapReporter implements ErrorReporterContract {
 
 vine.errorReporter = () => new FieldMapReporter()
 // saída: { "email": ["Informe um e-mail válido"], "password": ["..."] }
+```
+
+```ts
+// básico: o formato padrão (SimpleErrorReporter), já usado nesta stack
+import vine, { errors } from '@vinejs/vine'
+
+async function createPost(body: unknown) {
+  try {
+    return await vine.validate({ schema: vine.object({ title: vine.string() }), data: body })
+  } catch (error) {
+    if (error instanceof errors.E_VALIDATION_ERROR) {
+      // error.messages: [{ field, rule, message }, ...]
+      return error.messages
+    }
+    throw error
+  }
+}
+```
+
+```ts
+// caso real da stack: achatar { field, rule, message } no handler global,
+// em vez de trocar o errorReporter — é o padrão descrito acima
+type FieldErrors = Record<string, string>
+
+function toFieldErrors(messages: { field: string; message: string }[]): FieldErrors {
+  const out: FieldErrors = {}
+  for (const item of messages) out[item.field] = item.message
+  return out
+}
 ```
 
 #### helpers
@@ -468,7 +650,7 @@ em paralelo — é a árvore interna, e nela o `subtype` do campo sobrevive.
 
 **Um gerador que leia as rotas e os validators reais resolve isso de uma vez**,
 em vez de cada chamada de `toJSONSchema()` remendar as lacunas por conta.
-[`openapi.md`](openapi.md) descreve um assim, e serve de planta: as seções
+[`_padroes/openapi.md`](../_padroes/openapi.md) descreve um assim, e serve de planta: as seções
 `correcoes-de-schema` e `correcoes-por-campo` listam as quatro correções antes
 de você escrever conversão própria.
 
@@ -506,6 +688,39 @@ const schema = vine.object({
 })
 ```
 
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  name: vine.string().trim().minLength(2),
+})
+```
+
+```ts
+// caso real da stack: validator de criação, trim e minLength no padrão da casa
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const UserCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2),
+  email: vine.string().trim().email(),
+})
+
+export type UserCreatePayload = Infer<typeof UserCreateValidator>
+```
+
+```ts
+// armadilha: trim() depois de minLength() valida o tamanho ERRADO
+import vine from '@vinejs/vine'
+
+// errado: minLength roda antes do trim, então "  ab  " passa com 6 caracteres
+const schemaErrado = vine.object({ name: vine.string().minLength(3).trim() })
+
+// certo: trim primeiro, para o tamanho ser medido no valor já sem espaços
+const schemaCerto = vine.object({ name: vine.string().trim().minLength(3) })
+```
+
 #### types/boolean
 [doc](https://vinejs.dev/docs/types/boolean)
 
@@ -518,7 +733,7 @@ payload**, então normalmente ele precisa ser opcional com valor padrão.
 ```ts
 import vine from '@vinejs/vine'
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     // padrão: aceita "on", "true", "1", 1, true
     chargeTax: vine.boolean().optional(),
@@ -532,6 +747,36 @@ const schema = vine.compile(
 )
 
 await schema.validate({ chargeTax: 'on' }) // { chargeTax: true, newsletter: false }
+```
+
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  active: vine.boolean(),
+})
+```
+
+```ts
+// caso real da stack: flag de paginação opcional, vinda de query string
+import vine from '@vinejs/vine'
+
+export const PostPaginationValidator = vine.create({
+  onlyPublished: vine.boolean().optional(),
+})
+```
+
+```ts
+// armadilha: boolean solto aceita "on"/"1" de formulário, não só true/false
+import vine from '@vinejs/vine'
+
+// errado: num endpoint que só recebe JSON de outro serviço, aceitar "on" ou 1
+// disfarça um bug do cliente (campo deveria ser true/false e não é)
+const schemaErrado = vine.object({ active: vine.boolean() })
+
+// certo: strict() só aceita o booleano de verdade, sem conversão de string
+const schemaCerto = vine.object({ active: vine.boolean({ strict: true }) })
 ```
 
 #### types/number
@@ -561,6 +806,40 @@ const schema = vine.object({
 // "2499" (string da query) vira 2499 (number) automaticamente
 ```
 
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  age: vine.number().min(0).max(120),
+})
+```
+
+```ts
+// caso real da stack: validator de paginação, campo compartilhado por vários
+import vine from '@vinejs/vine'
+
+function paginationFields() {
+  return {
+    page: vine.number().withoutDecimals().min(1).optional(),
+    perPage: vine.number().withoutDecimals().range([1, 100]).optional(),
+  }
+}
+
+export const PostPaginationValidator = vine.create(vine.object(paginationFields()))
+```
+
+```ts
+// armadilha: "min/max" em number não é o mesmo que em string
+import vine from '@vinejs/vine'
+
+// errado: pensar que min(3) valida "3 caracteres" num campo numérico
+const schemaErrado = vine.object({ code: vine.number().min(3) }) // valor >= 3, não tamanho
+
+// certo: tamanho de dígitos é regra de string, então o campo nasce string
+const schemaCerto = vine.object({ code: vine.string().fixedLength(3) })
+```
+
 #### types/date
 [doc](https://vinejs.dev/docs/types/date)
 
@@ -585,6 +864,40 @@ const schema = vine.object({
 // o valor de saída é um objeto Date, não string
 ```
 
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  publishedAt: vine.date({ formats: ['YYYY-MM-DD'] }),
+})
+```
+
+```ts
+// caso real da stack: período de validade, fim depois do início
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const PostScheduleValidator = vine.create({
+  startsAt: vine.date({ formats: ['YYYY-MM-DD'] }),
+  endsAt: vine.date({ formats: ['YYYY-MM-DD'] }).afterField('startsAt'),
+})
+
+export type PostSchedulePayload = Infer<typeof PostScheduleValidator>
+```
+
+```ts
+// armadilha: formato implícito deixa o fuso por conta do ambiente
+import vine from '@vinejs/vine'
+
+// errado: sem "formats", o parser aceita qualquer formato aceito pelo dayjs,
+// e o resultado varia com o fuso configurado no processo que valida
+const schemaErrado = vine.object({ birthDate: vine.date() })
+
+// certo: formato fixo e explícito, igual nos dois lados (servidor e cliente)
+const schemaCerto = vine.object({ birthDate: vine.date({ formats: ['YYYY-MM-DD'] }) })
+```
+
 #### types/accepted
 [doc](https://vinejs.dev/docs/types/accepted)
 
@@ -596,7 +909,7 @@ verdadeiro".
 ```ts
 import vine from '@vinejs/vine'
 
-const signupSchema = vine.compile(
+const signupSchema = vine.create(
   vine.object({
     email: vine.string().email(),
     // falha se vier false, "off", ou não vier: aceitação tem que ser explícita
@@ -638,6 +951,45 @@ const schema = vine.object({
 })
 ```
 
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  status: vine.enum(['draft', 'published', 'archived']),
+})
+```
+
+```ts
+// caso real da stack: enum nativo do TypeScript, alimentado pela mesma fonte
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export enum TeamPlan {
+  Free = 'free',
+  Pro = 'pro',
+}
+
+export const TeamUpdateValidator = vine.create({
+  plan: vine.enum(TeamPlan),
+})
+
+export type TeamUpdatePayload = Infer<typeof TeamUpdateValidator>
+```
+
+```ts
+// armadilha: lista duplicada à mão diverge da fonte única aos poucos
+import vine from '@vinejs/vine'
+
+export const PostStatuses = { draft: 'draft', published: 'published' } as const
+
+// errado: alguém adiciona "archived" em PostStatuses e esquece daqui
+const schemaErrado = vine.object({ status: vine.enum(['draft', 'published']) })
+
+// certo: o enum sempre lê da mesma constante que o banco e o tipo usam
+const schemaCerto = vine.object({ status: vine.enum(Object.values(PostStatuses)) })
+```
+
 #### types/literal
 [doc](https://vinejs.dev/docs/types/literal)
 
@@ -667,7 +1019,7 @@ uma proteção contra mass assignment e uma das melhores decisões padrão da bi
 ```ts
 import vine from '@vinejs/vine'
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     name: vine.string(),
     // objeto aninhado
@@ -691,6 +1043,32 @@ console.log(out) // sem a chave role
 // reuso entre criar e editar
 const baseFields = { name: vine.string(), email: vine.string().email() }
 const createSchema = vine.object({ ...baseFields, password: vine.string().minLength(8) })
+```
+
+```ts
+// caso real da stack: validator de criação, no padrão de app/core/validator.ts
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const UserCreateValidator = vine.create({
+  name: vine.string().trim().minLength(2),
+  team: vine.object({
+    name: vine.string().trim().minLength(2),
+  }),
+})
+
+export type UserCreatePayload = Infer<typeof UserCreateValidator>
+```
+
+```ts
+// armadilha: allowUnknownProperties() reabre a proteção contra mass assignment
+import vine from '@vinejs/vine'
+
+// errado: qualquer chave extra do payload passa direto, inclusive "role"
+const schemaErrado = vine.object({ name: vine.string() }).allowUnknownProperties()
+
+// certo: declare o campo extra explicitamente, mesmo que seja vine.any()
+const schemaCerto = vine.object({ name: vine.string(), metadata: vine.object({}).allowUnknownProperties() })
 ```
 
 #### types/record
@@ -750,6 +1128,40 @@ const schema = vine.object({
   // distinct por campo, quando os itens são objetos
   images: vine.array(vine.object({ storageId: vine.string().uuid() })).distinct('storageId'),
 })
+```
+
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  tagIds: vine.array(vine.string().uuid()),
+})
+```
+
+```ts
+// caso real da stack: criar Post com lista de ids de categoria
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const PostCreateValidator = vine.create({
+  title: vine.string().trim().minLength(3),
+  categoryIds: vine.array(vine.string().uuid()).distinct().minLength(1),
+})
+
+export type PostCreatePayload = Infer<typeof PostCreateValidator>
+```
+
+```ts
+// armadilha: array vazio passa "minLength" ausente, e isso costuma ser bug
+import vine from '@vinejs/vine'
+
+// errado: sem minLength, [] é um array válido quando a regra de negócio
+// exige pelo menos um item (ex.: pedido sem nenhum item)
+const schemaErrado = vine.object({ items: vine.array(vine.string().uuid()).optional() })
+
+// certo: minLength(1) torna explícito que lista vazia é erro de validação
+const schemaCerto = vine.object({ items: vine.array(vine.string().uuid()).minLength(1) })
 ```
 
 #### types/tuple
@@ -838,6 +1250,39 @@ const melhor = vine.object({
 })
 ```
 
+```ts
+// básico
+import vine from '@vinejs/vine'
+
+const schema = vine.object({
+  webhookPayload: vine.any(),
+})
+```
+
+```ts
+// caso real da stack: metadado de terceiro que o backend só repassa, não lê
+import vine from '@vinejs/vine'
+import type { Infer } from '@vinejs/vine/types'
+
+export const StorageCompleteValidator = vine.create({
+  storageId: vine.string().uuid(),
+  providerMetadata: vine.any(),
+})
+
+export type StorageCompletePayload = Infer<typeof StorageCompleteValidator>
+```
+
+```ts
+// armadilha: any() em campo que o código efetivamente lê e usa
+import vine from '@vinejs/vine'
+
+// errado: o use-case acessa payload.config.limit, mas nada garante que exista
+const schemaErrado = vine.object({ config: vine.any() })
+
+// certo: valida a forma mínima que o código realmente consome
+const schemaCerto = vine.object({ config: vine.object({ limit: vine.number() }) })
+```
+
 #### types/native_file
 [doc](https://vinejs.dev/docs/types/native_file)
 
@@ -849,7 +1294,7 @@ tem uma regra própria, documentada na doc do framework.
 ```ts
 import vine from '@vinejs/vine'
 
-const schema = vine.compile(
+const schema = vine.create(
   vine.object({
     avatar: vine.file({
       size: '2mb',
@@ -901,10 +1346,62 @@ const uniqueRule = vine.createRule(
 
 export const unique = (options: UniqueOptions) => uniqueRule(options)
 
-const createUser = vine.compile(
+const createUser = vine.create(
   vine.object({
     email: vine.string().email().use(unique({ table: 'users', column: 'email' })),
   })
+)
+```
+
+```ts
+// básico
+import vine from '@vinejs/vine'
+import type { FieldContext } from '@vinejs/vine/types'
+
+const isEven = vine.createRule((value: unknown, _options, field: FieldContext) => {
+  if (typeof value !== 'number') return
+  if (value % 2 !== 0) field.report('O campo {{ field }} deve ser par', 'even', field)
+})
+
+const schema = vine.object({ quantity: vine.number().use(isEven()) })
+```
+
+```ts
+// caso real da stack: regra de CPF, no padrão de app/core/validator.ts
+import vine from '@vinejs/vine'
+import type { FieldContext } from '@vinejs/vine/types'
+
+function hasValidCpfDigits(value: string): boolean {
+  return /^\d{11}$/.test(value) // checagem real tem os dígitos verificadores
+}
+
+const cpfCheckDigits = vine.createRule((value: unknown, _options, field: FieldContext) => {
+  if (typeof value !== 'string') return
+  if (hasValidCpfDigits(value)) return
+
+  field.report('CPF inválido', 'checkDigits', field)
+})
+
+export const cpf = () => cpfCheckDigits()
+```
+
+```ts
+// armadilha: regra customizada rodando (ou não) em campo ausente
+import vine from '@vinejs/vine'
+import type { FieldContext } from '@vinejs/vine/types'
+
+// errado: por padrão a regra NÃO roda em valor null/undefined, então uma
+// checagem "tem que vir preenchido" aqui nunca dispara nesse caso
+const mustBeFilled = vine.createRule((value: unknown, _options, field: FieldContext) => {
+  if (!value) field.report('Preencha o campo {{ field }}', 'filled', field)
+})
+
+// certo: implicit: true faz a regra rodar mesmo quando o valor é null/undefined
+const mustBeFilledOk = vine.createRule(
+  (value: unknown, _options, field: FieldContext) => {
+    if (!value) field.report('Preencha o campo {{ field }}', 'filled', field)
+  },
+  { implicit: true }
 )
 ```
 
@@ -943,3 +1440,4 @@ const schema = vine.object({
   cnpj: vine.string().trim().cnpj(),
 })
 ```
+

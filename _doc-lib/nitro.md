@@ -2,11 +2,14 @@
 
 Servidor de produção que o build do frontend vira, portátil entre runtimes e plataformas.
 
-> ⚠️ **A v3 está em beta** (`3.0.260610-beta` no momento em que este arquivo foi escrito) e é a
-> versão que o plugin de Vite exige. O pacote mudou de nome — era `nitropack`, hoje é `nitro` — e
-> quase todo helper foi renomeado junto. Material escrito para a v2 (que é a maior parte do que se
-> acha buscando) usa nomes que não existem mais. A página `docs/migration` abaixo é a tradução
-> completa, e vale abrir antes de copiar qualquer trecho de fora daqui.
+> ⚠️ **A v3 está em beta** e é a versão que o plugin de Vite exige. O pacote mudou de nome — era
+> `nitropack`, hoje é `nitro` — e quase todo helper foi renomeado junto. Material escrito para a v2
+> (que é a maior parte do que se acha buscando) usa nomes que não existem mais. A página
+> `docs/migration` abaixo é a tradução completa, e vale abrir antes de copiar qualquer trecho de
+> fora daqui.
+>
+> Conferido contra o `llms.txt` oficial (nitro.build) nesta rodada — build nightly/beta, sem
+> "latest" estável publicado para comparar (é nightly/beta por natureza).
 
 **O que é:** o servidor que roda a aplicação em produção. Ele pega o resultado do build e produz um
 `.output/` que sabe rodar em Node, Bun, Deno, Cloudflare Workers, Vercel, Netlify e mais uma dúzia de
@@ -55,7 +58,9 @@ e é dele o `.output/`. Quando o build passa e o deploy quebra, o problema é qu
 camada. Ver [`vitejs.md`](vitejs.md) e [`tanstack-start.md`](tanstack-start.md) para os outros dois
 terços da fronteira.
 
-**Links:** 26.
+**Links:** 30.
+
+**Skills:** `vite-bundle-optimization`, `perf-web-optimization`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
 ---
 
@@ -141,6 +146,37 @@ quebra com erro claro: ele quebra com "não é uma função", ou pior, compila e
 // E o mínimo de Node subiu para 20.
 ```
 
+```ts
+// caso real da stack: migrar server/routes/health.get.ts (docs/routing)
+// que ainda estivesse na forma v2
+import { defineHandler, HTTPError } from 'nitro'
+
+export default defineHandler((event) => {
+  if (event.req.method !== 'GET') {
+    // v2: sendError(event, createError(...)). v3: lança, o H3 converte.
+    throw new HTTPError({ status: 405, message: 'method not allowed' })
+  }
+
+  return { status: 'ok' }
+})
+```
+
+```ts
+// errado — v2: helper de resposta por efeito colateral
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event) // h3 v2 não existe mais: "readBody is not a function"
+  send(event, body)
+})
+
+// certo — v3: Request/Response padrão web, o handler retorna o valor
+import { defineHandler } from 'nitro'
+
+export default defineHandler(async (event) => {
+  const body = await event.req.json()
+  return body
+})
+```
+
 #### docs/nightly
 [doc](https://nitro.build/docs/nightly) | [markdown](https://nitro.build/raw/docs/nightly.md)
 **O que é:** o canal noturno, publicado a cada commit no `main`.
@@ -193,6 +229,23 @@ routes/(admin)/users.ts     → /users              (parêntese agrupa sem virar
 # ordenação de STRING. `10.log.ts` vem antes de `2.auth.ts`. Zere à esquerda.
 ```
 
+```ts
+// server/routes/webhooks/billing.post.ts  →  POST /webhooks/billing
+// caso real: webhook de provedor de pagamento, que não pode passar pelo
+// backend de negócio sem duplicar validação de assinatura
+import { defineHandler, HTTPError } from 'nitro'
+
+export default defineHandler(async (event) => {
+  const signature = event.req.headers.get('x-webhook-signature')
+  const isValid = signature === process.env.WEBHOOK_SECRET
+
+  if (!isValid) throw new HTTPError({ status: 401, message: 'invalid signature' })
+
+  const payload = await event.req.json()
+  return { received: true }
+})
+```
+
 #### docs/renderer
 [doc](https://nitro.build/docs/renderer) | [markdown](https://nitro.build/raw/docs/renderer.md)
 **O que é:** o handler que pega tudo que não casou com rota nenhuma e devolve HTML. É por onde o SSR
@@ -212,9 +265,33 @@ export default defineConfig({
   },
 })
 
-// A colisão silenciosa: uma rota catch-all (`routes/[...].ts`) e o renderer
-// disputam as mesmas URLs, e o renderer ganha. O sintoma é a rota nunca
-// executar, sem erro nenhum.
+// A ordem real: rota catch-all (`routes/[...].ts`) é chamada ANTES do
+// renderer — server-entry e renderer só entram depois, como últimos
+// fallbacks. Quem espera configurar renderer.handler pra "vencer" uma rota
+// catch-all erra a leitura: é o inverso.
+```
+
+```ts
+// renderer.ts — página de status fora do shell do TanStack Start, pensada
+// pro health check do load balancer, sem hidratar React
+export default function renderer({ req }: { req: Request }) {
+  const { pathname } = new URL(req.url)
+
+  if (pathname === '/_status') return new Response('ok', { status: 200 })
+
+  return undefined
+}
+```
+
+```ts
+// errado — espera que renderer.handler intercepte ANTES da rota catch-all
+// nitro.config.ts
+export default defineConfig({ renderer: { handler: './renderer.ts' } })
+// server/routes/[...].ts → sempre responde primeiro; renderer.ts nunca roda
+
+// certo — quem decide o fallback customizado é a rota catch-all: o renderer
+// só entra depois dela, como último recurso
+export default defineHandler((event) => new Response('fallback customizado'))
 ```
 
 #### docs/server-entry
@@ -240,6 +317,37 @@ export default {
 }
 
 // Para desligar a detecção automática: `serverEntry: false` na config.
+```
+
+```ts
+// server.ts — bloqueio por IP antes de qualquer rota, pro `/internal/*`
+// que não deve nem chegar na tela React
+export default {
+  async fetch(req: Request) {
+    const url = new URL(req.url)
+    const allowed = ['127.0.0.1', '::1']
+    const ip = req.headers.get('x-forwarded-for') ?? ''
+
+    if (url.pathname.startsWith('/internal') && !allowed.includes(ip)) {
+      return new Response('forbidden', { status: 403 })
+    }
+
+    return undefined
+  },
+}
+```
+
+```ts
+// errado — handler estilo Node (req, res) nomeado `server.ts`: Nitro assume
+// formato "web" por padrão e chama como fetch(req), quebra em runtime
+import type { IncomingMessage, ServerResponse } from 'node:http'
+
+export default function handler(req: IncomingMessage, res: ServerResponse) {
+  res.end('ok')
+}
+
+// certo — o sufixo `.node.` no nome avisa o Nitro pra converter via srvx:
+// renomear server.ts → server.node.ts, mesmo handler
 ```
 
 #### docs/lifecycle
@@ -268,6 +376,39 @@ export default definePlugin((nitroApp) => {
   // `response` roda para TODA resposta, inclusive asset e erro. Contar
   // requisição aqui conta o favicon junto.
 })
+```
+
+```ts
+// plugins/shutdown.ts — fecha conexões pendentes no encerramento gracioso,
+// pro socket de migração de storage que fica aberto entre requests
+import { definePlugin } from 'nitro'
+
+export default definePlugin((nitroApp) => {
+  nitroApp.hooks.hook('close', async () => {
+    await closeOpenSockets()
+  })
+})
+
+async function closeOpenSockets() {
+  // implementação real mora no serviço de socket, não aqui
+}
+```
+
+```ts
+// errado — middleware pensando que protege TODO request, inclusive asset
+import { defineHandler, HTTPError } from 'nitro'
+
+export default defineHandler((event) => {
+  if (!isAuthenticated(event)) throw new HTTPError({ status: 401, message: 'unauthorized' })
+})
+// registrado como middleware global: nunca roda pra public/**, que o asset
+// estático responde ANTES do middleware na ordem do lifecycle
+
+// certo — arquivo que precisa de autenticação não mora em public/: vira rota
+// servida por handler, que aí sim passa pelo middleware
+function isAuthenticated(event: unknown) {
+  return false
+}
 ```
 
 #### docs/assets
@@ -392,6 +533,26 @@ export const getStars = defineCachedFunction(
 // Onde fica: memória em produção, .nitro/cache em desenvolvimento.
 ```
 
+```ts
+// errado — cacheia resposta que depende do usuário, sem variar por cookie
+import { defineCachedHandler } from 'nitro/cache'
+
+export default defineCachedHandler(async (event) => {
+  return getProfile(event.context.userId as string)
+})
+// próximo usuário recebe o perfil do primeiro: o cache ignora o userId
+
+// certo — varia a entrada do cache pelo cabeçalho de sessão
+export default defineCachedHandler(
+  async (event) => getProfile(event.context.userId as string),
+  { varies: ['cookie'] },
+)
+
+function getProfile(userId: string) {
+  return { userId }
+}
+```
+
 #### docs/database
 [doc](https://nitro.build/docs/database) | [markdown](https://nitro.build/raw/docs/database.md)
 **O que é:** uma camada SQL fina (`db0`) com conectores para SQLite, Postgres, MySQL, D1 e outros.
@@ -420,6 +581,19 @@ const { rows } = await db.sql`SELECT * FROM users WHERE id = ${userId}`
 
 // Com a flag ligada e nenhuma conexão configurada, o Nitro cria um SQLite
 // default sozinho — e aí o dado escrito some no próximo deploy.
+```
+
+```ts
+import { useDatabase } from 'nitro/database'
+
+const db = useDatabase()
+const userId = '42'
+
+// errado — interpolação de string: abre pra SQL injection
+const bad = await db.sql(`SELECT * FROM users WHERE id = ${userId}`)
+
+// certo — template tag faz o bind dos parâmetros, não concatena string
+const good = await db.sql`SELECT * FROM users WHERE id = ${userId}`
 ```
 
 #### docs/tasks
@@ -519,6 +693,15 @@ const token = useRuntimeConfig().apiToken
 // para o bundle do NAVEGADOR, `NITRO_` fica no servidor. Ver vitejs.md.
 ```
 
+```ts
+// errado — valor real como default: vai pro bundle do servidor e junto com
+// o nitro.config.ts pro controle de versão
+export default defineConfig({ runtimeConfig: { apiToken: 'sk_live_abc123' } })
+
+// certo — default vazio, valor real só via NITRO_API_TOKEN no ambiente
+export default defineConfig({ runtimeConfig: { apiToken: '' } })
+```
+
 #### config
 [doc](https://nitro.build/config) | [markdown](https://nitro.build/raw/config.md)
 **O que é:** a referência completa, com mais de oitenta opções agrupadas em geral, features, dev,
@@ -548,6 +731,27 @@ export default defineConfig({
 // preset pode mudar de comportamento numa atualização de patch.
 ```
 
+```ts
+// vite.config.ts — opções reais desta stack, direto no plugin nitro()
+import { nitro } from 'nitro/vite'
+
+nitro({
+  preset: 'node-server',
+  // ordem de import executada como no fonte, não a que o bundler escolher
+  rolldownConfig: { output: { strictExecutionOrder: true } },
+  routeRules: { '/**': { headers: { 'X-Frame-Options': 'DENY' } } },
+})
+```
+
+```ts
+// errado — troca output.dir sem atualizar o Dockerfile/CI que lê .output/
+export default defineConfig({ output: { dir: 'dist-server' } })
+// o `COPY --from=build /app/.output ...` do Dockerfile não acha nada
+
+// certo — não muda o dir, ou muda junto de todo script que referencia .output
+export default defineConfig({})
+```
+
 #### deploy
 [doc](https://nitro.build/deploy) | [markdown](https://nitro.build/raw/deploy.md)
 **O que é:** o índice de plataformas e a explicação de como o preset é escolhido.
@@ -568,6 +772,30 @@ nitro build --preset node-server      # flag — para teste pontual
 #
 # É por isso que "na minha máquina o build sai diferente do CI" é o
 # comportamento esperado, e não um bug: local cai no default node-server.
+```
+
+```dockerfile
+# Dockerfile-production — cravar o preset documenta a intenção pra quem lê o
+# Dockerfile, mesmo sem nenhuma env de plataforma gerenciada na imagem
+FROM node:22-slim AS build
+WORKDIR /app
+COPY . .
+ENV NITRO_PRESET=node-server
+RUN pnpm install --frozen-lockfile && pnpm build
+
+FROM node:22-slim
+COPY --from=build /app/.output /app/.output
+CMD ["node", "/app/.output/server/index.mjs"]
+```
+
+```bash
+# errado — export depois do build: a env não existe quando o nitro build roda
+pnpm build
+export NITRO_PRESET=node-server
+
+# certo — a env precisa estar presente ANTES do comando de build
+export NITRO_PRESET=node-server
+pnpm build
 ```
 
 #### deploy/runtimes/node
@@ -605,13 +833,22 @@ createServer(listener).listen(8080)
 //   NITRO_SSL_CERT / _KEY      só para teste; em produção, TLS no proxy
 ```
 
+```bash
+# errado — desliga o shutdown gracioso achando que acelera o restart
+NITRO_SHUTDOWN_DISABLED=true node .output/server/index.mjs
+# requests em andamento são cortados no meio no primeiro SIGTERM do orquestrador
+
+# certo — deixa o shutdown gracioso ligado (default), só ajusta o timeout
+NITRO_SHUTDOWN_TIMEOUT=10000 node .output/server/index.mjs
+```
+
 #### docs/openapi
 [doc](https://nitro.build/docs/openapi) | [markdown](https://nitro.build/raw/docs/openapi.md)
 **O que é:** geração de documento OpenAPI a partir das rotas **do servidor Nitro**, com Scalar e
 Swagger servidos em dev.
 **Para que serve:** documentar os endpoints que moram no Nitro.
 **Quando usar:** só se você tiver rotas Nitro que valham documentar. **Não confundir com
-[`openapi.md`](openapi.md) deste pacote**, que documenta a API do backend: são dois geradores
+[`_padroes/openapi.md`](../_padroes/openapi.md) deste pacote**, que documenta a API do backend: são dois geradores
 diferentes, cada um lendo as próprias rotas. É **experimental**.
 
 ```ts
@@ -635,6 +872,132 @@ defineRouteMeta({
 
 // O aviso da própria doc: ligado em produção, isso publica o mapa completo da
 // sua API. Proteja com autenticação ou deixe só em dev.
+```
+
+```ts
+// errado — liga em produção sem proteção: /_openapi.json fica público
+export default defineConfig({ experimental: { openAPI: true } })
+
+// certo — só fora de produção, ou atrás de autenticação via routeRules
+export default defineConfig({
+  experimental: { openAPI: process.env.NODE_ENV !== 'production' },
+})
+```
+
+#### docs/vite
+[doc](https://nitro.build/docs/vite) | [markdown](https://nitro.build/raw/docs/vite.md)
+**O que é:** a página que descreve exatamente o que o `nitro()` faz como plugin do Vite — API
+routes, SSR e build de produção que roda em qualquer lugar. É a base de como o Nitro entra aqui:
+não como servidor separado, só como plugin do `vite.config.ts` do TanStack Start.
+**Para que serve:** entender o que o plugin resolve por baixo antes de tocar no `nitro({ preset })`.
+**Quando usar:** ao debugar algo do build ou do SSR que pareça do Vite mas na verdade é o Nitro.
+
+```ts
+// vite.config.ts — a forma como aparece nos dois projetos daqui
+import { nitro } from 'nitro/vite'
+
+export default defineConfig({ plugins: [nitro({ preset: 'node-server' })] })
+```
+
+```ts
+// vite.config.ts — bundler real aqui é "vite" (auto-detectado pelo nitro()
+// dentro do Vite config), que junta cliente e servidor com Rolldown
+import { nitro } from 'nitro/vite'
+
+nitro({
+  preset: 'node-server',
+  // escape hatch pro bundler: módulo de terceiro que roda código no import
+  // (`window` no topo) quebrava toda rota com 500 ao compartilhar chunk
+  rolldownConfig: { output: { strictExecutionOrder: true } },
+})
+```
+
+```jsonc
+// errado — "dev": "nitro dev" num projeto que já usa o plugin nitro() no
+// Vite: o CLI do Nitro não suporta o builder do Vite
+{ "scripts": { "dev": "nitro dev" } }
+
+// certo — o Vite orquestra os dois lados quando o plugin está nele
+{ "scripts": { "dev": "vite dev" } }
+```
+
+#### docs/utils
+[doc](https://nitro.build/docs/utils) | [markdown](https://nitro.build/raw/docs/utils.md)
+**O que é:** o mapa de tudo que se importa de `nitro` e seus subpaths — **sem auto-import**, tudo
+precisa de `import` explícito.
+**Para que serve:** achar o import certo (`defineEventHandler`, `useStorage`, `defineTask`, etc.)
+sem adivinhar o subpath.
+**Quando usar:** **antes de escrever qualquer coisa que rode no runtime do Nitro** — importar do
+caminho errado é o erro mais comum.
+
+```ts
+// o handler vem do pacote raiz, não de um subpath
+import { defineHandler } from 'nitro'
+```
+
+```ts
+// server/routes/api/export.get.ts — combina os imports mais comuns da stack
+import { defineHandler, HTTPError } from 'nitro'
+import { getQuery } from 'nitro/h3'
+import { useRuntimeConfig } from 'nitro/runtime-config'
+
+export default defineHandler((event) => {
+  const { format } = getQuery(event)
+  if (!format) throw new HTTPError({ status: 400, message: 'format é obrigatório' })
+
+  const token = useRuntimeConfig().apiToken
+  return { format, hasToken: Boolean(token) }
+})
+```
+
+```ts
+// errado — useStorage não existe no pacote raiz, só no subpath
+import { useStorage } from 'nitro'
+
+// certo — cada utilitário mora no subpath que a tabela desta página lista
+import { useStorage } from 'nitro/storage'
+```
+
+#### docs/typescript
+[doc](https://nitro.build/docs/typescript) | [markdown](https://nitro.build/raw/docs/typescript.md)
+**O que é:** confirmação de que `.ts` funciona direto no Nitro, sem passo de compilação — o
+TypeScript só entra para type-check (`tsc --noEmit` na CI).
+**Para que serve:** saber que não falta configurar nada extra para TS no lado do Nitro.
+**Quando usar:** ao configurar CI e notar que falta um `tsc --noEmit` que cubra o código do Nitro.
+
+```jsonc
+// package.json: o type-check de CI é separado do build, o Nitro não bloqueia nele
+{ "scripts": { "typecheck": "tsc --noEmit" } }
+```
+
+#### docs/prerendering
+[doc](https://nitro.build/docs/prerendering) | [markdown](https://nitro.build/raw/docs/prerendering.md)
+**O que é:** renderizar rotas em tempo de build e servir como arquivo estático em
+`.output/public`, sem SSR em tempo de requisição para elas.
+**Para que serve:** página que não muda por request (landing, termos de uso) ficar rápida e
+cacheável sem custo de servidor a cada acesso.
+**Quando usar:** para rotas públicas que não dependem de dados por usuário. **Não prerenderize rota
+que lê sessão/cookie** — o conteúdo fica congelado no que existia no build.
+
+```ts
+export default defineConfig({ prerender: { routes: ['/termos', '/sobre'] } })
+```
+
+```ts
+// nitro.config.ts — prerenderiza só as páginas públicas de marketing, que
+// não dependem de sessão nem de dado por usuário
+export default defineConfig({
+  prerender: { routes: ['/', '/precos', '/termos', '/privacidade'] },
+})
+```
+
+```ts
+// errado — prerenderiza rota que lê sessão: o HTML fica congelado com o
+// usuário (ou ausência dele) que existia no momento do build
+export default defineConfig({ prerender: { routes: ['/conta/perfil'] } })
+
+// certo — rota de usuário fica fora do prerender, servida por SSR normal
+export default defineConfig({ prerender: { routes: ['/termos'] } })
 ```
 
 ## Exemplos com Vite
@@ -707,6 +1070,38 @@ export default defineConfig({
 // Start põe o nitro() entre tanstackStart() e viteReact(). Este exemplo é o
 // mais recente dos dois. Se o build sair estranho, é a primeira variável a
 // mexer — e a que quase ninguém desconfia.
+```
+
+```ts
+// vite.config.ts — ordem usada nos dois projetos desta stack: nitro() primeiro
+import { defineConfig } from 'vite'
+import { nitro } from 'nitro/vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [
+    nitro({ preset: 'node-server' }),
+    tailwindcss(),
+    tanstackStart({ router: { routeToken: 'layout' } }),
+    react(),
+  ],
+})
+```
+
+```ts
+// errado — seguir o guia de hosting do TanStack Start ao pé da letra e pôr
+// nitro() ENTRE tanstackStart() e viteReact()
+export default defineConfig({
+  plugins: [tanstackStart(), nitro(), viteReact()],
+})
+
+// certo — bater com o exemplo oficial mais recente: nitro() não fica
+// espremido entre os dois plugins de framework
+export default defineConfig({
+  plugins: [tanstackStart(), viteReact(), nitro()],
+})
 ```
 
 #### examples/vite-ssr-tsr-react
@@ -810,3 +1205,24 @@ export default defineConfig({
   ],
 })
 ```
+
+## Fora de escopo
+
+- docs/cli, docs/modules (uso avançado de build/CLI do Nitro como framework standalone; aqui ele só
+  roda como plugin do Vite)
+- docs/testing, examples/vitest (testar rotas **do servidor Nitro** com Vitest — não há rota Nitro
+  própria aqui para testar; o Vitest dos dois projetos testa componentes React)
+- examples/api-routes, cached-handler, custom-error-handler, database, elysia, express, fastify,
+  hello-world, hono, import-alias, middleware, mono-jsx, nano-jsx, plugins, renderer,
+  runtime-config, server-fetch, shiki, takumi, tracing, virtual-routes, websocket (padrões de
+  servidor Nitro próprio; o backend fica no AdonisJS/Fastify separado, não no Nitro)
+- examples/vite-ssr-html, vite-ssr-preact, vite-ssr-react-router, vite-ssr-solid,
+  vite-ssr-solidstart, vite-ssr-vue-router (outro framework de UI)
+- examples/vite-nitro-plugin (já coberto pela entrada `docs/vite` acima e por `examples/vite-ssr-tss-react`)
+- deploy (índice) e todos os `deploy/providers/*` (Alwaysdata, AWS Amplify, AWS Lambda, Azure,
+  Cleavr, Cloudflare, Deno Deploy, DigitalOcean, EdgeOne, Firebase, Flightcontrol, Genezio, GitHub
+  Pages, GitLab Pages, Heroku, IIS, Koyeb, Netlify, Render.com, Stormkit, Upsun, Vercel, Zeabur,
+  Zephyr, Zerops) e `deploy/runtimes/{bun,deno,standard}` — o deploy real é Docker com preset
+  `node-server` (`Dockerfile-production`/`Dockerfile-coolify`), nenhum provider bate exatamente
+- blog, blog/v3-beta
+- examples (índice)

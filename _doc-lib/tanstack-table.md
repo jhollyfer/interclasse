@@ -59,7 +59,11 @@ existir). **Row model** processa os dados (`createSortedRowModel()` faz as linha
 no mesmo `tableFeatures()`, e uma API que "sumiu na v9" quase sempre é uma feature que não foi
 registrada.
 
-**Links:** 45.
+**Links:** 46.
+
+**Skills:** `maiyu-frontend`, `virtual-lists` (lista grande). Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
+> Conferido contra `@tanstack/react-table@9.2.8` (`@tanstack/table-core@9.2.8`, latest).
 
 ---
 
@@ -630,6 +634,57 @@ table3.state.pagination
 // Precedência: átomo externo > `state` controlado > átomo interno. Fornecer os
 // três para a mesma fatia funciona, e o resultado surpreende quem não leu isto.
 // `table.reset()` não zera átomo externo.
+```
+
+#### framework/react/guide/react-compiler
+[doc](https://tanstack.com/table/latest/docs/framework/react/guide/react-compiler) | [markdown](https://raw.githubusercontent.com/tanstack/table/main/docs/framework/react/guide/react-compiler.md)
+**O que é:** a v9 é a primeira versão compatível com o React Compiler — componente que chama
+`useTable` compila normal, e na maioria dos casos `useMemo`/`useCallback` em volta de `columns`/
+`data` deixam de ser necessários.
+**Para que serve:** remover memoização manual sem perder estabilidade de referência.
+**Quando usar:** este projeto já roda o compiler (`babel-plugin-react-compiler` no `vite.config.ts`).
+**Um componente aninhado cujas únicas props são objetos da tabela (`table`, `row`, `cell`, `column`,
+`header`) é a exceção** — o compiler pode não re-renderizá-lo quando um método desses objetos
+devolve valor novo mesmo sem a referência mudar, e aí precisa do `Subscribe` do estado lido.
+
+```tsx
+// Sem o compiler, isto exigia useMemo em `columns` e `visiblePeople` para não
+// recriar a tabela a cada render do pai. Com o compiler, não precisa.
+function PeopleTable({ people, showInactive }: { people: Person[]; showInactive: boolean }) {
+  const columns = columnHelper.columns([
+    columnHelper.accessor('firstName', { header: 'Nome' }),
+  ])
+  const visiblePeople = showInactive ? people : people.filter((p) => p.active)
+  const table = useTable({ columns, data: visiblePeople })
+  return <TableBody table={table} />
+}
+```
+
+```tsx
+// Caso comum: componente de linha aninhado que só recebe `row` como prop.
+// `row.getIsSelected()` muda sem a REFERÊNCIA de `row` mudar — o compiler vê a
+// prop "igual" e pode pular o re-render. `source` aponta pro átomo certo.
+function TableRow({ row }: { row: Row<Product> }) {
+  return (
+    <row.table.Subscribe source={row.table.atoms.rowSelection} selector={(sel) => !!sel[row.id]}>
+      {(selected) => <tr className={selected ? 'selecionada' : ''}>{/* células */}</tr>}
+    </row.table.Subscribe>
+  )
+}
+
+declare type Product = { id: string; price: number }
+declare type Row<TData> = {
+  id: string
+  table: { atoms: { rowSelection: unknown }; Subscribe: unknown }
+}
+```
+
+```ts
+// Pegadinha: o ganho medido pelo próprio time (benchmark linkado na doc) é
+// pequeno para operação de tabela em si (sort, paginação) — o compiler ajuda
+// mais quando um PAI não relacionado re-renderiza e isso cascateava para a
+// tabela antes. Não é motivo para ligar o compiler SÓ por causa da tabela: a
+// decisão é do app inteiro, e a tabela já suporta os dois estados.
 ```
 
 #### framework/react/guide/composable-tables
@@ -1246,3 +1301,4 @@ const rowVirtualizer = useVirtualizer({
 // lista ATUAL da tabela. Ordenou, filtrou, paginou ou escondeu coluna? A lista
 // mudou, e o virtualizador precisa recalcular a partir dela.
 ```
+

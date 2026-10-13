@@ -3,12 +3,30 @@
 Os Jogos Estudantis do CMEI Cosme Jean: turmas, inscrições de atletas, sorteio
 automático das chaves, tabela de jogos, placar, classificação e avisos.
 
-Mesmo stack e mesma régua de `../adacaibs` e `../simple-hub` - o backend foi
-copiado do adacaibs e o domínio trocado. **A régua do backend é
-`PADRAO-BACKEND.md`**, byte-idêntica nos irmãos; `_doc-lib/` manda acima dela.
+O backend foi copiado do adacaibs e o domínio trocado.
 
 - `backend/` - AdonisJS 7 + Lucid/Postgres. Ver `backend/CLAUDE.md`.
-- `frontend/` - TanStack Start + Router + Query, shadcn sobre Base UI.
+- `frontend/` - TanStack Start + Router + Query, shadcn sobre Base UI. Ver `frontend/CLAUDE.md`.
+
+## A régua: padrão Maiyu
+
+`_padroes/`, `_doc-lib/`, `SKILLS-MAP.md` e as skills `maiyu-*`/`code-pattern` em
+`.claude/skills/` são **cópia** do upstream `jhollyfer/maiyu-pattern`. Não se editam
+aqui: a mudança é feita lá e trazida com
+`node ../maiyu-pattern/scripts/sync-to-project.mjs .`; `pnpm sync:check` (backend)
+reprova a cópia divergente.
+
+Autoridade: `_doc-lib/` (doc oficial) > tipo instalado > `_padroes/` > código.
+Antes de implementar ou decidir:
+
+1. Padrão da camada em `_padroes/`: `arquitetura.md`, `typescript.md` e `solid.md`
+   sempre; `backend.md`, `frontend.md`, `tooling.md`, `openapi.md` conforme a tarefa.
+2. Doc da biblioteca pelo índice `_doc-lib.md` → `_doc-lib/<lib>.md` → a entrada exata
+   (nunca o arquivo inteiro: `grep -n '^#### '` e leia só o trecho).
+3. Tipo instalado (`node_modules/<pkg>/**/*.d.ts`) quando a doc não cobre.
+4. Só então o código existente. Código que contradiz 1–3 está errado.
+
+O que ainda falta migrar está em `_padroes/MIGRACOES.md`, seção do interclasse.
 
 ## Papéis
 

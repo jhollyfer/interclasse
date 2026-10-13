@@ -2,6 +2,8 @@
 
 Camada única de armazenamento de arquivos sobre disco local, S3, R2, GCS e outros.
 
+> Conferido contra `@adonisjs/drive@4.0.0`
+
 **O que é:** uma abstração de sistema de arquivos para Node.js. Você programa contra uma API só,
 `put`, `get`, `delete`, `getUrl`, `getSignedUrl`, e troca o destino real (disco local, bucket S3,
 Cloudflare R2, Google Cloud Storage) mudando só a configuração. Sucessor espiritual do
@@ -36,6 +38,8 @@ provedor sem reescrever a feature. Se o app grava um único arquivo local e nunc
 
 **Links:** 13.
 
+**Skills:** `maiyu-backend`, `api-and-interface-design`, `security-best-practices`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
 ---
 
 ## Fundamentos
@@ -64,6 +68,34 @@ export const disk = new Disk(driver)
 
 // daqui para baixo, nenhuma linha do app sabe qual destino está ativo
 await disk.put('docs/contrato.pdf', buffer)
+```
+
+```ts
+// caso real da stack: FlyDrive entra como dependência injetada, nunca com `new`
+// dentro do use-case — quem decide o driver é a config, não a regra de negócio.
+@inject()
+export default class PostUploadFileUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      await this.drive.use().put(payload.key, payload.content)
+      return right(payload.key)
+    } catch (error) {
+      logger.error({ err: error }, '[post > upload-file][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'POST_UPLOAD_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: montar a URL na mão parte do endpoint do provedor na regra de negócio -
+// o endereço muda com o driver (fs, s3, r2...) e com a visibilidade do disco.
+const urlErrada = `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${key}`
+
+// certo: a própria abstração sabe como montar (ou assinar) o endereço do driver ativo
+const urlCerta = await disk.getUrl(key)
 ```
 
 #### getting_started
@@ -129,6 +161,39 @@ await disk.put('contratos/x.pdf', buffer, { visibility: 'private' })
 const temporaria = await disk.getSignedUrl('contratos/x.pdf', { expiresIn: '30 mins' })
 ```
 
+```ts
+// caso real da stack: o use-case gera a key (escopo + uuid) e guarda só ela no banco;
+// a visibility vem do disco configurado, não de um if na regra de negócio.
+@inject()
+export default class UserUploadAvatarUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    const key = `users/${payload.userId}/avatar/${randomUUID()}${extname(payload.fileName)}`
+    try {
+      await this.drive.use().put(key, payload.content, { contentType: payload.mimeType })
+      return right(key)
+    } catch (error) {
+      logger.error({ err: error }, '[user > upload-avatar][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'USER_UPLOAD_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: nome enviado pelo usuário vira key - o KeyNormalizer só aceita
+// [A-Za-z0-9-_!/. ] e lança E_UNALLOWED_CHARACTERS para "relatório ação.pdf".
+await disk.put(`posts/${payload.fileName}`, payload.content)
+
+// certo: key gerada pelo app; o nome original vai para o banco ou para o
+// Content-Disposition, nunca para o caminho
+const key = `posts/${randomUUID()}${extname(payload.fileName).toLowerCase()}`
+await disk.put(key, payload.content, {
+  contentDisposition: `attachment; filename*=UTF-8''${encodeURIComponent(payload.fileName)}`,
+})
+```
+
 ## API
 
 #### disk_api
@@ -166,6 +231,44 @@ await disk.delete('backup/logo.png')
 await disk.deleteAll('arquivadas/') // prefixo inteiro
 ```
 
+```ts
+// caso real da stack: a regra de negócio não fala com o driver, fala com o Disk
+// injetado - fica livre para trocar fs por s3 sem tocar no use-case.
+@inject()
+export default class PostDeleteFileUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      await this.drive.use().delete(payload.key)
+      return right(payload.key)
+    } catch (error) {
+      logger.error({ err: error }, '[post > delete-file][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'POST_DELETE_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: ler um stream grande e nunca drenar em caso de erro no meio do processamento
+// deixa o handle de arquivo aberto - acumula em uploads grandes ou em lote.
+const streamErrado = await disk.getStream('videos/aula.mp4')
+streamErrado.on('data', () => {
+  throw new Error('falha no processamento')
+})
+
+// certo: fechar o stream explicitamente também no caminho de erro
+const streamCerto = await disk.getStream('videos/aula.mp4')
+try {
+  for await (const _chunk of streamCerto) {
+    // processa o chunk
+  }
+} finally {
+  streamCerto.destroy()
+}
+```
+
 #### file_api
 [doc](https://flydrive.dev/docs/file_api)
 
@@ -194,6 +297,36 @@ for (const item of listagem.objects) {
 }
 ```
 
+```ts
+// caso real da stack: devolver metadados de um arquivo numa rota de listagem,
+// sem baixar o conteúdo - IO contido num use-case, erro vira Either.
+@inject()
+export default class GetFileMetadataUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      const meta = await this.drive.use().getMetaData(payload.key)
+      return right(meta)
+    } catch (error) {
+      logger.error({ err: error }, '[get > file-metadata][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'GET_METADATA_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: assumir que `contentType` sempre vem preenchido - o campo é opcional,
+// alguns drivers e alguns uploads sem Content-Type explícito deixam undefined.
+const metaErrada = await disk.getMetaData('imagens/logo.png')
+console.log(metaErrada.contentType.toUpperCase())
+
+// certo: tratar a ausência antes de usar
+const metaCerta = await disk.getMetaData('imagens/logo.png')
+const tipo = metaCerta.contentType ?? 'application/octet-stream'
+```
+
 #### drive_manager
 [doc](https://flydrive.dev/docs/drive_manager)
 
@@ -220,6 +353,35 @@ const drive = new DriveManager({
 
 await drive.use().put('avatars/a.png', buffer) // vai para o default do ambiente
 await drive.use('privado').put('contratos/x.pdf', buffer) // sempre no bucket privado
+```
+
+```ts
+// caso real da stack: o use-case recebe o DriveManager inteiro, não um Disk já
+// resolvido - quem decide o disco é a chamada, a dependência injetada é o manager.
+@inject()
+export default class PostUploadAvatarUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      await this.drive.use('publico').put(payload.key, payload.content)
+      return right(payload.key)
+    } catch (error) {
+      logger.error({ err: error }, '[post > upload-avatar][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'POST_UPLOAD_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: cada camada resolve o disco com `new S3Driver(...)` direto - duplica
+// config e invalida os testes, que esperam um único manager para dar fake().
+const discoErrado = new S3Driver({ bucket: 'assets-publicos', region: 'us-east-1', visibility: 'public' })
+
+// certo: um único DriveManager configurado uma vez, injetado onde precisar
+drive.fake('publico') // em teste, substitui o disco real sem tocar no use-case
+await drive.use('publico').put('avatars/a.png', buffer)
 ```
 
 ## Drivers
@@ -284,6 +446,34 @@ const minio = new S3Driver({
   bucket: 'teste',
   visibility: 'public',
 })
+```
+
+```ts
+// caso real da stack: a config do driver S3 fica fora do use-case - o use-case
+// só conhece o DriveManager injetado, nunca o driver nem suas credenciais.
+@inject()
+export default class PostUploadDocumentUseCase {
+  constructor(private readonly drive: DriveManager) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      await this.drive.use('s3').put(payload.key, payload.content, { visibility: 'private' })
+      return right(payload.key)
+    } catch (error) {
+      logger.error({ err: error }, '[post > upload-document][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'POST_UPLOAD_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: disco privado no S3 e depois usar getUrl() - o objeto não é público,
+// a URL devolvida nem sempre funciona e nada avisa isso em tempo de build.
+const urlErrada = await disk.getUrl('contratos/x.pdf')
+
+// certo: disco privado sempre com getSignedUrl(), que expira e exige assinatura
+const urlCerta = await disk.getSignedUrl('contratos/x.pdf', { expiresIn: '15 mins' })
 ```
 
 #### services/r2
@@ -433,3 +623,4 @@ const disk = new Disk(new MemoryDriver() as DriverContract)
 await disk.put('teste.txt', 'ok')
 console.log(await disk.get('teste.txt')) // "ok"
 ```
+
