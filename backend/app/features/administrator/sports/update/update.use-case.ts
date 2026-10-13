@@ -1,5 +1,5 @@
 import Sport from '#models/sport'
-import SlugService from '#services/slug.service'
+import SlugService from '#services/slug/slug.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'

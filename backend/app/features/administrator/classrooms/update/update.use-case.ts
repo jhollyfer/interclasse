@@ -1,6 +1,6 @@
 import Classroom from '#models/classroom'
 import Team from '#models/team'
-import ClassroomService from '#services/classroom.service'
+import ClassroomService from '#services/classroom/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'

@@ -8,7 +8,7 @@ import Match from '#models/match'
 import Sport from '#models/sport'
 import Student from '#models/student'
 import User from '#models/user'
-import JogosSeeder from '#database/seeders/jogos_seeder'
+import JogosSeeder from '#database/seeders/jogos.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
@@ -22,7 +22,7 @@ import { ActiveStatuses, Categories, MatchPhases, UserRoles, type Category } fro
  *
  * Só em desenvolvimento, e só roda à mão:
  *
- *   SEED_DEMO_PASSWORD=<senha> node ace db:seed --files database/seeders/demo_seeder.ts
+ *   SEED_DEMO_PASSWORD=<senha> node ace db:seed --files database/seeders/demo.seed.ts
  *
  * Banco que já tem chave sorteada é deixado em paz: o seeder não sabe distinguir
  * demonstração de campeonato real, e apagar o segundo não tem volta.

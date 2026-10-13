@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import { defineDocs } from '#core/openapi/types'
 import AuthenticationRefreshUseCase from './refresh.use-case.ts'
-import CookieService, { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie.service'
+import CookieService, { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie/cookie.service'
 
 @inject()
 export default class AuthenticationRefreshController {

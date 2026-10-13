@@ -106,7 +106,7 @@ export function errorResponse(
 export const AUTOMATIC_CODES = {
   /** `HttpExceptionHandler` traduz `E_UNAUTHORIZED_ACCESS` do guard. */
   unauthenticated: 'UNAUTHORIZED',
-  /** `role_middleware.ts` recusa o papel. */
+  /** `role.middleware.ts` recusa o papel. */
   forbidden: 'ACCESS_DENIED',
   /** `HttpExceptionHandler` traduz `E_VALIDATION_ERROR` do VineJS. */
   validation: 'VALIDATION_ERROR',

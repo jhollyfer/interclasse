@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { COOKIE_TOKEN } from '#services/cookie.service'
+import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '../helpers.ts'
 
 /**

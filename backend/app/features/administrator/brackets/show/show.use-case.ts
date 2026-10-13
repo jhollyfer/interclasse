@@ -1,4 +1,4 @@
-import BracketService, { type BracketDetail } from '#services/bracket.service'
+import BracketService, { type BracketDetail } from '#services/bracket/bracket.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'

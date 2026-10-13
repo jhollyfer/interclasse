@@ -4,7 +4,7 @@ import { defineDocs } from '#core/openapi/types'
 import StorageCreateUseCase from './create.use-case.ts'
 import { StorageCreateValidator } from '#features/storages/storages.validator'
 import { STORAGE_MIMETYPES, UPLOAD_MAX_SIZE } from '#core/validator'
-import { PART_SIZE } from '#services/multipart.service'
+import { PART_SIZE } from '#services/multipart/multipart.service'
 import { StorageUploadResponse } from '#core/response'
 
 @inject()

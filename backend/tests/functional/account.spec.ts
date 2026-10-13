@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import User from '#models/user'
-import { UserFactory } from '#database/factories/user_factory'
+import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
   authenticate,

@@ -1,5 +1,5 @@
 import Classroom from '#models/classroom'
-import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment.service'
+import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'

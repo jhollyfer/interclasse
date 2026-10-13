@@ -2,7 +2,7 @@ import { AuthenticationSignInValidator } from '#features/authentication/authenti
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { issueSessionTokens } from '#services/cookie.service'
+import CookieService, { issueSessionTokens } from '#services/cookie/cookie.service'
 import AuthenticationSignInUseCase from './sign-in.use-case.ts'
 
 @inject()

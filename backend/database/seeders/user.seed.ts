@@ -11,7 +11,7 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
 export default class extends BaseSeeder {
   /**
    * Fora de produção: lá os administradores reais vêm do recorte de produção
-   * (`demo_seeder.ts`), e este registro seria só uma credencial padrão
+   * (`demo.seed.ts`), e este registro seria só uma credencial padrão
    * conhecida com poder de administrador.
    */
   static environment = ['development', 'test']

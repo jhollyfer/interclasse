@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
-import MultipartService from '#services/multipart.service'
+import MultipartService from '#services/multipart/multipart.service'
 import { randomUUID } from 'node:crypto'
 
 /**

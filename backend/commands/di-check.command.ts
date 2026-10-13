@@ -27,7 +27,9 @@ export default class DiCheck extends BaseCommand {
   private async classesDe(diretorio: string, sufixo: string): Promise<string[]> {
     const caminho = join(this.app.appRoot.pathname, 'app', diretorio)
 
-    const entradas = await readdir(caminho).catch(() => [])
+    // Recursivo: service mora em `services/<nome>/<nome>.service.ts`
+    // (_padroes/arquitetura.md §3); policy continua plana.
+    const entradas = await readdir(caminho, { recursive: true }).catch(() => [])
 
     return entradas.filter(function (nome) {
       return nome.endsWith(sufixo)
