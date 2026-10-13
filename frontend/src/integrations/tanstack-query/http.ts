@@ -21,7 +21,7 @@ import * as server from './http.server'
  * handler do backend guarda **a primeira** mensagem de cada campo, e não a
  * lista. Tratar como array aqui faria a tela imprimir `[object Object]`.
  */
-export type HTTPErrorBody = {
+export type IHTTPErrorBody = {
   message: string
   status: number
   code: string
@@ -93,7 +93,7 @@ export class HTTPError extends Error {
   readonly code: string
   readonly errors?: Record<string, string>
 
-  constructor(body: HTTPErrorBody) {
+  constructor(body: IHTTPErrorBody) {
     super(body.message)
     this.name = 'HTTPError'
     this.status = body.status
@@ -377,7 +377,7 @@ async function perform(
   if (!response.ok) {
     // Corpo ilegível (HTML de proxy, resposta vazia) vira um HTTPError com o
     // status real mesmo assim - a UI nunca recebe um erro sem `status`.
-    let body: Partial<HTTPErrorBody> | null = null
+    let body: Partial<IHTTPErrorBody> | null = null
 
     try {
       body = await response.json()

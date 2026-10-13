@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { validateRedirectSearch } from '#/lib/redirect-search'
-import { SITE_TITLE } from '#/lib/site'
+import { SITE_TITLE } from '#/lib/constant'
 
 /**
  * O guard inverso: quem já tem sessão não vê o formulário de login. Fica no

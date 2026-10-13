@@ -83,10 +83,10 @@ export function FormShellDiscard({
   )
 }
 
-// `Omit` antes do `Merge`: o `children` do `SubmitButton` é obrigatório, e
-// `Merge` intersecta - sem tirar o original, o opcional daqui não vale nada.
+// O `children` do `SubmitButton` é obrigatório; aqui ele é opcional, e o
+// `Merge` substitui a chave em vez de intersectar.
 type FormShellSubmitProps = Merge<
-  Omit<React.ComponentProps<typeof SubmitButton>, 'children'>,
+  React.ComponentProps<typeof SubmitButton>,
   { children?: React.ReactNode }
 >
 

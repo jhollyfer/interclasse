@@ -15,13 +15,13 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations'
-import type { Announcement } from '#/lib/validator'
+import type { IAnnouncement } from '#/lib/interfaces'
 
 /** Editar e apagar. O aviso some do site na hora. */
 export function AnnouncementRowActions({
   announcement,
 }: {
-  announcement: Announcement
+  announcement: IAnnouncement
 }): React.JSX.Element {
   const queryClient = useQueryClient()
 

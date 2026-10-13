@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BRACKET_STATUS_LABELS, CATEGORY_LABELS } from '#/lib/labels'
-import type { Bracket } from '#/lib/validator'
+import type { IBracket } from '#/lib/interfaces'
 
 import { Empty } from './section'
 
@@ -14,7 +14,7 @@ import { Empty } from './section'
 export function BracketIndex({
   brackets,
 }: {
-  brackets: ReadonlyArray<Bracket>
+  brackets: ReadonlyArray<IBracket>
 }): React.JSX.Element {
   if (brackets.length === 0)
     return (
@@ -23,7 +23,7 @@ export function BracketIndex({
       </Empty>
     )
 
-  const sports = new Map<string, { name: string; brackets: Array<Bracket> }>()
+  const sports = new Map<string, { name: string; brackets: Array<IBracket> }>()
 
   for (const bracket of brackets) {
     const sport = sports.get(bracket.sportId) ?? {

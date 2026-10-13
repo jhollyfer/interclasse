@@ -36,7 +36,7 @@ import {
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { Student } from '#/lib/validator'
+import type { IStudent } from '#/lib/interfaces'
 
 import { studentsOf } from '../$classroomId/index'
 
@@ -169,7 +169,7 @@ function StudentRow({
   student,
   onChange,
 }: {
-  student: Student
+  student: IStudent
   onChange: () => Promise<void>
 }): React.JSX.Element {
   const [editing, setEditing] = React.useState(false)

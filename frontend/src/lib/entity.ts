@@ -1,20 +1,11 @@
 /**
- * O vocabulário do domínio - cópia de `backend/app/core/entity.ts`.
+ * O vocabulário do domínio - cópia de `backend/app/core/entity.ts`, na forma
+ * da régua: objeto `as const` (`USER_ROLE`), tipo (`UserRole`) e lista
+ * (`USER_ROLES`).
  *
- * Mora fora de `validator.ts`, e não por arrumação: aquele arquivo faz
- * `vine.messagesProvider = messages` no escopo do módulo e monta cada validator
- * com `vine.create({...})` no topo. São efeitos no topo, e o Rollup não poda
- * módulo com efeito no topo - então **um** `import { MatchPhases }`
- * arrastaria o VineJS inteiro e o arquivo de schemas para dentro do bundle de
- * quem importou.
- *
- * Quem paga essa conta é o site público: as páginas leem constante daqui só
- * para desenhar um rótulo de fase, e não têm por que embarcar uma biblioteca de
- * validação de servidor para ler a string `'FINAL'`.
- *
- * Aqui não entra nada que dependa de `vine`. `validator.ts` reexporta tudo,
- * então quem já importava de lá continua funcionando - mas código novo que só
- * precisa do vocabulário importa **deste** arquivo.
+ * Fora de `validator.ts` porque aquele módulo tem efeito no topo (configura o
+ * `vine`) e não é podável: o site público lê constante daqui só para desenhar
+ * um rótulo e não tem por que embarcar o VineJS. Nada aqui depende de `vine`.
  */
 
 // ---------------------------------------------------------------------------
@@ -27,7 +18,7 @@
  * literal repetido para divergir. O rótulo em português mora em `lib/labels.ts`,
  * porque é apresentação.
  */
-export const UserRoles = {
+export const USER_ROLE = {
   /** A organização dos jogos: cadastra, sorteia e lança placar. */
   ADMINISTRATOR: 'ADMINISTRATOR',
   /** O professor conselheiro: alunos e inscrições das próprias turmas. */
@@ -36,69 +27,68 @@ export const UserRoles = {
   REPRESENTATIVE: 'REPRESENTATIVE',
 } as const
 
-export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
+export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE]
 
-export const USER_ROLES = Object.values(UserRoles)
+export const USER_ROLES = Object.values(USER_ROLE)
 
 /**
  * Se a conta pode entrar. É o par ativo/inativo, e nada nele é específico de
  * usuário.
  */
-export const ActiveStatuses = {
+export const ACTIVE_STATUS = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
 } as const
 
-export type ActiveStatus = (typeof ActiveStatuses)[keyof typeof ActiveStatuses]
+export type ActiveStatus = (typeof ACTIVE_STATUS)[keyof typeof ACTIVE_STATUS]
 
-export const ACTIVE_STATUSES = Object.values(ActiveStatuses)
+export const ACTIVE_STATUSES = Object.values(ACTIVE_STATUS)
 
 // ---------------------------------------------------------------------------
 // Jogos - cópia de `backend/app/core/entity.ts`
 // ---------------------------------------------------------------------------
 
 /** Fundamental 1 (3º ao 5º) e Fundamental 2 (6º ao 9º). Nunca se enfrentam. */
-export const Categories = {
+export const CATEGORY = {
   F1: 'F1',
   F2: 'F2',
 } as const
 
-export type Category = (typeof Categories)[keyof typeof Categories]
+export type Category = (typeof CATEGORY)[keyof typeof CATEGORY]
 
-export const CATEGORIES = Object.values(Categories)
+export const CATEGORIES = Object.values(CATEGORY)
 
 /** Os anos que a escola tem. */
 export const GRADES = { MIN: 3, MAX: 9 } as const
 
-export const BracketStatuses = {
+export const BRACKET_STATUS = {
   KNOCKOUT: 'KNOCKOUT',
   FINISHED: 'FINISHED',
 } as const
 
-export type BracketStatus =
-  (typeof BracketStatuses)[keyof typeof BracketStatuses]
+export type BracketStatus = (typeof BRACKET_STATUS)[keyof typeof BRACKET_STATUS]
 
-export const BRACKET_STATUSES = Object.values(BracketStatuses)
+export const BRACKET_STATUSES = Object.values(BRACKET_STATUS)
 
-export const MatchPhases = {
+export const MATCH_PHASE = {
   ROUND_OF_16: 'ROUND_OF_16',
   QUARTER: 'QUARTER',
   SEMI: 'SEMI',
   FINAL: 'FINAL',
 } as const
 
-export type MatchPhase = (typeof MatchPhases)[keyof typeof MatchPhases]
+export type MatchPhase = (typeof MATCH_PHASE)[keyof typeof MATCH_PHASE]
 
-export const MATCH_PHASES = Object.values(MatchPhases)
+export const MATCH_PHASES = Object.values(MATCH_PHASE)
 
-export const MatchStatuses = {
+export const MATCH_STATUS = {
   SCHEDULED: 'SCHEDULED',
   FINISHED: 'FINISHED',
 } as const
 
-export type MatchStatus = (typeof MatchStatuses)[keyof typeof MatchStatuses]
+export type MatchStatus = (typeof MATCH_STATUS)[keyof typeof MATCH_STATUS]
 
-export const MATCH_STATUSES = Object.values(MatchStatuses)
+export const MATCH_STATUSES = Object.values(MATCH_STATUS)
 
 // ---------------------------------------------------------------------------
 // Arquivos
@@ -111,14 +101,14 @@ export const MATCH_STATUSES = Object.values(MatchStatuses)
  * coisa e outra a linha existe sem binário íntegro, e é isso que `PENDING`
  * nomeia - o backend recusa anexar o que não estiver `UPLOADED`.
  */
-export const UploadStatuses = {
+export const UPLOAD_STATUS = {
   PENDING: 'PENDING',
   UPLOADED: 'UPLOADED',
 } as const
 
-export type UploadStatus = (typeof UploadStatuses)[keyof typeof UploadStatuses]
+export type UploadStatus = (typeof UPLOAD_STATUS)[keyof typeof UPLOAD_STATUS]
 
-export const UPLOAD_STATUSES = Object.values(UploadStatuses)
+export const UPLOAD_STATUSES = Object.values(UPLOAD_STATUS)
 
 /**
  * Os tipos que o backend aceita anexar, espelhando `STORAGE_MIMETYPES` de
@@ -179,26 +169,26 @@ export const AUDIO_MIMETYPES = STORAGE_MIMETYPES.filter((mimetype) =>
  *
  * Aqui é `deletedAt`, a remoção lógica - hoje só contas e arquivos a têm.
  */
-export const TrashedModes = {
+export const TRASHED_MODE = {
   /** Só o que está na lixeira. É a listagem da tela de restauração. */
   ONLY: 'only',
   /** Ativos e removidos juntos. */
   WITH: 'with',
 } as const
 
-export type TrashedMode = (typeof TrashedModes)[keyof typeof TrashedModes]
+export type TrashedMode = (typeof TRASHED_MODE)[keyof typeof TRASHED_MODE]
 
-export const TRASHED_MODES = Object.values(TrashedModes)
+export const TRASHED_MODES = Object.values(TRASHED_MODE)
 
 /**
  * O sentido da ordenação de uma listagem. Ausente é `asc`, que é a ordem que as
  * listagens já tinham antes de aceitarem o parâmetro.
  */
-export const SortDirections = {
+export const SORT_DIRECTION = {
   ASC: 'asc',
   DESC: 'desc',
 } as const
 
-export type SortDirection = (typeof SortDirections)[keyof typeof SortDirections]
+export type SortDirection = (typeof SORT_DIRECTION)[keyof typeof SORT_DIRECTION]
 
-export const SORT_DIRECTIONS = Object.values(SortDirections)
+export const SORT_DIRECTIONS = Object.values(SORT_DIRECTION)

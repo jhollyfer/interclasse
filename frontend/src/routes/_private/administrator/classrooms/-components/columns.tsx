@@ -2,10 +2,10 @@ import { Badge } from '#/components/ui/badge'
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { Classroom } from '#/lib/validator'
+import type { IClassroom } from '#/lib/interfaces'
 
 /** `sortKey` só onde o backend ordena: `CLASSROOM_SORT_COLUMNS`. */
-export const classroomColumns: TableColumns<Classroom> = [
+export const classroomColumns: TableColumns<IClassroom> = [
   {
     accessorKey: 'name',
     meta: { label: 'Turma' },

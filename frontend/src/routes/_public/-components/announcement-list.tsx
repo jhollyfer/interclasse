@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import { PushPinIcon } from '@phosphor-icons/react'
 
-import type { Announcement } from '#/lib/validator'
+import type { IAnnouncement } from '#/lib/interfaces'
 
 import { Empty } from './section'
 import { formatWhen } from './match-row'
@@ -9,7 +9,7 @@ import { formatWhen } from './match-row'
 export function AnnouncementList({
   announcements,
 }: {
-  announcements: ReadonlyArray<Announcement>
+  announcements: ReadonlyArray<IAnnouncement>
 }): React.JSX.Element {
   if (announcements.length === 0)
     return <Empty>Nenhum aviso por enquanto.</Empty>

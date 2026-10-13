@@ -12,7 +12,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
-import type { Classroom } from '#/lib/validator'
+import type { IClassroom } from '#/lib/interfaces'
 import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
 import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -28,7 +28,7 @@ import {
 export function ClassroomFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
-    Classroom,
+    IClassroom,
     ClassroomCreatePayload
   >({
     formId: 'classroom-create',

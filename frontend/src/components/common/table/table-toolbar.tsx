@@ -5,7 +5,7 @@ import { ArchiveIcon } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
-import { TrashedModes } from '#/lib/entity'
+import { TRASHED_MODE } from '#/lib/entity'
 
 import { InputSearch } from './table-search-input'
 import { useTableContext } from './table-context'
@@ -80,14 +80,14 @@ export function TableTrashToggle(): React.JSX.Element {
   const { to, search } = useTableContext('TableTrashToggle')
   const navigate = useNavigate()
 
-  const isTrash = search.trashed === TrashedModes.ONLY
+  const isTrash = search.trashed === TRASHED_MODE.ONLY
 
   // Sem ternário de atribuição: o botão liga e desliga, e cada estado é uma
   // linha legível de cima para baixo.
   let variant: 'default' | 'outline' = 'outline'
   if (isTrash) variant = 'default'
 
-  let nextTrashed: typeof search.trashed = TrashedModes.ONLY
+  let nextTrashed: typeof search.trashed = TRASHED_MODE.ONLY
   if (isTrash) nextTrashed = undefined
 
   return (

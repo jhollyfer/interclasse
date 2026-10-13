@@ -15,7 +15,7 @@ import type { SortDirection, TrashedMode } from './entity'
  */
 
 /**
- * Os valores são literais, e `SortDirections`/`TrashedModes` de `entity.ts`
+ * Os valores são literais, e `SORT_DIRECTION`/`TRASHED_MODE` de `entity.ts`
  * entram só como **tipo**. Não é descuido: este arquivo é importado por toda
  * rota que declara `validateSearch`, então ele cai no chunk do router, enquanto
  * o enum mora com o resto do vocabulário. Ler o enum aqui, em escopo de módulo,
@@ -27,7 +27,7 @@ import type { SortDirection, TrashedMode } from './entity'
  *
  * O build passa verde e só o primeiro SSR em produção descobre. `import type`
  * some no build e a aresta com ele. A anotação é o que segura a duplicação: se
- * `TrashedModes.ONLY` mudar de valor, `'only'` deixa de ser atribuível a
+ * `TRASHED_MODE.ONLY` mudar de valor, `'only'` deixa de ser atribuível a
  * `TrashedMode` e o `tsc` acusa. `list-search.test.ts` confronta os dois mapas
  * com o enum de verdade.
  */

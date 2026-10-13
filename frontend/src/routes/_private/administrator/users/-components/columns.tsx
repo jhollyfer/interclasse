@@ -10,7 +10,7 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
-import type { User } from '#/lib/validator'
+import type { IUser } from '#/lib/interfaces'
 
 /**
  * `meta.label` é o rótulo em texto puro, para o menu de colunas visíveis:
@@ -20,7 +20,7 @@ import type { User } from '#/lib/validator'
  * `email`, `role`, `status` e `createdAt`. Qualquer outra coluna oferecendo a
  * ordem viraria `422` ao primeiro clique no cabeçalho.
  */
-export const userColumns: TableColumns<User> = [
+export const userColumns: TableColumns<IUser> = [
   {
     accessorKey: 'name',
     meta: { label: 'Usuário' },

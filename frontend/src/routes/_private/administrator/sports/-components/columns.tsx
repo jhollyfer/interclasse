@@ -1,8 +1,8 @@
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
-import type { Sport } from '#/lib/validator'
+import type { ISport } from '#/lib/interfaces'
 
-export const sportColumns: TableColumns<Sport> = [
+export const sportColumns: TableColumns<ISport> = [
   {
     accessorKey: 'name',
     meta: { label: 'Modalidade' },

@@ -4,8 +4,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { TrophyIcon } from '@phosphor-icons/react'
 
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries'
-import type { BracketMatch } from '#/integrations/response'
-import { MatchStatuses } from '#/lib/entity'
+import type { IBracketMatch } from '#/lib/interfaces'
+import { MATCH_STATUS } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_PHASE_LABELS, championName } from '#/lib/labels'
 
 import { formatWhen } from '../-components/match-row'
@@ -16,8 +16,8 @@ export const Route = createLazyFileRoute('/_public/classificacao/$id')({
 })
 
 /** Uma linha de jogo da chave: os dois times, o vencedor em destaque. */
-function Row({ match }: { match: BracketMatch }): React.JSX.Element {
-  const finished = match.status === MatchStatuses.FINISHED
+function Row({ match }: { match: IBracketMatch }): React.JSX.Element {
+  const finished = match.status === MATCH_STATUS.FINISHED
   const loser = 'text-muted-foreground'
   let homeClass = ''
   let awayClass = ''

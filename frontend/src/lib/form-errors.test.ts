@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fromPartial } from '@total-typescript/shoehorn'
 import { toast } from 'sonner'
-import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 
 import { HTTPError, HTTPErrorCode } from '#/integrations/tanstack-query/http'
 
@@ -19,7 +19,7 @@ function formStub() {
 
   return {
     setError,
-    form: fromPartial<UseFormReturn<FormValues & FieldValues>>({ setError }),
+    form: fromPartial<UseFormReturn<FormValues>>({ setError }),
   }
 }
 

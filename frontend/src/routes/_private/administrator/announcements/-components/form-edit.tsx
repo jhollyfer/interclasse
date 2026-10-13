@@ -14,9 +14,8 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
-import type { Announcement } from '#/lib/validator'
+import type { IAnnouncement, Merge  } from '#/lib/interfaces'
 import type { AnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
-import type { Merge } from '#/lib/interfaces'
 import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -34,7 +33,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
 
   const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
-    Announcement,
+    IAnnouncement,
     Merge<AnnouncementUpdatePayload, { id: string }>
   >({
     formId: 'announcement-update',

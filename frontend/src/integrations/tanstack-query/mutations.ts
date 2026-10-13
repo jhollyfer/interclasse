@@ -23,15 +23,15 @@ import type { UseMutationOptions } from '@tanstack/react-query'
 
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type {
-  Announcement,
-  Bracket,
-  Classroom,
-  Match,
-  Sport,
-  Storage,
-  Student,
-  User,
-} from '#/lib/validator'
+  IAnnouncement,
+  IBracket,
+  IClassroom,
+  IMatch,
+  ISport,
+  IStorage,
+  IStudent,
+  IUser, IEnrollmentBoard , Merge 
+} from '#/lib/interfaces'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 import type {
   AnnouncementCreatePayload,
@@ -58,8 +58,6 @@ import type { EnrollmentUpdatePayload as AdvisorEnrollmentUpdatePayload } from '
 import type { StudentCreatePayload } from '#/validators/advisor/students.validator'
 import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
-import type { EnrollmentBoard } from '#/integrations/response'
-import type { Merge } from '#/lib/interfaces'
 
 import type { HTTPError } from './http'
 import { request, send } from './http'
@@ -104,12 +102,12 @@ type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
  * do payload, e não enviado vazio.
  */
 export function useAccountUpdate(
-  options?: MutationProps<User, ProfileUpdatePayload>,
+  options?: MutationProps<IUser, ProfileUpdatePayload>,
 ) {
-  return useMutation<User, HTTPError, ProfileUpdatePayload>({
+  return useMutation<IUser, HTTPError, ProfileUpdatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<User>('/account', {
+      return request<IUser>('/account', {
         method: 'PUT',
         body: JSON.stringify(payload),
       })
@@ -183,7 +181,7 @@ export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
  * sobrava só sumia na varredura do servidor.
  */
 export function useStorageCreate(
-  options?: MutationProps<Storage, File, Error>,
+  options?: MutationProps<IStorage, File, Error>,
 ) {
   const { upload } = useMultipartUpload()
   const controller = React.useRef<AbortController | null>(null)
@@ -192,7 +190,7 @@ export function useStorageCreate(
     return () => controller.current?.abort()
   }, [])
 
-  return useMutation<Storage, Error, File>({
+  return useMutation<IStorage, Error, File>({
     ...options,
     mutationFn: function (file) {
       // Um por envio: um controller abortado não volta a valer, e reaproveitá-lo
@@ -231,12 +229,12 @@ export function useStorageDelete(options?: MutationProps<void, string>) {
 /** O módulo inteiro exige `ADMINISTRATOR`. */
 
 export function useUserCreate(
-  options?: MutationProps<User, UserCreatePayload>,
+  options?: MutationProps<IUser, UserCreatePayload>,
 ) {
-  return useMutation<User, HTTPError, UserCreatePayload>({
+  return useMutation<IUser, HTTPError, UserCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<User>('/administrator/users', {
+      return request<IUser>('/administrator/users', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -256,12 +254,12 @@ type UserUpdateVariables = Merge<UserUpdatePayload, { id: string }>
  * valor que o servidor recusa.
  */
 export function useUserUpdate(
-  options?: MutationProps<User, UserUpdateVariables>,
+  options?: MutationProps<IUser, UserUpdateVariables>,
 ) {
-  return useMutation<User, HTTPError, UserUpdateVariables>({
+  return useMutation<IUser, HTTPError, UserUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<User>('/administrator/users/'.concat(id), {
+      return request<IUser>('/administrator/users/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -318,12 +316,12 @@ export function useUserDelete(options?: MutationProps<void, string>) {
  */
 
 export function useClassroomCreate(
-  options?: MutationProps<Classroom, ClassroomCreatePayload>,
+  options?: MutationProps<IClassroom, ClassroomCreatePayload>,
 ) {
-  return useMutation<Classroom, HTTPError, ClassroomCreatePayload>({
+  return useMutation<IClassroom, HTTPError, ClassroomCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<Classroom>('/administrator/classrooms', {
+      return request<IClassroom>('/administrator/classrooms', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -334,12 +332,12 @@ export function useClassroomCreate(
 type ClassroomUpdateVariables = Merge<ClassroomUpdatePayload, { id: string }>
 
 export function useClassroomUpdate(
-  options?: MutationProps<Classroom, ClassroomUpdateVariables>,
+  options?: MutationProps<IClassroom, ClassroomUpdateVariables>,
 ) {
-  return useMutation<Classroom, HTTPError, ClassroomUpdateVariables>({
+  return useMutation<IClassroom, HTTPError, ClassroomUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Classroom>('/administrator/classrooms/'.concat(id), {
+      return request<IClassroom>('/administrator/classrooms/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -359,12 +357,12 @@ export function useClassroomDelete(options?: MutationProps<void, string>) {
 }
 
 export function useSportCreate(
-  options?: MutationProps<Sport, SportCreatePayload>,
+  options?: MutationProps<ISport, SportCreatePayload>,
 ) {
-  return useMutation<Sport, HTTPError, SportCreatePayload>({
+  return useMutation<ISport, HTTPError, SportCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<Sport>('/administrator/sports', {
+      return request<ISport>('/administrator/sports', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -375,12 +373,12 @@ export function useSportCreate(
 type SportUpdateVariables = Merge<SportUpdatePayload, { id: string }>
 
 export function useSportUpdate(
-  options?: MutationProps<Sport, SportUpdateVariables>,
+  options?: MutationProps<ISport, SportUpdateVariables>,
 ) {
-  return useMutation<Sport, HTTPError, SportUpdateVariables>({
+  return useMutation<ISport, HTTPError, SportUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Sport>('/administrator/sports/'.concat(id), {
+      return request<ISport>('/administrator/sports/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -400,12 +398,12 @@ export function useSportDelete(options?: MutationProps<void, string>) {
 }
 
 export function useAnnouncementCreate(
-  options?: MutationProps<Announcement, AnnouncementCreatePayload>,
+  options?: MutationProps<IAnnouncement, AnnouncementCreatePayload>,
 ) {
-  return useMutation<Announcement, HTTPError, AnnouncementCreatePayload>({
+  return useMutation<IAnnouncement, HTTPError, AnnouncementCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<Announcement>('/administrator/announcements', {
+      return request<IAnnouncement>('/administrator/announcements', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -419,15 +417,18 @@ type AnnouncementUpdateVariables = Merge<
 >
 
 export function useAnnouncementUpdate(
-  options?: MutationProps<Announcement, AnnouncementUpdateVariables>,
+  options?: MutationProps<IAnnouncement, AnnouncementUpdateVariables>,
 ) {
-  return useMutation<Announcement, HTTPError, AnnouncementUpdateVariables>({
+  return useMutation<IAnnouncement, HTTPError, AnnouncementUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Announcement>('/administrator/announcements/'.concat(id), {
-        method: 'PUT',
-        body: JSON.stringify(body),
-      })
+      return request<IAnnouncement>(
+        '/administrator/announcements/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
     },
   })
 }
@@ -449,12 +450,12 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
 
 /** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
 export function useBracketCreate(
-  options?: MutationProps<Bracket, BracketCreatePayload>,
+  options?: MutationProps<IBracket, BracketCreatePayload>,
 ) {
-  return useMutation<Bracket, HTTPError, BracketCreatePayload>({
+  return useMutation<IBracket, HTTPError, BracketCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<Bracket>('/administrator/brackets', {
+      return request<IBracket>('/administrator/brackets', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -478,12 +479,12 @@ type MatchUpdateVariables = Merge<MatchUpdatePayload, { id: string }>
 
 /** A agenda: data, hora e local. */
 export function useMatchUpdate(
-  options?: MutationProps<Match, MatchUpdateVariables>,
+  options?: MutationProps<IMatch, MatchUpdateVariables>,
 ) {
-  return useMutation<Match, HTTPError, MatchUpdateVariables>({
+  return useMutation<IMatch, HTTPError, MatchUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Match>('/administrator/matches/'.concat(id), {
+      return request<IMatch>('/administrator/matches/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -495,12 +496,12 @@ type MatchScoreVariables = Merge<MatchScorePayload, { id: string }>
 
 /** O placar. No mata-mata o vencedor avança sozinho. */
 export function useMatchScore(
-  options?: MutationProps<Match, MatchScoreVariables>,
+  options?: MutationProps<IMatch, MatchScoreVariables>,
 ) {
-  return useMutation<Match, HTTPError, MatchScoreVariables>({
+  return useMutation<IMatch, HTTPError, MatchScoreVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Match>('/administrator/matches/'.concat(id, '/score'), {
+      return request<IMatch>('/administrator/matches/'.concat(id, '/score'), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -509,11 +510,11 @@ export function useMatchScore(
 }
 
 /** Desfaz o placar: a partida volta a "a jogar" e o vencedor sai da seguinte. */
-export function useMatchUnscore(options?: MutationProps<Match, string>) {
-  return useMutation<Match, HTTPError, string>({
+export function useMatchUnscore(options?: MutationProps<IMatch, string>) {
+  return useMutation<IMatch, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<Match>('/administrator/matches/'.concat(id, '/score'), {
+      return request<IMatch>('/administrator/matches/'.concat(id, '/score'), {
         method: 'DELETE',
       })
     },
@@ -525,12 +526,12 @@ export function useMatchUnscore(options?: MutationProps<Match, string>) {
 // ---------------------------------------------------------------------------
 
 export function useStudentCreate(
-  options?: MutationProps<Student, StudentCreatePayload>,
+  options?: MutationProps<IStudent, StudentCreatePayload>,
 ) {
-  return useMutation<Student, HTTPError, StudentCreatePayload>({
+  return useMutation<IStudent, HTTPError, StudentCreatePayload>({
     ...options,
     mutationFn: function (payload) {
-      return request<Student>('/advisor/students', {
+      return request<IStudent>('/advisor/students', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -541,12 +542,12 @@ export function useStudentCreate(
 type StudentUpdateVariables = { id: string; name: string }
 
 export function useStudentUpdate(
-  options?: MutationProps<Student, StudentUpdateVariables>,
+  options?: MutationProps<IStudent, StudentUpdateVariables>,
 ) {
-  return useMutation<Student, HTTPError, StudentUpdateVariables>({
+  return useMutation<IStudent, HTTPError, StudentUpdateVariables>({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<Student>('/advisor/students/'.concat(id), {
+      return request<IStudent>('/advisor/students/'.concat(id), {
         method: 'PUT',
         body: JSON.stringify(body),
       })
@@ -567,16 +568,16 @@ export function useStudentDelete(options?: MutationProps<void, string>) {
 
 /** Troca a lista de atletas da turma numa modalidade, inteira. */
 export function useAdvisorEnrollmentUpdate(
-  options?: MutationProps<EnrollmentBoard, AdvisorEnrollmentUpdatePayload>,
+  options?: MutationProps<IEnrollmentBoard, AdvisorEnrollmentUpdatePayload>,
 ) {
   return useMutation<
-    EnrollmentBoard,
+    IEnrollmentBoard,
     HTTPError,
     AdvisorEnrollmentUpdatePayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentBoard>('/advisor/enrollments', {
+      return request<IEnrollmentBoard>('/advisor/enrollments', {
         method: 'PUT',
         body: JSON.stringify(payload),
       })
@@ -587,18 +588,18 @@ export function useAdvisorEnrollmentUpdate(
 /** A mesma troca, na turma do representante - que sai da sessão. */
 export function useRepresentativeEnrollmentUpdate(
   options?: MutationProps<
-    EnrollmentBoard,
+    IEnrollmentBoard,
     RepresentativeEnrollmentUpdatePayload
   >,
 ) {
   return useMutation<
-    EnrollmentBoard,
+    IEnrollmentBoard,
     HTTPError,
     RepresentativeEnrollmentUpdatePayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<EnrollmentBoard>('/representative/enrollments', {
+      return request<IEnrollmentBoard>('/representative/enrollments', {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

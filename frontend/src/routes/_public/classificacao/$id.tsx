@@ -3,7 +3,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import { SITE_TITLE } from '#/lib/site'
+import { SITE_TITLE } from '#/lib/constant'
 
 export const Route = createFileRoute('/_public/classificacao/$id')({
   loader: async ({ context, params }) => {

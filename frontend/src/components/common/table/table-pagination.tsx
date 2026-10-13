@@ -1,7 +1,7 @@
 import type * as React from 'react'
 
 import { PageShellFooter } from '#/components/common/page-shell'
-import type { PaginationMeta } from '#/integrations/response'
+import type { IPaginationMeta } from '#/lib/interfaces'
 
 import { useTableContext } from './table-context'
 import { Pagination } from './table-pagination-nav'
@@ -16,7 +16,7 @@ import { Pagination } from './table-pagination-nav'
 export function TablePagination({
   meta,
 }: {
-  meta: PaginationMeta | undefined
+  meta: IPaginationMeta | undefined
 }): React.JSX.Element | null {
   const { to, search } = useTableContext('TablePagination')
 

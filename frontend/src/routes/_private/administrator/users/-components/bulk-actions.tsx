@@ -8,7 +8,7 @@ import {
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchive } from '#/integrations/tanstack-query/mutations'
-import type { User } from '#/lib/validator'
+import type { IUser } from '#/lib/interfaces'
 
 /**
  * As ações da barra de seleção. Só arquivar: remover em massa não existe.
@@ -19,7 +19,7 @@ import type { User } from '#/lib/validator'
 export function UserBulkActions({
   users,
 }: {
-  users: Array<User>
+  users: Array<IUser>
 }): React.JSX.Element {
   const archive = useUserArchive({
     onError: (error) => toast.error(error.message, { id: 'users-archive' }),

@@ -5,11 +5,11 @@ import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import type { EnrollmentBoard as Board } from '#/integrations/response'
+import type { IEnrollmentBoard } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 
 type EnrollmentBoardProps = {
-  board: Board
+  board: IEnrollmentBoard
   /** Grava a lista inteira da modalidade. */
   onSave: (sportId: string, studentIds: Array<string>) => void
   /** A modalidade sendo salva agora. Só o cartão dela trava. */
@@ -81,8 +81,8 @@ function SportCard({
   isSaving,
   canRemove,
 }: {
-  sport: Board['sports'][number]
-  students: Board['students']
+  sport: IEnrollmentBoard['sports'][number]
+  students: IEnrollmentBoard['students']
   onSave: EnrollmentBoardProps['onSave']
   isSaving?: boolean
   canRemove: boolean

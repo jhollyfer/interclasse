@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries'
 import { validateStorefrontSearch } from '#/lib/list-search'
-import { SITE_TITLE } from '#/lib/site'
+import { SITE_TITLE } from '#/lib/constant'
 
 export const Route = createFileRoute('/_public/avisos/')({
   validateSearch: validateStorefrontSearch,

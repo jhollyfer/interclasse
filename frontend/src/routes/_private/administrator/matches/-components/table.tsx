@@ -41,12 +41,12 @@ import {
   MATCH_STATUS_VARIANTS,
   formatDate,
 } from '#/lib/labels'
-import type { Match } from '#/lib/validator'
+import type { IMatch } from '#/lib/interfaces'
 
 const route = getRouteApi('/_private/administrator/matches/')
 
 /** A partida no formato que os diálogos esperam: nomes já resolvidos. */
-function toRef(match: Match): MatchRef {
+function toRef(match: IMatch): MatchRef {
   return {
     ...match,
     homeName: match.homeTeam?.classroom.name ?? null,
@@ -54,11 +54,11 @@ function toRef(match: Match): MatchRef {
   }
 }
 
-function phaseOf(match: Match): string {
+function phaseOf(match: IMatch): string {
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
-const columns: TableColumns<Match> = [
+const columns: TableColumns<IMatch> = [
   // O jogo primeiro: é o que se procura na lista, e é o que a tabela estreita
   // não pode cortar.
   {

@@ -12,7 +12,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { SportCreateValidator } from '#/validators/administrator/sports.validator'
-import type { Sport } from '#/lib/validator'
+import type { ISport } from '#/lib/interfaces'
 import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
 import { useSportCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -28,7 +28,7 @@ import {
 export function SportFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     SportFormType,
-    Sport,
+    ISport,
     SportCreatePayload
   >({
     formId: 'sport-create',
