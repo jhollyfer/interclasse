@@ -28,11 +28,11 @@ describe('planParts', () => {
     const size = PART * 3 + 7
     const plan = planParts(size, PART)
 
-    expect(plan[0].start).toBe(0)
+    expect(plan[0]?.start).toBe(0)
     expect(plan.at(-1)?.end).toBe(size)
 
     plan.slice(1).forEach((part, index) => {
-      expect(part.start).toBe(plan[index].end)
+      expect(part.start).toBe(plan[index]?.end)
     })
   })
 
@@ -63,7 +63,7 @@ describe('missingParts', () => {
     const missing = missingParts(plan, uploaded)
 
     expect(missing).toHaveLength(1)
-    expect(missing[0].partNumber).toBe(1500)
+    expect(missing[0]?.partNumber).toBe(1500)
   })
 
   it('nada falta quando tudo subiu', () => {

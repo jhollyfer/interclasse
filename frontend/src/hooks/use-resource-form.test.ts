@@ -182,10 +182,10 @@ describe('useResourceForm', () => {
       client: {},
     } as never)
 
-    const call = vi.mocked(applyMutationError).mock.calls[0][0]
-    expect(call.retry?.id).toBe('testimonial-update-error')
+    const call = vi.mocked(applyMutationError).mock.calls[0]?.[0]
+    expect(call?.retry?.id).toBe('testimonial-update-error')
 
-    call.retry?.onClick()
+    call?.retry?.onClick()
     expect(stub.mutate).toHaveBeenCalledWith(sent)
   })
 
@@ -196,6 +196,8 @@ describe('useResourceForm', () => {
       client: {},
     } as never)
 
-    expect(vi.mocked(applyMutationError).mock.calls[0][0].retry).toBeUndefined()
+    expect(
+      vi.mocked(applyMutationError).mock.calls[0]?.[0].retry,
+    ).toBeUndefined()
   })
 })

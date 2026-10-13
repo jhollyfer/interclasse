@@ -236,14 +236,13 @@ async function pool<TItem>(
   limit: number,
   run: (item: TItem) => Promise<void>,
 ): Promise<void> {
-  let cursor = 0
+  // Um iterador só, compartilhado: cada `next()` entrega o item a um
+  // trabalhador e nenhum outro o vê de novo.
+  const queue = items.values()
 
   async function worker() {
-    while (cursor < items.length) {
-      const index = cursor
-      cursor++
-
-      await run(items[index])
+    for (const item of queue) {
+      await run(item)
     }
   }
 

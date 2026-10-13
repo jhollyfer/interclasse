@@ -118,7 +118,7 @@ export function mergeCookieHeader(
   for (const value of setCookies) {
     // O par vem antes do primeiro `;`. O resto são atributos (`Path`,
     // `HttpOnly`, `Max-Age`) que não existem no header `Cookie`.
-    const [pair] = value.split(';')
+    const [pair = ''] = value.split(';')
     const separator = pair.indexOf('=')
     if (separator < 0) continue
     pairs.set(pair.slice(0, separator).trim(), pair.slice(separator + 1))
