@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
 import { Route as AuthenticationLayoutRouteImport } from './routes/authentication/layout'
+import { Route as HealthCheckRouteImport } from './routes/health-check'
 import { Route as PrivateAdministratorLayoutRouteImport } from './routes/_private/administrator/layout'
 import { Route as PrivateAdvisorLayoutRouteImport } from './routes/_private/advisor/layout'
 import { Route as PrivatePainelRouteImport } from './routes/_private/painel'
@@ -71,6 +72,11 @@ const PublicLayoutRoute = PublicLayoutRouteImport.update({
 const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
   id: '/authentication',
   path: '/authentication',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthCheckRoute = HealthCheckRouteImport.update({
+  id: '/health-check',
+  path: '/health-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivateAdministratorLayoutRoute =
@@ -357,6 +363,7 @@ const PrivateAdministratorUsersIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/health-check': typeof HealthCheckRoute
   '/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
@@ -393,6 +400,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/health-check': typeof HealthCheckRoute
   '/painel': typeof PrivatePainelRoute
   '/$': typeof PublicSplatRoute
   '/administrator/profile': typeof PrivateAdministratorProfileRoute
@@ -429,6 +437,7 @@ export interface FileRoutesById {
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
   '/authentication': typeof AuthenticationLayoutRouteWithChildren
+  '/health-check': typeof HealthCheckRoute
   '/_private/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/_private/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/_private/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
@@ -469,6 +478,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/authentication'
+    | '/health-check'
     | '/administrator'
     | '/advisor'
     | '/representative'
@@ -505,6 +515,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/health-check'
     | '/painel'
     | '/$'
     | '/administrator/profile'
@@ -540,6 +551,7 @@ export interface FileRouteTypes {
     | '/_private'
     | '/_public'
     | '/authentication'
+    | '/health-check'
     | '/_private/administrator'
     | '/_private/advisor'
     | '/_private/representative'
@@ -580,6 +592,7 @@ export interface RootRouteChildren {
   PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
   AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
+  HealthCheckRoute: typeof HealthCheckRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -603,6 +616,13 @@ declare module '@tanstack/react-router' {
       path: '/authentication'
       fullPath: '/authentication'
       preLoaderRoute: typeof AuthenticationLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health-check': {
+      id: '/health-check'
+      path: '/health-check'
+      fullPath: '/health-check'
+      preLoaderRoute: typeof HealthCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_private/administrator': {
@@ -994,6 +1014,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
   AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
+  HealthCheckRoute: HealthCheckRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
