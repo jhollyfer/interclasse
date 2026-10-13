@@ -2,7 +2,8 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import StorageCompleteUseCase from './complete.use-case.ts'
-import { IdentifierValidator, StorageCompleteValidator } from '#core/validator'
+import { IdentifierValidator } from '#core/validator'
+import { StorageCompleteValidator } from '#features/storages/storages.validator'
 
 @inject()
 export default class StorageCompleteController {

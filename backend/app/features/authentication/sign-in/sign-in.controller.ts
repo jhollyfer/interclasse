@@ -1,4 +1,4 @@
-import { AuthenticationSignInValidator } from '#core/validator'
+import { AuthenticationSignInValidator } from '#features/authentication/authentication.validator'
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import { defineDocs } from '#core/openapi/types'

@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import RepresentativeEnrollmentUpdateUseCase from './update.use-case.ts'
-import { RepresentativeEnrollmentUpdateValidator } from '#core/validator'
+import { RepresentativeEnrollmentUpdateValidator } from '#features/representative/enrollments/enrollments.validator'
 
 @inject()
 export default class RepresentativeEnrollmentUpdateController {

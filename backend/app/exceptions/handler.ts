@@ -1,6 +1,6 @@
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
-import { errors as vineErrors } from '@vinejs/vine'
+import { vineErrors } from '#core/validator'
 import { errors as authErrors } from '@adonisjs/auth'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
 import type { HTTPExceptionPayload } from '#exceptions/http.exception'

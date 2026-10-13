@@ -4,7 +4,7 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { MatchStatuses, PAGINATION, type Paginated } from '#core/entity'
-import type { StorefrontMatchPaginationPayload } from '#core/validator'
+import type { StorefrontMatchPaginationPayload } from '#features/storefront/matches/matches.validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = StorefrontMatchPaginationPayload

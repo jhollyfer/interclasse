@@ -5,7 +5,7 @@ import AdministratorAnnouncementPaginateUseCase from './paginate.use-case.ts'
 import {
   ANNOUNCEMENT_SORT_COLUMNS,
   AdministratorAnnouncementPaginationValidator,
-} from '#core/validator'
+} from '#features/administrator/announcements/announcements.validator'
 
 @inject()
 export default class AdministratorAnnouncementPaginateController {

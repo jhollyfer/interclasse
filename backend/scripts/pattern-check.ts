@@ -199,6 +199,25 @@ const REGRAS: Regra[] = [
       'policy nao se injeta nem se chama direto; o unico caminho e `ctx.bouncer` (authorize/allows/denies/execute)',
   },
   {
+    nome: 'vine-fora-do-core',
+    secao: '4.4',
+    // O `vine` configurado (mensagens pt-BR, transform de data) sai de
+    // `#core/validator`; importar a lib direto pula essa configuracao.
+    escopo: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
+    padrao: /from\s+'@vinejs\/vine'/,
+    mensagem: 'importe `vine` (e `Infer`) de `#core/validator`, nunca de `@vinejs/vine`',
+  },
+  {
+    nome: 'validator-fora-do-recurso',
+    secao: '4.4',
+    // `app/core/` fica de fora: `response.ts` declara em VineJS o contrato de
+    // resposta que nao deriva de model, e isso nao e validator de entrada.
+    escopo: /^app\/(?!core\/).*(?<!\.validator)\.ts$/,
+    padrao: /\bvine\.create\(/,
+    mensagem:
+      'validator mora em `app/features/<modulo>/<recurso>/<recurso>.validator.ts` (ou e global em `app/core/validator.ts`)',
+  },
+  {
     nome: 'serializer-de-contexto',
     secao: '4.5',
     padrao: /\b(?:ctx|context)\.serialize\b/,
@@ -328,6 +347,40 @@ function conferirPastaDaAcao(relativo: string): Achado[] {
       mensagem: `mova para \`${dirname(relativo)}/${casado[1]}/${basename(relativo)}\``,
     },
   ]
+}
+
+/**
+ * Uma feature nao importa de outra (secao 1.3): o compartilhado vai para
+ * `_shared.<tema>` ou para um service. O dono de um arquivo e o recurso -
+ * `administrator/users` -, ou o modulo quando ele e o proprio recurso
+ * (`account`, `storages`).
+ */
+function conferirImportEntreFeatures(relativo: string, fonte: string): Achado[] {
+  if (!relativo.startsWith('app/features/')) return []
+  const partes = relativo.slice('app/features/'.length).split('/')
+  if (partes.length < 2) return []
+
+  let dono = partes.slice(0, -1)
+  const pasta = dono[dono.length - 1]
+  const arquivo = basename(relativo).replace(/\.(controller|use-case|validator)\.ts$/, '')
+  if (pasta === arquivo && !relativo.endsWith('.validator.ts')) dono = dono.slice(0, -1)
+  const prefixo = `${dono.join('/')}/`
+
+  const achados: Achado[] = []
+  const limpo = semComentarios(fonte)
+  for (const casado of limpo.matchAll(/from\s+'#features\/([^']+)'/g)) {
+    const alvo = casado[1] ?? ''
+    if (alvo.includes('_shared.')) continue
+    if (`${alvo}/`.startsWith(prefixo)) continue
+    achados.push({
+      arquivo: relativo,
+      linha: linhaDe(limpo, casado.index),
+      regra: 'feature-importa-feature',
+      secao: '1.3',
+      mensagem: `\`${dono.join('/')}\` importa \`#features/${alvo}\`; o compartilhado vai para \`_shared.<tema>\` ou service`,
+    })
+  }
+  return achados
 }
 
 /** Model em `app/models/` usa kebab-case. Secao 3. */
@@ -698,6 +751,7 @@ async function main(): Promise<void> {
     achados.push(...conferirNomeDeClasse(relativo, fonte))
     achados.push(...conferirNomeDeModel(relativo))
     achados.push(...conferirPastaDaAcao(relativo))
+    achados.push(...conferirImportEntreFeatures(relativo, fonte))
     achados.push(...conferirFormaDoUseCase(relativo, fonte))
   }
 

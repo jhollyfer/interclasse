@@ -5,7 +5,7 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
-import type { AdministratorSportCreatePayload } from '#core/validator'
+import type { AdministratorSportCreatePayload } from '#features/administrator/sports/sports.validator'
 
 type Payload = AdministratorSportCreatePayload
 type Response = Either<HTTPException, Sport>

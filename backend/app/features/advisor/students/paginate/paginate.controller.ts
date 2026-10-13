@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdvisorStudentPaginateUseCase from './paginate.use-case.ts'
-import { AdvisorStudentPaginationValidator } from '#core/validator'
+import { AdvisorStudentPaginationValidator } from '#features/advisor/students/students.validator'
 
 @inject()
 export default class AdvisorStudentPaginateController {

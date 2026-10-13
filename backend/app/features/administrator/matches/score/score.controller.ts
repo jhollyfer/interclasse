@@ -2,7 +2,8 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorMatchScoreUseCase from './score.use-case.ts'
-import { AdministratorMatchScoreValidator, IdentifierValidator } from '#core/validator'
+import { AdministratorMatchScoreValidator } from '#features/administrator/matches/matches.validator'
+import { IdentifierValidator } from '#core/validator'
 
 @inject()
 export default class AdministratorMatchScoreController {

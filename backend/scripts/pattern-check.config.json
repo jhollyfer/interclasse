@@ -13,7 +13,7 @@
     },
     {
       "simbolo": "SimpleMessagesProvider",
-      "arquivo": "start/validator.ts",
+      "arquivo": "app/core/validator.ts",
       "motivo": "API do VineJS, atribuída a vine.messagesProvider no boot"
     }
   ],

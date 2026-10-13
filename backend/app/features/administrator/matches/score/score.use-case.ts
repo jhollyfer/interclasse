@@ -7,7 +7,8 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchPhases, MatchStatuses, type Merge } from '#core/entity'
-import type { AdministratorMatchScorePayload, IdentifierPayload } from '#core/validator'
+import type { AdministratorMatchScorePayload } from '#features/administrator/matches/matches.validator'
+import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<AdministratorMatchScorePayload, IdentifierPayload>
 type Response = Either<HTTPException, Match>

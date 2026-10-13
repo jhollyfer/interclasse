@@ -5,7 +5,7 @@ import HTTPException from '#exceptions/http.exception'
 import { errors as authErrors } from '@adonisjs/auth'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import type { AuthenticationSignInPayload } from '#core/validator'
+import type { AuthenticationSignInPayload } from '#features/authentication/authentication.validator'
 
 type Payload = AuthenticationSignInPayload
 type Response = Either<HTTPException, User>

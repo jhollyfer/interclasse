@@ -2,7 +2,10 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorSportPaginateUseCase from './paginate.use-case.ts'
-import { AdministratorSportPaginationValidator, SPORT_SORT_COLUMNS } from '#core/validator'
+import {
+  AdministratorSportPaginationValidator,
+  SPORT_SORT_COLUMNS,
+} from '#features/administrator/sports/sports.validator'
 
 @inject()
 export default class AdministratorSportPaginateController {

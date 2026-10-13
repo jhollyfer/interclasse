@@ -17,7 +17,7 @@ import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchPhases, type MatchPhase } from '#core/entity'
-import type { AdministratorBracketCreatePayload } from '#core/validator'
+import type { AdministratorBracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 type Payload = AdministratorBracketCreatePayload

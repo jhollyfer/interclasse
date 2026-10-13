@@ -6,7 +6,7 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { AccountUpdatePayload } from '#core/validator'
+import type { AccountUpdatePayload } from '#features/account/account.validator'
 
 type Payload = Merge<AccountUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, User>
