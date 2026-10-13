@@ -1,6 +1,5 @@
 import type * as React from 'react'
 
-import { BulkArchive } from '#/components/common/bulk-archive'
 import { notifyError } from '#/lib/form-errors'
 import {
   ConfirmDialogDescription,
@@ -9,6 +8,8 @@ import {
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchive } from '#/integrations/tanstack-query/mutations'
 import type { IUser } from '#/lib/interfaces'
+
+import { BulkArchive } from './bulk-archive'
 
 /**
  * As ações da barra de seleção. Só arquivar: remover em massa não existe.
