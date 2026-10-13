@@ -76,10 +76,10 @@ function useActiveTo(items: ReadonlyArray<MenuItem>): string | undefined {
 function NavigationItem({
   item,
   isActive,
-}: {
+}: Readonly<{
   item: MenuItem
   isActive: boolean
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const { icon: Icon, label, ...link } = item
   const { setOpenMobile } = useSidebar()
 

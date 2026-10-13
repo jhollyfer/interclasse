@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import type { IEnrollmentBoard } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 
-type EnrollmentBoardProps = {
+type EnrollmentBoardProps = Readonly<{
   board: IEnrollmentBoard
   /** Grava a lista inteira da modalidade. */
   onSave: (sportId: string, studentIds: Array<string>) => void
@@ -19,7 +19,7 @@ type EnrollmentBoardProps = {
    * tira é o professor conselheiro - e o servidor recusa com `403`.
    */
   canRemove?: boolean
-}
+}>
 
 /**
  * A lista de atletas por modalidade: um cartão por modalidade, uma caixa por
@@ -80,13 +80,13 @@ function SportCard({
   onSave,
   isSaving,
   canRemove,
-}: {
+}: Readonly<{
   sport: IEnrollmentBoard['sports'][number]
   students: IEnrollmentBoard['students']
   onSave: EnrollmentBoardProps['onSave']
   isSaving?: boolean
   canRemove: boolean
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const enrolled = students
     .filter((student) => student.sportIds.includes(sport.id))
     .map((student) => student.id)

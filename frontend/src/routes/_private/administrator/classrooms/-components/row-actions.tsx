@@ -24,9 +24,9 @@ import type { IClassroom } from '#/lib/interfaces'
  */
 export function ClassroomRowActions({
   classroom,
-}: {
+}: Readonly<{
   classroom: IClassroom
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const invalidate = useInvalidate()
 
   const remove = useClassroomDelete({

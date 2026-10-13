@@ -10,10 +10,10 @@ import { cn } from '#/lib/utils'
 
 import type { TableFeatures } from './use-table'
 
-type TableDraggableHeaderProps<TRow extends RowData> = {
+type TableDraggableHeaderProps<TRow extends RowData> = Readonly<{
   header: Header<TableFeatures, TRow, unknown>
   children: React.ReactNode
-}
+}>
 
 /**
  * A alça de arrastar coluna, à esquerda do título.

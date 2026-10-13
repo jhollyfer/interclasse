@@ -6,10 +6,10 @@ import { cn } from '#/lib/utils'
 
 import type { TableInstance } from './use-table'
 
-type TableMobileCardsProps<TRow extends RowData> = {
+type TableMobileCardsProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
   onRowClick?: (row: TRow) => void
-}
+}>
 
 /**
  * A mesma tabela, empilhada em `rótulo: valor`, para telas estreitas.

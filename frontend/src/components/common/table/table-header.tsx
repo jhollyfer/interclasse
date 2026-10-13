@@ -101,10 +101,10 @@ function TableActions({
 function TableCreateButton({
   to,
   children,
-}: {
+}: Readonly<{
   to: string
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <Button
       type="button"

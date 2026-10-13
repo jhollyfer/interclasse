@@ -17,7 +17,7 @@ export type BulkOutcome = {
  * terminam e a contagem é exata.
  */
 export async function runBulk<TItem>(
-  items: Array<TItem>,
+  items: ReadonlyArray<TItem>,
   action: (item: TItem) => Promise<unknown>,
 ): Promise<BulkOutcome> {
   const results = await Promise.allSettled(items.map(action))

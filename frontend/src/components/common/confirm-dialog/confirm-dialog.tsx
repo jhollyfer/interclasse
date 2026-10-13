@@ -8,7 +8,7 @@ import {
 
 import { ConfirmDialogProvider } from './confirm-dialog-context'
 
-type ConfirmDialogProps = {
+type ConfirmDialogProps = Readonly<{
   /**
    * O elemento visível que abre o alerta - em geral um `DropdownMenuItem` com
    * `closeOnClick={false}`, porque sem isso o menu fecha e leva o gatilho antes
@@ -29,7 +29,7 @@ type ConfirmDialogProps = {
   /** Avisa quem contém o gatilho - o menu de linha fecha quando o alerta abre. */
   onOpenChange?: (open: boolean) => void
   children: React.ReactNode
-}
+}>
 
 /**
  * A confirmação de toda ação que remove ou arquiva.

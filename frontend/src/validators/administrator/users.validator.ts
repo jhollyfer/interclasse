@@ -111,6 +111,6 @@ export const UserPaginateValidator = vine.create({
   status: activeStatus().optional(),
 })
 
-export type UserCreatePayload = Infer<typeof UserCreateValidator>
-export type UserUpdatePayload = Infer<typeof UserUpdateValidator>
-export type UserPaginatePayload = Infer<typeof UserPaginateValidator>
+export type UserCreatePayload = Readonly<Infer<typeof UserCreateValidator>>
+export type UserUpdatePayload = Readonly<Infer<typeof UserUpdateValidator>>
+export type UserPaginatePayload = Readonly<Infer<typeof UserPaginateValidator>>

@@ -6,19 +6,21 @@ import type { Merge } from '#/lib/interfaces'
 
 import { TableProvider } from './table-context'
 
-type TableProps = Merge<
-  React.ComponentProps<typeof PageShell>,
-  {
-    /** A rota desta listagem, para busca, ordenação e paginação. */
-    to: string
-    search: ListSearch
-    /** A consulta está servindo a página anterior enquanto refaz a nova. */
-    isPlaceholderData?: boolean
-    /** A consulta falhou. Troca a área de conteúdo pelo estado de erro. */
-    isError?: boolean
-    /** Refaz a consulta, no botão do estado de erro. */
-    onRetry?: () => void
-  }
+type TableProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof PageShell>,
+    {
+      /** A rota desta listagem, para busca, ordenação e paginação. */
+      to: string
+      search: ListSearch
+      /** A consulta está servindo a página anterior enquanto refaz a nova. */
+      isPlaceholderData?: boolean
+      /** A consulta falhou. Troca a área de conteúdo pelo estado de erro. */
+      isError?: boolean
+      /** Refaz a consulta, no botão do estado de erro. */
+      onRetry?: () => void
+    }
+  >
 >
 
 /**

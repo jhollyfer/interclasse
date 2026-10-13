@@ -8,9 +8,9 @@ import { Empty } from './section'
 
 export function AnnouncementList({
   announcements,
-}: {
+}: Readonly<{
   announcements: ReadonlyArray<IAnnouncement>
-}): React.JSX.Element {
+}>): React.JSX.Element {
   if (announcements.length === 0)
     return <Empty>Nenhum aviso por enquanto.</Empty>
 

@@ -21,9 +21,9 @@ import type { IAnnouncement } from '#/lib/interfaces'
 /** Editar e apagar. O aviso some do site na hora. */
 export function AnnouncementRowActions({
   announcement,
-}: {
+}: Readonly<{
   announcement: IAnnouncement
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const invalidate = useInvalidate()
 
   const remove = useAnnouncementDelete({

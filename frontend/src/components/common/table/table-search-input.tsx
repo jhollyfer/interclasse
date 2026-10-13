@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from '#/components/ui/tooltip'
 
-type InputSearchProps = {
+type InputSearchProps = Readonly<{
   /** O termo **aplicado**, que mora na URL. */
   value: string | undefined
   /** Chamado quando a busca é aplicada ou limpa. `undefined` limpa. */
@@ -21,7 +21,7 @@ type InputSearchProps = {
   placeholder?: string
   /** O texto do balão de ajuda. Ausente, o botão de ajuda não aparece. */
   help?: string
-}
+}>
 
 /**
  * A caixa de busca das listagens.

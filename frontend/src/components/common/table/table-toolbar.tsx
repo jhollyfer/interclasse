@@ -19,9 +19,9 @@ import { useTableContext } from './table-context'
  */
 export function TableToolbar({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const { isPlaceholderData } = useTableContext('TableToolbar')
 
   return (
@@ -51,10 +51,10 @@ export function TableToolbar({
 export function TableSearch({
   placeholder,
   help = 'Digite e tecle Enter, ou clique na lupa',
-}: {
+}: Readonly<{
   placeholder: string
   help?: string
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const { to, search } = useTableContext('TableSearch')
   const navigate = useNavigate()
 

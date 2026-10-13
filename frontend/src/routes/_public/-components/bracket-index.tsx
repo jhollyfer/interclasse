@@ -13,9 +13,9 @@ import { Empty } from './section'
  */
 export function BracketIndex({
   brackets,
-}: {
+}: Readonly<{
   brackets: ReadonlyArray<IBracket>
-}): React.JSX.Element {
+}>): React.JSX.Element {
   if (brackets.length === 0)
     return (
       <Empty>

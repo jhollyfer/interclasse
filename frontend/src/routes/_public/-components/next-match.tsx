@@ -13,10 +13,10 @@ import { phaseLabel, scoreOf } from './match-row'
 export function NextMatch({
   next,
   last,
-}: {
+}: Readonly<{
   next?: IMatch
   last?: IMatch
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const match = next ?? last
 
   if (!match) {

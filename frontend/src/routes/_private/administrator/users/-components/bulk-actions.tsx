@@ -19,9 +19,9 @@ import { BulkArchive } from './bulk-archive'
  */
 export function UserBulkActions({
   users,
-}: {
-  users: Array<IUser>
-}): React.JSX.Element {
+}: Readonly<{
+  users: ReadonlyArray<IUser>
+}>): React.JSX.Element {
   const archive = useUserArchive({
     onError: (error) => notifyError(error, { id: 'users-archive' }),
   })

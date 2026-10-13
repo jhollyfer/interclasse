@@ -33,11 +33,11 @@ import { Skeleton } from '#/components/ui/skeleton'
 export function TableSkeleton({
   columns = 6,
   rows = 8,
-}: {
+}: Readonly<{
   /** Quantas colunas desenhar. Um literal, nunca `COLUMNS.length`. */
   columns?: number
   rows?: number
-}): React.JSX.Element {
+}>): React.JSX.Element {
   // As mesmas células no cabeçalho e em toda linha. Elemento React é imutável,
   // então o mesmo array serve os dois lugares - e as chaves são locais a cada
   // pai, não competem entre si.

@@ -19,7 +19,7 @@ import { Section } from '../../../-components/section'
 const route = getRouteApi('/_public/classificacao/$id/')
 
 /** Uma linha de jogo da chave: os dois times, o vencedor em destaque. */
-function Row({ match }: { match: IBracketMatch }): React.JSX.Element {
+function Row({ match }: Readonly<{ match: IBracketMatch }>): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
   const homeLost = finished && match.winnerTeamId === match.awayTeamId
   const awayLost = finished && match.winnerTeamId === match.homeTeamId

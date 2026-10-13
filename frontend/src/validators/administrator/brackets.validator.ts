@@ -7,4 +7,6 @@ export const BracketCreateValidator = vine.create({
   category: vine.enum(CATEGORIES),
 })
 
-export type BracketCreatePayload = Infer<typeof BracketCreateValidator>
+export type BracketCreatePayload = Readonly<
+  Infer<typeof BracketCreateValidator>
+>

@@ -14,9 +14,9 @@ import {
 import { Button } from '#/components/ui/button'
 import { bulkMessage, runBulk } from '#/lib/bulk'
 
-type BulkArchiveProps<TItem> = {
+type BulkArchiveProps<TItem> = Readonly<{
   /** As linhas selecionadas na barra de seleção. */
-  items: Array<TItem>
+  items: ReadonlyArray<TItem>
   /** O que arquivar um item. Quase sempre `(item) => archive.mutateAsync(item.id)`. */
   action: (item: TItem) => Promise<unknown>
   /**
@@ -35,7 +35,7 @@ type BulkArchiveProps<TItem> = {
   verb: string
   /** `ConfirmDialogTitle` e `ConfirmDialogDescription`: o texto é markup. */
   children: React.ReactNode
-}
+}>
 
 /**
  * Arquivar as linhas selecionadas.

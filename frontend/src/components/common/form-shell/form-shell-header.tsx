@@ -17,9 +17,9 @@ import { useFormShellContext } from './form-shell-context'
 /** O cabeçalho que não rola: voltar, título e ações. */
 export function FormShellHeader({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <PageShellHeader>
       {/* Mesma largura e mesmo centro do formulário: o "Salvar" fica sobre o
@@ -91,9 +91,11 @@ export function FormShellDiscard({
 
 // O `children` do `SubmitButton` é obrigatório; aqui ele é opcional, e o
 // `Merge` substitui a chave em vez de intersectar.
-type FormShellSubmitProps = Merge<
-  React.ComponentProps<typeof SubmitButton>,
-  { children?: React.ReactNode }
+type FormShellSubmitProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof SubmitButton>,
+    { children?: React.ReactNode }
+  >
 >
 
 /**

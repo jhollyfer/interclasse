@@ -5,13 +5,13 @@ import { PageShell } from '#/components/common/page-shell'
 
 import { FormShellProvider } from './form-shell-context'
 
-type FormShellProps = {
+type FormShellProps = Readonly<{
   formId: string
   backTo: LinkProps['to']
   backParams?: LinkProps['params']
   isPending?: boolean
   children: React.ReactNode
-}
+}>
 
 /**
  * A casca de todo formulário de criar/editar do painel.

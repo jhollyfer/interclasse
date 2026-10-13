@@ -24,9 +24,9 @@ import type { TableInstance } from './use-table'
  */
 export function TableColumnToggle<TRow extends RowData>({
   table,
-}: {
+}: Readonly<{
   table: TableInstance<TRow>
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger

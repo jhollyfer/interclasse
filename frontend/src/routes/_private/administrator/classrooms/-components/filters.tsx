@@ -9,9 +9,9 @@ import type { ClassroomListSearch } from '#/integrations/tanstack-query/queries'
 /** `page: undefined` junto: a página 3 de tudo quase nunca existe no recorte. */
 export function ClassroomFilters({
   search,
-}: {
+}: Readonly<{
   search: ClassroomListSearch
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const navigate = useNavigate()
 
   return (

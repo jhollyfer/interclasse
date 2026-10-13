@@ -24,9 +24,9 @@ import type { ISport } from '#/lib/interfaces'
  */
 export function SportRowActions({
   sport,
-}: {
+}: Readonly<{
   sport: ISport
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const invalidate = useInvalidate()
 
   const remove = useSportDelete({

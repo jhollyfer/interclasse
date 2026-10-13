@@ -13,7 +13,7 @@ import {
 } from '#/components/common/confirm-dialog'
 import { useSignOut } from '#/hooks/use-sign-out'
 
-type SignOutConfirmProps = {
+type SignOutConfirmProps = Readonly<{
   /**
    * O "Sair" visível - o botão do pé da barra lateral ou o item do menu da
    * conta. Vai na posição de `render` da primitiva, e é por isso que o item de
@@ -25,7 +25,7 @@ type SignOutConfirmProps = {
    */
   trigger: React.ReactElement
   children: React.ReactNode
-}
+}>
 
 /**
  * A confirmação antes de encerrar a sessão.

@@ -12,9 +12,9 @@ import type { IPaginationMeta } from '#/lib/interfaces'
  */
 export function Pager({
   meta,
-}: {
+}: Readonly<{
   meta?: IPaginationMeta
-}): React.JSX.Element | null {
+}>): React.JSX.Element | null {
   if (!meta || meta.lastPage <= 1) return null
 
   const page = meta.currentPage

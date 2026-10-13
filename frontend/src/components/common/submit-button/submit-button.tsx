@@ -5,13 +5,15 @@ import { Spinner } from '#/components/ui/spinner'
 import { useIsUploading } from '#/components/common/uploading-context'
 import type { Merge } from '#/lib/interfaces'
 
-type SubmitButtonProps = Merge<
-  React.ComponentProps<typeof Button>,
-  {
-    /** A mutation está em voo? Mostra o spinner e trava o botão. */
-    isPending?: boolean
-    children: React.ReactNode
-  }
+type SubmitButtonProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof Button>,
+    {
+      /** A mutation está em voo? Mostra o spinner e trava o botão. */
+      isPending?: boolean
+      children: React.ReactNode
+    }
+  >
 >
 
 /**

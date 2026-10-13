@@ -212,9 +212,11 @@ async function send(
 async function complete(
   storageId: string,
   uploadId: string | null,
-  parts: Array<{ partNumber: number; etag: string }>,
+  parts: ReadonlyArray<{ partNumber: number; etag: string }>,
 ): Promise<IStorage> {
-  const body: { parts?: Array<{ partNumber: number; etag: string }> } = {}
+  const body: {
+    parts?: ReadonlyArray<{ partNumber: number; etag: string }>
+  } = {}
 
   if (uploadId) body.parts = parts
 
@@ -232,7 +234,7 @@ async function complete(
  * numa rede irregular isso é a maior parte do tempo parado.
  */
 async function pool<TItem>(
-  items: Array<TItem>,
+  items: ReadonlyArray<TItem>,
   limit: number,
   run: (item: TItem) => Promise<void>,
 ): Promise<void> {

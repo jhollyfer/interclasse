@@ -55,7 +55,7 @@ export function groupByDay(matches: ReadonlyArray<IMatch>): Array<Day> {
  * modalidade e o local. Linha, e não cartão: a agenda é lida de cima para
  * baixo como a grade de um campeonato.
  */
-export function MatchRow({ match }: { match: IMatch }): React.JSX.Element {
+export function MatchRow({ match }: Readonly<{ match: IMatch }>): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
   const bracket = match.bracket
 
@@ -99,9 +99,9 @@ export function MatchRow({ match }: { match: IMatch }): React.JSX.Element {
 /** A agenda inteira, dia por dia. */
 export function Agenda({
   matches,
-}: {
+}: Readonly<{
   matches: ReadonlyArray<IMatch>
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <div className="flex flex-col gap-6">
       {groupByDay(matches).map((day) => (

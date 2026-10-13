@@ -34,9 +34,8 @@ export function ImageFieldActions({
   )
 }
 
-type ImageFieldUploadProps = Merge<
-  React.ComponentProps<typeof Button>,
-  { children: React.ReactNode }
+type ImageFieldUploadProps = Readonly<
+  Merge<React.ComponentProps<typeof Button>, { children: React.ReactNode }>
 >
 
 /**

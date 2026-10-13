@@ -22,7 +22,7 @@ import type { ListSearch } from '#/lib/list-search'
 /** As opções de itens por página. O teto do backend é 100 (`perPage.max(100)`). */
 const PER_PAGE_OPTIONS = ['10', '20', '30', '40', '50']
 
-type PaginationProps<TSearch extends ListSearch> = {
+type PaginationProps<TSearch extends ListSearch> = Readonly<{
   meta: IPaginationMeta
   /** A rota desta listagem, para onde os links apontam. */
   to: string
@@ -32,7 +32,7 @@ type PaginationProps<TSearch extends ListSearch> = {
    * `ListSearch` os apagaria do objeto espalhado.
    */
   search: TSearch
-}
+}>
 
 /**
  * A paginação das listagens: itens por página à esquerda, saltos à direita.
