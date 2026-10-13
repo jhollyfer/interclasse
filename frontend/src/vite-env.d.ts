@@ -12,7 +12,7 @@
  * aceita `type`.
  */
 interface ImportMetaEnv {
-  /** Base da API AdonisJS. Sem ela, `http.ts` cai no `localhost:3333` de dev. */
+  /** Base da API AdonisJS. Lida e checada em `src/env.ts`. */
   readonly VITE_API_URL?: string
 }
 
