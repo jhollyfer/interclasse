@@ -11,7 +11,7 @@ import { UploadStatuses } from '#core/entity'
  * `filename` sai aleatório para não repetir a mesma chave de bucket em duas
  * linhas.
  */
-export function linha(attributes: Partial<Storage> = {}) {
+export function storageRow(attributes: Partial<Storage> = {}) {
   const filename = `${randomUUID()}.png`
 
   return Storage.create({

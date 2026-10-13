@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
-import { linha } from '#tests/storages-fixtures'
+import { storageRow } from '#tests/storages-fixtures'
 import { UploadStatuses } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 
@@ -33,8 +33,8 @@ test.group('storages > listagem', (group) => {
   test('a ordem padrão é do mais recente para o mais antigo', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const antigo = await linha({ originalName: 'antigo.png' })
-    const recente = await linha({ originalName: 'recente.png' })
+    const antigo = await storageRow({ originalName: 'antigo.png' })
+    const recente = await storageRow({ originalName: 'recente.png' })
 
     // `createdAt` sai do `autoCreate` e as duas linhas nascem no mesmo
     // milissegundo: sem afastá-las, a ordem seria a do banco e o teste passaria
@@ -56,8 +56,8 @@ test.group('storages > listagem', (group) => {
   test('?status recorta o upload em aberto', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    await linha()
-    const pendente = await linha({ status: UploadStatuses.PENDING })
+    await storageRow()
+    const pendente = await storageRow({ status: UploadStatuses.PENDING })
 
     const response = await client.get('/storages').qs({ status: 'PENDING' }).cookies(session)
 
@@ -69,8 +69,8 @@ test.group('storages > listagem', (group) => {
   test('?mimetype recorta um tipo só', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    await linha()
-    const pdf = await linha({ mimetype: 'application/pdf' })
+    await storageRow()
+    const pdf = await storageRow({ mimetype: 'application/pdf' })
 
     const response = await client
       .get('/storages')
@@ -85,13 +85,13 @@ test.group('storages > listagem', (group) => {
   test('?search não escapa do filtro de status', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const confirmado = await linha({ originalName: 'contrato.pdf' })
+    const confirmado = await storageRow({ originalName: 'contrato.pdf' })
     // Casa a busca pelo **mimetype**, e não pelo nome original, e está
     // `PENDING`: com o `OR` solto ele apareceria mesmo com `?status=UPLOADED`,
     // porque o `OR` anula o `AND` anterior. O termo tem de cair numa coluna
     // depois da primeira, senão o `OR` agrupado e o solto respondem igual e o
     // teste não mede nada.
-    await linha({
+    await storageRow({
       originalName: 'sem-o-termo-no-nome.png',
       mimetype: 'application/pdf',
       status: UploadStatuses.PENDING,

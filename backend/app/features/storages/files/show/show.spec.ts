@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { linha } from '#tests/storages-fixtures'
+import { storageRow } from '#tests/storages-fixtures'
 import { UploadStatuses } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
@@ -23,7 +23,7 @@ test.group('storages > detalhe', (group) => {
 
   test('responde 200 com a url derivada', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const storage = await linha()
+    const storage = await storageRow()
 
     const response = await client.get(`/storages/${storage.id}`).cookies(session)
 
@@ -36,7 +36,7 @@ test.group('storages > detalhe', (group) => {
 
   test('alcança o upload ainda PENDING', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const storage = await linha({ status: UploadStatuses.PENDING })
+    const storage = await storageRow({ status: UploadStatuses.PENDING })
 
     // A tela de detalhe é onde se descobre que um upload ficou pela metade.
     // Quem exige `UPLOADED` é o anexo, não a leitura.
