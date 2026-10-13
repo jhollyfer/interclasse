@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { fromPartial } from '@total-typescript/shoehorn'
 
 import { UploadPartError, putPart } from './upload-transport'
 
@@ -61,11 +62,13 @@ class FakeXHR {
         return
       }
 
-      this.upload.onprogress?.({
-        lengthComputable: true,
-        loaded: body.size,
-        total: body.size,
-      } as ProgressEvent)
+      this.upload.onprogress?.(
+        fromPartial<ProgressEvent>({
+          lengthComputable: true,
+          loaded: body.size,
+          total: body.size,
+        }),
+      )
 
       this.status = 200
       if (script.kind === 'ok') this.#headers.set('ETag', script.etag)

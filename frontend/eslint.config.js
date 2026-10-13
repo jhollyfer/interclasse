@@ -134,20 +134,6 @@ export default [
     },
   },
   {
-    // Fixture de teste é parcial por definição: o dublê de `useMutation` traz
-    // `mutate` e `isPending` e nada mais, porque é só disso que o teste precisa.
-    // Descrever o tipo inteiro para satisfazer o compilador seria escrever a
-    // biblioteca de novo dentro do teste.
-    //
-    // O conserto de verdade é `@total-typescript/shoehorn`, que dá o parcial
-    // sem `as` — uma dependência a mais, que fica para quando houver motivo
-    // maior que este.
-    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
-    rules: {
-      '@typescript-eslint/consistent-type-assertions': 'off',
-    },
-  },
-  {
     // Arquivos gerados e artefatos de build.
     //
     // `src/routeTree.gen.ts` é saída versionada, não código: o plugin do Router

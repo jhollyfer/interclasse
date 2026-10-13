@@ -51,7 +51,9 @@ async function rejection(promise: Promise<unknown>): Promise<HTTPError> {
   try {
     await promise
   } catch (error) {
-    return error as HTTPError
+    if (error instanceof HTTPError) return error
+
+    throw error
   }
 
   throw new Error('esperava rejeição, a promessa resolveu')
@@ -229,8 +231,7 @@ test('FormData monta o próprio Content-Type', async () => {
   // Declarar `application/json` por cima faria o servidor procurar o `boundary`
   // num cabeçalho que não o tem, e o corpo chegaria vazio.
   const init = fetcher.mock.calls[0]?.[1]
-  const headers = init?.headers as Record<string, string>
-  expect(headers['Content-Type']).toBeUndefined()
+  expect(new Headers(init?.headers).get('Content-Type')).toBeNull()
 })
 
 test('corpo de objeto continua declarando JSON', async () => {
@@ -242,8 +243,9 @@ test('corpo de objeto continua declarando JSON', async () => {
   })
 
   const init = fetcher.mock.calls[0]?.[1]
-  const headers = init?.headers as Record<string, string>
-  expect(headers['Content-Type']).toBe('application/json')
+  expect(new Headers(init?.headers).get('Content-Type')).toBe(
+    'application/json',
+  )
 })
 
 test('o signal do queryFn chega ao fetch', async () => {

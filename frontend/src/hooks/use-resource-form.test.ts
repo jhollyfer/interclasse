@@ -3,12 +3,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { toast } from 'sonner'
+import { fromPartial } from '@total-typescript/shoehorn'
 import type {
+  MutationFunctionContext,
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
 
 import { applyMutationError } from '#/lib/form-errors'
+import { vine } from '#/lib/validator'
 import { HTTPError } from '#/integrations/tanstack-query/http'
 
 import { useResourceForm } from './use-resource-form'
@@ -48,6 +51,11 @@ type Payload = { name: string; id?: string }
 
 const FIELDS = ['name'] as const
 
+const NameValidator = vine.create({ name: vine.string() })
+
+/** O quarto argumento dos callbacks; o hook não o lê. */
+const CONTEXT = fromPartial<MutationFunctionContext>({})
+
 /** A mutation do recurso, reduzida ao que o hook usa dela. */
 function mutationStub() {
   const mutate = vi.fn()
@@ -61,11 +69,10 @@ function mutationStub() {
   function useStub(options?: Options) {
     captured = options
 
-    return { mutate, isPending: false } as unknown as UseMutationResult<
-      Record_,
-      HTTPError,
-      Payload
-    >
+    return fromPartial<UseMutationResult<Record_, HTTPError, Payload>>({
+      mutate,
+      isPending: false,
+    })
   }
 
   return {
@@ -81,7 +88,7 @@ function setup(overrides: Record<string, unknown> = {}) {
   const { result } = renderHook(() =>
     useResourceForm<Values, Record_, Payload>({
       formId: 'testimonial-create',
-      validator: {} as never,
+      validator: NameValidator,
       defaults: { name: '' },
       fields: FIELDS,
       mutation: stub.useStub,
@@ -145,9 +152,12 @@ describe('useResourceForm', () => {
 
     await stub
       .options()
-      ?.onSuccess?.({ id: '7', name: 'Ana' }, { name: 'Ana' }, undefined, {
-        client: {},
-      } as never)
+      ?.onSuccess?.(
+        { id: '7', name: 'Ana' },
+        { name: 'Ana' },
+        undefined,
+        CONTEXT,
+      )
 
     expect(invalidateQueries).toHaveBeenCalledWith({
       queryKey: ['testimonials'],
@@ -165,9 +175,12 @@ describe('useResourceForm', () => {
 
     await stub
       .options()
-      ?.onSuccess?.({ id: '7', name: 'Ana' }, { name: 'Ana' }, undefined, {
-        client: {},
-      } as never)
+      ?.onSuccess?.(
+        { id: '7', name: 'Ana' },
+        { name: 'Ana' },
+        undefined,
+        CONTEXT,
+      )
 
     expect(toast.success).toHaveBeenCalledWith('Depoimento salvo.')
   })
@@ -176,9 +189,7 @@ describe('useResourceForm', () => {
     const { stub } = setup({ retry: 'testimonial-update-error' })
     const sent = { name: 'Ana' }
 
-    stub.options()?.onError?.(serverError(), sent, undefined, {
-      client: {},
-    } as never)
+    stub.options()?.onError?.(serverError(), sent, undefined, CONTEXT)
 
     const call = vi.mocked(applyMutationError).mock.calls[0]?.[0]
     expect(call?.retry?.id).toBe('testimonial-update-error')
@@ -190,9 +201,9 @@ describe('useResourceForm', () => {
   it('não oferece reenvio quando o cadastro insere direto', () => {
     const { stub } = setup()
 
-    stub.options()?.onError?.(serverError(), { name: 'Ana' }, undefined, {
-      client: {},
-    } as never)
+    stub
+      .options()
+      ?.onError?.(serverError(), { name: 'Ana' }, undefined, CONTEXT)
 
     expect(
       vi.mocked(applyMutationError).mock.calls[0]?.[0].retry,

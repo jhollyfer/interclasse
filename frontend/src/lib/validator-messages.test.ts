@@ -24,9 +24,10 @@ type Introspectable = { toJSONSchema: () => unknown }
  */
 function branch(node: unknown, key: string): Array<unknown> {
   if (typeof node !== 'object' || node === null) return []
-  if (!(key in node)) return []
+  const entry = Object.entries(node).find(([name]) => name === key)
+  if (!entry) return []
 
-  const value = node[key as keyof typeof node]
+  const value: unknown = entry[1]
 
   if (Array.isArray(value)) return value
 
