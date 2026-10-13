@@ -35,8 +35,10 @@ export default class AdministratorUserUpdateController {
     // Corpo e params validados separadamente e fundidos: o `:id` vem da URL e
     // não do payload, e um schema só aceitaria um `id` no corpo capaz de
     // apontar para outra linha.
-    const body = await UserUpdateValidator.validate(context.request.body())
-    const params = await IdentifierValidator.validate(context.request.params())
+    const body = await context.request.validateUsing(UserUpdateValidator)
+    const params = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     await context.bouncer.with(UserPolicy).authorize('update', params.id, body)
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value

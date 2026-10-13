@@ -26,7 +26,9 @@ export default class AdministratorUserArchiveController {
   constructor(private readonly useCase: AdministratorUserArchiveUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await IdentifierValidator.validate(context.params)
+    const payload = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     await context.bouncer.with(UserPolicy).authorize('archive', payload.id)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value

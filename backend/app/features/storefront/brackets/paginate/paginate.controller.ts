@@ -15,7 +15,9 @@ export default class StorefrontBracketPaginateController {
   constructor(private readonly useCase: StorefrontBracketPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await BracketPaginateValidator.validate(context.request.qs())
+    const payload = await context.request.validateUsing(BracketPaginateValidator, {
+      data: context.request.qs(),
+    })
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

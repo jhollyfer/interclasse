@@ -19,7 +19,9 @@ export default class AdvisorStudentDeleteController {
   constructor(private readonly useCase: AdvisorStudentDeleteUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await IdentifierValidator.validate(context.params)
+    const payload = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     const student = await Student.query().where('id', payload.id).preload('classroom').first()
     await context.bouncer.with(ClassroomPolicy).authorize('manageStudent', student)
     const result = await this.useCase.execute(payload)

@@ -30,7 +30,7 @@ export default class AccountProfileUpdateController {
   constructor(private readonly useCase: AccountProfileUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await ProfileUpdateValidator.validate(context.request.body())
+    const payload = await context.request.validateUsing(ProfileUpdateValidator)
     const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

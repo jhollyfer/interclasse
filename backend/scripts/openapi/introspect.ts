@@ -136,13 +136,21 @@ function calleeText(call: ts.CallExpression): string {
 /**
  * De onde o payload vem, pelo argumento da chamada.
  *
- * `validateUsing` só existe sobre `request`, então é sempre corpo. As demais
- * são `Validator.validate(...)`, e o argumento diz a origem.
+ * `request.validateUsing(X)` sem opção valida o corpo; com `{ data: ... }` a
+ * origem é a que a opção aponta (`context.request.qs()`, `context.params`).
+ * `Validator.validate(...)` diz a origem no próprio argumento.
  */
 function sourceOf(call: ts.CallExpression): 'body' | 'query' | 'params' | undefined {
   const callee = calleeText(call)
 
-  if (callee.endsWith('.validateUsing')) return 'body'
+  if (callee.endsWith('.validateUsing')) {
+    const options = call.arguments[1]
+    if (!options) return 'body'
+    const text = options.getText()
+    if (text.includes('.qs(')) return 'query'
+    if (text.includes('.params')) return 'params'
+    return 'body'
+  }
   if (!callee.endsWith('.validate')) return undefined
 
   const [argument] = call.arguments

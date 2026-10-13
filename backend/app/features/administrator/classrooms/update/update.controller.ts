@@ -23,8 +23,10 @@ export default class AdministratorClassroomUpdateController {
   constructor(private readonly useCase: AdministratorClassroomUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await ClassroomUpdateValidator.validate(context.request.body())
-    const params = await IdentifierValidator.validate(context.request.params())
+    const body = await context.request.validateUsing(ClassroomUpdateValidator)
+    const params = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
