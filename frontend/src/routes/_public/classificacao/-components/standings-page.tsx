@@ -5,13 +5,16 @@ import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/qu
 
 import { BRACKETS_INDEX } from '../index'
 import { BracketIndex } from '../../-components/bracket-index'
-import { Section } from '../../-components/section'
+import { Section, SectionHeader, SectionTitle } from '../../-components/section'
 
 export function StandingsPage(): React.JSX.Element {
   const { data } = useQuery(storefrontBracketsQueryOptions(BRACKETS_INDEX))
 
   return (
-    <Section as="h1" title="Classificação">
+    <Section>
+      <SectionHeader>
+        <SectionTitle render={<h1 />}>Classificação</SectionTitle>
+      </SectionHeader>
       <BracketIndex brackets={data?.data ?? []} />
     </Section>
   )

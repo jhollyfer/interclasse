@@ -14,7 +14,11 @@ import {
 } from '#/lib/labels'
 import { cn } from '#/lib/utils'
 
-import { Section } from '../../../-components/section'
+import {
+  Section,
+  SectionHeader,
+  SectionTitle,
+} from '../../../-components/section'
 
 const route = getRouteApi('/_public/classificacao/$id/')
 
@@ -69,10 +73,12 @@ export function BracketPage(): React.JSX.Element {
   const phases = [...new Set(ordered.map((match) => match.phase))]
 
   return (
-    <Section
-      as="h1"
-      title={`${bracket.sport.name} · ${CATEGORY_LABELS[bracket.category]}`}
-    >
+    <Section>
+      <SectionHeader>
+        <SectionTitle
+          render={<h1 />}
+        >{`${bracket.sport.name} · ${CATEGORY_LABELS[bracket.category]}`}</SectionTitle>
+      </SectionHeader>
       {champion && (
         <p className="bg-accent text-accent-foreground flex items-center gap-3 rounded-lg p-4 text-lg font-extrabold uppercase italic">
           <TrophyIcon className="size-7" weight="fill" />
