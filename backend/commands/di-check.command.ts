@@ -26,53 +26,55 @@ export default class DiCheck extends BaseCommand {
 
   static override options: CommandOptions = { startApp: true }
 
-  private async classesDe(diretorio: string, sufixo: string): Promise<string[]> {
-    const caminho = join(this.app.appRoot.pathname, 'app', diretorio)
+  private async classesIn(directory: string, suffix: string): Promise<string[]> {
+    const dirPath = join(this.app.appRoot.pathname, 'app', directory)
 
     // Recursivo: service mora em `services/<nome>/<nome>.service.ts`
     // (_padroes/arquitetura.md §3); policy continua plana.
-    const entradas = await readdir(caminho, { recursive: true }).catch(() => [])
+    const entries = await readdir(dirPath, { recursive: true }).catch(() => [])
 
-    return entradas.filter(function (nome) {
-      return nome.endsWith(sufixo)
+    return entries.filter(function (name) {
+      return name.endsWith(suffix)
     })
   }
 
   override async run() {
-    const alvos: Array<{ diretorio: string; arquivo: string }> = []
+    const targets: Array<{ directory: string; file: string }> = []
 
-    for (const arquivo of await this.classesDe('services', '.service.ts')) {
-      alvos.push({ diretorio: 'services', arquivo })
+    for (const file of await this.classesIn('services', '.service.ts')) {
+      targets.push({ directory: 'services', file })
     }
 
-    for (const arquivo of await this.classesDe('policies', '.policy.ts')) {
-      alvos.push({ diretorio: 'policies', arquivo })
+    for (const file of await this.classesIn('policies', '.policy.ts')) {
+      targets.push({ directory: 'policies', file })
     }
 
-    const falhas: string[] = []
+    const failures: string[] = []
 
-    for (const alvo of alvos) {
-      const especificador = `#${alvo.diretorio}/${alvo.arquivo.replace(/\.ts$/, '')}`
+    for (const target of targets) {
+      const specifier = `#${target.directory}/${target.file.replace(/\.ts$/, '')}`
 
       try {
-        const modulo = await import(especificador)
-        if (typeof modulo.default !== 'function') continue
+        const imported = await import(specifier)
+        if (typeof imported.default !== 'function') continue
 
-        await this.app.container.make(modulo.default)
+        await this.app.container.make(imported.default)
       } catch (error) {
-        let motivo = String(error)
-        if (error instanceof Error) motivo = error.message
-        falhas.push(`${alvo.diretorio}/${alvo.arquivo}: ${motivo}`)
+        let reason = String(error)
+        if (error instanceof Error) reason = error.message
+        failures.push(`${target.directory}/${target.file}: ${reason}`)
       }
     }
 
-    if (falhas.length > 0) {
-      this.logger.error(`di:check: ${falhas.length} de ${alvos.length} nao sobem pelo container`)
-      for (const falha of falhas) this.logger.error(`  ${falha}`)
+    if (failures.length > 0) {
+      this.logger.error(
+        `di:check: ${failures.length} de ${targets.length} nao sobem pelo container`,
+      )
+      for (const failure of failures) this.logger.error(`  ${failure}`)
       this.exitCode = 1
       return
     }
 
-    this.logger.success(`di:check: ${alvos.length} classes construidas pelo container.`)
+    this.logger.success(`di:check: ${targets.length} classes construidas pelo container.`)
   }
 }
