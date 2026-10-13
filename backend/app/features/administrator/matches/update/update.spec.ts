@@ -64,6 +64,30 @@ test.group('matches > update', (group) => {
     assert.property(body(response).errors, 'location')
   })
 
+  test('data fora de ISO 8601 com fuso responde 422 e não grava', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const { match } = await scheduledMatch()
+
+    // `03/11/2026 14:30` virava 11 de março e `2026-11-03` virava meia-noite
+    // UTC pelo `iso8601` do VineJS, que cai no parse solto do dayjs.
+    for (const scheduledAt of [
+      '03/11/2026 14:30',
+      '2026-11-03',
+      '2026-11-03T14:30:00',
+      '2026-13-03T14:30:00Z',
+    ]) {
+      const response = await client
+        .put(`/administrator/matches/${match.id}`)
+        .cookies(admin)
+        .json({ scheduledAt })
+
+      response.assertStatus(422)
+      assert.property(body(response).errors, 'scheduledAt')
+    }
+    await match.refresh()
+    assert.isNull(match.scheduledAt)
+  })
+
   test('partida que não existe responde 404', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
