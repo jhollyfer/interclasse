@@ -19,7 +19,9 @@ export default class AdministratorMatchUnscoreController {
   constructor(private readonly useCase: AdministratorMatchUnscoreUseCase) {}
 
   async handle(context: HttpContext) {
-    const params = await IdentifierValidator.validate(context.request.params())
+    const params = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     const result = await this.useCase.execute(params)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

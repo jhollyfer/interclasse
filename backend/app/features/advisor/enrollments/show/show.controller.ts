@@ -19,7 +19,9 @@ export default class AdvisorEnrollmentShowController {
   constructor(private readonly useCase: AdvisorEnrollmentShowUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await EnrollmentShowValidator.validate(context.request.qs())
+    const payload = await context.request.validateUsing(EnrollmentShowValidator, {
+      data: context.request.qs(),
+    })
     // A regra por registro passa pelo Bouncer (_padroes/backend.md §4.6); turma
     // alheia ou ausente é `404`, decidido pela policy.
     const classroom = await Classroom.find(payload.classroomId)

@@ -32,7 +32,9 @@ export default class StoragesFileDownloadController {
   constructor(private readonly useCase: StoragesFileDownloadUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await IdentifierValidator.validate(context.params)
+    const payload = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     const storage = await Storage.find(payload.id)
     await context.bouncer.with(StoragePolicy).authorize('download', storage)
     const result = await this.useCase.execute(payload)

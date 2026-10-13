@@ -17,7 +17,9 @@ export default class StorefrontMatchPaginateController {
   constructor(private readonly useCase: StorefrontMatchPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await MatchPaginateValidator.validate(context.request.qs())
+    const payload = await context.request.validateUsing(MatchPaginateValidator, {
+      data: context.request.qs(),
+    })
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

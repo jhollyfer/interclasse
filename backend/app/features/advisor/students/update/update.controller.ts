@@ -18,8 +18,10 @@ export default class AdvisorStudentUpdateController {
   constructor(private readonly useCase: AdvisorStudentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await StudentUpdateValidator.validate(context.request.body())
-    const params = await IdentifierValidator.validate(context.request.params())
+    const body = await context.request.validateUsing(StudentUpdateValidator)
+    const params = await context.request.validateUsing(IdentifierValidator, {
+      data: context.params,
+    })
     const student = await Student.query().where('id', params.id).preload('classroom').first()
     await context.bouncer.with(ClassroomPolicy).authorize('manageStudent', student)
     const result = await this.useCase.execute({ ...body, ...params })

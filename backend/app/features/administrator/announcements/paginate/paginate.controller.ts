@@ -20,7 +20,9 @@ export default class AdministratorAnnouncementPaginateController {
   constructor(private readonly useCase: AdministratorAnnouncementPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AnnouncementPaginateValidator.validate(context.request.qs())
+    const payload = await context.request.validateUsing(AnnouncementPaginateValidator, {
+      data: context.request.qs(),
+    })
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

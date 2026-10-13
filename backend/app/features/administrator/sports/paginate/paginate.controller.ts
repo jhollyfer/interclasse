@@ -18,7 +18,9 @@ export default class AdministratorSportPaginateController {
   constructor(private readonly useCase: AdministratorSportPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await SportPaginateValidator.validate(context.request.qs())
+    const payload = await context.request.validateUsing(SportPaginateValidator, {
+      data: context.request.qs(),
+    })
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
