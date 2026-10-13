@@ -1,6 +1,9 @@
+import { glob } from 'node:fs/promises'
+import { pathToFileURL } from 'node:url'
 import { test } from '@japa/runner'
-import * as validator from '#core/validator'
-import { FIELD_LABELS } from '#start/validator'
+import app from '@adonisjs/core/services/app'
+import * as core from '#core/validator'
+import { FIELD_LABELS } from '#core/validator'
 
 /**
  * As auditorias estáticas dos validators, todas pelo `toJSONSchema()`.
@@ -39,7 +42,26 @@ function branch(node: unknown, key: string): Array<unknown> {
   return [value]
 }
 
-const validators = Object.values(validator).filter(isValidator)
+/**
+ * Todo validator do projeto: os globais de `#core/validator` e o
+ * `<recurso>.validator.ts` de cada recurso em `app/features` (_padroes/backend.md
+ * §4.4). O glob
+ * é o que deixa quebrar o validator por recurso sem perder a rede.
+ */
+const modulos: Array<Record<string, unknown>> = [core]
+for await (const arquivo of glob('app/features/**/*.validator.ts', { cwd: app.appRoot.pathname })) {
+  modulos.push(await import(pathToFileURL(app.makePath(arquivo)).href))
+}
+
+const validators = modulos.flatMap((modulo) => Object.values(modulo)).filter(isValidator)
+
+test.group('validator > varredura', () => {
+  // Sem esta guarda, um glob que não casa nada deixaria as auditorias abaixo
+  // verdes olhando só os validators globais.
+  test('acha o validator de cada recurso', ({ assert }) => {
+    assert.isAbove(modulos.length, 10)
+  })
+})
 
 /** Todo caminho cujo nó é `type: 'string'`, com o nó junto. */
 function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {

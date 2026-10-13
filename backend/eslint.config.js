@@ -106,7 +106,7 @@ const composicao = {
  *
  * O AdonisJS concentra a augmentation em lugares previsíveis — `config/*.ts`
  * (guards, hashers, disks, limiters, mailers), `providers/*.ts` (o que o
- * provider pendura no `HttpContext`), `start/validator.ts` (transform de data
+ * provider pendura no `HttpContext`), `app/core/validator.ts` (transform de data
  * do VineJS), `tests/bootstrap.ts` (registry do Japa) e o middleware que
  * inicializa o Bouncer. Nenhum deles é código de feature; o alvo da regra é
  * `app/features`, `app/services` e `app/models`, onde ela continua valendo.
@@ -116,7 +116,7 @@ const augmentation = {
     '**/*.d.ts',
     'config/*.ts',
     'providers/*.ts',
-    'start/validator.ts',
+    'app/core/validator.ts',
     'tests/bootstrap.ts',
     'app/middleware/initialize_bouncer_middleware.ts',
   ],

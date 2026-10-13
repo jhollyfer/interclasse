@@ -6,7 +6,7 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { RepresentativeEnrollmentUpdatePayload } from '#core/validator'
+import type { RepresentativeEnrollmentUpdatePayload } from '#features/representative/enrollments/enrollments.validator'
 
 type Payload = Merge<RepresentativeEnrollmentUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, EnrollmentBoard>

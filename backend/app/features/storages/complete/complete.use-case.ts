@@ -8,7 +8,8 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
-import type { IdentifierPayload, StorageCompletePayload } from '#core/validator'
+import type { IdentifierPayload } from '#core/validator'
+import type { StorageCompletePayload } from '#features/storages/storages.validator'
 
 type Payload = Merge<IdentifierPayload, StorageCompletePayload>
 type Response = Either<HTTPException, ModelObject>

@@ -8,7 +8,8 @@ import MultipartService, { PART_SIZE } from '#services/multipart.service'
 import StoragesPrune from '../../commands/storages_prune.ts'
 import { DateTime } from 'luxon'
 import { UploadStatuses } from '#core/entity'
-import { StorageCreateValidator, UPLOAD_MAX_SIZE, type StorageMimetype } from '#core/validator'
+import { StorageCreateValidator } from '#features/storages/storages.validator'
+import { UPLOAD_MAX_SIZE, type StorageMimetype } from '#core/validator'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,

@@ -4,9 +4,9 @@ import { defineDocs } from '#core/openapi/types'
 import StoragePaginateUseCase from './paginate.use-case.ts'
 import {
   StoragePaginationValidator,
-  STORAGE_MIMETYPES,
   STORAGE_SORT_COLUMNS,
-} from '#core/validator'
+} from '#features/storages/storages.validator'
+import { STORAGE_MIMETYPES } from '#core/validator'
 
 @inject()
 export default class StoragePaginateController {

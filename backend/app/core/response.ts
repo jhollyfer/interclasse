@@ -1,4 +1,4 @@
-import vine from '@vinejs/vine'
+import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
 import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'

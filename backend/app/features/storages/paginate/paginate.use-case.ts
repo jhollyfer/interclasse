@@ -4,7 +4,7 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, recentFirst, type Paginated } from '#core/entity'
-import type { StoragePaginationPayload } from '#core/validator'
+import type { StoragePaginationPayload } from '#features/storages/storages.validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = StoragePaginationPayload

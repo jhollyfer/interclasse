@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { body } from '#tests/helpers'
-import { RULE_MESSAGES } from '#start/validator'
+import { RULE_MESSAGES } from '#core/validator'
 
 /**
  * A frase de cada regra, em português.

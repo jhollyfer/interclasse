@@ -6,7 +6,7 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, UserRoles, type Merge, type Paginated } from '#core/entity'
-import type { AdvisorStudentPaginationPayload } from '#core/validator'
+import type { AdvisorStudentPaginationPayload } from '#features/advisor/students/students.validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 type Payload = Merge<AdvisorStudentPaginationPayload, { actor: User }>

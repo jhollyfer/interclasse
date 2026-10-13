@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import StorefrontMatchPaginateUseCase from './paginate.use-case.ts'
-import { StorefrontMatchPaginationValidator } from '#core/validator'
+import { StorefrontMatchPaginationValidator } from '#features/storefront/matches/matches.validator'
 
 @inject()
 export default class StorefrontMatchPaginateController {

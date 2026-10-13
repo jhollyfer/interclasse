@@ -12,7 +12,7 @@ import { UploadStatuses } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
-import type { StorageCreatePayload } from '#core/validator'
+import type { StorageCreatePayload } from '#features/storages/storages.validator'
 
 type Payload = StorageCreatePayload
 

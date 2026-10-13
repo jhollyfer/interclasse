@@ -4,7 +4,8 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdvisorStudentUpdateUseCase from './update.use-case.ts'
-import { AdvisorStudentUpdateValidator, IdentifierValidator } from '#core/validator'
+import { AdvisorStudentUpdateValidator } from '#features/advisor/students/students.validator'
+import { IdentifierValidator } from '#core/validator'
 
 @inject()
 export default class AdvisorStudentUpdateController {

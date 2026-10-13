@@ -7,7 +7,8 @@ import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
 import { categoryOf, type Merge } from '#core/entity'
-import type { AdministratorClassroomUpdatePayload, IdentifierPayload } from '#core/validator'
+import type { AdministratorClassroomUpdatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<AdministratorClassroomUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, Classroom>

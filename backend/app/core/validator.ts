@@ -1,40 +1,48 @@
-import vine from '@vinejs/vine'
+import { DateTime } from 'luxon'
+import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
 import env from '#start/env'
 import type { Infer } from '@vinejs/vine/types'
 import {
   ACTIVE_STATUSES,
-  BRACKET_STATUSES,
   CATEGORIES,
-  GRADES,
   MATCH_PHASES,
   MATCH_STATUSES,
   SORT_DIRECTIONS,
   TRASHED_MODES,
-  UPLOAD_STATUSES,
-  USER_ROLES,
 } from '#core/entity'
 
 /**
- * Fonte única dos schemas VineJS do backend.
+ * O `vine` configurado e o que é de todos os validators (_padroes/backend.md §4.4).
  *
- * Um arquivo só, e não um `_shared.validator.ts` por feature: a duplicação
- * fica visível, e o import tem um alvo estável - `#core/validator`. Em
- * `backend-old` as regras estavam espalhadas por `app/infra/http/validators/`,
- * e a mesma regra de senha existia em três arquivos.
+ * Cada recurso tem o próprio `app/features/<módulo>/<recurso>/<recurso>.validator.ts`,
+ * e importa daqui o `vine` - nunca de `@vinejs/vine` direto: é por este módulo
+ * que as mensagens pt-BR e o transform de data valem em todo schema. Aqui ficam
+ * só as regras usadas por dois ou mais recursos (como funções, para o
+ * `optional()` de um validator não vazar para outro), `LIST_LIMITS`, os
+ * validators globais e as mensagens.
  *
- * O gerador de OpenAPI resolve estes validators pelo AST dos controllers, lendo
- * o especificador do import e reimportando o módulo. Renomear um export sem
+ * O gerador de OpenAPI resolve os validators pelo AST dos controllers, lendo o
+ * especificador do import e reimportando o módulo. Renomear um export sem
  * atualizar o controller não quebra o build: a operação some do documento em
  * silêncio, e `node ace openapi:generate --check` é o que pega isso.
- *
- * A ordem é: regras compartilhadas, validators globais, e depois um bloco por
- * feature delimitado por banner - os blocos de feature nascem nas fases
- * seguintes.
  */
 
-// ---------------------------------------------------------------------------
-// Regras compartilhadas
-// ---------------------------------------------------------------------------
+export { vine }
+export type { Infer }
+/** Os erros do VineJS, para o `handler.ts` traduzir o 422 sem importar a lib direto. */
+export { errors as vineErrors } from '@vinejs/vine'
+
+declare module '@vinejs/vine/types' {
+  interface VineGlobalTransforms {
+    date: DateTime
+  }
+}
+
+/**
+ * Datas validadas saem como `DateTime` do Luxon, prontas para o Lucid - e não
+ * como o `Date` nativo, que o model teria de converter em cada caso de uso.
+ */
+VineDate.transform((value) => DateTime.fromJSDate(value))
 
 /**
  * Regras reaproveitadas por mais de um recurso.
@@ -139,10 +147,6 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
   }
 }
 
-// ---------------------------------------------------------------------------
-// Validators globais
-// ---------------------------------------------------------------------------
-
 /**
  * O identificador na URL. Vale para todo recurso: a PK é uuid em toda tabela.
  *
@@ -166,72 +170,10 @@ export const TrashablePaginationValidator = vine.create({
 })
 
 export type IdentifierPayload = Infer<typeof IdentifierValidator>
+
 export type PaginationPayload = Infer<typeof PaginationValidator>
+
 export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidator>
-
-// ---------------------------------------------------------------------------
-// account
-// ---------------------------------------------------------------------------
-
-/**
- * A própria conta, editada pelo dono dela.
- *
- * **Todo campo é opcional**: campo ausente significa "não mexer", e não
- * "apagar". `backend-old` usava `PATCH` com um schema que exigia `name`,
- * `email`, `role` e `avatarId` - o verbo prometia parcial e o schema recusava
- * parcial.
- *
- * `role` e `status` não entram: o papel é definido na criação, pelo
- * administrador, e ninguém muda o próprio. Declará-los só para ignorar depois
- * convidaria alguém a tentar.
- */
-export const AccountUpdateValidator = vine.create({
-  name: vine.string().trim().maxLength(120).optional(),
-  email: email().optional(),
-  password: password().optional(),
-  /**
-   * A senha atual, exigida **só** quando `password` vem no payload.
-   *
-   * É prova de identidade, e não de força: quem sequestra uma sessão tem o
-   * cookie, mas não sabe a senha. `PASSWORD_SAME_AS_CURRENT` não serve para
-   * isso - ele compara a nova com o hash, e passar por ele é justamente não
-   * saber a atual.
-   *
-   * `requiredIfExists` e não uma checagem no use-case: a obrigatoriedade
-   * condicional é forma do payload, e aqui ela vira `422` apontando o campo -
-   * é o que `backend-old` respondia como erro genérico
-   * (`profile/use-cases/update.use-case.ts:22`).
-   *
-   * Sem as regras de força de `password()`: o valor é conferido contra o hash,
-   * não gravado. O teto de 32 é o mesmo da política, porque é o maior valor que
-   * a aplicação já pode ter gravado.
-   */
-  currentPassword: vine.string().maxLength(32).optional().requiredIfExists('password'),
-  // `nullable` é o que permite tirar a foto sem trocá-la. O uuid só garante o
-  // formato; que o arquivo exista é checado no use-case, senão a violação da
-  // chave estrangeira estouraria como 500 em vez de 422.
-  avatarId: vine.string().uuid().nullable().optional(),
-})
-
-export type AccountUpdatePayload = Infer<typeof AccountUpdateValidator>
-
-// ---------------------------------------------------------------------------
-// authentication
-// ---------------------------------------------------------------------------
-
-export const AuthenticationSignInValidator = vine.create({
-  email: email(),
-  // Entrar não valida força: a senha só é comparada com o hash guardado.
-  // Exigir o formato atual aqui trancaria fora quem cadastrou antes de a regra
-  // endurecer - e diria, pela mensagem de validação, qual é a política.
-  password: vine.string().maxLength(128),
-})
-
-export type AuthenticationSignInPayload = Infer<typeof AuthenticationSignInValidator>
-
-// ---------------------------------------------------------------------------
-// storages
-// ---------------------------------------------------------------------------
 
 /**
  * Os tipos aceitos, e a extensão que cada um ganha na chave do objeto.
@@ -285,310 +227,6 @@ export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
  */
 export const UPLOAD_MAX_SIZE = env.get('UPLOAD_MAX_SIZE')
 
-/**
- * O que `POST /storages` recebe: metadados, nunca bytes.
- *
- * O binário vai do navegador direto ao bucket, então tipo e tamanho
- * são **declarados** aqui e conferidos contra o objeto real no
- * `POST /storages/:id/complete`. Recusar antes de assinar é o que impede um
- * arquivo proibido de chegar ao bucket; conferir depois é o que impede que o
- * declarado tenha sido mentira.
- */
-export const StorageCreateValidator = vine.create({
-  fileName: vine.string().trim().minLength(1).maxLength(255),
-  mimetype: vine.enum(STORAGE_MIMETYPES),
-  size: vine.number().min(1).max(UPLOAD_MAX_SIZE).withoutDecimals(),
-})
-
-export type StorageCreatePayload = Infer<typeof StorageCreateValidator>
-
-/**
- * O que `POST /storages/:id/complete` recebe: o `ETag` de cada parte enviada.
- *
- * Vazio - ou ausente - é upload de parte única, que não tem parte para
- * confirmar. O teto de dez mil é o do próprio S3.
- */
-export const StorageCompleteValidator = vine.create({
-  parts: vine
-    .array(
-      vine.object({
-        partNumber: vine.number().min(1).max(10_000).withoutDecimals(),
-        etag: vine.string().trim().maxLength(64).minLength(1),
-      })
-    )
-    .optional(),
-})
-
-export type StorageCompletePayload = Infer<typeof StorageCompleteValidator>
-
-/**
- * Por quais colunas a biblioteca de arquivos pode ser ordenada.
- *
- * Tupla fechada pelo mesmo motivo das outras: o valor entra direto no
- * `orderBy`, que o compõe no SQL, e texto livre da URL seria entregar a
- * cláusula ao cliente.
- *
- * `path` e `uploadId` ficam de fora de propósito - são detalhe do bucket e do
- * multipart, e ordenar por eles não é pergunta que a tela faça.
- */
-export const STORAGE_SORT_COLUMNS = ['originalName', 'mimetype', 'size', 'createdAt'] as const
-
-/**
- * O que `GET /storages` recebe.
- *
- * A biblioteca de arquivos do painel: `?search` acha pelo rótulo original, pelo
- * nome gerado ou pelo tipo - é a busca de `backend-old`, nas colunas que
- * sobreviveram ao de-para -, e `?status` e `?mimetype` recortam o que já subiu
- * e o que é imagem.
- *
- * Sem `trashedField()`: `storages` tem `deleted_at`, mas apagar arquivo é
- * `DELETE /storages/:id`, que remove a linha **e** o binário. Não há lixeira de
- * arquivo para restaurar, e o parâmetro seria aceito e ignorado em silêncio.
- */
-export const StoragePaginationValidator = vine.create({
-  ...paginationFields(),
-  status: vine.enum(UPLOAD_STATUSES).optional(),
-  // A lista fechada, e não texto livre: é a mesma tupla que `POST /storages`
-  // aceita, então filtrar por um tipo que a API nunca grava é 422 em vez de uma
-  // página vazia que parece um bug.
-  mimetype: vine.enum(STORAGE_MIMETYPES).optional(),
-  ...sortFields(STORAGE_SORT_COLUMNS),
-})
-
-export type StoragePaginationPayload = Infer<typeof StoragePaginationValidator>
-
-// ---------------------------------------------------------------------------
-// administrator/users
-// ---------------------------------------------------------------------------
-
-/**
- * Por quais colunas a listagem de usuários pode ser ordenada.
- *
- * São as colunas que a tela mostra, e nada além: `password` é hash e ordenar
- * por ele não significa nada, e `avatar` é relação, que exigiria `join`.
- */
-export const USER_SORT_COLUMNS = ['name', 'email', 'role', 'status', 'createdAt'] as const
-
-/**
- * O papel de um usuário gerenciado pelo painel.
- *
- * Aqui é o enum inteiro, e não um recorte como no simple-hub: os três papéis
- * nascem pelo painel, e o privilégio de purge que lá pertence a um `OWNER`
- * inalcançável fica com o `ADMINISTRATOR`. Não há papel a excluir da lista.
- */
-export function manageableRole() {
-  return vine.enum(USER_ROLES)
-}
-
-/**
- * O que `POST /administrator/users` recebe.
- *
- * `role` é **obrigatório**: a coluna não tem `DEFAULT`, e o papel é sempre
- * explícito. `backend-old` caía em `ADMINISTRATOR` por omissão, e um caminho de
- * criação esquecido gravava o papel mais poderoso em silêncio.
- *
- * `password` passa pela regra de força compartilhada, que também exige
- * `passwordConfirmation` com o mesmo valor - o campo é lido do input cru e não
- * entra no payload validado, então não há o que descartar antes do `merge()`.
- *
- * `status` é opcional porque a coluna tem `DEFAULT 'ACTIVE'`: a conta nasce
- * podendo entrar, e desativar é edição.
- */
-export const AdministratorUserCreateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120),
-  email: email(),
-  password: password(),
-  role: manageableRole(),
-  status: activeStatus().optional(),
-  // `nullable` é o que permite tirar a foto sem trocá-la. O uuid só garante o
-  // formato; que o arquivo exista é checado no use-case, senão a violação da
-  // chave estrangeira estouraria como `500` em vez de `422`.
-  avatarId: vine.string().uuid().nullable().optional(),
-})
-
-/**
- * O que `PUT /administrator/users/:id` recebe.
- *
- * **Todo campo é opcional**, inclusive os obrigatórios na criação: campo
- * ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
- * `null` explícito.
- *
- * `role` entra aqui, ao contrário de `AccountUpdateValidator`: promover e
- * rebaixar é o que este recurso existe para fazer, e ninguém muda o próprio
- * papel por `/account`.
- */
-export const AdministratorUserUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120).optional(),
-  email: email().optional(),
-  password: password().optional(),
-  role: manageableRole().optional(),
-  status: activeStatus().optional(),
-  avatarId: vine.string().uuid().nullable().optional(),
-})
-
-/**
- * O que `GET /administrator/users` aceita na query.
- *
- * Dois filtros próprios, que são os dois recortes da tela: `role` separa quem
- * administra de quem edita, e `status` separa quem entra de quem foi desativado
- * sem ser arquivado.
- */
-export const AdministratorUserPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...trashedField(),
-  ...sortFields(USER_SORT_COLUMNS),
-  role: manageableRole().optional(),
-  status: activeStatus().optional(),
-})
-
-export type AdministratorUserCreatePayload = Infer<typeof AdministratorUserCreateValidator>
-export type AdministratorUserUpdatePayload = Infer<typeof AdministratorUserUpdateValidator>
-export type AdministratorUserPaginationPayload = Infer<typeof AdministratorUserPaginationValidator>
-
-// ---------------------------------------------------------------------------
-// administrator/classrooms
-// ---------------------------------------------------------------------------
-
-export const CLASSROOM_SORT_COLUMNS = ['name', 'grade', 'category', 'createdAt'] as const
-
-/** O ano da turma. A categoria sai dele, e por isso ela não é campo de entrada. */
-export function grade() {
-  return vine.number().withoutDecimals().min(GRADES.MIN).max(GRADES.MAX)
-}
-
-/**
- * O que `POST /administrator/classrooms` recebe.
- *
- * Conselheiro e representante são opcionais: a turma nasce antes de alguém ser
- * indicado. Que a conta exista e tenha o papel certo é checado no use-case.
- */
-export const AdministratorClassroomCreateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(20),
-  grade: grade(),
-  advisorId: vine.string().uuid().nullable().optional(),
-  representativeId: vine.string().uuid().nullable().optional(),
-})
-
-/** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
-export const AdministratorClassroomUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(20).optional(),
-  grade: grade().optional(),
-  advisorId: vine.string().uuid().nullable().optional(),
-  representativeId: vine.string().uuid().nullable().optional(),
-})
-
-export const AdministratorClassroomPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...sortFields(CLASSROOM_SORT_COLUMNS),
-  category: vine.enum(CATEGORIES).optional(),
-})
-
-export type AdministratorClassroomCreatePayload = Infer<
-  typeof AdministratorClassroomCreateValidator
->
-export type AdministratorClassroomUpdatePayload = Infer<
-  typeof AdministratorClassroomUpdateValidator
->
-export type AdministratorClassroomPaginationPayload = Infer<
-  typeof AdministratorClassroomPaginationValidator
->
-
-// ---------------------------------------------------------------------------
-// administrator/sports
-// ---------------------------------------------------------------------------
-
-export const SPORT_SORT_COLUMNS = ['name', 'createdAt'] as const
-
-/** Atletas por time. Que o mínimo não passe do máximo é checado no use-case. */
-export function athletes() {
-  return vine.number().withoutDecimals().min(1).max(LIST_LIMITS.ATHLETES)
-}
-
-export const AdministratorSportCreateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(60),
-  minAthletes: athletes(),
-  maxAthletes: athletes(),
-})
-
-export const AdministratorSportUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(60).optional(),
-  minAthletes: athletes().optional(),
-  maxAthletes: athletes().optional(),
-})
-
-export const AdministratorSportPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...sortFields(SPORT_SORT_COLUMNS),
-})
-
-export type AdministratorSportCreatePayload = Infer<typeof AdministratorSportCreateValidator>
-export type AdministratorSportUpdatePayload = Infer<typeof AdministratorSportUpdateValidator>
-export type AdministratorSportPaginationPayload = Infer<
-  typeof AdministratorSportPaginationValidator
->
-
-// ---------------------------------------------------------------------------
-// administrator/announcements
-// ---------------------------------------------------------------------------
-
-export const ANNOUNCEMENT_SORT_COLUMNS = ['title', 'createdAt'] as const
-
-export const AdministratorAnnouncementCreateValidator = vine.create({
-  title: vine.string().trim().minLength(1).maxLength(160),
-  body: vine.string().trim().minLength(1).maxLength(5000),
-  pinned: vine.boolean().optional(),
-})
-
-export const AdministratorAnnouncementUpdateValidator = vine.create({
-  title: vine.string().trim().minLength(1).maxLength(160).optional(),
-  body: vine.string().trim().minLength(1).maxLength(5000).optional(),
-  pinned: vine.boolean().optional(),
-})
-
-export const AdministratorAnnouncementPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...sortFields(ANNOUNCEMENT_SORT_COLUMNS),
-})
-
-export type AdministratorAnnouncementCreatePayload = Infer<
-  typeof AdministratorAnnouncementCreateValidator
->
-export type AdministratorAnnouncementUpdatePayload = Infer<
-  typeof AdministratorAnnouncementUpdateValidator
->
-export type AdministratorAnnouncementPaginationPayload = Infer<
-  typeof AdministratorAnnouncementPaginationValidator
->
-
-// ---------------------------------------------------------------------------
-// administrator/brackets
-// ---------------------------------------------------------------------------
-
-/**
- * O que `POST /administrator/brackets` recebe: qual competição sortear. O resto
- * - times, grupos e partidas - sai das inscrições e do sorteio.
- */
-export const AdministratorBracketCreateValidator = vine.create({
-  sportId: vine.string().uuid(),
-  category: vine.enum(CATEGORIES),
-})
-
-export const AdministratorBracketPaginationValidator = vine.create({
-  ...paginationFields(),
-  sportId: vine.string().uuid().optional(),
-  category: vine.enum(CATEGORIES).optional(),
-  status: vine.enum(BRACKET_STATUSES).optional(),
-})
-
-export type AdministratorBracketCreatePayload = Infer<typeof AdministratorBracketCreateValidator>
-export type AdministratorBracketPaginationPayload = Infer<
-  typeof AdministratorBracketPaginationValidator
->
-
-// ---------------------------------------------------------------------------
-// administrator/matches
-// ---------------------------------------------------------------------------
-
 /** Os filtros da tabela de jogos, iguais no painel e no site. */
 export function matchFilterFields() {
   return {
@@ -600,62 +238,6 @@ export function matchFilterFields() {
   }
 }
 
-export const AdministratorMatchPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...matchFilterFields(),
-})
-
-/**
- * A agenda da partida. `scheduledAt` em ISO 8601 com fuso: a escola joga no
- * horário local, e o servidor grava em UTC.
- */
-export const AdministratorMatchUpdateValidator = vine.create({
-  scheduledAt: vine
-    .date({ formats: ['iso8601'] })
-    .nullable()
-    .optional(),
-  location: vine.string().trim().maxLength(120).nullable().optional(),
-})
-
-/**
- * O placar. `winnerTeamId` só é lido no mata-mata empatado - o vencedor nos
- * pênaltis; em qualquer outro caso o placar decide sozinho.
- */
-export const AdministratorMatchScoreValidator = vine.create({
-  homeScore: vine.number().withoutDecimals().min(0).max(999),
-  awayScore: vine.number().withoutDecimals().min(0).max(999),
-  winnerTeamId: vine.string().uuid().optional(),
-})
-
-export type AdministratorMatchPaginationPayload = Infer<
-  typeof AdministratorMatchPaginationValidator
->
-export type AdministratorMatchUpdatePayload = Infer<typeof AdministratorMatchUpdateValidator>
-export type AdministratorMatchScorePayload = Infer<typeof AdministratorMatchScoreValidator>
-
-// ---------------------------------------------------------------------------
-// advisor
-// ---------------------------------------------------------------------------
-
-export const AdvisorStudentPaginationValidator = vine.create({
-  ...paginationFields(),
-  classroomId: vine.string().uuid().optional(),
-})
-
-export const AdvisorStudentCreateValidator = vine.create({
-  classroomId: vine.string().uuid(),
-  name: vine.string().trim().minLength(1).maxLength(120),
-})
-
-/** Só o nome: trocar o aluno de turma é apagar e cadastrar na outra. */
-export const AdvisorStudentUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120),
-})
-
-export const AdvisorEnrollmentShowValidator = vine.create({
-  classroomId: vine.string().uuid(),
-})
-
 /** A lista de atletas de uma modalidade, inteira: substitui a anterior. */
 export function athleteListFields() {
   return {
@@ -663,52 +245,6 @@ export function athleteListFields() {
     studentIds: vine.array(vine.string().uuid()).distinct().maxLength(LIST_LIMITS.ATHLETES),
   }
 }
-
-export const AdvisorEnrollmentUpdateValidator = vine.create({
-  classroomId: vine.string().uuid(),
-  ...athleteListFields(),
-})
-
-export type AdvisorStudentPaginationPayload = Infer<typeof AdvisorStudentPaginationValidator>
-export type AdvisorStudentCreatePayload = Infer<typeof AdvisorStudentCreateValidator>
-export type AdvisorStudentUpdatePayload = Infer<typeof AdvisorStudentUpdateValidator>
-export type AdvisorEnrollmentShowPayload = Infer<typeof AdvisorEnrollmentShowValidator>
-export type AdvisorEnrollmentUpdatePayload = Infer<typeof AdvisorEnrollmentUpdateValidator>
-
-// ---------------------------------------------------------------------------
-// representative
-// ---------------------------------------------------------------------------
-
-/** Sem `classroomId`: a turma do representante sai da sessão, nunca do payload. */
-export const RepresentativeEnrollmentUpdateValidator = vine.create({
-  ...athleteListFields(),
-})
-
-export type RepresentativeEnrollmentUpdatePayload = Infer<
-  typeof RepresentativeEnrollmentUpdateValidator
->
-
-// ---------------------------------------------------------------------------
-// storefront
-// ---------------------------------------------------------------------------
-
-/**
- * O que o site aceita na query. **Sem `trashed`**: nada daqui tem lixeira, e o
- * parâmetro seria aceito e ignorado em silêncio.
- */
-export const StorefrontMatchPaginationValidator = vine.create({
-  ...paginationFields(),
-  ...matchFilterFields(),
-})
-
-export const StorefrontBracketPaginationValidator = vine.create({
-  ...paginationFields(),
-  sportId: vine.string().uuid().optional(),
-  category: vine.enum(CATEGORIES).optional(),
-})
-
-export type StorefrontMatchPaginationPayload = Infer<typeof StorefrontMatchPaginationValidator>
-export type StorefrontBracketPaginationPayload = Infer<typeof StorefrontBracketPaginationValidator>
 
 /**
  * O identificador público de uma modalidade. O teto de 255 é o da coluna - sem
@@ -719,3 +255,136 @@ export const SlugValidator = vine.create({
 })
 
 export type SlugPayload = Infer<typeof SlugValidator>
+
+/*
+|--------------------------------------------------------------------------
+| Mensagens de validação
+|--------------------------------------------------------------------------
+|
+| Sem isto o VineJS responde no default em inglês, e a 422 sai bilíngue: o
+| envelope de `app/exceptions/handler.ts` é português ("Dados inválidos") e os
+| valores de `errors` sairiam em inglês, porque o handler copia a mensagem
+| verbatim. Todo erro de negócio dos use-cases já é pt-BR - só o erro de
+| validação, que é o mais frequente, destoaria.
+|
+| Duas armadilhas, se for mexer:
+|
+| - `FIELD_LABELS` troca só o `{{ field }}` **exibido**. A chave do erro segue
+|   sendo o nome do campo (`avatarId`), e é ela que o frontend usa para marcar
+|   o input certo. Renomear chave quebra o formulário.
+| - Não configure `vine.errorReporter`. O handler depende do formato de array
+|   `{ field, rule, message }` do `SimpleErrorReporter`.
+|
+*/
+
+/**
+ * O nome amigável de cada campo, na forma que cai bem depois de "Informe".
+ *
+ * É exportado, e não escrito direto na chamada abaixo, porque
+ * `tests/functional/validator.spec.ts` precisa importá-lo pelo nome - sem
+ * depender da ordem dos argumentos do `SimpleMessagesProvider`. Esse mesmo
+ * teste cobra rótulo para todo campo dos validators e acusa rótulo órfão, então
+ * campo novo em `#core/validator` nasce vermelho até entrar aqui.
+ */
+export const FIELD_LABELS = {
+  // Identidade e conta
+  name: 'o nome',
+  email: 'o e-mail',
+  password: 'a senha',
+  passwordConfirmation: 'a confirmação da senha',
+  currentPassword: 'a senha atual',
+  role: 'o papel',
+  status: 'o status',
+  avatarId: 'o avatar',
+  id: 'o identificador',
+
+  // Turma e aluno
+  grade: 'o ano',
+  category: 'a categoria',
+  advisorId: 'o professor conselheiro',
+  representativeId: 'o aluno representante',
+  classroomId: 'a turma',
+
+  // Modalidade e inscrição
+  slug: 'o slug',
+  minAthletes: 'o mínimo de atletas',
+  maxAthletes: 'o máximo de atletas',
+  sportId: 'a modalidade',
+  studentIds: 'os atletas',
+
+  // Aviso
+  title: 'o título',
+  body: 'o texto',
+  pinned: 'o destaque',
+
+  // Chave e partida
+  bracketId: 'a chave',
+  phase: 'a fase',
+  scheduledAt: 'a data e hora',
+  location: 'o local',
+  homeScore: 'o placar do mandante',
+  awayScore: 'o placar do visitante',
+  winnerTeamId: 'o vencedor',
+
+  // Arquivo. Estes não passam por formulário do painel.
+  fileName: 'o nome do arquivo',
+  mimetype: 'o tipo do arquivo',
+  size: 'o tamanho',
+  parts: 'as partes',
+  partNumber: 'o número da parte',
+  etag: 'o ETag',
+
+  // Listagem
+  page: 'a página',
+  perPage: 'o total por página',
+  search: 'a busca',
+  sort: 'a ordenação',
+  direction: 'a direção da ordenação',
+  trashed: 'o filtro de arquivados',
+}
+
+/**
+ * A frase de cada regra de validação.
+ *
+ * É exportado pelo mesmo motivo de `FIELD_LABELS`:
+ * `tests/functional/mensagens.spec.ts` precisa importá-lo pelo nome para cobrar
+ * que toda regra usada pelos validators tenha tradução e que nenhuma frase
+ * tenha escapado em inglês.
+ */
+export const RULE_MESSAGES = {
+  // Genéricas
+  // O `{{ field }}` só aparece onde a frase começa por verbo. Os rótulos
+  // carregam artigo ("o resumo"), então campo no início da frase sairia em
+  // minúscula, e `'em {{ field }}'` sairia como "em a senha". Nas demais
+  // regras o nome é omitido: o erro é renderizado sob o campo rotulado, e na
+  // API vem indexado pelo nome dele.
+  'required': 'Informe {{ field }}',
+  'string': 'Informe {{ field }}',
+  'enum': 'Selecione {{ field }}',
+  'email': 'Informe um e-mail válido',
+  'number': 'Informe um número válido',
+  'boolean': 'Informe verdadeiro ou falso',
+  'array': 'Informe uma lista',
+  'object': 'Informe um objeto',
+  'uuid': 'Selecione uma opção válida',
+  'url': 'Informe um link válido',
+  'minLength': 'Informe ao menos {{ min }} caracteres',
+  'maxLength': 'Informe no máximo {{ max }} caracteres',
+  'min': 'Informe um valor maior ou igual a {{ min }}',
+  'max': 'Informe um valor menor ou igual a {{ max }}',
+  'positive': 'Informe um valor maior que zero',
+  'withoutDecimals': 'Informe um número inteiro',
+  'array.maxLength': 'Informe no máximo {{ max }} itens',
+
+  // Senha
+  // Os quatro `.regex()` de `password()` reportam todos a chave
+  // `password.regex`, e o VineJS para na primeira que falha - não há como dar
+  // uma mensagem por classe de caractere. Daí a mensagem combinada.
+  'password.regex': 'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
+  'password.minLength': 'A senha deve ter ao menos {{ min }} caracteres',
+  'password.maxLength': 'A senha deve ter no máximo {{ max }} caracteres',
+  // `confirmed` roda em `password` mas reporta em `passwordConfirmation`.
+  'passwordConfirmation.confirmed': 'As senhas não são iguais',
+}
+
+vine.messagesProvider = new SimpleMessagesProvider(RULE_MESSAGES, FIELD_LABELS)
