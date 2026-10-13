@@ -8,8 +8,8 @@ export const BRACKETS_INDEX = { perPage: 100 }
 
 export const Route = createFileRoute('/_public/classificacao/')({
   loader: ({ context }) =>
-    context.queryClient.prefetchQuery(
-      storefrontBracketsQueryOptions(BRACKETS_INDEX),
-    ),
+    context.queryClient
+      .query(storefrontBracketsQueryOptions(BRACKETS_INDEX))
+      .catch(() => undefined),
   head: () => ({ meta: [{ title: `Classificação | ${SITE_TITLE}` }] }),
 })

@@ -39,11 +39,13 @@ export const Route = createFileRoute('/_private')({
   ),
   beforeLoad: async ({ context, location }) => {
     try {
-      // `ensureQueryData` e não `prefetchQuery`: o primeiro devolve o dado e
-      // propaga o erro, o segundo engole os dois e o guard nunca reprovaria.
-      const account = await context.queryClient.ensureQueryData(
-        accountQueryOptions(),
-      )
+      // `query()` com `staleTime: 'static'` (o antigo `ensureQueryData`):
+      // devolve o dado e propaga o erro. Engolir o erro aqui faria o guard
+      // nunca reprovar.
+      const account = await context.queryClient.query({
+        ...accountQueryOptions(),
+        staleTime: 'static',
+      })
 
       // Volta para o contexto da rota: toda tela descendente lê o usuário por
       // `useRouteContext()`, sem consulta nova.

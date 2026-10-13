@@ -8,9 +8,10 @@ import { SITE_TITLE } from '#/lib/constant'
 export const Route = createFileRoute('/_public/classificacao/$id')({
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(
-        storefrontBracketQueryOptions(params.id),
-      )
+      return await context.queryClient.query({
+        ...storefrontBracketQueryOptions(params.id),
+        staleTime: 'static',
+      })
     } catch (error) {
       if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {
         throw notFound()

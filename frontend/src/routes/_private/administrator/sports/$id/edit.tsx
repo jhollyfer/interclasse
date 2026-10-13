@@ -7,9 +7,10 @@ export const Route = createFileRoute('/_private/administrator/sports/$id/edit')(
   {
     loader: async ({ context, params }) => {
       try {
-        return await context.queryClient.ensureQueryData(
-          sportQueryOptions(params.id),
-        )
+        return await context.queryClient.query({
+          ...sportQueryOptions(params.id),
+          staleTime: 'static',
+        })
       } catch (error) {
         if (
           error instanceof HTTPError &&

@@ -15,7 +15,7 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { UserUpdateValidator } from '#/validators/administrator/users.validator'
-import type { IUser, Merge  } from '#/lib/interfaces'
+import type { IUser, Merge } from '#/lib/interfaces'
 import type { UserUpdatePayload } from '#/validators/administrator/users.validator'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useUserUpdate } from '#/integrations/tanstack-query/mutations'

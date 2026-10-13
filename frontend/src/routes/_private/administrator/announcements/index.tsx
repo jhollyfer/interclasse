@@ -11,5 +11,8 @@ export const Route = createFileRoute('/_private/administrator/announcements/')({
   pendingComponent: () => <TableSkeleton />,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(announcementsQueryOptions(deps)),
+    context.queryClient.query({
+      ...announcementsQueryOptions(deps),
+      staleTime: 'static',
+    }),
 })

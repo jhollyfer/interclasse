@@ -14,7 +14,10 @@ export const Route = createFileRoute('/authentication')({
   validateSearch: validateRedirectSearch,
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.ensureQueryData(accountQueryOptions())
+      await context.queryClient.query({
+        ...accountQueryOptions(),
+        staleTime: 'static',
+      })
     } catch {
       // Sem sessão é o caso normal desta área: segue para o formulário.
       return

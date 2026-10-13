@@ -11,5 +11,8 @@ export const Route = createFileRoute('/_private/administrator/brackets/')({
   pendingComponent: () => <TableSkeleton />,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(bracketsQueryOptions(deps)),
+    context.queryClient.query({
+      ...bracketsQueryOptions(deps),
+      staleTime: 'static',
+    }),
 })

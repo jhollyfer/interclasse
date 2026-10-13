@@ -15,12 +15,14 @@ export const Route = createFileRoute('/_private/advisor/$classroomId/')({
   loader: async ({ context, params }) => {
     try {
       await Promise.all([
-        context.queryClient.ensureQueryData(
-          advisorEnrollmentsQueryOptions(params.classroomId),
-        ),
-        context.queryClient.ensureQueryData(
-          studentsQueryOptions(studentsOf(params.classroomId)),
-        ),
+        context.queryClient.query({
+          ...advisorEnrollmentsQueryOptions(params.classroomId),
+          staleTime: 'static',
+        }),
+        context.queryClient.query({
+          ...studentsQueryOptions(studentsOf(params.classroomId)),
+          staleTime: 'static',
+        }),
       ])
     } catch (error) {
       // Turma alheia também é 404: o servidor não confirma que ela existe.

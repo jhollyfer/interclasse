@@ -69,7 +69,7 @@ function Trail(): React.JSX.Element {
  * O menu da conta: quem está logado, o caminho para a própria conta e a saída.
  *
  * O nome e o avatar vêm do **contexto da rota**, que o `beforeLoad` de
- * `_private/layout.tsx` encheu com `ensureQueryData`. Aqui não sai requisição
+ * `_private/layout.tsx` encheu com `queryClient.query()`. Aqui não sai requisição
  * nova, e o cabeçalho nunca renderiza um instante sem nome.
  */
 function AccountMenu(): React.JSX.Element {

@@ -10,9 +10,10 @@ import { userQueryOptions } from '#/integrations/tanstack-query/queries'
 export const Route = createFileRoute('/_private/administrator/users/$id/edit')({
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(
-        userQueryOptions(params.id),
-      )
+      return await context.queryClient.query({
+        ...userQueryOptions(params.id),
+        staleTime: 'static',
+      })
     } catch (error) {
       // Só o 404 vira "não encontrado" na rota; rede fora, 403 e 500 sobem.
       if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {

@@ -11,5 +11,8 @@ export const Route = createFileRoute('/_private/administrator/classrooms/')({
   pendingComponent: () => <TableSkeleton />,
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(classroomsQueryOptions(deps)),
+    context.queryClient.query({
+      ...classroomsQueryOptions(deps),
+      staleTime: 'static',
+    }),
 })
