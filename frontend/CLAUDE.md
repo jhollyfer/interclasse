@@ -1,56 +1,44 @@
 # Frontend
 
-TanStack Start + Router + Query + Table, React Hook Form + VineJS, shadcn sobre
-Base UI, Tailwind v4. A régua é `_padroes/frontend.md` (e `tooling.md`,
-`typescript.md`); aqui fica só o que este projeto faz diferente dela, ou que ela
-não cobre.
+A régua é `_padroes/frontend.md` (com `typescript.md`, `solid.md` e `tooling.md`).
+Aqui fica só o que este projeto faz diferente dela, e os comandos.
 
 ## Comandos
 
-- `pnpm dev` sobe em `http://localhost:3001` (porta deslocada, ver o
-  `CLAUDE.md` da raiz).
+- `pnpm dev` sobe em `http://localhost:3001` (porta deslocada, ver o `CLAUDE.md`
+  da raiz).
 - Portões, na ordem do CI: `pnpm lint`, `pnpm typecheck`, `pnpm test`,
-  `pnpm build` e, depois do build, `pnpm check-cycles` (procura leitura
-  antecipada em ciclo entre os chunks de `.output/server`).
+  `pnpm build` e, depois do build, `pnpm check-cycles`.
 - `pnpm format` reescreve com Prettier e `eslint --fix`.
+- `routeTree.gen.ts` é regerado pelo plugin do Router (`pnpm dev` ou
+  `pnpm build`), nunca à mão.
 
 ## O que foge da régua
 
-- **TypeScript 7 com o 6 ao lado.** O `typescript-eslint` recusa a API do 7 na
-  carga, então o nome `typescript` no `package.json` aponta para
-  `@typescript/typescript6` (é o que o lint enxerga) e o `tsc` do
-  `pnpm typecheck` vem do alias `typescript7`. Quando o `typescript-eslint`
-  aceitar o 7, os dois voltam a ser um pacote só.
-- **`vitest.config.ts` próprio.** Os plugins do Start e do Nitro do
-  `vite.config.ts` carregavam o React CJS no module runner do Vitest. O glob
-  pega `src/**/*.test.ts` e também `scripts/**/*.test.ts`, onde mora o teste do
-  `check-chunk-cycles`.
-- **Entidades em `lib/validator.ts`.** `User`, `Classroom`, `Match` e as demais
-  formas que a API devolve moram ao lado do `vine` configurado, e o envelope de
-  resposta (paginação, contadores) em `integrations/response.ts`. Os validators
-  de recurso estão em `src/validators/`, como manda a régua.
-- **Data é texto no validator.** O backend declara `vine.date()`; aqui agenda e
-  datas ficam `vine.string()` com teto, porque o `Infer` viraria `Date` e o
-  corpo sairia em ISO completo, que o servidor recusa. Está explicado em
-  `lib/validator.ts` e `validators/administrator/matches.validator.ts`.
-- **`request` e `send`.** Em `integrations/tanstack-query/http.ts`, `request<T>`
-  lê o corpo e `send` serve as rotas que respondem 204 (sign-in, sign-out,
-  exclusão, arquivamento). 204 num `request` é `HTTPError`, não `undefined`.
-- **`useResourceForm` exige `payload`.** Cadastro cujo formulário é o corpo
-  passa `(values) => values`: é a identidade que faz o compilador conferir os
-  dois tipos.
-- **Teste aceita `as`.** `consistent-type-assertions` fica desligado em
-  `*.test.ts`: dublê de `useMutation` é parcial por definição. O `no-ternary`
-  vale nos testes também.
-
-## Kit comum (`components/common/`)
-
-- Sobe para cá o que **mais de uma rota** alcança, contando rota e não pasta:
-  `administrator` são seis rotas, então `row-actions/` e `option-combobox.tsx`
-  são kit.
-- Compound só onde há estado compartilhado. A instância do TanStack Table não
-  entra em contexto (o `React.Context` perde o genérico e cobraria um `as`): vai
-  por prop, e o porquê está em `table/table-context.ts`.
-- Composição pela prop `render` do Base UI, nunca `asChild`. Ícones do Phosphor.
-- Dentro de `Dialog`, `select` nativo e não `option-combobox`: o popup do
+- **TypeScript 7 com o 6 ao lado.** O `typescript-eslint` (8.71) aceita só TS
+  `<6.1`: o nome `typescript` aponta para `@typescript/typescript6` (o que o
+  lint carrega) e o `tsc` do `pnpm typecheck` vem do alias `typescript7`. Voltam
+  a ser um pacote só quando o `typescript-eslint` aceitar o 7.
+- **`vitest.config.ts` próprio.** Os plugins do Start e do Nitro carregavam o
+  React CJS no runner do Vitest. O glob inclui `scripts/**/*.test.ts`.
+- **`authentication/` continua com path**, e não `_authentication/` pathless:
+  sem o segmento, o login cairia em `/`, a home pública.
+- **Data é texto no validator.** O backend declara `vine.date()`; aqui é
+  `vine.string()` com teto, senão o `Infer` vira `Date` e o corpo sai em ISO
+  completo, que o servidor recusa (`lib/validator.ts`, `wireDate`).
+- **`request<T>` tem um `as` de fronteira** (`integrations/tanstack-query/http.ts`):
+  o corpo de sucesso não tem schema no cliente. O corpo de erro é estreitado.
+- **`lib/upload-resume.ts` estreita o `localStorage` com type guard**, não com
+  VineJS: a API de retomada é síncrona e o `validate` do VineJS não é.
+- **ESLint**: o `no-restricted-syntax` de `new *Controller` ignora o
+  `AbortController` (API da plataforma); `import-x/order` não roda em
+  `components/ui/**` (saída do shadcn).
+- **`pnpm-workspace.yaml` só com `allowBuilds`**: é onde o pnpm 12 lê a
+  aprovação de build de dependência, mesmo sem workspace.
+- **Kit comum sem `rich-editor/` e `multi-file-upload/`**: nenhuma tela do
+  domínio tem texto rico nem envio de vários arquivos.
+- **Tabela sem contexto para a instância**: o `React.Context` perde o genérico
+  do TanStack Table e cobraria um `as`, então ela vai por prop
+  (`components/common/table/table-context.ts`).
+- **Dentro de `Dialog`, `select` nativo** e não `option-combobox`: o popup do
   combobox abre atrás do overlay.
