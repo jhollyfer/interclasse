@@ -17,7 +17,7 @@ import type { Merge } from '#/lib/interfaces'
 
 import { useCloseRowActions } from './row-actions'
 
-type RowActionsItemProps = {
+type RowActionsItemProps = Readonly<{
   /** A mutation da linha, já com o id: `() => archive.mutate(row.id)`. */
   onConfirm: () => void
   /**
@@ -28,17 +28,19 @@ type RowActionsItemProps = {
    * obrigaria a genérica em todas.
    */
   children: React.ReactNode
-}
+}>
 
-type MenuConfirmProps = Merge<
-  RowActionsItemProps,
-  {
-    slot: string
-    icon: React.ReactNode
-    label: string
-    confirmLabel: string
-    destructive?: boolean
-  }
+type MenuConfirmProps = Readonly<
+  Merge<
+    RowActionsItemProps,
+    {
+      slot: string
+      icon: React.ReactNode
+      label: string
+      confirmLabel: string
+      destructive?: boolean
+    }
+  >
 >
 
 /**
@@ -124,12 +126,14 @@ export function RowActionsUnarchive(
   )
 }
 
-type RowActionsDeleteProps = Merge<
-  RowActionsItemProps,
-  {
-    /** O texto do item. "Excluir" por padrão. */
-    label?: string
-  }
+type RowActionsDeleteProps = Readonly<
+  Merge<
+    RowActionsItemProps,
+    {
+      /** O texto do item. "Excluir" por padrão. */
+      label?: string
+    }
+  >
 >
 
 /**

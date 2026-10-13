@@ -6,14 +6,16 @@ import type { Merge } from '#/lib/interfaces'
 
 import { useImageFieldContext } from './image-field-context'
 
-type ImageFieldPreviewProps = Merge<
-  React.ComponentProps<typeof Avatar>,
-  {
-    /** O texto alternativo da imagem. Acessibilidade, não markup - segue prop. */
-    alt: string
-    /** A sigla que aparece enquanto não há imagem. */
-    children: React.ReactNode
-  }
+type ImageFieldPreviewProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof Avatar>,
+    {
+      /** O texto alternativo da imagem. Acessibilidade, não markup - segue prop. */
+      alt: string
+      /** A sigla que aparece enquanto não há imagem. */
+      children: React.ReactNode
+    }
+  >
 >
 
 /** O quadrado com a imagem atual, ou a sigla enquanto não há nenhuma. */

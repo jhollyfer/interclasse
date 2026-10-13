@@ -51,8 +51,8 @@ export function planParts(size: number, partSize: number): Array<PartPlan> {
  * diante - nunca a primeira.
  */
 export function missingParts(
-  plan: Array<PartPlan>,
-  uploaded: Array<number>,
+  plan: ReadonlyArray<PartPlan>,
+  uploaded: ReadonlyArray<number>,
 ): Array<PartPlan> {
   const received = new Set(uploaded)
 

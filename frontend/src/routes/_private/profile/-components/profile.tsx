@@ -121,11 +121,11 @@ export function Profile(): React.JSX.Element {
   )
 }
 
-type DetailProps = {
+type DetailProps = Readonly<{
   icon: React.ReactNode
   label: string
   children: React.ReactNode
-}
+}>
 
 function Detail({ icon, label, children }: DetailProps): React.JSX.Element {
   return (

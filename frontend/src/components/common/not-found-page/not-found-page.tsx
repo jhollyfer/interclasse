@@ -7,16 +7,18 @@ import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
 import type { Merge } from '#/lib/interfaces'
 
-type NotFoundPageProps = Merge<
-  React.ComponentProps<'div'>,
-  {
-    /**
-     * O número gigante do painel escuro. `404` por padrão porque é para isso
-     * que a página nasceu; a fronteira de erro do router passa `500`, e sem
-     * este parâmetro ela anunciaria "404" para uma falha de servidor.
-     */
-    code?: React.ReactNode
-  }
+type NotFoundPageProps = Readonly<
+  Merge<
+    React.ComponentProps<'div'>,
+    {
+      /**
+       * O número gigante do painel escuro. `404` por padrão porque é para isso
+       * que a página nasceu; a fronteira de erro do router passa `500`, e sem
+       * este parâmetro ela anunciaria "404" para uma falha de servidor.
+       */
+      code?: React.ReactNode
+    }
+  >
 >
 
 /**
@@ -151,10 +153,10 @@ export function NotFoundPageActions({
 export function NotFoundPageHomeButton({
   to = '/',
   children = 'Voltar ao início',
-}: {
+}: Readonly<{
   to?: string
   children?: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <Button
       data-slot="not-found-page-home-button"

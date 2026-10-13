@@ -64,9 +64,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootDocument({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     // `suppressHydrationWarning` só aqui, e é obrigatório: o `next-themes`
     // escreve `class="dark"` no `<html>` por um script que roda antes da

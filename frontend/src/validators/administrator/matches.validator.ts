@@ -18,5 +18,5 @@ export const MatchScoreValidator = vine.create({
   winnerTeamId: vine.string().uuid().optional(),
 })
 
-export type MatchUpdatePayload = Infer<typeof MatchUpdateValidator>
-export type MatchScorePayload = Infer<typeof MatchScoreValidator>
+export type MatchUpdatePayload = Readonly<Infer<typeof MatchUpdateValidator>>
+export type MatchScorePayload = Readonly<Infer<typeof MatchScoreValidator>>

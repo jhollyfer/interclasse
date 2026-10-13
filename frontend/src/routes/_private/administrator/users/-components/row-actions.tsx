@@ -29,7 +29,7 @@ import type { IUser } from '#/lib/interfaces'
 
 import { CopyIdMenuItem } from './copy-id-menu-item'
 
-type UserRowActionsProps = {
+type UserRowActionsProps = Readonly<{
   user: IUser
   /** Só administrador apaga de vez. Vem da rota, que tem a conta em contexto. */
   canDelete: boolean
@@ -42,7 +42,7 @@ type UserRowActionsProps = {
    * as duas ações para não prometer o que a API nega.
    */
   isSelf: boolean
-}
+}>
 
 /**
  * O menu da linha: ver, editar, arquivar, restaurar e apagar.

@@ -11,7 +11,9 @@ import {
 import type { Input } from '#/components/ui/input'
 import { cn } from '#/lib/utils'
 
-type PasswordInputProps = Omit<React.ComponentProps<typeof Input>, 'type'>
+type PasswordInputProps = Readonly<
+  Omit<React.ComponentProps<typeof Input>, 'type'>
+>
 
 /**
  * O campo de senha, com o olho que revela o que foi digitado.

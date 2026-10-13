@@ -22,9 +22,9 @@ const UploadingContext = React.createContext<UploadingContextValue | null>(null)
  */
 export function UploadingProvider({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const [uploads, setUploads] = React.useState<Set<string>>(new Set())
 
   const register = React.useCallback((key: string) => {

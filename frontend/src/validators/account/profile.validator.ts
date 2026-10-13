@@ -45,4 +45,6 @@ export const ProfileUpdateValidator = vine.create({
   avatarId: vine.string().uuid().nullable().optional(),
 })
 
-export type ProfileUpdatePayload = Infer<typeof ProfileUpdateValidator>
+export type ProfileUpdatePayload = Readonly<
+  Infer<typeof ProfileUpdateValidator>
+>

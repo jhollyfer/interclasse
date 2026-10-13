@@ -13,7 +13,7 @@ import type { StorageMimetype } from '#/lib/entity'
 
 import { ImageFieldProvider } from './image-field-context'
 
-type ImageFieldProps = {
+type ImageFieldProps = Readonly<{
   /** O `id` do anexo atual, ou `null`. É o que vai no payload. */
   value: string | null
   onValueChange: (storageId: string | null) => void
@@ -26,7 +26,7 @@ type ImageFieldProps = {
   accept?: ReadonlyArray<StorageMimetype>
   id?: string
   children: React.ReactNode
-}
+}>
 
 /**
  * O campo de **um** arquivo: o avatar do usuário, a foto do depoimento e o

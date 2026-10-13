@@ -15,9 +15,9 @@ import { Pagination } from './table-pagination-nav'
  */
 export function TablePagination({
   meta,
-}: {
+}: Readonly<{
   meta: IPaginationMeta | undefined
-}): React.JSX.Element | null {
+}>): React.JSX.Element | null {
   const { to, search } = useTableContext('TablePagination')
 
   if (!meta) return null

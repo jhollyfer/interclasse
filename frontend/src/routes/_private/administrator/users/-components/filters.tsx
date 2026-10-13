@@ -21,9 +21,9 @@ import type { UserListSearch } from '#/integrations/tanstack-query/queries'
  */
 export function UserFilters({
   search,
-}: {
+}: Readonly<{
   search: UserListSearch
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const navigate = useNavigate()
 
   return (

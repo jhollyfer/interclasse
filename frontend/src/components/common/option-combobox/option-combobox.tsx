@@ -18,7 +18,7 @@ export type OptionComboboxItem = {
   dot?: string
 }
 
-type OptionComboboxProps = {
+type OptionComboboxProps = Readonly<{
   options: ReadonlyArray<OptionComboboxItem>
   /** O valor escolhido. `''` é "nada escolhido", como no resto dos formulários. */
   value: string | null | undefined
@@ -35,7 +35,7 @@ type OptionComboboxProps = {
   'aria-invalid'?: boolean
   'aria-label'?: string
   className?: string
-}
+}>
 
 /**
  * O campo de escolher um valor de uma lista fechada.

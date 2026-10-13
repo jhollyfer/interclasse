@@ -34,11 +34,11 @@ import type { TableFeatures, TableInstance } from './use-table'
 // `TableHeader`, `TableBody`) são os do compound desta pasta, e é o compound
 // que os consumidores importam.
 
-type TableGridProps<TRow extends RowData> = {
+type TableGridProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
   /** Abre o registro ao clicar na linha. */
   onRowClick?: (row: TRow) => void
-}
+}>
 
 /**
  * A posição de uma coluna fixada, em propriedades **lógicas**.

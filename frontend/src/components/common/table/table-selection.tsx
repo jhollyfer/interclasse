@@ -59,13 +59,13 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
   }
 }
 
-type TableSelectionBarProps<TRow extends RowData> = {
+type TableSelectionBarProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
   /** O nome do recurso no singular e no plural: `['tabela', 'tabelas']`. */
   noun: [string, string]
   /** Os botões de ação. Recebem as linhas selecionadas. */
-  children: (rows: Array<TRow>) => React.ReactNode
-}
+  children: (rows: ReadonlyArray<TRow>) => React.ReactNode
+}>
 
 /**
  * A barra que aparece quando há linhas selecionadas.

@@ -19,9 +19,9 @@ import {
  */
 export function NotFoundPageServerError({
   onRetry,
-}: {
+}: Readonly<{
   readonly onRetry: () => void
-}): React.JSX.Element {
+}>): React.JSX.Element {
   return (
     <NotFoundPage code="500">
       <NotFoundPageTitle>Algo quebrou aqui</NotFoundPageTitle>

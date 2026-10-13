@@ -17,9 +17,9 @@ import type { TableFeatures } from './use-table'
  */
 export function TableResizeHandle<TRow extends RowData>({
   header,
-}: {
+}: Readonly<{
   header: Header<TableFeatures, TRow, unknown>
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const isResizing = header.column.getIsResizing()
 
   return (

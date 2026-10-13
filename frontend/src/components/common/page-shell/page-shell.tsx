@@ -24,9 +24,8 @@ import type { Merge } from '#/lib/interfaces'
  * Compound e não uma prop `header`/`footer`: os slots aceitam qualquer coisa, e
  * a ordem no JSX é a ordem na tela.
  */
-type PageShellProps = Merge<
-  React.ComponentProps<'div'>,
-  { children: React.ReactNode }
+type PageShellProps = Readonly<
+  Merge<React.ComponentProps<'div'>, { children: React.ReactNode }>
 >
 
 export function PageShell({
@@ -59,9 +58,8 @@ export function PageShell({
 
 // A linha divisória é sempre desenhada: quem não a quer passa `border-b-0`
 // em `className`, e o `cn` resolve o conflito - estrutura não vira prop.
-type PageShellHeaderProps = Merge<
-  React.ComponentProps<'div'>,
-  { readonly children: React.ReactNode }
+type PageShellHeaderProps = Readonly<
+  Merge<React.ComponentProps<'div'>, { readonly children: React.ReactNode }>
 >
 
 export function PageShellHeader({
@@ -120,9 +118,8 @@ export function PageShellContent({
   )
 }
 
-type PageShellFooterProps = Merge<
-  React.ComponentProps<'div'>,
-  { children?: React.ReactNode }
+type PageShellFooterProps = Readonly<
+  Merge<React.ComponentProps<'div'>, { children?: React.ReactNode }>
 >
 
 export function PageShellFooter({
@@ -174,7 +171,7 @@ export function PageHeader({
   )
 }
 
-type PageHeaderBackProps = {
+type PageHeaderBackProps = Readonly<{
   /**
    * Para onde o botão de voltar aponta.
    *
@@ -187,7 +184,7 @@ type PageHeaderBackProps = {
   params?: LinkProps['params']
   /** A parte de outro compound que é esta seta (`form-shell-back`). */
   'data-slot'?: `${string}-back`
-}
+}>
 
 /** A seta de voltar. A tela que não veio de lugar nenhum simplesmente não a escreve. */
 export function PageHeaderBack({

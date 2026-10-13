@@ -7,9 +7,8 @@ import type { Merge } from '#/lib/interfaces'
 
 import { useFormShellContext } from './form-shell-context'
 
-type FormShellContentProps = Merge<
-  React.ComponentProps<'form'>,
-  { children: React.ReactNode }
+type FormShellContentProps = Readonly<
+  Merge<React.ComponentProps<'form'>, { children: React.ReactNode }>
 >
 
 /**
@@ -47,9 +46,8 @@ export function FormShellContent({
   )
 }
 
-type FormShellCardProps = Merge<
-  React.ComponentProps<typeof CardContent>,
-  { children: React.ReactNode }
+type FormShellCardProps = Readonly<
+  Merge<React.ComponentProps<typeof CardContent>, { children: React.ReactNode }>
 >
 
 /**

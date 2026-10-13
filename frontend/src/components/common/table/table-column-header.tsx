@@ -24,7 +24,7 @@ import type { SortDirection } from '#/lib/entity'
 import type { TableFeatures } from './use-table'
 import { useTableContext } from './table-context'
 
-type TableColumnHeaderProps<TRow extends RowData> = {
+type TableColumnHeaderProps<TRow extends RowData> = Readonly<{
   /** O rótulo da coluna. */
   children: React.ReactNode
   /**
@@ -33,7 +33,7 @@ type TableColumnHeaderProps<TRow extends RowData> = {
    */
   sortKey?: string
   column?: Column<TableFeatures, TRow, unknown>
-}
+}>
 
 /**
  * O cabeçalho de uma coluna: título, ordenação e fixação.

@@ -20,7 +20,7 @@ export const FileCreateValidator = vine.create({
   size: vine.number().min(1).withoutDecimals(),
 })
 
-export type FileCreatePayload = Infer<typeof FileCreateValidator>
+export type FileCreatePayload = Readonly<Infer<typeof FileCreateValidator>>
 
 /**
  * O que `POST /storages/:id/complete` recebe: o `ETag` de cada parte enviada.
@@ -39,7 +39,7 @@ export const FileCompleteValidator = vine.create({
     .optional(),
 })
 
-export type FileCompletePayload = Infer<typeof FileCompleteValidator>
+export type FileCompletePayload = Readonly<Infer<typeof FileCompleteValidator>>
 
 /**
  * Por quais colunas a biblioteca de arquivos pode ser ordenada.
@@ -71,4 +71,4 @@ export const FilePaginateValidator = vine.create({
   ...sortFields(STORAGE_SORT_COLUMNS),
 })
 
-export type FilePaginatePayload = Infer<typeof FilePaginateValidator>
+export type FilePaginatePayload = Readonly<Infer<typeof FilePaginateValidator>>

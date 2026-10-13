@@ -29,9 +29,9 @@ import { useTableContext } from './table-context'
  */
 export function TableContent({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const { isError, onRetry } = useTableContext('TableContent')
 
   if (isError) {

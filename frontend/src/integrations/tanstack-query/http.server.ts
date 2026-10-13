@@ -105,7 +105,7 @@ export function applySetCookie(
  */
 export function mergeCookieHeader(
   cookie: string | undefined,
-  setCookies: Array<string>,
+  setCookies: ReadonlyArray<string>,
 ): string {
   const pairs = new Map<string, string>()
 

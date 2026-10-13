@@ -5,4 +5,6 @@ export const EnrollmentUpdateValidator = vine.create({
   ...athleteListFields(),
 })
 
-export type EnrollmentUpdatePayload = Infer<typeof EnrollmentUpdateValidator>
+export type EnrollmentUpdatePayload = Readonly<
+  Infer<typeof EnrollmentUpdateValidator>
+>

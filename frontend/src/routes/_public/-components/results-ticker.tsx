@@ -14,9 +14,9 @@ import { phaseLabel } from './match-row'
  */
 export function ResultsTicker({
   matches,
-}: {
+}: Readonly<{
   matches: ReadonlyArray<IMatch>
-}): React.JSX.Element | null {
+}>): React.JSX.Element | null {
   if (matches.length === 0) return null
 
   const items = matches.map((match) => (

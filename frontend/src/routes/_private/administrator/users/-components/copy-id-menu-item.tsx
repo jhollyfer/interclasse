@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 
-type CopyIdMenuItemProps = {
+type CopyIdMenuItemProps = Readonly<{
   id: string
-}
+}>
 
 /**
  * "Copiar ID" no menu de uma linha.

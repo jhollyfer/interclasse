@@ -54,11 +54,11 @@ function useTableEmptyContext(consumer: string): TableEmptyContextValue {
   return context
 }
 
-type TableEmptyProps<TRow extends RowData> = {
+type TableEmptyProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
   /** O texto e a ação do vazio de verdade - o filtro e a lixeira têm os seus. */
   children?: React.ReactNode
-}
+}>
 
 /**
  * O que aparece no lugar da tabela quando não há linha nenhuma.

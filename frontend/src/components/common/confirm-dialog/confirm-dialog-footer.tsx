@@ -52,9 +52,8 @@ export function ConfirmDialogCancel({
   )
 }
 
-type ConfirmDialogConfirmProps = Merge<
-  React.ComponentProps<typeof Button>,
-  { children: React.ReactNode }
+type ConfirmDialogConfirmProps = Readonly<
+  Merge<React.ComponentProps<typeof Button>, { children: React.ReactNode }>
 >
 
 /**
