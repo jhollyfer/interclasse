@@ -149,18 +149,6 @@ test.group('documentação > o documento descreve o roteador', () => {
 test.group('documentação > as rotas de serviço', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a raiz responde ok, e não redireciona mais para a documentação', async ({
-    client,
-    assert,
-  }) => {
-    // Redirecionava para `/documentation`, que hoje é gateada: mandar todo
-    // mundo para uma rota que responde 404 é pior que responder aqui.
-    const response = await client.get('/').redirects(0)
-
-    response.assertStatus(200)
-    assert.deepEqual(response.body(), { status: 'ok' })
-  })
-
   test('a sonda responde ok e não conta nada da infraestrutura', async ({ client, assert }) => {
     const response = await client.get('/health-check')
 
@@ -204,17 +192,15 @@ test.group('documentação > as rotas de serviço', (group) => {
   test('nenhuma delas aparece no documento', async ({ assert }) => {
     const { paths } = await lerDocumento()
 
-    for (const caminho of ['/', '/health-check', '/openapi.json', '/documentation']) {
+    for (const caminho of ['/health-check', '/openapi.json', '/documentation']) {
       assert.isUndefined(paths[caminho], `${caminho} está documentado, e não é operação de API`)
     }
   })
 
-  test('a raiz e a sonda não exigem sessão', async ({ client, assert }) => {
-    for (const caminho of ['/', '/health-check']) {
-      const response = await client.get(caminho).redirects(0)
+  test('a sonda não exige sessão', async ({ client }) => {
+    const response = await client.get('/health-check').redirects(0)
 
-      assert.equal(response.status(), 200, `${caminho} exigiu sessão`)
-    }
+    response.assertStatus(200)
   })
 
   test('a referência não responde 401 nem 403 sem sessão', async ({ client, assert }) => {

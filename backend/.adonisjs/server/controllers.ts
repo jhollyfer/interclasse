@@ -160,6 +160,18 @@ export const controllers = {
       },
     },
   },
+  documentation: {
+    openapi: {
+      show: {
+        Show: () => import('#features/documentation/openapi/show/show.controller'),
+      },
+    },
+    reference: {
+      show: {
+        Show: () => import('#features/documentation/reference/show/show.controller'),
+      },
+    },
+  },
   HealthCheck: () => import('#features/health-check.controller'),
   representative: {
     enrollments: {
