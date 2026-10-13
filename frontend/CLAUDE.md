@@ -21,9 +21,6 @@ não cobre.
   `@typescript/typescript6` (é o que o lint enxerga) e o `tsc` do
   `pnpm typecheck` vem do alias `typescript7`. Quando o `typescript-eslint`
   aceitar o 7, os dois voltam a ser um pacote só.
-- **pnpm 11.21.0, não o mais novo.** O 12 instala e roda, mas os workflows fixam
-  `version: 11.21.0` no `pnpm/action-setup`, que reprova divergência com o
-  `packageManager`. Sobem juntos, num commit que mexa nos dois.
 - **`vitest.config.ts` próprio.** Os plugins do Start e do Nitro do
   `vite.config.ts` carregavam o React CJS no module runner do Vitest. O glob
   pega `src/**/*.test.ts` e também `scripts/**/*.test.ts`, onde mora o teste do

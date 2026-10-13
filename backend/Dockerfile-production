@@ -10,7 +10,7 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@11.21.0 --activate
+RUN corepack enable && corepack prepare pnpm@12.11.2 --activate
 
 # `pnpm-workspace.yaml` entra junto do manifesto: é ele que carrega o
 # `allowBuilds`, e sem ele o install decide sozinho o que compila - ou recusa o
