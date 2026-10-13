@@ -47,6 +47,12 @@ function isValidator<T>(value: T): value is T & Introspectable {
 }
 
 /** Todo caminho de campo do schema, incluindo os aninhados (`address.cep`). */
+/** Caminho do campo filho: `name` na raiz, `prefix.name` abaixo dela. */
+function join(prefix: string, name: string): string {
+  if (!prefix) return name
+  return `${prefix}.${name}`
+}
+
 function walk(schema: unknown, prefix = ''): Array<string> {
   const paths: Array<string> = []
 
@@ -58,7 +64,7 @@ function walk(schema: unknown, prefix = ''): Array<string> {
     if (typeof properties !== 'object' || properties === null) continue
 
     for (const [name, child] of Object.entries(properties)) {
-      const path = prefix ? `${prefix}.${name}` : name
+      const path = join(prefix, name)
 
       paths.push(path)
       paths.push(...walk(child, path))
@@ -81,7 +87,7 @@ function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {
     if (typeof properties !== 'object' || properties === null) continue
 
     for (const [name, child] of Object.entries(properties)) {
-      const path = prefix ? `${prefix}.${name}` : name
+      const path = join(prefix, name)
 
       if (branch(child, 'type').includes('string')) found.push([path, child])
 
