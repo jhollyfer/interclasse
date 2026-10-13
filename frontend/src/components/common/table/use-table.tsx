@@ -1,3 +1,4 @@
+import { createIsomorphicFn } from '@tanstack/react-start'
 import * as React from 'react'
 import {
   columnOrderingFeature,
@@ -19,6 +20,8 @@ import type {
   ColumnVisibilityState,
 } from '@tanstack/react-table'
 
+import { TableLayoutValidator } from './table-layout.validator'
+import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
 
 /**
@@ -51,12 +54,16 @@ export type TableColumns<TRow extends RowData> = Array<
 >
 
 /** O que persiste entre sessões. Seleção não entra: ela morre com a página. */
-type PersistedLayout = {
-  columnVisibility?: ColumnVisibilityState
-  columnOrder?: ColumnOrderState
-  columnSizing?: ColumnSizingState
-  columnPinning?: ColumnPinningState
-}
+type PersistedLayout = TableLayoutPayload
+
+/**
+ * O `localStorage`, que só existe no navegador. `createIsomorphicFn` e não
+ * `typeof window` solto: o primeiro render acontece no servidor, e lá a
+ * resposta é "não há onde ler".
+ */
+const layoutStorage = createIsomorphicFn()
+  .client((): Storage | null => window.localStorage)
+  .server((): Storage | null => null)
 
 /**
  * `v2` porque o layout salvo é durável e o que já está gravado está errado.
@@ -83,39 +90,45 @@ const MIN_COLUMN_SIZE = 40
 const MAX_COLUMN_SIZE = 640
 
 /**
- * Lê o layout salvo, saneado. Devolve vazio em qualquer falha - JSON corrompido
- * no `localStorage` não pode derrubar a tela, e o custo de errar é a tabela
- * abrir no default.
+ * Lê o layout salvo, validado e saneado. Devolve vazio em qualquer falha - JSON
+ * corrompido ou fora da forma não pode derrubar a tela, e o custo de errar é a
+ * tabela abrir no default.
  *
  * O saneamento existe porque este dado sobrevive a deploy: uma preferência
- * gravada num dia ruim continua valendo meses depois, e a tela não tem como
- * saber que o que está lendo é lixo. Duas regras bastam para o que já mordeu:
- * âncora não fica invisível, e largura fica dentro de um intervalo plausível.
+ * gravada num dia ruim continua valendo meses depois. Duas regras bastam para o
+ * que já mordeu: âncora não fica invisível, e largura fica dentro de um
+ * intervalo plausível.
  */
-function readLayout(key: string | undefined): PersistedLayout {
+async function readLayout(key: string | undefined): Promise<PersistedLayout> {
   if (!key) return {}
-  // No servidor não há `localStorage`, e o primeiro render acontece lá.
-  if (typeof window === 'undefined') return {}
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_PREFIX.concat(key))
+    const raw = layoutStorage()?.getItem(STORAGE_PREFIX.concat(key))
     if (!raw) return {}
 
-    const saved: PersistedLayout = JSON.parse(raw)
+    const parsed: unknown = JSON.parse(raw)
+    const [error, saved] = await TableLayoutValidator.tryValidate(parsed)
+    if (error) return {}
 
-    if (saved.columnVisibility) {
-      for (const id of ANCHOR_COLUMNS) delete saved.columnVisibility[id]
+    let columnVisibility = saved.columnVisibility
+    if (columnVisibility) {
+      columnVisibility = Object.fromEntries(
+        Object.entries(columnVisibility).filter(
+          ([id]) => !ANCHOR_COLUMNS.includes(id),
+        ),
+      )
     }
 
-    if (saved.columnSizing) {
-      for (const [id, size] of Object.entries(saved.columnSizing)) {
-        if (size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE) continue
-
-        delete saved.columnSizing[id]
-      }
+    let columnSizing = saved.columnSizing
+    if (columnSizing) {
+      columnSizing = Object.fromEntries(
+        Object.entries(columnSizing).filter(
+          ([, size]) => size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE,
+        ),
+      )
     }
 
-    return saved
+    return { ...saved, columnVisibility, columnSizing }
   } catch {
     return {}
   }
@@ -123,13 +136,9 @@ function readLayout(key: string | undefined): PersistedLayout {
 
 function writeLayout(key: string | undefined, layout: PersistedLayout): void {
   if (!key) return
-  if (typeof window === 'undefined') return
 
   try {
-    window.localStorage.setItem(
-      STORAGE_PREFIX.concat(key),
-      JSON.stringify(layout),
-    )
+    layoutStorage()?.setItem(STORAGE_PREFIX.concat(key), JSON.stringify(layout))
   } catch {
     // Cota estourada ou modo privativo: o layout não persiste e a tela segue.
   }
@@ -257,14 +266,27 @@ export function useTable<TRow extends RowData>({
   const [hydrated, setHydrated] = React.useState(false)
 
   React.useEffect(() => {
-    const saved = readLayout(persistKey)
+    // A validação é assíncrona; trocar de tabela no meio dela não pode aplicar
+    // o layout da anterior.
+    let current = true
 
-    if (saved.columnVisibility) setColumnVisibility(saved.columnVisibility)
-    if (saved.columnOrder) setColumnOrder(saved.columnOrder)
-    if (saved.columnSizing) setColumnSizing(saved.columnSizing)
-    if (saved.columnPinning) setColumnPinning(saved.columnPinning)
+    async function load(): Promise<void> {
+      const saved = await readLayout(persistKey)
+      if (!current) return
 
-    setHydrated(true)
+      if (saved.columnVisibility) setColumnVisibility(saved.columnVisibility)
+      if (saved.columnOrder) setColumnOrder(saved.columnOrder)
+      if (saved.columnSizing) setColumnSizing(saved.columnSizing)
+      if (saved.columnPinning) setColumnPinning(saved.columnPinning)
+
+      setHydrated(true)
+    }
+
+    void load()
+
+    return () => {
+      current = false
+    }
   }, [persistKey])
 
   React.useEffect(() => {
