@@ -35,7 +35,13 @@ export function FormShellHeader({
 export function FormShellBack(): React.JSX.Element {
   const { backTo, backParams } = useFormShellContext('FormShellBack')
 
-  return <PageHeaderBack to={backTo} params={backParams} />
+  return (
+    <PageHeaderBack
+      data-slot="form-shell-back"
+      to={backTo}
+      params={backParams}
+    />
+  )
 }
 
 export function FormShellTitle(

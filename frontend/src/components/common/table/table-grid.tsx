@@ -130,7 +130,7 @@ export function TableGrid<TRow extends RowData>({
 
   const wide = (
     <div
-      data-slot="table"
+      data-slot="table-grid"
       data-test-id="data-table"
       // Quem rola a lista passou a ser este elemento, e não o
       // `PageShellContent` - então o nome da rolagem tem de vir junto. Sem ele

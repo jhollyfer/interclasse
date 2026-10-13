@@ -23,7 +23,7 @@ export function TablePagination({
   if (!meta) return null
 
   return (
-    <PageShellFooter>
+    <PageShellFooter data-slot="table-pagination">
       <Pagination meta={meta} search={search} to={to} />
     </PageShellFooter>
   )

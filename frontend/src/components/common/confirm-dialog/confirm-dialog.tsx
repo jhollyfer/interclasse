@@ -80,7 +80,7 @@ export function ConfirmDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={change}>
       {trigger && <AlertDialogTrigger render={trigger} />}
-      <AlertDialogContent>
+      <AlertDialogContent data-slot="confirm-dialog">
         <ConfirmDialogProvider value={value}>{children}</ConfirmDialogProvider>
       </AlertDialogContent>
     </AlertDialog>
