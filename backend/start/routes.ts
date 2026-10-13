@@ -7,16 +7,11 @@
 |
 */
 
-import { readFile } from 'node:fs/promises'
-
-import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 
 import { signInAccountThrottle, signInThrottle, uploadThrottle } from '#start/limiter'
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
-import { scalarPage } from '#core/openapi/scalar'
-import openapi from '#config/openapi'
 
 /**
  * As rotas são agrupadas por **papel**, e não por recurso : o que um
@@ -29,49 +24,21 @@ import openapi from '#config/openapi'
  * produção como uma string de caminho quebraria.
  */
 
-/**
- * A raiz não é endpoint: manda para a documentação.
- *
- * Quem digita o domínio da API no navegador está procurando o que ela faz, e um
- * `404` na porta da frente é a resposta menos útil possível para essa pergunta.
- */
-router.get('/', function (context) {
-  // Não redireciona mais para `/documentation`: a referência é gateada, e
-  // mandar todo mundo para uma rota que responde 404 é pior que responder aqui.
-  return context.response.ok({ status: 'ok' })
-})
-
 /** Sonda de vida do container; o porquê está no controller. */
-router.get('/health-check', [controllers.HealthCheck])
+router.get('/health-check', [controllers.HealthCheck]).as('health-check')
 
 /**
- * Documentação da API.
- *
- * As duas rotas ficam fora de qualquer grupo autenticado, e as duas estão em
- * `openapi.ignore` junto com `/` e `/health-check` - o documento não se documenta.
- *
- * O JSON é lido do disco na primeira requisição e mantido em memória: é um
- * artefato gerado por `node ace openapi:generate` e commitado, então em produção
- * ele não muda enquanto o processo vive. Ler por requisição só gastaria I/O.
+ * Documentação da API: o documento e a referência navegável. Fora de qualquer
+ * grupo autenticado, em `openapi.ignore` junto com `/health-check` - o
+ * documento não se documenta -, e atrás de `middleware.documentation()`.
  */
-let specification: string | undefined
-
 router
-  .get('/openapi.json', async function (context) {
-    if (!specification) {
-      specification = await readFile(app.makePath('openapi.json'), 'utf-8')
-    }
-
-    return context.response.header('content-type', 'application/json').send(specification)
-  })
+  .get('/openapi.json', [controllers.documentation.openapi.show.Show])
+  .as('documentation.openapi')
   .use(middleware.documentation())
-
 router
-  .get('/documentation', function (context) {
-    return context.response
-      .header('content-type', 'text/html')
-      .send(scalarPage('/openapi.json', openapi.info.title))
-  })
+  .get('/documentation', [controllers.documentation.reference.show.Show])
+  .as('documentation.reference')
   .use(middleware.documentation())
 
 /**

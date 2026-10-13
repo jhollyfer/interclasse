@@ -1,0 +1,16 @@
+import { inject } from '@adonisjs/core'
+
+import { right, type Either } from '#core/either'
+import { scalarPage } from '#core/openapi/scalar'
+import type HTTPException from '#exceptions/http.exception'
+import openapi from '#config/openapi'
+
+type Response = Either<HTTPException, string>
+
+/** A referência navegável (Scalar) sobre `/openapi.json`. Montar a página não faz I/O. */
+@inject()
+export default class DocumentationReferenceShowUseCase {
+  async execute(): Promise<Response> {
+    return right(scalarPage('/openapi.json', openapi.info.title))
+  }
+}
