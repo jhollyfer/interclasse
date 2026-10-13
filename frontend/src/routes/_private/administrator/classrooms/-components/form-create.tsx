@@ -43,6 +43,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     success: (classroom) => `Turma ${classroom.name} criada.`,
     // Nome repetido é `409 CLASSROOM_ALREADY_EXISTS`: reenviar é seguro.
     retry: 'classroom-create-error',
+    payload: (values) => values,
   })
 
   return (

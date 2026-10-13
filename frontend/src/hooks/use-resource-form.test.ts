@@ -24,9 +24,6 @@ import { HTTPError } from '#/integrations/tanstack-query/http'
  * manda um `PUT` que a API recusa. Nenhuma delas aparece no `typecheck`.
  *
  * É o único teste do repositório que precisa de DOM, por causa do `renderHook`.
- * O `module is not defined` que o React imprime na saída é interop de CJS do
- * React 19 sob jsdom nesta versão do vitest - aparece com ou sem o pragma de
- * ambiente, e não reprova nada.
  */
 
 const navigate = vi.fn()
@@ -91,6 +88,7 @@ function setup(overrides: Record<string, unknown> = {}) {
       invalidate: ['testimonials'],
       backTo: '/administrator/sports',
       success: (created) => `Depoimento de ${created.name} criado.`,
+      payload: (values) => values,
       ...overrides,
     }),
   )

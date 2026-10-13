@@ -21,7 +21,7 @@ import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import type { UseMutationOptions } from '@tanstack/react-query'
 
-import { request } from './http'
+import { request, send } from './http'
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { HTTPError } from './http'
 import type {
@@ -124,7 +124,7 @@ export function useAuthenticationSignIn(
   return useMutation<void, HTTPError, AuthenticationSignInPayload>({
     ...options,
     mutationFn: async function (payload) {
-      await request<void>('/authentication/sign-in', {
+      await send('/authentication/sign-in', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -137,7 +137,7 @@ export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
   return useMutation<void, HTTPError, void>({
     ...options,
     mutationFn: async function () {
-      await request<void>('/authentication/sign-out', { method: 'POST' })
+      await send('/authentication/sign-out', { method: 'POST' })
     },
   })
 }
@@ -208,7 +208,7 @@ export function useStorageDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/storages/'.concat(id), { method: 'DELETE' })
+      return send('/storages/'.concat(id), { method: 'DELETE' })
     },
   })
 }
@@ -263,7 +263,7 @@ export function useUserArchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/users/'.concat(id, '/archive'), {
+      return send('/administrator/users/'.concat(id, '/archive'), {
         method: 'PATCH',
       })
     },
@@ -275,7 +275,7 @@ export function useUserUnarchive(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/users/'.concat(id, '/unarchive'), {
+      return send('/administrator/users/'.concat(id, '/unarchive'), {
         method: 'PATCH',
       })
     },
@@ -290,7 +290,7 @@ export function useUserDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/users/'.concat(id), {
+      return send('/administrator/users/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -345,7 +345,7 @@ export function useClassroomDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/classrooms/'.concat(id), {
+      return send('/administrator/classrooms/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -389,7 +389,7 @@ export function useSportDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/sports/'.concat(id), {
+      return send('/administrator/sports/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -437,7 +437,7 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/announcements/'.concat(id), {
+      return send('/administrator/announcements/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -468,7 +468,7 @@ export function useBracketDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/administrator/brackets/'.concat(id), {
+      return send('/administrator/brackets/'.concat(id), {
         method: 'DELETE',
       })
     },
@@ -562,7 +562,7 @@ export function useStudentDelete(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<void>('/advisor/students/'.concat(id), {
+      return send('/advisor/students/'.concat(id), {
         method: 'DELETE',
       })
     },
