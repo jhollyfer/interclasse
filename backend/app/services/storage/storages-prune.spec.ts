@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
 import type { ApiClient } from '@japa/api-client'
 
 import Storage from '#models/storage'
-import MultipartService, { PART_SIZE } from '#services/multipart/multipart.service'
+import { MultipartContract, PART_SIZE } from '#services/multipart/multipart-contract.service'
 import StoragesPrune from '#commands/storages-prune.command'
 import { type StorageMimetype } from '#core/validator'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
@@ -102,7 +102,7 @@ test.group('storages > prune', (group) => {
 
   test('apaga o PENDING velho e aborta o multipart dele', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const multipart = await app.container.make(MultipartService)
+    const multipart = await app.container.make(MultipartContract)
 
     const opened = await open(client, session, {
       fileName: 'galeria.png',

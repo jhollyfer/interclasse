@@ -5,13 +5,13 @@ import type { ModelObject } from '@adonisjs/lucid/types/model'
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import StorageService from '#services/storage/storage.service'
-import MultipartService, {
-  countParts,
-  pendingParts,
+import { StorageContract } from '#services/storage/storage-contract.service'
+import {
+  MultipartContract,
   PART_SIZE,
   type PresignedPart,
-} from '#services/multipart/multipart.service'
+} from '#services/multipart/multipart-contract.service'
+import { countParts, pendingParts } from '#features/storages/_shared.parts'
 import { UploadStatuses } from '#core/entity'
 import type { FileCreatePayload } from '#features/storages/files/files.validator'
 
@@ -60,8 +60,8 @@ type Response = Either<HTTPException, StorageUpload>
 @inject()
 export default class StoragesFileCreateUseCase {
   constructor(
-    private readonly storage: StorageService,
-    private readonly multipart: MultipartService,
+    private readonly storage: StorageContract,
+    private readonly multipart: MultipartContract,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
