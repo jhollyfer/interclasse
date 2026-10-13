@@ -1,0 +1,25 @@
+# Dependências na última versão publicada (_padroes/tooling.md §0): o Dependabot
+# abre o PR de atualização, e o upgrade é revisado antes do merge - changelog e
+# `.d.ts` novos em major. Backend e frontend são projetos pnpm separados.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+    groups:
+      minor-e-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    groups:
+      minor-e-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
