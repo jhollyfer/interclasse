@@ -1,5 +1,5 @@
 import { inject } from '@adonisjs/core'
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 import StoragesFilePaginateUseCase from './paginate.use-case.ts'
 

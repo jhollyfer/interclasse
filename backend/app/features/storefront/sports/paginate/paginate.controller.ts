@@ -1,5 +1,5 @@
 import { inject } from '@adonisjs/core'
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 import StorefrontSportPaginateUseCase from './paginate.use-case.ts'
 

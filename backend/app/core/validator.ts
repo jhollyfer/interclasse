@@ -187,18 +187,18 @@ export type PaginationPayload = Infer<typeof PaginationValidator>
  * tipo: acrescentar um mimetype na lista sem dizer que extensão ele tem quebra
  * a compilação, em vez de virar arquivo sem extensão no bucket.
  *
- * Áudio e vídeo entram porque o domínio os tem: um podcast guarda o arquivo de
- * áudio, e o `mp3` é o formato que `backend-old` já recebia.
+ * Áudio e vídeo entram porque o domínio os tem; `mp3` é o formato de áudio
+ * mais comum de chegar.
  */
 export const STORAGE_MIMETYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
   'image/gif',
-  // `image/svg+xml` saiu da lista: SVG é HTML, carrega `<script>`, e o bucket é
-  // público - `storage.service.ts` devolve a URL assinada com o `contentType`
-  // gravado, então o navegador o executa na origem do storage. Era XSS
-  // armazenado por upload. O academy já não o aceitava.
+  // `image/svg+xml` fica de fora: SVG é HTML e carrega `<script>`, e
+  // `storage.service.ts` devolve a URL assinada com o `contentType` gravado,
+  // então o navegador o executaria na origem do storage - XSS armazenado por
+  // upload.
   'application/pdf',
   'audio/mpeg',
   'audio/mp4',

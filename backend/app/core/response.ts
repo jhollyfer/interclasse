@@ -287,8 +287,8 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'representative/enrollments': EnrollmentBoardResponse,
 
   /**
-   * O site. Aqui o recurso é o model serializado, e não um recorte como nos
-   * irmãos: nada destas tabelas é privado - nome de turma, placar e aviso são
+   * O site. Aqui o recurso é o model serializado, sem recorte: nada destas
+   * tabelas é privado - nome de turma, placar e aviso são
    * públicos por natureza.
    */
   'storefront/sports': SPORT,

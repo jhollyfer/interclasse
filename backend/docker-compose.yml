@@ -10,10 +10,9 @@ services:
       POSTGRES_PASSWORD: interclasse
       POSTGRES_DB: interclasse
       POSTGRES_USER: interclasse
-    # 5434 no host por default, e não 5432: os backends irmãos
-    # roda nesta mesma máquina e ocupa a porta padrão. Porta própria deixa os
-    # dois projetos convivendo sem ninguém ter de derrubar o container do outro
-    # . Dentro da rede do compose o Postgres segue em 5432.
+    # 5434 no host por default, e não 5432: outros projetos na mesma máquina
+    # ocupam a porta padrão, e porta própria deixa todos convivendo sem derrubar
+    # o container de ninguém. Dentro da rede do compose o Postgres segue em 5432.
     ports:
       - "${DB_PORT:-5434}:5432"
     volumes:

@@ -6,10 +6,10 @@
  * validação de divergirem sem ninguém notar.
  *
  * A forma é sempre a mesma: objeto `as const`, tipo derivado dele, e o array
- * de valores por `Object.values`. `backend-old` usava `enum` do TypeScript, que
- * emite objeto em tempo de execução e não se espalha num `vine.enum()` sem
- * conversão - e, pior, deixa o valor gravado no banco e o literal do código
- * livres para divergirem.
+ * de valores por `Object.values`. `enum` do TypeScript (_padroes/typescript.md §4)
+ * emitiria objeto em tempo de execução, não se espalharia num `vine.enum()` sem
+ * conversão e deixaria o valor gravado no banco e o literal do código livres
+ * para divergirem.
  */
 
 // ---------------------------------------------------------------------------
@@ -59,8 +59,7 @@ export type Merge<A, B> = { [K in keyof (A & B)]: (A & B)[K] }
  * - `REPRESENTATIVE`: o aluno representante. Monta a lista de atletas por
  *   modalidade da própria turma, e nada além disso.
  *
- * Sem `OWNER`: o purge que os irmãos reservam a ele fica com o administrador,
- * como no adacaibs.
+ * Sem `OWNER`: o purge fica com o administrador.
  */
 export const UserRoles = {
   ADMINISTRATOR: 'ADMINISTRATOR',
@@ -81,8 +80,7 @@ export const USER_ROLES = Object.values(UserRoles)
 export const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [UserRoles.ADMINISTRATOR]
 
 /**
- * Se a conta pode entrar. Substitui o `UserStatus` de `backend-old`, com os
- * mesmos dois valores e nome genérico: é o par ativo/inativo, e nada nele é
+ * Se a conta pode entrar. Nome genérico: é o par ativo/inativo, e nada nele é
  * específico de usuário.
  *
  * Chave e valor em caixa alta: o valor do enum é identificador, não texto de

@@ -256,10 +256,10 @@ function resolveTagRule(path: string): TagRule | undefined {
  * substantivo daria frase errada. Elas não dependem do grupo, e por isso são as
  * únicas que respondem mesmo sem `singular` declarado.
  *
- * A tabela é de mecanismo e vale nos três backends. Ação que só existe num deles
- * - ou que precisa de outra frase - vai para `ACTION_OVERRIDES` em
- * `config/openapi.ts`, que é o arquivo do projeto; aqui, um nome de domínio
- * viraria resumo errado no repositório ao lado.
+ * A tabela é de mecanismo e vale em todo projeto. Ação de domínio - ou que
+ * precisa de outra frase - vai para `ACTION_OVERRIDES` em `config/openapi.ts`,
+ * que é o arquivo do projeto; aqui, um nome de domínio viraria resumo errado em
+ * outro projeto.
  */
 const ACTION_SUMMARY: Record<string, (rule: TagRule) => string> = {
   create: (rule) => `Criar ${rule.singular}`,
