@@ -93,12 +93,3 @@ export function getRouter() {
 
   return router
 }
-
-// module augmentation: o TypeScript exige `interface` para declaration
-// merging, e `type` não funciona aqui. É limite da linguagem, não estilo.
-declare module '@tanstack/react-router' {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-  interface Register {
-    router: ReturnType<typeof getRouter>
-  }
-}

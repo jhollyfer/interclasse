@@ -40,7 +40,7 @@ export function getContext() {
           // que `isServerError` cobre, ainda merecem outra chance.
           //
           // O `instanceof` continua aqui mesmo com `Register.defaultError`
-          // declarado em `http.ts`: aquilo é promessa de compilação, e um throw
+          // declarado em `register.d.ts`: aquilo é promessa de compilação, e um throw
           // que não venha de `request` - um bug, um `TypeError` - chega mesmo
           // assim.
           if (error instanceof HTTPError && !error.isServerError) return false

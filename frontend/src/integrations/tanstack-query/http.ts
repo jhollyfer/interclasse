@@ -113,25 +113,6 @@ export class HTTPError extends Error {
 }
 
 /**
- * Todo caminho de falha de `request` lança `HTTPError`, então o default `Error`
- * da biblioteca descreve mal o que chega em `onError` de mutação e em `error` de
- * query. Com isto, o `.status` e o `.errors` ficam visíveis sem `instanceof` em
- * cada tela, e sem repetir o generic em cada chamada.
- *
- * É promessa de compilação, não de runtime: um throw que não venha de `request`
- * - um bug, um `TypeError` - continua chegando aos callbacks. Por isso o `retry`
- * em `query-context.ts` mantém o `instanceof`.
- */
-// module augmentation: o TypeScript exige `interface` para declaration
-// merging, e `type` não funciona aqui. É limite da linguagem, não estilo.
-declare module '@tanstack/react-query' {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-  interface Register {
-    defaultError: HTTPError
-  }
-}
-
-/**
  * A raiz **pública** da API: o endereço que o navegador de quem acessa alcança.
  *
  * Exportada porque nem tudo que aponta para ela passa por `request()`: o `href`
@@ -222,6 +203,36 @@ function deadline(signal?: AbortSignal | null): AbortSignal {
   if (!signal) return timeout
 
   return AbortSignal.any([signal, timeout])
+}
+
+/**
+ * O corpo de erro como chegou, campo a campo: o que não tem o tipo esperado
+ * fica de fora e cai no fallback de `perform`. Proxy e HTML de erro não seguem
+ * o envelope da API, e o `.json()` devolve o que vier.
+ */
+function errorBody(value: unknown): Partial<IHTTPErrorBody> {
+  if (typeof value !== 'object' || value === null) return {}
+
+  const body: Partial<IHTTPErrorBody> = {}
+
+  if ('message' in value && typeof value.message === 'string')
+    body.message = value.message
+  if ('status' in value && typeof value.status === 'number')
+    body.status = value.status
+  if ('code' in value && typeof value.code === 'string') body.code = value.code
+  if (
+    'errors' in value &&
+    typeof value.errors === 'object' &&
+    value.errors !== null
+  ) {
+    body.errors = Object.fromEntries(
+      Object.entries(value.errors).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
+    )
+  }
+
+  return body
 }
 
 /** O que `request` usa internamente e nenhum chamador de fora precisa passar. */
@@ -380,7 +391,7 @@ async function perform(
     let body: Partial<IHTTPErrorBody> | null = null
 
     try {
-      body = await response.json()
+      body = errorBody(await response.json())
     } catch {
       body = null
     }
@@ -428,7 +439,10 @@ export async function request<T>(
     })
   }
 
-  return await response.json()
+  const body: unknown = await response.json()
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (`lib/interfaces.ts` explica por quê), e o `T` é o contrato que cada `queryOptions`/mutation declara.
+  return body as T
 }
 
 /**
