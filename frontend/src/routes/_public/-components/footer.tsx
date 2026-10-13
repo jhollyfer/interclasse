@@ -13,12 +13,12 @@ export function Footer(): React.JSX.Element {
   return (
     <footer
       data-slot="public-footer"
-      className="bg-brand-ink border-accent mt-12 border-t-4 text-white"
+      className="bg-brand-ink border-accent mt-12 border-t-4 text-brand-ink-foreground"
     >
       <div className="container mx-auto flex flex-col gap-6 px-4 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-2">
           <BrandMark />
-          <p className="max-w-sm text-sm text-white/70">
+          <p className="max-w-sm text-sm text-brand-ink-foreground/70">
             Jogos Estudantis do Centro Municipal de Educação Integral Cosme
             Jean.
           </p>
@@ -29,7 +29,7 @@ export function Footer(): React.JSX.Element {
             <Link
               key={item.label}
               to={item.to}
-              className="py-1 text-white/70 hover:text-white"
+              className="py-1 text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
             >
               {item.label}
             </Link>
@@ -40,21 +40,21 @@ export function Footer(): React.JSX.Element {
           href={INSTAGRAM}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-2 py-1 text-sm text-white/70 hover:text-white"
+          className="flex items-center gap-2 py-1 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
         >
           <InstagramLogoIcon className="size-5" />
           @cmei_cosme-jean
         </a>
       </div>
 
-      <div className="border-t border-white/10">
-        <p className="container mx-auto px-4 py-4 text-sm text-white/70">
+      <div className="border-t border-brand-ink-foreground/10">
+        <p className="container mx-auto px-4 py-4 text-sm text-brand-ink-foreground/70">
           Desenvolvido por{' '}
           <a
             href="https://maiyu.com.br"
             target="_blank"
             rel="noreferrer"
-            className="font-semibold text-white underline-offset-4 hover:underline"
+            className="font-semibold text-brand-ink-foreground underline-offset-4 hover:underline"
           >
             Maiyu
           </a>{' '}

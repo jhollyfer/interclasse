@@ -57,27 +57,23 @@ export function PageShell({
   )
 }
 
+// A linha divisória é sempre desenhada: quem não a quer passa `border-b-0`
+// em `className`, e o `cn` resolve o conflito - estrutura não vira prop.
 type PageShellHeaderProps = Merge<
   React.ComponentProps<'div'>,
-  {
-    children: React.ReactNode
-    /** A linha divisória embaixo. Desligue quando o conteúdo já tiver borda. */
-    borderBottom?: boolean
-  }
+  { readonly children: React.ReactNode }
 >
 
 export function PageShellHeader({
   children,
   className,
-  borderBottom = true,
   ...props
 }: PageShellHeaderProps): React.JSX.Element {
   return (
     <div
       data-slot="page-shell-header"
       className={cn(
-        'flex shrink-0 flex-col gap-2 pb-3 sm:flex-row sm:items-center sm:justify-between',
-        borderBottom && 'border-b',
+        'flex shrink-0 flex-col gap-2 border-b pb-3 sm:flex-row sm:items-center sm:justify-between',
         className,
       )}
       {...props}

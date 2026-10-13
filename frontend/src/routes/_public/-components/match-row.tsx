@@ -1,45 +1,15 @@
 import type * as React from 'react'
 
-import { CATEGORY_SHORT_LABELS, MATCH_PHASE_LABELS } from '#/lib/labels'
+import {
+  CATEGORY_SHORT_LABELS,
+  MATCH_PHASE_LABELS,
+  formatDay,
+  formatDayKey,
+  formatTime,
+} from '#/lib/labels'
 import { MATCH_STATUS } from '#/lib/entity'
-import { SCHOOL_TIME_ZONE } from '#/lib/constant'
 import { cn } from '#/lib/utils'
 import type { IMatch } from '#/lib/interfaces'
-
-/*
- * Datas no fuso da escola, nunca no do navegador: o site renderiza no SSR, e a
- * mesma hora em dois fusos diverge na hidratação.
- */
-const TIME = new Intl.DateTimeFormat('pt-BR', {
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: SCHOOL_TIME_ZONE,
-})
-
-const DAY = new Intl.DateTimeFormat('pt-BR', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  timeZone: SCHOOL_TIME_ZONE,
-})
-
-const DAY_KEY = new Intl.DateTimeFormat('en-CA', { timeZone: SCHOOL_TIME_ZONE })
-
-const WHEN = new Intl.DateTimeFormat('pt-BR', {
-  weekday: 'short',
-  day: '2-digit',
-  month: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: SCHOOL_TIME_ZONE,
-})
-
-/** "sex., 16/10, 08:30", ou o aviso de que o horário ainda não saiu. */
-export function formatWhen(value: string | null): string {
-  if (!value) return 'Horário a definir'
-
-  return WHEN.format(new Date(value))
-}
 
 /** "Quartas", "Semifinal"... */
 export function phaseLabel(match: Pick<IMatch, 'phase'>): string {
@@ -68,9 +38,8 @@ export function groupByDay(matches: ReadonlyArray<IMatch>): Array<Day> {
     let label = 'Horário a definir'
 
     if (match.scheduledAt) {
-      const date = new Date(match.scheduledAt)
-      key = DAY_KEY.format(date)
-      label = DAY.format(date)
+      key = formatDayKey(match.scheduledAt)
+      label = formatDay(match.scheduledAt)
     }
 
     const day = days.get(key) ?? { key, label, matches: [] }
@@ -90,8 +59,7 @@ export function MatchRow({ match }: { match: IMatch }): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
   const bracket = match.bracket
 
-  let time = '--:--'
-  if (match.scheduledAt) time = TIME.format(new Date(match.scheduledAt))
+  const time = formatTime(match.scheduledAt)
 
   return (
     <li className="grid grid-cols-[3.5rem_1fr] items-center gap-x-4 gap-y-1 py-3 sm:grid-cols-[4rem_1fr_14rem]">

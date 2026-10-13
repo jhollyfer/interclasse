@@ -38,7 +38,7 @@ function Home(): React.JSX.Element {
 
   return (
     <>
-      <section className="hero text-white">
+      <section className="hero text-brand-ink-foreground">
         <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
           <div className="flex flex-col gap-5">
             <p className="text-brand font-semibold">
@@ -47,7 +47,7 @@ function Home(): React.JSX.Element {
             <h1 className="font-display pb-1 text-5xl leading-[1.05] font-extrabold uppercase italic md:text-6xl">
               Jogos Estudantis 2026
             </h1>
-            <p className="max-w-md text-lg text-white/80">
+            <p className="max-w-md text-lg text-brand-ink-foreground/80">
               Tabela, placar e classificação das turmas do 3º ao 9º ano,
               atualizados durante os jogos.
             </p>
@@ -57,7 +57,7 @@ function Home(): React.JSX.Element {
               </Link>
               <Link
                 to="/classificacao"
-                className="skew-button border border-white/30 text-white"
+                className="skew-button border border-brand-ink-foreground/30 text-brand-ink-foreground"
               >
                 Classificação
               </Link>
