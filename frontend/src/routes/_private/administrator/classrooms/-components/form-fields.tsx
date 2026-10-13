@@ -16,7 +16,7 @@ import { OptionCombobox } from '#/components/common/option-combobox'
 import { UserRoles } from '#/lib/entity'
 import type { UserRole } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
-import type { AdministratorClassroomCreatePayload } from '#/lib/validator'
+import type { AdministratorClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
 
 export type ClassroomFormType = AdministratorClassroomCreatePayload
 

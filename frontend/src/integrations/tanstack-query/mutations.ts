@@ -25,31 +25,41 @@ import { request, send } from './http'
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { HTTPError } from './http'
 import type {
-  AccountUpdatePayload,
-  AdministratorAnnouncementCreatePayload,
-  AdministratorAnnouncementUpdatePayload,
-  AdministratorBracketCreatePayload,
-  AdministratorClassroomCreatePayload,
-  AdministratorClassroomUpdatePayload,
-  AdministratorMatchScorePayload,
-  AdministratorMatchUpdatePayload,
-  AdministratorSportCreatePayload,
-  AdministratorSportUpdatePayload,
-  AdministratorUserCreatePayload,
-  AdministratorUserUpdatePayload,
-  AdvisorEnrollmentUpdatePayload,
-  AdvisorStudentCreatePayload,
   Announcement,
-  AuthenticationSignInPayload,
   Bracket,
   Classroom,
   Match,
-  RepresentativeEnrollmentUpdatePayload,
   Sport,
   Storage,
   Student,
   User,
 } from '#/lib/validator'
+import type { AccountUpdatePayload } from '#/validators/account/account.validator'
+import type {
+  AdministratorAnnouncementCreatePayload,
+  AdministratorAnnouncementUpdatePayload,
+} from '#/validators/administrator/announcements.validator'
+import type { AdministratorBracketCreatePayload } from '#/validators/administrator/brackets.validator'
+import type {
+  AdministratorClassroomCreatePayload,
+  AdministratorClassroomUpdatePayload,
+} from '#/validators/administrator/classrooms.validator'
+import type {
+  AdministratorMatchScorePayload,
+  AdministratorMatchUpdatePayload,
+} from '#/validators/administrator/matches.validator'
+import type {
+  AdministratorSportCreatePayload,
+  AdministratorSportUpdatePayload,
+} from '#/validators/administrator/sports.validator'
+import type {
+  AdministratorUserCreatePayload,
+  AdministratorUserUpdatePayload,
+} from '#/validators/administrator/users.validator'
+import type { AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
+import type { AdvisorStudentCreatePayload } from '#/validators/advisor/students.validator'
+import type { AuthenticationSignInPayload } from '#/validators/authentication/authentication.validator'
+import type { RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 import type { EnrollmentBoard } from '#/integrations/response'
 import type { Merge } from '#/lib/interfaces'
 

@@ -41,8 +41,8 @@ import { useAccountUpdate } from '#/integrations/tanstack-query/mutations'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { applyMutationError } from '#/lib/form-errors'
 import { initials } from '#/lib/labels'
-import { AccountUpdateValidator } from '#/lib/validator'
-import type { AccountUpdatePayload } from '#/lib/validator'
+import { AccountUpdateValidator } from '#/validators/account/account.validator'
+import type { AccountUpdatePayload } from '#/validators/account/account.validator'
 
 const FORM_ID = 'profile'
 

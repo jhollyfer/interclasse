@@ -15,11 +15,9 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
 import type { ClassroomFormType } from './form-fields'
-import { AdministratorClassroomCreateValidator } from '#/lib/validator'
-import type {
-  AdministratorClassroomUpdatePayload,
-  Classroom,
-} from '#/lib/validator'
+import { AdministratorClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
+import type { Classroom } from '#/lib/validator'
+import type { AdministratorClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
 import type { Merge } from '#/lib/interfaces'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations'

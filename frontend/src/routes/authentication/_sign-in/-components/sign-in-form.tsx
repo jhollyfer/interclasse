@@ -27,8 +27,8 @@ import { SITE_DESCRIPTION } from '#/lib/site'
 import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { applyHTTPErrorToForm } from '#/lib/form-errors'
-import { AuthenticationSignInValidator } from '#/lib/validator'
-import type { AuthenticationSignInPayload } from '#/lib/validator'
+import { AuthenticationSignInValidator } from '#/validators/authentication/authentication.validator'
+import type { AuthenticationSignInPayload } from '#/validators/authentication/authentication.validator'
 
 const route = getRouteApi('/authentication/_sign-in/')
 

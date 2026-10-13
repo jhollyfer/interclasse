@@ -29,7 +29,7 @@ import {
   USER_ROLE_LABELS,
   initials,
 } from '#/lib/labels'
-import type { AdministratorUserCreatePayload } from '#/lib/validator'
+import type { AdministratorUserCreatePayload } from '#/validators/administrator/users.validator'
 
 export type UserFormType = AdministratorUserCreatePayload
 

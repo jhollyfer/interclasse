@@ -1,5 +1,3 @@
-import { SimpleMessagesProvider } from '@vinejs/vine'
-
 /**
  * As mensagens por regra.
  *
@@ -120,15 +118,3 @@ export const FIELD_LABELS = {
   direction: 'a direção da ordenação',
   trashed: 'o filtro de arquivados',
 }
-
-/**
- * Mensagens de validação em português, num lugar só.
- *
- * O VineJS não aceita mensagem inline por campo: a mensagem vem daqui, por
- * chave.
- *
- * Espelha `backend/start/validator.ts`, com as mesmas chaves e os mesmos textos.
- * São duas declarações do mesmo conteúdo pelo mesmo motivo dos validators: o
- * backend não publica o seu como pacote.
- */
-export const messages = new SimpleMessagesProvider(RULE_MESSAGES, FIELD_LABELS)

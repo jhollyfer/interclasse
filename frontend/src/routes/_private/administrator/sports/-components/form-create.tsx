@@ -17,8 +17,9 @@ import {
   SportFormFields,
 } from './form-fields'
 import type { SportFormType } from './form-fields'
-import { AdministratorSportCreateValidator } from '#/lib/validator'
-import type { AdministratorSportCreatePayload, Sport } from '#/lib/validator'
+import { AdministratorSportCreateValidator } from '#/validators/administrator/sports.validator'
+import type { Sport } from '#/lib/validator'
+import type { AdministratorSportCreatePayload } from '#/validators/administrator/sports.validator'
 import { useSportCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
