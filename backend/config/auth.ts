@@ -14,7 +14,7 @@ const authConfig = defineConfig({
     /**
      * Sessão da API, transportada em cookie `httpOnly`. Reaproveita a
      * maquinaria nativa de access tokens opacos do Adonis e troca o
-     * transporte: nada de cabeçalho `Authorization` (AD-005).
+     * transporte: nada de cabeçalho `Authorization`.
      */
     api: cookieAccessTokensGuard(),
 

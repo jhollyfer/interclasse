@@ -21,9 +21,8 @@ export const USER_SORT_COLUMNS = ['name', 'email', 'role', 'status', 'createdAt'
 /**
  * O papel de um usuário gerenciado pelo painel.
  *
- * Aqui é o enum inteiro, e não um recorte como no simple-hub: os três papéis
- * nascem pelo painel, e o privilégio de purge que lá pertence a um `OWNER`
- * inalcançável fica com o `ADMINISTRATOR`. Não há papel a excluir da lista.
+ * O enum inteiro, sem recorte: os três papéis nascem pelo painel, e o purge fica
+ * com o `ADMINISTRATOR`. Não há papel a excluir da lista.
  */
 export function manageableRole() {
   return vine.enum(USER_ROLES)

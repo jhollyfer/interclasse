@@ -179,13 +179,13 @@ const openapi = {
 }
 
 /**
- * Resumo fixo para ação que este projeto tem e os irmãos não - ou que precisa de
- * outra frase.
+ * Resumo fixo para ação de domínio deste projeto - ou que precisa de outra
+ * frase.
  *
- * `app/core/openapi/document.ts` é congelado e igual nos três, então a tabela de
+ * `scripts/openapi/emit.ts` é igual em todo projeto da casa, então a tabela de
  * ações dele é de mecanismo: `create`, `paginate`, `show`, `update`, `archive`,
  * `unarchive`, `delete` mais as de sessão e upload. Um nome de domínio ali
- * viraria resumo errado no repositório ao lado, e é este arquivo - que é do
+ * viraria resumo errado em outro projeto, e é este arquivo - que é do
  * projeto - o lugar de dizer o que só vale aqui.
  *
  * A chave é o nome do arquivo do controller sem o sufixo, e o valor ganha de

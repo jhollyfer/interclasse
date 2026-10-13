@@ -11,8 +11,7 @@ import type { InferLimiters } from '@adonisjs/limiter/types'
  * Só o store `database`: este projeto não tem Redis - nem a dependência, nem
  * `REDIS_URL`, nem serviço no compose. Declarar o store `redis` aqui faria o
  * container tentar resolver um binding que não existe e derrubar o boot. Quando
- * o projeto ganhar Redis, ele entra aqui e vira o padrão, como no academy:
- * contar tentativa é escrita quente e não vale ocupar a conexão do banco.
+ * o projeto ganhar Redis, ele entra aqui e vira o padrão: contar tentativa é escrita quente e não vale ocupar a conexão do banco.
  */
 const limiterConfig = defineConfig({
   default: 'database',
