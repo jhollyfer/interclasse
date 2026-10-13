@@ -65,7 +65,7 @@ test('toda requisição leva o cookie da sessão', async () => {
   // O cookie é `httpOnly` e assinado: o JavaScript não o lê nem o escreve, e
   // sem `credentials: 'include'` ele simplesmente não sai do navegador - o
   // login "funciona" e nenhuma tela seguinte autentica.
-  const [, init] = fetcher.mock.calls[0]
+  const init = fetcher.mock.calls[0]?.[1]
   expect(init?.credentials).toBe('include')
 })
 
@@ -216,7 +216,7 @@ test('FormData monta o próprio Content-Type', async () => {
 
   // Declarar `application/json` por cima faria o servidor procurar o `boundary`
   // num cabeçalho que não o tem, e o corpo chegaria vazio.
-  const [, init] = fetcher.mock.calls[0]
+  const init = fetcher.mock.calls[0]?.[1]
   const headers = init?.headers as Record<string, string>
   expect(headers['Content-Type']).toBeUndefined()
 })
@@ -229,7 +229,7 @@ test('corpo de objeto continua declarando JSON', async () => {
     body: JSON.stringify({ name: 'Maria' }),
   })
 
-  const [, init] = fetcher.mock.calls[0]
+  const init = fetcher.mock.calls[0]?.[1]
   const headers = init?.headers as Record<string, string>
   expect(headers['Content-Type']).toBe('application/json')
 })
@@ -248,7 +248,7 @@ test('o signal do queryFn chega ao fetch', async () => {
   // por `AbortSignal.any`. O que precisa continuar valendo é o efeito, e é o
   // efeito que se afere - comparar identidade trancaria a implementação, não o
   // comportamento.
-  const [, init] = fetcher.mock.calls[0]
+  const init = fetcher.mock.calls[0]?.[1]
   expect(init?.signal?.aborted).toBe(false)
 
   controller.abort()
@@ -263,7 +263,7 @@ test('a requisição tem prazo mesmo sem signal do chamador', async () => {
   // Sem prazo, um servidor que aceita a conexão e não responde deixa a promessa
   // pendurada até o limite do sistema operacional - e no SSR isso prende a
   // resposta HTML inteira. O `signal` existe mesmo quando ninguém passou um.
-  const [, init] = fetcher.mock.calls[0]
+  const init = fetcher.mock.calls[0]?.[1]
   expect(init?.signal).toBeInstanceOf(AbortSignal)
   expect(init?.signal?.aborted).toBe(false)
 })
