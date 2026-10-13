@@ -58,6 +58,7 @@ roda `--check` e os testes nem compilam sem o registry do Tuyau.
 - `node ace di:check` - constrói todo service e policy pelo container (exige banco).
 - `node ace test` - suíte funcional (`app/**/*.spec.ts`) contra Postgres e MinIO reais.
 - `pnpm sync:check` compara a régua com o upstream em `../../maiyu-pattern` (ou
-  `MAIYU_PATTERN_DIR`); sem ele, avisa e passa.
+  `MAIYU_PATTERN_DIR`); sem ele, avisa e passa. É conferência local: o CI não
+  depende do maiyu-pattern.
 
 O `pre-commit` roda `pnpm check && pnpm test`.

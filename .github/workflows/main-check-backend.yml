@@ -2,18 +2,11 @@ name: Check Backend
 
 on:
   workflow_call:
-    secrets:
-      MAIYU_PATTERN_TOKEN:
-        required: false
 
 jobs:
   check:
     name: Backend - Lint, Typecheck, OpenAPI & Test
     runs-on: ubuntu-latest
-
-    # Nível de job porque `if:` de passo não enxerga `secrets` direto.
-    env:
-      MAIYU_PATTERN_TOKEN: ${{ secrets.MAIYU_PATTERN_TOKEN }}
 
     # A porta e o nome do banco vêm de `backend/.env.test`, que é versionado:
     # 5434 no host e `interclasse_test`. Declarar `POSTGRES_DB` já com o
@@ -85,23 +78,11 @@ jobs:
           UPLOAD_MAX_SIZE: "1073741824"
         run: node ace openapi:generate --check --strict
 
-      # A régua vem do upstream privado `jhollyfer/maiyu-pattern`. Com o secret
-      # `MAIYU_PATTERN_TOKEN` (PAT com leitura do repositório) o `sync:check`
-      # compara `_padroes/`, `_doc-lib/` e as skills com ele; sem o secret o
-      # checkout é pulado e o script avisa que rodou isolado.
-      - name: Checkout da régua (maiyu-pattern)
-        if: ${{ env.MAIYU_PATTERN_TOKEN != '' }}
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          repository: jhollyfer/maiyu-pattern
-          token: ${{ secrets.MAIYU_PATTERN_TOKEN }}
-          path: maiyu-pattern
-
+      # Os guardas de forma do padrão. O `sync:check` (cópia da régua contra o
+      # upstream) fica de fora: é conferência local, não portão de deploy.
       - name: Guard-rails do padrão
         working-directory: ./backend
-        env:
-          MAIYU_PATTERN_DIR: ${{ github.workspace }}/maiyu-pattern
-        run: pnpm pattern:check && pnpm sync:check && pnpm authz:check
+        run: pnpm pattern:check && pnpm authz:check
 
       # O MinIO não sobe como `services:` porque precisa de `command` — a chave
       # existe no compose e não no bloco de serviço do Actions. `--network host`
