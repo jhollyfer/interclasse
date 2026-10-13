@@ -24,7 +24,7 @@
  * resolve as duas coisas - o hover mostra o objeto resultante, campo a campo.
  *
  * É o que os use-cases usam para somar o escopo da sessão ao payload validado:
- * `Merge<AccountUpdatePayload, { userId: string }>`.
+ * `Merge<ProfileUpdatePayload, { userId: string }>`.
  */
 /**
  * Os defaults de paginação, num lugar só.

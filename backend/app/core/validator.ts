@@ -102,10 +102,18 @@ export function activeStatus() {
  * próprio, para o teto de `perPage` viver num lugar só - repetido à mão em
  * cada recurso, é uma divergência esperando acontecer.
  */
-export function paginationFields() {
+/** Página e tamanho, para a listagem que não busca (_padroes/backend.md §4.4). */
+export function pageFields() {
   return {
     page: vine.number().min(1).optional(),
     perPage: vine.number().min(1).max(100).optional(),
+  }
+}
+
+/** Página, tamanho e `search` - só para quem de fato lê `payload.search`. */
+export function paginationFields() {
+  return {
+    ...pageFields(),
     search: vine.string().maxLength(100).optional(),
   }
 }
@@ -157,23 +165,14 @@ export const IdentifierValidator = vine.create({
   id: vine.string().uuid(),
 })
 
-export const PaginationValidator = vine.create(vine.object(paginationFields()))
+export const PageValidator = vine.create(vine.object(pageFields()))
 
-/**
- * A paginação dos recursos que têm lixeira. É o `PaginationValidator` mais o
- * `trashed`, e existe como schema próprio porque as listagens da vitrine
- * seguem sem ele.
- */
-export const TrashablePaginationValidator = vine.create({
-  ...paginationFields(),
-  ...trashedField(),
-})
+export const PaginationValidator = vine.create(vine.object(paginationFields()))
 
 export type IdentifierPayload = Infer<typeof IdentifierValidator>
 
+export type PagePayload = Infer<typeof PageValidator>
 export type PaginationPayload = Infer<typeof PaginationValidator>
-
-export type TrashablePaginationPayload = Infer<typeof TrashablePaginationValidator>
 
 /**
  * Os tipos aceitos, e a extensão que cada um ganha na chave do objeto.
@@ -246,16 +245,6 @@ export function athleteListFields() {
   }
 }
 
-/**
- * O identificador público de uma modalidade. O teto de 255 é o da coluna - sem
- * ele, uma URL absurdamente longa viraria uma consulta ao banco.
- */
-export const SlugValidator = vine.create({
-  slug: vine.string().trim().minLength(1).maxLength(255),
-})
-
-export type SlugPayload = Infer<typeof SlugValidator>
-
 /*
 |--------------------------------------------------------------------------
 | Mensagens de validação
@@ -306,7 +295,6 @@ export const FIELD_LABELS = {
   classroomId: 'a turma',
 
   // Modalidade e inscrição
-  slug: 'o slug',
   minAthletes: 'o mínimo de atletas',
   maxAthletes: 'o máximo de atletas',
   sportId: 'a modalidade',

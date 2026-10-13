@@ -11,7 +11,7 @@ import { ACTIVE_STATUSES, USER_ROLES } from '#/lib/entity'
 import type { UserListSearch } from '#/integrations/tanstack-query/queries'
 
 /**
- * Os dois recortes da tela, como o `AdministratorUserPaginationValidator`
+ * Os dois recortes da tela, como o `UserPaginateValidator`
  * aceita: `?role=` separa quem administra de quem edita, `?status=` separa quem
  * entra de quem foi desativado sem ser arquivado.
  *

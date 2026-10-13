@@ -6,6 +6,12 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'health_check': {
+    methods: ["GET","HEAD"],
+    pattern: '/health-check',
+    tokens: [{"old":"/health-check","type":0,"val":"health-check","end":""}],
+    types: placeholder as Registry['health_check']['types'],
+  },
   'storefront.sports': {
     methods: ["GET","HEAD"],
     pattern: '/storefront/sports',

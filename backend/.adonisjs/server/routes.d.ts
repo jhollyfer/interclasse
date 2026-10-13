@@ -4,6 +4,7 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'health_check': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
@@ -62,6 +63,7 @@ export type ScannedRoutes = {
     'representative.enrollments.update': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'health_check': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
@@ -89,6 +91,7 @@ export type ScannedRoutes = {
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'health_check': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }

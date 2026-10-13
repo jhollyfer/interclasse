@@ -15,9 +15,9 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { SPORT_FIELDS, SportFormFields } from './form-fields'
 import type { SportFormType } from './form-fields'
-import { AdministratorSportCreateValidator } from '#/validators/administrator/sports.validator'
+import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { Sport } from '#/lib/validator'
-import type { AdministratorSportUpdatePayload } from '#/validators/administrator/sports.validator'
+import type { SportUpdatePayload } from '#/validators/administrator/sports.validator'
 import type { Merge } from '#/lib/interfaces'
 import { sportQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useSportUpdate } from '#/integrations/tanstack-query/mutations'
@@ -34,10 +34,10 @@ export function SportFormEdit(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     SportFormType,
     Sport,
-    Merge<AdministratorSportUpdatePayload, { id: string }>
+    Merge<SportUpdatePayload, { id: string }>
   >({
     formId: 'sport-update',
-    validator: AdministratorSportCreateValidator,
+    validator: SportCreateValidator,
     values: {
       name: sport.name,
       minAthletes: sport.minAthletes,

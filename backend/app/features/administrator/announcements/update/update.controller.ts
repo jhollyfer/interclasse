@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorAnnouncementUpdateUseCase from './update.use-case.ts'
-import { AdministratorAnnouncementUpdateValidator } from '#features/administrator/announcements/announcements.validator'
+import { AnnouncementUpdateValidator } from '#features/administrator/announcements/announcements.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -14,7 +14,7 @@ export default class AdministratorAnnouncementUpdateController {
   constructor(private readonly useCase: AdministratorAnnouncementUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await AdministratorAnnouncementUpdateValidator.validate(context.request.body())
+    const body = await AnnouncementUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value

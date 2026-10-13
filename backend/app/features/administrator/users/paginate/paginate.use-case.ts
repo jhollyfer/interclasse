@@ -5,10 +5,10 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, sortOrder, type Paginated } from '#core/entity'
 import { applyTrashed } from '#features/_shared.trashed'
-import type { AdministratorUserPaginationPayload } from '#features/administrator/users/users.validator'
+import type { UserPaginatePayload } from '#features/administrator/users/users.validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
-type Payload = AdministratorUserPaginationPayload
+type Payload = UserPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
 
 /**

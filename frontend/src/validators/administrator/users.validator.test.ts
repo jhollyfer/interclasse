@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { fieldsOf } from '#/lib/validator.test-utils'
 import {
-  AdministratorUserCreateValidator,
-  AdministratorUserUpdateValidator,
+  UserCreateValidator,
+  UserUpdateValidator,
 } from './users.validator'
 
 const USER = {
@@ -14,13 +14,13 @@ const USER = {
 }
 
 function user(overrides: Record<string, unknown> = {}) {
-  return AdministratorUserCreateValidator.tryValidate({
+  return UserCreateValidator.tryValidate({
     ...USER,
     ...overrides,
   })
 }
 
-describe('AdministratorUserCreateValidator', () => {
+describe('UserCreateValidator', () => {
   /**
    * O campo é declarado aqui e **não** no schema do backend, e é a razão de
    * existir desta suíte: o `confirmed()` do servidor lê `passwordConfirmation`
@@ -38,7 +38,7 @@ describe('AdministratorUserCreateValidator', () => {
   it('exige a confirmação de senha', async () => {
     const { passwordConfirmation: _omitida, ...semConfirmacao } = USER
     const [error] =
-      await AdministratorUserCreateValidator.tryValidate(semConfirmacao)
+      await UserCreateValidator.tryValidate(semConfirmacao)
 
     expect(fieldsOf(error)).toContain('passwordConfirmation')
   })
@@ -72,17 +72,17 @@ describe('AdministratorUserCreateValidator', () => {
   // silêncio, que é o que o `backend-old` fazia.
   it('exige o papel', async () => {
     const { role: _omitido, ...semPapel } = USER
-    const [error] = await AdministratorUserCreateValidator.tryValidate(semPapel)
+    const [error] = await UserCreateValidator.tryValidate(semPapel)
 
     expect(fieldsOf(error)).toContain('role')
   })
 })
 
-describe('AdministratorUserUpdateValidator', () => {
+describe('UserUpdateValidator', () => {
   // Senha em branco significa "não trocar", e o formulário omite a chave. O
   // validator precisa aceitar o payload sem ela.
   it('aceita a edição sem senha nenhuma', async () => {
-    const [error, payload] = await AdministratorUserUpdateValidator.tryValidate(
+    const [error, payload] = await UserUpdateValidator.tryValidate(
       {
         name: 'Ana Lima',
         email: 'ana@mail.com',
@@ -96,7 +96,7 @@ describe('AdministratorUserUpdateValidator', () => {
   })
 
   it('continua exigindo a confirmação quando a senha nova vem junto', async () => {
-    const [error] = await AdministratorUserUpdateValidator.tryValidate({
+    const [error] = await UserUpdateValidator.tryValidate({
       password: 'Senha@123',
     })
 

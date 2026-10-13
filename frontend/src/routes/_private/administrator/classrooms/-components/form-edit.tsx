@@ -15,9 +15,9 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
 import type { ClassroomFormType } from './form-fields'
-import { AdministratorClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
+import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
 import type { Classroom } from '#/lib/validator'
-import type { AdministratorClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
+import type { ClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
 import type { Merge } from '#/lib/interfaces'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations'
@@ -34,10 +34,10 @@ export function ClassroomFormEdit(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     ClassroomFormType,
     Classroom,
-    Merge<AdministratorClassroomUpdatePayload, { id: string }>
+    Merge<ClassroomUpdatePayload, { id: string }>
   >({
     formId: 'classroom-update',
-    validator: AdministratorClassroomCreateValidator,
+    validator: ClassroomCreateValidator,
     values: {
       name: classroom.name,
       grade: classroom.grade,

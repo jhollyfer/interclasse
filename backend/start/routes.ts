@@ -108,14 +108,16 @@ router
 router
   .group(() => {
     router
-      .post('sign-in', [controllers.authentication.signIn.SignIn])
+      .post('sign-in', [controllers.authentication.sessions.signIn.SignIn])
       .use([signInThrottle, signInAccountThrottle])
     // O único do grupo que exige sessão: sair é apagar os tokens *desta*
     // sessão, e sem saber qual é ela não há o que apagar.
-    router.post('sign-out', [controllers.authentication.signOut.SignOut]).use(middleware.auth())
+    router
+      .post('sign-out', [controllers.authentication.sessions.signOut.SignOut])
+      .use(middleware.auth())
     // Fora do `auth()` porque é o token de acesso vencido que traz alguém até
     // aqui. Quem autoriza é o cookie de refresh, e nada mais.
-    router.post('refresh', [controllers.authentication.refresh.Refresh])
+    router.post('refresh', [controllers.authentication.sessions.refresh.Refresh])
   })
   .prefix('authentication')
   .as('authentication')
@@ -129,8 +131,8 @@ router
  */
 router
   .group(() => {
-    router.get('/', [controllers.account.show.Show])
-    router.put('/', [controllers.account.update.Update])
+    router.get('/', [controllers.account.profile.show.Show])
+    router.put('/', [controllers.account.profile.update.Update])
   })
   .prefix('account')
   .as('profile')
@@ -157,14 +159,14 @@ router
  */
 router
   .group(() => {
-    router.get('/', [controllers.storages.paginate.Paginate])
-    router.post('/', [controllers.storages.create.Create])
-    router.post(':id/complete', [controllers.storages.complete.Complete]).as('complete')
-    router.get(':id/parts', [controllers.storages.parts.Parts]).as('parts')
+    router.get('/', [controllers.storages.files.paginate.Paginate])
+    router.post('/', [controllers.storages.files.create.Create])
+    router.post(':id/complete', [controllers.storages.files.complete.Complete]).as('complete')
+    router.get(':id/parts', [controllers.storages.files.parts.Parts]).as('parts')
     // Depois de `:id/parts`: o caminho de duas partes é o mais específico, e
     // registrado antes ele não pode ser engolido pelo genérico.
-    router.get(':id', [controllers.storages.show.Show])
-    router.delete(':id', [controllers.storages.delete.Delete])
+    router.get(':id', [controllers.storages.files.show.Show])
+    router.delete(':id', [controllers.storages.files.delete.Delete])
 
     // O download com o nome original entra aqui, e não mais solto.
     //
@@ -174,7 +176,7 @@ router
     // própria porta dos fundos, emitindo URL assinada para qualquer uuid sem
     // sessão. O `<a>` de salvar arquivo continua funcionando: navegação de
     // mesmo site manda o cookie.
-    router.get(':id/download', [controllers.storages.download.Download]).as('download')
+    router.get(':id/download', [controllers.storages.files.download.Download]).as('download')
   })
   .prefix('storages')
   .as('storages')

@@ -1,18 +1,18 @@
 import { vine } from '#/lib/validator'
 import type { Infer } from '#/lib/validator'
 
-export const AdvisorStudentCreateValidator = vine.create({
+export const StudentCreateValidator = vine.create({
   classroomId: vine.string().uuid(),
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
-export const AdvisorStudentUpdateValidator = vine.create({
+export const StudentUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
-export type AdvisorStudentCreatePayload = Infer<
-  typeof AdvisorStudentCreateValidator
+export type StudentCreatePayload = Infer<
+  typeof StudentCreateValidator
 >
-export type AdvisorStudentUpdatePayload = Infer<
-  typeof AdvisorStudentUpdateValidator
+export type StudentUpdatePayload = Infer<
+  typeof StudentUpdateValidator
 >

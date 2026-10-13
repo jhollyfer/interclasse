@@ -13,9 +13,9 @@ import {
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
-import type { AdministratorAnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
+import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 
-export type AnnouncementFormType = AdministratorAnnouncementCreatePayload
+export type AnnouncementFormType = AnnouncementCreatePayload
 
 export const ANNOUNCEMENT_FORM_DEFAULTS: DefaultValues<AnnouncementFormType> = {
   title: '',

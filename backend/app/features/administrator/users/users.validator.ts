@@ -43,7 +43,7 @@ export function manageableRole() {
  * `status` é opcional porque a coluna tem `DEFAULT 'ACTIVE'`: a conta nasce
  * podendo entrar, e desativar é edição.
  */
-export const AdministratorUserCreateValidator = vine.create({
+export const UserCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
   email: email(),
   password: password(),
@@ -62,11 +62,11 @@ export const AdministratorUserCreateValidator = vine.create({
  * ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
  * `null` explícito.
  *
- * `role` entra aqui, ao contrário de `AccountUpdateValidator`: promover e
+ * `role` entra aqui, ao contrário de `ProfileUpdateValidator`: promover e
  * rebaixar é o que este recurso existe para fazer, e ninguém muda o próprio
  * papel por `/account`.
  */
-export const AdministratorUserUpdateValidator = vine.create({
+export const UserUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120).optional(),
   email: email().optional(),
   password: password().optional(),
@@ -82,7 +82,7 @@ export const AdministratorUserUpdateValidator = vine.create({
  * administra de quem edita, e `status` separa quem entra de quem foi desativado
  * sem ser arquivado.
  */
-export const AdministratorUserPaginationValidator = vine.create({
+export const UserPaginateValidator = vine.create({
   ...paginationFields(),
   ...trashedField(),
   ...sortFields(USER_SORT_COLUMNS),
@@ -90,8 +90,8 @@ export const AdministratorUserPaginationValidator = vine.create({
   status: activeStatus().optional(),
 })
 
-export type AdministratorUserCreatePayload = Infer<typeof AdministratorUserCreateValidator>
+export type UserCreatePayload = Infer<typeof UserCreateValidator>
 
-export type AdministratorUserUpdatePayload = Infer<typeof AdministratorUserUpdateValidator>
+export type UserUpdatePayload = Infer<typeof UserUpdateValidator>
 
-export type AdministratorUserPaginationPayload = Infer<typeof AdministratorUserPaginationValidator>
+export type UserPaginatePayload = Infer<typeof UserPaginateValidator>

@@ -17,9 +17,9 @@ import {
   ClassroomFormFields,
 } from './form-fields'
 import type { ClassroomFormType } from './form-fields'
-import { AdministratorClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
+import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
 import type { Classroom } from '#/lib/validator'
-import type { AdministratorClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
+import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
 import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -28,10 +28,10 @@ export function ClassroomFormCreate(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     ClassroomFormType,
     Classroom,
-    AdministratorClassroomCreatePayload
+    ClassroomCreatePayload
   >({
     formId: 'classroom-create',
-    validator: AdministratorClassroomCreateValidator,
+    validator: ClassroomCreateValidator,
     defaults: CLASSROOM_FORM_DEFAULTS,
     fields: CLASSROOM_FIELDS,
     mutation: useClassroomCreate,

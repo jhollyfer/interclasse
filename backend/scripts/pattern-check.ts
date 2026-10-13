@@ -385,6 +385,76 @@ function conferirImportEntreFeatures(relativo: string, fonte: string): Achado[] 
   return achados
 }
 
+/**
+ * Validator de recurso: todo export `*Validator` comeca pelo recurso no
+ * singular e termina na acao - `UserCreateValidator` em `users/users.validator.ts`
+ * (_padroes/backend.md §3 e §4.4).
+ */
+function conferirNomeDeValidator(relativo: string, fonte: string): Achado[] {
+  const casado = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativo)
+  if (casado === null) return []
+  const recurso = pascal(singular(casado[1] ?? ''))
+  const limpo = semComentarios(fonte)
+  const achados: Achado[] = []
+  for (const exportado of limpo.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+    const nome = exportado[1] ?? ''
+    if (nome.startsWith(recurso)) continue
+    achados.push({
+      arquivo: relativo,
+      linha: linhaDe(limpo, exportado.index),
+      regra: 'validator-sem-recurso',
+      secao: '4.4',
+      mensagem: `\`${nome}\` deveria ser \`${recurso}<Acao>Validator\``,
+    })
+  }
+  return achados
+}
+
+/**
+ * O espelho do frontend tem os mesmos exports (_padroes/arquitetura.md §4):
+ * `app/features/<modulo>/<recurso>/<recurso>.validator.ts` e
+ * `frontend/src/validators/<modulo>/<recurso>.validator.ts`. Todo export do
+ * frontend existe no backend - o frontend nao valida o que a API nao conhece.
+ * Sem o frontend ao lado (clone so do backend), a regra nao roda.
+ */
+async function conferirParidadeDeValidators(fontes: Map<string, string>): Promise<Achado[]> {
+  const raizFront = resolve(RAIZ, '../frontend/src/validators')
+  if (!(await existe(raizFront))) return []
+
+  const achados: Achado[] = []
+  for (const arquivo of await arquivosTs(raizFront)) {
+    if (!arquivo.endsWith('.validator.ts')) continue
+    const logico = relative(raizFront, arquivo)
+    const partes = logico.replace('.validator.ts', '').split('/')
+    const recurso = partes[partes.length - 1] ?? ''
+    const espelho = `app/features/${partes.join('/')}/${recurso}.validator.ts`
+    const back = fontes.get(espelho)
+    const front = semComentarios(await readFile(arquivo, 'utf8'))
+    if (back === undefined) {
+      achados.push({
+        arquivo: `../frontend/src/validators/${logico}`,
+        linha: 1,
+        regra: 'validator-sem-espelho',
+        secao: 'arquitetura 4',
+        mensagem: `nao ha \`${espelho}\` no backend`,
+      })
+      continue
+    }
+    for (const exportado of front.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+      const nome = exportado[1] ?? ''
+      if (new RegExp(`export\\s+const\\s+${nome}\\b`).test(back)) continue
+      achados.push({
+        arquivo: `../frontend/src/validators/${logico}`,
+        linha: linhaDe(front, exportado.index),
+        regra: 'validator-sem-espelho',
+        secao: 'arquitetura 4',
+        mensagem: `\`${nome}\` nao existe em \`${espelho}\``,
+      })
+    }
+  }
+  return achados
+}
+
 /** Model em `app/models/` usa kebab-case. Secao 3. */
 function conferirNomeDeModel(relativo: string): Achado[] {
   if (!relativo.startsWith('app/models/')) return []
@@ -696,8 +766,8 @@ async function conferirRota(arquivos: string[]): Promise<Achado[]> {
     const verbo = pascal(partes[partes.length - 1].replace('.controller.ts', ''))
     const chave = ['controllers', ...partes.slice(0, -1).map(camel), verbo].join('.')
 
-    // Limite de identificador, e nao `includes`: `controllers.account.Show`
-    // casaria dentro de `controllers.account.ShowX`, e a regra daria verde para
+    // Limite de identificador, e nao `includes`: `controllers.account.profile.Show`
+    // casaria dentro de `controllers.account.profile.ShowX`, e a regra daria verde para
     // um controller que nenhuma rota alcanca. Foi o que o sensor pegou na
     // primeira versao desta funcao.
     const referencia = new RegExp(`${chave.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`)
@@ -753,6 +823,7 @@ async function main(): Promise<void> {
     achados.push(...conferirNomeDeClasse(relativo, fonte))
     achados.push(...conferirNomeDeModel(relativo))
     achados.push(...conferirPastaDaAcao(relativo))
+    achados.push(...conferirNomeDeValidator(relativo, fonte))
     achados.push(...conferirImportEntreFeatures(relativo, fonte))
     achados.push(...conferirFormaDoUseCase(relativo, fonte))
   }
@@ -762,6 +833,7 @@ async function main(): Promise<void> {
   achados.push(...(await conferirSoftDelete(fontes)))
   achados.push(...(await conferirForma()))
   achados.push(...(await conferirRota(arquivos)))
+  achados.push(...(await conferirParidadeDeValidators(fontes)))
   relatar(achados)
 
   if (flags.has('--report')) return

@@ -1,8 +1,8 @@
-import { vine, paginationFields, matchFilterFields } from '#core/validator'
+import { vine, pageFields, matchFilterFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const AdministratorMatchPaginationValidator = vine.create({
-  ...paginationFields(),
+export const MatchPaginateValidator = vine.create({
+  ...pageFields(),
   ...matchFilterFields(),
 })
 
@@ -10,7 +10,7 @@ export const AdministratorMatchPaginationValidator = vine.create({
  * A agenda da partida. `scheduledAt` em ISO 8601 com fuso: a escola joga no
  * horário local, e o servidor grava em UTC.
  */
-export const AdministratorMatchUpdateValidator = vine.create({
+export const MatchUpdateValidator = vine.create({
   scheduledAt: vine
     .date({ formats: ['iso8601'] })
     .nullable()
@@ -22,16 +22,14 @@ export const AdministratorMatchUpdateValidator = vine.create({
  * O placar. `winnerTeamId` só é lido no mata-mata empatado - o vencedor nos
  * pênaltis; em qualquer outro caso o placar decide sozinho.
  */
-export const AdministratorMatchScoreValidator = vine.create({
+export const MatchScoreValidator = vine.create({
   homeScore: vine.number().withoutDecimals().min(0).max(999),
   awayScore: vine.number().withoutDecimals().min(0).max(999),
   winnerTeamId: vine.string().uuid().optional(),
 })
 
-export type AdministratorMatchPaginationPayload = Infer<
-  typeof AdministratorMatchPaginationValidator
->
+export type MatchPaginatePayload = Infer<typeof MatchPaginateValidator>
 
-export type AdministratorMatchUpdatePayload = Infer<typeof AdministratorMatchUpdateValidator>
+export type MatchUpdatePayload = Infer<typeof MatchUpdateValidator>
 
-export type AdministratorMatchScorePayload = Infer<typeof AdministratorMatchScoreValidator>
+export type MatchScorePayload = Infer<typeof MatchScoreValidator>

@@ -17,9 +17,9 @@ import {
   SportFormFields,
 } from './form-fields'
 import type { SportFormType } from './form-fields'
-import { AdministratorSportCreateValidator } from '#/validators/administrator/sports.validator'
+import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { Sport } from '#/lib/validator'
-import type { AdministratorSportCreatePayload } from '#/validators/administrator/sports.validator'
+import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
 import { useSportCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -28,10 +28,10 @@ export function SportFormCreate(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     SportFormType,
     Sport,
-    AdministratorSportCreatePayload
+    SportCreatePayload
   >({
     formId: 'sport-create',
-    validator: AdministratorSportCreateValidator,
+    validator: SportCreateValidator,
     defaults: SPORT_FORM_DEFAULTS,
     fields: SPORT_FIELDS,
     mutation: useSportCreate,

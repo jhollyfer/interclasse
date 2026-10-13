@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { fieldsOf } from '#/lib/validator.test-utils'
-import { AdministratorSportCreateValidator } from './sports.validator'
+import { SportCreateValidator } from './sports.validator'
 
 function sport(overrides: Record<string, unknown> = {}) {
-  return AdministratorSportCreateValidator.tryValidate({
+  return SportCreateValidator.tryValidate({
     name: 'Futsal',
     minAthletes: 5,
     maxAthletes: 12,
@@ -11,7 +11,7 @@ function sport(overrides: Record<string, unknown> = {}) {
   })
 }
 
-describe('AdministratorSportCreateValidator', () => {
+describe('SportCreateValidator', () => {
   it('recusa atletas fora de 1 a 40 e fracionários', async () => {
     const [error] = await sport({ minAthletes: 0, maxAthletes: 4.5 })
 

@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import RepresentativeEnrollmentUpdateUseCase from './update.use-case.ts'
-import { RepresentativeEnrollmentUpdateValidator } from '#features/representative/enrollments/enrollments.validator'
+import { EnrollmentUpdateValidator } from '#features/representative/enrollments/enrollments.validator'
 
 @inject()
 export default class RepresentativeEnrollmentUpdateController {
@@ -22,7 +22,7 @@ export default class RepresentativeEnrollmentUpdateController {
   constructor(private readonly useCase: RepresentativeEnrollmentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(RepresentativeEnrollmentUpdateValidator)
+    const payload = await context.request.validateUsing(EnrollmentUpdateValidator)
     const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

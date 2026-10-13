@@ -14,9 +14,9 @@ import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
 import type { UserFormType } from './form-fields'
-import { AdministratorUserCreateValidator } from '#/validators/administrator/users.validator'
+import { UserCreateValidator } from '#/validators/administrator/users.validator'
 import type { User } from '#/lib/validator'
-import type { AdministratorUserCreatePayload } from '#/validators/administrator/users.validator'
+import type { UserCreatePayload } from '#/validators/administrator/users.validator'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -36,10 +36,10 @@ export function UserFormCreate(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     UserFormType,
     User,
-    AdministratorUserCreatePayload
+    UserCreatePayload
   >({
     formId: FORM_ID,
-    validator: AdministratorUserCreateValidator,
+    validator: UserCreateValidator,
     defaults: USER_FORM_DEFAULTS,
     fields: USER_FIELDS,
     mutation: useUserCreate,

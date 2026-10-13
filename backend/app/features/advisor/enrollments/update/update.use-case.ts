@@ -4,9 +4,9 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import type { AdvisorEnrollmentUpdatePayload } from '#features/advisor/enrollments/enrollments.validator'
+import type { EnrollmentUpdatePayload } from '#features/advisor/enrollments/enrollments.validator'
 
-type Payload = AdvisorEnrollmentUpdatePayload
+type Payload = EnrollmentUpdatePayload
 type Response = Either<HTTPException, EnrollmentBoard>
 
 @inject()

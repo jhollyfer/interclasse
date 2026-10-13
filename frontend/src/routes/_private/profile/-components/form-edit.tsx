@@ -41,8 +41,8 @@ import { useAccountUpdate } from '#/integrations/tanstack-query/mutations'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { applyMutationError } from '#/lib/form-errors'
 import { initials } from '#/lib/labels'
-import { AccountUpdateValidator } from '#/validators/account/account.validator'
-import type { AccountUpdatePayload } from '#/validators/account/account.validator'
+import { ProfileUpdateValidator } from '#/validators/account/profile.validator'
+import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 
 const FORM_ID = 'profile'
 
@@ -79,8 +79,8 @@ export function ProfileFormEdit(): React.JSX.Element {
   // O `loader` da rota já garantiu o dado; aqui é leitura de cache.
   const { data: account } = useSuspenseQuery(accountQueryOptions())
 
-  const form = useForm<AccountUpdatePayload>({
-    resolver: vineResolver(AccountUpdateValidator),
+  const form = useForm<ProfileUpdatePayload>({
+    resolver: vineResolver(ProfileUpdateValidator),
     mode: 'onTouched',
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
@@ -138,7 +138,7 @@ export function ProfileFormEdit(): React.JSX.Element {
     },
   })
 
-  function onValid(values: AccountUpdatePayload): void {
+  function onValid(values: ProfileUpdatePayload): void {
     // Sem isto, a mensagem da tentativa anterior fica na tela durante a nova.
     form.clearErrors('root')
 
@@ -148,7 +148,7 @@ export function ProfileFormEdit(): React.JSX.Element {
     // API passaria a exigir `currentPassword` de quem não quis trocar senha.
     const { password, passwordConfirmation, currentPassword, ...rest } = values
 
-    const body: AccountUpdatePayload = { ...rest }
+    const body: ProfileUpdatePayload = { ...rest }
 
     if (password) {
       body.password = password

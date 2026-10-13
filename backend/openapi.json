@@ -774,15 +774,6 @@
             }
           },
           {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 100
-            }
-          },
-          {
             "name": "sportId",
             "in": "query",
             "required": false,
@@ -1717,15 +1708,6 @@
               "type": "number",
               "minimum": 1,
               "maximum": 100
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 100
             }
           },
           {
@@ -5124,15 +5106,6 @@
             }
           },
           {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 100
-            }
-          },
-          {
             "name": "sportId",
             "in": "query",
             "required": false,
@@ -5291,15 +5264,6 @@
               "type": "number",
               "minimum": 1,
               "maximum": 100
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 100
             }
           },
           {

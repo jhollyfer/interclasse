@@ -17,10 +17,10 @@ import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
 import { BracketStatuses, MatchPhases, type MatchPhase } from '#core/entity'
-import type { AdministratorBracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
+import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
-type Payload = AdministratorBracketCreatePayload
+type Payload = BracketCreatePayload
 type Response = Either<HTTPException, Bracket>
 
 /** Com menos de dois times não há partida a jogar. */

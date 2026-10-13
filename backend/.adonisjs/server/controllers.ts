@@ -5,11 +5,13 @@
 
 export const controllers = {
   account: {
-    show: {
-      Show: () => import('#features/account/show/show.controller'),
-    },
-    update: {
-      Update: () => import('#features/account/update/update.controller'),
+    profile: {
+      show: {
+        Show: () => import('#features/account/profile/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/account/profile/update/update.controller'),
+      },
     },
   },
   administrator: {
@@ -146,14 +148,16 @@ export const controllers = {
     },
   },
   authentication: {
-    refresh: {
-      Refresh: () => import('#features/authentication/refresh/refresh.controller'),
-    },
-    signIn: {
-      SignIn: () => import('#features/authentication/sign-in/sign-in.controller'),
-    },
-    signOut: {
-      SignOut: () => import('#features/authentication/sign-out/sign-out.controller'),
+    sessions: {
+      refresh: {
+        Refresh: () => import('#features/authentication/sessions/refresh/refresh.controller'),
+      },
+      signIn: {
+        SignIn: () => import('#features/authentication/sessions/sign-in/sign-in.controller'),
+      },
+      signOut: {
+        SignOut: () => import('#features/authentication/sessions/sign-out/sign-out.controller'),
+      },
     },
   },
   HealthCheck: () => import('#features/health-check.controller'),
@@ -168,26 +172,28 @@ export const controllers = {
     },
   },
   storages: {
-    complete: {
-      Complete: () => import('#features/storages/complete/complete.controller'),
-    },
-    create: {
-      Create: () => import('#features/storages/create/create.controller'),
-    },
-    delete: {
-      Delete: () => import('#features/storages/delete/delete.controller'),
-    },
-    download: {
-      Download: () => import('#features/storages/download/download.controller'),
-    },
-    paginate: {
-      Paginate: () => import('#features/storages/paginate/paginate.controller'),
-    },
-    parts: {
-      Parts: () => import('#features/storages/parts/parts.controller'),
-    },
-    show: {
-      Show: () => import('#features/storages/show/show.controller'),
+    files: {
+      complete: {
+        Complete: () => import('#features/storages/files/complete/complete.controller'),
+      },
+      create: {
+        Create: () => import('#features/storages/files/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/storages/files/delete/delete.controller'),
+      },
+      download: {
+        Download: () => import('#features/storages/files/download/download.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/storages/files/paginate/paginate.controller'),
+      },
+      parts: {
+        Parts: () => import('#features/storages/files/parts/parts.controller'),
+      },
+      show: {
+        Show: () => import('#features/storages/files/show/show.controller'),
+      },
     },
   },
   storefront: {

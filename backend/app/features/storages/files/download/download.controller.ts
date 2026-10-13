@@ -1,0 +1,38 @@
+import { inject } from '@adonisjs/core'
+import { HttpContext } from '@adonisjs/core/http'
+import { defineDocs } from '#core/openapi/types'
+import StoragesFileDownloadUseCase from './download.use-case.ts'
+import { IdentifierValidator } from '#core/validator'
+
+@inject()
+export default class StoragesFileDownloadController {
+  static docs = defineDocs({
+    summary: 'Baixar arquivo com o nome original',
+    description:
+      'Redireciona para uma URL temporária do bucket que entrega o arquivo com ' +
+      '`Content-Disposition: attachment` e o nome original.\n\n' +
+      'Existe por uma limitação do navegador, não do storage: o atributo `download` de um ' +
+      '`<a>` é ignorado entre origens, e a API responde numa origem diferente da do app. Sem ' +
+      'esta rota, "salvar arquivo" abriria a imagem numa aba, e o arquivo chegaria nomeado ' +
+      'com o uuid em vez do nome que a pessoa enviou.\n\n' +
+      'Redireciona em vez de servir o binário: o header viaja assinado dentro da URL, então a ' +
+      'aplicação entrega um endereço e sai do caminho, em vez de ficar ocupada pelo tempo da ' +
+      'transferência de cada download.\n\n' +
+      '**Exige sessão**: o bucket é `visibility: private`, e enquanto esta rota ficou aberta ' +
+      'ela emitia URL assinada para qualquer uuid sem sessão - a porta dos fundos que o ' +
+      'fechamento do bucket deixou aberta. Arquivo que a pessoa não alcança responde `404` e ' +
+      'não `403`, para não confirmar a quem sonda que aquele uuid existe.',
+    responses: { 302: 'no-content' },
+  })
+
+  constructor(private readonly useCase: StoragesFileDownloadUseCase) {}
+
+  async handle(context: HttpContext) {
+    const payload = await IdentifierValidator.validate(context.params)
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+
+    if (result.isLeft()) throw result.value
+
+    return context.response.redirect(result.value)
+  }
+}

@@ -1,23 +1,23 @@
 import { vine, paginationFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const AdvisorStudentPaginationValidator = vine.create({
+export const StudentPaginateValidator = vine.create({
   ...paginationFields(),
   classroomId: vine.string().uuid().optional(),
 })
 
-export const AdvisorStudentCreateValidator = vine.create({
+export const StudentCreateValidator = vine.create({
   classroomId: vine.string().uuid(),
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
 /** Só o nome: trocar o aluno de turma é apagar e cadastrar na outra. */
-export const AdvisorStudentUpdateValidator = vine.create({
+export const StudentUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
-export type AdvisorStudentPaginationPayload = Infer<typeof AdvisorStudentPaginationValidator>
+export type StudentPaginatePayload = Infer<typeof StudentPaginateValidator>
 
-export type AdvisorStudentCreatePayload = Infer<typeof AdvisorStudentCreateValidator>
+export type StudentCreatePayload = Infer<typeof StudentCreateValidator>
 
-export type AdvisorStudentUpdatePayload = Infer<typeof AdvisorStudentUpdateValidator>
+export type StudentUpdatePayload = Infer<typeof StudentUpdateValidator>

@@ -4,7 +4,7 @@ import { defineDocs } from '#core/openapi/types'
 import AdministratorAnnouncementPaginateUseCase from './paginate.use-case.ts'
 import {
   ANNOUNCEMENT_SORT_COLUMNS,
-  AdministratorAnnouncementPaginationValidator,
+  AnnouncementPaginateValidator,
 } from '#features/administrator/announcements/announcements.validator'
 
 @inject()
@@ -18,9 +18,7 @@ export default class AdministratorAnnouncementPaginateController {
   constructor(private readonly useCase: AdministratorAnnouncementPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AdministratorAnnouncementPaginationValidator.validate(
-      context.request.qs()
-    )
+    const payload = await AnnouncementPaginateValidator.validate(context.request.qs())
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

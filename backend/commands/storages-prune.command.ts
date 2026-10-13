@@ -21,7 +21,7 @@ const DEFAULT_HOURS = 24
  * cobradas - é lixo que só o aborto do multipart alcança. Sem esta varredura a
  * máquina de estado nunca fecha: `PENDING` é o único estado do qual não se sai.
  *
- * Reusa `StorageDeleteUseCase` em vez de repetir o aborto aqui: apagar um
+ * Reusa `StoragesFileDeleteUseCase` em vez de repetir o aborto aqui: apagar um
  * `PENDING` é exatamente o que o `DELETE` já faz, e duas implementações da
  * mesma coisa é uma que fica para trás. A regra de referência não atrapalha -
  * `assertExist` recusa anexar o que não está `UPLOADED`, então um `PENDING`
@@ -50,8 +50,8 @@ export default class StoragesPrune extends BaseCommand {
 
   async run() {
     const { default: Storage } = await import('#models/storage')
-    const { default: StorageDeleteUseCase } =
-      await import('#features/storages/delete/delete.use-case')
+    const { default: StoragesFileDeleteUseCase } =
+      await import('#features/storages/files/delete/delete.use-case')
     const { UploadStatuses } = await import('#core/entity')
 
     const hours = this.hours ?? DEFAULT_HOURS
@@ -77,7 +77,7 @@ export default class StoragesPrune extends BaseCommand {
       return
     }
 
-    const useCase = await this.app.container.make(StorageDeleteUseCase)
+    const useCase = await this.app.container.make(StoragesFileDeleteUseCase)
 
     let removed = 0
     let failed = 0

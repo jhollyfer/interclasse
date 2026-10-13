@@ -7,10 +7,10 @@ import db from '@adonisjs/lucid/services/db'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { AdministratorSportUpdatePayload } from '#features/administrator/sports/sports.validator'
+import type { SportUpdatePayload } from '#features/administrator/sports/sports.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<AdministratorSportUpdatePayload, IdentifierPayload>
+type Payload = Merge<SportUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, Sport>
 
 @inject()

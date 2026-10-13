@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorMatchPaginateUseCase from './paginate.use-case.ts'
-import { AdministratorMatchPaginationValidator } from '#features/administrator/matches/matches.validator'
+import { MatchPaginateValidator } from '#features/administrator/matches/matches.validator'
 
 @inject()
 export default class AdministratorMatchPaginateController {
@@ -15,7 +15,7 @@ export default class AdministratorMatchPaginateController {
   constructor(private readonly useCase: AdministratorMatchPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AdministratorMatchPaginationValidator.validate(context.request.qs())
+    const payload = await MatchPaginateValidator.validate(context.request.qs())
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

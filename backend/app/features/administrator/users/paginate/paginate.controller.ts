@@ -3,7 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 import {
-  AdministratorUserPaginationValidator,
+  UserPaginateValidator,
   USER_SORT_COLUMNS,
 } from '#features/administrator/users/users.validator'
 
@@ -24,7 +24,7 @@ export default class AdministratorUserPaginateController {
   constructor(private readonly useCase: AdministratorUserPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AdministratorUserPaginationValidator.validate(context.request.qs())
+    const payload = await UserPaginateValidator.validate(context.request.qs())
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

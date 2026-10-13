@@ -7,21 +7,21 @@ export function athletes() {
   return vine.number().withoutDecimals().min(1).max(LIST_LIMITS.ATHLETES)
 }
 
-export const AdministratorSportCreateValidator = vine.create({
+export const SportCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(60),
   minAthletes: athletes(),
   maxAthletes: athletes(),
 })
 
-export const AdministratorSportUpdateValidator = vine.create({
+export const SportUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(60).optional(),
   minAthletes: athletes().optional(),
   maxAthletes: athletes().optional(),
 })
 
-export type AdministratorSportCreatePayload = Infer<
-  typeof AdministratorSportCreateValidator
+export type SportCreatePayload = Infer<
+  typeof SportCreateValidator
 >
-export type AdministratorSportUpdatePayload = Infer<
-  typeof AdministratorSportUpdateValidator
+export type SportUpdatePayload = Infer<
+  typeof SportUpdateValidator
 >
