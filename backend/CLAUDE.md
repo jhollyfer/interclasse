@@ -19,9 +19,11 @@ use-case.
   fallback para `Authorization`. O guard recusa conta arquivada e inativa, e é por
   isso que `/account` usa o `actor` sem reconsultar.
 
-- **`typescript` preso em 6.x.** ponytail: o `typescript-eslint` recusa o TS 7, e o
-  introspector do OpenAPI (`app/core/openapi/introspect.ts`) usa a API JS do
-  compilador, que o TS 7 não tem — sobe quando os dois suportarem (`tooling.md` §0).
+- **TypeScript 7 com o 6 ao lado.** `tsc` (typecheck e build) é o 7, do alias
+  `typescript7`. O nome `typescript` aponta para `@typescript/typescript6`
+  (binário `tsc6`), que é a API JS que o `typescript-eslint` e o introspector do
+  OpenAPI carregam - o 7 não a tem. ponytail: vira um pacote só quando o
+  `typescript-eslint` aceitar o 7.
 
 `database/schema.ts`, `.adonisjs/**` e `openapi.json` são **gerados e commitados**.
 Mexeu em migration, rota, controller ou policy, regenere no **mesmo** commit - o CI
