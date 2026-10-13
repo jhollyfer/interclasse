@@ -39,25 +39,14 @@ router.get('/', function (context) {
   return context.response.ok({ status: 'ok' })
 })
 
-/**
- * Sonda de saúde do container.
- *
- * Responde apenas "o processo está de pé e aceitando requisição", que é o que o
- * orquestrador precisa para decidir se manda tráfego. Não é o
- * `@adonisjs/core/health` de propósito: o `/health/ready` dele reporta uso de
- * disco, memória e contagem de conexões, e a própria documentação avisa que essa
- * resposta descreve a infraestrutura e precisa de header secreto. Uma sonda que
- * exige segredo para ser usada é uma sonda a menos.
- */
-router.get('/health', function (context) {
-  return context.response.ok({ status: 'ok' })
-})
+/** Sonda de vida do container; o porquê está no controller. */
+router.get('/health-check', [controllers.HealthCheck])
 
 /**
  * Documentação da API.
  *
  * As duas rotas ficam fora de qualquer grupo autenticado, e as duas estão em
- * `openapi.ignore` junto com `/` e `/health` - o documento não se documenta.
+ * `openapi.ignore` junto com `/` e `/health-check` - o documento não se documenta.
  *
  * O JSON é lido do disco na primeira requisição e mantido em memória: é um
  * artefato gerado por `node ace openapi:generate` e commitado, então em produção

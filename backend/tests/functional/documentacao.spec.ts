@@ -160,7 +160,7 @@ test.group('documentação > as rotas de serviço', (group) => {
   })
 
   test('a sonda responde ok e não conta nada da infraestrutura', async ({ client, assert }) => {
-    const response = await client.get('/health')
+    const response = await client.get('/health-check')
 
     response.assertStatus(200)
 
@@ -168,6 +168,7 @@ test.group('documentação > as rotas de serviço', (group) => {
     // corpo é **só** isto. Uso de disco, memória ou contagem de conexões numa
     // sonda pública seria informação de infraestrutura de graça para quem pedir.
     assert.deepEqual(response.body(), { status: 'ok' })
+    assert.equal(response.header('cache-control'), 'no-store')
   })
 
   test('sem sessão, o documento responde 404 e não 403', async ({ client }) => {
@@ -201,13 +202,13 @@ test.group('documentação > as rotas de serviço', (group) => {
   test('nenhuma delas aparece no documento', async ({ assert }) => {
     const { paths } = await lerDocumento()
 
-    for (const caminho of ['/', '/health', '/openapi.json', '/documentation']) {
+    for (const caminho of ['/', '/health-check', '/openapi.json', '/documentation']) {
       assert.isUndefined(paths[caminho], `${caminho} está documentado, e não é operação de API`)
     }
   })
 
   test('a raiz e a sonda não exigem sessão', async ({ client, assert }) => {
-    for (const caminho of ['/', '/health']) {
+    for (const caminho of ['/', '/health-check']) {
       const response = await client.get(caminho).redirects(0)
 
       assert.equal(response.status(), 200, `${caminho} exigiu sessão`)

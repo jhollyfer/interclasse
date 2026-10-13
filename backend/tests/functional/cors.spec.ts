@@ -6,12 +6,12 @@ import { body } from '../helpers.ts'
  *
  * O teste roda fora de desenvolvimento - `NODE_ENV=test` -, que é a única
  * condição em que a lista vale: em dev a configuração libera qualquer origem e
- * não haveria o que medir. A rota escolhida é `/health`, porque é pública e o
+ * não haveria o que medir. A rota escolhida é `/health-check`, porque é pública e o
  * que se afere é o cabeçalho da resposta, não o corpo.
  */
 test.group('cors > allowlist', () => {
   test('origem na allowlist recebe o cabeçalho', async ({ client, assert }) => {
-    const response = await client.get('/health').header('origin', 'http://localhost:5173')
+    const response = await client.get('/health-check').header('origin', 'http://localhost:5173')
 
     response.assertStatus(200)
     assert.equal(response.header('access-control-allow-origin'), 'http://localhost:5173')
@@ -21,7 +21,7 @@ test.group('cors > allowlist', () => {
   })
 
   test('origem fora da allowlist não recebe o cabeçalho', async ({ client, assert }) => {
-    const response = await client.get('/health').header('origin', 'http://intruso.example')
+    const response = await client.get('/health-check').header('origin', 'http://intruso.example')
 
     // A requisição em si passa - CORS é decisão do navegador, e o servidor
     // apenas deixa de autorizar. Sem o cabeçalho, o navegador descarta a
