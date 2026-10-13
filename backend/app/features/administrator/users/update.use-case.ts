@@ -1,5 +1,4 @@
 import User from '#models/user'
-import UserPolicy from '#policies/user_policy'
 import ClassroomService from '#services/classroom.service'
 import StorageService from '#services/storage.service'
 import { left, right, type Either } from '#core/either'
@@ -9,8 +8,7 @@ import logger from '@adonisjs/core/services/logger'
 import { ActiveStatuses, type Merge } from '#core/entity'
 import type { AdministratorUserUpdatePayload, IdentifierPayload } from '#core/validator'
 
-/** `actor` é quem faz a requisição, tirado da sessão pelo controller. */
-type Payload = Merge<AdministratorUserUpdatePayload, Merge<IdentifierPayload, { actor: User }>>
+type Payload = Merge<AdministratorUserUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, User>
 
 /**
@@ -29,26 +27,11 @@ type Response = Either<HTTPException, User>
 export default class AdministratorUserUpdateUseCase {
   constructor(
     private readonly storage: StorageService,
-    private readonly policy: UserPolicy,
     private readonly classrooms: ClassroomService
   ) {}
 
-  async execute({ id, actor, ...payload }: Payload): Promise<Response> {
+  async execute({ id, ...payload }: Payload): Promise<Response> {
     try {
-      // A presença do campo basta, sem comparar com o valor atual: mandar o
-      // próprio papel de volta não é edição, e aceitar o que não muda nada só
-      // daria duas respostas para a mesma regra.
-      if (
-        !this.policy.operate(actor, id) &&
-        (payload.role !== undefined || payload.status !== undefined)
-      )
-        return left(
-          HTTPException.Forbidden(
-            'Você não pode alterar o próprio papel ou status',
-            'SELF_ACCESS_FORBIDDEN'
-          )
-        )
-
       const user = await User.query()
         .where('id', id)
         .withScopes((scopes) => scopes.notDeleted())

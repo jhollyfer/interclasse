@@ -1,3 +1,4 @@
+import UserPolicy from '#policies/user.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
@@ -19,10 +20,10 @@ export default class AdministratorUserUpdateController {
       'Sobre a **própria** conta, `role` e `status` respondem `403`: rebaixar-se a conselheiro ou ' +
       'marcar-se `INACTIVE` tira do painel quem estava administrando. Nome, e-mail, senha e ' +
       'foto continuam editáveis.',
-    // Declarado à mão porque nasce fora deste par: quem levanta o
-    // `STORAGE_NOT_FOUND` é o `StorageService`, e a leitura de AST do gerador
-    // só enxerga o `HTTPException` escrito no use-case irmão.
-    errors: { 422: 'STORAGE_NOT_FOUND' },
+    // Declarados à mão porque nascem fora deste par: `STORAGE_NOT_FOUND` vem do
+    // `StorageService` e `SELF_ACCESS_FORBIDDEN` da `UserPolicy`, e a leitura de
+    // AST do gerador só enxerga o `HTTPException` escrito no use-case irmão.
+    errors: { 403: 'SELF_ACCESS_FORBIDDEN', 422: 'STORAGE_NOT_FOUND' },
   })
 
   constructor(private readonly useCase: AdministratorUserUpdateUseCase) {}
@@ -33,12 +34,8 @@ export default class AdministratorUserUpdateController {
     // apontar para outra linha.
     const body = await AdministratorUserUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
-    // O ator vem da sessão, e não do payload.
-    const result = await this.useCase.execute({
-      ...body,
-      ...params,
-      actor: context.auth.getUserOrFail(),
-    })
+    await context.bouncer.with(UserPolicy).authorize('update', params.id, body)
+    const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

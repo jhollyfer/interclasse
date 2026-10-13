@@ -34,6 +34,7 @@
     "#exceptions/*": "./app/exceptions/*.js",
     "#models/*": "./app/models/*.js",
     "#policies/*": "./app/policies/*.js",
+    "#abilities/*": "./app/abilities/*.js",
     "#services/*": "./app/services/*.js",
     "#generated/*": "./.adonisjs/server/*.js",
     "#middleware/*": "./app/middleware/*.js",
@@ -67,6 +68,7 @@
   },
   "dependencies": {
     "@adonisjs/auth": "^10.1.0",
+    "@adonisjs/bouncer": "^4.0.1",
     "@adonisjs/core": "^7.5.0",
     "@adonisjs/cors": "^3.0.0",
     "@adonisjs/drive": "^4.0.0",

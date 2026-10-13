@@ -1,3 +1,5 @@
+import Student from '#models/student'
+import ClassroomPolicy from '#policies/classroom.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
@@ -16,7 +18,9 @@ export default class AdvisorStudentDeleteController {
 
   async handle(context: HttpContext) {
     const payload = await IdentifierValidator.validate(context.params)
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const student = await Student.query().where('id', payload.id).preload('classroom').first()
+    await context.bouncer.with(ClassroomPolicy).authorize('manageStudent', student)
+    const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }

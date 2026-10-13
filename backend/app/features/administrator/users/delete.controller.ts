@@ -1,3 +1,4 @@
+import UserPolicy from '#policies/user.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
@@ -15,14 +16,16 @@ export default class AdministratorUserDeleteController {
       'Só aceita usuário já arquivado: sem isso um clique perderia a conta sem escala ' +
       'intermediária.\n\n' +
       'A **própria** conta responde `403`, antes da exigência de arquivamento.',
+    // Declarado à mão porque nasce fora deste par: quem nega é a `UserPolicy`.
+    errors: { 403: 'SELF_DELETE_FORBIDDEN' },
   })
 
   constructor(private readonly useCase: AdministratorUserDeleteUseCase) {}
 
   async handle(context: HttpContext) {
     const payload = await IdentifierValidator.validate(context.params)
-    // O ator vem da sessão, e não do payload.
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    await context.bouncer.with(UserPolicy).authorize('delete', payload.id)
+    const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }
