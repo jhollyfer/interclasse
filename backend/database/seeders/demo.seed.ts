@@ -11,7 +11,7 @@ import Match from '#models/match'
 import Sport from '#models/sport'
 import Student from '#models/student'
 import User from '#models/user'
-import JogosSeeder from '#database/seeders/jogos.seed'
+import TournamentSeeder from '#database/seeders/tournament.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
 import { ActiveStatuses, Categories, MatchPhases, UserRoles, type Category } from '#core/entity'
@@ -53,8 +53,8 @@ export default class extends BaseSeeder {
 
     // Pelo container, não por `new` (_padroes/backend.md §2.1): o construtor do
     // seeder ganha dependência e a chamada continua montando o objeto inteiro.
-    const jogos = await app.container.make(JogosSeeder, [this.client])
-    await jogos.run()
+    const tournament = await app.container.make(TournamentSeeder, [this.client])
+    await tournament.run()
 
     const advisors = await this.advisors(password)
     const classrooms = await Classroom.query().orderBy('grade').orderBy('name')

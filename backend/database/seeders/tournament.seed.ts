@@ -12,7 +12,7 @@ import { categoryOf } from '#core/entity'
  * mesmo nome esbarraria no `unique` do teste. Idempotente - rodar de novo não
  * duplica, só reafirma.
  */
-export default class extends BaseSeeder {
+export default class TournamentSeeder extends BaseSeeder {
   static override environment = ['development', 'production']
 
   override async run() {
