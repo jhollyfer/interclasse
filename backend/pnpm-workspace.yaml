@@ -8,3 +8,6 @@ allowBuilds:
   # Não é usado: a conexão é PostgreSQL (T6). Compilar o binding do SQLite seria
   # minutos de build a cada install para um driver que ninguém abre.
   better-sqlite3: false
+  # Resolver nativo do `eslint-plugin-import-x`. O postinstall só confere o
+  # binário pré-compilado da plataforma; sem decisão, o install do pnpm 12 para.
+  unrs-resolver: true
