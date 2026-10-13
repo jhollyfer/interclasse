@@ -1,5 +1,9 @@
 # shadcn/ui
 
+> Conferido contra `shadcn@4.21.4` (última publicada no npm). A CLI é usada uma vez por `add`; sem
+> rodar código, não há como confirmar se os arquivos já gravados em `components/ui/` divergem da
+> geração atual (ver `docs/cli` → `diff`).
+
 Componentes React que você **copia para o seu projeto**, em vez de instalar como dependência.
 
 **O que é:** um catálogo de componentes acessíveis, construídos sobre primitivas headless (Radix ou
@@ -42,7 +46,9 @@ quebra o modo escuro depois.
 props. O campo "Quando usar" abaixo foca em **qual componente escolher**, que é a dúvida real, já que
 vários resolvem problemas parecidos.
 
-**Links:** 103.
+**Links:** 107.
+
+**Skills:** `shadcn`, `maiyu-frontend`, `compound-pattern`, `react-composition-patterns`, `dialog-pattern`, `sheet-pattern`, `accessibility`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
 ---
 
@@ -68,14 +74,41 @@ pnpm dlx shadcn@latest add button
 **Quando usar:** uma vez por projeto. Os **aliases de import** precisam existir antes, e é o
 tropeço mais comum do `init`.
 
+```bash
+# básico: exatamente como a doc oficial mostra
+npx shadcn@latest init
+```
+
 ```jsonc
-// tsconfig.json ANTES do init: sem isto, a CLI grava arquivos que não compilam
+// caso real da stack: tsconfig.json ANTES do init: sem isto, a CLI grava arquivos que não compilam
 {
   "compilerOptions": {
     "paths": { "@/*": ["./src/*"] }
   }
 }
 // e o alias equivalente no vite.config.ts, senão quebra só no build
+```
+
+```bash
+# armadilha: rodar o init sem o alias já configurado
+# ERRADO: CLI aceita, mas os imports "@/components/ui/button" gerados
+# não resolvem — erro só aparece no primeiro build/typecheck
+npx shadcn@latest init
+
+# CERTO: alias em tsconfig.json e vite.config.ts primeiro (ver bloco acima),
+# só então o init — a doc de installation lista isso como pré-requisito
+```
+
+#### docs/installation/tanstack
+[doc](https://ui.shadcn.com/docs/installation/tanstack) | [markdown](https://ui.shadcn.com/docs/installation/tanstack.md)
+**O que é:** o guia de instalação específico para TanStack Start — por `shadcn/create` (preset
+visual), pela CLI (`npx create-tsrouter-app@latest` + init) ou num projeto Start já existente.
+**Para que serve:** não adivinhar aliases e config de Vite/Tailwind que o Start já define diferente
+de um Vite genérico.
+**Quando usar:** ao criar um projeto novo com TanStack Start, ou ao rodar `init` num que já existe.
+
+```bash
+pnpm dlx shadcn@latest init   # num projeto TanStack Start existente, detecta o framework
 ```
 
 #### docs/components
@@ -85,11 +118,23 @@ tropeço mais comum do `init`.
 **Quando usar:** **antes de escrever qualquer componente novo**. A chance de já existir é alta.
 
 ```bash
-# o catálogo pelo terminal, sem abrir o navegador
+# básico: listar e adicionar pela CLI, como a doc oficial mostra
+npx shadcn@latest add button
+```
+
+```bash
+# caso real da stack: o catálogo pelo terminal, sem abrir o navegador
 pnpm dlx shadcn@latest add
 
 # e o que JÁ está no projeto (evita reescrever o que já foi instalado):
 ls src/components/ui
+```
+
+```bash
+# armadilha: criar um componente "do zero" em components/ui sem checar o índice
+# ERRADO: escrever um Combobox próprio porque "não lembrava" se existia
+# CERTO: checar docs/components (ou `ls src/components/ui`) antes — o índice
+# lista o que já existe e economiza reinventar variantes e acessibilidade
 ```
 
 #### docs/cli
@@ -126,6 +171,55 @@ errado.
 }
 ```
 
+#### docs/tailwind-v4
+[doc](https://ui.shadcn.com/docs/tailwind-v4) | [markdown](https://ui.shadcn.com/docs/tailwind-v4.md)
+**O que é:** o resumo do que mudou quando o shadcn passou a gerar para Tailwind v4 + React 19: sem
+`forwardRef`, `data-slot` em toda primitiva, cores em OKLCH, estilo padrão novo passa a ser
+`new-york`, e o `toast` antigo (pacote `sonner`) fica deprecado em favor do `Toast` do Base UI.
+**Para que serve:** saber se um trecho de código ou issue que você encontrou é da geração v3/React
+18 ou da atual, antes de copiar.
+**Quando usar:** ao debugar um componente colado de um exemplo antigo que usa `forwardRef` ou cor em
+HSL direto — **são os dois sinais de que o snippet é da geração anterior**, não um bug seu.
+
+```tsx
+// sinal de geração antiga (v3/React 18) — não é erro, é snippet desatualizado
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(...)
+
+// geração atual: sem forwardRef, com data-slot
+function Button({ className, ...props }: ButtonProps) {
+  return <button data-slot="button" className={cn(buttonVariants(), className)} {...props} />
+}
+```
+
+#### docs/react-19
+[doc](https://ui.shadcn.com/docs/react-19) | [markdown](https://ui.shadcn.com/docs/react-19.md)
+**O que é:** o aviso de peer dependency do `npm` quando um pacote ainda não lista React 19 — e a
+flag que resolve.
+**Para que serve:** não travar instalação por falso positivo de incompatibilidade.
+**Quando usar:** **quando `npm install` falhar com `ERESOLVE`** depois de adicionar uma lib de UI.
+`pnpm` (o gerenciador usado aqui) já resolve isso sozinho na maioria dos casos; a flag é para quem
+usa `npm`.
+
+```bash
+# básico: exatamente a flag que a doc oficial recomenda
+npm install --legacy-peer-deps
+```
+
+```bash
+# caso real da stack: só necessário em npm; pnpm normalmente não precisa disto
+npm install pacote-x --legacy-peer-deps
+```
+
+```bash
+# armadilha: usar --force em vez de --legacy-peer-deps
+# ERRADO: --force ignora TODO conflito de peer dep, não só o falso positivo do React 19
+npm install pacote-x --force
+
+# CERTO: --legacy-peer-deps volta ao comportamento do npm 6, que só avisa
+# e não bloqueia — é o que a doc react-19 pede, nada mais amplo que isso
+npm install pacote-x --legacy-peer-deps
+```
+
 #### docs/theming
 [doc](https://ui.shadcn.com/docs/theming) | [markdown](https://ui.shadcn.com/docs/theming.md)
 **O que é:** o sistema de tema por variáveis CSS, com os tokens semânticos (`background`,
@@ -134,7 +228,22 @@ errado.
 **Quando usar:** **leia antes de estilizar qualquer coisa**. Usar `bg-blue-500` em vez de
 `bg-primary` é o que garante que o modo escuro vai quebrar.
 
+```css
+/* básico: os tokens em @theme, exatamente como a doc oficial declara */
+@theme {
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.145 0 0);
+  --color-primary: oklch(0.205 0 0);
+}
+```
+
 ```tsx
+// caso real da stack: Tailwind v4 lê o token direto, sem prefixo "bg-primary-500"
+<Button className="bg-primary text-primary-foreground">Salvar</Button>
+```
+
+```tsx
+// armadilha
 // ERRADO: cor fixa. No modo escuro vira texto branco sobre fundo quase branco.
 // <div className="bg-white text-slate-900">
 
@@ -146,16 +255,28 @@ errado.
 
 #### docs/typeset
 [doc](https://ui.shadcn.com/docs/typeset) | [markdown](https://ui.shadcn.com/docs/typeset.md)
-**O que é:** o sistema de tipografia: escala, pesos, espaçamento e os estilos para conteúdo longo.
-**Para que serve:** texto consistente sem decidir tamanho e peso caso a caso.
-**Quando usar:** ao montar páginas com bastante texto, e ao definir os padrões visuais do projeto.
+**O que é:** um arquivo `typeset.css` próprio (gerado no builder em `/typeset`) que estiliza tudo
+dentro de um contêiner `.typeset` — título, parágrafo, lista, tabela, código — a partir de três
+variáveis (`--typeset-size`, `--typeset-leading`, `--typeset-flow`). Substitui o `prose` do
+`@tailwindcss/typography` (que esta doc antes mostrava); a antiga página `components/base/typography`
+(classes manuais como `scroll-m-20 text-4xl`) **redireciona para aqui** — não existe mais como
+página própria.
+**Para que serve:** texto consistente — markdown renderizado, post de blog, chat — sem decidir
+tamanho e espaçamento elemento por elemento.
+**Quando usar:** ao renderizar conteúdo longo vindo de markdown/CMS. Para um `<h1>`/`<p>` isolado
+escrito à mão no JSX, classes utilitárias pontuais ainda bastam — **não precisa instalar nada só
+para isso**.
+
+```css
+/* typeset.css importado depois do Tailwind */
+@import "tailwindcss";
+@import "./typeset.css";
+```
 
 ```tsx
-// conteúdo longo (markdown, descrição de post) num contêiner só, em vez de
-// classe de tipografia repetida em cada parágrafo
-<article className="prose dark:prose-invert max-w-none">
-  <h2>Título</h2>
-  <p>Parágrafo com escala e espaçamento já definidos.</p>
+// ativa o sistema (.typeset) + o preset gerado no builder (.typeset-docs)
+<article className="typeset typeset-docs">
+  <YourMarkdownRenderer>{content}</YourMarkdownRenderer>
 </article>
 ```
 
@@ -193,8 +314,20 @@ curl -s https://ui.shadcn.com/llms.txt | grep -i questionnaire
 própria página avisa, e isso significa que podem estar atrás da versão que você usa.
 
 ```text
-# a conferência que evita retrabalho: o kit cobre a versão que está no repositório?
+# básico: link do kit oficial, como a doc lista
+# https://www.figma.com/community/file/1203061493325953101
+```
+
+```text
+# caso real da stack: a conferência que evita retrabalho: o kit cobre a versão que está no repositório?
 # componente do kit que não existe no seu components/ui vira tela impossível de entregar.
+```
+
+```text
+# armadilha
+# ERRADO: aceitar o mockup do Figma como fonte de verdade de prop/variante
+# CERTO: Figma é só referência visual — a doc oficial do componente (e o
+# código em components/ui) é quem decide variant/size/API real
 ```
 
 #### docs/package-imports
@@ -247,7 +380,22 @@ não se atualiza sozinho, então saber o que mudou é o que decide se vale reapl
 crua sai praticamente vazia; esta é uma das poucas páginas que só valem no site.
 
 ```bash
-# o par: ler o changelog e só então conferir o que mudou no seu arquivo
+# básico: a página do changelog só existe no site — nada para rodar aqui,
+# a leitura em si é o passo básico antes de qualquer diff/reinstalação
+```
+
+```bash
+# caso real da stack: o par: ler o changelog e só então conferir o que mudou no seu arquivo
+pnpm dlx shadcn@latest diff button
+```
+
+```bash
+# armadilha
+# ERRADO: reinstalar por cima (`add button --overwrite`) sem olhar o changelog
+npx shadcn@latest add button --overwrite
+
+# CERTO: diff primeiro, decide linha a linha o que reaplicar — componente
+# editado à mão não se atualiza sozinho, overwrite perde a edição
 pnpm dlx shadcn@latest diff button
 ```
 
@@ -274,12 +422,30 @@ tratamento de SSR.
 SSR**, e a solução está aqui, não no CSS.
 
 ```tsx
-// o flash acontece porque o servidor não sabe o tema do usuário. A saída é ler
-// a preferência no SERVIDOR (cookie) e já mandar a classe no HTML.
+// básico: o script inline que a doc oficial injeta antes do hidrate, para
+// ler localStorage no cliente sem esperar o React montar
+<script>
+  {`document.documentElement.classList.toggle('dark', localStorage.theme === 'dark')`}
+</script>
+```
+
+```tsx
+// caso real da stack: o flash acontece porque o servidor não sabe o tema do
+// usuário. A saída é ler a preferência no SERVIDOR (cookie) e já mandar a
+// classe no HTML.
 export const Route = createRootRoute({
   loader: () => ({ tema: getCookie('tema') ?? 'light' }),
   component: () => <html className={Route.useLoaderData().tema} />,
 })
+```
+
+```tsx
+// armadilha
+// ERRADO: ler o tema só no cliente (useEffect) e trocar a classe depois do mount
+// — é exatamente o flash que a página existe para evitar
+
+// CERTO: tema decidido no loader do servidor, antes do primeiro HTML sair
+export const Route = createRootRoute({ loader: () => ({ tema: getCookie('tema') ?? 'light' }) })
 ```
 
 #### docs/dark-mode/vite
@@ -311,6 +477,23 @@ tipo do formulário de uma vez. Aqui são os componentes de campo; a biblioteca 
 está em [`react-hook-form.md`](react-hook-form.md), e o schema em [`vinejs.md`](vinejs.md).
 
 ```tsx
+// básico: exatamente o padrão da doc oficial — FormField ligando o campo
+// controlado ao Form.Control/Message do shadcn
+<FormField
+  control={form.control}
+  name="username"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Username</FormLabel>
+      <FormControl><Input {...field} /></FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+```
+
+```tsx
+// caso real da stack
 import { vineResolver } from '@hookform/resolvers/vine'
 import { useForm } from 'react-hook-form'
 import type { Infer } from '@vinejs/vine/types'
@@ -320,6 +503,16 @@ import { vine } from '@/lib/validator'
 const validator = vine.create({ document: vine.string().fixedLength(14) })
 
 // o tipo do formulário SAI do validator: um campo só existe se estiver validado
+const form = useForm<Infer<typeof validator>>({ resolver: vineResolver(validator) })
+```
+
+```tsx
+// armadilha
+// ERRADO: schema local redeclarado no componente, duplicando a regra do backend
+// const schema = z.object({ document: z.string().length(14) })
+
+// CERTO: validator único em lib/validator.ts, par do _shared.validator.ts do
+// backend — mudou a regra lá, muda aqui sem reescrever o form
 const form = useForm<Infer<typeof validator>>({ resolver: vineResolver(validator) })
 ```
 
@@ -350,11 +543,27 @@ projeto que valida com VineJS significa duas bibliotecas de schema no bundle do 
 exatamente o que a escolha de VineJS nos dois lados existe para evitar.
 
 ```tsx
-// o custo escondido: Formisch pressupõe Valibot, e o schema vira uma
-// terceira declaração ao lado dos dois validators que já existem
+// básico: exatamente como a doc oficial inicializa o form
+import { useForm } from 'formisch/react'
+
+const form = useForm({ schema: FormSchema })
+```
+
+```tsx
+// caso real da stack: o custo escondido: Formisch pressupõe Valibot, e o
+// schema vira uma terceira declaração ao lado dos dois validators que já existem
 import * as v from 'valibot'
 
 const FormSchema = v.object({ title: v.pipe(v.string(), v.minLength(5)) })
+```
+
+```tsx
+// armadilha
+// ERRADO: adotar Formisch num projeto que já valida com VineJS
+// — duas libs de schema (Valibot + VineJS) no mesmo bundle do cliente
+
+// CERTO: react-hook-form + vineResolver, a integração já padronizada aqui
+// (ver docs/forms/react-hook-form) — Formisch só em projeto novo sem VineJS
 ```
 
 ## Utilitários e helpers
@@ -384,6 +593,16 @@ referência de props**, porque a página do componente mostra a versão de nomes
 (`QuestionnaireItem`) e esta mostra o namespace (`Questionnaire.Item`).
 
 ```tsx
+// básico: o namespace de primitivas, como a doc oficial mostra
+import { Questionnaire } from '@shadcn/react/questionnaire'
+
+<Questionnaire.Root>
+  <Questionnaire.Item name="objetivo" />
+</Questionnaire.Root>
+```
+
+```tsx
+// caso real da stack
 import { Questionnaire } from '@shadcn/react/questionnaire'
 
 // o mapeamento que confunde: Root é um <form>, cada Item é um <fieldset> e
@@ -393,6 +612,17 @@ import { Questionnaire } from '@shadcn/react/questionnaire'
     <Questionnaire.Title>Qual o objetivo?</Questionnaire.Title>
   </Questionnaire.Item>
 </Questionnaire.Root>
+```
+
+```tsx
+// armadilha
+// ERRADO: procurar prop em QuestionnaireItem (nome achatado) quando a API
+// usada é a de namespace — a página do componente estilizado não documenta
+// o que o namespace aceita
+
+// CERTO: para prop de baixo nível, a referência é esta página (primitiva),
+// não a do componente estilizado
+<Questionnaire.Item name="objetivo" />
 ```
 
 #### docs/helpers/ai-sdk
@@ -458,6 +688,35 @@ pela mesma CLI.
 ```bash
 # o mesmo comando, apontando para o catálogo do time
 pnpm dlx shadcn@latest add https://ui.acme.com/r/tabela-padrao.json
+```
+
+#### docs/directory
+[doc](https://ui.shadcn.com/docs/directory) | [markdown](https://ui.shadcn.com/docs/directory.md)
+**O que é:** o índice de registries de terceiros já embutidos na CLI (sem precisar configurar
+`registries` no `components.json`).
+**Para que serve:** descobrir catálogos de componentes prontos antes de escrever um customizado.
+**Quando usar:** só avalie código de terceiro **revisando antes de instalar** — registry comunitário
+não passa por nenhuma curadoria do shadcn. Nos dois projetos daqui o campo `registries` do
+`components.json` está vazio; isto ainda não está em uso.
+
+```bash
+# básico: exatamente como a doc oficial lista um registry embutido
+npx shadcn add @acme/button
+```
+
+```bash
+# caso real da stack
+npx shadcn add @nome-do-registry/componente
+```
+
+```bash
+# armadilha
+# ERRADO: instalar sem ler o código que a CLI vai copiar para components/ui
+npx shadcn add @registry-comunitario/data-table
+
+# CERTO: revisar o arquivo-fonte do registry antes — não existe curadoria
+# oficial, e o campo `registries` do components.json aqui está vazio
+npx shadcn view @registry-comunitario/data-table
 ```
 
 #### docs/registry/getting-started
@@ -579,10 +838,25 @@ pnpm dlx shadcn@latest mcp init
 query string, que é o método mais fraco dos que existem.
 
 ```tsx
-// e o item precisa estar acessível sem login para o v0 conseguir ler
+// básico: a URL de endpoint que a doc oficial monta
+const url = 'https://ui.shadcn.com/r/styles/new-york/button.json'
+```
+
+```tsx
+// caso real da stack: e o item precisa estar acessível sem login para o v0 conseguir ler
 <a href={`https://v0.dev/chat/api/open?url=${url}`} target="_blank" rel="noreferrer">
   Abrir no v0
 </a>
+```
+
+```tsx
+// armadilha
+// ERRADO: apontar para um registry com cssVars/envVars ou autenticado por header
+// — a página avisa que esses casos não funcionam no botão "Abrir no v0"
+
+// CERTO: só item de registry público, sem variável de ambiente nem token
+// que não seja query string — senão o v0 não consegue buscar o JSON
+const url = 'https://ui.shadcn.com/r/styles/new-york/button.json'
 ```
 
 #### docs/registry/api-reference
@@ -621,6 +895,16 @@ curl -s https://ui.shadcn.com/r/index.json | jq '.[0]'
 componente traga junto os que ele usa.
 
 ```jsonc
+// básico: o shape mínimo que a doc oficial mostra
+{
+  "name": "hello-world",
+  "type": "registry:component",
+  "files": [{ "path": "hello-world.tsx", "type": "registry:component" }]
+}
+```
+
+```jsonc
+// caso real da stack
 {
   "name": "tabela-padrao",
   "type": "registry:component",
@@ -629,6 +913,15 @@ componente traga junto os que ele usa.
   "registryDependencies": ["table", "button", "dropdown-menu"],
   "files": [{ "path": "components/tabela-padrao.tsx", "type": "registry:component" }]
 }
+```
+
+```jsonc
+// armadilha
+// ERRADO: importar Button/DropdownMenu no arquivo e não listar em registryDependencies
+// — a CLI copia só o que está declarado; o import sobra sem o arquivo-fonte
+
+// CERTO: todo componente de components/ui usado no arquivo entra em registryDependencies
+{ "registryDependencies": ["table", "button", "dropdown-menu"] }
 ```
 
 ## Componentes: formulário e entrada
@@ -640,10 +933,28 @@ componente traga junto os que ele usa.
 **Quando usar:** o campo mais usado de qualquer formulário. Combine com `field` para rótulo e erro.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Input } from '@/components/ui/input'
+
+<Input type="email" placeholder="Email" />
+```
+
+```tsx
+// caso real da stack
 import { Input } from '@/components/ui/input'
 
 // type correto muda o teclado no celular e a validação nativa de graça
 <Input type="email" placeholder="user@dominio.com" autoComplete="email" />
+```
+
+```tsx
+// armadilha
+// ERRADO: Input controlado só por useState, em formulário com react-hook-form
+// const [value, setValue] = useState('')
+// <Input value={value} onChange={(e) => setValue(e.target.value)} />
+
+// CERTO: spread do field do RHF — é quem já dá value/onChange/onBlur/ref
+<FormControl><Input {...field} type="email" /></FormControl>
 ```
 
 #### textarea
@@ -654,11 +965,30 @@ import { Input } from '@/components/ui/input'
 ajuste seu.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Textarea } from '@/components/ui/textarea'
+
+<Textarea placeholder="Type your message here." />
+```
+
+```tsx
+// caso real da stack
 import { Textarea } from '@/components/ui/textarea'
 
 // a altura NÃO cresce sozinha: `rows` define o tamanho inicial, e crescimento
 // automático é código seu
 <Textarea rows={4} placeholder="Observações" />
+```
+
+```tsx
+// armadilha
+// ERRADO: contar caractere com useState espelhando o valor do campo
+// const [len, setLen] = useState(0)
+
+// CERTO: ler o valor direto do form (react-hook-form já guarda o estado)
+const descricao = form.watch('descricao')
+<Textarea {...field} />
+<span>{descricao.length}/500</span>
 ```
 
 #### input-group
@@ -669,11 +999,34 @@ import { Textarea } from '@/components/ui/textarea'
 ícone com CSS absoluto por cima.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { InputGroup, InputGroupInput, InputGroupAddon } from '@/components/ui/input-group'
+
+<InputGroup>
+  <InputGroupInput placeholder="Search..." />
+  <InputGroupAddon>@</InputGroupAddon>
+</InputGroup>
+```
+
+```tsx
+// caso real da stack
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 
 // ícone posicionado com `absolute` por cima do input rouba o clique e some no
 // modo RTL. Aqui ele faz parte do layout.
+<InputGroup>
+  <InputGroupAddon><MagnifyingGlass /></InputGroupAddon>
+  <InputGroupInput placeholder="Buscar post" />
+</InputGroup>
+```
+
+```tsx
+// armadilha
+// ERRADO: <div className="relative"><Search className="absolute left-2" /><Input className="pl-8" /></div>
+// — quebra no RTL (ver docs/rtl) e o padding mágico desalinha no primeiro ajuste de ícone
+
+// CERTO: InputGroupAddon já resolve posição e RTL
 <InputGroup>
   <InputGroupAddon><MagnifyingGlass /></InputGroupAddon>
   <InputGroupInput placeholder="Buscar post" />
@@ -688,12 +1041,36 @@ eles.
 **Quando usar:** nesses fluxos. Fazer isso na mão dá muito mais trabalho do que parece.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
+
+<InputOTP maxLength={6}>
+  <InputOTPGroup>
+    <InputOTPSlot index={0} />
+    <InputOTPSlot index={1} />
+  </InputOTPGroup>
+</InputOTP>
+```
+
+```tsx
+// caso real da stack
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 
 // colar o código inteiro distribui entre os quadrados, e Backspace volta para o
 // anterior: é essa parte que dá trabalho na mão
 <InputOTP maxLength={6} onComplete={verificar}>
   <InputOTPGroup>{[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}</InputOTPGroup>
+</InputOTP>
+```
+
+```tsx
+// armadilha
+// ERRADO: seis <Input maxLength={1}> controlando foco manualmente
+// — reimplementa colagem, backspace e navegação que o InputOTP já resolve
+
+// CERTO: um único InputOTP com onComplete, sem gerência de foco na mão
+<InputOTP maxLength={6} onComplete={verificar}>
+  <InputOTPGroup><InputOTPSlot index={0} /></InputOTPGroup>
 </InputOTP>
 ```
 
@@ -705,6 +1082,17 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 rico**. É mais leve, mais acessível de graça e melhor em telas pequenas.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { NativeSelect } from '@/components/ui/native-select'
+
+<NativeSelect>
+  <option value="light">Light</option>
+  <option value="dark">Dark</option>
+</NativeSelect>
+```
+
+```tsx
+// caso real da stack
 import { NativeSelect } from '@/components/ui/native-select'
 
 // no celular abre o seletor do sistema, que é melhor que qualquer lista
@@ -715,6 +1103,15 @@ import { NativeSelect } from '@/components/ui/native-select'
 </NativeSelect>
 ```
 
+```tsx
+// armadilha
+// ERRADO: usar Select customizado para um filtro de 3 opções sem busca
+// nem conteúdo rico — peso de JS maior que o nativo, sem ganho nenhum
+
+// CERTO: NativeSelect — mais leve, melhor no celular, acessibilidade de graça
+<NativeSelect><option value="ATIVO">Ativo</option></NativeSelect>
+```
+
 #### select
 [doc](https://ui.shadcn.com/docs/components/base/select) | [markdown](https://ui.shadcn.com/docs/components/base/select.md)
 **O que é:** o seletor customizado, com grupos, rótulos, separadores e conteúdo livre nas opções.
@@ -723,6 +1120,17 @@ import { NativeSelect } from '@/components/ui/native-select'
 busca.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+<Select>
+  <SelectTrigger className="w-[180px]"><SelectValue placeholder="Theme" /></SelectTrigger>
+  <SelectContent><SelectItem value="light">Light</SelectItem></SelectContent>
+</Select>
+```
+
+```tsx
+// caso real da stack
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // justifica-se quando a opção tem MAIS que texto: ícone, badge, descrição
@@ -730,6 +1138,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
   <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
   <SelectContent><SelectItem value="ATIVO">Ativo</SelectItem></SelectContent>
 </Select>
+```
+
+```tsx
+// armadilha
+// ERRADO: Select para uma lista de 50 cidades, sem busca
+// — usuário rola a lista inteira procurando, experiência despenca
+
+// CERTO: acima de ~20 opções o caso é combobox, que tem busca embutida
+<Combobox options={cidades} />
 ```
 
 #### combobox
@@ -740,6 +1157,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 experiência despenca.
 
 ```tsx
+// básico: exatamente a receita da doc oficial (popover + command)
+import { Command, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
+<Popover>
+  <PopoverTrigger>Select framework...</PopoverTrigger>
+  <PopoverContent>
+    <Command><CommandInput /><CommandList><CommandItem>Next.js</CommandItem></CommandList></Command>
+  </PopoverContent>
+</Popover>
+```
+
+```tsx
+// caso real da stack
 import { Command, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -755,6 +1186,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 </Popover>
 ```
 
+```tsx
+// armadilha
+// ERRADO: usar combobox para uma lista de 4 status fixos
+// — overhead de Command/Popover sem necessidade nenhuma de busca
+
+// CERTO: abaixo de ~20 opções sem conteúdo rico, select (ou native-select) basta
+<Select><SelectTrigger /><SelectContent /></Select>
+```
+
 #### checkbox
 [doc](https://ui.shadcn.com/docs/components/base/checkbox) | [markdown](https://ui.shadcn.com/docs/components/base/checkbox.md)
 **O que é:** a caixa de seleção, com suporte ao estado indeterminado.
@@ -763,11 +1203,29 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 o "selecionar todos" parcial.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Checkbox } from '@/components/ui/checkbox'
+
+<Checkbox id="terms" />
+```
+
+```tsx
+// caso real da stack
 import { Checkbox } from '@/components/ui/checkbox'
 
 // 'indeterminate' é um TERCEIRO estado, não um booleano: é o traço do
 // "selecionar todos" quando só parte das linhas está marcada
 <Checkbox checked={todas ? true : algumas ? 'indeterminate' : false} onCheckedChange={alternar} />
+```
+
+```tsx
+// armadilha
+// ERRADO: checked={todas && algumas} tentando simular o terceiro estado com booleano
+// — nunca mostra o traço, só marcado ou vazio
+
+// CERTO: passar a string literal 'indeterminate', o terceiro valor que o
+// componente aceita de fato
+<Checkbox checked={algumas ? 'indeterminate' : todas} />
 ```
 
 #### radio-group
@@ -777,6 +1235,17 @@ import { Checkbox } from '@/components/ui/checkbox'
 **Quando usar:** com até cinco opções. Acima disso, `select` ocupa menos espaço.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+
+<RadioGroup defaultValue="comfortable">
+  <RadioGroupItem value="default" id="r1" />
+  <RadioGroupItem value="comfortable" id="r2" />
+</RadioGroup>
+```
+
+```tsx
+// caso real da stack
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 // todas as opções visíveis ao mesmo tempo: é a vantagem sobre o select, e o
@@ -787,6 +1256,15 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 </RadioGroup>
 ```
 
+```tsx
+// armadilha
+// ERRADO: RadioGroup com oito opções visíveis de uma vez
+// — ocupa espaço vertical desproporcional ao valor da escolha
+
+// CERTO: acima de cinco opções, select ocupa menos espaço
+<Select><SelectTrigger /><SelectContent /></Select>
+```
+
 #### switch
 [doc](https://ui.shadcn.com/docs/components/base/switch) | [markdown](https://ui.shadcn.com/docs/components/base/switch.md)
 **O que é:** o interruptor de ligar e desligar.
@@ -795,10 +1273,27 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 "Salvar", o certo é `checkbox`, e trocar isso confunde o usuário.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Switch } from '@/components/ui/switch'
+
+<Switch id="airplane-mode" />
+```
+
+```tsx
+// caso real da stack
 import { Switch } from '@/components/ui/switch'
 
 // vale AGORA: a chamada sai no próprio onCheckedChange, sem botão de salvar
 <Switch checked={ativo} onCheckedChange={(v) => alternarStatus.mutate(v)} />
+```
+
+```tsx
+// armadilha
+// ERRADO: Switch dentro de um <form> com botão "Salvar" separado
+// — usuário muda o switch e espera efeito imediato, mas nada aconteceu ainda
+
+// CERTO: se depende de "Salvar", o componente certo é checkbox, não switch
+<Checkbox checked={ativo} onCheckedChange={setAtivo} />
 ```
 
 #### slider
@@ -809,11 +1304,28 @@ import { Switch } from '@/components/ui/switch'
 numérico é melhor.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Slider } from '@/components/ui/slider'
+
+<Slider defaultValue={[50]} max={100} step={1} />
+```
+
+```tsx
+// caso real da stack
 import { Slider } from '@/components/ui/slider'
 
 // dois valores no array = faixa. Digitar "R$ 1.237,00" aqui é impossível, e é
 // por isso que valor exato pede campo numérico.
 <Slider value={faixa} onValueChange={setFaixa} min={0} max={5000} step={50} />
+```
+
+```tsx
+// armadilha
+// ERRADO: Slider para um valor que precisa ser exato (ex.: idade digitada)
+// — usuário não consegue "acertar" 37 arrastando, só aproximar
+
+// CERTO: valor exato é campo numérico; slider é só para faixa aproximada
+<Input type="number" {...field} />
 ```
 
 #### label
@@ -823,12 +1335,29 @@ import { Slider } from '@/components/ui/slider'
 **Quando usar:** em todo campo. Sem rótulo associado, o formulário é inacessível.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Label } from '@/components/ui/label'
+
+<Label htmlFor="email">Your email address</Label>
+```
+
+```tsx
+// caso real da stack
 import { Label } from '@/components/ui/label'
 
 // htmlFor precisa bater com o id: é esse par que faz o clique focar o campo e
 // o leitor de tela anunciar o nome certo
 <Label htmlFor="document">documento</Label>
 <Input id="document" />
+```
+
+```tsx
+// armadilha
+// ERRADO: <span className="text-sm font-medium">documento</span> no lugar do Label
+// — parece igual visualmente, mas não associa ao campo nem é clicável
+
+// CERTO: Label com htmlFor batendo o id — clique foca, leitor de tela anuncia
+<Label htmlFor="document">documento</Label>
 ```
 
 #### field
@@ -839,6 +1368,17 @@ import { Label } from '@/components/ui/label'
 você não escreve nem um `aria-` na mão.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Field, FieldLabel } from '@/components/ui/field'
+
+<Field>
+  <FieldLabel htmlFor="username">Username</FieldLabel>
+  <Input id="username" />
+</Field>
+```
+
+```tsx
+// caso real da stack
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 
 // os aria-describedby e aria-invalid saem prontos: erro e ajuda ficam
@@ -851,6 +1391,15 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 </Field>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <p className="text-sm text-red-500">{erros.document?.message}</p> sem aria-describedby
+// — leitor de tela não anuncia o erro ao focar o campo
+
+// CERTO: FieldError já liga aria-describedby/aria-invalid ao campo do Field
+<FieldError>{erros.document?.message}</FieldError>
+```
+
 #### questionnaire
 [doc](https://ui.shadcn.com/docs/components/base/questionnaire) | [markdown](https://ui.shadcn.com/docs/components/base/questionnaire.md)
 **O que é:** o questionário de várias etapas, uma pergunta por tela, com escolha única, múltipla,
@@ -861,6 +1410,16 @@ visível de uma vez, continua sendo `field` mais `react-hook-form` — este aqui
 esconder campo é custo, não recurso.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Questionnaire, QuestionnaireItem } from '@/components/ui/questionnaire'
+
+<Questionnaire>
+  <QuestionnaireItem name="objetivo" />
+</Questionnaire>
+```
+
+```tsx
+// caso real da stack
 import { Questionnaire, QuestionnaireItem, QuestionnaireNext } from '@/components/ui/questionnaire'
 
 // o componente estilizado usa nomes achatados; a primitiva de
@@ -871,6 +1430,16 @@ import { Questionnaire, QuestionnaireItem, QuestionnaireNext } from '@/component
 </Questionnaire>
 ```
 
+```tsx
+// armadilha
+// ERRADO: montar um formulário comum (todos os campos visíveis) com Questionnaire
+// — esconder campo que não precisava esconder é custo, não recurso
+
+// CERTO: perguntas sequenciais e dependentes usam Questionnaire; formulário
+// normal continua field + react-hook-form, tudo visível de uma vez
+<Field><FieldLabel>documento</FieldLabel><Input /></Field>
+```
+
 #### calendar
 [doc](https://ui.shadcn.com/docs/components/base/calendar) | [markdown](https://ui.shadcn.com/docs/components/base/calendar.md)
 **O que é:** o calendário, com seleção de dia único, de vários dias e de intervalo.
@@ -879,11 +1448,28 @@ import { Questionnaire, QuestionnaireItem, QuestionnaireNext } from '@/component
 calendário com `popover`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Calendar } from '@/components/ui/calendar'
+
+<Calendar mode="single" selected={date} onSelect={setDate} />
+```
+
+```tsx
+// caso real da stack
 import { Calendar } from '@/components/ui/calendar'
 import { ptBR } from 'date-fns/locale'
 
 // sem `locale`, os dias da semana e os meses saem em inglês
 <Calendar mode="range" selected={periodo} onSelect={setPeriodo} locale={ptBR} />
+```
+
+```tsx
+// armadilha
+// ERRADO: Calendar direto na tela como campo de formulário, sem popover
+// — ocupa espaço permanente e não se comporta como um Field normal
+
+// CERTO: dentro de formulário, use date-picker (calendário + popover prontos)
+<DatePicker value={data} onChange={setData} />
 ```
 
 #### date-picker
@@ -913,6 +1499,14 @@ const paraApi = format(data, 'yyyy-MM-dd') // certo: sem passar por UTC
 que um `<Link>` do roteador tenha a aparência de botão sem aninhar `<a>` dentro de `<button>`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Button } from '@/components/ui/button'
+
+<Button variant="outline">Button</Button>
+```
+
+```tsx
+// caso real da stack
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
@@ -923,6 +1517,15 @@ import { Button } from '@/components/ui/button'
 </Button>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <Button onClick={() => navigate({ to: '/users/$id' })}>Ver user</Button>
+// — perde clique do meio, "abrir em nova aba" e o prefetch do Link
+
+// CERTO: asChild manda o estilo para o próprio <a>, sem aninhar elementos
+<Button asChild><Link to="/users/$id" params={{ id }}>Ver user</Link></Button>
+```
+
 #### button-group
 [doc](https://ui.shadcn.com/docs/components/base/button-group) | [markdown](https://ui.shadcn.com/docs/components/base/button-group.md)
 **O que é:** botões agrupados visualmente, com as bordas unidas.
@@ -930,6 +1533,17 @@ import { Button } from '@/components/ui/button'
 **Quando usar:** em barras de ação. Se as opções são mutuamente exclusivas, o certo é `toggle-group`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ButtonGroup } from '@/components/ui/button-group'
+
+<ButtonGroup>
+  <Button variant="outline">Button</Button>
+  <Button variant="outline">Button</Button>
+</ButtonGroup>
+```
+
+```tsx
+// caso real da stack
 import { ButtonGroup } from '@/components/ui/button-group'
 
 // AÇÕES, não estados: cada botão faz algo. Se fosse escolher entre modos de
@@ -940,6 +1554,15 @@ import { ButtonGroup } from '@/components/ui/button-group'
 </ButtonGroup>
 ```
 
+```tsx
+// armadilha
+// ERRADO: ButtonGroup para alternar entre "Lista" e "Grade" (estado, não ação)
+// — os dois ficam clicáveis ao mesmo tempo, sem indicar qual está ativo
+
+// CERTO: estado mutuamente exclusivo é toggle-group, que marca o selecionado
+<ToggleGroup type="single"><ToggleGroupItem value="lista" /></ToggleGroup>
+```
+
 #### toggle
 [doc](https://ui.shadcn.com/docs/components/base/toggle) | [markdown](https://ui.shadcn.com/docs/components/base/toggle.md)
 **O que é:** um botão de dois estados, pressionado ou não.
@@ -947,6 +1570,15 @@ import { ButtonGroup } from '@/components/ui/button-group'
 **Quando usar:** em barra de ferramentas. Para uma preferência, `switch` comunica melhor.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Bold } from 'lucide-react'
+import { Toggle } from '@/components/ui/toggle'
+
+<Toggle aria-label="Toggle bold"><Bold /></Toggle>
+```
+
+```tsx
+// caso real da stack
 import { TextB } from '@phosphor-icons/react'
 import { Toggle } from '@/components/ui/toggle'
 
@@ -956,6 +1588,15 @@ import { Toggle } from '@/components/ui/toggle'
 </Toggle>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <Toggle aria-pressed={negrito}>...</Toggle> escrevendo aria-pressed à mão
+// — o componente já deriva isso de `pressed`; o atributo manual pode divergir
+
+// CERTO: só passar `pressed`, o aria- sai sincronizado sozinho
+<Toggle pressed={negrito} onPressedChange={setNegrito} aria-label="Negrito" />
+```
+
 #### toggle-group
 [doc](https://ui.shadcn.com/docs/components/base/toggle-group) | [markdown](https://ui.shadcn.com/docs/components/base/toggle-group.md)
 **O que é:** um conjunto de toggles, com seleção única ou múltipla.
@@ -963,6 +1604,16 @@ import { Toggle } from '@/components/ui/toggle'
 **Quando usar:** quando as opções são poucas e cabem lado a lado.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+
+<ToggleGroup type="single">
+  <ToggleGroupItem value="a">A</ToggleGroupItem>
+</ToggleGroup>
+```
+
+```tsx
+// caso real da stack
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 // type="single" garante exclusividade; "multiple" permite combinar
@@ -970,6 +1621,15 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
   <ToggleGroupItem value="lista">Lista</ToggleGroupItem>
   <ToggleGroupItem value="grade">Grade</ToggleGroupItem>
 </ToggleGroup>
+```
+
+```tsx
+// armadilha
+// ERRADO: type="multiple" para "lista vs grade", que são mutuamente exclusivos
+// — permite os dois marcados ao mesmo tempo, estado que não existe na tela
+
+// CERTO: type="single" garante exclusividade de verdade
+<ToggleGroup type="single" value={modo} onValueChange={setModo} />
 ```
 
 #### dropdown-menu
@@ -980,6 +1640,17 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 interface bem mais limpa.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
+<DropdownMenu>
+  <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+  <DropdownMenuContent><DropdownMenuItem>Profile</DropdownMenuItem></DropdownMenuContent>
+</DropdownMenu>
+```
+
+```tsx
+// caso real da stack
 import { DotsThree } from '@phosphor-icons/react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
@@ -993,6 +1664,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 </DropdownMenu>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <DropdownMenuItem className="text-red-500">Remover</DropdownMenuItem>
+// — cor fixa fora do token semântico, não muda junto com o tema
+
+// CERTO: variant="destructive" já usa o token semântico certo
+<DropdownMenuItem variant="destructive">Remover</DropdownMenuItem>
+```
+
 #### context-menu
 [doc](https://ui.shadcn.com/docs/components/base/context-menu) | [markdown](https://ui.shadcn.com/docs/components/base/context-menu.md)
 **O que é:** o menu do clique direito.
@@ -1001,6 +1681,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 existe.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
+
+<ContextMenu>
+  <ContextMenuTrigger>Right click here</ContextMenuTrigger>
+  <ContextMenuContent><ContextMenuItem>Profile</ContextMenuItem></ContextMenuContent>
+</ContextMenu>
+```
+
+```tsx
+// caso real da stack
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 
 // no toque não há clique direito: TODA ação daqui precisa existir também no
@@ -1009,6 +1700,15 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } 
   <ContextMenuTrigger>{linha}</ContextMenuTrigger>
   <ContextMenuContent><ContextMenuItem>Duplicar</ContextMenuItem></ContextMenuContent>
 </ContextMenu>
+```
+
+```tsx
+// armadilha
+// ERRADO: ação "Duplicar" que só existe no context-menu
+// — no celular, sem clique direito, a ação simplesmente não existe
+
+// CERTO: a mesma ação também fica no dropdown-menu de três pontinhos da linha
+<DropdownMenu><DropdownMenuContent><DropdownMenuItem>Duplicar</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
 ```
 
 #### menubar
@@ -1038,6 +1738,16 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } fro
 escolha usual.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from '@/components/ui/navigation-menu'
+
+<NavigationMenu>
+  <NavigationMenuList><NavigationMenuItem>Item</NavigationMenuItem></NavigationMenuList>
+</NavigationMenu>
+```
+
+```tsx
+// caso real da stack
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuTrigger } from '@/components/ui/navigation-menu'
 
 // pensado para navegação PÚBLICA, com painéis largos e conteúdo promocional.
@@ -1050,6 +1760,15 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 </NavigationMenu>
 ```
 
+```tsx
+// armadilha
+// ERRADO: NavigationMenu como navegação principal de um painel administrativo
+// — pensado para painéis largos promocionais, não para hierarquia de páginas
+
+// CERTO: painel autenticado usa sidebar, que comunica hierarquia melhor
+<SidebarProvider><Sidebar /></SidebarProvider>
+```
+
 #### sidebar
 [doc](https://ui.shadcn.com/docs/components/base/sidebar) | [markdown](https://ui.shadcn.com/docs/components/base/sidebar.md)
 **O que é:** a barra lateral completa: recolhível, responsiva, com grupos, submenus, rodapé e
@@ -1059,6 +1778,16 @@ persistência do estado.
 isso na mão custa dias.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Sidebar, SidebarContent, SidebarProvider } from '@/components/ui/sidebar'
+
+<SidebarProvider>
+  <Sidebar><SidebarContent /></Sidebar>
+</SidebarProvider>
+```
+
+```tsx
+// caso real da stack
 import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarProvider } from '@/components/ui/sidebar'
 
 // o provider guarda o estado recolhido em cookie: sobrevive ao F5 e ao SSR
@@ -1073,6 +1802,15 @@ import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarProvide
 </SidebarProvider>
 ```
 
+```tsx
+// armadilha
+// ERRADO: montar sidebar recolhível na mão com useState + CSS de largura
+// — reimplementa dias de trabalho que o componente já resolve (persistência, SSR, atalho)
+
+// CERTO: SidebarProvider já guarda o estado recolhido em cookie
+<SidebarProvider><Sidebar collapsible="icon" /></SidebarProvider>
+```
+
 #### breadcrumb
 [doc](https://ui.shadcn.com/docs/components/base/breadcrumb) | [markdown](https://ui.shadcn.com/docs/components/base/breadcrumb.md)
 **O que é:** a trilha de navegação hierárquica, com colapso quando há níveis demais.
@@ -1080,6 +1818,16 @@ import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarProvide
 **Quando usar:** em hierarquias de três ou mais níveis. Em navegação rasa, é ruído.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb'
+
+<Breadcrumb>
+  <BreadcrumbList><BreadcrumbItem><BreadcrumbPage>Home</BreadcrumbPage></BreadcrumbItem></BreadcrumbList>
+</Breadcrumb>
+```
+
+```tsx
+// caso real da stack
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 // a página ATUAL não é link: BreadcrumbPage marca aria-current e evita o link
@@ -1092,6 +1840,15 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 </Breadcrumb>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <BreadcrumbLink>Acme</BreadcrumbLink> para a página atual
+// — vira um link que recarrega a própria página e não marca aria-current
+
+// CERTO: a última miga é BreadcrumbPage, nunca BreadcrumbLink
+<BreadcrumbItem><BreadcrumbPage>Acme</BreadcrumbPage></BreadcrumbItem>
+```
+
 #### pagination
 [doc](https://ui.shadcn.com/docs/components/base/pagination) | [markdown](https://ui.shadcn.com/docs/components/base/pagination.md)
 **O que é:** os controles de paginação, com anterior, próximo e números de página.
@@ -1100,6 +1857,16 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 funcionar.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination'
+
+<Pagination>
+  <PaginationContent><PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem></PaginationContent>
+</Pagination>
+```
+
+```tsx
+// caso real da stack
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination'
 
 // link de verdade, com a página na URL: botão voltar funciona e o link é
@@ -1111,6 +1878,15 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@
 </PaginationItem>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <PaginationLink onClick={() => setPage(2)}>2</PaginationLink>, página em useState
+// — botão voltar do navegador não volta de página, e o link não é compartilhável
+
+// CERTO: asChild + Link, página real na URL via search param
+<PaginationLink asChild><Link to="/posts/" search={{ page: 2 }}>2</Link></PaginationLink>
+```
+
 #### tabs
 [doc](https://ui.shadcn.com/docs/components/base/tabs) | [markdown](https://ui.shadcn.com/docs/components/base/tabs.md)
 **O que é:** abas com navegação por teclado e painéis associados.
@@ -1119,6 +1895,17 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@
 a página joga o usuário de volta na primeira aba.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+<Tabs defaultValue="account">
+  <TabsList><TabsTrigger value="account">Account</TabsTrigger></TabsList>
+  <TabsContent value="account">Account content</TabsContent>
+</Tabs>
+```
+
+```tsx
+// caso real da stack
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // a aba ativa vem do search param: F5 e link compartilhado preservam a aba
@@ -1127,6 +1914,15 @@ const { aba } = Route.useSearch()
   <TabsList><TabsTrigger value="dados">Dados</TabsTrigger></TabsList>
   <TabsContent value="dados">{conteudo}</TabsContent>
 </Tabs>
+```
+
+```tsx
+// armadilha
+// ERRADO: const [aba, setAba] = useState('dados'), sem ligar na URL
+// — F5 na aba "histórico" volta para "dados", e o link copiado também
+
+// CERTO: aba ativa é search param da rota, não useState local
+<Tabs value={aba} onValueChange={(v) => navigate({ search: { aba: v } })} />
 ```
 
 ## Componentes: sobreposição
@@ -1138,6 +1934,17 @@ const { aba } = Route.useSearch()
 **Quando usar:** para interações curtas. Formulário longo em modal é desconfortável, prefira página.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+
+<Dialog>
+  <DialogTrigger>Open</DialogTrigger>
+  <DialogContent><DialogTitle>Edit profile</DialogTitle></DialogContent>
+</Dialog>
+```
+
+```tsx
+// caso real da stack
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 // DialogTitle é obrigatório para acessibilidade: sem ele, o leitor de tela
@@ -1151,6 +1958,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 </Dialog>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <DialogContent><p>texto</p></DialogContent> sem DialogTitle
+// — leitor de tela anuncia "diálogo" sem nome, falha de acessibilidade real
+
+// CERTO: DialogTitle sempre presente, mesmo que visualmente oculto (sr-only)
+<DialogContent><DialogTitle className="sr-only">Nova categoria</DialogTitle></DialogContent>
+```
+
 #### alert-dialog
 [doc](https://ui.shadcn.com/docs/components/base/alert-dialog) | [markdown](https://ui.shadcn.com/docs/components/base/alert-dialog.md)
 **O que é:** o modal de confirmação, que **não fecha ao clicar fora** e exige uma escolha explícita.
@@ -1159,6 +1975,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 por acidente, e usar o componente errado aqui é um risco real.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from '@/components/ui/alert-dialog'
+
+<AlertDialog>
+  <AlertDialogContent>
+    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+    <AlertDialogCancel>Cancel</AlertDialogCancel>
+    <AlertDialogAction>Continue</AlertDialogAction>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+```tsx
+// caso real da stack
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from '@/components/ui/alert-dialog'
 
 // clicar fora NÃO fecha: a escolha precisa ser explícita. Com Dialog comum, um
@@ -1170,6 +2000,16 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
     <AlertDialogAction onClick={() => remover.mutate(id)}>Remover</AlertDialogAction>
   </AlertDialogContent>
 </AlertDialog>
+```
+
+```tsx
+// armadilha
+// ERRADO: usar Dialog comum para confirmar remoção
+// — clique fora do modal "cancela" silenciosamente, e o usuário nunca sabe
+// se a remoção aconteceu ou não
+
+// CERTO: toda remoção usa alert-dialog, que exige escolha explícita
+<AlertDialog><AlertDialogContent><AlertDialogAction onClick={() => remover.mutate(id)} /></AlertDialogContent></AlertDialog>
 ```
 
 #### drawer
@@ -1195,6 +2035,17 @@ return <Container>{conteudo}</Container>
 painel de filtros.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+
+<Sheet>
+  <SheetTrigger>Open</SheetTrigger>
+  <SheetContent><SheetTitle>Edit profile</SheetTitle></SheetContent>
+</Sheet>
+```
+
+```tsx
+// caso real da stack
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 
 // a lista continua visível atrás: é a diferença prática para o dialog, que
@@ -1205,6 +2056,15 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 </Sheet>
 ```
 
+```tsx
+// armadilha
+// ERRADO: Sheet para confirmar remoção de um item
+// — some sem exigir escolha explícita; clique fora fecha "sem querer"
+
+// CERTO: remoção/ação destrutiva é alert-dialog, que não fecha ao clicar fora
+<AlertDialog><AlertDialogContent /></AlertDialog>
+```
+
 #### popover
 [doc](https://ui.shadcn.com/docs/components/base/popover) | [markdown](https://ui.shadcn.com/docs/components/base/popover.md)
 **O que é:** um balão flutuante com conteúdo interativo, posicionado em relação a um gatilho.
@@ -1213,6 +2073,17 @@ formulário.
 **Quando usar:** quando o conteúdo é **interativo**. Se for só um texto explicativo, use `tooltip`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
+<Popover>
+  <PopoverTrigger>Open</PopoverTrigger>
+  <PopoverContent>Place content for the popover here.</PopoverContent>
+</Popover>
+```
+
+```tsx
+// caso real da stack
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 // abre por CLIQUE e o conteúdo é focável: tooltip não serve para nada que o
@@ -1223,6 +2094,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 </Popover>
 ```
 
+```tsx
+// armadilha
+// ERRADO: Tooltip com um formulário dentro (conteúdo interativo)
+// — tooltip some ao tirar o mouse, antes do clique chegar ao campo
+
+// CERTO: qualquer conteúdo que precise de clique ou digitação é popover
+<Popover><PopoverTrigger /><PopoverContent><Input /></PopoverContent></Popover>
+```
+
 #### hover-card
 [doc](https://ui.shadcn.com/docs/components/base/hover-card) | [markdown](https://ui.shadcn.com/docs/components/base/hover-card.md)
 **O que é:** um cartão que aparece ao passar o mouse, com conteúdo mais rico que um tooltip.
@@ -1231,6 +2111,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 existe passar o mouse.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+
+<HoverCard>
+  <HoverCardTrigger>Hover</HoverCardTrigger>
+  <HoverCardContent>The React Framework – created and maintained by @vercel.</HoverCardContent>
+</HoverCard>
+```
+
+```tsx
+// caso real da stack
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 
 // no celular este conteúdo NUNCA aparece: só prévia, nunca informação ou ação
@@ -1241,6 +2132,15 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 </HoverCard>
 ```
 
+```tsx
+// armadilha
+// ERRADO: colocar o único botão "Remover user" dentro do HoverCardContent
+// — no toque não existe passar o mouse, a ação fica inacessível no celular
+
+// CERTO: hover-card só para prévia; ação essencial mora fora dele
+<HoverCard><HoverCardContent>{user.document}</HoverCardContent></HoverCard>
+```
+
 #### tooltip
 [doc](https://ui.shadcn.com/docs/components/base/tooltip) | [markdown](https://ui.shadcn.com/docs/components/base/tooltip.md)
 **O que é:** a dica de texto curta que aparece ao passar o mouse ou focar.
@@ -1249,6 +2149,17 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 acessível, o `aria-label` continua necessário.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+
+<Tooltip>
+  <TooltipTrigger>Hover</TooltipTrigger>
+  <TooltipContent>Add to library</TooltipContent>
+</Tooltip>
+```
+
+```tsx
+// caso real da stack
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 // o aria-label continua obrigatório: o tooltip é visual, e o leitor de tela
@@ -1261,6 +2172,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 </Tooltip>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <Button size="icon"><Trash /></Button> sem aria-label, só com tooltip
+// — tooltip é visual; leitor de tela não anuncia nada no botão
+
+// CERTO: aria-label sempre, tooltip é reforço visual, não substituto
+<Button size="icon" aria-label="Remover"><Trash /></Button>
+```
+
 #### command
 [doc](https://ui.shadcn.com/docs/components/base/command) | [markdown](https://ui.shadcn.com/docs/components/base/command.md)
 **O que é:** a paleta de comandos com busca, no estilo Cmd+K, com grupos e atalhos.
@@ -1268,6 +2188,17 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 **Quando usar:** em aplicações densas, para usuários frequentes. É também a base do `combobox`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Command, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+
+<Command>
+  <CommandInput placeholder="Type a command..." />
+  <CommandList><CommandItem>Calendar</CommandItem></CommandList>
+</Command>
+```
+
+```tsx
+// caso real da stack
 import { CommandDialog, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 
 // o atalho é código seu: o componente não registra listener de teclado
@@ -1276,6 +2207,15 @@ useEffect(() => {
   document.addEventListener('keydown', h)
   return () => document.removeEventListener('keydown', h)
 }, [])
+```
+
+```tsx
+// armadilha
+// ERRADO: esperar que CommandDialog abra sozinho com Cmd+K
+// — o componente só desenha a paleta; o listener de teclado é código seu
+
+// CERTO: registrar o listener e controlar `open` manualmente (ver efeito acima)
+<CommandDialog open={aberto} onOpenChange={setAberto} />
 ```
 
 ## Componentes: exibição de dados
@@ -1288,6 +2228,17 @@ useEffect(() => {
 `data-table`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+<Table>
+  <TableHeader><TableRow><TableHead>Invoice</TableHead></TableRow></TableHeader>
+  <TableBody><TableRow><TableCell>INV001</TableCell></TableRow></TableBody>
+</Table>
+```
+
+```tsx
+// caso real da stack
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 // só marcação e estilo: ordenar, filtrar e paginar é com o TanStack Table
@@ -1295,6 +2246,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
   <TableHeader><TableRow><TableHead>User</TableHead></TableRow></TableHeader>
   <TableBody>{linhas.map((l) => <TableRow key={l.id}><TableCell>{l.name}</TableCell></TableRow>)}</TableBody>
 </Table>
+```
+
+```tsx
+// armadilha
+// ERRADO: implementar ordenação clicando no TableHead com useState manual
+// — reimplementa o que o TanStack Table já resolve, e diverge do resto do app
+
+// CERTO: tabela com ordenação/filtro é o padrão data-table, não Table puro
+<Table>{/* motor: useReactTable — ver entrada data-table */}</Table>
 ```
 
 #### data-table
@@ -1306,6 +2266,14 @@ ordenação, filtro, paginação, seleção e visibilidade de colunas.
 um componente instalável, e por isso vale ler com atenção antes de sair colando.
 
 ```tsx
+// básico: exatamente a receita da doc oficial
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+
+const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() })
+```
+
+```tsx
+// caso real da stack
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
 // `shadcn add data-table` NÃO existe: é código para copiar e adaptar.
@@ -1314,6 +2282,15 @@ const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() 
 
 // com paginação no SERVIDOR, use manualPagination e mande a página pela URL,
 // senão a tabela pagina só o que já está em memória
+```
+
+```tsx
+// armadilha
+// ERRADO: usar getPaginationRowModel() com dado já paginado pelo servidor
+// — a tabela repagina em memória o que já chegou paginado, só mostra uma parte
+
+// CERTO: manualPagination:true + pageCount vindo da API, página na URL
+const table = useReactTable({ data, columns, manualPagination: true, pageCount })
 ```
 
 #### chart
@@ -1325,12 +2302,30 @@ sistema de cores.
 tema.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
+
+const chartConfig = { desktop: { label: 'Desktop', color: 'var(--chart-1)' } }
+<ChartContainer config={chartConfig}><BarChart data={chartData} /></ChartContainer>
+```
+
+```tsx
+// caso real da stack
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
 
 // as cores saem do config, que aponta para variáveis CSS: o gráfico troca
 // junto com o tema, sem hex escrito no componente
 const config = { total: { label: 'Total', color: 'var(--chart-1)' } }
 <ChartContainer config={config}><BarChart data={dados}><ChartTooltip /></BarChart></ChartContainer>
+```
+
+```tsx
+// armadilha
+// ERRADO: <Bar fill="#2563eb" /> com hex fixo direto no Recharts
+// — não muda no modo escuro, porque não é token do tema
+
+// CERTO: cor vem do config, que referencia a variável CSS do tema
+<Bar dataKey="total" fill="var(--color-total)" />
 ```
 
 #### badge
@@ -1341,11 +2336,28 @@ const config = { total: { label: 'Total', color: 'var(--chart-1)' } }
 só, em vez de repetir o `if` em cada tela.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Badge } from '@/components/ui/badge'
+
+<Badge variant="secondary">Badge</Badge>
+```
+
+```tsx
+// caso real da stack
 import { Badge } from '@/components/ui/badge'
 
 // um lookup, não um if espalhado por tela: status novo se resolve num lugar só
 const VARIANTE = { ATIVO: 'default', INATIVO: 'secondary', REMOVIDO: 'destructive' } as const
 
+<Badge variant={VARIANTE[user.status]}>{user.status}</Badge>
+```
+
+```tsx
+// armadilha
+// ERRADO: if (status === 'ATIVO') variant = 'default'; else if (...) ...
+// repetido em cada tela que mostra o status
+
+// CERTO: lookup object único, importado onde precisar (regra 6 de typescript.md)
 <Badge variant={VARIANTE[user.status]}>{user.status}</Badge>
 ```
 
@@ -1356,6 +2368,17 @@ const VARIANTE = { ATIVO: 'default', INATIVO: 'secondary', REMOVIDO: 'destructiv
 **Quando usar:** em cabeçalho, listagem e comentários. O fallback evita o ícone de imagem quebrada.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+<Avatar>
+  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+  <AvatarFallback>CN</AvatarFallback>
+</Avatar>
+```
+
+```tsx
+// caso real da stack
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 // o fallback cobre os dois casos: sem avatar e com URL quebrada
@@ -1363,6 +2386,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   <AvatarImage src={user.avatarUrl} alt={user.name} />
   <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
 </Avatar>
+```
+
+```tsx
+// armadilha
+// ERRADO: <img src={user.avatarUrl ?? '/placeholder.png'} /> só
+// — se a URL existir mas a imagem falhar (404), fica o ícone de imagem quebrada
+
+// CERTO: AvatarFallback cobre os dois casos (sem URL e URL que falha)
+<Avatar><AvatarImage src={user.avatarUrl} /><AvatarFallback>CN</AvatarFallback></Avatar>
 ```
 
 #### card
@@ -1373,6 +2405,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 que organiza.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+<Card>
+  <CardHeader><CardTitle>Card Title</CardTitle></CardHeader>
+  <CardContent>Card Content</CardContent>
+</Card>
+```
+
+```tsx
+// caso real da stack
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 // card dentro de card multiplica bordas e sombras: use separator ou espaçamento
@@ -1383,19 +2426,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 </Card>
 ```
 
-#### typography
-[doc](https://ui.shadcn.com/docs/components/base/typography) | [markdown](https://ui.shadcn.com/docs/components/base/typography.md)
-**O que é:** o conjunto de classes para título, parágrafo, citação, lista, tabela e código.
-**Para que serve:** texto com hierarquia consistente sem decidir tamanho caso a caso.
-**Quando usar:** **não é componente instalável**, é uma página de receitas para copiar — `shadcn add
-typography` não existe. Serve para texto que você escreve no JSX; para conteúdo longo vindo de
-markdown, o contêiner de `typeset` resolve com uma classe só.
-
 ```tsx
-// as classes vão no elemento, uma por vez. Repetir isto em 40 parágrafos é o
-// sinal de que o caso era o contêiner de tipografia, não este.
-<h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">Título</h1>
-<p className="leading-7 [&:not(:first-child)]:mt-6">Parágrafo.</p>
+// armadilha
+// ERRADO: <Card><CardContent><Card>{secaoInterna}</Card></CardContent></Card>
+// — borda e sombra se multiplicam, visual fica poluído
+
+// CERTO: dividir seção interna com Separator ou só espaçamento, sem novo Card
+<Card><CardContent><Separator className="my-4" />{secaoInterna}</CardContent></Card>
 ```
 
 #### item
@@ -1406,6 +2443,16 @@ markdown, o contêiner de `typeset` resolve com uma classe só.
 toda vez.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Item, ItemContent, ItemTitle } from '@/components/ui/item'
+
+<Item>
+  <ItemContent><ItemTitle>Basic Item</ItemTitle></ItemContent>
+</Item>
+```
+
+```tsx
+// caso real da stack
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item'
 
 // o layout ícone / texto / ação já vem resolvido, inclusive o truncamento do
@@ -1417,6 +2464,15 @@ import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/componen
 </Item>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <div className="flex items-center gap-2">{icone}{texto}{acao}</div>
+// remontado em cada lista — trunca texto longo diferente em cada tela
+
+// CERTO: Item já resolve o layout e o truncamento de forma consistente
+<Item><ItemMedia /><ItemContent /><ItemActions /></Item>
+```
+
 #### empty
 [doc](https://ui.shadcn.com/docs/components/base/empty) | [markdown](https://ui.shadcn.com/docs/components/base/empty.md)
 **O que é:** o estado vazio, com ícone, título, descrição e ação.
@@ -1425,6 +2481,17 @@ import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/componen
 frustra quem chega primeiro no sistema.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty'
+
+<Empty>
+  <EmptyTitle>No Projects Yet</EmptyTitle>
+  <EmptyDescription>You haven&apos;t created any projects yet.</EmptyDescription>
+</Empty>
+```
+
+```tsx
+// caso real da stack
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty'
 
 // os dois casos pedem textos DIFERENTES: "ainda não há nada" convida a criar,
@@ -1438,6 +2505,15 @@ import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty'
 )}
 ```
 
+```tsx
+// armadilha
+// ERRADO: mesmo texto "Nenhum post ainda" tanto sem dado quanto com filtro sem
+// resultado — convida a "criar" quando o problema real é o filtro aplicado
+
+// CERTO: texto depende da causa (lista vazia vs. filtro sem resultado)
+<Empty><EmptyTitle>{filtroAtivo ? 'Nada encontrado' : 'Nenhum post ainda'}</EmptyTitle></Empty>
+```
+
 #### skeleton
 [doc](https://ui.shadcn.com/docs/components/base/skeleton) | [markdown](https://ui.shadcn.com/docs/components/base/skeleton.md)
 **O que é:** o bloco cinza que representa o conteúdo enquanto carrega.
@@ -1446,6 +2522,14 @@ import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui/empty'
 o pulo continua.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Skeleton } from '@/components/ui/skeleton'
+
+<Skeleton className="h-4 w-[250px]" />
+```
+
+```tsx
+// caso real da stack
 import { Skeleton } from '@/components/ui/skeleton'
 
 // as MEDIDAS precisam bater com o conteúdo real: esqueleto de 3 linhas para um
@@ -1455,6 +2539,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 </div>
 ```
 
+```tsx
+// armadilha
+// ERRADO: um só <Skeleton className="h-4" /> genérico para um card com avatar + 3 linhas
+// — layout pula do mesmo jeito quando o conteúdo real chega
+
+// CERTO: um skeleton por bloco real, nas mesmas medidas do conteúdo final
+<div className="flex gap-2"><Skeleton className="size-10 rounded-full" /><Skeleton className="h-4 w-40" /></div>
+```
+
 #### spinner
 [doc](https://ui.shadcn.com/docs/components/base/spinner) | [markdown](https://ui.shadcn.com/docs/components/base/spinner.md)
 **O que é:** o indicador circular de carregamento.
@@ -1462,6 +2555,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 **Quando usar:** em botão durante o envio. Para carregar uma tela inteira, `skeleton` é melhor.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Spinner } from '@/components/ui/spinner'
+
+<Spinner />
+```
+
+```tsx
+// caso real da stack
 import { Spinner } from '@/components/ui/spinner'
 
 // desabilitar junto evita o envio duplo por clique impaciente
@@ -1471,6 +2572,16 @@ import { Spinner } from '@/components/ui/spinner'
 </Button>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <Spinner /> cobrindo a tela inteira para um carregamento previsível
+// — pula o layout todo quando o conteúdo chega, sem reservar espaço
+
+// CERTO: tela inteira usa skeleton, do tamanho do conteúdo final; spinner é
+// só para espaço pequeno (botão, ícone)
+<Skeleton className="h-screen w-full" />
+```
+
 #### progress
 [doc](https://ui.shadcn.com/docs/components/base/progress) | [markdown](https://ui.shadcn.com/docs/components/base/progress.md)
 **O que é:** a barra de progresso, determinada ou indeterminada.
@@ -1478,11 +2589,28 @@ import { Spinner } from '@/components/ui/spinner'
 **Quando usar:** em upload e processamento com percentual conhecido. Sem percentual, `spinner`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Progress } from '@/components/ui/progress'
+
+<Progress value={33} />
+```
+
+```tsx
+// caso real da stack
 import { Progress } from '@/components/ui/progress'
 
 // barra sem percentual real (fake progress) mente para o usuário: sem número
 // confiável, spinner é mais honesto
 <Progress value={(enviados / total) * 100} />
+```
+
+```tsx
+// armadilha
+// ERRADO: <Progress value={progressoFalso} /> animado sozinho sem relação com
+// upload real — mente sobre o quanto falta
+
+// CERTO: sem percentual confiável, use spinner — é mais honesto que fingir
+<Spinner />
 ```
 
 #### separator
@@ -1493,11 +2621,28 @@ import { Progress } from '@/components/ui/progress'
 de tela não anunciar.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Separator } from '@/components/ui/separator'
+
+<Separator />
+```
+
+```tsx
+// caso real da stack
 import { Separator } from '@/components/ui/separator'
 
 // decorative: some da árvore de acessibilidade. Sem isso, o leitor de tela
 // anuncia cada linha como um marco de seção.
 <Separator decorative orientation="vertical" className="h-6" />
+```
+
+```tsx
+// armadilha
+// ERRADO: <Separator /> sem `decorative` dentro de uma lista puramente visual
+// — leitor de tela anuncia cada linha como marco de seção, virando ruído
+
+// CERTO: decorative quando a linha é só visual, sem significado estrutural
+<Separator decorative />
 ```
 
 #### aspect-ratio
@@ -1507,6 +2652,14 @@ import { Separator } from '@/components/ui/separator'
 **Quando usar:** em galerias e capas. Evita o pulo de layout quando a imagem chega.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { AspectRatio } from '@/components/ui/aspect-ratio'
+
+<AspectRatio ratio={16 / 9}><img src="..." alt="..." /></AspectRatio>
+```
+
+```tsx
+// caso real da stack
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 // o espaço é reservado ANTES da imagem carregar: sem isso a grade inteira
@@ -1514,6 +2667,15 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 <AspectRatio ratio={4 / 3}>
   <img src={post.imagemUrl} alt={post.name} className="h-full w-full object-cover" />
 </AspectRatio>
+```
+
+```tsx
+// armadilha
+// ERRADO: <img src={post.imagemUrl} className="w-full" /> sem contêiner de proporção
+// — grade inteira pula de altura enquanto cada foto carrega
+
+// CERTO: AspectRatio reserva o espaço antes da imagem chegar
+<AspectRatio ratio={4 / 3}><img src={post.imagemUrl} className="object-cover" /></AspectRatio>
 ```
 
 #### scroll-area
@@ -1524,10 +2686,27 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 adotar em tudo.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ScrollArea } from '@/components/ui/scroll-area'
+
+<ScrollArea className="h-72 w-48 rounded-md border">{itens}</ScrollArea>
+```
+
+```tsx
+// caso real da stack
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 // exige ALTURA definida: sem h- ou max-h, não há o que rolar e o componente
 // não faz nada
+<ScrollArea className="h-72">{itens}</ScrollArea>
+```
+
+```tsx
+// armadilha
+// ERRADO: <ScrollArea>{itens}</ScrollArea> sem h-/max-h nenhum
+// — sem altura definida não há overflow, o componente não rola nada
+
+// CERTO: sempre com altura fixa ou max-h explícita na classe
 <ScrollArea className="h-72">{itens}</ScrollArea>
 ```
 
@@ -1538,6 +2717,17 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 **Quando usar:** para um bloco isolado. Com vários itens coordenados, use `accordion`.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+
+<Collapsible>
+  <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>
+  <CollapsibleContent>Yes. Free to use for personal and commercial projects.</CollapsibleContent>
+</Collapsible>
+```
+
+```tsx
+// caso real da stack
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 // um bloco só, sem coordenação com vizinhos: "filtros avançados" é o caso
@@ -1548,6 +2738,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 </Collapsible>
 ```
 
+```tsx
+// armadilha
+// ERRADO: três Collapsible soltos onde só um deveria ficar aberto por vez
+// — cada um abre/fecha sozinho, sem coordenação nenhuma entre os três
+
+// CERTO: vários itens coordenados (só um aberto por vez) é accordion
+<Accordion type="single"><AccordionItem value="a" /></Accordion>
+```
+
 #### accordion
 [doc](https://ui.shadcn.com/docs/components/base/accordion) | [markdown](https://ui.shadcn.com/docs/components/base/accordion.md)
 **O que é:** vários painéis retráteis coordenados, com modo de um aberto por vez ou vários.
@@ -1556,6 +2755,19 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 de accordion fechado.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+    <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+```tsx
+// caso real da stack
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
 // campo obrigatório escondido aqui gera o pior erro de formulário: o usuário
@@ -1568,6 +2780,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 </Accordion>
 ```
 
+```tsx
+// armadilha
+// ERRADO: <AccordionContent>{campoObrigatorioCep}</AccordionContent> fechado por padrão
+// — usuário envia, VineJS rejeita, e o campo inválido fica escondido na seção fechada
+
+// CERTO: campo obrigatório fica fora do accordion, ou a seção abre por padrão
+<Accordion type="single" defaultValue="entrega"><AccordionItem value="entrega" /></Accordion>
+```
+
 #### carousel
 [doc](https://ui.shadcn.com/docs/components/base/carousel) | [markdown](https://ui.shadcn.com/docs/components/base/carousel.md)
 **O que é:** o carrossel sobre Embla, com gesto de arrastar e navegação por teclado.
@@ -1576,6 +2797,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 grade costuma servir melhor.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+
+<Carousel>
+  <CarouselContent><CarouselItem>1</CarouselItem></CarouselContent>
+</Carousel>
+```
+
+```tsx
+// caso real da stack
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 
 // só o primeiro slide é visto pela maioria: nada essencial a partir do segundo
@@ -1583,6 +2814,15 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
   <CarouselContent>{fotos.map((f) => <CarouselItem key={f.id}><img src={f.url} alt="" /></CarouselItem>)}</CarouselContent>
   <CarouselPrevious /><CarouselNext />
 </Carousel>
+```
+
+```tsx
+// armadilha
+// ERRADO: colocar o preço ou a única CTA de compra só no terceiro slide
+// — a maioria do tráfego nunca arrasta até lá, informação essencial se perde
+
+// CERTO: conteúdo essencial fora do carrossel; carrossel é só para destaque
+<Carousel><CarouselContent><CarouselItem>{fotoDestaque}</CarouselItem></CarouselContent></Carousel>
 ```
 
 #### resizable
@@ -1593,6 +2833,18 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 usuário reajusta toda vez.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+
+<ResizablePanelGroup direction="horizontal">
+  <ResizablePanel>One</ResizablePanel>
+  <ResizableHandle />
+  <ResizablePanel>Two</ResizablePanel>
+</ResizablePanelGroup>
+```
+
+```tsx
+// caso real da stack
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 // autoSaveId persiste as proporções: sem ele, o usuário reajusta a cada visita
@@ -1603,21 +2855,60 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 </ResizablePanelGroup>
 ```
 
+```tsx
+// armadilha
+// ERRADO: ResizablePanelGroup sem autoSaveId em painel usado todo dia
+// — usuário reajusta a proporção a cada visita, sempre do zero
+
+// CERTO: autoSaveId persiste a proporção entre sessões
+<ResizablePanelGroup direction="horizontal" autoSaveId="painel-posts" />
+```
+
 #### toast
 [doc](https://ui.shadcn.com/docs/components/base/toast) | [markdown](https://ui.shadcn.com/docs/components/base/toast.md)
-**O que é:** a notificação temporária de canto, com título, descrição e ação.
+**O que é:** a notificação temporária de canto, com título, descrição e ação. **Duas gerações
+coexistem**: a doc oficial atual mostra o wrapper `base-*` em cima do `Toast` do Base UI
+(`toast.add()`, de `@/components/ui/toast`) e deprecia o componente antigo que usava o pacote
+`sonner` direto. Nos dois projetos daqui, porém, **é o `sonner` que está de fato em uso** — `ui/toast.tsx`
+(o wrapper novo) existe no repo mas não tem nenhum import, e `ui/sonner.tsx` é o `<Toaster />`
+realmente montado no root.
 **Para que serve:** confirmar que a ação deu certo sem interromper o fluxo.
 **Quando usar:** depois de salvar, remover ou copiar. **Não use para erro que exige leitura atenta**,
-porque ele some sozinho.
+porque ele some sozinho — nesse caso é `alert` fixo na tela. **Para código novo aqui, siga o padrão
+`sonner` que já está montado** (`toast.success`/`toast.error`); `toast.add()` do wrapper `base-*` é
+código morto nos dois repos até migrar.
 
 ```tsx
+// básico: o <Toaster /> do sonner já está montado uma vez no root da rota —
+// em componentes de tela só se importa o disparador
 import { toast } from 'sonner'
 
-toast.success('User aprovada')
+toast.success('Endereço copiado.')
+```
 
-// erro que o usuário PRECISA ler e agir some em 4 segundos: esse caso é alert
-// fixo na tela, não toast
-toast.error('Falha ao salvar', { action: { label: 'Tentar de novo', onClick: salvar } })
+```tsx
+// caso comum: ação com id fixo (evita duplicar toast em clique repetido) e
+// callback de desfazer
+function removerItem(itemId: string): void {
+  toast.success('Item removido', {
+    id: `remover-${itemId}`,
+    action: { label: 'Desfazer', onClick: () => restaurarItem(itemId) },
+  })
+}
+```
+
+```tsx
+// pitfall: toast.add({ type, ... }) é da OUTRA geração (wrapper base-* não
+// usado aqui) e não existe no sonner — nestes dois repos isso é runtime error
+// ERRADO:
+// toast.add({ type: 'success', description: 'Usuário aprovado' })
+
+// CORRETO (sonner, o que está montado):
+toast.success('Usuário aprovado')
+
+// erro "esqueça e siga" ainda pode ser toast; erro que precisa de leitura e
+// ação do usuário é Alert, não Toast — ele some sozinho em poucos segundos
+toast.error('Falha ao salvar', { id: 'storage-create-error' })
 ```
 
 #### alert
@@ -1629,6 +2920,17 @@ conta pendente.
 concorrente.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+
+<Alert>
+  <AlertTitle>Success! Your changes have been saved</AlertTitle>
+  <AlertDescription>This is an alert with icon, title and description.</AlertDescription>
+</Alert>
+```
+
+```tsx
+// caso real da stack
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 // fica na tela enquanto a condição existir: é o certo para estado, e não para
@@ -1641,6 +2943,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 )}
 ```
 
+```tsx
+// armadilha
+// ERRADO: toast.error('Cadastro em análise') para um estado que persiste
+// — some em poucos segundos, e o usuário nem leu a mensagem inteira
+
+// CERTO: estado que precisa ficar visível é Alert fixo, não Toast
+<Alert variant="destructive"><AlertTitle>Cadastro em análise</AlertTitle></Alert>
+```
+
 #### kbd
 [doc](https://ui.shadcn.com/docs/components/base/kbd) | [markdown](https://ui.shadcn.com/docs/components/base/kbd.md)
 **O que é:** a representação visual de uma tecla ou combinação.
@@ -1648,12 +2959,29 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 **Quando usar:** em menus e na paleta de comandos, ao lado da ação correspondente.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Kbd } from '@/components/ui/kbd'
+
+<Kbd>Ctrl + K</Kbd>
+```
+
+```tsx
+// caso real da stack
 import { Kbd } from '@/components/ui/kbd'
 
 // o símbolo muda por sistema: ⌘ no macOS, Ctrl no resto. Fixar um confunde
 // metade dos usuários.
 <Kbd>{navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}</Kbd>
 <Kbd>K</Kbd>
+```
+
+```tsx
+// armadilha
+// ERRADO: <Kbd>Ctrl</Kbd><Kbd>K</Kbd> fixo em todo navegador, inclusive macOS
+// — metade dos usuários lê um atalho que não existe no próprio teclado
+
+// CERTO: símbolo condicional ao sistema operacional
+<Kbd>{navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}</Kbd>
 ```
 
 #### marker
@@ -1684,6 +3012,22 @@ import { DirectionProvider } from '@/components/ui/direction'
 <DirectionProvider dir="rtl">{app}</DirectionProvider>
 ```
 
+#### docs/rtl/start
+[doc](https://ui.shadcn.com/docs/rtl/start) | [markdown](https://ui.shadcn.com/docs/rtl/start.md)
+**O que é:** o guia de RTL específico para TanStack Start — onde montar o `DirectionProvider` e o
+`dir` do `<html>` na rota raiz.
+**Para que serve:** não esquecer a metade do RTL que o `DirectionProvider` **não** cobre (o `dir` do
+HTML em si).
+**Quando usar:** só se o projeto precisar suportar um idioma RTL — hoje `rtl: false` no
+`components.json` dos dois projetos, não está em uso.
+
+```tsx
+// __root.tsx: o dir do <html> é seu, o provider só cobre o comportamento
+<html dir="rtl">
+  <DirectionProvider dir="rtl">{children}</DirectionProvider>
+</html>
+```
+
 ## Componentes: conversa
 
 #### bubble
@@ -1693,11 +3037,28 @@ import { DirectionProvider } from '@/components/ui/direction'
 **Quando usar:** em interface de chat.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Bubble } from '@/components/ui/bubble'
+
+<Bubble variant="sent">Hello!</Bubble>
+```
+
+```tsx
+// caso real da stack
 import { Bubble } from '@/components/ui/bubble'
 
 // a variante decide alinhamento e cor: quem enviou fica de um lado, quem
 // recebeu do outro, sem CSS condicional espalhado
 <Bubble variant={mensagem.deMim ? 'sent' : 'received'}>{mensagem.texto}</Bubble>
+```
+
+```tsx
+// armadilha
+// ERRADO: className={mensagem.deMim ? 'ml-auto bg-primary' : 'bg-muted'} na mão
+// — reimplementa o que a variante já resolve, e diverge do resto do chat
+
+// CERTO: variant decide alinhamento e cor, sem classe condicional espalhada
+<Bubble variant={mensagem.deMim ? 'sent' : 'received'} />
 ```
 
 #### message
@@ -1707,6 +3068,16 @@ import { Bubble } from '@/components/ui/bubble'
 **Quando usar:** em chat e em assistente de IA.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Message, MessageContent } from '@/components/ui/message'
+
+<Message>
+  <MessageContent>Hello!</MessageContent>
+</Message>
+```
+
+```tsx
+// caso real da stack
 import { Message, MessageContent, MessageHeader } from '@/components/ui/message'
 
 // o Bubble é só o balão; Message é a linha inteira, com autor, horário e ações
@@ -1714,6 +3085,15 @@ import { Message, MessageContent, MessageHeader } from '@/components/ui/message'
   <MessageHeader>{m.autor}</MessageHeader>
   <MessageContent>{m.texto}</MessageContent>
 </Message>
+```
+
+```tsx
+// armadilha
+// ERRADO: usar só Bubble numa lista de chat com vários autores
+// — falta autor, horário e ações; some a informação de quem disse o quê
+
+// CERTO: Message é a linha inteira (autor + conteúdo + ações); Bubble é só o balão
+<Message><MessageHeader>{m.autor}</MessageHeader><MessageContent>{m.texto}</MessageContent></Message>
 ```
 
 #### message-scroller
@@ -1725,11 +3105,29 @@ primeira.
 **Quando usar:** em qualquer lista de mensagens, especialmente com streaming.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { MessageScroller } from '@/components/ui/message-scroller'
+
+<MessageScroller>{mensagens}</MessageScroller>
+```
+
+```tsx
+// caso real da stack
 import { MessageScroller } from '@/components/ui/message-scroller'
 
 // com streaming a lista cresce a cada token: sem este componente, ou a tela
 // não acompanha, ou ela arranca o usuário do trecho que ele estava lendo
 <MessageScroller>{mensagens.map((m) => <Message key={m.id} {...m} />)}</MessageScroller>
+```
+
+```tsx
+// armadilha
+// ERRADO: <div ref={scrollRef} className="overflow-y-auto">{mensagens}</div>
+// com scrollIntoView manual a cada mensagem nova — arranca o usuário do
+// trecho que ele estava lendo quando ele rolou para cima
+
+// CERTO: MessageScroller já respeita a rolagem manual do usuário
+<MessageScroller>{mensagens}</MessageScroller>
 ```
 
 #### attachment
@@ -1739,9 +3137,42 @@ import { MessageScroller } from '@/components/ui/message-scroller'
 **Quando usar:** em formulário com upload e em conversa com arquivos.
 
 ```tsx
+// básico: exatamente como a doc oficial mostra
+import { Attachment } from '@/components/ui/attachment'
+
+<Attachment name="file.pdf" size={1024} />
+```
+
+```tsx
+// caso real da stack
 import { Attachment } from '@/components/ui/attachment'
 
 // mostrar nome e TAMANHO antes do envio evita o upload que morre no limite do
 // servidor depois de dois minutos
 <Attachment name={arquivo.name} size={arquivo.size} onRemove={() => remover(arquivo)} />
 ```
+
+```tsx
+// armadilha
+// ERRADO: deixar o usuário anexar um arquivo de 80MB sem mostrar o tamanho antes
+// — upload morre no limite do servidor só depois de dois minutos de espera
+
+// CERTO: Attachment mostra nome e tamanho antes do envio, falha fica visível já
+<Attachment name={arquivo.name} size={arquivo.size} />
+```
+
+## Fora de escopo
+
+- installation/next, installation/remix, installation/astro, installation/laravel,
+  installation/gatsby, installation/react-router, installation/tanstack-router (framework não usado
+  aqui; TanStack Start tem guia próprio em `installation/tanstack`)
+- installation/vite (Vite puro sem TanStack Start — redundante com o guia do Start)
+- installation/manual
+- dark-mode (índice), dark-mode/next, dark-mode/astro, dark-mode/remix (frameworks não usados; já
+  cobertos `dark-mode/tanstack-start` e `dark-mode/vite`)
+- rtl (índice), rtl/next, rtl/vite (já cobertos `direction` e `rtl/start`, específico de Start)
+- forms (índice), forms/next (já cobertos os três guias de lib de formulário em `forms/*`)
+- v0 (integração com o builder visual v0 da Vercel)
+- docs/mcp (servidor MCP de propósito geral; `docs/registry/mcp` já cobre o uso real: registries)
+- docs/registry/faq
+- schema/registry.json, schema/registry-item.json (referência JSON pura, não página de uso)

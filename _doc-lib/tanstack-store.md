@@ -2,7 +2,7 @@
 
 Store reativo minúsculo e sem opinião, base interna do Router, do Query e do Table.
 
-> Conferido contra `@tanstack/store@0.11.1` e `@tanstack/react-store@0.11.1` instalados. Duas coisas
+> Conferido contra `@tanstack/store@0.11.2` e `@tanstack/react-store@0.11.2` (latest). Duas coisas
 > mudaram em relação ao material mais antigo que circula: **`Derived` não existe mais** — o valor
 > computado virou átomo, ou `createStore(fn)` — e **`useStore` está marcado como `@deprecated`**,
 > alias de `useSelector`. As duas quebras são silenciosas para quem só lê blog post.
@@ -41,7 +41,7 @@ TanStack Query. Dado que precisa sobreviver a um F5 ou ser compartilhável por l
 Router. Estado de um componente só é `useState`. O que sobra é Store — e, num projeto que já usa
 Router ou Query, ele **já está no bundle**, então não custa dependência nova.
 
-**A superfície inteira da 0.11.1**, conferida no `dist/index.d.ts` (é pequena de propósito):
+**A superfície inteira da 0.11.2**, conferida no `dist/index.d.ts` (é pequena de propósito):
 
 | Pacote | Exporta |
 |---|---|
@@ -49,6 +49,8 @@ Router ou Query, ele **já está no bundle**, então não custa dependência nov
 | `@tanstack/react-store` | `useSelector`, `useAtom`, `useCreateAtom`, `useCreateStore`, `createStoreContext`, `useStore` (deprecated) |
 
 **Links:** 4. É a menor seção do índice, e a doc oficial é curta de propósito — boa parte do que
+
+**Skills:** `maiyu-frontend`, `react-render-optimization`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 está anotado aqui veio do `.d.ts`, não do site.
 
 ---
@@ -76,6 +78,30 @@ const { unsubscribe } = store.subscribe(() => {
 
 store.setState((s) => ({ count: s.count + 1 })) // "mudou para 1"
 unsubscribe()
+```
+
+```tsx
+// Caso comum: estado de UI que não é do servidor e não cabe em search param —
+// um wizard de várias etapas, por exemplo.
+import { createStore } from '@tanstack/store'
+import { useSelector } from '@tanstack/react-store'
+
+type Team = { id: string; name: string }
+
+const wizardStore = createStore({ step: 1, team: null as Team | null })
+
+function WizardStep() {
+  const step = useSelector(wizardStore, (s) => s.step)
+  return <p>Passo {step} de 3</p>
+}
+```
+
+```ts
+// Pegadinha: criar o `createStore` DENTRO do componente (sem `useState`/
+// `useCreateStore` em volta) recria o store a cada render — qualquer
+// `setState` anterior se perde, e o sintoma é "o estado volta para o valor
+// inicial sozinho". Store vive fora do componente (módulo) ou atrás de
+// `useCreateStore`, nunca como `const store = createStore(...)` direto no corpo.
 ```
 
 #### installation
@@ -199,3 +225,4 @@ const soLeitura = useSelector(countAtom)       // só leitura, sem seletor
 // Para comparação customizada (evitar re-render com objeto recriado):
 //   useSelector(store, (s) => s.filtros, { compare: shallow })
 ```
+

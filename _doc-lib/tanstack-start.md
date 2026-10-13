@@ -37,7 +37,11 @@ um back-end separado, o **Router sozinho** basta e o Start só adiciona complexi
 misturá-los é a origem de quase todo erro estranho. As páginas de *execution model*, *import
 protection* e *hydration errors* são as que ensinam a manter essa fronteira nítida.
 
-**Links:** 43.
+**Links:** 45.
+
+**Skills:** `maiyu-frontend`, `server-side-rendering`, `streaming-ssr`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
+> Conferido contra `@tanstack/react-start@1.168.61` (`@tanstack/start-client-core@1.170.35`, latest).
 
 ---
 
@@ -993,6 +997,83 @@ export const pool = globalThis.__pool ?? new Pool({ connectionString: process.en
 if (process.env.NODE_ENV !== 'production') globalThis.__pool = pool
 ```
 
+#### guide/tanstack-query
+[doc](https://tanstack.com/start/latest/docs/framework/react/guide/tanstack-query) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/start/framework/react/guide/tanstack-query.md)
+**O que é:** como usar TanStack Query com o Start — SSR isolado por request, hidratação,
+invalidação depois de server function, e o cuidado extra de isolar dado de conta entre requests.
+**Para que serve:** a página que fecha o ciclo "o Router carrega, o Query possui o dado" no
+contexto específico do SSR do Start, que é o que este app faz.
+**Quando usar:** **sempre que uma mutação precisa refletir no SSR da próxima navegação**, e
+**sempre que a tela mostrar dado de conta/usuário** — um `QueryClient` de módulo nessas duas
+situações vaza dado de uma sessão para a próxima.
+
+```tsx
+// src/router.tsx — um QueryClient por ROUTER, e o router nasce por REQUEST no
+// Start (nunca por módulo, que seria compartilhado entre todos os visitantes).
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter } from '@tanstack/react-router'
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { routeTree } from './routeTree.gen'
+
+export function getRouter() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } })
+  const router = createRouter({ routeTree, context: { queryClient }, defaultPreload: 'intent' })
+
+  setupRouterSsrQueryIntegration({ router, queryClient })
+  return router
+}
+```
+
+```tsx
+// Caso comum: salvar algo numa server function e invalidar a query que lê o
+// mesmo dado, para a tela atualizar sem recarregar a página.
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useServerFn } from '@tanstack/react-start'
+
+type Team = { id: string; name: string }
+
+function useRenameTeam(teamId: string) {
+  const queryClient = useQueryClient()
+  const rename = useServerFn(renameTeamFn)
+
+  return useMutation({
+    mutationFn: (name: string) => rename({ data: { teamId, name } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team', teamId] }),
+  })
+}
+
+declare function renameTeamFn(opts: { data: { teamId: string; name: string } }): Promise<Team>
+```
+
+```ts
+// Pegadinha: isolar o QueryClient por request não autoriza nada por conta
+// própria, e não limpa cache do NAVEGADOR ao trocar de conta. No sign-out ou
+// troca de conta, é preciso cancelar e remover as queries privadas da conta
+// anterior (`queryClient.removeQueries`) e recarregar o contexto da rota —
+// senão a tela seguinte, por uma fração de segundo, mostra o dado da conta que
+// saiu. E toda resposta cujo corpo varia por cookie (dado de conta) precisa de
+// `Cache-Control: private, no-store` — isolar o QueryClient não protege a
+// resposta HTTP de ser cacheada por um CDN na frente.
+```
+
+#### guide/production-checklist
+[doc](https://tanstack.com/start/latest/docs/framework/react/guide/production-checklist) | [markdown](https://raw.githubusercontent.com/tanstack/router/main/docs/start/framework/react/guide/production-checklist.md)
+**O que é:** checklist para rodar contra o build de produção (e de novo pelo hostname público):
+segredo exposto, autorização, isolamento de cache, status HTTP, SEO, assets, logging, deploy.
+**Para que serve:** um servidor de desenvolvimento passando não verifica o adaptador de deploy, o
+runtime real nem a CDN — é preciso checar de novo depois do build.
+**Quando usar:** antes do primeiro deploy de produção, e de novo depois de qualquer mudança em
+variável de ambiente, autenticação ou cache.
+
+```txt
+Os itens que mais pegam gente desprevenida:
+
+- segredo: builda com um valor de teste único e grepa o client/sourcemaps por ele
+- autorização: testa o endpoint direto, deslogado e como OUTRA conta — um
+  redirect no beforeLoad não protege uma rota chamável separadamente
+- cache: resposta cujo corpo varia por cookie precisa de Cache-Control: private
+```
+
 ## Apresentação
 
 #### guide/css-styling
@@ -1098,3 +1179,9 @@ const moeda = createServerFn().handler(async () => {
   return pais === 'BR' ? 'BRL' : 'USD'
 })
 ```
+
+## Fora de escopo
+
+- eslint/eslint-plugin-start
+- eslint/no-async-client-component
+- eslint/no-client-code-in-server-component

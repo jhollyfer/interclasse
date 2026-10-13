@@ -1,5 +1,8 @@
 # Base UI
 
+> Conferido contra `@base-ui/react@1.9.0` (última publicada no npm; checado via `npm pack` + `.d.ts`,
+> sem rodar código).
+
 As primitivas headless que ficam **por baixo** dos componentes do shadcn.
 
 **O que é:** uma biblioteca de componentes React sem estilo nenhum. Ela entrega comportamento —
@@ -47,6 +50,8 @@ primitivo faz que a página do shadcn não mostra** — que é o motivo real de 
 componentes não têm par no shadcn e estão marcados.
 
 **Links:** 53 (as ~25 páginas de changelog por versão ficaram de fora; entra só o índice
+
+**Skills:** `shadcn`, `maiyu-frontend`, `compound-pattern`, `react-composition-patterns`, `dialog-pattern`, `sheet-pattern`, `accessibility`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 `overview/releases`).
 
 ---
@@ -70,6 +75,27 @@ aparecem como bug de z-index ou de modal cortado no iPhone semanas depois.
 body { position: relative; }
 ```
 
+```bash
+# básico (doc oficial): instalação
+pnpm add @base-ui/react
+```
+
+```tsx
+// caso real da stack: __root.tsx do TanStack Start é o layout raiz,
+// então o `.root` do quick-start vai nele, não em cada rota
+export const Route = createRootRoute({
+  component: () => (
+    <html lang="pt-BR">
+      <body>
+        <div className="root">
+          <Outlet />
+        </div>
+      </body>
+    </html>
+  ),
+})
+```
+
 #### react/overview/accessibility
 [doc](https://base-ui.com/react/overview/accessibility) | [markdown](https://base-ui.com/react/overview/accessibility.md)
 **O que é:** navegação por teclado, gestão de foco, contraste, nome acessível e como testar.
@@ -85,6 +111,27 @@ vem é o nome acessível, e essa parte é sempre sua.
 </Tooltip.Trigger>
 ```
 
+```tsx
+// caso real da stack: ação de ícone numa linha de tabela do shadcn
+type RowActionsProps = { postId: string; onDelete: (id: string) => void }
+
+function RowActions({ postId, onDelete }: RowActionsProps) {
+  return (
+    <Button aria-label="Excluir post" variant="ghost" size="icon" onClick={() => onDelete(postId)}>
+      <Trash className="size-4" />
+    </Button>
+  )
+}
+```
+
+```tsx
+// errado: ícone "fala por si", mas leitor de tela não lê SVG decorativo
+<Button size="icon"><Trash /></Button>
+
+// certo: nome acessível explícito — a doc é clara que isto nunca vem de graça
+<Button size="icon" aria-label="Excluir post"><Trash /></Button>
+```
+
 #### react/overview/releases
 [doc](https://base-ui.com/react/overview/releases) | [markdown](https://base-ui.com/react/overview/releases.md)
 **O que é:** o índice de changelogs, uma página por versão.
@@ -96,6 +143,17 @@ a última versão; seu lock aponta para outra.
 # a pergunta que o changelog responde: minha versão tem essa prop?
 pnpm why @base-ui/react
 # depois abra o changelog da SUA versão em /react/overview/releases/v1-6-0.md
+```
+
+```text
+# básico (doc oficial): uma página de changelog por versão, mesmo padrão de URL
+https://base-ui.com/react/overview/releases/v1-0-0.md
+```
+
+```bash
+# caso real da stack: antes de abrir PR que usa prop nova, confira a versão travada
+grep '"@base-ui/react"' frontend/package.json
+# ex.: "^1.6.0" -> abra /react/overview/releases/v1-6-0.md, não a doc "latest" do site
 ```
 
 #### react/overview/community
@@ -145,6 +203,21 @@ forma, e é a diferença que mais quebra código copiado de exemplo antigo.
 )} />
 ```
 
+```tsx
+// básico (doc oficial): trocar o elemento default (<h3>) do Accordion.Header
+<Accordion.Header render={<h2 />}>
+  <Accordion.Trigger>What is Base UI?</Accordion.Trigger>
+</Accordion.Header>
+```
+
+```tsx
+// caso real da stack: item de menu que navega usa <Link> do TanStack Router,
+// nunca <a> solto nem onClick com router.navigate
+<Menu.Item render={<Link to="/teams/$teamId" params={{ teamId }} />}>
+  Ver time
+</Menu.Item>
+```
+
 #### react/handbook/styling
 [doc](https://base-ui.com/react/handbook/styling) | [markdown](https://base-ui.com/react/handbook/styling.md)
 **O que é:** os quatro ganchos de estilo: `className`, `style`, atributos `data-*` de estado e
@@ -167,6 +240,16 @@ variáveis CSS.
 .Popup { max-height: var(--available-height); min-width: var(--anchor-width); }
 ```
 
+```tsx
+// errado: useState + classe condicional em JS para pintar estado que a
+// biblioteca já expõe como atributo — duas fontes de verdade para o mesmo estado
+const [checked, setChecked] = React.useState(false)
+<Switch.Thumb className={checked ? 'translate-x-4' : ''} onCheckedChange={setChecked} />
+
+// certo: data-* já reflete o estado real do componente, sem estado duplicado
+<Switch.Thumb className="data-checked:translate-x-4" />
+```
+
 #### react/handbook/animation
 [doc](https://base-ui.com/react/handbook/animation) | [markdown](https://base-ui.com/react/handbook/animation.md)
 **O que é:** os atributos de ciclo de vida da animação, e a integração com bibliotecas de JavaScript.
@@ -185,6 +268,20 @@ sempre a mesma: estilizar só `data-open` e esquecer `data-ending-style`.
 
 /* com @keyframes, os pares são [data-open] e [data-closed] — e aí a animação
    NÃO cancela no meio, que é a razão de a doc preferir transição */
+```
+
+```tsx
+// caso real da stack: mesma transição em utilitário Tailwind v4, no Popup do Popover
+<Popover.Popup className="origin-(--transform-origin) transition-[transform,opacity] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0" />
+```
+
+```css
+/* errado: estilizou a entrada e esqueceu a saída — some sem transição ao fechar */
+.Popup[data-starting-style] { opacity: 0; }
+
+/* certo: os dois pares, sempre juntos */
+.Popup[data-starting-style],
+.Popup[data-ending-style] { opacity: 0; }
 ```
 
 #### react/handbook/customization
@@ -209,6 +306,34 @@ controlar o componente por estado externo.
 <NumberField.Input onPaste={(event) => event.preventBaseUIHandler()} />
 ```
 
+```tsx
+// básico (doc oficial): não fechar o tooltip quando o clique foi no próprio gatilho
+<Tooltip.Root
+  onOpenChange={(open, eventDetails) => {
+    eventDetails.reason === 'trigger-press' && eventDetails.cancel()
+  }}
+>
+  ...
+</Tooltip.Root>
+```
+
+```tsx
+// caso real da stack: formulário sujo não fecha o Dialog por clique fora ou Esc
+type EditTeamDialogProps = { formDirty: boolean }
+
+function EditTeamDialog({ formDirty }: EditTeamDialogProps) {
+  return (
+    <Dialog.Root
+      onOpenChange={(open, details) => {
+        !open && formDirty && details.reason !== 'close-click' && details.cancel()
+      }}
+    >
+      ...
+    </Dialog.Root>
+  )
+}
+```
+
 #### react/handbook/forms
 [doc](https://base-ui.com/react/handbook/forms) | [markdown](https://base-ui.com/react/handbook/forms.md)
 **O que é:** como nomear e rotular cada tipo de controle, validação nativa e customizada, erro do
@@ -231,6 +356,31 @@ evita campo sem nome acessível. A biblioteca de formulário em si está em
 </Field.Root>
 ```
 
+```tsx
+// básico (doc oficial): rótulo implícito, mesmo padrão do Switch
+<Field.Root>
+  <Field.Label>
+    <Switch.Root />
+    Developer mode
+  </Field.Label>
+  <Field.Description>Enables extra tools for web developers</Field.Description>
+</Field.Root>
+```
+
+```tsx
+// errado: Select é controle de GATILHO — Field.Label não o associa de verdade
+<Field.Root>
+  <Field.Label>Time</Field.Label>
+  <Select.Root />
+</Field.Root>
+
+// certo: Select.Label é quem faz a associação, a tabela da doc é explícita nisto
+<Select.Root>
+  <Select.Label>Time</Select.Label>
+  <Select.Trigger />
+</Select.Root>
+```
+
 #### react/handbook/typescript
 [doc](https://base-ui.com/react/handbook/typescript) | [markdown](https://base-ui.com/react/handbook/typescript.md)
 **O que é:** os namespaces de tipo: `Props`, `State`, `ChangeEventDetails`, `ChangeEventReason`.
@@ -248,6 +398,22 @@ function MyTooltip(props: Tooltip.Root.Props) {
 
 // o `reason` do handler também é tipado, e o autocomplete lista os valores:
 function onValueChange(v: string, d: Combobox.Root.ChangeEventDetails) {}
+```
+
+```tsx
+// básico (doc oficial): `State` tipa o segundo argumento do render function
+function renderPositioner(props: Popover.Positioner.Props, state: Popover.Positioner.State) {
+  return <div {...props}>{state.open ? 'aberto' : 'fechado'}</div>
+}
+```
+
+```tsx
+// caso real da stack: wrapper gerado em components/ui/dialog.tsx segue o mesmo padrão
+type DialogContentProps = Dialog.Popup.Props
+
+function DialogContent(props: DialogContentProps) {
+  return <Dialog.Popup className="rounded-md border bg-popover p-6" {...props} />
+}
 ```
 
 #### llms.txt
@@ -283,6 +449,39 @@ mensagem por tipo de erro, sem `if` no JSX.
 // validationDebounceTime evita validar a cada tecla em regra cara
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, montando as partes
+import { Field } from '@base-ui/react/field'
+
+<Field.Root>
+  <Field.Label />
+  <Field.Control />
+  <Field.Description />
+  <Field.Error />
+</Field.Root>
+```
+
+```tsx
+// caso real da stack: Field integrado ao Controller do react-hook-form (handbook/forms)
+type DocumentFieldProps = { control: Control<{ document: string }> }
+
+function DocumentField({ control }: DocumentFieldProps) {
+  return (
+    <Controller
+      name="document"
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field.Root invalid={fieldState.invalid}>
+          <Field.Label>Documento</Field.Label>
+          <Field.Control {...field} onValueChange={field.onChange} />
+          <Field.Error match={!!fieldState.error}>{fieldState.error?.message}</Field.Error>
+        </Field.Root>
+      )}
+    />
+  )
+}
+```
+
 #### react/components/fieldset
 [doc](https://base-ui.com/react/components/fieldset) | [markdown](https://base-ui.com/react/components/fieldset.md)
 **O que é:** o `<fieldset>` nativo com uma `Legend` estilizável. **Não tem par no shadcn.**
@@ -315,6 +514,34 @@ const [erros, setErros] = React.useState({})
 </Form>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+<Form>
+  <Field.Root>
+    <Field.Label />
+    <Field.Control />
+    <Field.Error />
+  </Field.Root>
+</Form>
+```
+
+```tsx
+// caso real da stack: 422 de um applyHTTPErrorToForm central (_padroes/frontend.md §4)
+// vira `errors` do Form quando o campo não existe no react-hook-form (erro de outro recurso)
+type CreateUserFormProps = { serverErrors: Record<string, string> }
+
+function CreateUserForm({ serverErrors }: CreateUserFormProps) {
+  return (
+    <Form errors={serverErrors} onFormSubmit={(values) => criar(values)}>
+      <Field.Root name="document">
+        <Field.Control />
+        <Field.Error />
+      </Field.Root>
+    </Form>
+  )
+}
+```
+
 #### react/components/input
 [doc](https://base-ui.com/react/components/input) | [markdown](https://base-ui.com/react/components/input.md)
 **O que é:** o `<input>` nativo que se registra sozinho no `Field` ao redor.
@@ -325,6 +552,27 @@ o `onValueChange`, que entrega o valor direto em vez do evento.
 ```tsx
 // onValueChange dá o valor pronto; onChange continua existindo e dá o evento
 <Input onValueChange={(valor) => setBusca(valor)} />
+```
+
+```tsx
+// básico (doc oficial): parte única, sem Field ao redor
+import { Input } from '@base-ui/react/input'
+
+<Input />
+```
+
+```tsx
+// caso real da stack: busca de tela, estado na URL (convenção de filtro em search params)
+type SearchInputProps = { value: string; onSearch: (value: string) => void }
+
+function SearchInput({ value, onSearch }: SearchInputProps) {
+  return (
+    <Field.Root>
+      <Field.Label>Buscar</Field.Label>
+      <Input value={value} onValueChange={onSearch} placeholder="Nome do post" />
+    </Field.Root>
+  )
+}
 ```
 
 #### react/components/checkbox
@@ -344,6 +592,33 @@ o `onValueChange`, que entrega o valor direto em vez do evento.
 // uncheckedValue: o que vai no formulário quando desmarcado (default: nada)
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+import { Checkbox } from '@base-ui/react/checkbox'
+
+<Checkbox.Root>
+  <Checkbox.Indicator />
+</Checkbox.Root>
+```
+
+```tsx
+// caso real da stack: checkbox controlado, rotulado implicitamente por Field.Label
+type AcceptTermsFieldProps = { checked: boolean; onCheckedChange: (checked: boolean) => void }
+
+function AcceptTermsField({ checked, onCheckedChange }: AcceptTermsFieldProps) {
+  return (
+    <Field.Root>
+      <Field.Label>
+        <Checkbox.Root checked={checked} onCheckedChange={onCheckedChange}>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        Aceito os termos
+      </Field.Label>
+    </Field.Root>
+  )
+}
+```
+
 #### react/components/checkbox-group
 [doc](https://base-ui.com/react/components/checkbox-group) | [markdown](https://base-ui.com/react/components/checkbox-group.md)
 **O que é:** o estado compartilhado de uma série de checkboxes. **Não tem par no shadcn.**
@@ -359,17 +634,41 @@ caixa e a lógica do "marcar todos" na mão.
 </CheckboxGroup>
 ```
 
-#### react/components/radio
-[doc](https://base-ui.com/react/components/radio) | [markdown](https://base-ui.com/react/components/radio.md)
-**O que é:** o botão de rádio — `Radio.Root` e `Radio.Indicator` — sempre dentro de um `RadioGroup`.
+#### react/components/radio-group
+[doc](https://base-ui.com/react/components/radio-group) | [markdown](https://base-ui.com/react/components/radio-group.md)
+**O que é:** o botão de rádio — `Radio.Root` e `Radio.Indicator` — sempre dentro de um `RadioGroup`
+(a página `react/components/radio` foi renomeada para esta).
 **Para que serve:** escolha única entre poucas opções visíveis.
 **Quando usar:** `Radio` **fora** de `RadioGroup` não funciona: as setas do teclado e o `name` do
-formulário vêm do grupo. É a montagem que mais se erra ao escrever o wrapper.
+formulário vêm do grupo. É a montagem que mais se erra ao escrever o wrapper. `RadioGroup` **não
+tem `.Root`** — ele mesmo é o componente raiz; só `Radio.Root`/`Radio.Indicator` usam esse padrão.
 
 ```tsx
+import { Radio } from '@base-ui/react/radio'
+import { RadioGroup } from '@base-ui/react/radio-group'
+
 <RadioGroup name="status" value={status} onValueChange={setStatus}>
   <Radio.Root value="ATIVO"><Radio.Indicator /></Radio.Root>
   <Radio.Root value="INATIVO"><Radio.Indicator /></Radio.Root>
+</RadioGroup>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima
+<RadioGroup>
+  <Radio.Root>
+    <Radio.Indicator />
+  </Radio.Root>
+</RadioGroup>
+```
+
+```tsx
+// errado: Radio solto, sem RadioGroup — setas do teclado e name não funcionam
+<Radio.Root value="ATIVO"><Radio.Indicator /></Radio.Root>
+
+// certo: sempre dentro de RadioGroup, que é a raiz (não tem .Root próprio)
+<RadioGroup name="status">
+  <Radio.Root value="ATIVO"><Radio.Indicator /></Radio.Root>
 </RadioGroup>
 ```
 
@@ -385,6 +684,31 @@ desligados **não mandam nada**, e é isso que faz o backend receber `undefined`
 <Switch.Root name="notificar" value="on" uncheckedValue="off">
   <Switch.Thumb />
 </Switch.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima
+<Switch.Root>
+  <Switch.Thumb />
+</Switch.Root>
+```
+
+```tsx
+// caso real da stack: switch controlado, rótulo implícito dentro do Field.Label
+type DarkModeFieldProps = { enabled: boolean; onEnabledChange: (enabled: boolean) => void }
+
+function DarkModeField({ enabled, onEnabledChange }: DarkModeFieldProps) {
+  return (
+    <Field.Root>
+      <Field.Label>
+        <Switch.Root checked={enabled} onCheckedChange={onEnabledChange}>
+          <Switch.Thumb />
+        </Switch.Root>
+        Modo escuro
+      </Field.Label>
+    </Field.Root>
+  )
+}
 ```
 
 #### react/components/select
@@ -406,6 +730,32 @@ longa, o caso é `combobox`.
 <Select.Root items={statuses} multiple />
 ```
 
+```tsx
+// básico (doc oficial): anatomia (Portal/Backdrop/Positioner/Popup/List omitidos aqui por espaço)
+<Select.Root>
+  <Select.Trigger>
+    <Select.Value />
+  </Select.Trigger>
+</Select.Root>
+```
+
+```tsx
+// caso real da stack: status de um recurso, rótulo vindo de `items` (nunca enum cru na tela)
+type StatusSelectProps = { value: string; onValueChange: (value: string) => void }
+
+const statusItems = { ATIVO: 'Ativo', INATIVO: 'Inativo' }
+
+function StatusSelect({ value, onValueChange }: StatusSelectProps) {
+  return (
+    <Select.Root items={statusItems} value={value} onValueChange={onValueChange}>
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+    </Select.Root>
+  )
+}
+```
+
 #### react/components/combobox
 [doc](https://base-ui.com/react/components/combobox) | [markdown](https://base-ui.com/react/components/combobox.md)
 **O que é:** o select filtrável: input mais lista de itens predefinidos, com chips para seleção
@@ -423,6 +773,22 @@ const { contains } = Combobox.useFilter()
   <Combobox.Chips><Combobox.Chip><Combobox.ChipRemove /></Combobox.Chip></Combobox.Chips>
   <Combobox.Empty>Nenhuma categoria</Combobox.Empty>
 </Combobox.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima, sem popup/lista por espaço
+<Combobox.Root>
+  <Combobox.Input />
+</Combobox.Root>
+```
+
+```tsx
+// errado: filtro manual perde acento — "orgânico" nunca acha "organico" digitado
+const filtrados = categorias.filter((c) => c.name.toLowerCase().includes(busca.toLowerCase()))
+
+// certo: useFilter já citado acima resolve locale e acento pelo Intl.Collator
+const { contains } = Combobox.useFilter()
+const corretos = categorias.filter((c) => contains(c.name, busca))
 ```
 
 #### react/components/autocomplete
@@ -467,6 +833,27 @@ formatação por `Intl`. **Não tem par no shadcn.**
 </NumberField.Root>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, sem ScrubArea por espaço
+<NumberField.Root>
+  <NumberField.Group>
+    <NumberField.Decrement />
+    <NumberField.Input />
+    <NumberField.Increment />
+  </NumberField.Group>
+</NumberField.Root>
+```
+
+```tsx
+// errado: <Input type="number"> aceita "1e5" e "+", e entrega string pro estado
+<Input type="number" onValueChange={(v) => setQtd(v)} />
+
+// certo: NumberField valida e entrega number | null, não string
+<NumberField.Root min={0} onValueChange={(qtd) => setQtd(qtd)}>
+  <NumberField.Input />
+</NumberField.Root>
+```
+
 #### react/components/otp-field
 [doc](https://base-ui.com/react/components/otp-field) | [markdown](https://base-ui.com/react/components/otp-field.md)
 **O que é:** o campo de código, com um slot por caractere — `Root`, `Input`, `Separator`. **Não tem
@@ -501,6 +888,38 @@ dispara a cada pixel arrastado, `onValueCommitted` só quando o usuário solta.
 />
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+<Slider.Root>
+  <Slider.Control>
+    <Slider.Track>
+      <Slider.Indicator />
+      <Slider.Thumb />
+    </Slider.Track>
+  </Slider.Control>
+</Slider.Root>
+```
+
+```tsx
+// caso real da stack: faixa de preço de filtro, label fora porque Slider usa Slider.Label
+type PriceRangeFilterProps = { range: number[]; onRangeChange: (range: number[]) => void }
+
+function PriceRangeFilter({ range, onRangeChange }: PriceRangeFilterProps) {
+  return (
+    <Slider.Root value={range} onValueChange={onRangeChange} min={0} max={1000}>
+      <Slider.Label>Faixa de preço</Slider.Label>
+      <Slider.Control>
+        <Slider.Track>
+          <Slider.Indicator />
+          <Slider.Thumb />
+          <Slider.Thumb />
+        </Slider.Track>
+      </Slider.Control>
+    </Slider.Root>
+  )
+}
+```
+
 ## Componentes: ação e navegação
 
 #### react/components/button
@@ -519,6 +938,21 @@ enviar. Para link com cara de botão, a doc é explícita: **não use este compo
 // este não assume submit dentro de um form.
 ```
 
+```tsx
+// básico (doc oficial): parte única, sem props especiais
+import { Button } from '@base-ui/react/button'
+
+<Button>Submit</Button>
+```
+
+```tsx
+// errado: <a> com cara de botão perde navegação nativa (clique do meio, nova aba)
+<Button render={<a href="/posts" />}>Ver posts</Button>
+
+// certo: a doc é explícita — link usa <Link> do router direto, não Button
+<Link to="/posts" className={buttonVariants({ variant: 'outline' })}>Ver posts</Link>
+```
+
 #### react/components/toggle
 [doc](https://base-ui.com/react/components/toggle) | [markdown](https://base-ui.com/react/components/toggle.md)
 **O que é:** o botão de dois estados, uma parte só.
@@ -528,6 +962,30 @@ para vetar a mudança em vez de controlar o estado por fora.
 
 ```tsx
 <Toggle pressed={negrito} onPressedChange={setNegrito} aria-label="Negrito" />
+```
+
+```tsx
+// básico (doc oficial): parte única
+import { Toggle } from '@base-ui/react/toggle'
+
+<Toggle />
+```
+
+```tsx
+// caso real da stack: favoritar post, vetando o toggle enquanto a mutation está em voo
+type FavoriteToggleProps = { favorited: boolean; pending: boolean; onToggle: (next: boolean) => void }
+
+function FavoriteToggle({ favorited, pending, onToggle }: FavoriteToggleProps) {
+  return (
+    <Toggle
+      pressed={favorited}
+      aria-label="Favoritar post"
+      onPressedChange={(next, details) => pending && details.cancel()}
+    >
+      <Star className="size-4" data-pressed={favorited || undefined} />
+    </Toggle>
+  )
+}
 ```
 
 #### react/components/toggle-group
@@ -543,6 +1001,27 @@ seta volta ao início no fim da lista).
   <Toggle value="lista" />
   <Toggle value="grade" />
 </ToggleGroup>
+```
+
+```tsx
+// básico (doc oficial): parte única
+import { ToggleGroup } from '@base-ui/react/toggle-group'
+
+<ToggleGroup />
+```
+
+```tsx
+// caso real da stack: alinhamento de texto, múltiplo porque negrito+itálico coexistem
+type TextStyleToggleProps = { value: string[]; onValueChange: (value: string[]) => void }
+
+function TextStyleToggle({ value, onValueChange }: TextStyleToggleProps) {
+  return (
+    <ToggleGroup value={value} onValueChange={onValueChange} multiple>
+      <Toggle value="bold" aria-label="Negrito"><Bold className="size-4" /></Toggle>
+      <Toggle value="italic" aria-label="Itálico"><Italic className="size-4" /></Toggle>
+    </ToggleGroup>
+  )
+}
 ```
 
 #### react/components/menu
@@ -566,6 +1045,28 @@ item que só alterna algo.
 </Menu.Portal>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, sem Backdrop/Arrow por espaço
+<Menu.Root>
+  <Menu.Trigger />
+  <Menu.Portal>
+    <Menu.Positioner>
+      <Menu.Popup>
+        <Menu.Item />
+      </Menu.Popup>
+    </Menu.Positioner>
+  </Menu.Portal>
+</Menu.Root>
+```
+
+```tsx
+// errado: item que navega como <div onClick>, perde Ctrl+clique e "abrir em nova aba"
+<Menu.Item onClick={() => navigate({ to: '/posts/$id', params: { id } })}>Ver post</Menu.Item>
+
+// certo: LinkItem é um <a> de verdade por baixo
+<Menu.LinkItem render={<Link to="/posts/$id" params={{ id }} />}>Ver post</Menu.LinkItem>
+```
+
 #### react/components/menubar
 [doc](https://base-ui.com/react/components/menubar) | [markdown](https://base-ui.com/react/components/menubar.md)
 **O que é:** a barra que coordena vários `Menu.Root` irmãos.
@@ -582,6 +1083,40 @@ sendo `Menu`.
 </Menubar>
 ```
 
+```tsx
+// básico (doc oficial): Menubar + Menu.Root por dentro
+import { Menubar } from '@base-ui/react/menubar'
+import { Menu } from '@base-ui/react/menu'
+
+<Menubar>
+  <Menu.Root>
+    <Menu.Trigger />
+  </Menu.Root>
+</Menubar>
+```
+
+```tsx
+// caso real da stack: cabeçalho de editor, dois menus irmãos coordenados pela mesma barra
+function EditorMenubar() {
+  return (
+    <Menubar>
+      <Menu.Root>
+        <Menu.Trigger>Arquivo</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner><Menu.Popup><Menu.Item>Salvar</Menu.Item></Menu.Popup></Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
+      <Menu.Root>
+        <Menu.Trigger>Editar</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner><Menu.Popup><Menu.Item>Desfazer</Menu.Item></Menu.Popup></Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
+    </Menubar>
+  )
+}
+```
+
 #### react/components/navigation-menu
 [doc](https://base-ui.com/react/components/navigation-menu) | [markdown](https://base-ui.com/react/components/navigation-menu.md)
 **O que é:** o menu de navegação com painéis, `Viewport` compartilhado e transição de tamanho entre
@@ -593,6 +1128,29 @@ mudando de tamanho ao trocar de item — sem elas o painel pisca no lugar de tra
 ```css
 /* a animação de morph entre painéis de tamanhos diferentes */
 .Popup { width: var(--popup-width); height: var(--popup-height); transition: 200ms; }
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima, sem Viewport/Backdrop por espaço
+<NavigationMenu.Root>
+  <NavigationMenu.List>
+    <NavigationMenu.Item>
+      <NavigationMenu.Trigger />
+      <NavigationMenu.Content />
+    </NavigationMenu.Item>
+  </NavigationMenu.List>
+</NavigationMenu.Root>
+```
+
+```tsx
+// caso real da stack: item que só navega não precisa de Trigger/Content, é um Link direto
+<NavigationMenu.Root>
+  <NavigationMenu.List>
+    <NavigationMenu.Item>
+      <NavigationMenu.Link render={<Link to="/produtos" />}>Produtos</NavigationMenu.Link>
+    </NavigationMenu.Item>
+  </NavigationMenu.List>
+</NavigationMenu.Root>
 ```
 
 #### react/components/tabs
@@ -613,6 +1171,33 @@ variáveis `--active-tab-*` para deslizar.
 </Tabs.Root>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+<Tabs.Root>
+  <Tabs.List>
+    <Tabs.Tab />
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Panel />
+</Tabs.Root>
+```
+
+```tsx
+// errado: Tab.Panel pesado trocando só por navegar de seta, sem desligar activateOnFocus
+<Tabs.Root>
+  <Tabs.List>
+    <Tabs.Tab value="relatorio">Relatório pesado</Tabs.Tab>
+  </Tabs.List>
+</Tabs.Root>
+
+// certo: activateOnFocus={false} — seta só move o foco, Enter troca o painel
+<Tabs.Root activateOnFocus={false}>
+  <Tabs.List>
+    <Tabs.Tab value="relatorio">Relatório pesado</Tabs.Tab>
+  </Tabs.List>
+</Tabs.Root>
+```
+
 #### react/components/toolbar
 [doc](https://base-ui.com/react/components/toolbar) | [markdown](https://base-ui.com/react/components/toolbar.md)
 **O que é:** o contêiner que dá navegação por setas a um conjunto de controles — `Button`, `Link`,
@@ -627,6 +1212,32 @@ as setas disputam com o cursor de texto.
   <Toolbar.Button />
   <Toolbar.Separator />
   <Toolbar.Input /> {/* um só, e por último */}
+</Toolbar.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia com Group
+<Toolbar.Root>
+  <Toolbar.Button />
+  <Toolbar.Separator />
+  <Toolbar.Group>
+    <Toolbar.Button />
+    <Toolbar.Button />
+  </Toolbar.Group>
+</Toolbar.Root>
+```
+
+```tsx
+// errado: Input no meio da barra — a seta do teclado disputa com o cursor de texto nele
+<Toolbar.Root>
+  <Toolbar.Input />
+  <Toolbar.Button />
+</Toolbar.Root>
+
+// certo: um Input só, e por último, como a doc recomenda
+<Toolbar.Root>
+  <Toolbar.Button />
+  <Toolbar.Input />
 </Toolbar.Root>
 ```
 
@@ -650,6 +1261,35 @@ const confirmar = Dialog.createHandle<{ id: string }>()
 confirmar.openWithPayload({ id })
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, sem Backdrop/Viewport por espaço
+<Dialog.Root>
+  <Dialog.Trigger />
+  <Dialog.Portal>
+    <Dialog.Popup>
+      <Dialog.Title />
+    </Dialog.Popup>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+```tsx
+// caso real da stack: editar recurso, foco inicial no primeiro campo do formulário
+function EditUserDialog({ userId }: { userId: string }) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  return (
+    <Dialog.Root>
+      <Dialog.Portal>
+        <Dialog.Popup initialFocus={inputRef}>
+          <Dialog.Title>Editar usuário</Dialog.Title>
+          <Input ref={inputRef} />
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+```
+
 #### react/components/alert-dialog
 [doc](https://base-ui.com/react/components/alert-dialog) | [markdown](https://base-ui.com/react/components/alert-dialog.md)
 **O que é:** o mesmo dialog, mas que **não fecha por clique fora nem por Esc**.
@@ -667,6 +1307,30 @@ saber se removeu.
 </AlertDialog.Popup>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+<AlertDialog.Root>
+  <AlertDialog.Trigger />
+  <AlertDialog.Portal>
+    <AlertDialog.Popup>
+      <AlertDialog.Title />
+    </AlertDialog.Popup>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
+```
+
+```tsx
+// errado: Dialog comum para exclusão — clique fora fecha sem o usuário decidir nada
+<Dialog.Root>
+  <Dialog.Popup><Button onClick={remover}>Remover</Button></Dialog.Popup>
+</Dialog.Root>
+
+// certo: AlertDialog não descarta por clique fora nem Esc, força uma resposta
+<AlertDialog.Root>
+  <AlertDialog.Popup><Button onClick={remover}>Remover</Button></AlertDialog.Popup>
+</AlertDialog.Root>
+```
+
 #### react/components/drawer
 [doc](https://base-ui.com/react/components/drawer) | [markdown](https://base-ui.com/react/components/drawer.md)
 **O que é:** o dialog **estendido** com gesto de arrastar, pontos de parada (`snapPoints`) e o efeito
@@ -680,6 +1344,28 @@ borda e não precisa de gesto é um `Dialog` posicionado, e sai mais barato.
 <Drawer.Root snapPoints={[0.5, 1]} swipeDirection="down">
   <Drawer.Popup><Drawer.Content>{conteudo}</Drawer.Content></Drawer.Popup>
 </Drawer.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima, sem Provider/Indent por espaço
+<Drawer.Root>
+  <Drawer.Trigger />
+  <Drawer.Portal>
+    <Drawer.Popup>
+      <Drawer.Content />
+    </Drawer.Popup>
+  </Drawer.Portal>
+</Drawer.Root>
+```
+
+```tsx
+// errado: painel de borda sem gesto nem snap point ganhando Drawer — custo que a doc não pede
+<Drawer.Root><Drawer.Popup><Drawer.Content>{filtros}</Drawer.Content></Drawer.Popup></Drawer.Root>
+
+// certo: sem gesto, é só Dialog posicionado na borda — mais barato, mesmo efeito visual
+<Dialog.Root>
+  <Dialog.Popup className="inset-y-0 right-0 h-full w-80">{filtros}</Dialog.Popup>
+</Dialog.Root>
 ```
 
 #### react/components/popover
@@ -698,6 +1384,28 @@ comum ao editar o wrapper.
 </Popover.Positioner>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, sem Arrow/Viewport por espaço
+<Popover.Root>
+  <Popover.Trigger />
+  <Popover.Portal>
+    <Popover.Positioner>
+      <Popover.Popup />
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+```tsx
+// errado: side no Popup não existe nessa parte — o posicionamento mora no Positioner
+<Popover.Popup side="bottom" />
+
+// certo: side, align e sideOffset ficam todos no Positioner
+<Popover.Positioner side="bottom" align="start" sideOffset={8}>
+  <Popover.Popup />
+</Popover.Positioner>
+```
+
 #### react/components/preview-card
 [doc](https://base-ui.com/react/components/preview-card) | [markdown](https://base-ui.com/react/components/preview-card.md)
 **O que é:** o cartão de prévia que abre ao passar o mouse num link. **Não tem par no shadcn** com
@@ -711,6 +1419,38 @@ tela, então nada essencial ali.
 <PreviewCard.Root delay={600}>
   <PreviewCard.Trigger render={<Link to="/users/$id" params={{ id }} />} />
 </PreviewCard.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima, sem Arrow/Viewport por espaço
+<PreviewCard.Root>
+  <PreviewCard.Trigger />
+  <PreviewCard.Portal>
+    <PreviewCard.Positioner>
+      <PreviewCard.Popup />
+    </PreviewCard.Positioner>
+  </PreviewCard.Portal>
+</PreviewCard.Root>
+```
+
+```tsx
+// caso real da stack: prévia de usuário num link de autor, dado já em cache (TanStack Query)
+function AuthorPreview({ userId }: { userId: string }) {
+  return (
+    <PreviewCard.Root>
+      <PreviewCard.Trigger render={<Link to="/users/$id" params={{ id: userId }} />}>
+        Ver autor
+      </PreviewCard.Trigger>
+      <PreviewCard.Portal>
+        <PreviewCard.Positioner>
+          <PreviewCard.Popup>
+            <UserSummary userId={userId} />
+          </PreviewCard.Popup>
+        </PreviewCard.Positioner>
+      </PreviewCard.Portal>
+    </PreviewCard.Root>
+  )
+}
 ```
 
 #### react/components/tooltip
@@ -728,6 +1468,34 @@ diz que tooltip não é rótulo.
 // trackCursorAxis="x" faz a dica acompanhar o cursor, útil em gráfico
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima, sem Arrow/Viewport por espaço
+<Tooltip.Provider>
+  <Tooltip.Root>
+    <Tooltip.Trigger />
+    <Tooltip.Portal>
+      <Tooltip.Positioner>
+        <Tooltip.Popup />
+      </Tooltip.Positioner>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+</Tooltip.Provider>
+```
+
+```tsx
+// errado: tooltip como único nome acessível — a doc avisa que não é rótulo
+<Tooltip.Root>
+  <Tooltip.Trigger render={<Button size="icon" />}><Trash /></Tooltip.Trigger>
+  <Tooltip.Portal><Tooltip.Popup>Excluir</Tooltip.Popup></Tooltip.Portal>
+</Tooltip.Root>
+
+// certo: aria-label continua obrigatório, tooltip só reforça visualmente
+<Tooltip.Root>
+  <Tooltip.Trigger render={<Button size="icon" aria-label="Excluir" />}><Trash /></Tooltip.Trigger>
+  <Tooltip.Portal><Tooltip.Popup>Excluir</Tooltip.Popup></Tooltip.Portal>
+</Tooltip.Root>
+```
+
 #### react/components/context-menu
 [doc](https://base-ui.com/react/components/context-menu) | [markdown](https://base-ui.com/react/components/context-menu.md)
 **O que é:** o menu do clique direito e do toque longo, com as mesmas partes do `Menu`.
@@ -740,6 +1508,38 @@ da própria página. Toda ação daqui precisa existir também num menu visível
 <ContextMenu.Root>
   <ContextMenu.Trigger render={<tr />} />
 </ContextMenu.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima, sem Backdrop/Arrow por espaço
+<ContextMenu.Root>
+  <ContextMenu.Trigger />
+  <ContextMenu.Portal>
+    <ContextMenu.Positioner>
+      <ContextMenu.Popup>
+        <ContextMenu.Item />
+      </ContextMenu.Popup>
+    </ContextMenu.Positioner>
+  </ContextMenu.Portal>
+</ContextMenu.Root>
+```
+
+```tsx
+// caso real da stack: linha de tabela com clique direito, duplicando as mesmas ações do botão de menu
+function PostRow({ postId, onDelete }: { postId: string; onDelete: (id: string) => void }) {
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger render={<tr />}>{/* células */}</ContextMenu.Trigger>
+      <ContextMenu.Portal>
+        <ContextMenu.Positioner>
+          <ContextMenu.Popup>
+            <ContextMenu.Item onClick={() => onDelete(postId)}>Excluir</ContextMenu.Item>
+          </ContextMenu.Popup>
+        </ContextMenu.Positioner>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
+  )
+}
 ```
 
 ## Componentes: exibição e estrutura
@@ -763,6 +1563,18 @@ vem de `--accordion-panel-height`.
 .Panel { height: var(--accordion-panel-height); transition: height 150ms; }
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+<Accordion.Root>
+  <Accordion.Item>
+    <Accordion.Header>
+      <Accordion.Trigger>Pergunta</Accordion.Trigger>
+    </Accordion.Header>
+    <Accordion.Panel>Resposta</Accordion.Panel>
+  </Accordion.Item>
+</Accordion.Root>
+```
+
 #### react/components/collapsible
 [doc](https://base-ui.com/react/components/collapsible) | [markdown](https://base-ui.com/react/components/collapsible.md)
 **O que é:** um bloco que abre e fecha, sem coordenação com vizinhos.
@@ -777,6 +1589,25 @@ existe.
   height: var(--collapsible-panel-height);
   transition: height 200ms;
   overflow: hidden;
+}
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima
+import { Collapsible } from '@base-ui/react/collapsible'
+
+<Collapsible.Root>
+  <Collapsible.Trigger>Chaves de recuperação</Collapsible.Trigger>
+  <Collapsible.Panel>Conteúdo</Collapsible.Panel>
+</Collapsible.Root>
+```
+
+```tsx
+// caso real da stack: wrapper em components/ui/collapsible.tsx só repassa as partes
+type CollapsibleContentProps = Collapsible.Panel.Props
+
+function CollapsibleContent(props: CollapsibleContentProps) {
+  return <Collapsible.Panel data-slot="collapsible-content" {...props} />
 }
 ```
 
@@ -795,6 +1626,31 @@ existe.
 </Avatar.Root>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+import { Avatar } from '@base-ui/react/avatar'
+
+<Avatar.Root>
+  <Avatar.Image src={url} />
+  <Avatar.Fallback>LT</Avatar.Fallback>
+</Avatar.Root>
+```
+
+```tsx
+// caso real da stack: wrapper em components/ui/avatar.tsx, tamanho por data-size
+type AppAvatarProps = Avatar.Root.Props & { size?: 'sm' | 'default' | 'lg' }
+
+function AppAvatar({ size = 'default', className, ...props }: AppAvatarProps) {
+  return (
+    <Avatar.Root
+      data-size={size}
+      className={cn('data-[size=sm]:size-6 data-[size=lg]:size-10', className)}
+      {...props}
+    />
+  )
+}
+```
+
 #### react/components/progress
 [doc](https://base-ui.com/react/components/progress) | [markdown](https://base-ui.com/react/components/progress.md)
 **O que é:** a barra de progresso — `Track`, `Indicator`, `Value`, `Label` — com estado
@@ -811,6 +1667,34 @@ indeterminado.
 </Progress.Root>
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+import { Progress } from '@base-ui/react/progress'
+
+<Progress.Root value={50}>
+  <Progress.Label>Export data</Progress.Label>
+  <Progress.Track>
+    <Progress.Indicator />
+  </Progress.Track>
+</Progress.Root>
+```
+
+```tsx
+// caso real da stack: wrapper em components/ui/progress.tsx, Track/Indicator fixos
+type AppProgressProps = Progress.Root.Props
+
+function AppProgress({ className, children, ...props }: AppProgressProps) {
+  return (
+    <Progress.Root data-slot="progress" className={cn('flex gap-3', className)} {...props}>
+      {children}
+      <Progress.Track className="h-1 bg-muted">
+        <Progress.Indicator className="bg-primary" />
+      </Progress.Track>
+    </Progress.Root>
+  )
+}
+```
+
 #### react/components/meter
 [doc](https://base-ui.com/react/components/meter) | [markdown](https://base-ui.com/react/components/meter.md)
 **O que é:** a exibição de um valor dentro de uma faixa. **Não tem par no shadcn.**
@@ -824,6 +1708,34 @@ medidor só mostra onde está. Usar `progress` para "70% da cota" mente para o l
   <Meter.Label>Armazenamento</Meter.Label>
   <Meter.Track><Meter.Indicator /></Meter.Track>
 </Meter.Root>
+```
+
+```tsx
+// básico (doc oficial): anatomia mínima
+import { Meter } from '@base-ui/react/meter'
+
+<Meter.Root value={24}>
+  <Meter.Label>Armazenamento</Meter.Label>
+  <Meter.Track>
+    <Meter.Indicator />
+  </Meter.Track>
+</Meter.Root>
+```
+
+```tsx
+// caso real da stack: wrapper simples, max explícito para o leitor de tela
+type AppMeterProps = Meter.Root.Props & { label: string }
+
+function AppMeter({ label, className, ...props }: AppMeterProps) {
+  return (
+    <Meter.Root max={100} className={cn('flex gap-3', className)} {...props}>
+      <Meter.Label>{label}</Meter.Label>
+      <Meter.Track className="h-3 bg-muted">
+        <Meter.Indicator className="bg-primary" />
+      </Meter.Track>
+    </Meter.Root>
+  )
+}
 ```
 
 #### react/components/scroll-area
@@ -850,6 +1762,36 @@ esmaecimento nas bordas indicando que há mais conteúdo, sem JavaScript de scro
 }
 ```
 
+```tsx
+// básico (doc oficial): anatomia mínima
+import { ScrollArea } from '@base-ui/react/scroll-area'
+
+<ScrollArea.Root>
+  <ScrollArea.Viewport>
+    <ScrollArea.Content>conteúdo longo</ScrollArea.Content>
+  </ScrollArea.Viewport>
+  <ScrollArea.Scrollbar>
+    <ScrollArea.Thumb />
+  </ScrollArea.Scrollbar>
+</ScrollArea.Root>
+```
+
+```tsx
+// caso real da stack: wrapper em components/ui/scroll-area.tsx, Scrollbar fixo no Root
+type AppScrollAreaProps = ScrollArea.Root.Props
+
+function AppScrollArea({ className, children, ...props }: AppScrollAreaProps) {
+  return (
+    <ScrollArea.Root data-slot="scroll-area" className={cn('relative', className)} {...props}>
+      <ScrollArea.Viewport className="size-full">{children}</ScrollArea.Viewport>
+      <ScrollArea.Scrollbar data-orientation="vertical">
+        <ScrollArea.Thumb className="bg-border" />
+      </ScrollArea.Scrollbar>
+    </ScrollArea.Root>
+  )
+}
+```
+
 #### react/components/separator
 [doc](https://base-ui.com/react/components/separator) | [markdown](https://base-ui.com/react/components/separator.md)
 **O que é:** a linha divisória com a semântica correta.
@@ -859,6 +1801,32 @@ também corrige a navegação por teclado em barras.
 
 ```tsx
 <Separator orientation="vertical" className="h-6" />
+```
+
+```tsx
+// básico (doc oficial): parte única, decorativa por padrão
+import { Separator } from '@base-ui/react/separator'
+
+<Separator />
+```
+
+```tsx
+// caso real da stack: wrapper em components/ui/separator.tsx, espessura por orientação
+type AppSeparatorProps = Separator.Props
+
+function AppSeparator({ className, orientation = 'horizontal', ...props }: AppSeparatorProps) {
+  return (
+    <Separator
+      data-slot="separator"
+      orientation={orientation}
+      className={cn(
+        'data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
 ```
 
 #### react/components/toast
@@ -881,6 +1849,26 @@ toastManager.promise(salvar(post), {
 })
 ```
 
+```tsx
+// básico (doc oficial): Provider na raiz, Viewport por toast, Root vem da lista
+import { Toast } from '@base-ui/react/toast'
+
+<Toast.Provider>
+  <Toast.Viewport>
+    {/* Toast.Root é renderizado a partir de toasts da lista */}
+  </Toast.Viewport>
+</Toast.Provider>
+```
+
+```tsx
+// caso real da stack: Close com render default para o Button do design system
+type ToastCloseProps = Toast.Close.Props
+
+function ToastClose({ render = <Button variant="ghost" size="icon-sm" />, ...props }: ToastCloseProps) {
+  return <Toast.Close data-slot="toast-close" render={render} {...props} />
+}
+```
+
 ## Utils
 
 #### react/utils/csp-provider
@@ -894,6 +1882,22 @@ esse: a política bloqueou o `<style>` inline, e nada aparece no console da sua 
 ```tsx
 // o nonce precisa ser o MESMO que a resposta HTTP declarou no header
 <CSPProvider nonce={nonce}>{app}</CSPProvider>
+```
+
+```tsx
+// básico (doc oficial): importa e envolve o app
+import { CSPProvider } from '@base-ui/react/csp-provider'
+
+<CSPProvider nonce="...">{app}</CSPProvider>
+```
+
+```tsx
+// caso real da stack: nonce vindo do header de resposta, lido no root do SSR
+type AppRootProps = { nonce: string; children: React.ReactNode }
+
+function AppRoot({ nonce, children }: AppRootProps) {
+  return <CSPProvider nonce={nonce}>{children}</CSPProvider>
+}
 ```
 
 #### react/utils/direction-provider
@@ -910,6 +1914,18 @@ esse: a política bloqueou o `<style>` inline, e nada aparece no console da sua 
 </html>
 ```
 
+```tsx
+// básico (doc oficial): importa e envolve o app
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+
+<DirectionProvider>{app}</DirectionProvider>
+```
+
+```tsx
+// caso real da stack: re-exportado em components/ui/direction.tsx, sem wrapper próprio
+export { DirectionProvider, useDirection } from '@base-ui/react/direction-provider'
+```
+
 #### react/utils/merge-props
 [doc](https://base-ui.com/react/utils/merge-props) | [markdown](https://base-ui.com/react/utils/merge-props.md)
 **O que é:** o utilitário que mescla conjuntos de props React, encadeando handlers e concatenando
@@ -921,6 +1937,20 @@ esse: a política bloqueou o `<style>` inline, e nada aparece no console da sua 
 ```tsx
 // os dois onClick rodam; className soma em vez de sobrescrever
 const props = mergeProps<'button'>({ onClick: fechar }, propsRecebidas)
+```
+
+```ts
+// básico (doc oficial): valor normal sobrescreve; className e handler mesclam
+mergeProps({ id: 'a' }, { id: 'b' }) // { id: 'b' }
+mergeProps({ className: 'a' }, { className: 'b' }) // 'b a'
+```
+
+```tsx
+// caso real da stack: Button usa mergeProps para não apagar o className calculado
+props: mergeProps<'button'>(
+  { className: cn(buttonVariants({ variant, size, className })) },
+  props,
+)
 ```
 
 #### react/utils/use-render
@@ -942,3 +1972,18 @@ function Text(props: useRender.ComponentProps<'p'>) {
 
 <Text render={<strong />}>agora sai como strong</Text>
 ```
+
+```tsx
+// básico (doc oficial): render troca a tag, state vira data-*
+function Text(props: useRender.ComponentProps<'p'>) {
+  return useRender({ defaultTagName: 'p', render: props.render, props })
+}
+```
+
+```tsx
+// caso real da stack: Button troca useRender pelo primitivo para aceitar <a> estilizado
+function Button({ render, ...props }: useRender.ComponentProps<'button'>) {
+  return useRender({ defaultTagName: 'button', render, props })
+}
+```
+

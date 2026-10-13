@@ -2,6 +2,8 @@
 
 Framework Node.js completo, com TypeScript nativo, injeção de dependência e baterias inclusas.
 
+> Conferido contra `@adonisjs/core@7.6.0`
+
 **O que é:** um framework MVC para backend em Node.js, no espírito do Laravel: em vez de escolher e
 costurar dez bibliotecas, ele já traz roteamento, validação, ORM, autenticação, sessão, e-mail,
 filas, cache, testes e uma CLI de scaffolding, todos integrados e tipados. Roda em TypeScript de
@@ -39,6 +41,8 @@ carrega request, response, usuário autenticado e sessão através de toda a req
 
 **Links:** 91.
 
+**Skills:** `maiyu-backend`, `api-and-interface-design`, `security-best-practices`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
+
 ---
 
 ## Começando
@@ -75,6 +79,22 @@ npm init adonisjs@latest backend -- --kit=api
 # npm init adonisjs@latest app -- --kit=web
 ```
 
+```bash
+# caso real da stack: já define o banco e o guard de auth na criação, e evita
+# um segundo passo de `node ace configure` depois
+npm init adonisjs@latest backend -- --kit=api --db=postgres --auth-guard=access_tokens
+```
+
+```bash
+# errado: criar com `--kit=web` para uma API consumida por SPA separada
+npm init adonisjs@latest backend -- --kit=web
+# traz Edge, Vite e sessão de página que este projeto nunca usa, e cada
+# atualização do AdonisJS arrasta dependência morta nessa área
+
+# certo: `--kit=api`, sem Edge nem Vite
+npm init adonisjs@latest backend -- --kit=api
+```
+
 #### installation
 [doc](https://docs.adonisjs.com/installation)
 **O que é:** requisitos, comando de criação e as flags disponíveis.
@@ -104,6 +124,27 @@ import { middleware } from '#start/kernel'
 
 // package.json:
 // "imports": { "#models/*": "./app/models/*.js", "#exceptions/*": "./app/exceptions/*.js" }
+```
+
+```ts
+// caso real da stack: feature organizada por pasta, não por camada técnica
+// app/features/users/create.controller.ts
+// app/features/users/create.use-case.ts
+// app/features/users/create.validator.ts
+import UserCreateUseCase from '#features/users/create.use-case'
+
+@inject()
+export default class UserCreateController {
+  constructor(private readonly useCase: UserCreateUseCase) {}
+}
+```
+
+```ts
+// errado: import relativo cruzando pastas, que quebra ao mover o arquivo
+import User from '../../../models/user'
+
+// certo: subpath import com `#`, estável independente de onde o arquivo vive
+import User from '#models/user'
 ```
 
 #### dev-environment
@@ -144,6 +185,32 @@ export default await Env.create(new URL('../', import.meta.url), {
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
 })
 // env.get('DB_HOST') é `string`, não `string | undefined`
+```
+
+```ts
+// caso real da stack: config própria lendo do env validado, com tipo próprio
+// config/limiter.ts
+import env from '#start/env'
+import { defineConfig, stores } from '@adonisjs/limiter'
+
+export default defineConfig({
+  default: 'database',
+  stores: {
+    database: stores.database({}),
+  },
+})
+```
+
+```ts
+// errado: ler a variável direto do process.env dentro da regra de negócio
+async execute(payload: Payload) {
+  const limite = Number(process.env.UPLOAD_MAX_SIZE)
+  // sem validação de boot: se a variável faltar, `limite` é `NaN` em runtime
+}
+
+// certo: declarada em `start/env.ts` e lida do serviço `env`, tipada
+import env from '#start/env'
+const limite = env.get('UPLOAD_MAX_SIZE')
 ```
 
 #### deployment
@@ -315,6 +382,23 @@ router
   .use([middleware.auth(), middleware.role(['owner', 'admin'])])
 ```
 
+```ts
+// básico: rota nomeada, usada depois com `urlFor('posts.show', ...)`
+router.get('/posts/:id', [controllers.posts.Show]).as('posts.show')
+```
+
+```ts
+// errado: rota com parâmetro definida antes da rota estática do mesmo prefixo
+router.get('/posts/:id', [controllers.posts.Show])
+router.get('/posts/featured', [controllers.posts.Featured])
+// "/posts/featured" nunca chega ao segundo handler: cai no `:id` primeiro,
+// porque o AdonisJS casa as rotas na ordem em que foram registradas
+
+// certo: a rota estática vem antes da rota com parâmetro
+router.get('/posts/featured', [controllers.posts.Featured])
+router.get('/posts/:id', [controllers.posts.Show])
+```
+
 #### guides/basics/controllers
 [doc](https://docs.adonisjs.com/guides/basics/controllers)
 **O que é:** controllers como classes, o import dinâmico com `lazy import` nas rotas, controllers de
@@ -362,6 +446,32 @@ async handle({ auth, params, request, response, logger }: HttpContext) {
 }
 ```
 
+```ts
+// básico: o controller recebe o HttpContext inteiro, não peça só o pedaço
+async handle(context: HttpContext) {
+  return context.response.ok({ id: context.params.id })
+}
+```
+
+```ts
+// caso real da stack: o actor sai de `context.auth`, nunca do payload validado
+type Payload = Merge<PostUpdatePayload, { actor: User }>
+type Response = Either<HTTPException, Post>
+
+@inject()
+export default class PostUpdateController {
+  constructor(private readonly useCase: PostUpdateUseCase) {}
+
+  async handle(context: HttpContext) {
+    const payload = await context.request.validateUsing(PostUpdateValidator)
+    const actor = context.auth.getUserOrFail()
+    const result = await this.useCase.execute({ ...payload, actor })
+    if (result.isLeft()) throw result.value
+    return context.response.ok(result.value)
+  }
+}
+```
+
 #### guides/basics/middleware
 [doc](https://docs.adonisjs.com/guides/basics/middleware)
 **O que é:** os três tipos de middleware (servidor, roteador e nomeado), o registro em `start/
@@ -382,6 +492,33 @@ export default class RoleMiddleware {
   }
 }
 // start/kernel.ts: export const middleware = router.named({ role: () => import(...) })
+```
+
+```ts
+// básico: middleware de servidor, roda em toda requisição, mesmo sem rota
+// app/middleware/force_json_response_middleware.ts
+export default class ForceJsonResponseMiddleware {
+  async handle({ request }: HttpContext, next: NextFn) {
+    request.request.headers.accept = 'application/json'
+    return next()
+  }
+}
+```
+
+```ts
+// errado: validar o corpo dentro do middleware, antes do bodyparser decidir
+// o content-type e popular `request.body()`
+async handle({ request }: HttpContext, next: NextFn) {
+  const payload = request.body() // pode vir vazio, dependendo da ordem no kernel
+  return next()
+}
+
+// certo: middleware só decide passagem (auth, papel, cabeçalho); validação de
+// corpo fica no controller, depois do bodyparser já ter rodado
+async handle({ auth }: HttpContext, next: NextFn) {
+  auth.getUserOrFail()
+  return next()
+}
 ```
 
 #### guides/basics/request
@@ -439,6 +576,28 @@ export default defineConfig({
 })
 ```
 
+```ts
+// básico: limite do corpo JSON, separado do limite de multipart
+// config/bodyparser.ts
+export default defineConfig({
+  json: {
+    limit: '1mb',
+  },
+})
+```
+
+```ts
+// errado: subir o limite só no schema de validação, sem olhar o bodyparser
+export const AttachmentUploadValidator = vine.create(
+  vine.object({ file: vine.file({ size: '20mb' }) })
+)
+// com `multipart.limit: '2mb'` no config, o corpo é cortado antes do schema
+// rodar, e o erro que chega não menciona tamanho de arquivo
+
+// certo: os dois limites alinhados, bodyparser igual ou maior que o schema
+// config/bodyparser.ts -> multipart.limit: '20mb'
+```
+
 #### guides/basics/validation
 [doc](https://docs.adonisjs.com/guides/basics/validation)
 **O que é:** a integração com VineJS: schemas, `request.validateUsing`, mensagens customizadas e
@@ -450,7 +609,7 @@ poder confiar nos dados, o que elimina uma classe inteira de verificação defen
 ```ts
 import vine from '@vinejs/vine'
 
-export const TeamCreateValidator = vine.compile(
+export const TeamCreateValidator = vine.create(
   vine.object({
     document: vine.string().trim().fixedLength(14),
     displayName: vine.string().trim().minLength(3),
@@ -462,6 +621,37 @@ export type TeamCreatePayload = Infer<typeof TeamCreateValidator>
 const payload = await context.request.validateUsing(TeamCreateValidator)
 ```
 
+```ts
+// caso real da stack: validator -> controller -> use-case, actor sempre do auth
+type Payload = Merge<PostCreatePayload, { actor: User }>
+type Response = Either<HTTPException, Post>
+
+@inject()
+export default class PostCreateController {
+  constructor(private readonly useCase: PostCreateUseCase) {}
+
+  async handle(context: HttpContext) {
+    const payload = await context.request.validateUsing(PostCreateValidator)
+    const actor = context.auth.getUserOrFail()
+    const result = await this.useCase.execute({ ...payload, actor })
+    if (result.isLeft()) throw result.value
+    return context.response.created(result.value)
+  }
+}
+```
+
+```ts
+// errado: ler o campo direto do request, sem passar pelo schema
+async handle({ request }: HttpContext) {
+  const title = request.input('title') // sem tipo, sem validação de tamanho
+}
+
+// certo: `validateUsing` valida e já devolve o tipo inferido do schema
+async handle({ request }: HttpContext) {
+  const { title } = await request.validateUsing(PostCreateValidator)
+}
+```
+
 #### guides/basics/file-uploads
 [doc](https://docs.adonisjs.com/guides/basics/file-uploads)
 **O que é:** upload multipart, o objeto `MultipartFile`, validação de tamanho e extensão, e o
@@ -471,7 +661,7 @@ const payload = await context.request.validateUsing(TeamCreateValidator)
 inválido ser recusado antes de tocar o disco.
 
 ```ts
-const UploadValidator = vine.compile(
+const UploadValidator = vine.create(
   vine.object({
     // a validação acontece antes de qualquer gravação: arquivo inválido nunca
     // chega ao disco nem ao bucket
@@ -481,6 +671,25 @@ const UploadValidator = vine.compile(
 
 const { arquivo } = await request.validateUsing(UploadValidator)
 const chave = await arquivo.moveToDisk('anexos') // usa o disco do ambiente
+```
+
+```ts
+// básico: checar se o upload chegou íntegro antes de mover
+const file = request.file('avatar')
+if (!file) {
+  throw HTTPException.BadRequest('Arquivo obrigatório', 'FILE_REQUIRED')
+}
+```
+
+```ts
+// errado: usar `file.clientName` para nomear o arquivo salvo
+const chave = await file.moveToDisk('avatars', { name: file.clientName })
+// nome vem do cliente: dois uploads com o mesmo nome colidem no bucket, e um
+// nome malicioso pode tentar atravessar pasta
+
+// certo: gerar um nome próprio, o nome original fica só como metadado
+import { randomUUID } from 'node:crypto'
+const chave = await file.moveToDisk('avatars', { name: randomUUID() })
 ```
 
 #### guides/basics/session
@@ -510,14 +719,30 @@ uma rota mudar de caminho.
 confirmação de e-mail ou redefinição de senha sem inventar criptografia.
 
 ```ts
-import router from '@adonisjs/core/services/router'
+import { signedUrlFor } from '@adonisjs/core/services/url_builder'
 
 // assinada: a própria URL carrega a prova de que o servidor a emitiu, e expira
 // sozinha. Não precisa de tabela de tokens para confirmação de e-mail.
-const link = router
-  .builder()
-  .params({ id: usuario.id })
-  .makeSigned('verificarEmail', { expiresIn: '24 hours' })
+const link = signedUrlFor('verificarEmail', { id: usuario.id }, { expiresIn: '24 hours' })
+```
+
+```ts
+// básico: link comum, sem assinatura, para rota pública
+import { urlFor } from '@adonisjs/core/services/url_builder'
+
+const link = urlFor('posts.show', { id: post.id })
+```
+
+```ts
+// errado: `router.builder()` é a API legada (depreciada em favor do serviço
+// `url_builder`), e mistura dois jeitos de gerar URL no mesmo projeto
+const link = router.builder().params({ id: usuario.id }).makeSigned('verificarEmail')
+
+// certo: `signedUrlFor`, o serviço atual, com o mesmo resultado
+import { signedUrlFor } from '@adonisjs/core/services/url_builder'
+
+const link = signedUrlFor('verificarEmail', { id: usuario.id }, { expiresIn: '24 hours' })
+// na rota que recebe o clique: `request.hasValidSignature()` confirma a prova
 ```
 
 #### guides/basics/exception-handling
@@ -539,6 +764,40 @@ export default class HTTPException extends Exception {
 
 // o formato do corpo de erro é decidido UMA vez, no handler global. Cada
 // controller só lança; ninguém monta resposta de erro na mão.
+```
+
+```ts
+// caso real da stack: a regra de negócio devolve `Either`, e só o controller
+// traduz o lado esquerdo em exceção lançada
+type Response = Either<HTTPException, Post>
+
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.find(payload.id)
+  if (!post) {
+    return left(HTTPException.NotFound('Post não encontrado', 'POST_NOT_FOUND'))
+  }
+  return right(post)
+}
+
+// no controller:
+const result = await useCase.execute(payload)
+if (result.isLeft()) throw result.value // só aqui a exceção é lançada
+```
+
+```ts
+// errado: usar `findOrFail`/`firstOrFail` dentro do caso de uso
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.findOrFail(payload.id) // lança direto, sem passar por Either
+  return right(post)
+}
+
+// certo: `find` devolve `null`, e o caso de uso decide o `left` com a
+// mensagem e o código certos para este domínio
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.find(payload.id)
+  if (!post) return left(HTTPException.NotFound('Post não encontrado', 'POST_NOT_FOUND'))
+  return right(post)
+}
 ```
 
 #### guides/basics/debugging
@@ -716,6 +975,23 @@ export default defineConfig({
 // Trocar de guard depois mexe em login, middleware e testes de uma vez só.
 ```
 
+```ts
+// básico: o guard escolhido no config decide qual `auth.use(...)` existe
+await auth.use('web').login(user)
+const usuario = auth.use('web').user
+```
+
+```ts
+// errado: trocar de guard (de sessão para access tokens) só no login, sem
+// atualizar o middleware e os testes que ainda assumem cookie de sessão
+router.post('/login', [controllers.auth.SignIn]) // agora devolve um token...
+router.get('/me', [controllers.auth.Me]).use(middleware.auth()) // ...mas o
+// middleware padrão ainda está configurado para o guard `web`
+
+// certo: guard explícito em cada ponto que depende dele, revisado junto
+router.get('/me', [controllers.auth.Me]).use(middleware.auth({ guards: ['api'] }))
+```
+
 #### guides/auth/verifying-user-credentials
 [doc](https://docs.adonisjs.com/guides/auth/verifying-user-credentials)
 **O que é:** o mixin `withAuthFinder`, a verificação de senha e a proteção contra ataque de tempo.
@@ -732,6 +1008,36 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 // verifyCredentials gasta o mesmo tempo com e-mail inexistente e senha errada.
 // Buscar o usuário e só então comparar o hash entrega, pelo tempo de resposta,
 // quais e-mails existem no sistema.
+const user = await User.verifyCredentials(email, password)
+```
+
+```ts
+// caso real da stack: caso de uso de login, erro de credencial é um `left`,
+// não uma exceção que escapa do fluxo normal
+type Response = Either<HTTPException, User>
+
+@inject()
+export default class SignInUseCase {
+  async execute(payload: SignInPayload): Promise<Response> {
+    try {
+      const user = await User.verifyCredentials(payload.email, payload.password)
+      return right(user)
+    } catch (error) {
+      return left(HTTPException.Unauthorized('Credenciais inválidas', 'INVALID_CREDENTIALS'))
+    }
+  }
+}
+```
+
+```ts
+// errado: buscar o usuário e comparar o hash na mão
+const user = await User.findBy('email', email)
+let senhaCorreta = false
+if (user) {
+  senhaCorreta = await hash.verify(user.password, password)
+} // caminho sem usuário é mais rápido: vaza quais e-mails existem
+
+// certo: `verifyCredentials` sempre faz o hash, existindo ou não o usuário
 const user = await User.verifyCredentials(email, password)
 ```
 
@@ -767,6 +1073,26 @@ const token = await User.accessTokens.create(user, ['*'], { expiresIn: '30 days'
 // derruba as sessões de verdade, na hora
 const tokens = await User.accessTokens.all(user)
 for (const t of tokens) await User.accessTokens.delete(user, t.identifier)
+```
+
+```ts
+// básico: criar o token na resposta do login
+async handle(context: HttpContext) {
+  const payload = await context.request.validateUsing(SignInValidator)
+  const user = await User.verifyCredentials(payload.email, payload.password)
+  const token = await User.accessTokens.create(user)
+  return context.response.created({ token }) // `toJSON` já expõe o valor público
+}
+```
+
+```ts
+// errado: devolver o mesmo token sempre, sem expiração nem habilidade
+const token = await User.accessTokens.create(user)
+// sem `expiresIn`, o token nunca expira sozinho, e sem lista de habilidades
+// qualquer rota autenticada aceita este token para qualquer ação
+
+// certo: expiração e habilidades restritas ao que aquele token precisa fazer
+const token = await User.accessTokens.create(user, ['posts:read'], { expiresIn: '30 days' })
 ```
 
 #### guides/auth/basic-auth-guard
@@ -837,6 +1163,40 @@ if (await bouncer.with(PostPolicy).denies('edit', post)) {
 }
 ```
 
+```ts
+// caso real da stack: a policy estende BasePolicy, e a checagem acontece no
+// controller via ctx.bouncer — é lá que o HttpContext existe. O use-case
+// recebe o registro já autorizado e segue devolvendo Either para o resto
+export default class PostUpdateController {
+  constructor(private readonly useCase: PostUpdateUseCase) {}
+
+  async handle({ bouncer, params, request }: HttpContext) {
+    const post = await Post.findOrFail(params.id)
+    await bouncer.with(PostPolicy).authorize('edit', post)
+
+    const result = await this.useCase.execute({ post, ...request.body() })
+    // ...
+  }
+}
+```
+
+```ts
+// errado: chamar o método da policy direto, pulando o Bouncer — perde o
+// AuthorizationException -> 403 automático e o `allowGuest`/metadata da classe
+export default class PostUpdateUseCase {
+  constructor(private readonly policy: PostPolicy) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    if (!this.policy.edit(payload.actor, payload.post)) {
+      return left(HTTPException.Forbidden('Acesso negado', 'ACCESS_DENIED'))
+    }
+    return right(payload.post)
+  }
+}
+
+// certo: ctx.bouncer.with(Policy).authorize(...) no controller, como a doc mostra
+```
+
 ## Segurança
 
 #### guides/security/hashing
@@ -872,6 +1232,25 @@ const original = encryption.decrypt<string>(cifrado)
 
 // Senha nunca: hash é via de mão única DE PROPÓSITO. Se dá para descriptografar,
 // um vazamento do banco mais a APP_KEY entrega todas as senhas.
+```
+
+```ts
+// básico: `purpose` escopa o valor cifrado ao uso pretendido
+const cifrado = encryption.encrypt(documentoFiscal, '7 days', 'document-verification')
+const original = encryption.decrypt<string>(cifrado, 'document-verification')
+```
+
+```ts
+// errado: ignorar que `decrypt` devolve `null` quando o purpose não casa
+// ou o valor expirou, e seguir como se fosse sempre string
+const token = encryption.decrypt<string>(cifrado, 'password-reset')
+await enviarParaParceiro(token) // explode em runtime se vier `null`
+
+// certo: tratar o `null` como falha de negócio, não deixar propagar
+const token = encryption.decrypt<string>(cifrado, 'password-reset')
+if (!token) {
+  throw HTTPException.BadRequest('Link inválido ou expirado', 'INVALID_LINK')
+}
 ```
 
 #### guides/security/cors
@@ -928,6 +1307,33 @@ const throttleLogin = limiter.define('login', () =>
 router.post('sign-in', [controllers.authentication.SignIn]).use(throttleLogin)
 ```
 
+```ts
+// básico: sem `usingKey`, a chave padrão é o IP do request
+const throttleApi = limiter.define('api', () => limiter.allowRequests(100).every('1 minute'))
+```
+
+```ts
+// caso real da stack: chave por e-mail do corpo, não por usuário autenticado
+// (no login ainda não existe sessão para tirar o id de `ctx.auth`)
+export const signInThrottle = limiter.define('sign-in', (ctx) => {
+  const email = ctx.request.input('email', 'anonymous')
+  return limiter.allowRequests(5).every('1 minute').usingKey(`sign-in_${email}`).blockFor('10 mins')
+})
+```
+
+```ts
+// errado: só por IP, sem `usingKey` por e-mail
+const throttleLogin = limiter.define('login', () => limiter.allowRequests(5).every('1 minute'))
+// um atacante distribuído em vários IPs nunca bate o limite, e o bloqueio
+// por IP também pode trancar uma rede inteira atrás de um NAT corporativo
+
+// certo: chave combinando IP e identificador da conta visada
+const throttleLogin = limiter.define('login', (ctx) => {
+  const email = ctx.request.input('email', 'anonymous')
+  return limiter.allowRequests(5).every('1 minute').usingKey(`${ctx.request.ip()}_${email}`)
+})
+```
+
 ## Conceitos
 
 #### guides/concepts/application-lifecycle
@@ -971,6 +1377,30 @@ export default class TeamCreateUseCase {
 @inject()
 export default class TeamCreateController {
   constructor(private readonly useCase: TeamCreateUseCase) {}
+}
+```
+
+```ts
+// básico: classe simples, sem dependência nenhuma, ainda assim decorada
+@inject()
+export default class PostPolicy {
+  edit(actor: User, post: Post): boolean {
+    return actor.teamId === post.teamId
+  }
+}
+```
+
+```ts
+// errado: instanciar a dependência na mão dentro da classe
+export default class PostCreateUseCase {
+  private readonly mailer = new MailService() // o ESLint da casa recusa isto,
+  // mas o motivo é este: no teste não dá para trocar por um substituto
+}
+
+// certo: dependência entra pelo construtor, resolvida pelo container
+@inject()
+export default class PostCreateUseCase {
+  constructor(private readonly mailer: MailService) {}
 }
 ```
 
@@ -1226,6 +1656,32 @@ export default defineConfig({
 // use ctx.logger: ele já carrega o id da requisição em toda linha
 ```
 
+```ts
+// caso real da stack: erro inesperado do caso de uso vai pro logger, nunca
+// direto pro `response`, e o `left` devolvido não carrega o stack trace
+@inject()
+export default class PostCreateUseCase {
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      const post = await Post.create(payload)
+      return right(post)
+    } catch (error) {
+      logger.error({ err: error }, '[post > create][error]')
+      return left(HTTPException.InternalServerError('Erro interno do servidor', 'CREATE_ERROR'))
+    }
+  }
+}
+```
+
+```ts
+// errado: logar o payload inteiro, antes de checar o que tem dentro
+logger.info({ payload }, 'cadastro recebido') // se `payload.password` existir,
+// e o `redact` do config não cobrir este campo específico, ela vai pro log
+
+// certo: logar só o que identifica o evento, nunca o payload bruto
+logger.info({ email: payload.email }, 'cadastro recebido')
+```
+
 #### guides/digging-deeper/mail
 [doc](https://docs.adonisjs.com/guides/digging-deeper/mail)
 **O que é:** o pacote de e-mail, com os drivers (SMTP, SES, Mailgun, Resend), templates em Edge,
@@ -1242,6 +1698,31 @@ import mail from '@adonisjs/mail/services/main'
 await mail.sendLater((message) => {
   message.to(user.email).subject('User aprovada').htmlView('emails/aprovada', { user })
 })
+```
+
+```ts
+// básico: `send` aguarda o SMTP responder, útil só em teste ou script local
+await mail.send((message) => {
+  message.to(user.email).subject('Bem-vindo').htmlView('emails/bem-vindo', { user })
+})
+```
+
+```ts
+// errado: `send` dentro do caso de uso de cadastro, na mesma requisição
+async execute(payload: Payload): Promise<Response> {
+  const user = await User.create(payload)
+  await mail.send((message) => message.to(user.email).subject('Bem-vindo'))
+  // a resposta da API só sai depois do SMTP confirmar, e um provedor lento
+  // vira timeout do cliente que nada tem a ver com o cadastro em si
+  return right(user)
+}
+
+// certo: `sendLater`, a resposta não espera o e-mail saber se foi entregue
+async execute(payload: Payload): Promise<Response> {
+  const user = await User.create(payload)
+  await mail.sendLater((message) => message.to(user.email).subject('Bem-vindo'))
+  return right(user)
+}
 ```
 
 #### guides/digging-deeper/queues
@@ -1331,6 +1812,44 @@ export default class BackfillCnpj extends BaseCommand {
 }
 ```
 
+```ts
+// básico: comando resolve a dependência pelo container dentro do `run`, não
+// no construtor — o Kernel do Ace já fixa a assinatura do construtor
+export default class StoragesPrune extends BaseCommand {
+  static commandName = 'storages:prune'
+  static options: CommandOptions = { startApp: true }
+
+  async run() {
+    const { default: StorageDeleteUseCase } = await import('#features/storages/delete.use-case')
+    const useCase = await this.app.container.make(StorageDeleteUseCase)
+    await useCase.execute({ olderThanHours: 24 })
+  }
+}
+```
+
+```ts
+// errado: `startApp: false` (o padrão) num comando que importa um model
+export default class ListarUsers extends BaseCommand {
+  static commandName = 'users:list'
+
+  async run() {
+    const { default: User } = await import('#models/user')
+    await User.query() // falha: o container e a conexão de banco não subiram
+  }
+}
+
+// certo: `startApp: true` sobe a aplicação antes do `run`
+export default class ListarUsers extends BaseCommand {
+  static commandName = 'users:list'
+  static options: CommandOptions = { startApp: true }
+
+  async run() {
+    const { default: User } = await import('#models/user')
+    await User.query()
+  }
+}
+```
+
 #### guides/ace/arguments
 [doc](https://docs.adonisjs.com/guides/ace/arguments)
 **O que é:** argumentos posicionais dos comandos, com obrigatoriedade e valor padrão.
@@ -1410,6 +1929,26 @@ node ace repl
 # > .ls        lista os helpers disponíveis
 ```
 
+```bash
+# básico: inspecionar um service sem escrever comando nem teste
+node ace repl
+# > const StorageService = await importDefault('#services/storage.service')
+# > const service = await app.container.make(StorageService)
+# > await service.listPending()
+```
+
+```bash
+# errado: testar uma query de escrita direto no REPL contra o banco de
+# desenvolvimento compartilhado, sem transação
+# > await User.query().where('status', 'inactive').delete()
+# apaga de verdade, e não tem `--dry-run` nem confirmação como um comando tem
+
+# certo: ler antes, e só escrever depois de confirmar visualmente o alvo
+# > const alvo = await User.query().where('status', 'inactive')
+# > alvo.length
+# > await User.query().where('status', 'inactive').delete()
+```
+
 ## Testes
 
 #### guides/testing/introduction
@@ -1445,6 +1984,42 @@ test('user não alcança o módulo do administrador', async ({ client }) => {
   const response = await client.get('/administrator/teams').loginAs(user)
 
   response.assertStatus(403)
+})
+```
+
+```ts
+// básico: rota pública, sem `loginAs`
+test('lista posts publicados', async ({ client }) => {
+  const response = await client.get('/posts')
+
+  response.assertStatus(200)
+})
+```
+
+```ts
+// errado: montar o corpo da requisição com o id do dono vindo do teste,
+// como se o endpoint confiasse nisso
+test('user edita o próprio post', async ({ client }) => {
+  const user = await UserFactory.create()
+  const post = await PostFactory.merge({ authorId: user.id }).create()
+
+  const response = await client
+    .put(`/posts/${post.id}`)
+    .json({ title: 'novo título', authorId: user.id }) // o endpoint real
+    // ignora isto: quem edita é sempre `ctx.auth`, então o teste não prova nada
+    .loginAs(user)
+
+  response.assertStatus(200)
+})
+
+// certo: o teste nem envia o campo que o endpoint não aceita do corpo
+test('user edita o próprio post', async ({ client }) => {
+  const user = await UserFactory.create()
+  const post = await PostFactory.merge({ authorId: user.id }).create()
+
+  const response = await client.put(`/posts/${post.id}`).json({ title: 'novo título' }).loginAs(user)
+
+  response.assertStatus(200)
 })
 ```
 
@@ -1495,6 +2070,34 @@ export const testUtils = {
 // cada teste roda dentro de uma transação e sofre rollback no fim: mais rápido
 // que truncar, e sem deixar rastro para o teste seguinte.
 // Cuidado: código que abre transação própria pode conflitar com a global.
+```
+
+```ts
+// básico: o mesmo setup, registrado uma vez para toda a suíte
+export const testUtils = {
+  setup: [() => testUtils.db().withGlobalTransaction()],
+}
+// cada arquivo de teste não repete isto: herda do `tests/bootstrap.ts`
+```
+
+```ts
+// errado: caso de uso que abre a própria transação no caminho feliz
+async execute(payload: Payload): Promise<Response> {
+  return db.transaction(async (trx) => {
+    const post = await Post.create(payload, { client: trx })
+    return right(post)
+  })
+  // em teste, isto roda DENTRO da transação global já aberta pelo
+  // `withGlobalTransaction`, e uma sub-transação que falha pode fazer
+  // rollback de mais do que o esperado
+}
+
+// certo: deixar a transação para quem orquestra múltiplos passos de escrita,
+// e manter a escrita simples sem transação própria quando é uma linha só
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.create(payload)
+  return right(post)
+}
 ```
 
 #### guides/testing/database-assertions
@@ -1628,6 +2231,39 @@ resposta costuma estar em uma linha.
 if (error.code === 'E_ROW_NOT_FOUND') return response.notFound({})
 ```
 
+```ts
+// caso real da stack: traduzir o código do framework pro `Either` do domínio,
+// na borda, para o resto do caso de uso nunca precisar conhecer `E_*`
+async execute(payload: Payload): Promise<Response> {
+  try {
+    const post = await Post.findOrFail(payload.id)
+    return right(post)
+  } catch (error) {
+    if (error.code === 'E_ROW_NOT_FOUND') {
+      return left(HTTPException.NotFound('Post não encontrado', 'POST_NOT_FOUND'))
+    }
+    throw error
+  }
+}
+```
+
+```ts
+// errado: deixar `findOrFail` escapar do caso de uso sem tradução
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.findOrFail(payload.id)
+  // `E_ROW_NOT_FOUND` vira uma resposta 404 genérica do handler global, sem o
+  // código de domínio `POST_NOT_FOUND` que o frontend espera
+  return right(post)
+}
+
+// certo: `find`, que devolve `null`, e o `left` com o código certo
+async execute(payload: Payload): Promise<Response> {
+  const post = await Post.find(payload.id)
+  if (!post) return left(HTTPException.NotFound('Post não encontrado', 'POST_NOT_FOUND'))
+  return right(post)
+}
+```
+
 #### reference/helpers
 [doc](https://docs.adonisjs.com/reference/helpers)
 **O que é:** os utilitários incluídos: manipulação de string (slug, camelCase, plural), `cuid`,
@@ -1643,6 +2279,28 @@ import { cuid, safeEqual, base64 } from '@adonisjs/core/helpers'
 string.slug('Café com Leite') // 'cafe-com-leite', sem instalar slugify
 cuid() // id ordenável, sem instalar uuid
 safeEqual(tokenRecebido, tokenEsperado) // comparação em tempo constante
+```
+
+```ts
+// básico: slug de título, usado como parte da chave de um arquivo
+import string from '@adonisjs/core/helpers/string'
+
+const chave = `${string.slug(post.title)}-${cuid()}`
+```
+
+```ts
+// errado: comparar token com `===`, vulnerável a timing attack
+if (tokenRecebido === tokenEsperado) {
+  // a diferença de tempo entre acertar o primeiro caractere e o último
+  // caractere do token é mensurável, e dá pra descobrir o token aos poucos
+}
+
+// certo: `safeEqual`, mesmo tempo de execução independente de onde diverge
+import { safeEqual } from '@adonisjs/core/helpers'
+
+if (safeEqual(tokenRecebido, tokenEsperado)) {
+  // autorizado
+}
 ```
 
 #### reference/types-helpers
@@ -1663,3 +2321,4 @@ export default class RoleMiddleware {
   }
 }
 ```
+

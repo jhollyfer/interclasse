@@ -3,10 +3,10 @@
 Interclasse: os Jogos Estudantis do CMEI Cosme Jean - turmas, inscricoes,
 sorteio, tabela de jogos, placar e classificacao.
 
-AdonisJS 7 + Lucid, vertical slice por feature. **A regua e
-`../PADRAO-BACKEND.md`**, byte-identica nos repositorios irmaos e cobrada por
-`sync:check`. Este arquivo assume tudo o que ela diz e nao repete nada: aqui fica so
-o que e deste projeto.
+AdonisJS 7 + Lucid, vertical slice por feature. **A regua e `../_padroes/`**
+(`arquitetura.md` e `backend.md` acima de tudo), copia do upstream `maiyu-pattern`
+cobrada por `sync:check`. Este arquivo assume tudo o que ela diz e nao repete nada:
+aqui fica so o que e deste projeto.
 
 ## Arvore
 

@@ -11,6 +11,8 @@ concurrency:
 jobs:
   check-backend:
     uses: ./.github/workflows/main-check-backend.yml
+    secrets:
+      MAIYU_PATTERN_TOKEN: ${{ secrets.MAIYU_PATTERN_TOKEN }}
 
   build-frontend:
     uses: ./.github/workflows/main-build-frontend.yml

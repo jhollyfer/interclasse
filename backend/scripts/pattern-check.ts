@@ -1,5 +1,5 @@
 /**
- * Cobra as convencoes de PADRAO-BACKEND.md que o ESLint nao alcanca.
+ * Cobra as convencoes de `_padroes/backend.md` e `_padroes/arquitetura.md` que o ESLint nao alcanca.
  *
  * O ESLint ja cobra as quatro regras de escrita (ternario, `any`, `as`,
  * `interface`) e a proibicao de `new` em servico. O que sobra e o que depende de
@@ -9,7 +9,9 @@
  * de 300 linhas resolve.
  *
  * Cada regra aponta a secao da regua que a origina, para que a mensagem de erro
- * leve a decisao junto e nao so ao sintoma.
+ * leve a decisao junto e nao so ao sintoma. O que e deste projeto - isencoes
+ * nomeadas, chaves de ambiente fora do leitor, arquivos de FORMA - mora em
+ * `scripts/pattern-check.config.json`.
  *
  * Uso:
  *   node --import @poppinss/ts-exec scripts/pattern-check.ts            # reprova
@@ -29,20 +31,7 @@ type Achado = {
 
 const RAIZ = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
-/** O nome do diretorio que contem o backend - `academy`, `adacaibs`, `simple-hub`. */
-const PROJETO = basename(resolve(RAIZ, '..'))
-
-/** Uma entrada de `envChaves.chaves` do manifesto. */
-type EntradaEnv = {
-  /** Os projetos que leem a chave hoje, por `env.get()`. */
-  lidaPor?: string[]
-  /** Um caminho de exemplo, so para quem for procurar. */
-  onde?: string
-  /** Por que a chave nao aparece em `env.get()` nenhum, quando nao aparece. */
-  foraDoCodigo?: string
-}
-
-/** Uma entrada de `newAllowlist` do manifesto. */
+/** Uma entrada de `newAllowlist` da config. */
 type EntradaNew = {
   /** O simbolo construido com `new`. */
   simbolo: string
@@ -51,6 +40,18 @@ type EntradaNew = {
   /** Por que aquele `new` e legitimo. */
   motivo: string
 }
+
+type Config = {
+  /** Chave que nunca passa por `env.get()`, com o motivo. Secao 6. */
+  envForaDoLeitor: Record<string, string>
+  newAllowlist: EntradaNew[]
+  softDeleteExempt: string[]
+  forma: string[]
+}
+
+const CONFIG: Config = JSON.parse(
+  await readFile(join(RAIZ, 'scripts/pattern-check.config.json'), 'utf8')
+)
 
 /** Diretorios que a regua exige mesmo vazios. Secao 1.1. */
 const DIRETORIOS_OBRIGATORIOS = [
@@ -314,35 +315,25 @@ function conferirNomeDeModel(relativo: string): Achado[] {
 /**
  * Toda chave lida por `env.get()` e declarada no schema, e vice-versa. Secao 6.
  *
- * O `config/database.ts` de dois projetos ainda carrega blocos de driver
- * comentados, e e por isso que a leitura ignora comentario: `DB_HOST` la dentro
- * nao e uma chave de verdade.
+ * Chave declarada que nenhum codigo le e chave morta, e sai. A excecao e o que
+ * nunca passa pelo leitor - `PORT` e `HOST` (lidas por `@adonisjs/core`),
+ * `NODE_ENV` e `TZ` -, listado em `envForaDoLeitor` da config com o motivo.
  *
- * Alem disso, o schema declara exatamente a lista de `envChaves` do manifesto -
- * nem uma a menos, nem uma a mais. Declarar so o que se usa parecia mais limpo e
- * cobrava caro: quem copiava um modulo de um projeto para outro descobria a
- * variavel faltando em producao, no primeiro pedido que a lia. A base e canonica
- * e os tres sao espelho um do outro; chave lida so por um irmao fica declarada e
- * opcional aqui, e nao custa nada.
- *
- * O que a lista **nao** carrega e chave morta. Cada entrada registra em
- * `lidaPor` quem a le hoje, e quando este projeto esta la, a leitura tem que
- * existir: chave que perdeu o ultimo leitor sai dos tres. `foraDoCodigo` e a
- * saida para o que nunca passa por `env.get()` - `PORT` e `HOST` sao lidas em
- * `process.env` por `@adonisjs/core`, e `TZ` pelo proprio Node.
+ * A leitura ignora comentario: um bloco de driver comentado em `config/` nao e
+ * uma chave de verdade.
  */
 async function conferirEnv(arquivos: string[]): Promise<Achado[]> {
   const schema = await readFile(join(RAIZ, 'start/env.ts'), 'utf8').catch(() => '')
   if (schema === '') return []
+  const schemaLimpo = semComentarios(schema)
 
   const declaradas = new Set<string>()
-  for (const casado of semComentarios(schema).matchAll(/^\s*([A-Z][A-Z0-9_]*)\s*:/gm)) {
-    declaradas.add(casado[1])
+  for (const casado of schemaLimpo.matchAll(/^\s*([A-Z][A-Z0-9_]*)\s*:/gm)) {
+    const chave = casado[1]
+    if (chave !== undefined) declaradas.add(chave)
   }
 
   const achados: Achado[] = []
-  const vistas = new Set<string>()
-
   const lidas = new Set<string>()
 
   for (const arquivo of arquivos) {
@@ -352,75 +343,29 @@ async function conferirEnv(arquivos: string[]): Promise<Achado[]> {
 
     for (const casado of limpo.matchAll(/env\.get\(\s*'([A-Z][A-Z0-9_]*)'/g)) {
       const chave = casado[1]
+      if (chave === undefined) continue
+      if (!lidas.has(chave) && !declaradas.has(chave)) {
+        achados.push({
+          arquivo: relativo,
+          linha: linhaDe(limpo, casado.index),
+          regra: 'env-sem-schema',
+          secao: '6',
+          mensagem: `\`${chave}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
+        })
+      }
       lidas.add(chave)
-      if (declaradas.has(chave) || vistas.has(chave)) continue
-      vistas.add(chave)
-      achados.push({
-        arquivo: relativo,
-        linha: linhaDe(limpo, casado.index),
-        regra: 'env-sem-schema',
-        secao: '6',
-        mensagem: `\`${chave}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
-      })
     }
-  }
-
-  const bruto = await readFile(join(RAIZ, 'padrao.manifest.json'), 'utf8').catch(() => '')
-  if (bruto === '') return achados
-
-  const manifesto: { envChaves?: { chaves?: Record<string, EntradaEnv> } } = JSON.parse(bruto)
-  const canonicas = manifesto.envChaves?.chaves ?? {}
-  const nomes = Object.keys(canonicas)
-  if (nomes.length === 0) return achados
-
-  for (const chave of nomes) {
-    if (!declaradas.has(chave)) {
-      achados.push({
-        arquivo: 'start/env.ts',
-        linha: 1,
-        regra: 'env-fora-do-padrao',
-        secao: '6',
-        mensagem: `\`${chave}\` esta em \`padrao.manifest.json\` e falta aqui; a lista e a mesma nos tres`,
-      })
-      continue
-    }
-
-    const entrada = canonicas[chave]
-    const leitores = entrada.lidaPor ?? []
-
-    // Chave que ninguem le em lugar nenhum e chave morta, e sai dos tres. A
-    // excecao e o que nunca passa por `env.get()`, e por isso precisa estar
-    // registrado a mao - senao a regra acusaria `PORT` como morta.
-    if (leitores.length === 0 && entrada.foraDoCodigo === undefined) {
-      achados.push({
-        arquivo: 'start/env.ts',
-        linha: linhaDe(semComentarios(schema), semComentarios(schema).indexOf(chave)),
-        regra: 'env-sem-leitor',
-        secao: '6',
-        mensagem: `\`${chave}\` nao e lida por nenhum dos tres; remova dos tres ou registre \`foraDoCodigo\``,
-      })
-      continue
-    }
-
-    if (!leitores.includes(PROJETO) || lidas.has(chave)) continue
-
-    achados.push({
-      arquivo: 'start/env.ts',
-      linha: linhaDe(semComentarios(schema), semComentarios(schema).indexOf(chave)),
-      regra: 'env-leitor-sumiu',
-      secao: '6',
-      mensagem: `o manifesto diz que \`${PROJETO}\` le \`${chave}\`, e nao ha \`env.get('${chave}')\` no repositorio; tire este projeto de \`lidaPor\`, e se ficar vazio a chave sai dos tres`,
-    })
   }
 
   for (const chave of declaradas) {
-    if (nomes.includes(chave)) continue
+    if (lidas.has(chave)) continue
+    if (chave in CONFIG.envForaDoLeitor) continue
     achados.push({
       arquivo: 'start/env.ts',
-      linha: linhaDe(semComentarios(schema), semComentarios(schema).indexOf(chave)),
-      regra: 'env-fora-do-padrao',
+      linha: linhaDe(schemaLimpo, schemaLimpo.indexOf(chave)),
+      regra: 'env-sem-leitor',
       secao: '6',
-      mensagem: `\`${chave}\` nao esta em \`padrao.manifest.json\`; chave nova entra nos tres ou em nenhum`,
+      mensagem: `\`${chave}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envForaDoLeitor\` com o motivo`,
     })
   }
 
@@ -446,7 +391,7 @@ async function conferirDiretorios(): Promise<Achado[]> {
 }
 
 /**
- * Um caminho do manifesto, como o de `use-case` sob `app/features`, virando
+ * Um caminho do config, como o de `use-case` sob `app/features`, virando
  * expressao.
  *
  * Duas estrelas seguidas de barra casam qualquer profundidade, inclusive
@@ -465,7 +410,7 @@ function padraoDeCaminho(glob: string): RegExp {
  * Toda entrada de `newAllowlist` descreve um uso que existe.
  *
  * O ESLint ja recusa `new X()` onde `X` termina em Service, UseCase, Policy ou
- * Controller (secao 2.1). O manifesto e onde as excecoes ficam nomeadas com o
+ * Controller (secao 2.1). O config e onde as excecoes ficam nomeadas com o
  * motivo ao lado, e o que se cobra aqui e o outro lado da lista: entrada sem uso.
  *
  * Existe porque a lista era letra morta — nenhuma funcao a lia. Uma excecao que
@@ -474,11 +419,9 @@ function padraoDeCaminho(glob: string): RegExp {
  * uma chamada que nenhum caso de uso fazia.
  */
 async function conferirNewAllowlist(fontes: Map<string, string>): Promise<Achado[]> {
-  const bruto = await readFile(join(RAIZ, 'padrao.manifest.json'), 'utf8')
-  const manifesto: { newAllowlist?: EntradaNew[] } = JSON.parse(bruto)
   const achados: Achado[] = []
 
-  for (const entrada of manifesto.newAllowlist ?? []) {
+  for (const entrada of CONFIG.newAllowlist) {
     const alvo = padraoDeCaminho(entrada.arquivo)
     const uso = new RegExp(`\\bnew\\s+${entrada.simbolo}\\s*\\(`)
 
@@ -492,7 +435,7 @@ async function conferirNewAllowlist(fontes: Map<string, string>): Promise<Achado
 
     if (usada) continue
     achados.push({
-      arquivo: 'padrao.manifest.json',
+      arquivo: 'scripts/pattern-check.config.json',
       linha: 1,
       regra: 'allowlist-de-new-sem-uso',
       secao: '2.1',
@@ -514,13 +457,11 @@ async function conferirNewAllowlist(fontes: Map<string, string>): Promise<Achado
  *
  * `app/models/` fica de fora porque e la que o scope mora - e o corpo dele que
  * escreve o `whereNull`, uma vez. As demais excecoes sao nomeadas em
- * `softDeleteExempt` no manifesto, e sao sempre a mesma situacao: consulta sobre
+ * `softDeleteExempt` no config, e sao sempre a mesma situacao: consulta sobre
  * `LucidModel` generico, tipo em que scope nomeado nao existe.
  */
 async function conferirSoftDelete(fontes: Map<string, string>): Promise<Achado[]> {
-  const bruto = await readFile(join(RAIZ, 'padrao.manifest.json'), 'utf8')
-  const manifesto: { softDeleteExempt?: string[] } = JSON.parse(bruto)
-  const isentos = new Set(manifesto.softDeleteExempt ?? [])
+  const isentos = new Set(CONFIG.softDeleteExempt)
   const achados: Achado[] = []
   const padrao = /whereNull\(\s*'(?:deletedAt|deleted_at)'\s*\)/
 
@@ -546,7 +487,7 @@ async function conferirSoftDelete(fontes: Map<string, string>): Promise<Achado[]
 }
 
 /**
- * Os caminhos FORMA do manifesto existem neste repositorio.
+ * Os caminhos FORMA do config existem neste repositorio.
  *
  * FORMA e a categoria do meio da secao 5: mesma API publica e mesma estrutura,
  * conteudo por dominio. `sync:check` nao os cobra por sha256 justamente porque o
@@ -567,19 +508,17 @@ async function existe(caminho: string): Promise<boolean> {
 }
 
 async function conferirForma(): Promise<Achado[]> {
-  const bruto = await readFile(join(RAIZ, 'padrao.manifest.json'), 'utf8')
-  const manifesto: { forma?: string[] } = JSON.parse(bruto)
   const achados: Achado[] = []
 
-  for (const caminho of manifesto.forma ?? []) {
+  for (const caminho of CONFIG.forma) {
     if (await existe(join(RAIZ, caminho))) continue
 
     achados.push({
-      arquivo: 'padrao.manifest.json',
+      arquivo: 'scripts/pattern-check.config.json',
       linha: 1,
       regra: 'forma-ausente',
       secao: '5',
-      mensagem: `\`${caminho}\` e FORMA no manifesto e nao existe aqui; crie o arquivo ou tire o caminho de \`forma\``,
+      mensagem: `\`${caminho}\` e FORMA no config e nao existe aqui; crie o arquivo ou tire o caminho de \`forma\``,
     })
   }
 
@@ -700,7 +639,7 @@ function relatar(achados: Achado[]): void {
   console.log(`pattern:check: ${achados.length} violacoes\n`)
   for (const a of achados) {
     console.log(`  ${a.arquivo}:${a.linha}`)
-    console.log(`      [${a.regra}] ${a.mensagem}  (PADRAO-BACKEND.md ${a.secao})`)
+    console.log(`      [${a.regra}] ${a.mensagem}  (_padroes/backend.md ${a.secao})`)
   }
 
   console.log('\n  Por regra:')

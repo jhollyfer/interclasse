@@ -5,6 +5,8 @@ ORM oficial do AdonisJS: Active Record por cima do Knex, com migrations, models 
 > O nome é **Lucid**, sem "e". `lucide-react` é outra coisa completamente diferente, uma biblioteca
 > de ícones para o frontend. A confusão é comum e vale checar antes de instalar.
 
+> Conferido contra `@adonisjs/lucid@22.4.2`
+
 **O que é:** uma camada de banco de dados com duas metades que dá para usar separadas. A de baixo é
 um query builder (Knex por dentro) que fala SQL de forma programática. A de cima é um ORM Active
 Record, onde cada model é uma classe que representa uma tabela e cada instância representa uma
@@ -40,6 +42,8 @@ simples. `User.query()` é o **model query builder**, devolve instâncias do mod
 relacionamentos. Boa parte das dúvidas de quem começa vem de misturar os dois.
 
 **Links:** 35.
+
+**Skills:** `maiyu-backend`, `api-and-interface-design`, `security-best-practices`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
 ---
 
@@ -135,6 +139,41 @@ export default defineConfig({
       client: 'pg',
       connection: { host: env.get('DB_REPLICA_HOST') /* ... */ },
     },
+  },
+})
+```
+
+```ts
+// básico: conexão única, sem réplica nem pool customizado
+import { defineConfig } from '@adonisjs/lucid'
+import env from '#start/env'
+
+export default defineConfig({
+  connection: 'postgres',
+  connections: {
+    postgres: {
+      client: 'pg',
+      connection: { connectionString: env.get('DATABASE_URL') },
+    },
+  },
+})
+```
+
+```ts
+// errado: pool.max sem limite pensado estoura o limite de conexões do banco
+// gerenciado (RDS, Supabase) sob carga, e o erro só aparece em produção
+export default defineConfig({
+  connection: 'postgres',
+  connections: {
+    postgres: { client: 'pg', connection: { /* ... */ }, pool: { min: 2, max: 1000 } },
+  },
+})
+
+// certo: max alinhado ao limite do banco dividido pelo número de instâncias da app
+export default defineConfig({
+  connection: 'postgres',
+  connections: {
+    postgres: { client: 'pg', connection: { /* ... */ }, pool: { min: 2, max: 10 } },
   },
 })
 ```
@@ -240,6 +279,63 @@ try {
 }
 ```
 
+```ts
+// básico: uma escrita só, gerenciada
+import db from '@adonisjs/lucid/services/db'
+import User from '#models/user'
+
+const user = await db.transaction(async (trx) => {
+  const created = new User()
+  created.name = 'Ana'
+  created.useTransaction(trx)
+  await created.save()
+  return created
+})
+```
+
+```ts
+// caso real da stack: criar Team e já ligar o User dono, uma falha reverte tudo
+import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
+import type { Either } from '#core/either'
+import User from '#models/user'
+import Team from '#models/team'
+
+type Payload = { userId: string; name: string; slug: string }
+
+@inject()
+export class CreateTeamUseCase {
+  async execute(payload: Payload): Promise<Either<HTTPException, Team>> {
+    const existing = await Team.query().where('slug', payload.slug).first()
+    if (existing) return left(HTTPException.Conflict('slug já em uso'))
+
+    const team = await db.transaction(async (trx) => {
+      const user = await User.findOrFail(payload.userId, { client: trx })
+      const createdTeam = await user.related('team').create({
+        slug: payload.slug,
+        displayName: payload.name,
+      })
+      return createdTeam
+    })
+
+    return right(team)
+  }
+}
+```
+
+```ts
+// errado: dois writes sem transação compartilhada — se o segundo falhar,
+// o primeiro já está commitado e não há como desfazer
+const user = await User.create(payload.user)
+const team = await Team.create({ userId: user.id, ...payload.team }) // pode falhar sozinho
+
+// certo: as duas escritas compartilham a mesma trx, ou nenhuma delas acontece
+await db.transaction(async (trx) => {
+  const user = await User.create(payload.user, { client: trx })
+  await Team.create({ userId: user.id, ...payload.team }, { client: trx })
+})
+```
+
 #### pagination
 [doc](https://lucid.adonisjs.com/docs/pagination)
 
@@ -269,6 +365,42 @@ return posts.serialize()
 // }
 ```
 
+```ts
+// básico
+const rows = await User.query().paginate(1, 20)
+console.log(rows.getMeta(), rows.all())
+```
+
+```ts
+// caso real da stack: meta e data montados na mão a partir do paginator,
+// nunca com .serialize() — o tipo do item se mantém ModelObject[], não genérico
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+import type { Either } from '#core/either'
+import { PAGINATION } from '#core/pagination'
+import User from '#models/user'
+
+type Response = Either<HTTPException, Paginated<ModelObject>>
+
+export class ListUsersUseCase {
+  async execute(payload: { page?: number; perPage?: number }): Promise<Response> {
+    const rows = await User.query()
+      .withScopes((scopes) => scopes.notDeleted())
+      .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
+
+    return right({ meta: rows.getMeta(), data: rows.all() })
+  }
+}
+```
+
+```ts
+// errado: .serialize() devolve o paginator inteiro recursivamente, perde o tipo
+// do item e esconde campos com serializeAs: null que a API às vezes precisa
+return right(rows.serialize())
+
+// certo: meta e data explícitos, item mantém o tipo ModelObject[] de .all()
+return right({ meta: rows.getMeta(), data: rows.all() })
+```
+
 #### debugging
 [doc](https://lucid.adonisjs.com/docs/debugging)
 
@@ -293,6 +425,37 @@ emitter.on('db:query', (query) => {
 
 // 3. ligar globalmente em config/database.ts: debug: true
 // Se aparecerem 50 selects iguais mudando só o id, é N+1: falta um preload.
+```
+
+```ts
+// básico: inspecionar o SQL de uma única consulta antes de executar
+const query = Post.query().where('status', 'active')
+console.log(query.toQuery())
+```
+
+```ts
+// caso real da stack: logar toda query lenta em produção, sem logar todas
+import emitter from '@adonisjs/core/services/emitter'
+
+emitter.on('db:query', (query) => {
+  const ms = query.duration ? query.duration[0] * 1000 + query.duration[1] / 1e6 : 0
+  if (ms > 100) {
+    console.log(`query lenta (${ms.toFixed(1)}ms): ${query.sql}`, query.bindings)
+  }
+})
+```
+
+```ts
+// errado: debug: true direto em produção loga TODA query, inclusive bindings
+// com dado sensível, e enche o log a ponto de esconder o que importa
+export default defineConfig({ connection: 'postgres', connections: { /* ... */ }, debug: true })
+
+// certo: debug só em development, no resto só quando a query passa de um limite
+export default defineConfig({
+  connection: 'postgres',
+  connections: { /* ... */ },
+  debug: env.get('NODE_ENV') === 'development',
+})
 ```
 
 #### connection-manager
@@ -340,7 +503,7 @@ e-mail.
 import vine from '@vinejs/vine'
 import db from '@adonisjs/lucid/services/db'
 
-export const createUserValidator = vine.compile(
+export const createUserValidator = vine.create(
   vine.object({
     email: vine
       .string()
@@ -476,6 +639,37 @@ user.password = 'texto puro' // beforeSave faz o hash
 await user.save()
 ```
 
+```ts
+// básico
+await db.from('posts').where('id', id).update({ status: 'archived' })
+```
+
+```ts
+// caso real da stack: soft delete em massa continua sendo update, não .delete()
+// do model, porque hooks não disparam aqui — o deletedAt é setado explicitamente
+import db from '@adonisjs/lucid/services/db'
+import { DateTime } from 'luxon'
+
+export class ArchiveTeamPostsUseCase {
+  async execute(payload: { teamId: string }): Promise<void> {
+    await db
+      .from('posts')
+      .where('team_id', payload.teamId)
+      .update({ deleted_at: DateTime.now().toSQL() })
+  }
+}
+```
+
+```ts
+// errado: esperar que o beforeDelete do model rode numa deleção em massa
+await db.from('posts').where('team_id', teamId).delete() // hook NÃO dispara
+
+// certo: se a lógica depende de hook, carregar e remover um a um,
+// ou mover a invariante para fora do hook
+const posts = await Post.query().where('team_id', teamId)
+for (const post of posts) await post.delete()
+```
+
 #### raw-query-builder
 [doc](https://lucid.adonisjs.com/docs/raw-query-builder)
 
@@ -512,6 +706,39 @@ await db.from('posts').select(db.raw('price * ? as price_with_tax', [1.1]))
 // await db.rawQuery(`select * from users where email = '${email}'`)
 ```
 
+```ts
+// básico
+const { rows } = await db.rawQuery('select count(*) as total from posts where status = ?', [
+  'active',
+])
+```
+
+```ts
+// caso real da stack: operador de JSON do Postgres que o builder não expressa
+import db from '@adonisjs/lucid/services/db'
+
+type Row = { id: string; preferences: Record<string, unknown> }
+
+export class FindUsersByPreferenceUseCase {
+  async execute(payload: { key: string; value: string }): Promise<Row[]> {
+    const { rows } = await db.rawQuery<Row[]>(
+      `select id, preferences from users where preferences ->> :key = :value`,
+      { key: payload.key, value: payload.value }
+    )
+    return rows
+  }
+}
+```
+
+```ts
+// errado: concatenar o valor direto na string é injeção de SQL
+const busca = request.input('q')
+await db.rawQuery(`select * from posts where name ilike '%${busca}%'`)
+
+// certo: o valor sempre entra como binding, nunca interpolado na string
+await db.rawQuery('select * from posts where name ilike ?', [`%${busca}%`])
+```
+
 ## Schema e migrations
 
 #### migrations
@@ -543,6 +770,60 @@ export default class extends BaseSchema {
       table.dropColumn('role')
     })
   }
+}
+```
+
+```ts
+// básico: criar uma tabela nova
+import { BaseSchema } from '@adonisjs/lucid/schema'
+
+export default class extends BaseSchema {
+  protected tableName = 'teams'
+
+  async up() {
+    this.schema.createTable(this.tableName, (table) => {
+      table.uuid('id').primary()
+      table.string('name').notNullable()
+    })
+  }
+
+  async down() {
+    this.schema.dropTable(this.tableName)
+  }
+}
+```
+
+```ts
+// caso real da stack: adicionar coluna nullable com FK, reversível de verdade
+import { BaseSchema } from '@adonisjs/lucid/schema'
+
+export default class extends BaseSchema {
+  protected tableName = 'posts'
+
+  async up() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.uuid('team_id').nullable().references('id').inTable('teams').onDelete('CASCADE')
+    })
+  }
+
+  async down() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.dropColumn('team_id')
+    })
+  }
+}
+```
+
+```ts
+// errado: down vazio "porque não vai rodar rollback em produção" — até o dia
+// em que precisa, e migration:rollback trava por falta de down real
+async down() {}
+
+// certo: down desfaz exatamente o que o up fez
+async down() {
+  this.schema.alterTable(this.tableName, (table) => {
+    table.dropColumn('team_id')
+  })
 }
 ```
 
@@ -623,6 +904,37 @@ this.schema.createTable('posts', (table) => {
   table.timestamp('updated_at', { useTz: true }).nullable()
   table.timestamp('deleted_at', { useTz: true }).nullable()
 })
+```
+
+```ts
+// básico: tabela mínima com PK e FK
+this.schema.createTable('teams', (table) => {
+  table.uuid('id').primary()
+  table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
+  table.string('display_name').notNullable()
+})
+```
+
+```ts
+// caso real da stack: tabela de usuário com soft delete e índice composto,
+// sem o unique() do Lucid na coluna — unicidade é regra de negócio no use-case
+this.schema.createTable('users', (table) => {
+  table.uuid('id').primary()
+  table.string('email').notNullable()
+  table.string('password').notNullable()
+  table.timestamp('deleted_at', { useTz: true }).nullable()
+
+  table.index(['email'])
+  table.unique(['email']) // restrição de BANCO, não a validação unique() do VineJS
+})
+```
+
+```ts
+// errado: enum sem defaultTo trava todo insert que não informa a coluna
+table.enum('status', ['draft', 'active', 'archived']).notNullable()
+
+// certo: defaultTo evita que todo insert existente precise passar o valor
+table.enum('status', ['draft', 'active', 'archived']).notNullable().defaultTo('draft')
 ```
 
 #### schema-generation
@@ -711,6 +1023,53 @@ export default class User extends BaseModel {
   get isDeleted() {
     return this.deletedAt !== null
   }
+}
+```
+
+```ts
+// básico
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+
+export default class Team extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: string
+
+  @column()
+  declare name: string
+}
+```
+
+```ts
+// caso real da stack: nome de tabela explícito e coluna com prepare/consume
+// para um tipo que o driver devolve diferente do que o código espera
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+
+export default class Post extends BaseModel {
+  static table = 'posts'
+
+  @column({ isPrimary: true })
+  declare id: string
+
+  // bigint do banco chega como string: normaliza para number no código
+  @column({ consume: (value: string) => Number(value) })
+  declare viewCount: number
+
+  @column({ serializeAs: null })
+  declare internalNotes: string | null
+}
+```
+
+```ts
+// errado: declarar a propriedade sem @column faz o Lucid ignorar a coluna
+// silenciosamente — o campo nunca é lido nem gravado, sem erro nenhum
+export default class Post extends BaseModel {
+  declare price: number
+}
+
+// certo: toda coluna do banco precisa do decorator para existir no model
+export default class Post extends BaseModel {
+  @column()
+  declare price: number
 }
 ```
 
@@ -827,6 +1186,39 @@ const comContagem = await Team.query().withCount('posts')
 comContagem[0].$extras.posts_count
 ```
 
+```ts
+// básico
+const users = await User.query().where('status', 'active').orderBy('name')
+```
+
+```ts
+// caso real da stack: filtro + preload + scope de soft delete juntos
+import User from '#models/user'
+
+export class SearchUsersUseCase {
+  async execute(payload: { teamId: string; q?: string }): Promise<User[]> {
+    const query = User.query()
+      .withScopes((scopes) => scopes.notDeleted())
+      .where('team_id', payload.teamId)
+      .preload('team', (teamQuery) => teamQuery.select('id', 'displayName'))
+
+    if (payload.q) query.whereILike('name', `%${payload.q}%`)
+
+    return query.orderBy('createdAt', 'desc')
+  }
+}
+```
+
+```ts
+// errado: findOrFail lança exceção não tratada, que em geral virou um 500
+// no handler global em vez de uma resposta de negócio prevista
+const user = await User.findOrFail(id)
+
+// certo: use-case decide o caminho de falha como Either, sem deixar o throw escapar
+const user = await User.query().where('id', id).first()
+if (!user) return left(HTTPException.NotFound('user não encontrado'))
+```
+
 #### model-query-scopes
 [doc](https://lucid.adonisjs.com/docs/model-query-scopes)
 
@@ -866,6 +1258,64 @@ const meus = await Post.query()
   .paginate(page, perPage)
 
 // se a regra de isolamento mudar, muda em um lugar só
+```
+
+```ts
+// básico: soft delete como scope, não como hook global
+import { BaseModel, scope } from '@adonisjs/lucid/orm'
+
+export default class Team extends BaseModel {
+  static notDeleted = scope((query) => {
+    query.whereNull('deletedAt')
+  })
+}
+
+const rows = await Team.query().withScopes((scopes) => scopes.notDeleted())
+```
+
+```ts
+// caso real da stack: scope parametrizado combinado com paginação
+import { BaseModel, scope } from '@adonisjs/lucid/orm'
+import type { Either } from '#core/either'
+import { PAGINATION } from '#core/pagination'
+
+export default class Post extends BaseModel {
+  static notDeleted = scope((query) => {
+    query.whereNull('deletedAt')
+  })
+
+  static byTeam = scope((query, teamId: string) => {
+    query.where('teamId', teamId)
+  })
+}
+
+export class ListPostsUseCase {
+  async execute(payload: { teamId: string; page?: number }): Promise<Either<HTTPException, Paginated<ModelObject>>> {
+    const rows = await Post.query()
+      .withScopes((scopes) => {
+        scopes.notDeleted()
+        scopes.byTeam(payload.teamId)
+      })
+      .paginate(payload.page ?? PAGINATION.PAGE, PAGINATION.PER_PAGE)
+
+    return right({ meta: rows.getMeta(), data: rows.all() })
+  }
+}
+```
+
+```ts
+// errado: Lucid não tem global scope automático — um @beforeFetch que ninguém
+// vê de fora esconde a regra e some em query builder cru (db.from)
+@beforeFetch()
+static ignoreDeleted(query: ModelQueryBuilderContract<typeof Post>) {
+  query.whereNull('deletedAt')
+}
+
+// certo: scope explícito, chamado onde a consulta é montada — visível e opcional
+static notDeleted = scope((query) => {
+  query.whereNull('deletedAt')
+})
+// uso: Post.query().withScopes((scopes) => scopes.notDeleted())
 ```
 
 #### model-hooks
@@ -915,6 +1365,51 @@ export default class User extends BaseModel {
 // ATENÇÃO: db.from('users').update({ password: 'x' }) NÃO passa por hashPassword
 ```
 
+```ts
+// básico
+import { BaseModel, beforeCreate } from '@adonisjs/lucid/orm'
+import { randomUUID } from 'node:crypto'
+
+export default class Team extends BaseModel {
+  @beforeCreate()
+  static assignId(team: Team) {
+    if (!team.id) team.id = randomUUID()
+  }
+}
+```
+
+```ts
+// caso real da stack: normalizar um campo sempre que ele mudar, sem precisar
+// que todo use-case lembre de chamar uma função de normalização
+import { BaseModel, beforeSave, column } from '@adonisjs/lucid/orm'
+
+export default class User extends BaseModel {
+  @column()
+  declare email: string
+
+  @beforeSave()
+  static normalizeEmail(user: User) {
+    if (user.$dirty.email) {
+      user.email = user.email.trim().toLowerCase()
+    }
+  }
+}
+```
+
+```ts
+// errado: validar unicidade dentro de um hook — o hook roda depois que o
+// use-case já decidiu seguir, então o erro chega tarde e sem contexto de negócio
+@beforeSave()
+static async checkUnique(user: User) {
+  const existing = await User.findBy('email', user.email)
+  if (existing) throw new Error('email duplicado')
+}
+
+// certo: a checagem de unicidade é regra de negócio do use-case, como Either
+const existing = await User.query().where('email', payload.email).first()
+if (existing) return left(HTTPException.Conflict('email já cadastrado'))
+```
+
 #### serializing-models
 [doc](https://lucid.adonisjs.com/docs/serializing-models)
 
@@ -962,6 +1457,41 @@ class Team extends BaseModel {
 }
 ```
 
+```ts
+// básico
+const user = await User.findOrFail(id)
+return user.serialize({ fields: { pick: ['id', 'name', 'email'] } })
+```
+
+```ts
+// caso real da stack: um único item responde com .serialize(), mas uma
+// listagem paginada usa .all() — serialize() recursivo não é o formato esperado
+import User from '#models/user'
+import type { Either } from '#core/either'
+
+export class ShowUserUseCase {
+  async execute(payload: { id: string }): Promise<Either<HTTPException, ModelObject>> {
+    const user = await User.query().where('id', payload.id).first()
+    if (!user) return left(HTTPException.NotFound('user não encontrado'))
+
+    return right(user.serialize({ fields: { omit: ['password'] } }))
+  }
+}
+```
+
+```ts
+// errado: esconder senha só na hora de responder deixa o campo acessível
+// em qualquer outro ponto que leia a instância antes da resposta
+@column()
+declare password: string
+// ... await someLogger.log(user) // vaza o hash sem querer
+
+// certo: serializeAs: null remove o campo do JSON em qualquer serialize/toJSON,
+// não depende de quem está montando a resposta lembrar de omitir
+@column({ serializeAs: null })
+declare password: string
+```
+
 ## Relacionamentos
 
 #### relationships
@@ -993,6 +1523,35 @@ comTotais[0].$extras.active_products_count
 const comEstoque = await Team.query().withAggregate('posts', (q) => {
   q.sum('stock').as('total_stock')
 })
+```
+
+```ts
+// básico
+const team = await Team.query().preload('posts').first()
+```
+
+```ts
+// caso real da stack: load sob demanda numa instância já em mãos, com filtro,
+// usado quando o preload da consulta original não cobre o caso
+import Team from '#models/team'
+
+export class ShowTeamWithActivePostsUseCase {
+  async execute(payload: { id: string }): Promise<Team> {
+    const team = await Team.findOrFail(payload.id)
+    await team.load('posts', (query) => query.whereNull('deletedAt').where('status', 'active'))
+    return team
+  }
+}
+```
+
+```ts
+// errado: preload('posts') seguido de preload('posts.category') em cadeias
+// separadas gera duas idas ao relacionamento; o ponto é compor numa chamada
+const a = await Post.query().preload('category')
+const b = await Post.query().preload('team')
+
+// certo: um preload por relacionamento, encadeados, continua sendo 1 consulta cada
+const posts = await Post.query().preload('category').preload('team')
 ```
 
 #### belongs-to
@@ -1031,6 +1590,46 @@ await post.load('category')
 console.log(post.category.name)
 ```
 
+```ts
+// básico
+export default class Post extends BaseModel {
+  @column()
+  declare teamId: string
+
+  @belongsTo(() => Team)
+  declare team: BelongsTo<typeof Team>
+}
+```
+
+```ts
+// caso real da stack: trocar o dono de um post, validando que o novo dono existe
+import Team from '#models/team'
+import Post from '#models/post'
+import type { Either } from '#core/either'
+
+export class ChangePostOwnerUseCase {
+  async execute(payload: { postId: string; teamId: string }): Promise<Either<HTTPException, Post>> {
+    const team = await Team.query().where('id', payload.teamId).first()
+    if (!team) return left(HTTPException.NotFound('team não encontrado'))
+
+    const post = await Post.findOrFail(payload.postId)
+    await post.related('team').associate(team)
+
+    return right(post)
+  }
+}
+```
+
+```ts
+// errado: setar a coluna da FK na mão ignora validação do próprio Lucid
+// e deixa fácil esquecer de salvar depois
+post.teamId = team.id
+// faltou await post.save()
+
+// certo: associate já salva a FK no banco, não precisa de save() separado
+await post.related('team').associate(team)
+```
+
 #### has-many
 [doc](https://lucid.adonisjs.com/docs/has-many)
 
@@ -1063,6 +1662,42 @@ await team.related('posts').createMany([{ name: 'A' }, { name: 'B' }])
 
 // consultar só os filhos, sem carregar todos
 const ativos = await team.related('posts').query().where('status', 'active').paginate(1, 20)
+```
+
+```ts
+// básico
+const post = await team.related('posts').create({ name: 'Camiseta' })
+```
+
+```ts
+// caso real da stack: criar vários filhos na mesma transação do pai
+import db from '@adonisjs/lucid/services/db'
+import Team from '#models/team'
+
+export class CreateTeamWithPostsUseCase {
+  async execute(payload: { name: string; posts: ReadonlyArray<{ name: string }> }): Promise<Team> {
+    return db.transaction(async (trx) => {
+      const team = new Team()
+      team.name = payload.name
+      team.useTransaction(trx)
+      await team.save()
+
+      await team.related('posts').createMany(payload.posts)
+      return team
+    })
+  }
+}
+```
+
+```ts
+// errado: instanciar o filho e chamar save() direto nunca preenche a FK,
+// porque só related().create()/saveMany() fazem esse hydrate automático
+const post = new Post()
+post.name = 'Camiseta'
+await post.save() // team_id fica null
+
+// certo: related().create() preenche team_id antes de salvar
+const post = await team.related('posts').create({ name: 'Camiseta' })
 ```
 
 #### many-to-many
@@ -1110,6 +1745,47 @@ await post.load('images')
 post.images[0].$extras.pivot_position
 ```
 
+```ts
+// básico
+export default class Post extends BaseModel {
+  @manyToMany(() => Tag, { pivotTable: 'post_tags' })
+  declare tags: ManyToMany<typeof Tag>
+}
+
+await post.related('tags').sync(payload.tagIds)
+```
+
+```ts
+// caso real da stack: sincronizar tags de um formulário com checkboxes,
+// validando antes que todas as tags enviadas pertencem ao team do post
+import Post from '#models/post'
+import Tag from '#models/tag'
+import type { Either } from '#core/either'
+
+export class UpdatePostTagsUseCase {
+  async execute(payload: { postId: string; teamId: string; tagIds: ReadonlyArray<string> }): Promise<Either<HTTPException, Post>> {
+    const validTags = await Tag.query().where('teamId', payload.teamId).whereIn('id', payload.tagIds)
+    if (validTags.length !== payload.tagIds.length) {
+      return left(HTTPException.Conflict('uma ou mais tags não pertencem a este team'))
+    }
+
+    const post = await Post.findOrFail(payload.postId)
+    await post.related('tags').sync(payload.tagIds)
+
+    return right(post)
+  }
+}
+```
+
+```ts
+// errado: attach soma à lista existente, não substitui — se o form reenviar
+// a lista inteira, a pivô acumula duplicatas em vez de refletir o estado atual
+await post.related('tags').attach(payload.tagIds)
+
+// certo: sync deixa a pivô igual à lista enviada, adicionando e removendo
+await post.related('tags').sync(payload.tagIds)
+```
+
 #### has-one
 [doc](https://lucid.adonisjs.com/docs/has-one)
 
@@ -1142,6 +1818,53 @@ const user = await User.create({ name: 'Acme', email: 'a@acme.com' })
 await user.related('team').create({ slug: 'acme', displayName: 'Acme' })
 
 await user.load('team')
+```
+
+```ts
+// básico
+export default class User extends BaseModel {
+  @hasOne(() => Profile)
+  declare profile: HasOne<typeof Profile>
+}
+
+await user.load('profile')
+```
+
+```ts
+// caso real da stack: buscar o perfil, criando-o na primeira vez que falta
+import User from '#models/user'
+
+export class GetOrCreateProfileUseCase {
+  async execute(payload: { userId: string }): Promise<Profile> {
+    const user = await User.findOrFail(payload.userId)
+    await user.load('profile')
+
+    if (user.profile) return user.profile
+
+    return user.related('profile').create({ bio: '' })
+  }
+}
+```
+
+```ts
+// errado: @hasOne no lado que TEM a FK devolve o relacionamento errado
+// em runtime, porque o Lucid assume que a FK está na tabela do OUTRO model
+export class Team extends BaseModel {
+  @column()
+  declare userId: string
+
+  @hasOne(() => User) // errado: team tem a FK, então aqui é belongsTo
+  declare user: HasOne<typeof User>
+}
+
+// certo: quem guarda a FK usa belongsTo, o outro lado usa hasOne
+export class Team extends BaseModel {
+  @column()
+  declare userId: string
+
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
+}
 ```
 
 #### has-many-through
@@ -1210,6 +1933,27 @@ test.group('Posts', (group) => {
     await assert.rejects(() => Post.findByOrFail('name', 'inexistente'))
   })
 })
+```
+
+```ts
+// básico: transação global só para este grupo de testes
+import { test } from '@japa/runner'
+import testUtils from '@adonisjs/core/services/test_utils'
+
+test.group('Users', (group) => {
+  group.each.setup(() => testUtils.db().withGlobalTransaction())
+})
+```
+
+```ts
+// errado: criar dados de teste fora da transação global (outra conexão,
+// ou migration:fresh no meio da suíte) faz o registro sobreviver ao rollback
+// e contaminar o próximo teste
+await db.connection('outra').table('users').insert({ name: 'X' })
+
+// certo: toda escrita do teste usa a mesma conexão sob a transação global,
+// que a suíte já configurou — nada criado aqui sobrevive ao próximo teste
+await User.create({ name: 'X', email: 'x@x.com' })
 ```
 
 #### model-factories
@@ -1290,3 +2034,4 @@ export default class extends BaseSeeder {
   }
 }
 ```
+
