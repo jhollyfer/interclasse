@@ -148,7 +148,12 @@ function nomesDerivados(relativo: string, sufixo: string): string[] {
   if (dentro === undefined) return []
 
   const partes = dentro.split('/')
-  const dirs = partes.slice(0, -1)
+  // A pasta da acao repete o verbo e nao entra no nome da classe:
+  // `administrator/users/archive/archive.controller.ts` -> `AdministratorUserArchiveController`.
+  const pasta = partes[partes.length - 2]
+  const arquivo = basename(relativo).replace(/\.(controller|use-case)\.ts$/, '')
+  let dirs = partes.slice(0, -1)
+  if (pasta === arquivo) dirs = partes.slice(0, -2)
   if (dirs.length === 0) return []
 
   const verbo = verboDoArquivo(relativo)
@@ -299,6 +304,28 @@ function conferirNomeDeClasse(relativo: string, fonte: string): Achado[] {
       regra: 'nome-de-classe',
       secao: '3',
       mensagem: `classe \`${nome}\` deveria ser \`${aceitos.join('` ou `')}\`, derivado do caminho`,
+    },
+  ]
+}
+
+/**
+ * Acao e pasta, sempre: `<recurso>/<acao>/<acao>.{controller,use-case,spec}.ts`
+ * (_padroes/arquitetura.md §3). E onde a spec da acao mora e onde quem procura
+ * "arquivar usuario" encontra tudo.
+ */
+function conferirPastaDaAcao(relativo: string): Achado[] {
+  if (!relativo.startsWith('app/features/')) return []
+  const casado = /([a-z-]+)\.(?:controller|use-case)\.ts$/.exec(relativo)
+  if (casado === null) return []
+  if (basename(dirname(relativo)) === casado[1]) return []
+
+  return [
+    {
+      arquivo: relativo,
+      linha: 1,
+      regra: 'acao-fora-de-pasta',
+      secao: 'arquitetura 3',
+      mensagem: `mova para \`${dirname(relativo)}/${casado[1]}/${basename(relativo)}\``,
     },
   ]
 }
@@ -670,6 +697,7 @@ async function main(): Promise<void> {
     achados.push(...aplicarRegras(relativo, fonte))
     achados.push(...conferirNomeDeClasse(relativo, fonte))
     achados.push(...conferirNomeDeModel(relativo))
+    achados.push(...conferirPastaDaAcao(relativo))
     achados.push(...conferirFormaDoUseCase(relativo, fonte))
   }
 

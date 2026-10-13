@@ -50,7 +50,8 @@ export default class StoragesPrune extends BaseCommand {
 
   async run() {
     const { default: Storage } = await import('#models/storage')
-    const { default: StorageDeleteUseCase } = await import('#features/storages/delete.use-case')
+    const { default: StorageDeleteUseCase } =
+      await import('#features/storages/delete/delete.use-case')
     const { UploadStatuses } = await import('#core/entity')
 
     const hours = this.hours ?? DEFAULT_HOURS

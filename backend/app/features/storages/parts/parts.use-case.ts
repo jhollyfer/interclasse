@@ -13,7 +13,7 @@ import { UploadStatuses } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { IdentifierPayload } from '#core/validator'
-import type { StorageUpload } from './create.use-case.ts'
+import type { StorageUpload } from '../create/create.use-case.ts'
 
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, StorageUpload>
