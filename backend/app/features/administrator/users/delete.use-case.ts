@@ -1,14 +1,11 @@
 import User from '#models/user'
-import UserPolicy from '#policies/user_policy'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import type { Merge } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
-/** `actor` é quem faz a requisição, tirado da sessão pelo controller. */
-type Payload = Merge<IdentifierPayload, { actor: User }>
+type Payload = IdentifierPayload
 type Response = Either<HTTPException, User>
 
 /**
@@ -32,15 +29,8 @@ type Response = Either<HTTPException, User>
  */
 @inject()
 export default class AdministratorUserDeleteUseCase {
-  constructor(private readonly policy: UserPolicy) {}
-
-  async execute({ id, actor }: Payload): Promise<Response> {
+  async execute({ id }: Payload): Promise<Response> {
     try {
-      if (!this.policy.operate(actor, id))
-        return left(
-          HTTPException.Forbidden('Você não pode apagar a própria conta', 'SELF_DELETE_FORBIDDEN')
-        )
-
       const user = await User.query().where('id', id).first()
 
       if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))

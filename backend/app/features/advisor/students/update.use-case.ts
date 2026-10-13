@@ -1,6 +1,4 @@
 import Student from '#models/student'
-import type User from '#models/user'
-import ClassroomPolicy from '#policies/classroom_policy'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
@@ -8,19 +6,16 @@ import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
 import type { AdvisorStudentUpdatePayload, IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<Merge<AdvisorStudentUpdatePayload, IdentifierPayload>, { actor: User }>
+type Payload = Merge<AdvisorStudentUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, Student>
 
 @inject()
 export default class AdvisorStudentUpdateUseCase {
-  constructor(private readonly policy: ClassroomPolicy) {}
-
-  async execute({ id, actor, name }: Payload): Promise<Response> {
+  async execute({ id, name }: Payload): Promise<Response> {
     try {
       const student = await Student.query().where('id', id).preload('classroom').first()
 
-      if (!student || !this.policy.manage(actor, student.classroom))
-        return left(HTTPException.NotFound('Aluno não encontrado', 'STUDENT_NOT_FOUND'))
+      if (!student) return left(HTTPException.NotFound('Aluno não encontrado', 'STUDENT_NOT_FOUND'))
 
       student.name = name
       await student.save()

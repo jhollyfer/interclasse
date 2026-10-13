@@ -41,7 +41,7 @@ export default class DiCheck extends BaseCommand {
       alvos.push({ diretorio: 'services', arquivo })
     }
 
-    for (const arquivo of await this.classesDe('policies', '_policy.ts')) {
+    for (const arquivo of await this.classesDe('policies', '.policy.ts')) {
       alvos.push({ diretorio: 'policies', arquivo })
     }
 

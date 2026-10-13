@@ -1,3 +1,5 @@
+import Classroom from '#models/classroom'
+import ClassroomPolicy from '#policies/classroom.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
@@ -21,7 +23,9 @@ export default class AdvisorEnrollmentUpdateController {
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(AdvisorEnrollmentUpdateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const classroom = await Classroom.find(payload.classroomId)
+    await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)
+    const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

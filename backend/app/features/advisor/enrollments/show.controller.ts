@@ -1,3 +1,5 @@
+import Classroom from '#models/classroom'
+import ClassroomPolicy from '#policies/classroom.policy'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
@@ -16,7 +18,11 @@ export default class AdvisorEnrollmentShowController {
 
   async handle(context: HttpContext) {
     const payload = await AdvisorEnrollmentShowValidator.validate(context.request.qs())
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    // A regra por registro passa pelo Bouncer (_padroes/backend.md §4.6); turma
+    // alheia ou ausente é `404`, decidido pela policy.
+    const classroom = await Classroom.find(payload.classroomId)
+    await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)
+    const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

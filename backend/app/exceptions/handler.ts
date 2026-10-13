@@ -2,6 +2,7 @@ import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import { errors as vineErrors } from '@vinejs/vine'
 import { errors as authErrors } from '@adonisjs/auth'
+import { errors as bouncerErrors } from '@adonisjs/bouncer'
 import type { HTTPExceptionPayload } from '#exceptions/http.exception'
 
 type FieldMessage = {
@@ -52,7 +53,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   override async handle(error: unknown, ctx: HttpContext) {
     /**
-     * Só erros de TERCEIROS são traduzidos aqui, e só estes dois: são os que
+     * Só erros de TERCEIROS são traduzidos aqui, e só estes três: são os que
      * chegam ao cliente com formato próprio e quebrariam o contrato de erro
      * único da API. O HTTPException não passa por aqui - ele se resolve no
      * próprio `handle()`.
@@ -73,6 +74,22 @@ export default class HttpExceptionHandler extends ExceptionHandler {
         message: 'Não autorizado',
         status: 401,
         code: 'UNAUTHORIZED',
+      }
+
+      return ctx.response.status(payload.status).send(payload)
+    }
+
+    /**
+     * Negação de policy pelo `ctx.bouncer` (_padroes/backend.md §4.6). A
+     * policy diz status e mensagem pela `AuthorizationResponse`, e o
+     * identificador de tradução é o `code` estável - o projeto não tem i18n, e
+     * o identificador já é a chave que o cliente compara.
+     */
+    if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
+      const payload: HTTPExceptionPayload = {
+        message: error.response.message ?? 'Acesso negado',
+        status: error.response.status ?? 403,
+        code: error.response.translation?.identifier ?? 'FORBIDDEN',
       }
 
       return ctx.response.status(payload.status).send(payload)

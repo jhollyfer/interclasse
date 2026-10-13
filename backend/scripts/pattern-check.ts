@@ -176,15 +176,22 @@ type Regra = {
 
 const REGRAS: Regra[] = [
   {
-    nome: 'bouncer-do-contexto',
+    nome: 'policy-fora-do-bouncer',
     secao: '4.6',
-    // So em features: `initialize_bouncer_middleware.ts` e quem monta o
-    // `ctx.bouncer`, e precisa continuar montando — o Bouncer entra como classe
-    // base das policies mesmo sem ninguem ler o contexto.
-    escopo: /app\/features\//,
-    padrao: /\b(?:ctx|context)\.bouncer\b/,
+    // A policy e checada pelo controller com `ctx.bouncer.with(Policy)`; o caso
+    // de uso recebe o registro ja autorizado e nao conhece policy nenhuma.
+    escopo: /\.use-case\.ts$/,
+    padrao: /from\s+'#policies\//,
     mensagem:
-      'injete a policy no construtor e chame o metodo; `ctx.bouncer` obriga o caso de uso a receber HttpContext',
+      'policy nao entra no caso de uso: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
+  },
+  {
+    nome: 'policy-injetada',
+    secao: '4.6',
+    escopo: /app\/(?:features|services|middleware)\//,
+    padrao: /\bprivate\s+readonly\s+\w+\s*:\s*\w+Policy\b/,
+    mensagem:
+      'policy nao se injeta nem se chama direto; o unico caminho e `ctx.bouncer` (authorize/allows/denies/execute)',
   },
   {
     nome: 'serializer-de-contexto',

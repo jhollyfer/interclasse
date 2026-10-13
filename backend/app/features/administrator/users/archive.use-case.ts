@@ -1,19 +1,13 @@
 import User from '#models/user'
-import UserPolicy from '#policies/user_policy'
 import ClassroomService from '#services/classroom.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
-import type { Merge } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
-/**
- * `actor` é o id de quem faz a requisição, que o controller tira da sessão. Não
- * vem de validator nenhum: o escopo do pedido sai do token, nunca do payload.
- */
-type Payload = Merge<IdentifierPayload, { actor: User }>
+type Payload = IdentifierPayload
 type Response = Either<HTTPException, User>
 
 /**
@@ -25,7 +19,8 @@ type Response = Either<HTTPException, User>
  * `deleted_at`, então sem isto o arquivado seguiria dentro do painel até o
  * token vencer - e arquivar não desligaria ninguém.
  *
- * A própria conta não passa por aqui. É a guarda de auto-trancamento do projeto
+ * A própria conta não chega aqui: a `UserPolicy`, checada pelo controller com
+ * `ctx.bouncer`, a recusa com `403` antes de qualquer leitura. É a guarda de auto-trancamento do projeto
  * de referência, que mantém intocável a conta que ninguém mais consegue
  * restaurar; sem um terceiro papel para reservá-la, aqui o intocável é
  * quem está fazendo a requisição. Como todo administrador vivo é protegido de
@@ -34,24 +29,10 @@ type Response = Either<HTTPException, User>
  */
 @inject()
 export default class AdministratorUserArchiveUseCase {
-  constructor(
-    private readonly policy: UserPolicy,
-    private readonly classrooms: ClassroomService
-  ) {}
+  constructor(private readonly classrooms: ClassroomService) {}
 
-  async execute({ id, actor }: Payload): Promise<Response> {
+  async execute({ id }: Payload): Promise<Response> {
     try {
-      // Antes da busca, e `403` em vez do `404` dos demais: a conta é a de quem
-      // pediu, e esconder a existência dela seria mentira. O que se diz é que é
-      // proibido.
-      if (!this.policy.operate(actor, id))
-        return left(
-          HTTPException.Forbidden(
-            'Você não pode arquivar a própria conta',
-            'SELF_ARCHIVE_FORBIDDEN'
-          )
-        )
-
       const user = await User.query()
         .where('id', id)
         .withScopes((scopes) => scopes.notDeleted())
