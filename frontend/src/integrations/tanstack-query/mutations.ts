@@ -57,7 +57,10 @@ import type {
   UserUpdatePayload,
 } from '#/validators/administrator/users.validator'
 import type { EnrollmentUpdatePayload as AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
-import type { StudentCreatePayload } from '#/validators/advisor/students.validator'
+import type {
+  StudentCreatePayload,
+  StudentUpdatePayload,
+} from '#/validators/advisor/students.validator'
 import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 
@@ -245,7 +248,10 @@ export function useUserCreate(
 }
 
 /** O `id` viaja com o payload porque ele vai no caminho, não no corpo. */
-type UserUpdateVariables = Merge<UserUpdatePayload, { id: string }>
+export type UserUpdateVariables = Merge<
+  UserUpdatePayload,
+  { readonly id: string }
+>
 
 /**
  * Campo ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
@@ -331,7 +337,10 @@ export function useClassroomCreate(
   })
 }
 
-type ClassroomUpdateVariables = Merge<ClassroomUpdatePayload, { id: string }>
+export type ClassroomUpdateVariables = Merge<
+  ClassroomUpdatePayload,
+  { readonly id: string }
+>
 
 export function useClassroomUpdate(
   options?: MutationProps<IClassroom, ClassroomUpdateVariables>,
@@ -372,7 +381,10 @@ export function useSportCreate(
   })
 }
 
-type SportUpdateVariables = Merge<SportUpdatePayload, { id: string }>
+export type SportUpdateVariables = Merge<
+  SportUpdatePayload,
+  { readonly id: string }
+>
 
 export function useSportUpdate(
   options?: MutationProps<ISport, SportUpdateVariables>,
@@ -413,9 +425,9 @@ export function useAnnouncementCreate(
   })
 }
 
-type AnnouncementUpdateVariables = Merge<
+export type AnnouncementUpdateVariables = Merge<
   AnnouncementUpdatePayload,
-  { id: string }
+  { readonly id: string }
 >
 
 export function useAnnouncementUpdate(
@@ -477,7 +489,10 @@ export function useBracketDelete(options?: MutationProps<void, string>) {
   })
 }
 
-type MatchUpdateVariables = Merge<MatchUpdatePayload, { id: string }>
+export type MatchUpdateVariables = Merge<
+  MatchUpdatePayload,
+  { readonly id: string }
+>
 
 /** A agenda: data, hora e local. */
 export function useMatchUpdate(
@@ -494,7 +509,10 @@ export function useMatchUpdate(
   })
 }
 
-type MatchScoreVariables = Merge<MatchScorePayload, { id: string }>
+export type MatchScoreVariables = Merge<
+  MatchScorePayload,
+  { readonly id: string }
+>
 
 /** O placar. No mata-mata o vencedor avança sozinho. */
 export function useMatchScore(
@@ -541,7 +559,10 @@ export function useStudentCreate(
   })
 }
 
-type StudentUpdateVariables = { id: string; name: string }
+export type StudentUpdateVariables = Merge<
+  StudentUpdatePayload,
+  { readonly id: string }
+>
 
 export function useStudentUpdate(
   options?: MutationProps<IStudent, StudentUpdateVariables>,

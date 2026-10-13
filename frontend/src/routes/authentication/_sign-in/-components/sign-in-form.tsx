@@ -1,23 +1,18 @@
 import { getRouteApi, useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { Controller, useForm } from 'react-hook-form'
-import { vineResolver } from '@hookform/resolvers/vine'
 
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
-import { Alert, AlertDescription } from '#/components/ui/alert'
 import { InputPassword } from '#/components/common/input-password'
 import { SubmitButton } from '#/components/common/submit-button'
-import { SITE_DESCRIPTION } from '#/lib/constant'
-import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
+import { Field, FieldGroup } from '#/components/ui/field'
+import { Input } from '#/components/ui/input'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { applyMutationError } from '#/lib/form-errors'
+import { useMutationForm } from '#/hooks/use-mutation-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
+import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
+import { SITE_DESCRIPTION } from '#/lib/constant'
 import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
 import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 
@@ -42,49 +37,35 @@ const FIELDS = ['email', 'password'] as const
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter()
-  const queryClient = useQueryClient()
   // Validado no layout pai (`authentication/layout.tsx`), que já recusou
   // qualquer destino que não seja um caminho deste app.
   const search = route.useSearch()
 
-  const form = useForm<SessionSignInPayload>({
-    resolver: vineResolver(SessionSignInValidator),
+  const { form, mutation, onSubmit } = useMutationForm<
+    SessionSignInPayload,
+    void,
+    SessionSignInPayload
+  >({
+    validator: SessionSignInValidator,
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  })
-  const mutation = useAuthenticationSignIn({
-    onError(error, payload) {
-      // O 401 chega em `root` - o canal do backend para "a mensagem é do
-      // formulário, não de um campo", e ele o usa porque não revela se falhou
-      // o e-mail, a senha, a conta inativa ou a arquivada. 5xx e rede viram
-      // aviso com "Tentar de novo": entrar não cria nada, reenviar é seguro.
-      applyMutationError({
-        form,
-        error,
-        fields: FIELDS,
-        retry: {
-          id: 'sign-in-error',
-          onClick: () => mutation.mutate(payload),
-        },
-      })
-    },
+    defaults: { email: '', password: '' },
+    // O 401 chega em `root` - o canal do backend para "a mensagem é do
+    // formulário, não de um campo", e ele o usa porque não revela se falhou o
+    // e-mail, a senha, a conta inativa ou a arquivada.
+    fields: FIELDS,
+    mutation: useAuthenticationSignIn,
+    // O sign-in responde 204 e não diz quem entrou - quem sabe é o
+    // `GET /account`. Sem invalidar, o cache ainda guarda a ausência de sessão
+    // de um segundo atrás, e o guard do painel mandaria de volta ao login.
+    invalidate: [queryKeys.account.profile.all],
+    // Entrar não cria nada: 5xx e rede viram aviso com "Tentar de novo".
+    retry: 'sign-in-error',
+    payload: (values) => values,
     async onSuccess() {
-      // O sign-in responde 204 e não diz quem entrou - quem sabe é o
-      // `GET /account`. Sem invalidar, o cache desta mesma tela ainda guarda a
-      // ausência de sessão de um segundo atrás, e o guard do painel a reusaria
-      // para mandar de volta ao login.
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.account.profile.all,
-      })
-
       // `href` e não `to`: o destino veio da URL como string, e `to` é o campo
-      // tipado contra a árvore de rotas - ele não aceita, e com razão. Tem
-      // prioridade sobre o painel: quem foi barrado no meio volta para onde
-      // estava, não para a tela inicial.
+      // tipado contra a árvore de rotas. Tem prioridade sobre o painel: quem
+      // foi barrado no meio volta para onde estava.
       if (search.redirect) {
         await router.navigate({ href: search.redirect })
         return
@@ -94,12 +75,6 @@ export function SignInForm(): React.JSX.Element {
     },
   })
 
-  function onSubmit(payload: SessionSignInPayload): void {
-    // Sem isto, a mensagem da tentativa anterior fica na tela durante a nova.
-    form.clearErrors('root')
-    mutation.mutate(payload)
-  }
-
   return (
     <AuthShell>
       <AuthShellAside>
@@ -107,8 +82,7 @@ export function SignInForm(): React.JSX.Element {
           <AuthShellBrand className="h-auto w-full max-w-[320px]" />
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
               anuncia: a marca desenha a sigla, e é aqui que ela é dita
-              inteira. Escrever a frase de novo criaria uma segunda versão do
-              nome da associação para envelhecer sozinha. */}
+              inteira. */}
           <AuthShellTagline>{SITE_DESCRIPTION}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
@@ -116,65 +90,47 @@ export function SignInForm(): React.JSX.Element {
       <AuthShellContent className="max-w-md">
         {/* `method="post"`: clique em "Entrar" antes da hidratação vira envio
             nativo, e com GET a senha iria parar na URL e no histórico. */}
-        <form
-          method="post"
-          onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
-          className="flex flex-col gap-6"
-        >
+        <form method="post" onSubmit={onSubmit} className="flex flex-col gap-6">
           <AuthShellHeader title="Entre na sua conta">
             Organização, professores conselheiros e representantes de turma.
           </AuthShellHeader>
 
           <FieldGroup>
-            <Controller
+            <AppField
+              control={form.control}
               name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-email">E-mail</FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="voce@escola.com"
-                    type="email"
-                    autoComplete="email"
-                    className="bg-primary/5"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              id="form-email"
+              label="E-mail"
+            >
+              {({ field, control }) => (
+                <Input
+                  {...field}
+                  {...control}
+                  placeholder="voce@escola.com"
+                  type="email"
+                  autoComplete="email"
+                  className="bg-primary/5"
+                />
               )}
-            />
+            </AppField>
 
-            <Controller
+            <AppField
+              control={form.control}
               name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-password">Senha</FieldLabel>
-                  <InputPassword
-                    {...field}
-                    id="form-password"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+              id="form-password"
+              label="Senha"
+            >
+              {({ field, control }) => (
+                <InputPassword
+                  {...field}
+                  {...control}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                />
               )}
-            />
+            </AppField>
 
-            {form.formState.errors.root && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {form.formState.errors.root.message}
-                </AlertDescription>
-              </Alert>
-            )}
+            <AppFormRootError form={form} />
 
             <Field>
               <SubmitButton
@@ -189,9 +145,8 @@ export function SignInForm(): React.JSX.Element {
         </form>
         {/*
           Sem rodapé de "cadastre-se": não existe cadastro público neste
-          produto. Conta de editor e de administrador nasce em
-          `/administrator/users`, criada por quem já está dentro, e o primeiro
-          administrador vem do `db:seed` do backend.
+          produto. A conta nasce em `/administrator/users`, criada por quem já
+          está dentro, e o primeiro administrador vem do `db:seed` do backend.
         */}
       </AuthShellContent>
     </AuthShell>

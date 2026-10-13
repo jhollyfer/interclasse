@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '#/components/ui/button'
@@ -12,16 +12,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog'
-import { Field, FieldLabel } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
+import { useMutationForm } from '#/hooks/use-mutation-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
 import {
   useMatchScore,
   useMatchUnscore,
   useMatchUpdate,
 } from '#/integrations/tanstack-query/mutations'
+import type {
+  MatchScoreVariables,
+  MatchUpdateVariables,
+} from '#/integrations/tanstack-query/mutations'
+import type { IMatch } from '#/lib/interfaces'
+import {
+  MatchScoreValidator,
+  MatchUpdateValidator,
+} from '#/validators/administrator/matches.validator'
+import type { MatchScorePayload } from '#/validators/administrator/matches.validator'
 import {
   ConfirmDialog,
   ConfirmDialogCancel,
@@ -33,7 +47,7 @@ import {
 } from '#/components/common/confirm-dialog'
 
 /** O mínimo de uma partida que os dois diálogos precisam. */
-export type MatchRef = {
+export type MatchRef = Readonly<{
   id: string
   phase: string
   homeTeamId: string | null
@@ -45,63 +59,67 @@ export type MatchRef = {
   winnerTeamId: string | null
   scheduledAt: string | null
   location: string | null
-}
+}>
 
-type DialogProps = {
+type DialogProps = Readonly<{
   match: MatchRef
   open: boolean
   onOpenChange: (open: boolean) => void
-}
+}>
+
+const SCORE_FIELDS = ['homeScore', 'awayScore', 'winnerTeamId'] as const
+const SCHEDULE_FIELDS = ['scheduledAt', 'location'] as const
 
 /** Placar e agenda mexem na chave inteira, e ela no site e nas inscrições. */
-function useInvalidateGames(): () => Promise<void> {
-  const invalidate = useInvalidate()
+const GAME_CHANGE = [...GAME_KEYS, ...DEPENDENTS.games]
 
-  return () => invalidate([...GAME_KEYS, ...DEPENDENTS.games])
+/** O `<select>` de quem venceu nos pênaltis, que só aparece no empate. */
+function isTied(home: number | undefined, away: number | undefined): boolean {
+  return home !== undefined && !Number.isNaN(home) && home === away
 }
 
 /**
  * O placar. Empatado, aparece a escolha de quem venceu nos pênaltis - o
  * servidor recusa o empate sem ela.
- *
- * Estado local e não `react-hook-form`: são dois números e uma escolha, e a
- * regra que importa (empate, vencedor) é do servidor, que responde 422.
  */
 export function MatchScoreDialog({
   match,
   open,
   onOpenChange,
 }: DialogProps): React.JSX.Element {
-  const [home, setHome] = React.useState(String(match.homeScore ?? ''))
-  const [away, setAway] = React.useState(String(match.awayScore ?? ''))
-  const [winner, setWinner] = React.useState(match.winnerTeamId ?? '')
-  const invalidate = useInvalidateGames()
-
-  const score = useMatchScore({
-    onSuccess: async () => {
-      toast.success('Placar salvo.')
-      await invalidate()
-      onOpenChange(false)
+  const { form, mutation, onSubmit } = useMutationForm<
+    MatchScorePayload,
+    IMatch,
+    MatchScoreVariables
+  >({
+    validator: MatchScoreValidator,
+    defaults: {
+      homeScore: match.homeScore ?? undefined,
+      awayScore: match.awayScore ?? undefined,
+      winnerTeamId: match.winnerTeamId ?? undefined,
     },
-    onError: (error) => notifyError(error, { id: 'match-score' }),
+    fields: SCORE_FIELDS,
+    mutation: useMatchScore,
+    success: 'Placar salvo.',
+    // Placar é escrita idempotente: reenviar grava o mesmo resultado.
+    retry: 'match-score',
+    payload: (values) => {
+      let winnerTeamId: string | undefined = undefined
+      if (isTied(values.homeScore, values.awayScore))
+        winnerTeamId = values.winnerTeamId
+
+      return { ...values, id: match.id, winnerTeamId }
+    },
+    invalidate: GAME_CHANGE,
+    onSuccess: () => onOpenChange(false),
   })
 
-  const tied = home !== '' && home === away
-
-  function submit(event: React.FormEvent) {
-    event.preventDefault()
-    score.mutate({
-      id: match.id,
-      homeScore: Number(home),
-      awayScore: Number(away),
-      winnerTeamId: (tied && winner) || undefined,
-    })
-  }
+  const tied = isTied(form.watch('homeScore'), form.watch('awayScore'))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form method="post" onSubmit={submit} className="grid gap-4">
+        <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
             <DialogTitle>Placar</DialogTitle>
             <DialogDescription>
@@ -110,56 +128,70 @@ export function MatchScoreDialog({
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field>
-              <FieldLabel htmlFor="score-home">{match.homeName}</FieldLabel>
-              <Input
-                id="score-home"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                required
-                value={home}
-                onChange={(event) => setHome(event.target.value)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="score-away">{match.awayName}</FieldLabel>
-              <Input
-                id="score-away"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                required
-                value={away}
-                onChange={(event) => setAway(event.target.value)}
-              />
-            </Field>
+            <AppField
+              control={form.control}
+              name="homeScore"
+              id="score-home"
+              label={match.homeName}
+            >
+              {({ field, control }) => (
+                <ScoreInput
+                  {...control}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
+            </AppField>
+            <AppField
+              control={form.control}
+              name="awayScore"
+              id="score-away"
+              label={match.awayName}
+            >
+              {({ field, control }) => (
+                <ScoreInput
+                  {...control}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
+            </AppField>
           </div>
 
           {tied && (
-            <Field>
-              <FieldLabel htmlFor="score-winner">
-                Venceu nos pênaltis
-              </FieldLabel>
-              <NativeSelect
-                id="score-winner"
-                required
-                value={winner}
-                onChange={(event) => setWinner(event.target.value)}
-              >
-                <NativeSelectOption value="">Selecione</NativeSelectOption>
-                <NativeSelectOption value={match.homeTeamId ?? ''}>
-                  {match.homeName}
-                </NativeSelectOption>
-                <NativeSelectOption value={match.awayTeamId ?? ''}>
-                  {match.awayName}
-                </NativeSelectOption>
-              </NativeSelect>
-            </Field>
+            <AppField
+              control={form.control}
+              name="winnerTeamId"
+              id="score-winner"
+              label="Venceu nos pênaltis"
+            >
+              {({ field, control }) => (
+                <NativeSelect
+                  {...control}
+                  value={field.value ?? ''}
+                  onChange={(event) =>
+                    field.onChange(event.target.value || undefined)
+                  }
+                  onBlur={field.onBlur}
+                >
+                  <NativeSelectOption value="">Selecione</NativeSelectOption>
+                  <NativeSelectOption value={match.homeTeamId ?? ''}>
+                    {match.homeName}
+                  </NativeSelectOption>
+                  <NativeSelectOption value={match.awayTeamId ?? ''}>
+                    {match.awayName}
+                  </NativeSelectOption>
+                </NativeSelect>
+              )}
+            </AppField>
           )}
 
+          <AppFormRootError form={form} />
+
           <DialogFooter>
-            <Button type="submit" disabled={score.isPending}>
+            <Button type="submit" disabled={mutation.isPending}>
               Salvar placar
             </Button>
           </DialogFooter>
@@ -169,38 +201,73 @@ export function MatchScoreDialog({
   )
 }
 
+type ScoreInputProps = Readonly<{
+  id: string
+  'aria-invalid': boolean
+  value: number | undefined
+  onValueChange: (value: number) => void
+  onBlur: () => void
+}>
+
+/** Gols de um lado. Vazio vira `NaN`, que o validator recusa como número. */
+function ScoreInput({
+  value,
+  onValueChange,
+  ...props
+}: ScoreInputProps): React.JSX.Element {
+  let shown = ''
+  if (value !== undefined && !Number.isNaN(value)) shown = String(value)
+
+  return (
+    <Input
+      {...props}
+      type="number"
+      inputMode="numeric"
+      min={0}
+      value={shown}
+      onChange={(event) => onValueChange(event.target.valueAsNumber)}
+    />
+  )
+}
+
+/** O que a agenda edita: o texto do `datetime-local` e o local. */
+type ScheduleForm = Readonly<{ scheduledAt: string; location: string }>
+
 /** Data, hora e local da partida. */
 export function MatchScheduleDialog({
   match,
   open,
   onOpenChange,
 }: DialogProps): React.JSX.Element {
-  const [when, setWhen] = React.useState(toSchoolInput(match.scheduledAt))
-  const [location, setLocation] = React.useState(match.location ?? '')
-  const invalidate = useInvalidateGames()
-
-  const update = useMatchUpdate({
-    onSuccess: async () => {
-      toast.success('Agenda salva.')
-      await invalidate()
-      onOpenChange(false)
+  const { form, mutation, onSubmit } = useMutationForm<
+    ScheduleForm,
+    IMatch,
+    MatchUpdateVariables
+  >({
+    validator: MatchUpdateValidator,
+    defaults: {
+      scheduledAt: toSchoolInput(match.scheduledAt),
+      location: match.location ?? '',
     },
-    onError: (error) => notifyError(error, { id: 'match-update' }),
+    fields: SCHEDULE_FIELDS,
+    mutation: useMatchUpdate,
+    success: 'Agenda salva.',
+    retry: 'match-update',
+    // O campo guarda o relógio da escola; a API recebe ISO com fuso.
+    payload: (values) => {
+      let scheduledAt: string | null = null
+      if (values.scheduledAt) scheduledAt = fromSchoolInput(values.scheduledAt)
+
+      return { id: match.id, scheduledAt, location: values.location || null }
+    },
+    invalidate: GAME_CHANGE,
+    onSuccess: () => onOpenChange(false),
   })
-
-  function submit(event: React.FormEvent) {
-    event.preventDefault()
-
-    let scheduledAt: string | null = null
-    if (when) scheduledAt = fromSchoolInput(when)
-
-    update.mutate({ id: match.id, scheduledAt, location: location || null })
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form method="post" onSubmit={submit} className="grid gap-4">
+        <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
             <DialogTitle>Agendar partida</DialogTitle>
             <DialogDescription>
@@ -208,28 +275,36 @@ export function MatchScheduleDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <Field>
-            <FieldLabel htmlFor="schedule-when">Data e hora</FieldLabel>
-            <Input
-              id="schedule-when"
-              type="datetime-local"
-              value={when}
-              onChange={(event) => setWhen(event.target.value)}
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="schedule-location">Local</FieldLabel>
-            <Input
-              id="schedule-location"
-              value={location}
-              maxLength={120}
-              placeholder="Quadra principal"
-              onChange={(event) => setLocation(event.target.value)}
-            />
-          </Field>
+          <AppField
+            control={form.control}
+            name="scheduledAt"
+            id="schedule-when"
+            label="Data e hora"
+          >
+            {({ field, control }) => (
+              <Input {...field} {...control} type="datetime-local" />
+            )}
+          </AppField>
+          <AppField
+            control={form.control}
+            name="location"
+            id="schedule-location"
+            label="Local"
+          >
+            {({ field, control }) => (
+              <Input
+                {...field}
+                {...control}
+                maxLength={120}
+                placeholder="Quadra principal"
+              />
+            )}
+          </AppField>
+
+          <AppFormRootError form={form} />
 
           <DialogFooter>
-            <Button type="submit" disabled={update.isPending}>
+            <Button type="submit" disabled={mutation.isPending}>
               Salvar agenda
             </Button>
           </DialogFooter>
@@ -248,11 +323,11 @@ export function MatchUnscoreDialog({
   open,
   onOpenChange,
 }: DialogProps): React.JSX.Element {
-  const invalidate = useInvalidateGames()
+  const invalidate = useInvalidate()
   const unscore = useMatchUnscore({
     onSuccess: async () => {
       toast.success('Placar desfeito.')
-      await invalidate()
+      await invalidate(GAME_CHANGE)
     },
     onError: (error) => notifyError(error, { id: 'match-unscore' }),
   })
