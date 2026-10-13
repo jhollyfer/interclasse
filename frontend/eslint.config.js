@@ -98,9 +98,6 @@ export default [
     files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
     rules: {
       '@typescript-eslint/consistent-type-assertions': 'off',
-      // Teste monta caso e espera resultado; o ternário ali é a tabela do caso,
-      // não desvio de fluxo do produto.
-      'no-ternary': 'off',
     },
   },
   {

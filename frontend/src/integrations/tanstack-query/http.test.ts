@@ -34,8 +34,11 @@ function respondExpired() {
 }
 
 function respond(status: number, body?: unknown) {
+  let payload: string | null = null
+  if (body !== undefined) payload = JSON.stringify(body)
+
   return vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-    new Response(body === undefined ? null : JSON.stringify(body), {
+    new Response(payload, {
       status,
       headers: { 'Content-Type': 'application/json' },
     }),
