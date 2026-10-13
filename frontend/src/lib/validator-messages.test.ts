@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import * as validator from './validator'
+import * as shared from './validator'
 import { FIELD_LABELS, RULE_MESSAGES } from './validator-messages'
 
 /**
@@ -98,11 +98,28 @@ function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {
   return found
 }
 
-const validators = Object.values(validator).filter(isValidator)
+/**
+ * Todo módulo de validator: o compartilhado e os de recurso em
+ * `src/validators/`. O glob é o que impede um recurso novo de escapar da
+ * varredura - não há lista para lembrar de atualizar.
+ */
+const resources = import.meta.glob<Record<string, unknown>>(
+  '../validators/**/*.validator.ts',
+  { eager: true },
+)
+
+const validators = [shared, ...Object.values(resources)]
+  .flatMap((module) => Object.values(module))
+  .filter(isValidator)
 
 const fields = new Set(validators.flatMap((each) => walk(each.toJSONSchema())))
 
 describe('rótulos', () => {
+  test('a varredura enxerga os validators de recurso', () => {
+    // Glob vazio deixaria os testes abaixo verdes sem olhar campo nenhum.
+    expect(Object.keys(resources).length).toBeGreaterThan(0)
+  })
+
   test('todo campo dos validators tem nome em português', () => {
     // O nome cru serve de fallback do VineJS, então basta o último segmento ter
     // rótulo - `address.cep` cai em `cep` se o caminho completo não estiver
@@ -142,7 +159,7 @@ describe('mensagens', () => {
     //
     // A lista é escrita à mão, e é isso que deixa a regra nova passar: ela só é
     // cobrada aqui depois que alguém a acrescenta. Foi assim que `url` e
-    // `array.maxLength` sobreviveram até esta task. Regra nova em `validator.ts`
+    // `array.maxLength` sobreviveram até esta task. Regra nova num validator
     // entra nesta lista no mesmo commit.
     //
     // `regex`, `checkDigits` e `confirmed` ficam de fora de propósito: todo uso

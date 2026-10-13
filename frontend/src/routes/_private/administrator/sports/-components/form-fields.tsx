@@ -11,7 +11,7 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
-import type { AdministratorSportCreatePayload } from '#/lib/validator'
+import type { AdministratorSportCreatePayload } from '#/validators/administrator/sports.validator'
 
 export type SportFormType = AdministratorSportCreatePayload
 

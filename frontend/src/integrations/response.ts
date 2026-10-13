@@ -4,7 +4,7 @@
  * São `type` e não validators: o que sai do backend já passou pelo VineJS de
  * lá, e validar de novo aqui criaria uma segunda fonte de verdade sobre o mesmo
  * dado, sem nada em troca. Validator no frontend é para o que o **usuário**
- * digita, e mora em `lib/validator.ts`.
+ * digita, e mora em `src/validators/<módulo>/<recurso>.validator.ts`.
  *
  * Aqui entra só **envelope e forma de resposta** - a paginação, os contadores
  * da chave e das inscrições. As entidades em si (`Storage`, `User`,

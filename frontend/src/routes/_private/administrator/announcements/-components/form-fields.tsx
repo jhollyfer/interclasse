@@ -13,7 +13,7 @@ import {
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
-import type { AdministratorAnnouncementCreatePayload } from '#/lib/validator'
+import type { AdministratorAnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 
 export type AnnouncementFormType = AdministratorAnnouncementCreatePayload
 

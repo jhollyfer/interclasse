@@ -17,11 +17,9 @@ import {
   ClassroomFormFields,
 } from './form-fields'
 import type { ClassroomFormType } from './form-fields'
-import { AdministratorClassroomCreateValidator } from '#/lib/validator'
-import type {
-  AdministratorClassroomCreatePayload,
-  Classroom,
-} from '#/lib/validator'
+import { AdministratorClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
+import type { Classroom } from '#/lib/validator'
+import type { AdministratorClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
 import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
