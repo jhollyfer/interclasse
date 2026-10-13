@@ -19,7 +19,13 @@ import { BracketIndex } from './bracket-index'
 import { Agenda } from './match-row'
 import { NextMatch } from './next-match'
 import { ResultsTicker } from './results-ticker'
-import { Empty, Section } from './section'
+import {
+  Empty,
+  Section,
+  SectionHeader,
+  SectionMore,
+  SectionTitle,
+} from './section'
 
 export function HomePage(): React.JSX.Element {
   const next = useQuery(storefrontMatchesQueryOptions(HOME_NEXT))
@@ -66,24 +72,29 @@ export function HomePage(): React.JSX.Element {
 
       <ResultsTicker matches={finished} />
 
-      <Section
-        title="Próximos jogos"
-        more={{ to: '/jogos', label: 'Tabela completa' }}
-      >
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Próximos jogos</SectionTitle>
+          <SectionMore to="/jogos">Tabela completa</SectionMore>
+        </SectionHeader>
         {upcoming.length === 0 && (
           <Empty>Nenhum jogo marcado. A agenda sai depois do sorteio.</Empty>
         )}
         <Agenda matches={upcoming} />
       </Section>
 
-      <Section title="Classificação">
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Classificação</SectionTitle>
+        </SectionHeader>
         <BracketIndex brackets={brackets.data?.data ?? []} />
       </Section>
 
-      <Section
-        title="Avisos"
-        more={{ to: '/avisos', label: 'Todos os avisos' }}
-      >
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Avisos</SectionTitle>
+          <SectionMore to="/avisos">Todos os avisos</SectionMore>
+        </SectionHeader>
         <AnnouncementList announcements={announcements.data?.data ?? []} />
       </Section>
     </>

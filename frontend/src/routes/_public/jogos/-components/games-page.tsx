@@ -10,7 +10,12 @@ import {
 import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
 
-import { Empty, Section } from '../../-components/section'
+import {
+  Empty,
+  Section,
+  SectionHeader,
+  SectionTitle,
+} from '../../-components/section'
 import { Pager } from '../../-components/pager'
 import { Agenda } from '../../-components/match-row'
 
@@ -29,7 +34,10 @@ export function GamesPage(): React.JSX.Element {
   }
 
   return (
-    <Section as="h1" title="Tabela de jogos">
+    <Section>
+      <SectionHeader>
+        <SectionTitle render={<h1 />}>Tabela de jogos</SectionTitle>
+      </SectionHeader>
       <div className="grid gap-2 sm:flex sm:flex-wrap">
         <OptionCombobox
           aria-label="Modalidade"
