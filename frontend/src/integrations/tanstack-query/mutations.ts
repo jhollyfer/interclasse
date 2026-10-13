@@ -14,7 +14,7 @@
  * precisam vir preenchidos, e é o que os aliases abaixo fazem.
  *
  * O `TError` continua explícito por ser documentação no lugar certo, mas já é o
- * default do app: `http.ts` declara `Register.defaultError` como `HTTPError`.
+ * default do app: `register.d.ts` declara `Register.defaultError` como `HTTPError`.
  */
 
 import * as React from 'react'
@@ -79,7 +79,7 @@ import { request, send } from './http'
  * preencher, a função resultante não aceita o payload.
  *
  * `TError` tem default `HTTPError` porque todo caminho de falha de `request()`
- * lança `HTTPError` — é o que `http.ts` declara em `Register.defaultError`. Quem
+ * lança `HTTPError` — é o que `register.d.ts` declara em `Register.defaultError`. Quem
  * não passa por `request()` o informa: o upload multipart fala com o bucket
  * direto e pode lançar `Error` cru.
  */
