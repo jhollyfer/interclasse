@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { UserFactory } from '#database/factories/user.factory'
 import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 
 test.group('classrooms > paginate (conselheiro)', (group) => {
@@ -23,6 +24,21 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
       body(response).data.map((classroom: { name: string }) => classroom.name),
       ['7º A', '9º B'],
     )
+  })
+
+  test('conselheiro sem turma recebe lista vazia, mesmo havendo turmas de outro', async ({
+    client,
+    assert,
+  }) => {
+    const { session } = await signInWithFactory(client)
+    const other = await UserFactory.create()
+    await ClassroomFactory.merge({ advisorId: other.id }).create()
+
+    const response = await client.get('/advisor/classrooms').cookies(session)
+
+    response.assertStatus(200)
+    assert.lengthOf(body(response).data, 0)
+    assert.equal(body(response).meta.total, 0)
   })
 
   test('o administrador vê todas', async ({ client, assert }) => {
