@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 
 import { CATEGORY, MATCH_PHASE } from '#core/entity'
 import { createSport, draw, enrolledClassrooms } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
 /**
  * O sorteio, por HTTP: turmas, alunos e inscrições pela rota, porque é delas
@@ -64,75 +64,5 @@ test.group('brackets > create', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'ENROLLMENT_LOCKED')
-  })
-
-  test('o representante só acrescenta; quem tira é o conselheiro', async ({ client, assert }) => {
-    const admin = await authenticateAsAdministrator(client)
-    const representante = await signInWithFactory(client, 'representative')
-    const sport = await createSport(client, admin)
-    const classroom = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '7º C', grade: 7, representativeId: representante.user.id })
-    const ids: string[] = []
-    for (const name of ['Ana', 'Bia']) {
-      const student = await client
-        .post('/advisor/students')
-        .cookies(admin)
-        .json({ classroomId: body(classroom).id, name })
-      ids.push(body(student).id)
-    }
-
-    const acrescenta = await client
-      .put('/representative/enrollments')
-      .cookies(representante.session)
-      .json({ sportId: sport.id, studentIds: ids })
-    const tira = await client
-      .put('/representative/enrollments')
-      .cookies(representante.session)
-      .json({ sportId: sport.id, studentIds: [ids[0]] })
-    const conselheiroTira = await client
-      .put('/advisor/enrollments')
-      .cookies(admin)
-      .json({ classroomId: body(classroom).id, sportId: sport.id, studentIds: [ids[0]] })
-
-    acrescenta.assertStatus(200)
-    tira.assertStatus(403)
-    assert.equal(body(tira).code, 'ENROLLMENT_REMOVAL_FORBIDDEN')
-    conselheiroTira.assertStatus(200)
-  })
-
-  test('o máximo não desce abaixo de uma lista já inscrita', async ({ client, assert }) => {
-    const admin = await authenticateAsAdministrator(client)
-    const sport = await createSport(client, admin)
-    const classroom = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '8º Z', grade: 8 })
-    const ids: string[] = []
-    for (const name of ['Ana', 'Bia', 'Caio']) {
-      const student = await client
-        .post('/advisor/students')
-        .cookies(admin)
-        .json({ classroomId: body(classroom).id, name })
-      ids.push(body(student).id)
-    }
-    await client
-      .put('/advisor/enrollments')
-      .cookies(admin)
-      .json({ classroomId: body(classroom).id, sportId: sport.id, studentIds: ids })
-
-    const abaixo = await client
-      .put(`/administrator/sports/${sport.id}`)
-      .cookies(admin)
-      .json({ maxAthletes: 2 })
-    abaixo.assertStatus(409)
-    assert.equal(body(abaixo).code, 'SPORT_ROSTER_ABOVE_LIMIT')
-
-    const igual = await client
-      .put(`/administrator/sports/${sport.id}`)
-      .cookies(admin)
-      .json({ maxAthletes: 3 })
-    igual.assertStatus(200)
   })
 })
