@@ -118,7 +118,7 @@ const augmentation = {
     'providers/*.ts',
     'app/core/validator.ts',
     'tests/bootstrap.ts',
-    'app/middleware/initialize_bouncer_middleware.ts',
+    'app/middleware/initialize-bouncer.middleware.ts',
   ],
   rules: {
     '@typescript-eslint/consistent-type-definitions': 'off',

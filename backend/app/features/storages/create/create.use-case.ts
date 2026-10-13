@@ -1,13 +1,13 @@
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import StorageService from '#services/storage.service'
+import StorageService from '#services/storage/storage.service'
 import MultipartService, {
   countParts,
   pendingParts,
   PART_SIZE,
   type PresignedPart,
-} from '#services/multipart.service'
+} from '#services/multipart/multipart.service'
 import { UploadStatuses } from '#core/entity'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'

@@ -13,13 +13,13 @@ lembrar de pendurar o middleware nela.
 
 | Arquivo | Proposito |
 |---|---|
-| `auth_middleware.ts` | Auth middleware is used authenticate HTTP requests and deny access to unauthenticated users |
-| `container_bindings_middleware.ts` | The container bindings middleware binds classes to their request specific value using the container resolver |
-| `documentation_middleware.ts` | Quem opera o painel |
-| `force_json_response_middleware.ts` | — |
-| `origin_middleware.ts` | Os content-types que **não** disparam preflight |
-| `role_middleware.ts` | Recusa quem chega a um módulo cujo papel não é o seu |
-| `silent_auth_middleware.ts` | Silent auth middleware can be used as a global middleware to silent check if the user is logged-in or not |
+| `auth.middleware.ts` | Auth middleware is used authenticate HTTP requests and deny access to unauthenticated users |
+| `container-bindings.middleware.ts` | The container bindings middleware binds classes to their request specific value using the container resolver |
+| `documentation.middleware.ts` | Quem opera o painel |
+| `force-json-response.middleware.ts` | — |
+| `origin.middleware.ts` | Os content-types que **não** disparam preflight |
+| `role.middleware.ts` | Recusa quem chega a um módulo cujo papel não é o seu |
+| `silent-auth.middleware.ts` | Silent auth middleware can be used as a global middleware to silent check if the user is logged-in or not |
 
 A coluna de proposito e a primeira frase do JSDoc de cada arquivo, extraida do
 proprio arquivo. Um travessao ali quer dizer que o arquivo nao se explicou.

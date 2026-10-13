@@ -93,7 +93,7 @@ export function pendingParts(totalParts: number, uploaded: Array<number>): Array
  * "quero subir isto em pedaços" para o protocolo. Quem decide quando iniciar,
  * confirmar ou abortar é o use-case.
  *
- * O cliente vem do container (`providers/storage_provider.ts`), e não de um
+ * O cliente vem do container (`providers/storage.provider.ts`), e não de um
  * `new` aqui dentro: é o que permite a um teste apontar para outro bucket ou
  * simular uma falha do storage sem mexer no ambiente do processo.
  */

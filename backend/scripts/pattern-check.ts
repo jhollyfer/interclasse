@@ -581,7 +581,7 @@ async function conferirSoftDelete(fontes: Map<string, string>): Promise<Achado[]
  * conteudo difere - e por isso ninguem cobrava nada, e um projeto podia perder o
  * arquivo inteiro sem reprovar.
  *
- * Presenca e o que da para cobrar sem inventar: se `app/services/slug.service.ts`
+ * Presenca e o que da para cobrar sem inventar: se `app/services/slug/slug.service.ts`
  * sumir de um dos tres, a regra aponta em vez de a diferenca aparecer no dia em
  * que alguem for procurar o service que os irmaos tem.
  */

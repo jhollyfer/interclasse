@@ -6,7 +6,7 @@ import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 
 import User from '#models/user'
 import { ActiveStatuses } from '#core/entity'
-import { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie.service'
+import { COOKIE_TOKEN, issueSessionTokens } from '#services/cookie/cookie.service'
 
 /**
  * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.

@@ -4,7 +4,7 @@ import { defineDocs } from '#core/openapi/types'
 import StoragePartsUseCase from './parts.use-case.ts'
 import { IdentifierValidator } from '#core/validator'
 import { StorageUploadResponse } from '#core/response'
-import { PART_SIZE, PRESIGNED_BATCH } from '#services/multipart.service'
+import { PART_SIZE, PRESIGNED_BATCH } from '#services/multipart/multipart.service'
 
 @inject()
 export default class StoragePartsController {

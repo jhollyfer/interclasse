@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { COOKIE_TOKEN } from '#services/cookie.service'
+import CookieService, { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import AuthenticationSignOutUseCase from './sign-out.use-case.ts'
 
 @inject()

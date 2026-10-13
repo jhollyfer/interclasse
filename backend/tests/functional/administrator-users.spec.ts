@@ -5,7 +5,7 @@ import db from '@adonisjs/lucid/services/db'
 import Storage from '#models/storage'
 import User from '#models/user'
 import { ActiveStatuses, UploadStatuses, UserRoles } from '#core/entity'
-import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user_factory'
+import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
   authenticate,

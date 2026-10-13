@@ -1,7 +1,7 @@
 import type { ApiClient, ApiResponse } from '@japa/api-client'
 import testUtils from '@adonisjs/core/services/test_utils'
-import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user_factory'
-import { COOKIE_TOKEN } from '#services/cookie.service'
+import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
+import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import type User from '#models/user'
 
 /**

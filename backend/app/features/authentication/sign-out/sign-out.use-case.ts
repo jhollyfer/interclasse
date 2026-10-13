@@ -1,7 +1,7 @@
 import User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { COOKIE_TOKEN } from '#services/cookie.service'
+import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import { inject } from '@adonisjs/core'
 import { Secret } from '@adonisjs/core/helpers'
 import logger from '@adonisjs/core/services/logger'

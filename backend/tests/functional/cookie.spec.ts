@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { resolveSameSite } from '#services/cookie.service'
+import { resolveSameSite } from '#services/cookie/cookie.service'
 
 /**
  * O `SameSite` do cookie de sessão.

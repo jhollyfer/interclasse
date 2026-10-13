@@ -56,7 +56,7 @@ export default defineConfig({
     () => import('@adonisjs/auth/auth_provider'),
     () => import('@adonisjs/drive/drive_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
-    () => import('#providers/storage_provider'),
+    () => import('#providers/storage.provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
   ],
 
@@ -113,7 +113,7 @@ export default defineConfig({
     // responde 500 no servidor buildado - mas funciona em desenvolvimento.
     { pattern: 'openapi.json', reloadServer: false },
 
-    // O recorte de produção que `database/seeders/demo_seeder.ts` lê por caminho
+    // O recorte de produção que `database/seeders/demo.seed.ts` lê por caminho
     // relativo a si mesmo (`import.meta.url`). Como o seeder agora também roda em
     // produção, o JSON precisa existir dentro de `build/` - sem esta entrada o
     // assembler copia só o `.js` compilado, e `db:seed` quebra com ENOENT no
