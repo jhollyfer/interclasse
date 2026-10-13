@@ -8,7 +8,7 @@ import type { UploadStatus } from '#core/entity'
 /**
  * Registro neutro de arquivo: nome da chave, rótulo original, tipo, tamanho e
  * onde o binário vive (`path`). A `url` é derivada na leitura - nunca uma
- * coluna, como era em `backend-old`, para que trocar de bucket ou de CDN não
+ * coluna, para que trocar de bucket ou de CDN não
  * exija sair reescrevendo linha por linha.
  */
 export default class Storage extends StorageSchema {

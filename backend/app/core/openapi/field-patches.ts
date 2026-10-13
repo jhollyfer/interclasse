@@ -41,9 +41,8 @@ export type FieldPatch = {
 export const FIELD_PATCHES: Record<string, FieldPatch> = {
   /**
    * `vine.date()` sai como `{}` vazio, e o fallback de `schema.ts` o completa
-   * com `date-time` - que é o certo para `createdAt` e errado aqui. As quatro
-   * colunas `date` (eventos, podcasts, vídeos e álbuns) guardam o dia, o Lucid
-   * as serializa por `toISODate()`, e a resposta documenta `format: "date"`.
+   * com `date-time` - que é o certo para `createdAt` e errado aqui. Coluna
+   * `date` guarda o dia, o Lucid a serializa por `toISODate()`, e a resposta documenta `format: "date"`.
    * Sem esta correção o mesmo campo sairia `date-time` na entrada e `date` na
    * saída, e um cliente gerado do documento mandaria o instante completo que o
    * validador recusa.

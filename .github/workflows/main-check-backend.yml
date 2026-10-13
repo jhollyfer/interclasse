@@ -76,6 +76,11 @@ jobs:
           SESSION_DRIVER: cookie
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
           UPLOAD_MAX_SIZE: "1073741824"
+          # Obrigatórias no schema; o gerador não fala com o bucket.
+          STORAGE_KEY: ci-placeholder
+          STORAGE_SECRET: ci-placeholder
+          STORAGE_BUCKET: ci-placeholder
+          STORAGE_ENDPOINT: http://localhost:9004
         run: node ace openapi:generate --check --strict
 
       # Os guardas de forma do padrão. O `sync:check` (cópia da régua contra o

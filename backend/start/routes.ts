@@ -156,8 +156,7 @@ router
  * decide é a referência viva.
  *
  * As duas leituras - `GET /` e `GET :id` - são a biblioteca de arquivos do
- * painel, que `backend-old` servia em `/storage/paginate` e `/storage/:id`. Não
- * há `PUT`: arquivo não se edita, se troca.
+ * painel. Não há `PUT`: arquivo não se edita, se troca.
  */
 router
   .group(() => {

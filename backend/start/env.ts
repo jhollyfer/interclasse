@@ -27,7 +27,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------------------------
   |
   | `TZ` é lida pelo próprio Node, não por `env.get()`, e por isso passava
-  | despercebida: estava nos três `.env.example` e em schema nenhum. Ausente, o
+  | despercebida: estava no `.env.example` e em schema nenhum. Ausente, o
   | processo herda o fuso do host, e a mesma consulta responde datas diferentes
   | conforme a máquina. `UTC` em todo ambiente; quem converte para o fuso de quem
   | lê é a camada de apresentação.
@@ -103,10 +103,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   */
   UPLOAD_MAX_SIZE: Env.schema.number(),
 
-  STORAGE_KEY: Env.schema.string.optional(),
-  STORAGE_SECRET: Env.schema.string.optional(),
-  STORAGE_BUCKET: Env.schema.string.optional(),
-  STORAGE_ENDPOINT: Env.schema.string.optional(),
+  // Credencial e destino do bucket: obrigatórios e sem default. O storage é
+  // funcionalidade de base, e subir sem ele é subir com upload quebrado.
+  STORAGE_KEY: Env.schema.string(),
+  STORAGE_SECRET: Env.schema.string(),
+  STORAGE_BUCKET: Env.schema.string(),
+  STORAGE_ENDPOINT: Env.schema.string(),
 
   /**
    * O MinIO só atende no estilo `endpoint/bucket/chave`; os buckets gerenciados

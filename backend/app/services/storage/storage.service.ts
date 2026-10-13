@@ -142,8 +142,8 @@ export default class StorageService {
    *
    * O `Content-Disposition` viaja assinado dentro da própria URL, e é o bucket
    * que o devolve no download - por isso o binário não precisa atravessar esta
-   * aplicação só para ganhar um header. Em `backend-old` atravessava, e cada
-   * download ocupava a aplicação pelo tempo da transferência.
+   * aplicação só para ganhar um header - atravessando, cada download ocuparia
+   * a aplicação pelo tempo da transferência.
    *
    * Expira em minutos porque é endereço de uma ação, não de um recurso: quem
    * quiser o arquivo de novo pede outra.

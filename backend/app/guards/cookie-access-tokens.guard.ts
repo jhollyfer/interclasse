@@ -24,7 +24,7 @@ type GuardUser = User & { currentAccessToken: AccessToken }
  * transporte: o token é lido do cookie `access-token`.
  *
  * **Sem fallback para o cabeçalho `Authorization`.** O cookie é `httpOnly`
- * justamente para o JavaScript da página não alcançar o token (AD-005); aceitar
+ * justamente para o JavaScript da página não alcançar o token; aceitar
  * o mesmo token pelo cabeçalho reabriria o caminho que o `httpOnly` fecha.
  */
 export class CookieAccessTokensGuard implements GuardContract<GuardUser> {

@@ -16,7 +16,7 @@ import env from '#start/env'
  * o código depende é do protocolo. R2, S3, Spaces, Linode e MinIO trocam de
  * lugar mudando `STORAGE_ENDPOINT`.
  */
-export const bucket = env.get('STORAGE_BUCKET') ?? ''
+export const bucket = env.get('STORAGE_BUCKET')
 
 /**
  * A conexão com o bucket, exportada porque tem **dois** consumidores: o
@@ -28,8 +28,8 @@ export const bucket = env.get('STORAGE_BUCKET') ?? ''
  */
 export const clientConfig: S3ClientConfig = {
   credentials: {
-    accessKeyId: env.get('STORAGE_KEY') ?? '',
-    secretAccessKey: env.get('STORAGE_SECRET') ?? '',
+    accessKeyId: env.get('STORAGE_KEY'),
+    secretAccessKey: env.get('STORAGE_SECRET'),
   },
   region: 'auto',
   endpoint: env.get('STORAGE_ENDPOINT'),

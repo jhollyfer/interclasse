@@ -21,8 +21,7 @@ function cut(slug: string, max: number): string {
  * Duas chamadas de `string.slug` com opções escritas à mão divergiriam, e a
  * divergência apareceria como URL quebrada na vitrine, nunca como erro.
  *
- * Sem deduplicação por sufixo, ao contrário do simple-hub: aqui nada é
- * cadastrado por terceiros: quem cadastra é a organização, e slug repetido é
+ * Sem deduplicação por sufixo: quem cadastra é a organização, e slug repetido é
  * conflito a resolver - `409` apontando o campo -, não empate a desempatar
  * sozinho.
  */
