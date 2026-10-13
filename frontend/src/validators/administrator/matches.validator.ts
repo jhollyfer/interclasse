@@ -3,7 +3,7 @@ import type { Infer } from '#/lib/validator'
 
 /**
  * A agenda. **Divergência deliberada do backend**, pelo mesmo motivo de
- * `wireDate()`: lá é `vine.date({ formats: ['iso8601'] })`; aqui o valor é o
+ * `wireDate()`: lá é ISO 8601 com fuso (`scheduledAt()`); aqui o valor é o
  * texto que o campo `datetime-local` produz, convertido para ISO com fuso na
  * hora de enviar.
  */
