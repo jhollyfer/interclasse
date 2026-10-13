@@ -1,30 +1,11 @@
+import type { Infer } from '#core/validator'
+import { type BracketDetailResponse } from '#core/openapi/response'
 import Bracket from '#models/bracket'
 import type Match from '#models/match'
-import { BRACKET_STATUS, MATCH_PHASE, type BracketStatus, type Category } from '#core/entity'
+import { BRACKET_STATUS, MATCH_PHASE } from '#core/entity'
 
-export type BracketDetail = {
-  id: string
-  category: Category
-  status: BracketStatus
-  sport: { id: string; name: string; slug: string }
-  championTeamId: string | null
-  matches: Array<{
-    id: string
-    phase: string
-    round: number
-    position: number
-    status: string
-    homeTeamId: string | null
-    awayTeamId: string | null
-    homeName: string | null
-    awayName: string | null
-    homeScore: number | null
-    awayScore: number | null
-    winnerTeamId: string | null
-    scheduledAt: string | null
-    location: string | null
-  }>
-}
+/** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_padroes/typescript.md §2). */
+export type BracketDetail = Infer<typeof BracketDetailResponse>
 
 /**
  * A chave como ela é lida: as partidas de cada fase, com os nomes das turmas.

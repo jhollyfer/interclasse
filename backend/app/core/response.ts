@@ -29,18 +29,18 @@ export type ErrorEnvelope = {
  * `all()` mantém `T[]`, e o `any` de `getMeta()` morre nesta fronteira.
  */
 export type PaginationMeta = {
-  total: number
-  perPage: number
-  currentPage: number
-  lastPage: number
-  firstPage: number
-  firstPageUrl: string
-  lastPageUrl: string
-  nextPageUrl: string | null
-  previousPageUrl: string | null
+  readonly total: number
+  readonly perPage: number
+  readonly currentPage: number
+  readonly lastPage: number
+  readonly firstPage: number
+  readonly firstPageUrl: string
+  readonly lastPageUrl: string
+  readonly nextPageUrl: string | null
+  readonly previousPageUrl: string | null
 }
 
 export type Paginated<T> = {
-  meta: PaginationMeta
-  data: T[]
+  readonly meta: PaginationMeta
+  readonly data: ReadonlyArray<T>
 }

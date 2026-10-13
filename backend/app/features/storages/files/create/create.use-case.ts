@@ -25,14 +25,18 @@ type Payload = FileCreatePayload
  * duas formas para a mesma resposta seriam dois caminhos no cliente.
  */
 export type StorageUpload = {
-  storage: ModelObject
-  uploadId: string | null
-  partSize: number
-  totalParts: number
+  readonly storage: ModelObject
+  readonly uploadId: string | null
+  readonly partSize: number
+  readonly totalParts: number
   /** As URLs deste lote. Pode ser menos que `totalParts` (ver `PRESIGNED_BATCH`). */
-  parts: Array<PresignedPart>
+  readonly parts: ReadonlyArray<PresignedPart>
   /** As partes que o bucket já tem. Sempre vazio ao iniciar. */
-  uploaded: Array<{ partNumber: number; size: number; etag: string }>
+  readonly uploaded: ReadonlyArray<{
+    readonly partNumber: number
+    readonly size: number
+    readonly etag: string
+  }>
 }
 
 type Response = Either<HTTPException, StorageUpload>

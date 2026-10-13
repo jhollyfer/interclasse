@@ -7,8 +7,8 @@ import { vineErrors } from '#core/validator'
 import type { HTTPExceptionPayload } from '#exceptions/http.exception'
 
 type FieldMessage = {
-  field: string
-  message: string
+  readonly field: string
+  readonly message: string
 }
 
 function isFieldMessage(value: unknown): value is FieldMessage {

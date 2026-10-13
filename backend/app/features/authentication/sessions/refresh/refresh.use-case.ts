@@ -11,7 +11,7 @@ import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import SessionService, { type SessionTokens } from '#services/session/session.service'
 
 type Payload = {
-  refreshToken?: string
+  readonly refreshToken?: string
 }
 
 type Response = Either<HTTPException, SessionTokens>

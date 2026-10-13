@@ -6,7 +6,7 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { USER_ROLE, type UserRole } from '#core/entity'
 
-type People = { advisorId?: string | null; representativeId?: string | null }
+type People = { advisorId?: string | null; readonly representativeId?: string | null }
 
 /**
  * Os vínculos de pessoa de uma turma: conselheiro e representante.
