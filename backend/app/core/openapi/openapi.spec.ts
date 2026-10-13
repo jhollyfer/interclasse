@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { authenticateAsAdministrator, resetDatabase } from '../helpers.ts'
+import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
 import { readFile } from 'node:fs/promises'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'

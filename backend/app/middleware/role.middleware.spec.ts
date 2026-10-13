@@ -7,7 +7,7 @@ import {
   body,
   resetDatabase,
   signInWithFactory,
-} from '../helpers.ts'
+} from '#tests/helpers'
 
 /**
  * A matriz de papéis inteira, uma célula por caso.

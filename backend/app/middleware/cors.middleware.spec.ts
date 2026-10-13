@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { body } from '../helpers.ts'
+import { body } from '#tests/helpers'
 
 /**
  * A allowlist de `config/cors.ts`, que vem de `CORS_ORIGIN`.

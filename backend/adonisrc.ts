@@ -87,10 +87,11 @@ export default defineConfig({
   tests: {
     // Suíte única: sem repositório injetável não há o que dublar num teste
     // unitário. Testar por HTTP exercita rota, middleware, validator, use-case e
-    // serialização de uma vez (AD-009).
+    // serialização de uma vez. A spec mora ao lado do que cobre - a da ação na
+    // pasta da ação (_padroes/backend.md §7); `tests/` guarda só infraestrutura.
     suites: [
       {
-        files: ['tests/functional/**/*.spec.{ts,js}'],
+        files: ['app/**/*.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },

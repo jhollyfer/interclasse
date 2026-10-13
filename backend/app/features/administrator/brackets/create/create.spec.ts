@@ -7,7 +7,7 @@ import {
   resetDatabase,
   signInWithFactory,
   type Session,
-} from '../helpers.ts'
+} from '#tests/helpers'
 
 /**
  * O caminho dos jogos de ponta a ponta, por HTTP: turmas, alunos, inscrições,
@@ -93,116 +93,6 @@ async function scoreAll(client: ApiClient, admin: Session, bracketId: string, ph
     response.assertStatus(200)
   }
 }
-
-test.group('jogos > turmas', (group) => {
-  group.each.setup(() => resetDatabase())
-
-  test('a categoria sai do ano, e nome repetido é 409', async ({ client, assert }) => {
-    const admin = await authenticateAsAdministrator(client)
-
-    const quinto = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '5º A', grade: 5 })
-    const sexto = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '6º A', grade: 6 })
-    const repetido = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '6º A', grade: 6 })
-
-    assert.equal(body(quinto).category, Categories.F1)
-    assert.equal(body(sexto).category, Categories.F2)
-    repetido.assertStatus(409)
-    assert.equal(body(repetido).code, 'CLASSROOM_ALREADY_EXISTS')
-  })
-
-  test('conselheiro precisa ter o papel de conselheiro', async ({ client, assert }) => {
-    const admin = await authenticateAsAdministrator(client)
-    const { user } = await signInWithFactory(client, 'representative')
-
-    const response = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '7º A', grade: 7, advisorId: user.id })
-
-    response.assertStatus(422)
-    assert.equal(body(response).code, 'ADVISOR_NOT_FOUND')
-  })
-})
-
-test.group('jogos > conselheiro e representante', (group) => {
-  group.each.setup(() => resetDatabase())
-
-  test('o conselheiro cuida só da própria turma', async ({ client, assert }) => {
-    const admin = await authenticateAsAdministrator(client)
-    const dono = await signInWithFactory(client)
-    const outro = await signInWithFactory(client)
-
-    const classroom = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '8º B', grade: 8, advisorId: dono.user.id })
-
-    const proprio = await client
-      .post('/advisor/students')
-      .cookies(dono.session)
-      .json({ classroomId: body(classroom).id, name: 'Maria' })
-    const alheio = await client
-      .post('/advisor/students')
-      .cookies(outro.session)
-      .json({ classroomId: body(classroom).id, name: 'João' })
-    const lista = await client.get('/advisor/classrooms').cookies(outro.session)
-
-    proprio.assertStatus(201)
-    alheio.assertStatus(404)
-    assert.lengthOf(body(lista).data, 0)
-  })
-
-  test('o representante monta a lista da própria turma, dentro do limite', async ({
-    client,
-    assert,
-  }) => {
-    const admin = await authenticateAsAdministrator(client)
-    const representante = await signInWithFactory(client, 'representative')
-    const sport = await createSport(client, admin)
-
-    const classroom = await client
-      .post('/administrator/classrooms')
-      .cookies(admin)
-      .json({ name: '9º C', grade: 9, representativeId: representante.user.id })
-
-    const alunos: string[] = []
-    for (const name of ['Ana', 'Bia', 'Caio', 'Davi']) {
-      const student = await client
-        .post('/advisor/students')
-        .cookies(admin)
-        .json({ classroomId: body(classroom).id, name })
-      alunos.push(body(student).id)
-    }
-
-    const dentro = await client
-      .put('/representative/enrollments')
-      .cookies(representante.session)
-      .json({ sportId: sport.id, studentIds: alunos.slice(0, 3) })
-    const acima = await client
-      .put('/representative/enrollments')
-      .cookies(representante.session)
-      .json({ sportId: sport.id, studentIds: alunos })
-
-    dentro.assertStatus(200)
-    assert.lengthOf(
-      body(dentro).students.filter((student: { sportIds: string[] }) =>
-        student.sportIds.includes(sport.id)
-      ),
-      3
-    )
-    acima.assertStatus(422)
-    assert.equal(body(acima).code, 'ENROLLMENT_LIMIT_EXCEEDED')
-  })
-})
 
 test.group('jogos > sorteio e placar', (group) => {
   group.each.setup(() => resetDatabase())

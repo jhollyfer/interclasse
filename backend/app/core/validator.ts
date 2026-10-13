@@ -281,7 +281,7 @@ export type SlugPayload = Infer<typeof SlugValidator>
  * O nome amigável de cada campo, na forma que cai bem depois de "Informe".
  *
  * É exportado, e não escrito direto na chamada abaixo, porque
- * `tests/functional/validator.spec.ts` precisa importá-lo pelo nome - sem
+ * `app/core/validator.spec.ts` precisa importá-lo pelo nome - sem
  * depender da ordem dos argumentos do `SimpleMessagesProvider`. Esse mesmo
  * teste cobra rótulo para todo campo dos validators e acusa rótulo órfão, então
  * campo novo em `#core/validator` nasce vermelho até entrar aqui.
@@ -347,7 +347,7 @@ export const FIELD_LABELS = {
  * A frase de cada regra de validação.
  *
  * É exportado pelo mesmo motivo de `FIELD_LABELS`:
- * `tests/functional/mensagens.spec.ts` precisa importá-lo pelo nome para cobrar
+ * `app/core/validator-messages.spec.ts` precisa importá-lo pelo nome para cobrar
  * que toda regra usada pelos validators tenha tradução e que nenhuma frase
  * tenha escapado em inglês.
  */

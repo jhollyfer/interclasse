@@ -138,7 +138,7 @@ const augmentation = {
  * exceção sai daqui no dia em que o registry casar rota por método.
  */
 const testes = {
-  files: ['tests/**/*.ts'],
+  files: ['tests/**/*.ts', '**/*.spec.ts'],
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
   },
