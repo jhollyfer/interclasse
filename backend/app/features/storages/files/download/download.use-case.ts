@@ -4,12 +4,10 @@ import logger from '@adonisjs/core/services/logger'
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import StorageService from '#services/storage/storage.service'
+import { StorageContract } from '#services/storage/storage-contract.service'
 import type { IdentifierPayload } from '#core/validator'
-import type { Merge } from '#core/entity'
-import type User from '#models/user'
 
-type Payload = Merge<IdentifierPayload, { actor: User }>
+type Payload = IdentifierPayload
 type Response = Either<HTTPException, string>
 
 /**
@@ -34,18 +32,13 @@ type Response = Either<HTTPException, string>
  */
 @inject()
 export default class StoragesFileDownloadUseCase {
-  constructor(private readonly storage: StorageService) {}
+  constructor(private readonly storage: StorageContract) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
       const storage = await Storage.query().where('id', payload.id).first()
 
       if (!storage)
-        return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
-
-      // A mesma resposta de arquivo inexistente: um 403 confirmaria a quem
-      // sondar que aquele uuid existe.
-      if (!(await this.storage.canDownload(storage, payload.actor)))
         return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
 
       return right(await this.storage.signedDownload(storage))

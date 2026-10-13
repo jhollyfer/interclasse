@@ -1,8 +1,6 @@
-import { afterFetch, afterFind, column, computed, scope } from '@adonisjs/lucid/orm'
-import drive from '@adonisjs/drive/services/main'
+import { column, computed, scope } from '@adonisjs/lucid/orm'
 
 import { StorageSchema } from '#database/schema'
-import { URL_TTL } from '#config/drive'
 import type { UploadStatus } from '#core/entity'
 
 /**
@@ -45,45 +43,17 @@ export default class Storage extends StorageSchema {
   declare size: number
 
   /**
-   * A `url` derivada de `path`, resolvida na leitura por hook.
-   *
-   * É hook e não getter porque `getUrl()` do FlyDrive é **assíncrono** e
-   * `serialize()` do Lucid é síncrono - sem isto a derivação teria que morar
-   * numa camada de serializer à parte, remontando a resposta à mão.
-   *
-   * Vale para toda leitura, inclusive `preload`: o preloader executa o query
-   * builder do model relacionado, que dispara `after:find` e `after:fetch` como
-   * qualquer consulta. Uma capa precarregada chega com `url` sem que o use-case
-   * peça.
-   *
-   * Assinada, e com prazo: o disco é privado, então nenhum endereço deste
-   * objeto autoriza sozinho. `getUrl` continua devolvendo um endereço - a doc
-   * do FlyDrive avisa que ele não confere existência nem visibilidade -, só que
-   * esse endereço responde 403. Quem serve a leitura é a assinatura.
-   *
-   * Não custa rede: o FlyDrive assina por `@aws-sdk/s3-request-presigner`, que
-   * calcula a SigV4 localmente. A URL vence em `URL_TTL`, e quem a guardar
-   * recebe 403 depois disso.
-   */
-  @afterFind()
-  static async resolveUrl(storage: Storage): Promise<void> {
-    storage.$extras.url = await drive.use().getSignedUrl(storage.path, { expiresIn: URL_TTL })
-  }
-
-  /** O mesmo para a leitura em lote - listagem, galeria e todo `preload`. */
-  @afterFetch()
-  static async resolveUrls(storages: Storage[]): Promise<void> {
-    await Promise.all(storages.map((storage) => Storage.resolveUrl(storage)))
-  }
-
-  /**
-   * O que o hook resolveu, exposto no JSON.
+   * A URL assinada, exposta no JSON. Quem a resolve a cada leitura é o hook
+   * registrado em `providers/storage.provider.ts`, que a deixa em `$extras`.
    *
    * `@computed` e não `@column` porque não existe coluna `url`: ela é derivada,
-   * e gravá-la seria congelar o endereço do bucket na linha.
+   * e gravá-la seria congelar o endereço do bucket na linha. Ausente (registro
+   * recém-criado, nunca lido), a chave some do JSON.
    */
   @computed()
-  get url(): string {
-    return this.$extras.url
+  get url(): string | undefined {
+    const url: unknown = this.$extras.url
+    if (typeof url === 'string') return url
+    return undefined
   }
 }

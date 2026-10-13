@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import type { ApiClient } from '@japa/api-client'
 
-import StorageService from '#services/storage/storage.service'
+import { StorageContract } from '#services/storage/storage-contract.service'
 import { type StorageMimetype } from '#core/validator'
 import {
   authenticateAsAdministrator,
@@ -155,7 +155,7 @@ test.group('storages > download', (group) => {
  */
 test.group('storages > contentDisposition', () => {
   test('mantém o acento na versão UTF-8 e o remove na ASCII', async ({ assert }) => {
-    const service = await app.container.make(StorageService)
+    const service = await app.container.make(StorageContract)
 
     const header = service.contentDisposition('Relatório Anual.pdf')
 
@@ -164,7 +164,7 @@ test.group('storages > contentDisposition', () => {
   })
 
   test('neutraliza aspas, que escapariam do header', async ({ assert }) => {
-    const service = await app.container.make(StorageService)
+    const service = await app.container.make(StorageContract)
 
     const header = service.contentDisposition('nota "final".pdf')
 

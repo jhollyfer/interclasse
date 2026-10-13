@@ -4,11 +4,12 @@ import db from '@adonisjs/lucid/services/db'
 import drive from '@adonisjs/drive/services/main'
 
 import Storage from '#models/storage'
-import type User from '#models/user'
+import { StorageContract, type StorageMetadata } from '#services/storage/storage-contract.service'
+import { URL_TTL } from '#config/drive'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { STORAGE_EXTENSIONS, type StorageMimetype } from '#core/validator'
-import { STAFF_USER_ROLES, UploadStatuses } from '#core/entity'
+import { UploadStatuses } from '#core/entity'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
@@ -16,19 +17,12 @@ import { STAFF_USER_ROLES, UploadStatuses } from '#core/entity'
  *
  * Uma lista só de objetos, e não listas casadas por índice: com duas, uma
  * inserção no meio de uma delas troca o rótulo de todas as seguintes, e o
- * compilador não tem como perceber. É também onde `owner` fica pendurado, e com
- * listas paralelas não haveria onde.
- *
- * `owner` é a coluna que carrega o id da pessoa de quem é a linha. Só o avatar
- * tem: o resto, quando houver, é acervo da organização, que não pertence a uma conta. Ausente
- * quer dizer que só quem opera o painel baixa o arquivo.
+ * compilador não tem como perceber.
  *
  * `db.from` para todas, inclusive as que têm model: o que se pergunta é a
  * contagem de uma coluna, e o model não acrescenta nada a isso.
  */
-const REFERENCES = [
-  { table: 'users', column: 'avatar_id', label: 'avatar de usuário', owner: 'id' },
-] as const
+const REFERENCES = [{ table: 'users', column: 'avatar_id', label: 'avatar de usuário' }] as const
 
 /**
  * Tudo que envolve arquivo: a chave sob a qual ele vive no bucket, o que o
@@ -41,7 +35,7 @@ const REFERENCES = [
  * O binário **não** passa por aqui: ele vai do navegador direto ao
  * bucket por URL assinada. O que atravessa esta camada é metadado.
  */
-export default class StorageService {
+export default class StorageService extends StorageContract {
   /**
    * A chave sob a qual o objeto vai viver no bucket.
    *
@@ -65,8 +59,18 @@ export default class StorageService {
    * É com isto que a confirmação do upload confere o que **de fato** subiu
    * contra o que o cliente declarou ao pedir as URLs.
    */
-  async metadata(storage: Storage) {
+  async metadata(storage: Storage): Promise<StorageMetadata> {
     return drive.use().getMetaData(storage.path)
+  }
+
+  /**
+   * A URL assinada de leitura, com prazo: o disco é privado, então nenhum
+   * endereço do registro autoriza sozinho. Não custa rede: o FlyDrive assina por
+   * `@aws-sdk/s3-request-presigner`, que calcula a SigV4 localmente. Vence em
+   * `URL_TTL`, e quem a guardar recebe 403 depois disso.
+   */
+  async signedUrl(storage: Storage): Promise<string> {
+    return drive.use().getSignedUrl(storage.path, { expiresIn: URL_TTL })
   }
 
   /** Apaga só o binário, deixando a linha. Usado quando a confirmação recusa. */
@@ -104,37 +108,6 @@ export default class StorageService {
     )
 
     return counts.filter((count) => count.total > 0).map((count) => count.label)
-  }
-
-  /**
-   * Quem pode baixar um arquivo pela rota de download.
-   *
-   * A rota existe porque o atributo `download` de um `<a>` é ignorado entre
-   * origens; ela não é um caminho alternativo de leitura, e por isso não repete
-   * a regra do site. O que o site mostra sai por `url` assinada, derivada na
-   * leitura do recurso que a contém - e quem chega àquele recurso já passou
-   * pela autorização dele.
-   *
-   * O administrador baixa tudo. Conselheiro e representante estão fora de
-   * `STAFF_USER_ROLES` e caem na segunda regra, onde só alcançam a própria
-   * linha - fechado por omissão, não por alguém lembrar de vir aqui.
-   */
-  async canDownload(storage: Storage, actor: User): Promise<boolean> {
-    if (STAFF_USER_ROLES.includes(actor.role)) return true
-
-    for (const reference of REFERENCES) {
-      if (!('owner' in reference)) continue
-
-      const rows = await db
-        .from(reference.table)
-        .where(reference.column, storage.id)
-        .where(reference.owner, actor.id)
-        .count('* as total')
-
-      if (Number(rows[0]?.total ?? 0) > 0) return true
-    }
-
-    return false
   }
 
   /**
@@ -211,7 +184,10 @@ export default class StorageService {
    * íntegro - anexá-la publicaria uma notícia cuja capa ainda está a meio
    * caminho, e a tela mostraria um 404.
    */
-  async assertExist(field: string, storageIds: string[]): Promise<Either<HTTPException, string[]>> {
+  async assertExist(
+    field: string,
+    storageIds: ReadonlyArray<string>,
+  ): Promise<Either<HTTPException, string[]>> {
     const ids = [...new Set(storageIds)]
 
     if (ids.length === 0) return right(ids)

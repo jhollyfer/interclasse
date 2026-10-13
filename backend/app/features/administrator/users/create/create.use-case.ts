@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
-import StorageService from '#services/storage/storage.service'
+import { StorageContract } from '#services/storage/storage-contract.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
@@ -21,7 +21,7 @@ type Response = Either<HTTPException, User>
  */
 @inject()
 export default class AdministratorUserCreateUseCase {
-  constructor(private readonly storage: StorageService) {}
+  constructor(private readonly storage: StorageContract) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {

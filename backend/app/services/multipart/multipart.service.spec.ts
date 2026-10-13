@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
 
-import MultipartService from '#services/multipart/multipart.service'
+import { MultipartContract } from '#services/multipart/multipart-contract.service'
 
 /**
  * O multipart contra o bucket de verdade (o MinIO do `docker-compose.yml`).
@@ -49,7 +49,7 @@ function item<T>(list: ReadonlyArray<T>, index: number): T {
 
 test.group('multipart', () => {
   test('sobe em partes, remonta, e o objeto final tem a soma dos tamanhos', async ({ assert }) => {
-    const multipart = await app.container.make(MultipartService)
+    const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
@@ -86,7 +86,7 @@ test.group('multipart', () => {
   })
 
   test('listParts enxerga só o que subiu, e é isso que a retomada usa', async ({ assert }) => {
-    const multipart = await app.container.make(MultipartService)
+    const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
@@ -105,7 +105,7 @@ test.group('multipart', () => {
   })
 
   test('abort descarta as partes, e nada fica ocupando o bucket', async ({ assert }) => {
-    const multipart = await app.container.make(MultipartService)
+    const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
@@ -121,7 +121,7 @@ test.group('multipart', () => {
   })
 
   test('URL assinada para de valer depois de expirar', async ({ assert }) => {
-    const multipart = await app.container.make(MultipartService)
+    const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')

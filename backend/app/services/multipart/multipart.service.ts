@@ -11,39 +11,11 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 import { bucket } from '#config/drive'
-
-/** Uma parte que o cliente ainda vai enviar, e o endereço para onde enviá-la. */
-export type PresignedPart = {
-  partNumber: number
-  url: string
-}
-
-/** Uma parte que o bucket já recebeu. O `etag` é o que o `complete` exige. */
-export type UploadedPart = {
-  partNumber: number
-  size: number
-  etag: string
-}
-
-/**
- * O tamanho de cada parte, em bytes.
- *
- * 10 MB e não 5 MB, que é o mínimo do S3: com o dobro do tamanho são metade das
- * partes, metade das conexões e metade das URLs para assinar. O teto de 10.000
- * partes por upload vira um teto de 100 GB por arquivo, folgado para o
- * `UPLOAD_MAX_SIZE` de 1 GiB.
- */
-export const PART_SIZE = 10 * 1024 * 1024
-
-/**
- * Quantas URLs saem numa resposta só.
- *
- * Um arquivo grande tem partes demais para assinar tudo de uma vez: cada URL
- * assinada tem uns 500 bytes, e mil delas seriam meio megabyte de JSON para
- * entregar antes do primeiro byte de arquivo subir. O cliente pede o próximo
- * lote em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.
- */
-export const PRESIGNED_BATCH = 100
+import {
+  MultipartContract,
+  type PresignedPart,
+  type UploadedPart,
+} from '#services/multipart/multipart-contract.service'
 
 /**
  * Por quanto tempo uma URL assinada vale, em segundos.
@@ -53,32 +25,6 @@ export const PRESIGNED_BATCH = 100
  * para as partes que faltam.
  */
 const URL_EXPIRES_IN = 60 * 60
-
-/** Em quantas partes um arquivo deste tamanho é fatiado. Nunca menos que uma. */
-export function countParts(size: number, partSize: number): number {
-  return Math.max(1, Math.ceil(size / partSize))
-}
-
-/**
- * Os números das partes que ainda faltam, no máximo um lote.
- *
- * É o que serve tanto ao começo (`uploaded` vazio, devolve `[1, 2, 3, …]`)
- * quanto à retomada (devolve o buraco). O corte em `PRESIGNED_BATCH` é o que
- * impede um arquivo grande de virar meio megabyte de URLs numa resposta só.
- */
-export function pendingParts(totalParts: number, uploaded: Array<number>): Array<number> {
-  const received = new Set(uploaded)
-  const pending: Array<number> = []
-
-  for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
-    if (received.has(partNumber)) continue
-    if (pending.length === PRESIGNED_BATCH) break
-
-    pending.push(partNumber)
-  }
-
-  return pending
-}
 
 /**
  * O multipart do S3, que o FlyDrive não expõe.
@@ -99,8 +45,10 @@ export function pendingParts(totalParts: number, uploaded: Array<number>): Array
  * simular uma falha do storage sem mexer no ambiente do processo.
  */
 @inject()
-export default class MultipartService {
-  constructor(private readonly client: S3Client) {}
+export default class MultipartService extends MultipartContract {
+  constructor(private readonly client: S3Client) {
+    super()
+  }
 
   /**
    * Abre um upload em partes e devolve o `UploadId` que identifica a conversa.

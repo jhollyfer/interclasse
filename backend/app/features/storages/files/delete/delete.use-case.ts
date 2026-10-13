@@ -4,8 +4,8 @@ import logger from '@adonisjs/core/services/logger'
 import Storage from '#models/storage'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import StorageService from '#services/storage/storage.service'
-import MultipartService from '#services/multipart/multipart.service'
+import { StorageContract } from '#services/storage/storage-contract.service'
+import { MultipartContract } from '#services/multipart/multipart-contract.service'
 import { UploadStatuses } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -34,8 +34,8 @@ type Response = Either<HTTPException, null>
 @inject()
 export default class StoragesFileDeleteUseCase {
   constructor(
-    private readonly storage: StorageService,
-    private readonly multipart: MultipartService,
+    private readonly storage: StorageContract,
+    private readonly multipart: MultipartContract,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
