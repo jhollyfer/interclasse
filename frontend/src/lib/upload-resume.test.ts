@@ -29,7 +29,7 @@ function withStorage() {
 }
 
 function fileOf(name: string, size: number, lastModified: number): File {
-  return { name, size, lastModified } as unknown as File
+  return new File([new Uint8Array(size)], name, { lastModified })
 }
 
 const FILE = fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)

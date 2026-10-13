@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fromPartial } from '@total-typescript/shoehorn'
 import { toast } from 'sonner'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
@@ -18,7 +19,7 @@ function formStub() {
 
   return {
     setError,
-    form: { setError } as unknown as UseFormReturn<FormValues & FieldValues>,
+    form: fromPartial<UseFormReturn<FormValues & FieldValues>>({ setError }),
   }
 }
 
