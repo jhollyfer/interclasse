@@ -181,7 +181,7 @@ type Rule = {
 
 const RULES: Rule[] = [
   {
-    name: 'policy-fora-do-bouncer',
+    name: 'policy-outside-bouncer',
     section: '4.6',
     // A policy e checada pelo controller com `ctx.bouncer.with(Policy)`; o caso
     // de uso recebe o registro ja autorizado e nao conhece policy nenhuma.
@@ -191,7 +191,7 @@ const RULES: Rule[] = [
       'policy nao entra no caso de uso: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
   },
   {
-    name: 'policy-injetada',
+    name: 'injected-policy',
     section: '4.6',
     scope: /app\/(?:features|services|middleware)\//,
     pattern: /\bprivate\s+readonly\s+\w+\s*:\s*\w+Policy\b/,
@@ -199,7 +199,7 @@ const RULES: Rule[] = [
       'policy nao se injeta nem se chama direto; o unico caminho e `ctx.bouncer` (authorize/allows/denies/execute)',
   },
   {
-    name: 'vine-fora-do-core',
+    name: 'vine-outside-core',
     section: '4.4',
     // O `vine` configurado (mensagens pt-BR, transform de data) sai de
     // `#core/validator`; importar a lib direto pula essa configuracao.
@@ -208,7 +208,7 @@ const RULES: Rule[] = [
     message: 'importe `vine` (e `Infer`) de `#core/validator`, nunca de `@vinejs/vine`',
   },
   {
-    name: 'validator-fora-do-recurso',
+    name: 'validator-outside-resource',
     section: '4.4',
     // `app/core/` fica de fora: `response.ts` declara em VineJS o contrato de
     // resposta que nao deriva de model, e isso nao e validator de entrada.
@@ -218,42 +218,42 @@ const RULES: Rule[] = [
       'validator mora em `app/features/<modulo>/<recurso>/<recurso>.validator.ts` (ou e global em `app/core/validator.ts`)',
   },
   {
-    name: 'serializer-de-contexto',
+    name: 'context-serializer',
     section: '4.5',
     pattern: /\b(?:ctx|context)\.serialize\b/,
     message:
       '`context.serialize` foi removido junto com o `api_provider`; o envelope e `{ meta, data }` montado no caso de uso',
   },
   {
-    name: 'paginacao-constante-local',
+    name: 'local-pagination-constant',
     section: '4.5',
     scope: /app\/features\//,
     pattern: /^\s*const\s+(?:PAGE|PER_PAGE)\s*=/m,
     message: 'default de paginacao nao se redeclara por caso de uso',
   },
   {
-    name: 'actor-como-id',
+    name: 'actor-as-id',
     section: '4.3',
     scope: /\.use-case\.ts$/,
     pattern: /\bactor\s*:\s*string\b/,
     message: '`actor` e o objeto `User`, nao o id — a policy recebe (actor, target)',
   },
   {
-    name: 'throw-em-use-case',
+    name: 'throw-in-use-case',
     section: '4.2',
     scope: /\.use-case\.ts$/,
     pattern: /^(?!.*\/\/).*?\bthrow\s+HTTPException\./m,
     message: 'falha de negocio e `left(HTTPException...)`, nunca `throw`',
   },
   {
-    name: 'core-importa-camada-acima',
+    name: 'core-imports-upper-layer',
     section: '1.3',
     scope: /app\/core\//,
     pattern: /from\s+'#(?:features|services)\//,
     message: '`app/core/` nao importa de features nem de services',
   },
   {
-    name: 'service-importa-feature',
+    name: 'service-imports-feature',
     section: '1.3',
     scope: /app\/services\//,
     // `#features/_shared.<tema>` fica de fora: e o lugar declarado da funcao pura
@@ -320,7 +320,7 @@ function checkClassName(relativePath: string, source: string): Finding[] {
     {
       file: relativePath,
       line: lineOf(clean, declaration.index),
-      rule: 'nome-de-classe',
+      rule: 'class-name',
       section: '3',
       message: `classe \`${name}\` deveria ser \`${accepted.join('` ou `')}\`, derivado do caminho`,
     },
@@ -344,7 +344,7 @@ function checkActionFolder(relativePath: string): Finding[] {
     {
       file: relativePath,
       line: 1,
-      rule: 'acao-fora-de-pasta',
+      rule: 'action-outside-folder',
       section: 'arquitetura 3',
       message: `mova para \`${dirname(relativePath)}/${match[1]}/${basename(relativePath)}\``,
     },
@@ -402,7 +402,7 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
     findings.push({
       file: relativePath,
       line: lineOf(clean, exported.index),
-      rule: 'validator-sem-recurso',
+      rule: 'validator-without-resource',
       section: '4.4',
       message: `\`${name}\` deveria ser \`${resource}<Acao>Validator\``,
     })
@@ -434,7 +434,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
       findings.push({
         file: `../frontend/src/validators/${logical}`,
         line: 1,
-        rule: 'validator-sem-espelho',
+        rule: 'validator-without-mirror',
         section: 'arquitetura 4',
         message: `nao ha \`${mirror}\` no backend`,
       })
@@ -446,7 +446,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
       findings.push({
         file: `../frontend/src/validators/${logical}`,
         line: lineOf(frontSource, exported.index),
-        rule: 'validator-sem-espelho',
+        rule: 'validator-without-mirror',
         section: 'arquitetura 4',
         message: `\`${name}\` nao existe em \`${mirror}\``,
       })
@@ -507,7 +507,7 @@ async function checkEnv(files: string[]): Promise<Finding[]> {
         findings.push({
           file: relativePath,
           line: lineOf(clean, match.index),
-          rule: 'env-sem-schema',
+          rule: 'env-without-schema',
           section: '6',
           message: `\`${key}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
         })
@@ -522,7 +522,7 @@ async function checkEnv(files: string[]): Promise<Finding[]> {
     findings.push({
       file: 'start/env.ts',
       line: lineOf(cleanSchema, cleanSchema.indexOf(key)),
-      rule: 'env-sem-leitor',
+      rule: 'env-without-reader',
       section: '6',
       message: `\`${key}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envForaDoLeitor\` com o motivo`,
     })
@@ -540,7 +540,7 @@ async function checkDirectories(): Promise<Finding[]> {
       findings.push({
         file: dir,
         line: 1,
-        rule: 'diretorio-obrigatorio',
+        rule: 'required-directory',
         section: '1.1',
         message: 'diretorio transversal nasce presente, mesmo vazio',
       })
@@ -596,7 +596,7 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
     findings.push({
       file: 'scripts/pattern-check.config.json',
       line: 1,
-      rule: 'allowlist-de-new-sem-uso',
+      rule: 'unused-new-allowlist-entry',
       section: '2.1',
       message: `\`newAllowlist\` isenta \`new ${entry.symbol}\` em \`${entry.file}\`, e nao ha esse uso; tire a entrada ou corrija o caminho`,
     })
@@ -635,7 +635,7 @@ async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]>
     findings.push({
       file: relativePath,
       line: lineOf(source, match.index),
-      rule: 'soft-delete-sem-scope',
+      rule: 'soft-delete-without-scope',
       section: '4.8',
       message:
         'troque por `withScopes((scopes) => scopes.notDeleted())`; se a consulta e sobre `LucidModel` generico, nomeie o arquivo em `softDeleteExempt`',
@@ -675,7 +675,7 @@ async function checkShape(): Promise<Finding[]> {
     findings.push({
       file: 'scripts/pattern-check.config.json',
       line: 1,
-      rule: 'forma-ausente',
+      rule: 'missing-shape',
       section: '5',
       message: `\`${filePath}\` e FORMA no config e nao existe aqui; crie o arquivo ou tire o caminho de \`shape\``,
     })
@@ -713,7 +713,7 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
     findings.push({
       file: relativePath,
       line: lineOf(clean, execute.index),
-      rule: 'use-case-sem-payload',
+      rule: 'use-case-without-payload',
       section: '4.2',
       message:
         'declare `type Payload` no topo e use-o na assinatura; o tipo do validator direto nao tem onde receber `actor`',
@@ -726,7 +726,7 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
     findings.push({
       file: relativePath,
       line: 1,
-      rule: 'use-case-sem-response',
+      rule: 'use-case-without-response',
       section: '4.2',
       message: 'declare `type Response = Either<HTTPException, T>` no topo',
     })
@@ -777,7 +777,7 @@ async function checkRoute(files: string[]): Promise<Finding[]> {
     findings.push({
       file: relativePath,
       line: 1,
-      rule: 'controller-sem-rota',
+      rule: 'controller-without-route',
       section: '1.2',
       message: `nenhuma rota referencia \`${key}\`; registre a rota ou apague o arquivo e o caso de uso irmao`,
     })
