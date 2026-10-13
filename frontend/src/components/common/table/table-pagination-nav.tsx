@@ -84,7 +84,7 @@ export function Pagination<TSearch extends ListSearch>({
           id={perPageId}
           value={String(meta.perPage)}
           onValueChange={(perPage) =>
-            navigate({
+            void navigate({
               to,
               search: { ...search, perPage: Number(perPage), page: undefined },
             })

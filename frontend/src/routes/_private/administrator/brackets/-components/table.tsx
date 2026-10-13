@@ -2,8 +2,6 @@ import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { bracketColumns } from './columns'
-import { DrawDialog } from './draw-dialog'
 import {
   Table,
   TableActions,
@@ -19,6 +17,9 @@ import {
   useTable,
 } from '#/components/common/table'
 import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+
+import { bracketColumns } from './columns'
+import { DrawDialog } from './draw-dialog'
 
 const route = getRouteApi('/_private/administrator/brackets/')
 

@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { toast } from 'sonner'
 
-import { ImageFieldProvider } from './image-field-context'
-
 import { Field } from '#/components/ui/field'
 import {
   useStorageCreate,
@@ -11,6 +9,8 @@ import {
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/entity'
 import type { StorageMimetype } from '#/lib/entity'
+
+import { ImageFieldProvider } from './image-field-context'
 
 type ImageFieldProps = {
   /** O `id` do anexo atual, ou `null`. É o que vai no payload. */

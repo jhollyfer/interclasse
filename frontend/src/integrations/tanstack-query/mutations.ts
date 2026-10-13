@@ -21,9 +21,7 @@ import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import type { UseMutationOptions } from '@tanstack/react-query'
 
-import { request, send } from './http'
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
-import type { HTTPError } from './http'
 import type {
   Announcement,
   Bracket,
@@ -62,6 +60,9 @@ import type { SessionSignInPayload } from '#/validators/authentication/sessions.
 import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 import type { EnrollmentBoard } from '#/integrations/response'
 import type { Merge } from '#/lib/interfaces'
+
+import type { HTTPError } from './http'
+import { request, send } from './http'
 
 // ---------------------------------------------------------------------------
 // /account
@@ -319,23 +320,18 @@ export function useUserDelete(options?: MutationProps<void, string>) {
 export function useClassroomCreate(
   options?: MutationProps<Classroom, ClassroomCreatePayload>,
 ) {
-  return useMutation<Classroom, HTTPError, ClassroomCreatePayload>(
-    {
-      ...options,
-      mutationFn: function (payload) {
-        return request<Classroom>('/administrator/classrooms', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        })
-      },
+  return useMutation<Classroom, HTTPError, ClassroomCreatePayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<Classroom>('/administrator/classrooms', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
     },
-  )
+  })
 }
 
-type ClassroomUpdateVariables = Merge<
-  ClassroomUpdatePayload,
-  { id: string }
->
+type ClassroomUpdateVariables = Merge<ClassroomUpdatePayload, { id: string }>
 
 export function useClassroomUpdate(
   options?: MutationProps<Classroom, ClassroomUpdateVariables>,
@@ -376,10 +372,7 @@ export function useSportCreate(
   })
 }
 
-type SportUpdateVariables = Merge<
-  SportUpdatePayload,
-  { id: string }
->
+type SportUpdateVariables = Merge<SportUpdatePayload, { id: string }>
 
 export function useSportUpdate(
   options?: MutationProps<Sport, SportUpdateVariables>,
@@ -409,11 +402,7 @@ export function useSportDelete(options?: MutationProps<void, string>) {
 export function useAnnouncementCreate(
   options?: MutationProps<Announcement, AnnouncementCreatePayload>,
 ) {
-  return useMutation<
-    Announcement,
-    HTTPError,
-    AnnouncementCreatePayload
-  >({
+  return useMutation<Announcement, HTTPError, AnnouncementCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<Announcement>('/administrator/announcements', {
@@ -485,10 +474,7 @@ export function useBracketDelete(options?: MutationProps<void, string>) {
   })
 }
 
-type MatchUpdateVariables = Merge<
-  MatchUpdatePayload,
-  { id: string }
->
+type MatchUpdateVariables = Merge<MatchUpdatePayload, { id: string }>
 
 /** A agenda: data, hora e local. */
 export function useMatchUpdate(

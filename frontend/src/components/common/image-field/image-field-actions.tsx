@@ -1,13 +1,13 @@
 import type * as React from 'react'
 import { TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react'
 
-import { useImageFieldContext } from './image-field-context'
-
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { FieldContent, FieldDescription } from '#/components/ui/field'
 import { Spinner } from '#/components/ui/spinner'
 import type { Merge } from '#/lib/interfaces'
+
+import { useImageFieldContext } from './image-field-context'
 
 /** A coluna à direita do preview: os botões e a descrição. */
 export function ImageFieldContent(

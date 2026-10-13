@@ -1,9 +1,10 @@
 import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 
-import { Empty } from './section'
 import { BRACKET_STATUS_LABELS, CATEGORY_LABELS } from '#/lib/labels'
 import type { Bracket } from '#/lib/validator'
+
+import { Empty } from './section'
 
 /**
  * As chaves por modalidade: uma linha por esporte, com as categorias

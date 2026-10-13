@@ -5,18 +5,15 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-
 import { ThemeProvider } from 'next-themes'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import type { QueryClient } from '@tanstack/react-query'
 
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
 import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/site'
 
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'
-
-import type { QueryClient } from '@tanstack/react-query'
 
 /** O idioma do documento: o site é só em português. */
 const LOCALE = 'pt-BR'

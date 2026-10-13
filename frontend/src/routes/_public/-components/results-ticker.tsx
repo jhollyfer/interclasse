@@ -1,7 +1,8 @@
 import type * as React from 'react'
 
-import { phaseLabel } from './match-row'
 import type { Match } from '#/lib/validator'
+
+import { phaseLabel } from './match-row'
 
 /**
  * A faixa amarela de resultados, a marca do site anterior.

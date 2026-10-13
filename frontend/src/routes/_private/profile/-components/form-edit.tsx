@@ -127,14 +127,14 @@ export function ProfileFormEdit(): React.JSX.Element {
       // só a faria descobrir isso no próximo 401.
       if (payload.email !== account.email || payload.password) {
         toast.success('Acesso atualizado. Entre de novo.')
-        router.navigate({ to: '/authentication' })
+        await router.navigate({ to: '/authentication' })
         return
       }
 
       // Volta para a ficha, e não para o painel: quem salvou veio de lá, e é lá
       // que o nome e o e-mail novos aparecem para conferência.
       toast.success(`${updated.name} salvo.`)
-      router.navigate({ to: '/profile' })
+      await router.navigate({ to: '/profile' })
     },
   })
 
@@ -174,7 +174,9 @@ export function ProfileFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent
+        onSubmit={(event) => void form.handleSubmit(onValid)(event)}
+      >
         <FormShellCard>
           <FieldSet>
             <FieldLegend>Identidade</FieldLegend>

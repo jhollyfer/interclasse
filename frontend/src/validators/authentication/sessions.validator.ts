@@ -9,6 +9,4 @@ export const SessionSignInValidator = vine.create({
   password: vine.string().maxLength(128),
 })
 
-export type SessionSignInPayload = Infer<
-  typeof SessionSignInValidator
->
+export type SessionSignInPayload = Infer<typeof SessionSignInValidator>

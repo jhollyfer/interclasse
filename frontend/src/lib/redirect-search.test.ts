@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { validateRedirectSearch } from './redirect-search'
 
 test('aceita caminho interno', () => {

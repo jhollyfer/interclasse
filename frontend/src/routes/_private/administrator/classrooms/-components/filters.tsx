@@ -21,7 +21,7 @@ export function ClassroomFilters({
       value={search.category ?? ''}
       clearable
       onValueChange={(value) =>
-        navigate({
+        void navigate({
           to: '/administrator/classrooms',
           search: { ...search, category: value || undefined, page: undefined },
         })

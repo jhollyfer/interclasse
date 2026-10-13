@@ -13,8 +13,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { SPORT_FIELDS, SportFormFields } from './form-fields'
-import type { SportFormType } from './form-fields'
 import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { Sport } from '#/lib/validator'
 import type { SportUpdatePayload } from '#/validators/administrator/sports.validator'
@@ -24,6 +22,9 @@ import { useSportUpdate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { SportFormType } from './form-fields'
+import { SPORT_FIELDS, SportFormFields } from './form-fields'
+
 const route = getRouteApi('/_private/administrator/sports/$id/edit')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
@@ -31,7 +32,7 @@ export function SportFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: sport } = useSuspenseQuery(sportQueryOptions(id))
 
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     SportFormType,
     Sport,
     Merge<SportUpdatePayload, { id: string }>
@@ -64,7 +65,7 @@ export function SportFormEdit(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <SportFormFields form={form} idPrefix="edit-sport" />

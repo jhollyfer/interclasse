@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { breadcrumbTitle, buildBreadcrumbs } from './breadcrumbs'
 
 test('rotula os segmentos fixos e não linka a página atual', () => {

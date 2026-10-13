@@ -2,9 +2,6 @@ import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { RowData } from '@tanstack/react-table'
 
-import { useTableContext } from './table-context'
-import type { TableInstance } from './use-table'
-
 import { Button } from '#/components/ui/button'
 import {
   Empty,
@@ -14,6 +11,9 @@ import {
 } from '#/components/ui/empty'
 import { cn } from '#/lib/utils'
 import { TrashedModes } from '#/lib/entity'
+
+import type { TableInstance } from './use-table'
+import { useTableContext } from './table-context'
 
 /**
  * Qual dos três vazios está na tela.
@@ -96,7 +96,7 @@ export function TableEmpty<TRow extends RowData>({
             <Button
               variant="outline"
               onClick={() =>
-                navigate({
+                void navigate({
                   to,
                   search: { ...search, search: undefined, page: undefined },
                 })

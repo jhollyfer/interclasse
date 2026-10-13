@@ -62,18 +62,20 @@ export function BulkArchive<TItem>({
 }: BulkArchiveProps<TItem>): React.JSX.Element {
   const queryClient = useQueryClient()
 
+  async function confirm(): Promise<void> {
+    const outcome = await runBulk(items, action)
+
+    // O aviso primeiro: `invalidateQueries` só resolve quando o refetch
+    // volta, e esperá-lo aqui atrasaria o "7 de 9 arquivados" por uma ida
+    // ao servidor que ninguém está olhando.
+    toast.success(bulkMessage(outcome, verb), { id: 'bulk-archive' })
+
+    await queryClient.invalidateQueries({ queryKey })
+  }
+
   return (
     <ConfirmDialog
-      onConfirm={async () => {
-        const outcome = await runBulk(items, action)
-
-        // O aviso primeiro: `invalidateQueries` só resolve quando o refetch
-        // volta, e esperá-lo aqui atrasaria o "7 de 9 arquivados" por uma ida
-        // ao servidor que ninguém está olhando.
-        toast.success(bulkMessage(outcome, verb), { id: 'bulk-archive' })
-
-        await queryClient.invalidateQueries({ queryKey })
-      }}
+      onConfirm={() => void confirm()}
       trigger={
         <Button variant="outline">
           <ArchiveIcon />

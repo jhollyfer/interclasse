@@ -27,9 +27,5 @@ export const ClassroomUpdateValidator = vine.create({
   representativeId: vine.string().uuid().nullable().optional(),
 })
 
-export type ClassroomCreatePayload = Infer<
-  typeof ClassroomCreateValidator
->
-export type ClassroomUpdatePayload = Infer<
-  typeof ClassroomUpdateValidator
->
+export type ClassroomCreatePayload = Infer<typeof ClassroomCreateValidator>
+export type ClassroomUpdatePayload = Infer<typeof ClassroomUpdateValidator>

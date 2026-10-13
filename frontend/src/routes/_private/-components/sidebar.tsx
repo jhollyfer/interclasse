@@ -2,12 +2,6 @@ import type * as React from 'react'
 import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
 import { SignOutIcon } from '@phosphor-icons/react'
 
-import { menuFor } from './menu'
-import {
-  SignOutConfirm,
-  SignOutConfirmFooter,
-  SignOutConfirmHeader,
-} from './sign-out-confirm'
 import { BrandMark } from '#/components/common/brand-mark'
 import {
   Sidebar as Root,
@@ -21,6 +15,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '#/components/ui/sidebar'
+
+import { menuFor } from './menu'
+import {
+  SignOutConfirm,
+  SignOutConfirmFooter,
+  SignOutConfirmHeader,
+} from './sign-out-confirm'
 import type { MenuItem } from './menu'
 
 const privateRoute = getRouteApi('/_private')

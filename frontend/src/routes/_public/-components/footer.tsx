@@ -2,8 +2,9 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
 
-import { NAVIGATION } from './menu'
 import { BrandMark } from '#/components/common/brand-mark'
+
+import { NAVIGATION } from './menu'
 
 /** O Instagram da escola, como no site anterior. */
 const INSTAGRAM = 'https://instagram.com/cmei_cosme-jean'

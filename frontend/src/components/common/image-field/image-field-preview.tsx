@@ -1,10 +1,10 @@
 import type * as React from 'react'
 
-import { useImageFieldContext } from './image-field-context'
-
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { cn } from '#/lib/utils'
 import type { Merge } from '#/lib/interfaces'
+
+import { useImageFieldContext } from './image-field-context'
 
 type ImageFieldPreviewProps = Merge<
   React.ComponentProps<typeof Avatar>,

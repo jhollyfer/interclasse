@@ -15,14 +15,6 @@ import {
 import { FlexRender } from '@tanstack/react-table'
 import type { Cell, Header, RowData } from '@tanstack/react-table'
 
-import { TableDraggableHeader } from './table-draggable-header'
-import { TableMobileCards } from './table-mobile-cards'
-import { TableResizeHandle } from './table-resize-handle'
-import type { TableFeatures, TableInstance } from './use-table'
-
-// As primitivas do catálogo entram apelidadas: os nomes crus (`Table`,
-// `TableHeader`, `TableBody`) são os do compound desta pasta, e é o compound
-// que os consumidores importam.
 import {
   Table as TableRoot,
   TableBody as BodyRoot,
@@ -32,6 +24,15 @@ import {
   TableRow as RowRoot,
 } from '#/components/ui/table'
 import { cn } from '#/lib/utils'
+
+import { TableDraggableHeader } from './table-draggable-header'
+import { TableMobileCards } from './table-mobile-cards'
+import { TableResizeHandle } from './table-resize-handle'
+import type { TableFeatures, TableInstance } from './use-table'
+
+// As primitivas do catálogo entram apelidadas: os nomes crus (`Table`,
+// `TableHeader`, `TableBody`) são os do compound desta pasta, e é o compound
+// que os consumidores importam.
 
 type TableGridProps<TRow extends RowData> = {
   table: TableInstance<TRow>

@@ -1,8 +1,6 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
-
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
-import { getContext } from './integrations/tanstack-query/query-context'
+
 import {
   NotFoundPage,
   NotFoundPageActions,
@@ -13,6 +11,9 @@ import {
 } from '#/components/common/not-found-page'
 import { Button } from '#/components/ui/button'
 import { HTTPError } from '#/integrations/tanstack-query/http'
+
+import { getContext } from './integrations/tanstack-query/query-context'
+import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
   const context = getContext()

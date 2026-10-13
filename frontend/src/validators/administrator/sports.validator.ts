@@ -19,9 +19,5 @@ export const SportUpdateValidator = vine.create({
   maxAthletes: athletes().optional(),
 })
 
-export type SportCreatePayload = Infer<
-  typeof SportCreateValidator
->
-export type SportUpdatePayload = Infer<
-  typeof SportUpdateValidator
->
+export type SportCreatePayload = Infer<typeof SportCreateValidator>
+export type SportUpdatePayload = Infer<typeof SportUpdateValidator>

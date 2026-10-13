@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 
 /**

@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { validateRedirectSearch } from '#/lib/redirect-search'
 import { SITE_TITLE } from '#/lib/site'

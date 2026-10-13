@@ -1,9 +1,9 @@
+import type * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { vineResolver } from '@hookform/resolvers/vine'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-
 import type {
   DefaultValues,
   FieldPath,
@@ -16,8 +16,8 @@ import type {
   UseMutationResult,
 } from '@tanstack/react-query'
 import type { LinkProps } from '@tanstack/react-router'
-import type { HTTPError } from '#/integrations/tanstack-query/http'
 
+import type { HTTPError } from '#/integrations/tanstack-query/http'
 import { applyMutationError } from '#/lib/form-errors'
 
 /**
@@ -90,6 +90,11 @@ type UseResourceFormReturn<TValues extends FieldValues, TRecord, TPayload> = {
   form: UseFormReturn<TValues>
   mutation: UseMutationResult<TRecord, HTTPError, TPayload>
   onValid: (values: TValues) => void
+  /**
+   * O `onSubmit` do `<form>`, pronto: `handleSubmit(onValid)` devolve promessa,
+   * e o atributo do JSX espera `void`.
+   */
+  onSubmit: (event?: React.BaseSyntheticEvent) => void
   /** As quatro props do `FormShell`, prontas para espalhar. */
   shell: {
     formId: string
@@ -181,7 +186,7 @@ export function useResourceForm<
       if (typeof success === 'string') toast.success(success)
       else toast.success(success(record))
 
-      router.navigate({ to: backTo, params: backParams })
+      await router.navigate({ to: backTo, params: backParams })
     },
   })
 
@@ -193,10 +198,15 @@ export function useResourceForm<
     mutation.mutate(toPayload(submitted))
   }
 
+  function onSubmit(event?: React.BaseSyntheticEvent): void {
+    void form.handleSubmit(onValid)(event)
+  }
+
   return {
     form,
     mutation,
     onValid,
+    onSubmit,
     shell: { formId, backTo, backParams, isPending: mutation.isPending },
   }
 }

@@ -11,12 +11,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import {
-  ANNOUNCEMENT_FIELDS,
-  ANNOUNCEMENT_FORM_DEFAULTS,
-  AnnouncementFormFields,
-} from './form-fields'
-import type { AnnouncementFormType } from './form-fields'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
 import type { Announcement } from '#/lib/validator'
 import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
@@ -24,8 +18,15 @@ import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 
+import type { AnnouncementFormType } from './form-fields'
+import {
+  ANNOUNCEMENT_FIELDS,
+  ANNOUNCEMENT_FORM_DEFAULTS,
+  AnnouncementFormFields,
+} from './form-fields'
+
 export function AnnouncementFormCreate(): React.JSX.Element {
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
     Announcement,
     AnnouncementCreatePayload
@@ -54,7 +55,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <AnnouncementFormFields form={form} idPrefix="announcement" />

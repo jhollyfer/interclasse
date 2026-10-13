@@ -2,9 +2,6 @@ import type * as React from 'react'
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
-import { Agenda } from '../-components/match-row'
-import { Pager } from '../-components/pager'
-import { Empty, Section } from '../-components/section'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
   storefrontMatchesQueryOptions,
@@ -12,6 +9,10 @@ import {
 } from '#/integrations/tanstack-query/queries'
 import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
+
+import { Empty, Section } from '../-components/section'
+import { Pager } from '../-components/pager'
+import { Agenda } from '../-components/match-row'
 
 export const Route = createLazyFileRoute('/_public/jogos/')({
   component: Games,

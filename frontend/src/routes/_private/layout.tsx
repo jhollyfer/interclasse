@@ -1,8 +1,6 @@
 import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
-import { Header } from './-components/header'
-import { Sidebar } from './-components/sidebar'
 import { UploadingProvider } from '#/components/common/uploading-context'
 import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
@@ -10,6 +8,9 @@ import { Spinner } from '#/components/ui/spinner'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { SITE_TITLE } from '#/lib/site'
+
+import { Sidebar } from './-components/sidebar'
+import { Header } from './-components/header'
 
 /**
  * O portão do painel. Fica no layout, e não em cada tela, porque assim rota nova

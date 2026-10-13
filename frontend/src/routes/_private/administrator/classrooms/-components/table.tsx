@@ -2,9 +2,6 @@ import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { classroomColumns } from './columns'
-import { ClassroomFilters } from './filters'
-import { ClassroomRowActions } from './row-actions'
 import {
   Table,
   TableActions,
@@ -24,6 +21,10 @@ import {
   useTable,
 } from '#/components/common/table'
 import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries'
+
+import { classroomColumns } from './columns'
+import { ClassroomFilters } from './filters'
+import { ClassroomRowActions } from './row-actions'
 
 const route = getRouteApi('/_private/administrator/classrooms/')
 

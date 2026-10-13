@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { useConfirmDialogContext } from './confirm-dialog-context'
-
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -9,6 +7,8 @@ import {
 } from '#/components/ui/alert-dialog'
 import { Button } from '#/components/ui/button'
 import type { Merge } from '#/lib/interfaces'
+
+import { useConfirmDialogContext } from './confirm-dialog-context'
 
 /**
  * A linha de botões. Em telas estreitas ela empilha, com a saída por cima.

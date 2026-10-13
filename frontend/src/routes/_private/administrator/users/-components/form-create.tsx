@@ -1,3 +1,5 @@
+import type * as React from 'react'
+
 import {
   FormShell,
   FormShellActions,
@@ -8,18 +10,17 @@ import {
   FormShellSubmit,
   FormShellTitle,
 } from '#/components/common/form-shell'
-import type * as React from 'react'
-
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
-import type { UserFormType } from './form-fields'
 import { UserCreateValidator } from '#/validators/administrator/users.validator'
 import type { User } from '#/lib/validator'
 import type { UserCreatePayload } from '#/validators/administrator/users.validator'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+
+import type { UserFormType } from './form-fields'
+import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
 
 const FORM_ID = 'user-create'
 
@@ -33,7 +34,7 @@ export function UserFormCreate(): React.JSX.Element {
   // Os três parâmetros explícitos, e não inferidos como no molde de
   // depoimento: `USER_FORM_DEFAULTS` é `DefaultValues<>`, que é um parcial
   // profundo, e o compilador não tem como voltar dele ao tipo do formulário.
-  const { form, onValid, shell } = useResourceForm<
+  const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     User,
     UserCreatePayload
@@ -65,7 +66,7 @@ export function UserFormCreate(): React.JSX.Element {
         </FormShellActions>
       </FormShellHeader>
 
-      <FormShellContent onSubmit={form.handleSubmit(onValid)}>
+      <FormShellContent onSubmit={onSubmit}>
         <Card>
           <CardContent>
             <FieldSet>

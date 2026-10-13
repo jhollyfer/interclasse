@@ -1,8 +1,8 @@
 import type { VariantProps } from 'class-variance-authority'
 
 import type { badgeVariants } from '#/components/ui/badge'
-import { SCHOOL_TIME_ZONE } from './site'
 
+import { SCHOOL_TIME_ZONE } from './site'
 import type {
   ActiveStatus,
   BracketStatus,

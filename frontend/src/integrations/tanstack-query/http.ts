@@ -8,8 +8,10 @@
  */
 
 import { createIsomorphicFn } from '@tanstack/react-start'
-import * as server from './http.server'
+
 import { env } from '#/env'
+
+import * as server from './http.server'
 
 /**
  * O corpo de erro que toda rota da API devolve. Espelha

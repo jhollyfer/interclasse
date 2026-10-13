@@ -4,11 +4,11 @@ import { CSS } from '@dnd-kit/utilities'
 import { DotsSixVerticalIcon } from '@phosphor-icons/react'
 import type { Header, RowData } from '@tanstack/react-table'
 
-import type { TableFeatures } from './use-table'
-
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
+
+import type { TableFeatures } from './use-table'
 
 type TableDraggableHeaderProps<TRow extends RowData> = {
   header: Header<TableFeatures, TRow, unknown>

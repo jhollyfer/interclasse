@@ -2,10 +2,11 @@ import type * as React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
+import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries'
+
 import { AnnouncementList } from '../-components/announcement-list'
 import { Section } from '../-components/section'
 import { Pager } from '../-components/pager'
-import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries'
 
 export const Route = createLazyFileRoute('/_public/avisos/')({
   component: Announcements,

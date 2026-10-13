@@ -26,7 +26,7 @@ export function CopyIdMenuItem({ id }: CopyIdMenuItemProps): React.JSX.Element {
   }
 
   return (
-    <DropdownMenuItem onClick={copy}>
+    <DropdownMenuItem onClick={() => void copy()}>
       <CopySimpleIcon />
       Copiar ID
     </DropdownMenuItem>

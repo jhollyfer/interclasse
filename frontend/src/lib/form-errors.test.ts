@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'sonner'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
-import { applyHTTPErrorToForm, applyMutationError } from './form-errors'
 import { HTTPError, HTTPErrorCode } from '#/integrations/tanstack-query/http'
+
+import { applyHTTPErrorToForm, applyMutationError } from './form-errors'
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
 
