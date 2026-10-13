@@ -99,8 +99,13 @@ function SportCard({
     [savedKey],
   )
   const [selected, setSelected] = React.useState(initial)
-
-  React.useEffect(() => setSelected(initial), [initial])
+  // Reset no render, e não `useEffect` espelhando a prop (`frontend.md` §2): a
+  // lista gravada mudou, o rascunho volta a ela antes de desenhar.
+  const [seenKey, setSeenKey] = React.useState(savedKey)
+  if (seenKey !== savedKey) {
+    setSeenKey(savedKey)
+    setSelected(initial)
+  }
 
   const over = selected.size > sport.maxAthletes
   const under = selected.size > 0 && selected.size < sport.minAthletes
