@@ -22,7 +22,7 @@ import {
   TableTrashToggle,
   useTable,
 } from '#/components/common/table'
-import { UserRoles } from '#/lib/entity'
+import { USER_ROLE } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
 
 import { UserBulkActions } from './bulk-actions'
@@ -39,7 +39,7 @@ export function UsersTable(): React.JSX.Element {
   // `/administrator/users` inteiro é de `ADMINISTRATOR`: quem chega aqui sem o
   // papel recebe `403` da própria listagem. A checagem fica porque o papel
   // pode mudar debaixo da sessão aberta; quem autoriza de verdade é o backend.
-  const canDelete = account.role === UserRoles.ADMINISTRATOR
+  const canDelete = account.role === USER_ROLE.ADMINISTRATOR
 
   // `useQuery` e não `useSuspenseQuery`: a listagem precisa de
   // `isPlaceholderData` e de `isError` para manter as linhas antigas na troca

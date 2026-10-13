@@ -4,7 +4,7 @@ import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/que
 import { validateStorefrontSearch } from '#/lib/list-search'
 import type { StorefrontSearch } from '#/lib/list-search'
 import type { Merge } from '#/lib/interfaces'
-import { SITE_TITLE } from '#/lib/site'
+import { SITE_TITLE } from '#/lib/constant'
 
 /** Os filtros da tabela de jogos vivem na URL: o link compartilhado abre o mesmo recorte. */
 type GamesSearch = Merge<

@@ -16,14 +16,14 @@ import {
 } from '#/components/ui/pagination'
 import { Field, FieldDescription, FieldLabel } from '#/components/ui/field'
 import { OptionCombobox } from '#/components/common/option-combobox'
-import type { PaginationMeta } from '#/integrations/response'
+import type { IPaginationMeta } from '#/lib/interfaces'
 import type { ListSearch } from '#/lib/list-search'
 
 /** As opções de itens por página. O teto do backend é 100 (`perPage.max(100)`). */
 const PER_PAGE_OPTIONS = ['10', '20', '30', '40', '50']
 
 type PaginationProps<TSearch extends ListSearch> = {
-  meta: PaginationMeta
+  meta: IPaginationMeta
   /** A rota desta listagem, para onde os links apontam. */
   to: string
   /**

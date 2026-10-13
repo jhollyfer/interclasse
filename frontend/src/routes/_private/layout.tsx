@@ -7,7 +7,7 @@ import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Spinner } from '#/components/ui/spinner'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
-import { SITE_TITLE } from '#/lib/site'
+import { SITE_TITLE } from '#/lib/constant'
 
 import { Sidebar } from './-components/sidebar'
 import { Header } from './-components/header'

@@ -1,10 +1,10 @@
 import type * as React from 'react'
 
 import { CATEGORY_SHORT_LABELS, MATCH_PHASE_LABELS } from '#/lib/labels'
-import { MatchStatuses } from '#/lib/entity'
-import { SCHOOL_TIME_ZONE } from '#/lib/site'
+import { MATCH_STATUS } from '#/lib/entity'
+import { SCHOOL_TIME_ZONE } from '#/lib/constant'
 import { cn } from '#/lib/utils'
-import type { Match } from '#/lib/validator'
+import type { IMatch } from '#/lib/interfaces'
 
 /*
  * Datas no fuso da escola, nunca no do navegador: o site renderiza no SSR, e a
@@ -42,25 +42,25 @@ export function formatWhen(value: string | null): string {
 }
 
 /** "Quartas", "Semifinal"... */
-export function phaseLabel(match: Pick<Match, 'phase'>): string {
+export function phaseLabel(match: Pick<IMatch, 'phase'>): string {
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
 /** O placar, ou o "x" de quem ainda não jogou. */
-export function scoreOf(match: Match): string {
-  if (match.status === MatchStatuses.FINISHED)
+export function scoreOf(match: IMatch): string {
+  if (match.status === MATCH_STATUS.FINISHED)
     return `${match.homeScore} x ${match.awayScore}`
 
   return 'x'
 }
 
-type Day = { key: string; label: string; matches: Array<Match> }
+type Day = { key: string; label: string; matches: Array<IMatch> }
 
 /**
  * A agenda em dias, na ordem em que a API devolveu. Jogo sem horário fica
  * num grupo próprio, no fim.
  */
-export function groupByDay(matches: ReadonlyArray<Match>): Array<Day> {
+export function groupByDay(matches: ReadonlyArray<IMatch>): Array<Day> {
   const days = new Map<string, Day>()
 
   for (const match of matches) {
@@ -86,8 +86,8 @@ export function groupByDay(matches: ReadonlyArray<Match>): Array<Day> {
  * modalidade e o local. Linha, e não cartão: a agenda é lida de cima para
  * baixo como a grade de um campeonato.
  */
-export function MatchRow({ match }: { match: Match }): React.JSX.Element {
-  const finished = match.status === MatchStatuses.FINISHED
+export function MatchRow({ match }: { match: IMatch }): React.JSX.Element {
+  const finished = match.status === MATCH_STATUS.FINISHED
   const bracket = match.bracket
 
   let time = '--:--'
@@ -132,7 +132,7 @@ export function MatchRow({ match }: { match: Match }): React.JSX.Element {
 export function Agenda({
   matches,
 }: {
-  matches: ReadonlyArray<Match>
+  matches: ReadonlyArray<IMatch>
 }): React.JSX.Element {
   return (
     <div className="flex flex-col gap-6">

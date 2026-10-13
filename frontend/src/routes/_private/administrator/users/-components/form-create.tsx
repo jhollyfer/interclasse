@@ -13,7 +13,7 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { UserCreateValidator } from '#/validators/administrator/users.validator'
-import type { User } from '#/lib/validator'
+import type { IUser } from '#/lib/interfaces'
 import type { UserCreatePayload } from '#/validators/administrator/users.validator'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -36,7 +36,7 @@ export function UserFormCreate(): React.JSX.Element {
   // profundo, e o compilador não tem como voltar dele ao tipo do formulário.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
-    User,
+    IUser,
     UserCreatePayload
   >({
     formId: FORM_ID,

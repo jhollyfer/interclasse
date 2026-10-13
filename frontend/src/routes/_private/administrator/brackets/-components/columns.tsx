@@ -8,10 +8,10 @@ import {
   CATEGORY_LABELS,
   formatDate,
 } from '#/lib/labels'
-import type { Bracket } from '#/lib/validator'
+import type { IBracket } from '#/lib/interfaces'
 
 /** Sem `sortKey`: a listagem de chaves não aceita `?sort`. */
-export const bracketColumns: TableColumns<Bracket> = [
+export const bracketColumns: TableColumns<IBracket> = [
   {
     id: 'sport',
     accessorFn: (row) => row.sport?.name ?? '',

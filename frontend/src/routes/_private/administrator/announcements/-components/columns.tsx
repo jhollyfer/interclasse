@@ -2,9 +2,9 @@ import { Badge } from '#/components/ui/badge'
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
 import { formatDate } from '#/lib/labels'
-import type { Announcement } from '#/lib/validator'
+import type { IAnnouncement } from '#/lib/interfaces'
 
-export const announcementColumns: TableColumns<Announcement> = [
+export const announcementColumns: TableColumns<IAnnouncement> = [
   {
     accessorKey: 'title',
     meta: { label: 'Título' },

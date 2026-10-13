@@ -37,7 +37,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries'
-import type { BracketMatch } from '#/integrations/response'
+import type { IBracketMatch } from '#/lib/interfaces'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
@@ -56,15 +56,15 @@ const SCORE_BUTTON: Record<string, 'default' | 'outline'> = {
 }
 
 /** Quem caiu fica apagado: no empate, é o que diz quem passou nos pênaltis. */
-function loserClass(match: BracketMatch, teamId: string | null): string {
+function loserClass(match: IBracketMatch, teamId: string | null): string {
   if (!match.winnerTeamId || !teamId || match.winnerTeamId === teamId) return ''
 
   return 'text-muted-foreground line-through decoration-1'
 }
 
 /** Agrupa as partidas pela ordem em que acontecem: uma seção por fase. */
-function bySection(matches: ReadonlyArray<BracketMatch>) {
-  const sections = new Map<string, BracketMatch[]>()
+function bySection(matches: ReadonlyArray<IBracketMatch>) {
+  const sections = new Map<string, IBracketMatch[]>()
   const ordered = [...matches].sort(
     (a, b) => a.round - b.round || a.position - b.position,
   )

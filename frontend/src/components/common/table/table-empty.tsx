@@ -10,7 +10,7 @@ import {
   EmptyTitle,
 } from '#/components/ui/empty'
 import { cn } from '#/lib/utils'
-import { TrashedModes } from '#/lib/entity'
+import { TRASHED_MODE } from '#/lib/entity'
 
 import type { TableInstance } from './use-table'
 import { useTableContext } from './table-context'
@@ -79,7 +79,7 @@ export function TableEmpty<TRow extends RowData>({
   // O filtro vence a lixeira: buscar dentro dela e não achar nada é problema do
   // termo, não da lixeira estar vazia.
   let variant: TableEmptyVariant = 'empty'
-  if (search.trashed === TrashedModes.ONLY) variant = 'trash'
+  if (search.trashed === TRASHED_MODE.ONLY) variant = 'trash'
   if (search.search) variant = 'filtered'
 
   const value = React.useMemo(() => ({ variant }), [variant])

@@ -25,10 +25,10 @@ import {
   useUserDelete,
   useUserUnarchive,
 } from '#/integrations/tanstack-query/mutations'
-import type { User } from '#/lib/validator'
+import type { IUser } from '#/lib/interfaces'
 
 type UserRowActionsProps = {
-  user: User
+  user: IUser
   /** Só administrador apaga de vez. Vem da rota, que tem a conta em contexto. */
   canDelete: boolean
   /**

@@ -136,7 +136,7 @@ function writeLayout(key: string | undefined, layout: PersistedLayout): void {
 }
 
 type UseTableOptions<TRow extends RowData> = {
-  rows: Array<TRow>
+  rows: ReadonlyArray<TRow>
   columns: TableColumns<TRow>
   getRowId: (row: TRow) => string
   /**

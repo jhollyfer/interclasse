@@ -3,7 +3,7 @@ import { missingParts, planParts } from '#/lib/chunking'
 import { putPart } from '#/lib/upload-transport'
 import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
 import { isStorageMimetype } from '#/lib/entity'
-import type { Storage, StorageUpload } from '#/lib/validator'
+import type { IStorage, IStorageUpload } from '#/lib/interfaces'
 
 /**
  * O upload de um arquivo, do começo ao fim, do lado do cliente.
@@ -38,7 +38,7 @@ export type UploadFile = (
   file: File,
   onProgress: (percent: number) => void,
   signal: AbortSignal,
-) => Promise<Storage>
+) => Promise<IStorage>
 
 export function useMultipartUpload({
   concurrency = 3,
@@ -47,7 +47,7 @@ export function useMultipartUpload({
     file: File,
     onProgress: (percent: number) => void,
     signal: AbortSignal,
-  ): Promise<Storage> {
+  ): Promise<IStorage> {
     const mimetype = file.type
 
     if (!isStorageMimetype(mimetype)) {
@@ -91,12 +91,12 @@ export function useMultipartUpload({
  * abandono -, e um `404` aqui não é erro: é só um upload que não existe mais, e
  * o certo é abrir outro.
  */
-async function open(file: File, mimetype: string): Promise<StorageUpload> {
+async function open(file: File, mimetype: string): Promise<IStorageUpload> {
   const saved = readResume(file)
 
   if (saved) {
     try {
-      return await request<StorageUpload>(`/storages/${saved.storageId}/parts`)
+      return await request<IStorageUpload>(`/storages/${saved.storageId}/parts`)
     } catch (error) {
       if (!(error instanceof HTTPError) || error.status !== 404) throw error
 
@@ -104,7 +104,7 @@ async function open(file: File, mimetype: string): Promise<StorageUpload> {
     }
   }
 
-  return request<StorageUpload>('/storages', {
+  return request<IStorageUpload>('/storages', {
     method: 'POST',
     body: JSON.stringify({
       fileName: file.name,
@@ -125,7 +125,7 @@ async function open(file: File, mimetype: string): Promise<StorageUpload> {
  */
 async function send(
   file: File,
-  initial: StorageUpload,
+  initial: IStorageUpload,
   onProgress: (percent: number) => void,
   signal: AbortSignal,
   concurrency: number,
@@ -164,7 +164,7 @@ async function send(
     // O lote acabou e ainda falta parte: peça o próximo, que vem com URLs
     // recém-assinadas - as antigas podem já ter expirado.
     if (ready.length === 0) {
-      batch = await request<StorageUpload>(
+      batch = await request<IStorageUpload>(
         `/storages/${initial.storage.id}/parts`,
       )
 
@@ -213,12 +213,12 @@ async function complete(
   storageId: string,
   uploadId: string | null,
   parts: Array<{ partNumber: number; etag: string }>,
-): Promise<Storage> {
+): Promise<IStorage> {
   const body: { parts?: Array<{ partNumber: number; etag: string }> } = {}
 
   if (uploadId) body.parts = parts
 
-  return request<Storage>(`/storages/${storageId}/complete`, {
+  return request<IStorage>(`/storages/${storageId}/complete`, {
     method: 'POST',
     body: JSON.stringify(body),
   })

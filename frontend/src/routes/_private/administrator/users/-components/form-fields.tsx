@@ -22,7 +22,7 @@ import {
 } from '#/components/common/image-field'
 import { InputPassword } from '#/components/common/input-password'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
-import { ACTIVE_STATUSES, ActiveStatuses, USER_ROLES } from '#/lib/entity'
+import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#/lib/entity'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_DOTS,
@@ -50,7 +50,7 @@ export const USER_FORM_DEFAULTS: DefaultValues<UserFormType> = {
   email: '',
   password: '',
   passwordConfirmation: '',
-  status: ActiveStatuses.ACTIVE,
+  status: ACTIVE_STATUS.ACTIVE,
   avatarId: null,
 }
 
@@ -277,7 +277,7 @@ export function UserFormFields({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={`${idPrefix}-status`}>Situação</FieldLabel>
             <OptionCombobox
-              value={field.value ?? ActiveStatuses.ACTIVE}
+              value={field.value ?? ACTIVE_STATUS.ACTIVE}
               onValueChange={field.onChange}
               onBlur={field.onBlur}
               id={`${idPrefix}-status`}

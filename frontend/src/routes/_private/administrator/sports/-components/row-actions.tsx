@@ -15,7 +15,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useSportDelete } from '#/integrations/tanstack-query/mutations'
-import type { Sport } from '#/lib/validator'
+import type { ISport } from '#/lib/interfaces'
 
 /**
  * Editar e apagar. Modalidade com inscrições é recusada pelo servidor com
@@ -24,7 +24,7 @@ import type { Sport } from '#/lib/validator'
 export function SportRowActions({
   sport,
 }: {
-  sport: Sport
+  sport: ISport
 }): React.JSX.Element {
   const queryClient = useQueryClient()
 

@@ -5,7 +5,7 @@ import {
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
 } from '#/integrations/tanstack-query/queries'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/site'
+import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
 
 /** As consultas da home, com os mesmos parâmetros no loader e na tela. */
 export const HOME_NEXT = { status: 'SCHEDULED', perPage: 6 }

@@ -10,7 +10,7 @@ import type { QueryClient } from '@tanstack/react-query'
 
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/site'
+import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'

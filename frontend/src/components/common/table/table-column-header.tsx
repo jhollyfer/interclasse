@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { SortDirections } from '#/lib/entity'
+import { SORT_DIRECTION } from '#/lib/entity'
 import type { SortDirection } from '#/lib/entity'
 
 import type { TableFeatures } from './use-table'
@@ -95,8 +95,8 @@ export function TableColumnHeader<TRow extends RowData>({
               // é markup, e `String(elemento)` daria `[object Object]`.
               aria-label={`Opções de ${column?.columnDef.meta?.label ?? 'coluna'}`}
             >
-              {direction === SortDirections.ASC && <ArrowUpIcon />}
-              {direction === SortDirections.DESC && <ArrowDownIcon />}
+              {direction === SORT_DIRECTION.ASC && <ArrowUpIcon />}
+              {direction === SORT_DIRECTION.DESC && <ArrowDownIcon />}
               {!direction && <ArrowsDownUpIcon className="opacity-40" />}
             </Button>
           }
@@ -106,14 +106,14 @@ export function TableColumnHeader<TRow extends RowData>({
             <>
               <DropdownMenuItem
                 data-test-id="sort-asc"
-                onClick={() => sort(SortDirections.ASC)}
+                onClick={() => sort(SORT_DIRECTION.ASC)}
               >
                 <ArrowUpIcon />
                 Crescente
               </DropdownMenuItem>
               <DropdownMenuItem
                 data-test-id="sort-desc"
-                onClick={() => sort(SortDirections.DESC)}
+                onClick={() => sort(SORT_DIRECTION.DESC)}
               >
                 <ArrowDownIcon />
                 Decrescente

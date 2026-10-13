@@ -33,7 +33,7 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { UserRoles } from '#/lib/entity'
+import { USER_ROLE } from '#/lib/entity'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries'
 import {
   useUserArchive,
@@ -59,7 +59,7 @@ export function UserDetail(): React.JSX.Element {
   // o que a rota já entrega.
   const { queryClient, account } = route.useRouteContext()
   // Só administrador apaga de vez. Ver o comentário na listagem.
-  const canDelete = account.role === UserRoles.ADMINISTRATOR
+  const canDelete = account.role === USER_ROLE.ADMINISTRATOR
   // A própria conta não se arquiva nem se apaga: o backend responde
   // `403 SELF_ARCHIVE_FORBIDDEN` e `403 SELF_DELETE_FORBIDDEN`.
   const isSelf = account.id === id

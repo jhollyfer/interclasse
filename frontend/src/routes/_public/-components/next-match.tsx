@@ -1,7 +1,7 @@
 import type * as React from 'react'
 
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { Match } from '#/lib/validator'
+import type { IMatch } from '#/lib/interfaces'
 
 import { formatWhen, phaseLabel, scoreOf } from './match-row'
 
@@ -14,8 +14,8 @@ export function NextMatch({
   next,
   last,
 }: {
-  next?: Match
-  last?: Match
+  next?: IMatch
+  last?: IMatch
 }): React.JSX.Element {
   const match = next ?? last
 

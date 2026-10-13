@@ -5,21 +5,21 @@ import {
   validateStorefrontSearch,
   withExtra,
 } from './list-search'
-import { SortDirections, TrashedModes } from './entity'
+import { SORT_DIRECTION, TRASHED_MODE } from './entity'
 
 /**
  * O recorte de lixeira. Vale um teste próprio porque os valores aceitos são
- * **literais** em `list-search.ts`, e não `TrashedModes.X`: ler o enum ali cria
+ * **literais** em `list-search.ts`, e não `TRASHED_MODE.X`: ler o enum ali cria
  * uma aresta entre o chunk do router e o chunk do vocabulário, e num grafo de
  * chunks cíclico ela devolve `undefined` no SSR. A duplicação é intencional, e
  * é aqui que ela é confrontada com a fonte.
  */
 describe('validateListSearch, recorte de lixeira', () => {
   it('aceita os dois modos que o enum declara', () => {
-    expect(validateListSearch({ trashed: TrashedModes.ONLY })).toEqual({
+    expect(validateListSearch({ trashed: TRASHED_MODE.ONLY })).toEqual({
       trashed: 'only',
     })
-    expect(validateListSearch({ trashed: TrashedModes.WITH })).toEqual({
+    expect(validateListSearch({ trashed: TRASHED_MODE.WITH })).toEqual({
       trashed: 'with',
     })
   })
@@ -35,10 +35,10 @@ describe('validateListSearch, recorte de lixeira', () => {
 describe('validateListSearch, ordenação', () => {
   it('aceita as duas direções que o enum declara', () => {
     expect(
-      validateListSearch({ sort: 'name', direction: SortDirections.ASC }),
+      validateListSearch({ sort: 'name', direction: SORT_DIRECTION.ASC }),
     ).toEqual({ sort: 'name', direction: 'asc' })
     expect(
-      validateListSearch({ sort: 'name', direction: SortDirections.DESC }),
+      validateListSearch({ sort: 'name', direction: SORT_DIRECTION.DESC }),
     ).toEqual({ sort: 'name', direction: 'desc' })
   })
 
@@ -146,13 +146,13 @@ describe('validateStorefrontSearch', () => {
         search: 'tikuna',
         sort: 'title',
         direction: 'asc',
-        trashed: TrashedModes.ONLY,
+        trashed: TRASHED_MODE.ONLY,
       }),
     ).toEqual({
       page: 2,
       search: 'tikuna',
       sort: 'title',
-      direction: SortDirections.ASC,
+      direction: SORT_DIRECTION.ASC,
     })
   })
 })

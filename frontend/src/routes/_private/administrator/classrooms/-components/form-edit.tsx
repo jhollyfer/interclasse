@@ -14,9 +14,8 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
-import type { Classroom } from '#/lib/validator'
+import type { IClassroom, Merge  } from '#/lib/interfaces'
 import type { ClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
-import type { Merge } from '#/lib/interfaces'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -34,7 +33,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
 
   const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
-    Classroom,
+    IClassroom,
     Merge<ClassroomUpdatePayload, { id: string }>
   >({
     formId: 'classroom-update',

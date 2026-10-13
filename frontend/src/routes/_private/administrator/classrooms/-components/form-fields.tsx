@@ -13,7 +13,7 @@ import {
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { OptionCombobox } from '#/components/common/option-combobox'
-import { UserRoles } from '#/lib/entity'
+import { USER_ROLE } from '#/lib/entity'
 import type { UserRole } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
 import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
@@ -58,8 +58,8 @@ export function ClassroomFormFields({
   idPrefix: string
 }): React.JSX.Element {
   const { errors } = form.formState
-  const advisors = usePeople(UserRoles.ADVISOR)
-  const representatives = usePeople(UserRoles.REPRESENTATIVE)
+  const advisors = usePeople(USER_ROLE.ADVISOR)
+  const representatives = usePeople(USER_ROLE.REPRESENTATIVE)
 
   return (
     <FieldGroup>

@@ -12,7 +12,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
-import type { Announcement } from '#/lib/validator'
+import type { IAnnouncement } from '#/lib/interfaces'
 import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -28,7 +28,7 @@ import {
 export function AnnouncementFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
-    Announcement,
+    IAnnouncement,
     AnnouncementCreatePayload
   >({
     formId: 'announcement-create',

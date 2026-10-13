@@ -11,7 +11,7 @@ import {
 } from '@phosphor-icons/react'
 import { linkOptions } from '@tanstack/react-router'
 
-import { UserRoles } from '#/lib/entity'
+import { USER_ROLE } from '#/lib/entity'
 import type { UserRole } from '#/lib/entity'
 
 /**
@@ -73,17 +73,17 @@ export const MENU: ReadonlyArray<MenuGroup> = [
   {
     label: 'Organização',
     items: ORGANIZATION,
-    roles: [UserRoles.ADMINISTRATOR],
+    roles: [USER_ROLE.ADMINISTRATOR],
   },
   {
     label: 'Conselheiro',
     items: ADVISOR,
-    roles: [UserRoles.ADMINISTRATOR, UserRoles.ADVISOR],
+    roles: [USER_ROLE.ADMINISTRATOR, USER_ROLE.ADVISOR],
   },
   {
     label: 'Representante',
     items: REPRESENTATIVE,
-    roles: [UserRoles.REPRESENTATIVE],
+    roles: [USER_ROLE.REPRESENTATIVE],
   },
   { label: 'Conta', items: ACCOUNT },
 ]

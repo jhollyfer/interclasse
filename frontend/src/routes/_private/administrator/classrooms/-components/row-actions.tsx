@@ -15,7 +15,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useClassroomDelete } from '#/integrations/tanstack-query/mutations'
-import type { Classroom } from '#/lib/validator'
+import type { IClassroom } from '#/lib/interfaces'
 
 /**
  * Editar e apagar. Turma já sorteada numa chave é recusada pelo servidor com
@@ -24,7 +24,7 @@ import type { Classroom } from '#/lib/validator'
 export function ClassroomRowActions({
   classroom,
 }: {
-  classroom: Classroom
+  classroom: IClassroom
 }): React.JSX.Element {
   const queryClient = useQueryClient()
 

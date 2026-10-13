@@ -1,22 +1,18 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type { Merge } from '#/lib/interfaces'
-import type {
-  BracketDetail,
-  EnrollmentBoard,
-  Paginated,
-} from '#/integrations/response'
+import type { Merge,
+  IBracketDetail,
+  IEnrollmentBoard,
+  IPaginated,
+  IAnnouncement,
+  IBracket,
+  IClassroom,
+  IMatch,
+  ISport,
+  IStudent,
+  IUser } from '#/lib/interfaces'
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
-import type {
-  Announcement,
-  Bracket,
-  Classroom,
-  Match,
-  Sport,
-  Student,
-  User,
-} from '#/lib/validator'
 
 import { request } from './http'
 
@@ -95,7 +91,7 @@ export const accountQueryOptions = () =>
     // O `signal` vem da própria biblioteca e é repassado ao `fetch`: sem ele,
     // query que desmonta antes de resolver não cancela nada, e a resposta
     // atrasada de uma sessão anterior chega depois da atual.
-    queryFn: ({ signal }) => request<User>('/account', { signal }),
+    queryFn: ({ signal }) => request<IUser>('/account', { signal }),
     // O 401 já foi tratado dentro de `request`, que tentou renovar a sessão e
     // não conseguiu. Repetir a chamada não muda a resposta, só atrasa o
     // redirecionamento para o login.
@@ -115,9 +111,12 @@ export const usersQueryOptions = (params: UserListSearch) =>
   queryOptions({
     queryKey: queryKeys.users.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<User>>('/administrator/users'.concat(search(params)), {
-        signal,
-      }),
+      request<IPaginated<IUser>>(
+        '/administrator/users'.concat(search(params)),
+        {
+          signal,
+        },
+      ),
     placeholderData: keepPreviousData,
   })
 
@@ -126,14 +125,14 @@ export const userQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.users.detail(id),
     queryFn: ({ signal }) =>
-      request<User>('/administrator/users/'.concat(id), { signal }),
+      request<IUser>('/administrator/users/'.concat(id), { signal }),
   })
 
 export const classroomsQueryOptions = (params: ClassroomListSearch) =>
   queryOptions({
     queryKey: queryKeys.classrooms.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Classroom>>(
+      request<IPaginated<IClassroom>>(
         '/administrator/classrooms'.concat(search(params)),
         { signal },
       ),
@@ -144,14 +143,14 @@ export const classroomQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.classrooms.detail(id),
     queryFn: ({ signal }) =>
-      request<Classroom>('/administrator/classrooms/'.concat(id), { signal }),
+      request<IClassroom>('/administrator/classrooms/'.concat(id), { signal }),
   })
 
 export const sportsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.sports.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Sport>>(
+      request<IPaginated<ISport>>(
         '/administrator/sports'.concat(search(params)),
         { signal },
       ),
@@ -162,14 +161,14 @@ export const sportQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.sports.detail(id),
     queryFn: ({ signal }) =>
-      request<Sport>('/administrator/sports/'.concat(id), { signal }),
+      request<ISport>('/administrator/sports/'.concat(id), { signal }),
   })
 
 export const announcementsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.announcements.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Announcement>>(
+      request<IPaginated<IAnnouncement>>(
         '/administrator/announcements'.concat(search(params)),
         { signal },
       ),
@@ -180,7 +179,7 @@ export const announcementQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.announcements.detail(id),
     queryFn: ({ signal }) =>
-      request<Announcement>('/administrator/announcements/'.concat(id), {
+      request<IAnnouncement>('/administrator/announcements/'.concat(id), {
         signal,
       }),
   })
@@ -189,7 +188,7 @@ export const bracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
     queryKey: queryKeys.brackets.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Bracket>>(
+      request<IPaginated<IBracket>>(
         '/administrator/brackets'.concat(search(params)),
         { signal },
       ),
@@ -201,7 +200,7 @@ export const bracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.brackets.detail(id),
     queryFn: ({ signal }) =>
-      request<BracketDetail>('/administrator/brackets/'.concat(id), {
+      request<IBracketDetail>('/administrator/brackets/'.concat(id), {
         signal,
       }),
   })
@@ -210,7 +209,7 @@ export const matchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
     queryKey: queryKeys.matches.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Match>>(
+      request<IPaginated<IMatch>>(
         '/administrator/matches'.concat(search(params)),
         { signal },
       ),
@@ -226,7 +225,7 @@ export const advisorClassroomsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisorClassrooms.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Classroom>>(
+      request<IPaginated<IClassroom>>(
         '/advisor/classrooms'.concat(search(params)),
         { signal },
       ),
@@ -237,9 +236,12 @@ export const studentsQueryOptions = (params: StudentListSearch) =>
   queryOptions({
     queryKey: queryKeys.students.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Student>>('/advisor/students'.concat(search(params)), {
-        signal,
-      }),
+      request<IPaginated<IStudent>>(
+        '/advisor/students'.concat(search(params)),
+        {
+          signal,
+        },
+      ),
     placeholderData: keepPreviousData,
   })
 
@@ -248,7 +250,7 @@ export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
   queryOptions({
     queryKey: queryKeys.enrollments.board(classroomId),
     queryFn: ({ signal }) =>
-      request<EnrollmentBoard>(
+      request<IEnrollmentBoard>(
         '/advisor/enrollments'.concat(search({ classroomId })),
         { signal },
       ),
@@ -259,7 +261,7 @@ export const representativeEnrollmentsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.enrollments.board(null),
     queryFn: ({ signal }) =>
-      request<EnrollmentBoard>('/representative/enrollments', { signal }),
+      request<IEnrollmentBoard>('/representative/enrollments', { signal }),
     retry: false,
   })
 
@@ -281,7 +283,7 @@ export const storefrontSportsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.storefront.sports,
     queryFn: ({ signal }) =>
-      request<Paginated<Sport>>('/storefront/sports?perPage=100', { signal }),
+      request<IPaginated<ISport>>('/storefront/sports?perPage=100', { signal }),
     staleTime: 5 * 60 * 1000,
   })
 
@@ -289,7 +291,7 @@ export const storefrontAnnouncementsQueryOptions = (params: StorefrontSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.announcements(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Announcement>>(
+      request<IPaginated<IAnnouncement>>(
         '/storefront/announcements'.concat(search(params)),
         { signal },
       ),
@@ -300,9 +302,12 @@ export const storefrontMatchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.matches(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Match>>('/storefront/matches'.concat(search(params)), {
-        signal,
-      }),
+      request<IPaginated<IMatch>>(
+        '/storefront/matches'.concat(search(params)),
+        {
+          signal,
+        },
+      ),
     placeholderData: keepPreviousData,
     refetchInterval: LIVE,
   })
@@ -311,7 +316,7 @@ export const storefrontBracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.brackets(params),
     queryFn: ({ signal }) =>
-      request<Paginated<Bracket>>(
+      request<IPaginated<IBracket>>(
         '/storefront/brackets'.concat(search(params)),
         { signal },
       ),
@@ -321,6 +326,6 @@ export const storefrontBracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.storefront.bracket(id),
     queryFn: ({ signal }) =>
-      request<BracketDetail>('/storefront/brackets/'.concat(id), { signal }),
+      request<IBracketDetail>('/storefront/brackets/'.concat(id), { signal }),
     refetchInterval: LIVE,
   })

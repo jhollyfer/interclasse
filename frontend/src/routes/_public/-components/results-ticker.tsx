@@ -1,6 +1,6 @@
 import type * as React from 'react'
 
-import type { Match } from '#/lib/validator'
+import type { IMatch } from '#/lib/interfaces'
 
 import { phaseLabel } from './match-row'
 
@@ -15,7 +15,7 @@ import { phaseLabel } from './match-row'
 export function ResultsTicker({
   matches,
 }: {
-  matches: ReadonlyArray<Match>
+  matches: ReadonlyArray<IMatch>
 }): React.JSX.Element | null {
   if (matches.length === 0) return null
 
