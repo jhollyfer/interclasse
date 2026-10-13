@@ -9,8 +9,6 @@ jobs:
   # diferente da do deploy.
   backend-check:
     uses: ./.github/workflows/main-check-backend.yml
-    secrets:
-      MAIYU_PATTERN_TOKEN: ${{ secrets.MAIYU_PATTERN_TOKEN }}
 
   frontend-lint-build:
     name: Frontend - Lint & Build

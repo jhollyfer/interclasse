@@ -7,12 +7,11 @@
  * comparação seja uma só (_padroes/backend.md §10 e §11).
  *
  * Onde fica o upstream, nesta ordem:
- *   1. `MAIYU_PATTERN_DIR`, quando definido (o CI aponta para o checkout dele);
+ *   1. `MAIYU_PATTERN_DIR`, quando definido;
  *   2. `maiyu-pattern/` ao lado do repositório (`../../maiyu-pattern` a partir de `backend/`).
  *
- * Sem upstream à mão o script avisa e sai 0: o repositório é privado, e quem não
- * tem acesso a ele ainda precisa rodar `pnpm check`. O CI com o token configurado
- * cobra de verdade.
+ * Conferência local, fora do CI. Sem upstream à mão o script avisa e sai 0: o
+ * repositório é privado, e quem não tem acesso a ele ainda precisa rodar `pnpm check`.
  *
  * Uso:
  *   node --import @poppinss/ts-exec scripts/sync-check.ts
