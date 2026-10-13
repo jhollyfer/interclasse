@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdvisorEnrollmentUpdateUseCase from './update.use-case.ts'
-import { AdvisorEnrollmentUpdateValidator } from '#features/advisor/enrollments/enrollments.validator'
+import { EnrollmentUpdateValidator } from '#features/advisor/enrollments/enrollments.validator'
 
 @inject()
 export default class AdvisorEnrollmentUpdateController {
@@ -22,7 +22,7 @@ export default class AdvisorEnrollmentUpdateController {
   constructor(private readonly useCase: AdvisorEnrollmentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdvisorEnrollmentUpdateValidator)
+    const payload = await context.request.validateUsing(EnrollmentUpdateValidator)
     const classroom = await Classroom.find(payload.classroomId)
     await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)
     const result = await this.useCase.execute(payload)

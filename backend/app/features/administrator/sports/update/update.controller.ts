@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorSportUpdateUseCase from './update.use-case.ts'
-import { AdministratorSportUpdateValidator } from '#features/administrator/sports/sports.validator'
+import { SportUpdateValidator } from '#features/administrator/sports/sports.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -16,7 +16,7 @@ export default class AdministratorSportUpdateController {
   constructor(private readonly useCase: AdministratorSportUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await AdministratorSportUpdateValidator.validate(context.request.body())
+    const body = await SportUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value

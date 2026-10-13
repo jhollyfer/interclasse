@@ -1,13 +1,13 @@
-import { vine, paginationFields, matchFilterFields } from '#core/validator'
+import { vine, pageFields, matchFilterFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
  * O que o site aceita na query. **Sem `trashed`**: nada daqui tem lixeira, e o
  * parâmetro seria aceito e ignorado em silêncio.
  */
-export const StorefrontMatchPaginationValidator = vine.create({
-  ...paginationFields(),
+export const MatchPaginateValidator = vine.create({
+  ...pageFields(),
   ...matchFilterFields(),
 })
 
-export type StorefrontMatchPaginationPayload = Infer<typeof StorefrontMatchPaginationValidator>
+export type MatchPaginatePayload = Infer<typeof MatchPaginateValidator>

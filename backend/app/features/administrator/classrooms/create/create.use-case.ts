@@ -6,9 +6,9 @@ import { inject } from '@adonisjs/core'
 import { isUniqueViolation } from '#features/_shared.database'
 import logger from '@adonisjs/core/services/logger'
 import { categoryOf } from '#core/entity'
-import type { AdministratorClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { ClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
 
-type Payload = AdministratorClassroomCreatePayload
+type Payload = ClassroomCreatePayload
 type Response = Either<HTTPException, Classroom>
 
 @inject()

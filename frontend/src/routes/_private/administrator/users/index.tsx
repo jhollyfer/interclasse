@@ -5,7 +5,7 @@ import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
 
 /**
  * `?role=` e `?status=` recortam a listagem, como o
- * `AdministratorUserPaginationValidator` aceita: um separa quem administra de
+ * `UserPaginateValidator` aceita: um separa quem administra de
  * quem edita, o outro separa quem entra de quem foi desativado sem ser
  * arquivado.
  *

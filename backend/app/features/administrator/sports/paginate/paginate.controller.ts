@@ -3,7 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorSportPaginateUseCase from './paginate.use-case.ts'
 import {
-  AdministratorSportPaginationValidator,
+  SportPaginateValidator,
   SPORT_SORT_COLUMNS,
 } from '#features/administrator/sports/sports.validator'
 
@@ -16,7 +16,7 @@ export default class AdministratorSportPaginateController {
   constructor(private readonly useCase: AdministratorSportPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AdministratorSportPaginationValidator.validate(context.request.qs())
+    const payload = await SportPaginateValidator.validate(context.request.qs())
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

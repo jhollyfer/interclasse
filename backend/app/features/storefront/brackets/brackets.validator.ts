@@ -1,11 +1,11 @@
-import { vine, paginationFields } from '#core/validator'
+import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 import { CATEGORIES } from '#core/entity'
 
-export const StorefrontBracketPaginationValidator = vine.create({
-  ...paginationFields(),
+export const BracketPaginateValidator = vine.create({
+  ...pageFields(),
   sportId: vine.string().uuid().optional(),
   category: vine.enum(CATEGORIES).optional(),
 })
 
-export type StorefrontBracketPaginationPayload = Infer<typeof StorefrontBracketPaginationValidator>
+export type BracketPaginatePayload = Infer<typeof BracketPaginateValidator>

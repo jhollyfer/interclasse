@@ -1,15 +1,15 @@
 import { vine, athleteListFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const AdvisorEnrollmentShowValidator = vine.create({
+export const EnrollmentShowValidator = vine.create({
   classroomId: vine.string().uuid(),
 })
 
-export const AdvisorEnrollmentUpdateValidator = vine.create({
+export const EnrollmentUpdateValidator = vine.create({
   classroomId: vine.string().uuid(),
   ...athleteListFields(),
 })
 
-export type AdvisorEnrollmentShowPayload = Infer<typeof AdvisorEnrollmentShowValidator>
+export type EnrollmentShowPayload = Infer<typeof EnrollmentShowValidator>
 
-export type AdvisorEnrollmentUpdatePayload = Infer<typeof AdvisorEnrollmentUpdateValidator>
+export type EnrollmentUpdatePayload = Infer<typeof EnrollmentUpdateValidator>

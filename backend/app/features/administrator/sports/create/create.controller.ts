@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorSportCreateUseCase from './create.use-case.ts'
-import { AdministratorSportCreateValidator } from '#features/administrator/sports/sports.validator'
+import { SportCreateValidator } from '#features/administrator/sports/sports.validator'
 
 @inject()
 export default class AdministratorSportCreateController {
@@ -15,7 +15,7 @@ export default class AdministratorSportCreateController {
   constructor(private readonly useCase: AdministratorSportCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorSportCreateValidator)
+    const payload = await context.request.validateUsing(SportCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

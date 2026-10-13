@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdvisorStudentUpdateUseCase from './update.use-case.ts'
-import { AdvisorStudentUpdateValidator } from '#features/advisor/students/students.validator'
+import { StudentUpdateValidator } from '#features/advisor/students/students.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -16,7 +16,7 @@ export default class AdvisorStudentUpdateController {
   constructor(private readonly useCase: AdvisorStudentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await AdvisorStudentUpdateValidator.validate(context.request.body())
+    const body = await StudentUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
     const student = await Student.query().where('id', params.id).preload('classroom').first()
     await context.bouncer.with(ClassroomPolicy).authorize('manageStudent', student)

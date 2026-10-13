@@ -16,9 +16,9 @@ import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { USER_FIELDS, UserFormFields } from './form-fields'
 import type { UserFormType } from './form-fields'
-import { AdministratorUserUpdateValidator } from '#/validators/administrator/users.validator'
+import { UserUpdateValidator } from '#/validators/administrator/users.validator'
 import type { User } from '#/lib/validator'
-import type { AdministratorUserUpdatePayload } from '#/validators/administrator/users.validator'
+import type { UserUpdatePayload } from '#/validators/administrator/users.validator'
 import type { Merge } from '#/lib/interfaces'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useUserUpdate } from '#/integrations/tanstack-query/mutations'
@@ -42,7 +42,7 @@ export function UserFormEdit(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     UserFormType,
     User,
-    Merge<AdministratorUserUpdatePayload, { id: string }>
+    Merge<UserUpdatePayload, { id: string }>
   >({
     formId: FORM_ID,
     /**
@@ -56,7 +56,7 @@ export function UserFormEdit(): React.JSX.Element {
      * sem redefinir a senha dela. É o que a referência faz em
      * `administrators/-components/form-edit.tsx`, pelo mesmo motivo.
      */
-    validator: AdministratorUserUpdateValidator,
+    validator: UserUpdateValidator,
     // Sem `defaults`: o registro chega da query e `values` já é o objeto
     // completo. Não há estado inicial a declarar que `values` não sobrescreva
     // no render seguinte.

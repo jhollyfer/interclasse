@@ -27,8 +27,8 @@ import { SITE_DESCRIPTION } from '#/lib/site'
 import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { applyHTTPErrorToForm } from '#/lib/form-errors'
-import { AuthenticationSignInValidator } from '#/validators/authentication/authentication.validator'
-import type { AuthenticationSignInPayload } from '#/validators/authentication/authentication.validator'
+import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
+import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 
 const route = getRouteApi('/authentication/_sign-in/')
 
@@ -46,8 +46,8 @@ export function SignInForm(): React.JSX.Element {
   // qualquer destino que não seja um caminho deste app.
   const search = route.useSearch()
 
-  const form = useForm<AuthenticationSignInPayload>({
-    resolver: vineResolver(AuthenticationSignInValidator),
+  const form = useForm<SessionSignInPayload>({
+    resolver: vineResolver(SessionSignInValidator),
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
     defaultValues: {
@@ -103,7 +103,7 @@ export function SignInForm(): React.JSX.Element {
     },
   })
 
-  function onSubmit(payload: AuthenticationSignInPayload): void {
+  function onSubmit(payload: SessionSignInPayload): void {
     // Sem isto, a mensagem da tentativa anterior fica na tela durante a nova.
     form.clearErrors('root')
     mutation.mutate(payload)

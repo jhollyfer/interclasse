@@ -4,10 +4,10 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { PAGINATION, recentFirst, type Paginated } from '#core/entity'
-import type { AdministratorAnnouncementPaginationPayload } from '#features/administrator/announcements/announcements.validator'
+import type { AnnouncementPaginatePayload } from '#features/administrator/announcements/announcements.validator'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
 
-type Payload = AdministratorAnnouncementPaginationPayload
+type Payload = AnnouncementPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
 
 @inject()

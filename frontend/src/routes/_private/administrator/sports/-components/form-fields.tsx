@@ -11,9 +11,9 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
-import type { AdministratorSportCreatePayload } from '#/validators/administrator/sports.validator'
+import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
 
-export type SportFormType = AdministratorSportCreatePayload
+export type SportFormType = SportCreatePayload
 
 export const SPORT_FORM_DEFAULTS: DefaultValues<SportFormType> = {
   name: '',

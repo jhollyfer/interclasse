@@ -34,32 +34,32 @@ import type {
   Student,
   User,
 } from '#/lib/validator'
-import type { AccountUpdatePayload } from '#/validators/account/account.validator'
+import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 import type {
-  AdministratorAnnouncementCreatePayload,
-  AdministratorAnnouncementUpdatePayload,
+  AnnouncementCreatePayload,
+  AnnouncementUpdatePayload,
 } from '#/validators/administrator/announcements.validator'
-import type { AdministratorBracketCreatePayload } from '#/validators/administrator/brackets.validator'
+import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
 import type {
-  AdministratorClassroomCreatePayload,
-  AdministratorClassroomUpdatePayload,
+  ClassroomCreatePayload,
+  ClassroomUpdatePayload,
 } from '#/validators/administrator/classrooms.validator'
 import type {
-  AdministratorMatchScorePayload,
-  AdministratorMatchUpdatePayload,
+  MatchScorePayload,
+  MatchUpdatePayload,
 } from '#/validators/administrator/matches.validator'
 import type {
-  AdministratorSportCreatePayload,
-  AdministratorSportUpdatePayload,
+  SportCreatePayload,
+  SportUpdatePayload,
 } from '#/validators/administrator/sports.validator'
 import type {
-  AdministratorUserCreatePayload,
-  AdministratorUserUpdatePayload,
+  UserCreatePayload,
+  UserUpdatePayload,
 } from '#/validators/administrator/users.validator'
-import type { AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
-import type { AdvisorStudentCreatePayload } from '#/validators/advisor/students.validator'
-import type { AuthenticationSignInPayload } from '#/validators/authentication/authentication.validator'
-import type { RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
+import type { EnrollmentUpdatePayload as AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
+import type { StudentCreatePayload } from '#/validators/advisor/students.validator'
+import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
+import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 import type { EnrollmentBoard } from '#/integrations/response'
 import type { Merge } from '#/lib/interfaces'
 
@@ -103,9 +103,9 @@ type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
  * do payload, e não enviado vazio.
  */
 export function useAccountUpdate(
-  options?: MutationProps<User, AccountUpdatePayload>,
+  options?: MutationProps<User, ProfileUpdatePayload>,
 ) {
-  return useMutation<User, HTTPError, AccountUpdatePayload>({
+  return useMutation<User, HTTPError, ProfileUpdatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<User>('/account', {
@@ -126,12 +126,12 @@ export function useAccountUpdate(
  * `GET /account`.
  */
 export function useAuthenticationSignIn(
-  options?: MutationProps<void, AuthenticationSignInPayload>,
+  options?: MutationProps<void, SessionSignInPayload>,
 ) {
   // Os generics ficam explícitos: são eles que dão tipo contextual aos
   // callbacks do chamador. A regra "tipe a queryFn, não o hook" vale para
   // query, onde `select` e `data` dependem da inferência em cadeia.
-  return useMutation<void, HTTPError, AuthenticationSignInPayload>({
+  return useMutation<void, HTTPError, SessionSignInPayload>({
     ...options,
     mutationFn: async function (payload) {
       await send('/authentication/sign-in', {
@@ -230,9 +230,9 @@ export function useStorageDelete(options?: MutationProps<void, string>) {
 /** O módulo inteiro exige `ADMINISTRATOR`. */
 
 export function useUserCreate(
-  options?: MutationProps<User, AdministratorUserCreatePayload>,
+  options?: MutationProps<User, UserCreatePayload>,
 ) {
-  return useMutation<User, HTTPError, AdministratorUserCreatePayload>({
+  return useMutation<User, HTTPError, UserCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<User>('/administrator/users', {
@@ -244,7 +244,7 @@ export function useUserCreate(
 }
 
 /** O `id` viaja com o payload porque ele vai no caminho, não no corpo. */
-type UserUpdateVariables = Merge<AdministratorUserUpdatePayload, { id: string }>
+type UserUpdateVariables = Merge<UserUpdatePayload, { id: string }>
 
 /**
  * Campo ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
@@ -317,9 +317,9 @@ export function useUserDelete(options?: MutationProps<void, string>) {
  */
 
 export function useClassroomCreate(
-  options?: MutationProps<Classroom, AdministratorClassroomCreatePayload>,
+  options?: MutationProps<Classroom, ClassroomCreatePayload>,
 ) {
-  return useMutation<Classroom, HTTPError, AdministratorClassroomCreatePayload>(
+  return useMutation<Classroom, HTTPError, ClassroomCreatePayload>(
     {
       ...options,
       mutationFn: function (payload) {
@@ -333,7 +333,7 @@ export function useClassroomCreate(
 }
 
 type ClassroomUpdateVariables = Merge<
-  AdministratorClassroomUpdatePayload,
+  ClassroomUpdatePayload,
   { id: string }
 >
 
@@ -363,9 +363,9 @@ export function useClassroomDelete(options?: MutationProps<void, string>) {
 }
 
 export function useSportCreate(
-  options?: MutationProps<Sport, AdministratorSportCreatePayload>,
+  options?: MutationProps<Sport, SportCreatePayload>,
 ) {
-  return useMutation<Sport, HTTPError, AdministratorSportCreatePayload>({
+  return useMutation<Sport, HTTPError, SportCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<Sport>('/administrator/sports', {
@@ -377,7 +377,7 @@ export function useSportCreate(
 }
 
 type SportUpdateVariables = Merge<
-  AdministratorSportUpdatePayload,
+  SportUpdatePayload,
   { id: string }
 >
 
@@ -407,12 +407,12 @@ export function useSportDelete(options?: MutationProps<void, string>) {
 }
 
 export function useAnnouncementCreate(
-  options?: MutationProps<Announcement, AdministratorAnnouncementCreatePayload>,
+  options?: MutationProps<Announcement, AnnouncementCreatePayload>,
 ) {
   return useMutation<
     Announcement,
     HTTPError,
-    AdministratorAnnouncementCreatePayload
+    AnnouncementCreatePayload
   >({
     ...options,
     mutationFn: function (payload) {
@@ -425,7 +425,7 @@ export function useAnnouncementCreate(
 }
 
 type AnnouncementUpdateVariables = Merge<
-  AdministratorAnnouncementUpdatePayload,
+  AnnouncementUpdatePayload,
   { id: string }
 >
 
@@ -460,9 +460,9 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
 
 /** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
 export function useBracketCreate(
-  options?: MutationProps<Bracket, AdministratorBracketCreatePayload>,
+  options?: MutationProps<Bracket, BracketCreatePayload>,
 ) {
-  return useMutation<Bracket, HTTPError, AdministratorBracketCreatePayload>({
+  return useMutation<Bracket, HTTPError, BracketCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<Bracket>('/administrator/brackets', {
@@ -486,7 +486,7 @@ export function useBracketDelete(options?: MutationProps<void, string>) {
 }
 
 type MatchUpdateVariables = Merge<
-  AdministratorMatchUpdatePayload,
+  MatchUpdatePayload,
   { id: string }
 >
 
@@ -505,7 +505,7 @@ export function useMatchUpdate(
   })
 }
 
-type MatchScoreVariables = Merge<AdministratorMatchScorePayload, { id: string }>
+type MatchScoreVariables = Merge<MatchScorePayload, { id: string }>
 
 /** O placar. No mata-mata o vencedor avança sozinho. */
 export function useMatchScore(
@@ -539,9 +539,9 @@ export function useMatchUnscore(options?: MutationProps<Match, string>) {
 // ---------------------------------------------------------------------------
 
 export function useStudentCreate(
-  options?: MutationProps<Student, AdvisorStudentCreatePayload>,
+  options?: MutationProps<Student, StudentCreatePayload>,
 ) {
-  return useMutation<Student, HTTPError, AdvisorStudentCreatePayload>({
+  return useMutation<Student, HTTPError, StudentCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<Student>('/advisor/students', {

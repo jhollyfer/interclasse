@@ -17,9 +17,9 @@ import {
   AnnouncementFormFields,
 } from './form-fields'
 import type { AnnouncementFormType } from './form-fields'
-import { AdministratorAnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
+import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
 import type { Announcement } from '#/lib/validator'
-import type { AdministratorAnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
+import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -28,10 +28,10 @@ export function AnnouncementFormCreate(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     AnnouncementFormType,
     Announcement,
-    AdministratorAnnouncementCreatePayload
+    AnnouncementCreatePayload
   >({
     formId: 'announcement-create',
-    validator: AdministratorAnnouncementCreateValidator,
+    validator: AnnouncementCreateValidator,
     defaults: ANNOUNCEMENT_FORM_DEFAULTS,
     fields: ANNOUNCEMENT_FIELDS,
     mutation: useAnnouncementCreate,

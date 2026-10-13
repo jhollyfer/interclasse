@@ -3,7 +3,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorUserUpdateUseCase from './update.use-case.ts'
-import { AdministratorUserUpdateValidator } from '#features/administrator/users/users.validator'
+import { UserUpdateValidator } from '#features/administrator/users/users.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -33,7 +33,7 @@ export default class AdministratorUserUpdateController {
     // Corpo e params validados separadamente e fundidos: o `:id` vem da URL e
     // não do payload, e um schema só aceitaria um `id` no corpo capaz de
     // apontar para outra linha.
-    const body = await AdministratorUserUpdateValidator.validate(context.request.body())
+    const body = await UserUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
     await context.bouncer.with(UserPolicy).authorize('update', params.id, body)
     const result = await this.useCase.execute({ ...body, ...params })

@@ -4,10 +4,10 @@ import HTTPException from '#exceptions/http.exception'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { Merge } from '#core/entity'
-import type { AdministratorMatchUpdatePayload } from '#features/administrator/matches/matches.validator'
+import type { MatchUpdatePayload } from '#features/administrator/matches/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<AdministratorMatchUpdatePayload, IdentifierPayload>
+type Payload = Merge<MatchUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, Match>
 
 @inject()

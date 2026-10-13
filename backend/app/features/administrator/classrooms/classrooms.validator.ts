@@ -15,7 +15,7 @@ export function grade() {
  * Conselheiro e representante são opcionais: a turma nasce antes de alguém ser
  * indicado. Que a conta exista e tenha o papel certo é checado no use-case.
  */
-export const AdministratorClassroomCreateValidator = vine.create({
+export const ClassroomCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(20),
   grade: grade(),
   advisorId: vine.string().uuid().nullable().optional(),
@@ -23,27 +23,21 @@ export const AdministratorClassroomCreateValidator = vine.create({
 })
 
 /** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
-export const AdministratorClassroomUpdateValidator = vine.create({
+export const ClassroomUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(20).optional(),
   grade: grade().optional(),
   advisorId: vine.string().uuid().nullable().optional(),
   representativeId: vine.string().uuid().nullable().optional(),
 })
 
-export const AdministratorClassroomPaginationValidator = vine.create({
+export const ClassroomPaginateValidator = vine.create({
   ...paginationFields(),
   ...sortFields(CLASSROOM_SORT_COLUMNS),
   category: vine.enum(CATEGORIES).optional(),
 })
 
-export type AdministratorClassroomCreatePayload = Infer<
-  typeof AdministratorClassroomCreateValidator
->
+export type ClassroomCreatePayload = Infer<typeof ClassroomCreateValidator>
 
-export type AdministratorClassroomUpdatePayload = Infer<
-  typeof AdministratorClassroomUpdateValidator
->
+export type ClassroomUpdatePayload = Infer<typeof ClassroomUpdateValidator>
 
-export type AdministratorClassroomPaginationPayload = Infer<
-  typeof AdministratorClassroomPaginationValidator
->
+export type ClassroomPaginatePayload = Infer<typeof ClassroomPaginateValidator>

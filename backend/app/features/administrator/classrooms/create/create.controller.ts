@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorClassroomCreateUseCase from './create.use-case.ts'
-import { AdministratorClassroomCreateValidator } from '#features/administrator/classrooms/classrooms.validator'
+import { ClassroomCreateValidator } from '#features/administrator/classrooms/classrooms.validator'
 
 @inject()
 export default class AdministratorClassroomCreateController {
@@ -20,7 +20,7 @@ export default class AdministratorClassroomCreateController {
   constructor(private readonly useCase: AdministratorClassroomCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorClassroomCreateValidator)
+    const payload = await context.request.validateUsing(ClassroomCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

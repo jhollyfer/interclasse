@@ -238,7 +238,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    * impede a resposta do `PUT` apagar do cache do cliente o que o `GET`
    * acabou de entregar.
    */
-  'account': USER,
+  'account/profile': USER,
 
   /**
    * Sign-in, sign-out e refresh respondem `204` sem corpo - o que
@@ -246,7 +246,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    * resolve a feature pelo diretório, e ausência aqui seria indistinguível de
    * um contrato esquecido.
    */
-  'authentication': USER,
+  'authentication/sessions': USER,
 
   /**
    * O arquivo cru, que é o que `paginate`, `show` e `POST /storages/:id/complete`
@@ -256,7 +256,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    * `download` não têm corpo -, e por isso declaram `responses` no próprio
    * controller.
    */
-  'storages': STORAGE,
+  'storages/files': STORAGE,
 
   /**
    * As sete ações de usuário respondem a mesma forma: a conta com o avatar

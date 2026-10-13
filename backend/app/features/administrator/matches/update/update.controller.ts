@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdministratorMatchUpdateUseCase from './update.use-case.ts'
-import { AdministratorMatchUpdateValidator } from '#features/administrator/matches/matches.validator'
+import { MatchUpdateValidator } from '#features/administrator/matches/matches.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -17,7 +17,7 @@ export default class AdministratorMatchUpdateController {
   constructor(private readonly useCase: AdministratorMatchUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await AdministratorMatchUpdateValidator.validate(context.request.body())
+    const body = await MatchUpdateValidator.validate(context.request.body())
     const params = await IdentifierValidator.validate(context.request.params())
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value

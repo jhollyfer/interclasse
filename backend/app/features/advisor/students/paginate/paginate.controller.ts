@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { defineDocs } from '#core/openapi/types'
 import AdvisorStudentPaginateUseCase from './paginate.use-case.ts'
-import { AdvisorStudentPaginationValidator } from '#features/advisor/students/students.validator'
+import { StudentPaginateValidator } from '#features/advisor/students/students.validator'
 
 @inject()
 export default class AdvisorStudentPaginateController {
@@ -15,7 +15,7 @@ export default class AdvisorStudentPaginateController {
   constructor(private readonly useCase: AdvisorStudentPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await AdvisorStudentPaginationValidator.validate(context.request.qs())
+    const payload = await StudentPaginateValidator.validate(context.request.qs())
     const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

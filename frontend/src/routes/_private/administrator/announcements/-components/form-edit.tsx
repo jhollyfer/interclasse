@@ -15,9 +15,9 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
 import type { AnnouncementFormType } from './form-fields'
-import { AdministratorAnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
+import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
 import type { Announcement } from '#/lib/validator'
-import type { AdministratorAnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
+import type { AnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
 import type { Merge } from '#/lib/interfaces'
 import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
 import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations'
@@ -34,10 +34,10 @@ export function AnnouncementFormEdit(): React.JSX.Element {
   const { form, onValid, shell } = useResourceForm<
     AnnouncementFormType,
     Announcement,
-    Merge<AdministratorAnnouncementUpdatePayload, { id: string }>
+    Merge<AnnouncementUpdatePayload, { id: string }>
   >({
     formId: 'announcement-update',
-    validator: AdministratorAnnouncementCreateValidator,
+    validator: AnnouncementCreateValidator,
     values: {
       title: announcement.title,
       body: announcement.body,
