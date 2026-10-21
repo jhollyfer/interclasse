@@ -43,6 +43,13 @@ export function HomePage(): React.JSX.Element {
       <section className="hero text-brand-ink-foreground">
         <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
           <div className="flex flex-col gap-5">
+            <img
+              src="/logo-512.png"
+              alt="2º JIC - II Jogos Interclasse do Cosme, CMEI 2026"
+              width={144}
+              height={144}
+              className="size-28 md:size-36"
+            />
             <p className="text-brand font-semibold">
               CMEI Cosme Jean, 2ª edição
             </p>

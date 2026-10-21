@@ -1,4 +1,4 @@
-import { getRouteApi, useRouter } from '@tanstack/react-router'
+import { Link, getRouteApi, useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
 
 import { InputPassword } from '#/components/common/input-password'
@@ -20,7 +20,6 @@ import {
   AuthShell,
   AuthShellAside,
   AuthShellAsideBody,
-  AuthShellBrand,
   AuthShellContent,
   AuthShellHeader,
   AuthShellTagline,
@@ -79,7 +78,18 @@ export function SignInForm(): React.JSX.Element {
     <AuthShell>
       <AuthShellAside>
         <AuthShellAsideBody>
-          <AuthShellBrand className="h-auto w-full max-w-[320px]" />
+          {/* A logo da edição faz o papel da marca aqui: com as duas, o
+              selo aparecia repetido em tamanhos diferentes. Leva ao site,
+              como a marca levava. */}
+          <Link to="/" aria-label="Jogos Estudantis - voltar ao site">
+            <img
+              src="/logo-512.png"
+              alt="2º JIC - II Jogos Interclasse do Cosme, CMEI 2026"
+              width={256}
+              height={256}
+              className="size-64"
+            />
+          </Link>
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
               anuncia: a marca desenha a sigla, e é aqui que ela é dita
               inteira. */}

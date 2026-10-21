@@ -1,11 +1,12 @@
 import type * as React from 'react'
-import { TrophyIcon } from '@phosphor-icons/react'
 
 import { cn } from '#/lib/utils'
 
 /**
- * A marca dos jogos: troféu e o nome em itálico esportivo, como o cabeçalho do
- * site anterior.
+ * A marca dos jogos: a logo do 2º JIC e o nome em itálico esportivo.
+ *
+ * A logo é decorativa (`alt` vazio): o nome ao lado já diz o que ela diz, e
+ * repeti-lo faria o leitor de tela ler a marca duas vezes.
  *
  * Não é um link: quem decide para onde ela leva é quem a usa.
  */
@@ -19,11 +20,14 @@ export function BrandMark({
       {...rest}
       className={cn('flex items-center gap-2 leading-none', className)}
     >
-      {/* Na barra lateral recolhida sobra só o troféu: o nome some da tela, e
+      {/* Na barra lateral recolhida sobra só a logo: o nome some da tela, e
           não do leitor de tela. Fora da barra o seletor não casa nada. */}
-      <TrophyIcon
-        className="text-accent size-7 shrink-0 group-data-[collapsible=icon]:size-5"
-        weight="fill"
+      <img
+        src="/logo-128.png"
+        alt=""
+        width={40}
+        height={40}
+        className="size-10 shrink-0 group-data-[collapsible=icon]:size-7"
       />
       <span className="font-display text-xl font-extrabold uppercase italic group-data-[collapsible=icon]:sr-only">
         Jogos Estudantis
