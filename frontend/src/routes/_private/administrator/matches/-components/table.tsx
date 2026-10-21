@@ -1,13 +1,16 @@
 import * as React from 'react'
-import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import { Link, getRouteApi, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
+  CardsIcon,
   NumberSquareOneIcon,
+  TreeStructureIcon,
 } from '@phosphor-icons/react'
 
 import {
+  MatchCardsDialog,
   MatchScheduleDialog,
   MatchUnscoreDialog,
   MatchScoreDialog,
@@ -16,8 +19,10 @@ import type { MatchRef } from '#/components/common/match-dialogs'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
   Table,
+  TableActions,
   TableContent,
   TableEmpty,
+  TableEmptyActions,
   TableEmptyDescription,
   TableEmptyTitle,
   TableGrid,
@@ -29,6 +34,7 @@ import {
 } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
 import { Badge } from '#/components/ui/badge'
+import { buttonVariants } from '#/components/ui/button'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import { RowActions } from '#/components/common/row-actions'
 import { matchesQueryOptions } from '#/integrations/tanstack-query/queries'
@@ -135,6 +141,7 @@ export function MatchesTable(): React.JSX.Element {
   const [scoring, setScoring] = React.useState<MatchRef | null>(null)
   const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
   const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
+  const [carding, setCarding] = React.useState<MatchRef | null>(null)
 
   const table = useTable({
     rows: data?.data ?? [],
@@ -155,6 +162,13 @@ export function MatchesTable(): React.JSX.Element {
         >
           <NumberSquareOneIcon />
           Lançar placar
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={!match.homeTeamId || !match.awayTeamId}
+          onClick={() => setCarding(toRef(match))}
+        >
+          <CardsIcon />
+          Cartões
         </DropdownMenuItem>
         {match.status === 'FINISHED' && (
           <DropdownMenuItem
@@ -186,6 +200,17 @@ export function MatchesTable(): React.JSX.Element {
     >
       <TableHeader>
         <TableTitle>Partidas</TableTitle>
+        <TableActions>
+          {/* Jogo novo não se cria aqui: nasce do sorteio da chave, e as fases
+              seguintes se preenchem sozinhas com os vencedores. */}
+          <Link
+            to="/administrator/brackets"
+            className={buttonVariants({ variant: 'outline' })}
+          >
+            <TreeStructureIcon />
+            Lançar jogos (sortear chave)
+          </Link>
+        </TableActions>
       </TableHeader>
 
       <TableToolbar>
@@ -217,8 +242,19 @@ export function MatchesTable(): React.JSX.Element {
         <TableEmpty table={table}>
           <TableEmptyTitle>Nenhuma partida</TableEmptyTitle>
           <TableEmptyDescription>
-            As partidas nascem do sorteio de cada chave.
+            As partidas nascem do sorteio de cada chave: sorteie a modalidade
+            numa categoria e os jogos aparecem aqui. Quem vence avança sozinho
+            para a fase seguinte.
           </TableEmptyDescription>
+          <TableEmptyActions>
+            <Link
+              to="/administrator/brackets"
+              className={buttonVariants({ variant: 'default' })}
+            >
+              <TreeStructureIcon />
+              Ir para as chaves
+            </Link>
+          </TableEmptyActions>
         </TableEmpty>
 
         <TableGrid table={table} />
@@ -240,6 +276,14 @@ export function MatchesTable(): React.JSX.Element {
           match={scheduling}
           open
           onOpenChange={() => setScheduling(null)}
+        />
+      )}
+      {carding && (
+        <MatchCardsDialog
+          key={carding.id}
+          match={carding}
+          open
+          onOpenChange={() => setCarding(null)}
         />
       )}
       {unscoring && (

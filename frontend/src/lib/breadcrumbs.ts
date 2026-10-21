@@ -29,6 +29,8 @@ const SEGMENT_LABELS: Record<string, string | undefined> = {
   profile: 'Perfil',
   brackets: 'Chaves',
   matches: 'Partidas',
+  cards: 'Cartões',
+  removals: 'Remoções de atleta',
   classrooms: 'Turmas',
   sports: 'Modalidades',
   announcements: 'Avisos',

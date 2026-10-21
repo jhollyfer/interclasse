@@ -52,9 +52,12 @@ import {
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { IStudent } from '#/lib/interfaces'
+import type { IEnrollmentBoard, IStudent } from '#/lib/interfaces'
 
 import { studentsOf } from '../$classroomId/index'
+import { ClassroomCards } from './classroom-cards'
+import { RemovalReasonDialog } from './removal-reason-dialog'
+import type { PendingRemoval } from './removal-reason-dialog'
 
 const route = getRouteApi('/_private/advisor/$classroomId/')
 
@@ -70,13 +73,17 @@ export function ClassroomPage(): React.JSX.Element {
     advisorEnrollmentsQueryOptions(classroomId),
   )
   const queryClient = useQueryClient()
+  const [pending, setPending] = React.useState<PendingRemoval | null>(null)
+
+  const store = (updated: IEnrollmentBoard) =>
+    queryClient.setQueryData(
+      queryKeys.advisor.enrollments.board(classroomId),
+      updated,
+    )
 
   const save = useAdvisorEnrollmentUpdate({
     onSuccess: (updated) => {
-      queryClient.setQueryData(
-        queryKeys.advisor.enrollments.board(classroomId),
-        updated,
-      )
+      store(updated)
       toast.success('Atletas salvos.')
     },
     onError: (error) => notifyError(error, { id: 'enrollment-save' }),
@@ -96,6 +103,7 @@ export function ClassroomPage(): React.JSX.Element {
         <TabsList>
           <TabsTrigger value="athletes">Atletas por modalidade</TabsTrigger>
           <TabsTrigger value="students">Alunos</TabsTrigger>
+          <TabsTrigger value="cards">Cartões</TabsTrigger>
         </TabsList>
         <TabsContent value="athletes" className="pt-4">
           <EnrollmentBoard
@@ -103,13 +111,32 @@ export function ClassroomPage(): React.JSX.Element {
             savingSportId={
               (save.isPending && save.variables.sportId) || undefined
             }
-            onSave={(sportId, studentIds) =>
+            onSave={(sportId, studentIds, removed) => {
+              // Tirar atleta pede o motivo antes de gravar.
+              if (removed.length > 0) {
+                const sportName =
+                  board.sports.find((sport) => sport.id === sportId)?.name ?? ''
+                setPending({ sportId, sportName, studentIds, removed })
+                return
+              }
               save.mutate({ classroomId, sportId, studentIds })
-            }
+            }}
           />
+          {pending && (
+            <RemovalReasonDialog
+              key={pending.sportId}
+              classroomId={classroomId}
+              pending={pending}
+              onClose={() => setPending(null)}
+              onSaved={store}
+            />
+          )}
         </TabsContent>
         <TabsContent value="students" className="pt-4">
           <Students classroomId={classroomId} />
+        </TabsContent>
+        <TabsContent value="cards" className="pt-4">
+          <ClassroomCards classroomId={classroomId} />
         </TabsContent>
       </Tabs>
     </div>
