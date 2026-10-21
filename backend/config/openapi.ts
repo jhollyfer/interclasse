@@ -120,6 +120,20 @@ const tags: TagRule[] = [
     plural: 'partidas',
   },
   {
+    prefix: '/administrator/cards',
+    name: 'Painel · Cartões',
+    description: 'Os cartões amarelos e vermelhos que os atletas levaram nas partidas.',
+    singular: 'cartão',
+    plural: 'cartões',
+  },
+  {
+    prefix: '/administrator/enrollment-removals',
+    name: 'Painel · Remoções de atleta',
+    description: 'O aviso de cada atleta que o conselheiro tirou de uma modalidade, com o motivo.',
+    singular: 'aviso de remoção',
+    plural: 'avisos de remoção',
+  },
+  {
     prefix: '/administrator/users',
     name: 'Painel · Usuários',
     description:

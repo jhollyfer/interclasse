@@ -17,7 +17,9 @@ type Response = Either<HTTPException, Paginated<ModelObject>>
 export default class AdvisorClassroomPaginateUseCase {
   async execute({ actor, ...payload }: Payload): Promise<Response> {
     try {
-      const query = Classroom.query()
+      // Quem cuida da turma vem junto: o card mostra o conselheiro e o
+      // representante de cada uma.
+      const query = Classroom.query().preload('advisor').preload('representative')
 
       if (actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', actor.id)
       if (payload.search) query.whereILike('name', `%${payload.search}%`)

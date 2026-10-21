@@ -311,6 +311,9 @@ export const FIELD_LABELS = {
   maxAthletes: 'o máximo de atletas',
   sportId: 'a modalidade',
   studentIds: 'os atletas',
+  studentId: 'o atleta',
+  reason: 'o motivo',
+  pending: 'o filtro de pendentes',
 
   // Aviso
   title: 'o título',
@@ -325,6 +328,9 @@ export const FIELD_LABELS = {
   homeScore: 'o placar do mandante',
   awayScore: 'o placar do visitante',
   winnerTeamId: 'o vencedor',
+  matchId: 'a partida',
+  color: 'a cor do cartão',
+  note: 'a observação',
 
   // Arquivo. Estes não passam por formulário do painel.
   fileName: 'o nome do arquivo',

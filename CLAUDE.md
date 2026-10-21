@@ -32,8 +32,8 @@ O que ainda falta migrar está em `_padroes/MIGRACOES.md`, seção do interclass
 
 | Papel | Área | Faz |
 |---|---|---|
-| `ADMINISTRATOR` | `/administrator` | turmas, modalidades, contas, sorteio, agenda, placar, avisos |
-| `ADVISOR` | `/advisor` | alunos e inscrições das turmas que aconselha |
+| `ADMINISTRATOR` | `/administrator` | turmas, modalidades, contas, sorteio, agenda, placar, cartões, avisos; recebe o aviso de atleta tirado de modalidade |
+| `ADVISOR` | `/advisor` | alunos e inscrições das turmas que aconselha, inclusive depois do sorteio (tirar atleta exige motivo) |
 | `REPRESENTATIVE` | `/representative` | lista de atletas da própria turma |
 
 O site público (`/storefront` na API, `_public` no front) não exige conta.

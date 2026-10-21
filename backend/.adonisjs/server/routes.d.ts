@@ -4,7 +4,9 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'health_check': { paramsTuple?: []; params?: {} }
+    'health-check': { paramsTuple?: []; params?: {} }
+    'documentation.openapi': { paramsTuple?: []; params?: {} }
+    'documentation.reference': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
@@ -39,12 +41,19 @@ export type ScannedRoutes = {
     'administrator.announcements.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
     'administrator.brackets.create': { paramsTuple?: []; params?: {} }
+    'administrator.brackets.preview': { paramsTuple?: []; params?: {} }
     'administrator.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.paginate': { paramsTuple?: []; params?: {} }
     'administrator.matches.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.score': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.matches.athletes': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.unscore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.cards.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.cards.create': { paramsTuple?: []; params?: {} }
+    'administrator.cards.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.enrollmentRemovals.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.enrollmentRemovals.acknowledge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.users.paginate': { paramsTuple?: []; params?: {} }
     'administrator.users.create': { paramsTuple?: []; params?: {} }
     'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -53,6 +62,7 @@ export type ScannedRoutes = {
     'administrator.lifecycle.users.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.users.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.classrooms': { paramsTuple?: []; params?: {} }
+    'advisor.cards': { paramsTuple?: []; params?: {} }
     'advisor.students.paginate': { paramsTuple?: []; params?: {} }
     'advisor.students.create': { paramsTuple?: []; params?: {} }
     'advisor.students.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -63,7 +73,9 @@ export type ScannedRoutes = {
     'representative.enrollments.update': { paramsTuple?: []; params?: {} }
   }
   GET: {
-    'health_check': { paramsTuple?: []; params?: {} }
+    'health-check': { paramsTuple?: []; params?: {} }
+    'documentation.openapi': { paramsTuple?: []; params?: {} }
+    'documentation.reference': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
@@ -81,17 +93,24 @@ export type ScannedRoutes = {
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.brackets.preview': { paramsTuple?: []; params?: {} }
     'administrator.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.matches.athletes': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.cards.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.enrollmentRemovals.paginate': { paramsTuple?: []; params?: {} }
     'administrator.users.paginate': { paramsTuple?: []; params?: {} }
     'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.classrooms': { paramsTuple?: []; params?: {} }
+    'advisor.cards': { paramsTuple?: []; params?: {} }
     'advisor.students.paginate': { paramsTuple?: []; params?: {} }
     'advisor.enrollments.show': { paramsTuple?: []; params?: {} }
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
-    'health_check': { paramsTuple?: []; params?: {} }
+    'health-check': { paramsTuple?: []; params?: {} }
+    'documentation.openapi': { paramsTuple?: []; params?: {} }
+    'documentation.reference': { paramsTuple?: []; params?: {} }
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
@@ -109,11 +128,16 @@ export type ScannedRoutes = {
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.brackets.preview': { paramsTuple?: []; params?: {} }
     'administrator.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.matches.athletes': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.cards.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.enrollmentRemovals.paginate': { paramsTuple?: []; params?: {} }
     'administrator.users.paginate': { paramsTuple?: []; params?: {} }
     'administrator.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.classrooms': { paramsTuple?: []; params?: {} }
+    'advisor.cards': { paramsTuple?: []; params?: {} }
     'advisor.students.paginate': { paramsTuple?: []; params?: {} }
     'advisor.enrollments.show': { paramsTuple?: []; params?: {} }
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
@@ -128,6 +152,7 @@ export type ScannedRoutes = {
     'administrator.sports.create': { paramsTuple?: []; params?: {} }
     'administrator.announcements.create': { paramsTuple?: []; params?: {} }
     'administrator.brackets.create': { paramsTuple?: []; params?: {} }
+    'administrator.cards.create': { paramsTuple?: []; params?: {} }
     'administrator.users.create': { paramsTuple?: []; params?: {} }
     'advisor.students.create': { paramsTuple?: []; params?: {} }
   }
@@ -150,10 +175,12 @@ export type ScannedRoutes = {
     'administrator.announcements.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.unscore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.cards.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.users.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.students.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
+    'administrator.enrollmentRemovals.acknowledge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.users.archive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.users.unarchive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

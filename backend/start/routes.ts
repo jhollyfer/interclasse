@@ -201,6 +201,8 @@ router
       .group(() => {
         router.get('/', [controllers.administrator.brackets.paginate.Paginate])
         router.post('/', [controllers.administrator.brackets.create.Create])
+        // Antes de `:id`: senão `preview` seria lido como o id de uma chave.
+        router.get('preview', [controllers.administrator.brackets.preview.Preview]).as('preview')
         router.get(':id', [controllers.administrator.brackets.show.Show])
         router.delete(':id', [controllers.administrator.brackets.delete.Delete])
       })
@@ -218,11 +220,40 @@ router
         router.put(':id', [controllers.administrator.matches.update.Update])
         router.put(':id/score', [controllers.administrator.matches.score.Score]).as('score')
         router
+          .get(':id/athletes', [controllers.administrator.matches.athletes.Athletes])
+          .as('athletes')
+        router
           .delete(':id/score', [controllers.administrator.matches.unscore.Unscore])
           .as('unscore')
       })
       .prefix('matches')
       .as('matches')
+
+    /** Os cartões amarelos e vermelhos que os atletas levaram nas partidas. */
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.cards.paginate.Paginate])
+        router.post('/', [controllers.administrator.cards.create.Create])
+        router.delete(':id', [controllers.administrator.cards.delete.Delete])
+      })
+      .prefix('cards')
+      .as('cards')
+
+    /**
+     * Os avisos de atleta tirado de modalidade pelo conselheiro, com o motivo.
+     * Nascem da escrita da lista (`PUT /advisor/enrollments`), nunca daqui.
+     */
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.enrollmentRemovals.paginate.Paginate])
+        router
+          .patch(':id/acknowledge', [
+            controllers.administrator.enrollmentRemovals.acknowledge.Acknowledge,
+          ])
+          .as('acknowledge')
+      })
+      .prefix('enrollment-removals')
+      .as('enrollmentRemovals')
 
     /**
      * Contas de acesso. O ciclo de vida mora no subgrupo `lifecycle` por causa
@@ -270,6 +301,7 @@ router
 router
   .group(() => {
     router.get('classrooms', [controllers.advisor.classrooms.paginate.Paginate]).as('classrooms')
+    router.get('cards', [controllers.advisor.cards.paginate.Paginate]).as('cards')
 
     router
       .group(() => {

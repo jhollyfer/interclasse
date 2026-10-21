@@ -2,6 +2,8 @@ import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
 import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
+import EnrollmentRemoval from '#models/enrollment-removal'
+import MatchCard from '#models/match-card'
 import Match from '#models/match'
 import Sport from '#models/sport'
 import Storage from '#models/storage'
@@ -11,6 +13,7 @@ import User from '#models/user'
 import {
   ACTIVE_STATUSES,
   BRACKET_STATUSES,
+  CARD_COLORS,
   CATEGORIES,
   MATCH_PHASES,
   MATCH_STATUSES,
@@ -91,11 +94,24 @@ const BRACKET: ModelResource = {
   relations: { sport: SPORT },
 }
 
+/** O aviso de atleta tirado da lista: a turma, a modalidade e quem tirou. */
+const ENROLLMENT_REMOVAL: ModelResource = {
+  model: EnrollmentRemoval,
+  relations: { classroom: CLASSROOM, sport: SPORT, actor: PERSON },
+}
+
 /** A partida com os dois times e a competição, que é o que a tabela de jogos mostra. */
 const MATCH: ModelResource = {
   model: Match,
   enums: { phase: MATCH_PHASES, status: MATCH_STATUSES },
   relations: { homeTeam: TEAM, awayTeam: TEAM, bracket: BRACKET },
+}
+
+/** O cartão com o atleta, o time por que jogava e a partida. */
+const MATCH_CARD: ModelResource = {
+  model: MatchCard,
+  enums: { color: CARD_COLORS },
+  relations: { student: STUDENT, team: TEAM, match: MATCH },
 }
 
 // ---------------------------------------------------------------------------
@@ -227,6 +243,47 @@ export const EnrollmentBoardResponse = vine.create({
   ),
 })
 
+/**
+ * Os atletas que podem levar cartão numa partida: os alunos das duas turmas,
+ * com os inscritos na modalidade marcados - são eles que entram em quadra.
+ */
+export const MatchAthletesResponse = vine.create({
+  teams: vine.array(
+    vine.object({
+      teamId: vine.string().uuid(),
+      classroomId: vine.string().uuid(),
+      name: vine.string(),
+      students: vine.array(
+        vine.object({
+          id: vine.string().uuid(),
+          name: vine.string(),
+          enrolled: vine.boolean(),
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * O que o sorteio faria agora: cada turma da categoria com quantos atletas tem
+ * inscritos na modalidade, e se entra. É o que o diálogo mostra antes de
+ * sortear, para a turma de fora não ser surpresa.
+ */
+export const DrawPreviewResponse = vine.create({
+  minAthletes: vine.number(),
+  maxTeams: vine.number(),
+  /** Já existe chave desta modalidade nesta categoria. */
+  drawn: vine.boolean(),
+  classrooms: vine.array(
+    vine.object({
+      id: vine.string().uuid(),
+      name: vine.string(),
+      athletes: vine.number(),
+      eligible: vine.boolean(),
+    }),
+  ),
+})
+
 // ---------------------------------------------------------------------------
 // O registro, por diretório de feature
 // ---------------------------------------------------------------------------
@@ -280,8 +337,11 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    */
   'administrator/brackets': BRACKET,
   'administrator/matches': MATCH,
+  'administrator/enrollment-removals': ENROLLMENT_REMOVAL,
+  'administrator/cards': MATCH_CARD,
+  'advisor/cards': MATCH_CARD,
 
-  'advisor/classrooms': CLASSROOM,
+  'advisor/classrooms': CLASSROOM_WITH_PEOPLE,
   'advisor/students': STUDENT,
   'advisor/enrollments': EnrollmentBoardResponse,
   'representative/enrollments': EnrollmentBoardResponse,

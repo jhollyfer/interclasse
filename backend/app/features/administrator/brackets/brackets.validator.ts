@@ -11,6 +11,12 @@ export const BracketCreateValidator = vine.create({
   category: vine.enum(CATEGORIES),
 })
 
+/** A prévia do sorteio pergunta o mesmo que o sorteio. */
+export const BracketPreviewValidator = vine.create({
+  sportId: vine.string().uuid(),
+  category: vine.enum(CATEGORIES),
+})
+
 export const BracketPaginateValidator = vine.create({
   ...pageFields(),
   sportId: vine.string().uuid().optional(),
@@ -21,3 +27,5 @@ export const BracketPaginateValidator = vine.create({
 export type BracketCreatePayload = Infer<typeof BracketCreateValidator>
 
 export type BracketPaginatePayload = Infer<typeof BracketPaginateValidator>
+
+export type BracketPreviewPayload = Infer<typeof BracketPreviewValidator>

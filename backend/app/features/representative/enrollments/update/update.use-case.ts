@@ -24,7 +24,7 @@ export default class RepresentativeEnrollmentUpdateUseCase {
         return left(HTTPException.NotFound('Nenhuma turma vinculada', 'CLASSROOM_NOT_FOUND'))
 
       const board = await this.enrollments.replace(classroom, sportId, studentIds, {
-        canRemove: false,
+        role: 'representative',
       })
       if (board.isLeft()) return left(board.value)
 

@@ -1,17 +1,34 @@
 import db from '@adonisjs/lucid/services/db'
+import { DateTime } from 'luxon'
 
 import type { Infer } from '#core/validator'
 import { type EnrollmentBoardResponse } from '#core/openapi/response'
 import Bracket from '#models/bracket'
 import type Classroom from '#models/classroom'
 import Enrollment from '#models/enrollment'
+import EnrollmentRemoval from '#models/enrollment-removal'
 import Sport from '#models/sport'
 import Student from '#models/student'
+import type User from '#models/user'
+import { USER_ROLE } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 
 /** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_padroes/typescript.md §2). */
 export type EnrollmentBoard = Infer<typeof EnrollmentBoardResponse>
+
+/**
+ * Quem escreve a lista, e o que isso permite.
+ *
+ * O representante só acrescenta, e só antes do sorteio. O conselheiro (e o
+ * administrador, que cobre a falta dele) mexe a qualquer momento - inclusive
+ * depois do sorteio, porque o time sorteado é a turma, e trocar quem joga por
+ * ela não muda a chave. Tirar atleta exige o motivo, que vira aviso para a
+ * organização.
+ */
+export type EnrollmentWriter =
+  | { readonly role: 'representative' }
+  | { readonly role: 'advisor'; readonly actor: User; readonly reason?: string }
 
 /**
  * As inscrições de uma turma: quem joga o quê.
@@ -26,8 +43,14 @@ export type EnrollmentBoard = Infer<typeof EnrollmentBoardResponse>
  * caso de uso, pela policy ou pela sessão.
  */
 export default class EnrollmentService {
-  /** A matriz aluno x modalidade da turma. */
-  async board(classroom: Classroom): Promise<EnrollmentBoard> {
+  /**
+   * A matriz aluno x modalidade da turma. `lockAfterDraw` é o que diferencia
+   * as duas telas: só a do representante trava na modalidade sorteada.
+   */
+  async board(
+    classroom: Classroom,
+    { lockAfterDraw }: { lockAfterDraw: boolean },
+  ): Promise<EnrollmentBoard> {
     const [sports, students, drawn] = await Promise.all([
       Sport.query().orderBy('name', 'asc'),
       Student.query()
@@ -46,7 +69,8 @@ export default class EnrollmentService {
         name: sport.name,
         minAthletes: sport.minAthletes,
         maxAthletes: sport.maxAthletes,
-        locked: locked.has(sport.id),
+        drawn: locked.has(sport.id),
+        locked: lockAfterDraw && locked.has(sport.id),
       })),
       students: students.map((student) => ({
         id: student.id,
@@ -62,15 +86,12 @@ export default class EnrollmentService {
    * A lista é inteira, e não um aluno por vez: a tela é uma coluna de caixas
    * marcadas, e o que ela tem para mandar é o estado final. Diferença calculada
    * no cliente esbarraria em duas abas abertas.
-   *
-   * Trava depois do sorteio: o time já está na chave, e mudar quem joga ali
-   * mudaria o time que foi sorteado.
    */
   async replace(
     classroom: Classroom,
     sportId: string,
     studentIds: string[],
-    { canRemove }: { canRemove: boolean },
+    writer: EnrollmentWriter,
   ): Promise<Either<HTTPException, EnrollmentBoard>> {
     const sport = await Sport.find(sportId)
 
@@ -80,24 +101,6 @@ export default class EnrollmentService {
           sportId: 'Modalidade não encontrada',
         }),
       )
-
-    // O representante só acrescenta: tirar atleta da lista é decisão do
-    // professor conselheiro. A lista enviada precisa conter toda a atual.
-    if (!canRemove) {
-      const current = await Enrollment.query()
-        .where('sportId', sport.id)
-        .whereIn('studentId', Student.query().where('classroomId', classroom.id).select('id'))
-        .select('studentId')
-      const kept = new Set(studentIds)
-
-      if (current.some((enrollment) => !kept.has(enrollment.studentId)))
-        return left(
-          HTTPException.Forbidden(
-            'Só o professor conselheiro tira atleta da lista',
-            'ENROLLMENT_REMOVAL_FORBIDDEN',
-          ),
-        )
-    }
 
     if (studentIds.length > sport.maxAthletes)
       return left(
@@ -120,25 +123,64 @@ export default class EnrollmentService {
         }),
       )
 
-    const saved = await db.transaction(async (trx) => {
+    const kept = new Set(studentIds)
+
+    const outcome = await db.transaction(async (trx) => {
       // A mesma trava do sorteio, e a checagem do sorteio só depois dela: lida
       // antes, a lista podia ser gravada depois de a chave ser fechada.
       await Sport.query({ client: trx }).where('id', sport.id).forUpdate().first()
 
-      const drawn = await Bracket.query({ client: trx })
+      const current = await Enrollment.query({ client: trx })
         .where('sportId', sport.id)
-        .where('category', classroom.category)
-        .first()
+        .whereIn(
+          'studentId',
+          Student.query({ client: trx }).where('classroomId', classroom.id).select('id'),
+        )
+        .preload('student')
+      const removed = current.filter((enrollment) => !kept.has(enrollment.studentId))
 
-      if (drawn) return false
+      if (writer.role === 'representative') {
+        // O representante só acrescenta: tirar atleta da lista é decisão do
+        // professor conselheiro. A lista enviada precisa conter toda a atual.
+        if (removed.length > 0) return 'removal-forbidden'
 
-      const classStudents = Student.query({ client: trx })
-        .where('classroomId', classroom.id)
-        .select('id')
+        // Depois do sorteio a lista do representante trava: a partir daí quem
+        // mexe é o conselheiro, que responde pela troca.
+        const drawn = await Bracket.query({ client: trx })
+          .where('sportId', sport.id)
+          .where('category', classroom.category)
+          .first()
+
+        if (drawn) return 'locked'
+      }
+
+      if (writer.role === 'advisor' && removed.length > 0) {
+        if (!writer.reason) return 'reason-required'
+
+        // O administrador não avisa a si mesmo: a remoção dele já nasce lida.
+        let acknowledgedAt: DateTime | null = null
+        if (writer.actor.role === USER_ROLE.ADMINISTRATOR) acknowledgedAt = DateTime.now()
+
+        await EnrollmentRemoval.createMany(
+          removed.map((enrollment) => ({
+            classroomId: classroom.id,
+            sportId: sport.id,
+            studentId: enrollment.studentId,
+            studentName: enrollment.student.name,
+            reason: writer.reason ?? '',
+            actorId: writer.actor.id,
+            acknowledgedAt,
+          })),
+          { client: trx },
+        )
+      }
 
       await Enrollment.query({ client: trx })
         .where('sportId', sport.id)
-        .whereIn('studentId', classStudents)
+        .whereIn(
+          'studentId',
+          Student.query({ client: trx }).where('classroomId', classroom.id).select('id'),
+        )
         .delete()
 
       if (studentIds.length > 0)
@@ -147,10 +189,18 @@ export default class EnrollmentService {
           { client: trx },
         )
 
-      return true
+      return 'saved'
     })
 
-    if (!saved)
+    if (outcome === 'removal-forbidden')
+      return left(
+        HTTPException.Forbidden(
+          'Só o professor conselheiro tira atleta da lista',
+          'ENROLLMENT_REMOVAL_FORBIDDEN',
+        ),
+      )
+
+    if (outcome === 'locked')
       return left(
         HTTPException.Conflict(
           'As inscrições desta modalidade estão encerradas: o sorteio já aconteceu',
@@ -158,6 +208,15 @@ export default class EnrollmentService {
         ),
       )
 
-    return right(await this.board(classroom))
+    if (outcome === 'reason-required')
+      return left(
+        HTTPException.UnprocessableEntity(
+          'Informe o motivo da remoção',
+          'ENROLLMENT_REASON_REQUIRED',
+          { reason: 'Diga por que o atleta saiu da lista' },
+        ),
+      )
+
+    return right(await this.board(classroom, { lockAfterDraw: writer.role === 'representative' }))
   }
 }
