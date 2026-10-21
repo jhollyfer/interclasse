@@ -32,6 +32,8 @@ import type {
   IStudent,
   IUser,
   IEnrollmentBoard,
+  IEnrollmentRemoval,
+  IMatchCard,
   Merge,
 } from '#/lib/interfaces'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
@@ -40,6 +42,7 @@ import type {
   AnnouncementUpdatePayload,
 } from '#/validators/administrator/announcements.validator'
 import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
+import type { CardCreatePayload } from '#/validators/administrator/cards.validator'
 import type {
   ClassroomCreatePayload,
   ClassroomUpdatePayload,
@@ -537,6 +540,45 @@ export function useMatchUnscore(options?: MutationProps<IMatch, string>) {
       return request<IMatch>('/administrator/matches/'.concat(id, '/score'), {
         method: 'DELETE',
       })
+    },
+  })
+}
+
+/** Lança um cartão. O time sai do atleta, no servidor. */
+export function useCardCreate(
+  options?: MutationProps<IMatchCard, CardCreatePayload>,
+) {
+  return useMutation<IMatchCard, HTTPError, CardCreatePayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<IMatchCard>('/administrator/cards', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export function useCardDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/cards/'.concat(id), { method: 'DELETE' })
+    },
+  })
+}
+
+/** A ciência do aviso de remoção. Repetir não muda nada. */
+export function useEnrollmentRemovalAcknowledge(
+  options?: MutationProps<IEnrollmentRemoval, string>,
+) {
+  return useMutation<IEnrollmentRemoval, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<IEnrollmentRemoval>(
+        '/administrator/enrollment-removals/'.concat(id, '/acknowledge'),
+        { method: 'PATCH' },
+      )
     },
   })
 }

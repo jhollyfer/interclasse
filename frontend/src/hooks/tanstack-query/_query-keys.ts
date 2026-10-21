@@ -53,11 +53,25 @@ export const queryKeys = {
         ['administrator', 'brackets', 'list', params] as const,
       detail: (id: string) =>
         ['administrator', 'brackets', 'detail', id] as const,
+      preview: (sportId: string, category: string) =>
+        ['administrator', 'brackets', 'preview', sportId, category] as const,
     },
     matches: {
       all: ['administrator', 'matches'] as const,
       list: (params: ListSearch) =>
         ['administrator', 'matches', 'list', params] as const,
+      athletes: (id: string) =>
+        ['administrator', 'matches', 'athletes', id] as const,
+    },
+    cards: {
+      all: ['administrator', 'cards'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'cards', 'list', params] as const,
+    },
+    enrollmentRemovals: {
+      all: ['administrator', 'enrollment-removals'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'enrollment-removals', 'list', params] as const,
     },
   },
 
@@ -77,6 +91,11 @@ export const queryKeys = {
       all: ['advisor', 'enrollments'] as const,
       board: (classroomId: string) =>
         ['advisor', 'enrollments', 'board', classroomId] as const,
+    },
+    cards: {
+      all: ['advisor', 'cards'] as const,
+      list: (params: ListSearch) =>
+        ['advisor', 'cards', 'list', params] as const,
     },
   },
 
@@ -120,6 +139,8 @@ export const queryKeys = {
 export const GAME_KEYS = [
   queryKeys.administrator.brackets.all,
   queryKeys.administrator.matches.all,
+  queryKeys.administrator.cards.all,
+  queryKeys.advisor.cards.all,
 ] as const
 
 /**

@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
+import { Skeleton } from '#/components/ui/skeleton'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useMutationForm } from '#/hooks/use-mutation-form'
 import {
@@ -21,10 +22,13 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useBracketCreate } from '#/integrations/tanstack-query/mutations'
-import { sportsQueryOptions } from '#/integrations/tanstack-query/queries'
+import {
+  bracketPreviewQueryOptions,
+  sportsQueryOptions,
+} from '#/integrations/tanstack-query/queries'
 import { CATEGORIES } from '#/lib/entity'
 import type { IBracket } from '#/lib/interfaces'
-import { CATEGORY_LABELS } from '#/lib/labels'
+import { CATEGORY_LABELS, plural } from '#/lib/labels'
 import { BracketCreateValidator } from '#/validators/administrator/brackets.validator'
 import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
 
@@ -76,8 +80,8 @@ export function DrawDialog(): React.JSX.Element {
             <DialogTitle>Sortear chave</DialogTitle>
             <DialogDescription>
               Entram as turmas da categoria com o mínimo de atletas inscritos.
-              Depois do sorteio, as inscrições da modalidade nessa categoria
-              travam.
+              Depois do sorteio, só o professor conselheiro troca atleta da
+              lista.
             </DialogDescription>
           </DialogHeader>
 
@@ -129,6 +133,11 @@ export function DrawDialog(): React.JSX.Element {
             )}
           </AppField>
 
+          <DrawPreview
+            sportId={form.watch('sportId')}
+            category={form.watch('category')}
+          />
+
           <AppFormRootError form={form} />
 
           <DialogFooter>
@@ -139,5 +148,60 @@ export function DrawDialog(): React.JSX.Element {
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/**
+ * Quem entraria no sorteio agora. Sem ela, a turma abaixo do mínimo ficava de
+ * fora sem aviso, e "não há turmas suficientes" parecia defeito do sorteio.
+ */
+function DrawPreview({
+  sportId,
+  category,
+}: Readonly<{
+  sportId: string | undefined
+  category: string | undefined
+}>): React.JSX.Element | null {
+  const { data, isPending } = useQuery({
+    ...bracketPreviewQueryOptions(sportId ?? '', category ?? ''),
+    enabled: Boolean(sportId && category),
+  })
+
+  if (!sportId || !category) return null
+  if (isPending) return <Skeleton className="h-20 w-full" />
+  if (!data) return null
+
+  const eligible = data.classrooms.filter((row) => row.eligible)
+  const out = data.classrooms.filter((row) => !row.eligible)
+
+  return (
+    <div className="grid gap-2 rounded-lg border p-3 text-sm">
+      {data.drawn && (
+        <p className="text-destructive">
+          Esta modalidade já foi sorteada nesta categoria. Para refazer, apague
+          a chave atual.
+        </p>
+      )}
+      <p className="font-medium">
+        {`${plural(eligible.length, 'turma entra', 'turmas entram')} (mínimo de ${plural(data.minAthletes, 'atleta', 'atletas')})`}
+      </p>
+      {eligible.length > 0 && (
+        <p className="text-muted-foreground">
+          {eligible.map((row) => `${row.name} (${row.athletes})`).join(', ')}
+        </p>
+      )}
+      {out.length > 0 && (
+        <p className="text-muted-foreground">
+          <span className="text-foreground">Ficam de fora: </span>
+          {out.map((row) => `${row.name} (${row.athletes})`).join(', ')}
+        </p>
+      )}
+      {eligible.length < 2 && !data.drawn && (
+        <p className="text-destructive">
+          São necessárias ao menos 2 turmas com o mínimo de atletas. Peça aos
+          conselheiros e representantes que completem as listas.
+        </p>
+      )}
+    </div>
   )
 }

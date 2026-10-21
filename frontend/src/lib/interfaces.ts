@@ -1,6 +1,7 @@
 import type {
   ActiveStatus,
   BracketStatus,
+  CardColor,
   Category,
   MatchPhase,
   MatchStatus,
@@ -165,6 +166,68 @@ export type IMatch = {
 }
 
 /**
+ * O aviso de um atleta tirado de uma modalidade, com o motivo. `studentName` é
+ * cópia: o aluno pode ter saído da turma depois.
+ */
+export type IEnrollmentRemoval = {
+  readonly id: string
+  readonly classroomId: string
+  readonly sportId: string
+  readonly studentId: string | null
+  readonly studentName: string
+  readonly reason: string
+  readonly actorId: string | null
+  readonly acknowledgedAt: string | null
+  readonly classroom: IClassroom
+  readonly sport: ISport
+  readonly actor: IPerson | null
+  readonly createdAt: string
+  readonly updatedAt: string | null
+}
+
+/** Um cartão: o atleta, o time por que jogava e a partida. */
+export type IMatchCard = {
+  readonly id: string
+  readonly matchId: string
+  readonly teamId: string
+  readonly studentId: string
+  readonly color: CardColor
+  readonly note: string | null
+  readonly student: IStudent
+  readonly team: ITeam
+  readonly match: IMatch
+  readonly createdAt: string
+  readonly updatedAt: string | null
+}
+
+/** Quem pode levar cartão na partida (`MatchAthletesResponse`). */
+export type IMatchAthletes = {
+  readonly teams: ReadonlyArray<{
+    readonly teamId: string
+    readonly classroomId: string
+    readonly name: string
+    readonly students: ReadonlyArray<{
+      readonly id: string
+      readonly name: string
+      readonly enrolled: boolean
+    }>
+  }>
+}
+
+/** O que o sorteio faria agora (`DrawPreviewResponse`). */
+export type IDrawPreview = {
+  readonly minAthletes: number
+  readonly maxTeams: number
+  readonly drawn: boolean
+  readonly classrooms: ReadonlyArray<{
+    readonly id: string
+    readonly name: string
+    readonly athletes: number
+    readonly eligible: boolean
+  }>
+}
+
+/**
  * O plano de upload (`StorageUpload` de `backend/app/features/storages/`). A
  * mesma forma sai de `POST /storages` e de `GET /storages/:id/parts`: começar
  * e retomar são a mesma pergunta. `parts` pode ser menor que `totalParts`,
@@ -246,7 +309,8 @@ export type IBracketDetail = {
 
 /**
  * A matriz aluno x modalidade de uma turma (`EnrollmentBoardResponse`).
- * `locked` diz que a modalidade já foi sorteada: a lista não muda mais.
+ * `drawn` diz que a modalidade já foi sorteada na categoria; `locked`, que a
+ * lista não muda mais para quem lê - só o representante trava.
  */
 export type IEnrollmentBoard = {
   readonly classroom: {
@@ -259,6 +323,7 @@ export type IEnrollmentBoard = {
     readonly name: string
     readonly minAthletes: number
     readonly maxAthletes: number
+    readonly drawn: boolean
     readonly locked: boolean
   }>
   readonly students: ReadonlyArray<{

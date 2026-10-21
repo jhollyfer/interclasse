@@ -9,6 +9,7 @@ import {
 } from '#/components/common/page-shell'
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -46,13 +47,25 @@ export function ClassroomsPage(): React.JSX.Element {
             to="/advisor/$classroomId"
             params={{ classroomId: classroom.id }}
           >
-            <Card className="hover:border-primary transition-colors">
+            <Card className="hover:border-primary h-full transition-colors">
               <CardHeader>
                 <CardTitle className="text-2xl">{classroom.name}</CardTitle>
                 <CardDescription>
                   {CATEGORY_LABELS[classroom.category]}
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                  <dt className="text-muted-foreground">Conselheiro</dt>
+                  <dd className="truncate">
+                    {classroom.advisor?.name ?? 'Sem conselheiro'}
+                  </dd>
+                  <dt className="text-muted-foreground">Representante</dt>
+                  <dd className="truncate">
+                    {classroom.representative?.name ?? 'Sem representante'}
+                  </dd>
+                </dl>
+              </CardContent>
             </Card>
           </Link>
         ))}

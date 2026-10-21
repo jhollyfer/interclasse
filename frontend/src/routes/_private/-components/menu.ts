@@ -1,12 +1,15 @@
 import {
   BasketballIcon,
   CalendarDotsIcon,
+  CardsIcon,
   ChalkboardTeacherIcon,
+  GaugeIcon,
   IdentificationCardIcon,
   ListChecksIcon,
   MegaphoneIcon,
   StudentIcon,
   TreeStructureIcon,
+  UserMinusIcon,
   UsersIcon,
 } from '@phosphor-icons/react'
 import { linkOptions } from '@tanstack/react-router'
@@ -22,8 +25,15 @@ import type { UserRole } from '#/lib/entity'
  * que leva a lugar nenhum.
  */
 const ORGANIZATION = linkOptions([
+  { to: '/administrator', label: 'Painel', icon: GaugeIcon },
   { to: '/administrator/brackets', label: 'Chaves', icon: TreeStructureIcon },
   { to: '/administrator/matches', label: 'Partidas', icon: CalendarDotsIcon },
+  { to: '/administrator/cards', label: 'Cartões', icon: CardsIcon },
+  {
+    to: '/administrator/removals',
+    label: 'Remoções de atleta',
+    icon: UserMinusIcon,
+  },
   {
     to: '/administrator/classrooms',
     label: 'Turmas',
@@ -93,9 +103,15 @@ export function menuFor(role: UserRole): ReadonlyArray<MenuGroup> {
   return MENU.filter((group) => !group.roles || group.roles.includes(role))
 }
 
+/**
+ * O contador de avisos de remoção sem ciência: só `meta.total` importa. A mesma
+ * chave no menu e no painel, para os dois lerem do mesmo cache.
+ */
+export const PENDING_REMOVALS = { pending: true, perPage: 1 } as const
+
 /** A primeira tela de cada papel, para onde o login e o logotipo levam. */
 export const HOME_BY_ROLE = {
-  ADMINISTRATOR: '/administrator/brackets',
+  ADMINISTRATOR: '/administrator',
   ADVISOR: '/advisor',
   REPRESENTATIVE: '/representative',
 } as const satisfies Record<UserRole, string>

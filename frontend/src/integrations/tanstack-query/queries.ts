@@ -4,7 +4,11 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type {
   Merge,
   IBracketDetail,
+  IDrawPreview,
   IEnrollmentBoard,
+  IEnrollmentRemoval,
+  IMatchAthletes,
+  IMatchCard,
   IPaginated,
   IAnnouncement,
   IBracket,
@@ -48,6 +52,13 @@ export type MatchListSearch = Merge<
 >
 
 export type StudentListSearch = Merge<ListSearch, { classroomId?: string }>
+
+export type CardListSearch = Merge<
+  ListSearch,
+  { matchId?: string; classroomId?: string; studentId?: string }
+>
+
+export type RemovalListSearch = Merge<ListSearch, { pending?: boolean }>
 
 /**
  * Monta a query string ignorando o que não foi preenchido.
@@ -218,6 +229,51 @@ export const matchesQueryOptions = (params: MatchListSearch) =>
     placeholderData: keepPreviousData,
   })
 
+/** Quem entraria no sorteio agora. Só consulta: o sorteio é o `POST`. */
+export const bracketPreviewQueryOptions = (sportId: string, category: string) =>
+  queryOptions({
+    queryKey: queryKeys.administrator.brackets.preview(sportId, category),
+    queryFn: ({ signal }) =>
+      request<IDrawPreview>(
+        '/administrator/brackets/preview'.concat(search({ sportId, category })),
+        { signal },
+      ),
+    // A prévia muda a cada lista salva pelas turmas: o diálogo sempre relê.
+    staleTime: 0,
+  })
+
+export const matchAthletesQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.administrator.matches.athletes(id),
+    queryFn: ({ signal }) =>
+      request<IMatchAthletes>(
+        '/administrator/matches/'.concat(id, '/athletes'),
+        { signal },
+      ),
+  })
+
+export const cardsQueryOptions = (params: CardListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.administrator.cards.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IMatchCard>>(
+        '/administrator/cards'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
+export const enrollmentRemovalsQueryOptions = (params: RemovalListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.administrator.enrollmentRemovals.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IEnrollmentRemoval>>(
+        '/administrator/enrollment-removals'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
 // ---------------------------------------------------------------------------
 // /advisor e /representative
 // ---------------------------------------------------------------------------
@@ -248,6 +304,18 @@ export const studentsQueryOptions = (params: StudentListSearch) =>
   })
 
 /** A matriz aluno x modalidade de uma turma do conselheiro. */
+export const advisorCardsQueryOptions = (
+  params: Merge<ListSearch, { classroomId: string }>,
+) =>
+  queryOptions({
+    queryKey: queryKeys.advisor.cards.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IMatchCard>>('/advisor/cards'.concat(search(params)), {
+        signal,
+      }),
+    placeholderData: keepPreviousData,
+  })
+
 export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
   queryOptions({
     queryKey: queryKeys.advisor.enrollments.board(classroomId),

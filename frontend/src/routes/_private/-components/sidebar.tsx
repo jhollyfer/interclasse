@@ -1,12 +1,16 @@
 import type * as React from 'react'
 import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { SignOutIcon } from '@phosphor-icons/react'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { USER_ROLE } from '#/lib/entity'
 import {
   Sidebar as Root,
   SidebarContent,
   SidebarFooter,
+  SidebarMenuBadge,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -16,7 +20,7 @@ import {
   useSidebar,
 } from '#/components/ui/sidebar'
 
-import { menuFor } from './menu'
+import { PENDING_REMOVALS, menuFor } from './menu'
 import {
   SignOutConfirm,
   SignOutConfirmFooter,
@@ -76,9 +80,12 @@ function useActiveTo(items: ReadonlyArray<MenuItem>): string | undefined {
 function NavigationItem({
   item,
   isActive,
+  badge,
 }: Readonly<{
   item: MenuItem
   isActive: boolean
+  /** Um número ao lado do rótulo: o que espera a atenção de quem lê. */
+  badge?: number
 }>): React.JSX.Element {
   const { icon: Icon, label, ...link } = item
   const { setOpenMobile } = useSidebar()
@@ -96,6 +103,11 @@ function NavigationItem({
         <Icon />
         <span>{label}</span>
       </SidebarMenuButton>
+      {Boolean(badge) && (
+        <SidebarMenuBadge className="bg-primary text-primary-foreground">
+          {badge}
+        </SidebarMenuBadge>
+      )}
     </SidebarMenuItem>
   )
 }
@@ -118,6 +130,15 @@ export function Sidebar(): React.JSX.Element {
   // A união de todos os grupos: o item mais específico ganha, e ele pode estar
   // num grupo diferente do que casou primeiro.
   const active = useActiveTo(menu.flatMap((group) => group.items))
+  // O aviso de atleta tirado chega ao administrador pelo menu, onde quer que
+  // ele esteja no painel.
+  const { data: removals } = useQuery({
+    ...enrollmentRemovalsQueryOptions(PENDING_REMOVALS),
+    enabled: account.role === USER_ROLE.ADMINISTRATOR,
+  })
+  const badges: Partial<Record<string, number>> = {
+    '/administrator/removals': removals?.meta.total,
+  }
 
   return (
     <Root collapsible="icon" variant="sidebar">
@@ -146,6 +167,7 @@ export function Sidebar(): React.JSX.Element {
                   key={item.label}
                   item={item}
                   isActive={active === item.to}
+                  badge={badges[item.to]}
                 />
               ))}
             </SidebarMenu>

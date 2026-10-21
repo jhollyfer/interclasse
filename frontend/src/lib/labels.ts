@@ -6,6 +6,7 @@ import { SCHOOL_TIME_ZONE } from './constant'
 import type {
   ActiveStatus,
   BracketStatus,
+  CardColor,
   Category,
   MatchPhase,
   MatchStatus,
@@ -113,6 +114,17 @@ export const MATCH_STATUS_VARIANTS: Record<string, BadgeVariant> = {
   SCHEDULED: 'neutral',
   FINISHED: 'success',
 } satisfies Record<MatchStatus, BadgeVariant>
+
+export const CARD_COLOR_LABELS: Record<string, string | undefined> = {
+  YELLOW: 'Amarelo',
+  RED: 'Vermelho',
+} satisfies Record<CardColor, string>
+
+/** A cor do próprio cartão, para o retângulo que o representa na tela. */
+export const CARD_COLOR_CLASSES: Record<string, string | undefined> = {
+  YELLOW: 'bg-yellow-400',
+  RED: 'bg-red-600',
+} satisfies Record<CardColor, string>
 
 /**
  * O estado de um arquivo na biblioteca.

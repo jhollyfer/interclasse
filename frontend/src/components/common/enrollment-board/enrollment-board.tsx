@@ -10,8 +10,15 @@ import { plural } from '#/lib/labels'
 
 type EnrollmentBoardProps = Readonly<{
   board: IEnrollmentBoard
-  /** Grava a lista inteira da modalidade. */
-  onSave: (sportId: string, studentIds: Array<string>) => void
+  /**
+   * Grava a lista inteira da modalidade. `removed` são os nomes de quem estava
+   * salvo e saiu: o conselheiro precisa justificar a saída.
+   */
+  onSave: (
+    sportId: string,
+    studentIds: Array<string>,
+    removed: ReadonlyArray<string>,
+  ) => void
   /** A modalidade sendo salva agora. Só o cartão dela trava. */
   savingSportId?: string
   /**
@@ -130,6 +137,9 @@ function SportCard({
             Sorteada
           </Badge>
         )}
+        {/* Sorteada e ainda editável: só o conselheiro chega aqui, e o time
+            sorteado é a turma, não a lista. */}
+        {sport.drawn && !sport.locked && <Badge variant="info">Sorteada</Badge>}
         <Badge variant={COUNT_VARIANT[String(over || under)]}>
           {plural(selected.size, 'atleta', 'atletas')} · {sport.minAthletes} a{' '}
           {sport.maxAthletes}
@@ -171,7 +181,18 @@ function SportCard({
             className="self-end"
             size="sm"
             disabled={!dirty || over || isSaving}
-            onClick={() => onSave(sport.id, [...selected])}
+            onClick={() =>
+              onSave(
+                sport.id,
+                [...selected],
+                students
+                  .filter(
+                    (student) =>
+                      initial.has(student.id) && !selected.has(student.id),
+                  )
+                  .map((student) => student.name),
+              )
+            }
           >
             Salvar {sport.name}
           </Button>

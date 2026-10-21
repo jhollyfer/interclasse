@@ -4,6 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
+  CardsIcon,
   TrashIcon,
   TrophyIcon,
 } from '@phosphor-icons/react'
@@ -18,7 +19,9 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
+import { BracketTree } from '#/components/common/bracket-tree'
 import {
+  MatchCardsDialog,
   MatchScheduleDialog,
   MatchUnscoreDialog,
   MatchScoreDialog,
@@ -35,7 +38,7 @@ import {
 } from '#/components/common/page-shell'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { Card, CardContent } from '#/components/ui/card'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries'
@@ -44,9 +47,7 @@ import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
   CATEGORY_LABELS,
-  MATCH_PHASE_LABELS,
   championName,
-  formatDate,
 } from '#/lib/labels'
 
 const route = getRouteApi('/_private/administrator/brackets/$id/')
@@ -57,26 +58,25 @@ const SCORE_BUTTON: Record<string, 'default' | 'outline'> = {
   FINISHED: 'outline',
 }
 
-/** Quem caiu fica apagado: no empate, é o que diz quem passou nos pênaltis. */
-function loserClass(match: IBracketMatch, teamId: string | null): string {
-  if (!match.winnerTeamId || !teamId || match.winnerTeamId === teamId) return ''
-
-  return 'text-muted-foreground line-through decoration-1'
+const UNSCORE_TITLE: Record<string, string> = {
+  true: 'A partida seguinte já tem placar: desfaça-a antes',
+  false: 'Desfazer placar',
 }
 
-/** Agrupa as partidas pela ordem em que acontecem: uma seção por fase. */
-function bySection(matches: ReadonlyArray<IBracketMatch>) {
-  const sections = new Map<string, IBracketMatch[]>()
-  const ordered = [...matches].sort(
-    (a, b) => a.round - b.round || a.position - b.position,
+/**
+ * A partida que recebe o vencedor desta. Desfazer o placar só vale enquanto
+ * ela não foi jogada: o servidor recusa com `NEXT_MATCH_PLAYED`, e o botão já
+ * diz isso antes, em vez de dar erro.
+ */
+function nextOf(
+  matches: ReadonlyArray<IBracketMatch>,
+  match: IBracketMatch,
+): IBracketMatch | undefined {
+  return matches.find(
+    (item) =>
+      item.round === match.round + 1 &&
+      item.position === Math.floor(match.position / 2),
   )
-
-  for (const match of ordered) {
-    const key = MATCH_PHASE_LABELS[match.phase] ?? match.phase
-    sections.set(key, [...(sections.get(key) ?? []), match])
-  }
-
-  return [...sections.entries()]
 }
 
 export function BracketDetailView(): React.JSX.Element {
@@ -87,6 +87,7 @@ export function BracketDetailView(): React.JSX.Element {
   const [scoring, setScoring] = React.useState<MatchRef | null>(null)
   const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
   const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
+  const [carding, setCarding] = React.useState<MatchRef | null>(null)
 
   const invalidate = () => invalidateKeys([...GAME_KEYS, ...DEPENDENTS.games])
 
@@ -172,64 +173,62 @@ export function BracketDetailView(): React.JSX.Element {
         </Card>
       )}
 
-      {bySection(bracket.matches).map(([section, matches]) => (
-        <Card key={section}>
-          <CardHeader>
-            <CardTitle>{section}</CardTitle>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {matches.map((match) => (
-              <div
-                key={match.id}
-                className="flex flex-wrap items-center gap-3 py-2"
+      <p className="text-muted-foreground text-sm">
+        As partidas nascem do sorteio. Lance o placar e o vencedor sobe sozinho
+        para a fase seguinte; empate pede quem venceu nos pênaltis.
+      </p>
+
+      <BracketTree
+        bracket={bracket}
+        renderActions={(match) => {
+          const ready = Boolean(match.homeTeamId && match.awayTeamId)
+          const next = nextOf(bracket.matches, match)
+          const locked = next?.status === 'FINISHED'
+
+          return (
+            <div className="mt-1 flex flex-wrap gap-1">
+              <Button
+                size="sm"
+                variant={SCORE_BUTTON[match.status]}
+                disabled={!ready}
+                title={(!ready && 'Esperando os dois times') || undefined}
+                onClick={() => setScoring(match)}
               >
-                <span className="text-muted-foreground w-full text-sm sm:w-36">
-                  {formatDate(match.scheduledAt)}
-                  {match.location && ` · ${match.location}`}
-                </span>
-                <span className="flex-1 font-medium">
-                  <span className={loserClass(match, match.homeTeamId)}>
-                    {match.homeName ?? 'A definir'}
-                  </span>{' '}
-                  <span className="bg-foreground text-background mx-1 rounded px-2 py-0.5 tabular-nums">
-                    {match.homeScore ?? '-'} x {match.awayScore ?? '-'}
-                  </span>{' '}
-                  <span className={loserClass(match, match.awayTeamId)}>
-                    {match.awayName ?? 'A definir'}
-                  </span>
-                </span>
+                Placar
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setScheduling(match)}
+              >
+                <CalendarBlankIcon />
+                Agendar
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={!ready}
+                onClick={() => setCarding(match)}
+              >
+                <CardsIcon />
+                Cartões
+              </Button>
+              {match.status === 'FINISHED' && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => setScheduling(match)}
+                  disabled={locked}
+                  title={UNSCORE_TITLE[String(locked)]}
+                  onClick={() => setUnscoring(match)}
                 >
-                  <CalendarBlankIcon />
-                  Agendar
+                  <ArrowCounterClockwiseIcon />
+                  Desfazer
                 </Button>
-                <Button
-                  size="sm"
-                  variant={SCORE_BUTTON[match.status]}
-                  disabled={!match.homeTeamId || !match.awayTeamId}
-                  onClick={() => setScoring(match)}
-                >
-                  Placar
-                </Button>
-                {match.status === 'FINISHED' && (
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Desfazer placar"
-                    title="Desfazer placar"
-                    onClick={() => setUnscoring(match)}
-                  >
-                    <ArrowCounterClockwiseIcon />
-                  </Button>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      ))}
+              )}
+            </div>
+          )
+        }}
+      />
 
       {scoring && (
         <MatchScoreDialog
@@ -245,6 +244,14 @@ export function BracketDetailView(): React.JSX.Element {
           match={unscoring}
           open
           onOpenChange={() => setUnscoring(null)}
+        />
+      )}
+      {carding && (
+        <MatchCardsDialog
+          key={carding.id}
+          match={carding}
+          open
+          onOpenChange={() => setCarding(null)}
         />
       )}
       {scheduling && (

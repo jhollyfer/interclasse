@@ -1,0 +1,203 @@
+import { CheckIcon, TrophyIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
+
+import { MATCH_STATUS } from '#/lib/entity'
+import type { IBracketDetail, IBracketMatch } from '#/lib/interfaces'
+import { MATCH_PHASE_LABELS, championName, formatWhen } from '#/lib/labels'
+import { cn } from '#/lib/utils'
+
+type BracketTreeProps = Readonly<{
+  bracket: IBracketDetail
+  /** O que vai embaixo de cada partida: no painel, placar, agenda e cartões. */
+  renderActions?: (match: IBracketMatch) => React.ReactNode
+}>
+
+/** Uma vaga de uma fase: a partida, ou a folga de quem subiu sem jogar. */
+type Slot =
+  | { kind: 'match'; match: IBracketMatch }
+  | { kind: 'bye'; key: string; teamName: string | null }
+
+/**
+ * A fase seguinte guarda quem subiu de folga: a vaga `position` da primeira
+ * fase cai na partida `position / 2` da seguinte, como mandante quando é par -
+ * a mesma conta do `advanceSlot` do backend.
+ */
+function byeTeam(
+  matches: ReadonlyArray<IBracketMatch>,
+  round: number,
+  position: number,
+): string | null {
+  const next = matches.find(
+    (match) =>
+      match.round === round + 1 && match.position === Math.floor(position / 2),
+  )
+  if (!next) return null
+  if (position % 2 === 0) return next.homeName
+
+  return next.awayName
+}
+
+/** As colunas da chave, uma por fase, com o número de vagas de cada uma. */
+function columns(matches: ReadonlyArray<IBracketMatch>) {
+  const rounds = Math.max(1, ...matches.map((match) => match.round))
+
+  return Array.from({ length: rounds }, (_, index) => {
+    const round = index + 1
+    const slots = 2 ** (rounds - round)
+    const inRound = matches.filter((match) => match.round === round)
+    const phase = inRound[0]?.phase
+
+    const items: Slot[] = Array.from({ length: slots }, (_slot, position) => {
+      const match = inRound.find((item) => item.position === position)
+      if (match) return { kind: 'match', match }
+
+      return {
+        kind: 'bye',
+        key: `bye-${round}-${position}`,
+        teamName: byeTeam(matches, round, position),
+      }
+    })
+
+    return { round, phase, items }
+  })
+}
+
+/**
+ * A chave de mata-mata desenhada como chave: uma coluna por fase, cada partida
+ * entre as duas que a alimentam. Quem venceu leva o ✓ e segue; quem perdeu
+ * fica riscado - está fora.
+ *
+ * Mora em `common` porque o site e o painel desenham a mesma chave; o painel
+ * só acrescenta as ações embaixo de cada partida.
+ */
+export function BracketTree({
+  bracket,
+  renderActions,
+}: BracketTreeProps): React.JSX.Element {
+  const champion = championName(bracket)
+  const tree = columns(bracket.matches)
+
+  return (
+    <div className="-mx-4 overflow-x-auto px-4 pb-2">
+      <ol className="flex min-w-max gap-6">
+        {tree.map((column) => (
+          <li key={column.round} className="flex w-56 flex-col">
+            <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
+              {MATCH_PHASE_LABELS[column.phase ?? ''] ?? `Fase ${column.round}`}
+            </h3>
+            <ul className="flex flex-1 flex-col justify-around gap-4">
+              {column.items.map((slot) => {
+                if (slot.kind === 'bye')
+                  return (
+                    <li
+                      key={slot.key}
+                      className="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs"
+                    >
+                      {slot.teamName ?? 'A definir'} · folga, avançou direto
+                    </li>
+                  )
+
+                return (
+                  <li key={slot.match.id}>
+                    <MatchBox match={slot.match} />
+                    {renderActions?.(slot.match)}
+                  </li>
+                )
+              })}
+            </ul>
+          </li>
+        ))}
+        <li className="flex w-44 flex-col">
+          <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
+            Campeã
+          </h3>
+          <div className="flex flex-1 flex-col justify-around">
+            <div
+              className={cn(
+                'flex items-center gap-2 rounded-lg border p-3 font-semibold',
+                champion && 'bg-accent text-accent-foreground border-accent',
+                !champion && 'text-muted-foreground border-dashed',
+              )}
+            >
+              <TrophyIcon className="size-5 shrink-0" weight="fill" />
+              {champion ?? 'A definir'}
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  )
+}
+
+/** Uma partida: os dois lados, o placar e quem seguiu. */
+function MatchBox({
+  match,
+}: Readonly<{ match: IBracketMatch }>): React.JSX.Element {
+  const finished = match.status === MATCH_STATUS.FINISHED
+
+  return (
+    <div className="bg-card overflow-hidden rounded-lg border text-sm shadow-xs">
+      <TeamRow
+        name={match.homeName}
+        score={match.homeScore}
+        finished={finished}
+        won={finished && match.winnerTeamId === match.homeTeamId}
+      />
+      <TeamRow
+        name={match.awayName}
+        score={match.awayScore}
+        finished={finished}
+        won={finished && match.winnerTeamId === match.awayTeamId}
+      />
+      {!finished && (
+        <p className="text-muted-foreground border-t px-3 py-1 text-xs">
+          {formatWhen(match.scheduledAt)}
+          {match.location && ` · ${match.location}`}
+        </p>
+      )}
+    </div>
+  )
+}
+
+type TeamRowProps = Readonly<{
+  name: string | null
+  score: number | null
+  finished: boolean
+  won: boolean
+}>
+
+function TeamRow({
+  name,
+  score,
+  finished,
+  won,
+}: TeamRowProps): React.JSX.Element {
+  const lost = finished && !won
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 px-3 py-1.5 not-last:border-b',
+        won && 'bg-primary/10 font-semibold',
+      )}
+    >
+      <span
+        className={cn(
+          'flex-1 truncate',
+          !name && 'text-muted-foreground',
+          lost && 'text-muted-foreground line-through decoration-1',
+        )}
+      >
+        {name ?? 'A definir'}
+      </span>
+      {won && (
+        <span className="text-primary flex items-center gap-0.5 text-xs">
+          <CheckIcon weight="bold" />
+          Avançou
+        </span>
+      )}
+      {lost && <span className="text-muted-foreground text-xs">Fora</span>}
+      <span className="w-5 text-right tabular-nums">{score ?? ''}</span>
+    </div>
+  )
+}

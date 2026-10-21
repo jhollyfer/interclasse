@@ -29,9 +29,11 @@ import { Route as PublicJogosIndexRouteImport } from './routes/_public/jogos/ind
 import { Route as AuthenticationSignInIndexRouteImport } from './routes/authentication/_sign-in/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
+import { Route as PrivateAdministratorCardsIndexRouteImport } from './routes/_private/administrator/cards/index'
 import { Route as PrivateAdministratorClassroomsIndexRouteImport } from './routes/_private/administrator/classrooms/index'
 import { Route as PrivateAdministratorMatchesIndexRouteImport } from './routes/_private/administrator/matches/index'
 import { Route as PrivateAdministratorProfileIndexRouteImport } from './routes/_private/administrator/profile/index'
+import { Route as PrivateAdministratorRemovalsIndexRouteImport } from './routes/_private/administrator/removals/index'
 import { Route as PrivateAdministratorSportsIndexRouteImport } from './routes/_private/administrator/sports/index'
 import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_private/administrator/users/index'
 import { Route as PrivateAdvisorClassroomIdIndexRouteImport } from './routes/_private/advisor/$classroomId/index'
@@ -98,7 +100,9 @@ const PrivateAdministratorIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/index.lazy').then((d) => d.Route),
+  )
 const PrivateAdvisorIndexRoute = PrivateAdvisorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -176,6 +180,16 @@ const PrivateAdministratorBracketsIndexRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorCardsIndexRoute =
+  PrivateAdministratorCardsIndexRouteImport.update({
+    id: '/cards/',
+    path: '/cards/',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/cards/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorClassroomsIndexRoute =
   PrivateAdministratorClassroomsIndexRouteImport.update({
     id: '/classrooms/',
@@ -202,6 +216,16 @@ const PrivateAdministratorProfileIndexRoute =
     path: '/profile/',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any)
+const PrivateAdministratorRemovalsIndexRoute =
+  PrivateAdministratorRemovalsIndexRouteImport.update({
+    id: '/removals/',
+    path: '/removals/',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/removals/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorSportsIndexRoute =
   PrivateAdministratorSportsIndexRouteImport.update({
     id: '/sports/',
@@ -369,9 +393,11 @@ export interface FileRoutesByFullPath {
   '/authentication/': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
+  '/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
   '/administrator/classrooms/': typeof PrivateAdministratorClassroomsIndexRoute
   '/administrator/matches/': typeof PrivateAdministratorMatchesIndexRoute
   '/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
+  '/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
   '/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -403,9 +429,11 @@ export interface FileRoutesByTo {
   '/authentication': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets': typeof PrivateAdministratorBracketsIndexRoute
+  '/administrator/cards': typeof PrivateAdministratorCardsIndexRoute
   '/administrator/classrooms': typeof PrivateAdministratorClassroomsIndexRoute
   '/administrator/matches': typeof PrivateAdministratorMatchesIndexRoute
   '/administrator/profile': typeof PrivateAdministratorProfileIndexRoute
+  '/administrator/removals': typeof PrivateAdministratorRemovalsIndexRoute
   '/administrator/sports': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users': typeof PrivateAdministratorUsersIndexRoute
   '/advisor/$classroomId': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -444,9 +472,11 @@ export interface FileRoutesById {
   '/authentication/_sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/_private/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
+  '/_private/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
   '/_private/administrator/classrooms/': typeof PrivateAdministratorClassroomsIndexRoute
   '/_private/administrator/matches/': typeof PrivateAdministratorMatchesIndexRoute
   '/_private/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
+  '/_private/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
   '/_private/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/_private/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/_private/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -484,9 +514,11 @@ export interface FileRouteTypes {
     | '/authentication/'
     | '/administrator/announcements/'
     | '/administrator/brackets/'
+    | '/administrator/cards/'
     | '/administrator/classrooms/'
     | '/administrator/matches/'
     | '/administrator/profile/'
+    | '/administrator/removals/'
     | '/administrator/sports/'
     | '/administrator/users/'
     | '/advisor/$classroomId/'
@@ -518,9 +550,11 @@ export interface FileRouteTypes {
     | '/authentication'
     | '/administrator/announcements'
     | '/administrator/brackets'
+    | '/administrator/cards'
     | '/administrator/classrooms'
     | '/administrator/matches'
     | '/administrator/profile'
+    | '/administrator/removals'
     | '/administrator/sports'
     | '/administrator/users'
     | '/advisor/$classroomId'
@@ -558,9 +592,11 @@ export interface FileRouteTypes {
     | '/authentication/_sign-in/'
     | '/_private/administrator/announcements/'
     | '/_private/administrator/brackets/'
+    | '/_private/administrator/cards/'
     | '/_private/administrator/classrooms/'
     | '/_private/administrator/matches/'
     | '/_private/administrator/profile/'
+    | '/_private/administrator/removals/'
     | '/_private/administrator/sports/'
     | '/_private/administrator/users/'
     | '/_private/advisor/$classroomId/'
@@ -727,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorBracketsIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
+    '/_private/administrator/cards/': {
+      id: '/_private/administrator/cards/'
+      path: '/cards'
+      fullPath: '/administrator/cards/'
+      preLoaderRoute: typeof PrivateAdministratorCardsIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
     '/_private/administrator/classrooms/': {
       id: '/_private/administrator/classrooms/'
       path: '/classrooms'
@@ -746,6 +789,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/administrator/profile/'
       preLoaderRoute: typeof PrivateAdministratorProfileIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
+    '/_private/administrator/removals/': {
+      id: '/_private/administrator/removals/'
+      path: '/removals'
+      fullPath: '/administrator/removals/'
+      preLoaderRoute: typeof PrivateAdministratorRemovalsIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/sports/': {
@@ -860,9 +910,11 @@ interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorIndexRoute: typeof PrivateAdministratorIndexRoute
   PrivateAdministratorAnnouncementsIndexRoute: typeof PrivateAdministratorAnnouncementsIndexRoute
   PrivateAdministratorBracketsIndexRoute: typeof PrivateAdministratorBracketsIndexRoute
+  PrivateAdministratorCardsIndexRoute: typeof PrivateAdministratorCardsIndexRoute
   PrivateAdministratorClassroomsIndexRoute: typeof PrivateAdministratorClassroomsIndexRoute
   PrivateAdministratorMatchesIndexRoute: typeof PrivateAdministratorMatchesIndexRoute
   PrivateAdministratorProfileIndexRoute: typeof PrivateAdministratorProfileIndexRoute
+  PrivateAdministratorRemovalsIndexRoute: typeof PrivateAdministratorRemovalsIndexRoute
   PrivateAdministratorSportsIndexRoute: typeof PrivateAdministratorSportsIndexRoute
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
   PrivateAdministratorAnnouncementsNewIndexRoute: typeof PrivateAdministratorAnnouncementsNewIndexRoute
@@ -884,12 +936,15 @@ const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteCh
       PrivateAdministratorAnnouncementsIndexRoute,
     PrivateAdministratorBracketsIndexRoute:
       PrivateAdministratorBracketsIndexRoute,
+    PrivateAdministratorCardsIndexRoute: PrivateAdministratorCardsIndexRoute,
     PrivateAdministratorClassroomsIndexRoute:
       PrivateAdministratorClassroomsIndexRoute,
     PrivateAdministratorMatchesIndexRoute:
       PrivateAdministratorMatchesIndexRoute,
     PrivateAdministratorProfileIndexRoute:
       PrivateAdministratorProfileIndexRoute,
+    PrivateAdministratorRemovalsIndexRoute:
+      PrivateAdministratorRemovalsIndexRoute,
     PrivateAdministratorSportsIndexRoute: PrivateAdministratorSportsIndexRoute,
     PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
     PrivateAdministratorAnnouncementsNewIndexRoute:
