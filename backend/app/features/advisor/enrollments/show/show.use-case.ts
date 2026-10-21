@@ -21,7 +21,7 @@ export default class AdvisorEnrollmentShowUseCase {
       if (!classroom)
         return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
 
-      return right(await this.enrollments.board(classroom))
+      return right(await this.enrollments.board(classroom, { lockAfterDraw: false }))
     } catch (error) {
       logger.error({ err: error }, '[enrollments > show][error]')
 

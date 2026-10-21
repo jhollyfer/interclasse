@@ -2,7 +2,11 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  healthCheck: typeof routes['health_check']
+  healthCheck: typeof routes['health-check']
+  documentation: {
+    openapi: typeof routes['documentation.openapi']
+    reference: typeof routes['documentation.reference']
+  }
   storefront: {
     sports: typeof routes['storefront.sports']
     announcements: typeof routes['storefront.announcements']
@@ -55,6 +59,7 @@ export interface ApiDefinition {
     brackets: {
       paginate: typeof routes['administrator.brackets.paginate']
       create: typeof routes['administrator.brackets.create']
+      preview: typeof routes['administrator.brackets.preview']
       show: typeof routes['administrator.brackets.show']
       delete: typeof routes['administrator.brackets.delete']
     }
@@ -62,7 +67,17 @@ export interface ApiDefinition {
       paginate: typeof routes['administrator.matches.paginate']
       update: typeof routes['administrator.matches.update']
       score: typeof routes['administrator.matches.score']
+      athletes: typeof routes['administrator.matches.athletes']
       unscore: typeof routes['administrator.matches.unscore']
+    }
+    cards: {
+      paginate: typeof routes['administrator.cards.paginate']
+      create: typeof routes['administrator.cards.create']
+      delete: typeof routes['administrator.cards.delete']
+    }
+    enrollmentRemovals: {
+      paginate: typeof routes['administrator.enrollmentRemovals.paginate']
+      acknowledge: typeof routes['administrator.enrollmentRemovals.acknowledge']
     }
     users: {
       paginate: typeof routes['administrator.users.paginate']
@@ -80,6 +95,7 @@ export interface ApiDefinition {
   }
   advisor: {
     classrooms: typeof routes['advisor.classrooms']
+    cards: typeof routes['advisor.cards']
     students: {
       paginate: typeof routes['advisor.students.paginate']
       create: typeof routes['advisor.students.create']

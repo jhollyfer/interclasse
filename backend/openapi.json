@@ -45,6 +45,14 @@
       "description": "A agenda e o placar. As partidas nascem do sorteio, nunca à mão."
     },
     {
+      "name": "Painel · Cartões",
+      "description": "Os cartões amarelos e vermelhos que os atletas levaram nas partidas."
+    },
+    {
+      "name": "Painel · Remoções de atleta",
+      "description": "O aviso de cada atleta que o conselheiro tirou de uma modalidade, com o motivo."
+    },
+    {
       "name": "Painel · Usuários",
       "description": "As contas de acesso: administradores, professores conselheiros e alunos representantes. Não há cadastro público - toda conta nasce aqui. A senha não sai em resposta nenhuma."
     },
@@ -895,6 +903,98 @@
         }
       }
     },
+    "/administrator/brackets/preview": {
+      "get": {
+        "operationId": "administratorBracketsPreview",
+        "summary": "Prever sorteio de chave",
+        "tags": [
+          "Painel · Chaves"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorBracketsPreviewResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Modalidade não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422SportNotFoundValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorBracketPreviewError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Quem entraria no sorteio agora: cada turma da categoria com quantos atletas inscreveu na modalidade, e se chegou ao mínimo. Não grava nada.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "sportId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "F1",
+                "F2"
+              ]
+            }
+          }
+        ]
+      }
+    },
     "/administrator/brackets/{id}": {
       "get": {
         "operationId": "administratorBracketsShow",
@@ -1057,6 +1157,311 @@
           }
         },
         "description": "**Irreversível**: apaga a chave com todos os times, partidas e placares, e reabre as inscrições da modalidade naquela categoria. É o caminho para refazer um sorteio.\n\nChave com placar lançado responde `409`: desfaça os placares antes.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/cards": {
+      "get": {
+        "operationId": "administratorCardsPaginate",
+        "summary": "Listar cartões",
+        "tags": [
+          "Painel · Cartões"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdministratorCardsPaginateItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorCardPaginateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os cartões lançados, do mais novo ao mais antigo, com o atleta, o time e a partida. Filtra por partida, turma ou atleta.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "matchId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "classroomId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "administratorCardsCreate",
+        "summary": "Criar cartão",
+        "tags": [
+          "Painel · Cartões"
+        ],
+        "responses": {
+          "201": {
+            "description": "Recurso criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorCardsCreateResponse201"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A partida ainda não tem os dois times definidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409MatchTeamsPending"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Partida não encontrada · Atleta fora da partida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422MatchNotFoundStudentNotInMatchValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorCardCreateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Lança um cartão amarelo ou vermelho para um atleta numa partida. O atleta tem que ser de uma das duas turmas da partida.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorCardsCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/administrator/cards/{id}": {
+      "delete": {
+        "operationId": "administratorCardsDelete",
+        "summary": "Remover cartão",
+        "tags": [
+          "Painel · Cartões"
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso, sem corpo"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cartão não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404CardNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorCardDeleteError"
+                }
+              }
+            }
+          }
+        },
+        "description": "**Irreversível**: o cartão some da partida e da ficha do atleta.",
         "security": [
           {
             "cookieAuth": []
@@ -1607,6 +2012,221 @@
         ]
       }
     },
+    "/administrator/enrollment-removals": {
+      "get": {
+        "operationId": "administratorEnrollmentRemovalsPaginate",
+        "summary": "Listar avisos de remoção de atleta",
+        "tags": [
+          "Painel · Remoções de atleta"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdministratorEnrollmentRemovalsPaginateItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500EnrollmentRemovalPaginateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Cada atleta que o conselheiro tirou de uma modalidade, com o motivo. `?pending=true` traz só os que ainda não tiveram ciência.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "pending",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Aceita também as representações de formulário HTML: `\"1\"`, `\"true\"`, `\"on\"`, `\"0\"` e `\"false\"`."
+            }
+          },
+          {
+            "name": "classroomId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/administrator/enrollment-removals/{id}/acknowledge": {
+      "patch": {
+        "operationId": "administratorEnrollmentRemovalsAcknowledge",
+        "summary": "Dar ciência de remoção de atleta",
+        "tags": [
+          "Painel · Remoções de atleta"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorEnrollmentRemovalsAcknowledgeResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Aviso de remoção não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404EnrollmentRemovalNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500EnrollmentRemovalAcknowledgeError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Marca o aviso como lido. Repetir não muda a data da primeira ciência.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
     "/administrator/matches": {
       "get": {
         "operationId": "administratorMatchesPaginate",
@@ -1865,6 +2485,97 @@
             }
           }
         }
+      }
+    },
+    "/administrator/matches/{id}/athletes": {
+      "get": {
+        "operationId": "administratorMatchesAthletes",
+        "summary": "Listar atletas da partida",
+        "tags": [
+          "Painel · Partidas"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorMatchesAthletesResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Partida não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404MatchNotFound"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorMatchAthletesError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os alunos das duas turmas da partida, com os inscritos na modalidade marcados. É de onde sai o atleta de um cartão.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
       }
     },
     "/administrator/matches/{id}/score": {
@@ -3315,6 +4026,122 @@
         ]
       }
     },
+    "/advisor/cards": {
+      "get": {
+        "operationId": "advisorCards",
+        "summary": "Listar turmas",
+        "tags": [
+          "Conselheiro"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AdvisorCardsItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR, ADVISOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdvisorCardPaginateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Os cartões que os atletas da turma levaram, do mais novo ao mais antigo. Turma alheia responde `404`.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR",
+          "ADVISOR"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "classroomId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
     "/advisor/classrooms": {
       "get": {
         "operationId": "advisorClassrooms",
@@ -3569,22 +4396,12 @@
               }
             }
           },
-          "409": {
-            "description": "Conflito com o estado atual",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error409EnrollmentLocked"
-                }
-              }
-            }
-          },
           "422": {
             "description": "Dados inválidos",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422EnrollmentLimitExceededSportNotFoundStudentNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422EnrollmentLimitExceededEnrollmentReasonRequiredSportNotFoundStudentNotFoundValidationError"
                 }
               }
             }
@@ -3600,7 +4417,7 @@
             }
           }
         },
-        "description": "Troca a lista de atletas da turma numa modalidade pela enviada, inteira. Responde a matriz atualizada. Depois do sorteio da modalidade na categoria da turma, `409`.",
+        "description": "Troca a lista de atletas da turma numa modalidade pela enviada, inteira. Responde a matriz atualizada. Vale também depois do sorteio: o time sorteado é a turma. Tirar atleta exige `reason`, que vira aviso para a organização.",
         "security": [
           {
             "cookieAuth": []
@@ -5796,6 +6613,57 @@
           "updatedAt"
         ]
       },
+      "AdministratorBracketsPreviewResponse200": {
+        "type": "object",
+        "properties": {
+          "minAthletes": {
+            "type": "number"
+          },
+          "maxTeams": {
+            "type": "number"
+          },
+          "drawn": {
+            "type": "boolean",
+            "description": "Aceita também as representações de formulário HTML: `\"1\"`, `\"true\"`, `\"on\"`, `\"0\"` e `\"false\"`."
+          },
+          "classrooms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "athletes": {
+                  "type": "number"
+                },
+                "eligible": {
+                  "type": "boolean",
+                  "description": "Aceita também as representações de formulário HTML: `\"1\"`, `\"true\"`, `\"on\"`, `\"0\"` e `\"false\"`."
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "athletes",
+                "eligible"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "minAthletes",
+          "maxTeams",
+          "drawn",
+          "classrooms"
+        ],
+        "additionalProperties": false
+      },
       "AdministratorBracketsShowResponse200": {
         "type": "object",
         "properties": {
@@ -5949,6 +6817,1096 @@
           "matches"
         ],
         "additionalProperties": false
+      },
+      "AdministratorCardsCreateBody": {
+        "type": "object",
+        "properties": {
+          "matchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "color": {
+            "enum": [
+              "YELLOW",
+              "RED"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "matchId",
+          "studentId",
+          "color"
+        ],
+        "additionalProperties": false
+      },
+      "AdministratorCardsCreateResponse201": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "enum": [
+              "YELLOW",
+              "RED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "matchId": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "student": {
+            "type": "object",
+            "properties": {
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "classroomId",
+              "createdAt",
+              "id",
+              "name",
+              "updatedAt"
+            ]
+          },
+          "team": {
+            "type": "object",
+            "properties": {
+              "bracketId": {
+                "type": "string"
+              },
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "classroom": {
+                "type": "object",
+                "properties": {
+                  "advisorId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "grade": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "representativeId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "advisorId",
+                  "category",
+                  "createdAt",
+                  "grade",
+                  "id",
+                  "name",
+                  "representativeId",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "bracketId",
+              "classroomId",
+              "createdAt",
+              "id",
+              "updatedAt"
+            ]
+          },
+          "match": {
+            "type": "object",
+            "properties": {
+              "awayScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "awayTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "bracketId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "homeScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "homeTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phase": {
+                "type": "string",
+                "enum": [
+                  "ROUND_OF_16",
+                  "QUARTER",
+                  "SEMI",
+                  "FINAL"
+                ]
+              },
+              "position": {
+                "type": "number"
+              },
+              "round": {
+                "type": "number"
+              },
+              "scheduledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SCHEDULED",
+                  "FINISHED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "winnerTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "homeTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "awayTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "bracket": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "sportId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "KNOCKOUT",
+                      "FINISHED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "sport": {
+                    "type": "object",
+                    "properties": {
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "maxAthletes": {
+                        "type": "number"
+                      },
+                      "minAthletes": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "createdAt",
+                      "id",
+                      "maxAthletes",
+                      "minAthletes",
+                      "name",
+                      "slug",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "category",
+                  "createdAt",
+                  "id",
+                  "sportId",
+                  "status",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "awayScore",
+              "awayTeamId",
+              "bracketId",
+              "createdAt",
+              "homeScore",
+              "homeTeamId",
+              "id",
+              "location",
+              "phase",
+              "position",
+              "round",
+              "scheduledAt",
+              "status",
+              "updatedAt",
+              "winnerTeamId"
+            ]
+          }
+        },
+        "required": [
+          "color",
+          "createdAt",
+          "id",
+          "matchId",
+          "note",
+          "studentId",
+          "teamId",
+          "updatedAt"
+        ]
+      },
+      "AdministratorCardsPaginateItem": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "enum": [
+              "YELLOW",
+              "RED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "matchId": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "student": {
+            "type": "object",
+            "properties": {
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "classroomId",
+              "createdAt",
+              "id",
+              "name",
+              "updatedAt"
+            ]
+          },
+          "team": {
+            "type": "object",
+            "properties": {
+              "bracketId": {
+                "type": "string"
+              },
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "classroom": {
+                "type": "object",
+                "properties": {
+                  "advisorId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "grade": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "representativeId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "advisorId",
+                  "category",
+                  "createdAt",
+                  "grade",
+                  "id",
+                  "name",
+                  "representativeId",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "bracketId",
+              "classroomId",
+              "createdAt",
+              "id",
+              "updatedAt"
+            ]
+          },
+          "match": {
+            "type": "object",
+            "properties": {
+              "awayScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "awayTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "bracketId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "homeScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "homeTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phase": {
+                "type": "string",
+                "enum": [
+                  "ROUND_OF_16",
+                  "QUARTER",
+                  "SEMI",
+                  "FINAL"
+                ]
+              },
+              "position": {
+                "type": "number"
+              },
+              "round": {
+                "type": "number"
+              },
+              "scheduledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SCHEDULED",
+                  "FINISHED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "winnerTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "homeTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "awayTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "bracket": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "sportId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "KNOCKOUT",
+                      "FINISHED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "sport": {
+                    "type": "object",
+                    "properties": {
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "maxAthletes": {
+                        "type": "number"
+                      },
+                      "minAthletes": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "createdAt",
+                      "id",
+                      "maxAthletes",
+                      "minAthletes",
+                      "name",
+                      "slug",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "category",
+                  "createdAt",
+                  "id",
+                  "sportId",
+                  "status",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "awayScore",
+              "awayTeamId",
+              "bracketId",
+              "createdAt",
+              "homeScore",
+              "homeTeamId",
+              "id",
+              "location",
+              "phase",
+              "position",
+              "round",
+              "scheduledAt",
+              "status",
+              "updatedAt",
+              "winnerTeamId"
+            ]
+          }
+        },
+        "required": [
+          "color",
+          "createdAt",
+          "id",
+          "matchId",
+          "note",
+          "studentId",
+          "teamId",
+          "updatedAt"
+        ]
       },
       "AdministratorClassroomsCreateBody": {
         "type": "object",
@@ -6742,6 +8700,506 @@
           "representativeId",
           "updatedAt"
         ]
+      },
+      "AdministratorEnrollmentRemovalsAcknowledgeResponse200": {
+        "type": "object",
+        "properties": {
+          "acknowledgedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "actorId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "classroomId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "sportId": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "classroom": {
+            "type": "object",
+            "properties": {
+              "advisorId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "F1",
+                  "F2"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "grade": {
+                "type": "number"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "representativeId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "advisorId",
+              "category",
+              "createdAt",
+              "grade",
+              "id",
+              "name",
+              "representativeId",
+              "updatedAt"
+            ]
+          },
+          "sport": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "maxAthletes": {
+                "type": "number"
+              },
+              "minAthletes": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "createdAt",
+              "id",
+              "maxAthletes",
+              "minAthletes",
+              "name",
+              "slug",
+              "updatedAt"
+            ]
+          },
+          "actor": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "ADMINISTRATOR",
+                  "ADVISOR",
+                  "REPRESENTATIVE"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "id",
+              "name",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "acknowledgedAt",
+          "actorId",
+          "classroomId",
+          "createdAt",
+          "id",
+          "reason",
+          "sportId",
+          "studentId",
+          "studentName",
+          "updatedAt"
+        ]
+      },
+      "AdministratorEnrollmentRemovalsPaginateItem": {
+        "type": "object",
+        "properties": {
+          "acknowledgedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "actorId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "classroomId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "sportId": {
+            "type": "string"
+          },
+          "studentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "classroom": {
+            "type": "object",
+            "properties": {
+              "advisorId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "F1",
+                  "F2"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "grade": {
+                "type": "number"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "representativeId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "advisorId",
+              "category",
+              "createdAt",
+              "grade",
+              "id",
+              "name",
+              "representativeId",
+              "updatedAt"
+            ]
+          },
+          "sport": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "maxAthletes": {
+                "type": "number"
+              },
+              "minAthletes": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "createdAt",
+              "id",
+              "maxAthletes",
+              "minAthletes",
+              "name",
+              "slug",
+              "updatedAt"
+            ]
+          },
+          "actor": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "ADMINISTRATOR",
+                  "ADVISOR",
+                  "REPRESENTATIVE"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "id",
+              "name",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "acknowledgedAt",
+          "actorId",
+          "classroomId",
+          "createdAt",
+          "id",
+          "reason",
+          "sportId",
+          "studentId",
+          "studentName",
+          "updatedAt"
+        ]
+      },
+      "AdministratorMatchesAthletesResponse200": {
+        "type": "object",
+        "properties": {
+          "teams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "teamId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "classroomId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "students": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "enrolled": {
+                        "type": "boolean",
+                        "description": "Aceita também as representações de formulário HTML: `\"1\"`, `\"true\"`, `\"on\"`, `\"0\"` e `\"false\"`."
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "enrolled"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "teamId",
+                "classroomId",
+                "name",
+                "students"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "teams"
+        ],
+        "additionalProperties": false
       },
       "AdministratorMatchesPaginateItem": {
         "type": "object",
@@ -9140,6 +11598,535 @@
           "updatedAt"
         ]
       },
+      "AdvisorCardsItem": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "enum": [
+              "YELLOW",
+              "RED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "matchId": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studentId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "student": {
+            "type": "object",
+            "properties": {
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "classroomId",
+              "createdAt",
+              "id",
+              "name",
+              "updatedAt"
+            ]
+          },
+          "team": {
+            "type": "object",
+            "properties": {
+              "bracketId": {
+                "type": "string"
+              },
+              "classroomId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "classroom": {
+                "type": "object",
+                "properties": {
+                  "advisorId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "grade": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "representativeId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "advisorId",
+                  "category",
+                  "createdAt",
+                  "grade",
+                  "id",
+                  "name",
+                  "representativeId",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "bracketId",
+              "classroomId",
+              "createdAt",
+              "id",
+              "updatedAt"
+            ]
+          },
+          "match": {
+            "type": "object",
+            "properties": {
+              "awayScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "awayTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "bracketId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "homeScore": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "homeTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phase": {
+                "type": "string",
+                "enum": [
+                  "ROUND_OF_16",
+                  "QUARTER",
+                  "SEMI",
+                  "FINAL"
+                ]
+              },
+              "position": {
+                "type": "number"
+              },
+              "round": {
+                "type": "number"
+              },
+              "scheduledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SCHEDULED",
+                  "FINISHED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "winnerTeamId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "homeTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "awayTeam": {
+                "type": "object",
+                "properties": {
+                  "bracketId": {
+                    "type": "string"
+                  },
+                  "classroomId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "classroom": {
+                    "type": "object",
+                    "properties": {
+                      "advisorId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "F1",
+                          "F2"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "representativeId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "advisorId",
+                      "category",
+                      "createdAt",
+                      "grade",
+                      "id",
+                      "name",
+                      "representativeId",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "bracketId",
+                  "classroomId",
+                  "createdAt",
+                  "id",
+                  "updatedAt"
+                ]
+              },
+              "bracket": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "F1",
+                      "F2"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "sportId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "KNOCKOUT",
+                      "FINISHED"
+                    ]
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "sport": {
+                    "type": "object",
+                    "properties": {
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "maxAthletes": {
+                        "type": "number"
+                      },
+                      "minAthletes": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "createdAt",
+                      "id",
+                      "maxAthletes",
+                      "minAthletes",
+                      "name",
+                      "slug",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "required": [
+                  "category",
+                  "createdAt",
+                  "id",
+                  "sportId",
+                  "status",
+                  "updatedAt"
+                ]
+              }
+            },
+            "required": [
+              "awayScore",
+              "awayTeamId",
+              "bracketId",
+              "createdAt",
+              "homeScore",
+              "homeTeamId",
+              "id",
+              "location",
+              "phase",
+              "position",
+              "round",
+              "scheduledAt",
+              "status",
+              "updatedAt",
+              "winnerTeamId"
+            ]
+          }
+        },
+        "required": [
+          "color",
+          "createdAt",
+          "id",
+          "matchId",
+          "note",
+          "studentId",
+          "teamId",
+          "updatedAt"
+        ]
+      },
       "AdvisorClassroomsItem": {
         "type": "object",
         "properties": {
@@ -9181,6 +12168,134 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "advisor": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "ADMINISTRATOR",
+                  "ADVISOR",
+                  "REPRESENTATIVE"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "id",
+              "name",
+              "role",
+              "status",
+              "updatedAt"
+            ]
+          },
+          "representative": {
+            "type": "object",
+            "properties": {
+              "avatarId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "ADMINISTRATOR",
+                  "ADVISOR",
+                  "REPRESENTATIVE"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "INACTIVE"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "avatarId",
+              "createdAt",
+              "deletedAt",
+              "email",
+              "id",
+              "name",
+              "role",
+              "status",
+              "updatedAt"
+            ]
           }
         },
         "required": [
@@ -9309,6 +12424,11 @@
             },
             "uniqueItems": true,
             "maxItems": 40
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500
           }
         },
         "required": [
@@ -9963,6 +13083,40 @@
           "code"
         ]
       },
+      "Error404CardNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "CARD_NOT_FOUND"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error404ClassroomNotFound": {
         "type": "object",
         "properties": {
@@ -9981,6 +13135,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "CLASSROOM_NOT_FOUND"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error404EnrollmentRemovalNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_REMOVAL_NOT_FOUND"
             ]
           },
           "errors": {
@@ -10411,6 +13599,40 @@
           "code"
         ]
       },
+      "Error409MatchTeamsPending": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "MATCH_TEAMS_PENDING"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error409MatchTeamsPendingNextMatchPlayed": {
         "type": "object",
         "properties": {
@@ -10760,6 +13982,45 @@
           "errors"
         ]
       },
+      "Error422EnrollmentLimitExceededEnrollmentReasonRequiredSportNotFoundStudentNotFoundValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_LIMIT_EXCEEDED",
+              "ENROLLMENT_REASON_REQUIRED",
+              "SPORT_NOT_FOUND",
+              "STUDENT_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422EnrollmentLimitExceededSportNotFoundStudentNotFoundValidationError": {
         "type": "object",
         "properties": {
@@ -10780,6 +14041,43 @@
               "ENROLLMENT_LIMIT_EXCEEDED",
               "SPORT_NOT_FOUND",
               "STUDENT_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
+      "Error422MatchNotFoundStudentNotInMatchValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "MATCH_NOT_FOUND",
+              "STUDENT_NOT_IN_MATCH",
               "VALIDATION_ERROR"
             ]
           },
@@ -11285,6 +14583,40 @@
           "code"
         ]
       },
+      "Error500AdministratorBracketPreviewError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_BRACKET_PREVIEW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AdministratorBracketShowError": {
         "type": "object",
         "properties": {
@@ -11303,6 +14635,108 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_BRACKET_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorCardCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_CARD_CREATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorCardDeleteError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_CARD_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorCardPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_CARD_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -11473,6 +14907,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_CLASSROOM_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorMatchAthletesError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_MATCH_ATHLETES_ERROR"
             ]
           },
           "errors": {
@@ -11795,6 +15263,40 @@
           "code"
         ]
       },
+      "Error500AdvisorCardPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADVISOR_CARD_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AdvisorClassroomPaginateError": {
         "type": "object",
         "properties": {
@@ -11881,6 +15383,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADVISOR_ENROLLMENT_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500EnrollmentRemovalAcknowledgeError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500EnrollmentRemovalPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ENROLLMENT_REMOVAL_PAGINATE_ERROR"
             ]
           },
           "errors": {

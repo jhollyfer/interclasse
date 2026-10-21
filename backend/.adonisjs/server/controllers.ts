@@ -42,8 +42,22 @@ export const controllers = {
       paginate: {
         Paginate: () => import('#features/administrator/brackets/paginate/paginate.controller'),
       },
+      preview: {
+        Preview: () => import('#features/administrator/brackets/preview/preview.controller'),
+      },
       show: {
         Show: () => import('#features/administrator/brackets/show/show.controller'),
+      },
+    },
+    cards: {
+      create: {
+        Create: () => import('#features/administrator/cards/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/cards/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/cards/paginate/paginate.controller'),
       },
     },
     classrooms: {
@@ -63,7 +77,18 @@ export const controllers = {
         Update: () => import('#features/administrator/classrooms/update/update.controller'),
       },
     },
+    enrollmentRemovals: {
+      acknowledge: {
+        Acknowledge: () => import('#features/administrator/enrollment-removals/acknowledge/acknowledge.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/enrollment-removals/paginate/paginate.controller'),
+      },
+    },
     matches: {
+      athletes: {
+        Athletes: () => import('#features/administrator/matches/athletes/athletes.controller'),
+      },
       paginate: {
         Paginate: () => import('#features/administrator/matches/paginate/paginate.controller'),
       },
@@ -119,6 +144,11 @@ export const controllers = {
     },
   },
   advisor: {
+    cards: {
+      paginate: {
+        Paginate: () => import('#features/advisor/cards/paginate/paginate.controller'),
+      },
+    },
     classrooms: {
       paginate: {
         Paginate: () => import('#features/advisor/classrooms/paginate/paginate.controller'),

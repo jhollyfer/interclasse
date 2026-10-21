@@ -2,19 +2,21 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 
 import Classroom from '#models/classroom'
+import type User from '#models/user'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import type { Merge } from '#core/entity'
 import type { EnrollmentUpdatePayload } from '#features/advisor/enrollments/enrollments.validator'
 
-type Payload = EnrollmentUpdatePayload
+type Payload = Merge<EnrollmentUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, EnrollmentBoard>
 
 @inject()
 export default class AdvisorEnrollmentUpdateUseCase {
   constructor(private readonly enrollments: EnrollmentService) {}
 
-  async execute({ classroomId, sportId, studentIds }: Payload): Promise<Response> {
+  async execute({ classroomId, sportId, studentIds, reason, actor }: Payload): Promise<Response> {
     try {
       const classroom = await Classroom.find(classroomId)
 
@@ -22,7 +24,9 @@ export default class AdvisorEnrollmentUpdateUseCase {
         return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
 
       const board = await this.enrollments.replace(classroom, sportId, studentIds, {
-        canRemove: true,
+        role: 'advisor',
+        actor,
+        reason,
       })
       if (board.isLeft()) return left(board.value)
 

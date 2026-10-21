@@ -4,6 +4,8 @@ import type Classroom from '#models/classroom'
 import type Sport from '#models/sport'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { MatchFactory } from '#database/factories/match.factory'
+import { StudentFactory } from '#database/factories/student.factory'
 import { TeamFactory } from '#database/factories/team.factory'
 import { categoryOf } from '#features/administrator/_shared.classroom'
 import { signInWithFactory } from '#tests/helpers'
@@ -53,4 +55,28 @@ export async function drawnClassroom(grade = 7) {
   await TeamFactory.merge({ bracketId: bracket.id, classroomId: classroom.id }).create()
 
   return classroom
+}
+
+/**
+ * Uma partida com os dois times definidos e um aluno em cada turma: o mínimo
+ * para lançar cartão.
+ */
+export async function matchWithTeams() {
+  const bracket = await BracketFactory.with('sport').create()
+  const [home, away] = await ClassroomFactory.merge({
+    grade: 3,
+    category: categoryOf(3),
+  }).createMany(2)
+  if (!home || !away) throw new Error('factory criou menos turmas que o pedido')
+  const homeTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: home.id }).create()
+  const awayTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: away.id }).create()
+  const match = await MatchFactory.merge({
+    bracketId: bracket.id,
+    homeTeamId: homeTeam.id,
+    awayTeamId: awayTeam.id,
+  }).create()
+  const homeStudent = await StudentFactory.merge({ classroomId: home.id }).create()
+  const awayStudent = await StudentFactory.merge({ classroomId: away.id }).create()
+
+  return { bracket, match, home, away, homeTeam, awayTeam, homeStudent, awayStudent }
 }

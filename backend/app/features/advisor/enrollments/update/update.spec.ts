@@ -1,12 +1,13 @@
 import { test } from '@japa/runner'
 
 import Enrollment from '#models/enrollment'
+import EnrollmentRemoval from '#models/enrollment-removal'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
-import { body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 
 test.group('enrollments > update', (group) => {
   group.each.setup(() => resetDatabase())
@@ -26,7 +27,12 @@ test.group('enrollments > update', (group) => {
     const response = await client
       .put('/advisor/enrollments')
       .cookies(session)
-      .json({ classroomId: classroom.id, sportId: sport.id, studentIds: [entrando.id] })
+      .json({
+        classroomId: classroom.id,
+        sportId: sport.id,
+        studentIds: [entrando.id],
+        reason: 'Mudou de turno',
+      })
 
     response.assertStatus(200)
     assert.equal(body(response).classroom.id, classroom.id)
@@ -53,7 +59,7 @@ test.group('enrollments > update', (group) => {
     assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 0)
   })
 
-  test('modalidade já sorteada na categoria responde 409', async ({ client, assert }) => {
+  test('depois do sorteio o conselheiro ainda troca a lista', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.create()
     const aluno = await StudentFactory.merge({ classroomId: classroom.id }).create()
@@ -64,8 +70,68 @@ test.group('enrollments > update', (group) => {
       .cookies(session)
       .json({ classroomId: classroom.id, sportId: sport.id, studentIds: [aluno.id] })
 
-    response.assertStatus(409)
-    assert.equal(body(response).code, 'ENROLLMENT_LOCKED')
+    response.assertStatus(200)
+    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 1)
+  })
+
+  test('tirar atleta sem motivo responde 422 e nada muda', async ({ client, assert }) => {
+    const { session, classroom } = await signInAsAdvisorOfClassroom(client)
+    const sport = await SportFactory.create()
+    const aluno = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    await EnrollmentFactory.merge({ studentId: aluno.id, sportId: sport.id }).create()
+
+    const response = await client
+      .put('/advisor/enrollments')
+      .cookies(session)
+      .json({ classroomId: classroom.id, sportId: sport.id, studentIds: [] })
+
+    response.assertStatus(422)
+    assert.equal(body(response).code, 'ENROLLMENT_REASON_REQUIRED')
+    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 1)
+  })
+
+  test('tirar atleta com motivo vira aviso pendente para a organização', async ({
+    client,
+    assert,
+  }) => {
+    const { user, session, classroom } = await signInAsAdvisorOfClassroom(client)
+    const sport = await SportFactory.create()
+    const aluno = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    await EnrollmentFactory.merge({ studentId: aluno.id, sportId: sport.id }).create()
+
+    const response = await client.put('/advisor/enrollments').cookies(session).json({
+      classroomId: classroom.id,
+      sportId: sport.id,
+      studentIds: [],
+      reason: 'Mau comportamento com os colegas',
+    })
+
+    response.assertStatus(200)
+    const removals = await EnrollmentRemoval.query().where('classroomId', classroom.id)
+    assert.lengthOf(removals, 1)
+    assert.equal(removals[0]?.studentName, aluno.name)
+    assert.equal(removals[0]?.reason, 'Mau comportamento com os colegas')
+    assert.equal(removals[0]?.actorId, user.id)
+    assert.isNull(removals[0]?.acknowledgedAt ?? null)
+  })
+
+  test('a remoção feita pelo administrador já nasce lida', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const classroom = await ClassroomFactory.create()
+    const sport = await SportFactory.create()
+    const aluno = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    await EnrollmentFactory.merge({ studentId: aluno.id, sportId: sport.id }).create()
+
+    const response = await client.put('/advisor/enrollments').cookies(session).json({
+      classroomId: classroom.id,
+      sportId: sport.id,
+      studentIds: [],
+      reason: 'Transferido de escola',
+    })
+
+    response.assertStatus(200)
+    const removal = await EnrollmentRemoval.findByOrFail('classroomId', classroom.id)
+    assert.isNotNull(removal.acknowledgedAt)
   })
 
   test('acima do máximo da modalidade responde 422', async ({ client, assert }) => {

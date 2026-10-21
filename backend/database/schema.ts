@@ -87,6 +87,31 @@ export class ClassroomSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class EnrollmentRemovalSchema extends BaseModel {
+  static $columns = ['acknowledgedAt', 'actorId', 'classroomId', 'createdAt', 'id', 'reason', 'sportId', 'studentId', 'studentName', 'updatedAt'] as const
+  $columns = EnrollmentRemovalSchema.$columns
+  @column.dateTime()
+  declare acknowledgedAt: DateTime | null
+  @column()
+  declare actorId: string | null
+  @column()
+  declare classroomId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare reason: string
+  @column()
+  declare sportId: string
+  @column()
+  declare studentId: string | null
+  @column()
+  declare studentName: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class EnrollmentSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'sportId', 'studentId', 'updatedAt'] as const
   $columns = EnrollmentSchema.$columns
@@ -98,6 +123,27 @@ export class EnrollmentSchema extends BaseModel {
   declare sportId: string
   @column()
   declare studentId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class MatchCardSchema extends BaseModel {
+  static $columns = ['color', 'createdAt', 'id', 'matchId', 'note', 'studentId', 'teamId', 'updatedAt'] as const
+  $columns = MatchCardSchema.$columns
+  @column()
+  declare color: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare matchId: string
+  @column()
+  declare note: string | null
+  @column()
+  declare studentId: string
+  @column()
+  declare teamId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

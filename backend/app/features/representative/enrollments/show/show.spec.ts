@@ -37,6 +37,7 @@ test.group('enrollments > show', (group) => {
         name: sport.name,
         minAthletes: sport.minAthletes,
         maxAthletes: sport.maxAthletes,
+        drawn: false,
         locked: false,
       },
     ])

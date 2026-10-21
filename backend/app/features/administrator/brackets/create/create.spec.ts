@@ -51,18 +51,24 @@ test.group('brackets > create', (group) => {
     assert.isNull(final?.awayTeamId)
   })
 
-  test('o sorteio trava as inscrições da modalidade na categoria', async ({ client, assert }) => {
+  test('depois do sorteio a lista do conselheiro segue editável, com motivo', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const sport = await createSport(client, admin)
     const [classroomId] = await enrolledClassrooms(client, admin, sport.id, 2)
     await draw(client, admin, sport.id)
 
-    const response = await client
-      .put('/advisor/enrollments')
-      .cookies(admin)
-      .json({ classroomId, sportId: sport.id, studentIds: [] })
+    const response = await client.put('/advisor/enrollments').cookies(admin).json({
+      classroomId,
+      sportId: sport.id,
+      studentIds: [],
+      reason: 'Atleta machucado',
+    })
 
-    response.assertStatus(409)
-    assert.equal(body(response).code, 'ENROLLMENT_LOCKED')
+    response.assertStatus(200)
+    assert.isTrue(body(response).sports[0].drawn)
+    assert.isFalse(body(response).sports[0].locked)
   })
 })

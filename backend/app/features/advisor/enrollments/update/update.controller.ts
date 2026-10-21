@@ -13,11 +13,16 @@ export default class AdvisorEnrollmentUpdateController {
   static docs = defineDocs({
     description:
       'Troca a lista de atletas da turma numa modalidade pela enviada, inteira. Responde a ' +
-      'matriz atualizada. Depois do sorteio da modalidade na categoria da turma, `409`.',
+      'matriz atualizada. Vale também depois do sorteio: o time sorteado é a turma. Tirar ' +
+      'atleta exige `reason`, que vira aviso para a organização.',
     // Nascem no `EnrollmentService`, fora da leitura de AST do gerador.
     errors: {
-      409: 'ENROLLMENT_LOCKED',
-      422: ['SPORT_NOT_FOUND', 'STUDENT_NOT_FOUND', 'ENROLLMENT_LIMIT_EXCEEDED'],
+      422: [
+        'SPORT_NOT_FOUND',
+        'STUDENT_NOT_FOUND',
+        'ENROLLMENT_LIMIT_EXCEEDED',
+        'ENROLLMENT_REASON_REQUIRED',
+      ],
     },
   })
 
@@ -27,7 +32,7 @@ export default class AdvisorEnrollmentUpdateController {
     const payload = await context.request.validateUsing(EnrollmentUpdateValidator)
     const classroom = await Classroom.find(payload.classroomId)
     await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)
-    const result = await this.useCase.execute(payload)
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

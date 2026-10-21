@@ -48,11 +48,13 @@ test.group('brackets > delete', (group) => {
     assert.lengthOf(await Team.query().where('bracketId', bracket.id), 0)
     assert.lengthOf(await Match.query().where('bracketId', bracket.id), 0)
 
-    // Sem a chave, a lista da turma volta a aceitar mudança.
-    const inscricao = await client
-      .put('/advisor/enrollments')
-      .cookies(admin)
-      .json({ classroomId: classroomIds[0], sportId: sport.id, studentIds: [] })
+    // Sem a chave, a lista da turma continua aceitando mudança.
+    const inscricao = await client.put('/advisor/enrollments').cookies(admin).json({
+      classroomId: classroomIds[0],
+      sportId: sport.id,
+      studentIds: [],
+      reason: 'Refazer o sorteio',
+    })
     inscricao.assertStatus(200)
   })
 

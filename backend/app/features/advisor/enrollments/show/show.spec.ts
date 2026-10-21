@@ -40,6 +40,7 @@ test.group('enrollments > show', (group) => {
         name: sport.name,
         minAthletes: sport.minAthletes,
         maxAthletes: sport.maxAthletes,
+        drawn: false,
         locked: false,
       },
     ])
@@ -48,7 +49,10 @@ test.group('enrollments > show', (group) => {
     ])
   })
 
-  test('modalidade sorteada na categoria da turma aparece travada', async ({ client, assert }) => {
+  test('modalidade sorteada aparece sorteada, mas não travada para o conselheiro', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sorteada = await SportFactory.create()
     const aberta = await SportFactory.create()
@@ -60,13 +64,16 @@ test.group('enrollments > show', (group) => {
       .cookies(session)
 
     response.assertStatus(200)
-    const locked = Object.fromEntries(
-      body(response).sports.map((sport: { id: string; locked: boolean }) => [
+    const state = Object.fromEntries(
+      body(response).sports.map((sport: { id: string; drawn: boolean; locked: boolean }) => [
         sport.id,
-        sport.locked,
+        { drawn: sport.drawn, locked: sport.locked },
       ]),
     )
-    assert.deepEqual(locked, { [sorteada.id]: true, [aberta.id]: false })
+    assert.deepEqual(state, {
+      [sorteada.id]: { drawn: true, locked: false },
+      [aberta.id]: { drawn: false, locked: false },
+    })
   })
 
   test('turma de outro conselheiro ou inexistente responde 404', async ({ client, assert }) => {

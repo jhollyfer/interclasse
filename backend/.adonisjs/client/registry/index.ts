@@ -6,11 +6,23 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'health_check': {
+  'health-check': {
     methods: ["GET","HEAD"],
     pattern: '/health-check',
     tokens: [{"old":"/health-check","type":0,"val":"health-check","end":""}],
-    types: placeholder as Registry['health_check']['types'],
+    types: placeholder as Registry['health-check']['types'],
+  },
+  'documentation.openapi': {
+    methods: ["GET","HEAD"],
+    pattern: '/openapi.json',
+    tokens: [{"old":"/openapi.json","type":0,"val":"openapi.json","end":""}],
+    types: placeholder as Registry['documentation.openapi']['types'],
+  },
+  'documentation.reference': {
+    methods: ["GET","HEAD"],
+    pattern: '/documentation',
+    tokens: [{"old":"/documentation","type":0,"val":"documentation","end":""}],
+    types: placeholder as Registry['documentation.reference']['types'],
   },
   'storefront.sports': {
     methods: ["GET","HEAD"],
@@ -216,6 +228,12 @@ const routes = {
     tokens: [{"old":"/administrator/brackets","type":0,"val":"administrator","end":""},{"old":"/administrator/brackets","type":0,"val":"brackets","end":""}],
     types: placeholder as Registry['administrator.brackets.create']['types'],
   },
+  'administrator.brackets.preview': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/brackets/preview',
+    tokens: [{"old":"/administrator/brackets/preview","type":0,"val":"administrator","end":""},{"old":"/administrator/brackets/preview","type":0,"val":"brackets","end":""},{"old":"/administrator/brackets/preview","type":0,"val":"preview","end":""}],
+    types: placeholder as Registry['administrator.brackets.preview']['types'],
+  },
   'administrator.brackets.show': {
     methods: ["GET","HEAD"],
     pattern: '/administrator/brackets/:id',
@@ -246,11 +264,47 @@ const routes = {
     tokens: [{"old":"/administrator/matches/:id/score","type":0,"val":"administrator","end":""},{"old":"/administrator/matches/:id/score","type":0,"val":"matches","end":""},{"old":"/administrator/matches/:id/score","type":1,"val":"id","end":""},{"old":"/administrator/matches/:id/score","type":0,"val":"score","end":""}],
     types: placeholder as Registry['administrator.matches.score']['types'],
   },
+  'administrator.matches.athletes': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/matches/:id/athletes',
+    tokens: [{"old":"/administrator/matches/:id/athletes","type":0,"val":"administrator","end":""},{"old":"/administrator/matches/:id/athletes","type":0,"val":"matches","end":""},{"old":"/administrator/matches/:id/athletes","type":1,"val":"id","end":""},{"old":"/administrator/matches/:id/athletes","type":0,"val":"athletes","end":""}],
+    types: placeholder as Registry['administrator.matches.athletes']['types'],
+  },
   'administrator.matches.unscore': {
     methods: ["DELETE"],
     pattern: '/administrator/matches/:id/score',
     tokens: [{"old":"/administrator/matches/:id/score","type":0,"val":"administrator","end":""},{"old":"/administrator/matches/:id/score","type":0,"val":"matches","end":""},{"old":"/administrator/matches/:id/score","type":1,"val":"id","end":""},{"old":"/administrator/matches/:id/score","type":0,"val":"score","end":""}],
     types: placeholder as Registry['administrator.matches.unscore']['types'],
+  },
+  'administrator.cards.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/cards',
+    tokens: [{"old":"/administrator/cards","type":0,"val":"administrator","end":""},{"old":"/administrator/cards","type":0,"val":"cards","end":""}],
+    types: placeholder as Registry['administrator.cards.paginate']['types'],
+  },
+  'administrator.cards.create': {
+    methods: ["POST"],
+    pattern: '/administrator/cards',
+    tokens: [{"old":"/administrator/cards","type":0,"val":"administrator","end":""},{"old":"/administrator/cards","type":0,"val":"cards","end":""}],
+    types: placeholder as Registry['administrator.cards.create']['types'],
+  },
+  'administrator.cards.delete': {
+    methods: ["DELETE"],
+    pattern: '/administrator/cards/:id',
+    tokens: [{"old":"/administrator/cards/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/cards/:id","type":0,"val":"cards","end":""},{"old":"/administrator/cards/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.cards.delete']['types'],
+  },
+  'administrator.enrollmentRemovals.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/enrollment-removals',
+    tokens: [{"old":"/administrator/enrollment-removals","type":0,"val":"administrator","end":""},{"old":"/administrator/enrollment-removals","type":0,"val":"enrollment-removals","end":""}],
+    types: placeholder as Registry['administrator.enrollmentRemovals.paginate']['types'],
+  },
+  'administrator.enrollmentRemovals.acknowledge': {
+    methods: ["PATCH"],
+    pattern: '/administrator/enrollment-removals/:id/acknowledge',
+    tokens: [{"old":"/administrator/enrollment-removals/:id/acknowledge","type":0,"val":"administrator","end":""},{"old":"/administrator/enrollment-removals/:id/acknowledge","type":0,"val":"enrollment-removals","end":""},{"old":"/administrator/enrollment-removals/:id/acknowledge","type":1,"val":"id","end":""},{"old":"/administrator/enrollment-removals/:id/acknowledge","type":0,"val":"acknowledge","end":""}],
+    types: placeholder as Registry['administrator.enrollmentRemovals.acknowledge']['types'],
   },
   'administrator.users.paginate': {
     methods: ["GET","HEAD"],
@@ -299,6 +353,12 @@ const routes = {
     pattern: '/advisor/classrooms',
     tokens: [{"old":"/advisor/classrooms","type":0,"val":"advisor","end":""},{"old":"/advisor/classrooms","type":0,"val":"classrooms","end":""}],
     types: placeholder as Registry['advisor.classrooms']['types'],
+  },
+  'advisor.cards': {
+    methods: ["GET","HEAD"],
+    pattern: '/advisor/cards',
+    tokens: [{"old":"/advisor/cards","type":0,"val":"advisor","end":""},{"old":"/advisor/cards","type":0,"val":"cards","end":""}],
+    types: placeholder as Registry['advisor.cards']['types'],
   },
   'advisor.students.paginate': {
     methods: ["GET","HEAD"],
