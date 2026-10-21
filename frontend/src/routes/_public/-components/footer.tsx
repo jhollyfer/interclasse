@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { MaiyuCredit } from '#/components/common/maiyu-credit'
 
 import { NAVIGATION } from './menu'
 
@@ -48,18 +49,7 @@ export function Footer(): React.JSX.Element {
       </div>
 
       <div className="border-t border-brand-ink-foreground/10">
-        <p className="container mx-auto px-4 py-4 text-sm text-brand-ink-foreground/70">
-          Desenvolvido por{' '}
-          <a
-            href="https://maiyu.com.br"
-            target="_blank"
-            rel="noreferrer"
-            className="font-semibold text-brand-ink-foreground underline-offset-4 hover:underline"
-          >
-            Maiyu
-          </a>{' '}
-          - Consultoria e Desenvolvimento em Tecnologia
-        </p>
+        <MaiyuCredit className="container mx-auto justify-start px-4 py-4 text-sm text-brand-ink-foreground/70 [&_a]:text-brand-ink-foreground" />
       </div>
     </footer>
   )

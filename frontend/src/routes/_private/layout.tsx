@@ -4,6 +4,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { NotFoundPageServerError } from '#/components/common/not-found-page'
+import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { UploadingProvider } from '#/components/common/uploading-context'
 import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
@@ -162,17 +163,8 @@ function RouteComponent(): React.JSX.Element {
 
         {/* O crédito fica fora da área que rola: sempre no pé, abaixo da
             paginação, sem disputar espaço com a tela. */}
-        <footer className="text-muted-foreground shrink-0 border-t px-4 py-2 text-center text-xs">
-          Desenvolvido por{' '}
-          <a
-            href="https://maiyu.com.br"
-            target="_blank"
-            rel="noreferrer"
-            className="text-foreground font-semibold underline-offset-4 hover:underline"
-          >
-            Maiyu
-          </a>{' '}
-          - Consultoria e Desenvolvimento em Tecnologia
+        <footer className="text-muted-foreground shrink-0 border-t px-4 py-2 text-xs [&_a]:text-foreground">
+          <MaiyuCredit />
         </footer>
       </SidebarInset>
     </SidebarProvider>
