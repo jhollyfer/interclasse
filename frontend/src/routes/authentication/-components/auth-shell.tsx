@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { cn } from '#/lib/utils'
 import type { Merge } from '#/lib/interfaces'
 
@@ -199,6 +200,9 @@ function AuthShellContent({
       >
         {children}
       </div>
+      <footer className="text-muted-foreground px-6 py-4 text-xs [&_a]:text-foreground">
+        <MaiyuCredit />
+      </footer>
     </main>
   )
 }
