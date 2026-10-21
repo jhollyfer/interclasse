@@ -37,6 +37,43 @@ function byeTeam(
   return next.awayName
 }
 
+/**
+ * O número de cada jogo, como na súmula do professor: em ordem de fase e de
+ * posição, contando só as partidas que existem (folga não é jogo).
+ */
+function numbering(matches: ReadonlyArray<IBracketMatch>): Map<string, number> {
+  const ordered = [...matches].sort(
+    (a, b) => a.round - b.round || a.position - b.position,
+  )
+
+  return new Map(ordered.map((match, index) => [match.id, index + 1]))
+}
+
+/**
+ * O que mostrar na vaga ainda vazia: de qual jogo sai quem ocupa ela. A vaga
+ * de mandante vem do jogo na posição `2p` da fase anterior; a de visitante,
+ * do `2p + 1` - o inverso do `advanceSlot` do backend.
+ */
+function feederLabel(
+  matches: ReadonlyArray<IBracketMatch>,
+  numbers: Map<string, number>,
+  match: IBracketMatch,
+  side: 'home' | 'away',
+): string {
+  let offset = 0
+  if (side === 'away') offset = 1
+
+  const feeder = matches.find(
+    (item) =>
+      item.round === match.round - 1 &&
+      item.position === match.position * 2 + offset,
+  )
+  const number = feeder && numbers.get(feeder.id)
+  if (!number) return 'A definir'
+
+  return `Vencedor do Jogo ${number}`
+}
+
 /** As colunas da chave, uma por fase, com o número de vagas de cada uma. */
 function columns(matches: ReadonlyArray<IBracketMatch>) {
   const rounds = Math.max(1, ...matches.map((match) => match.round))
@@ -76,6 +113,7 @@ export function BracketTree({
 }: BracketTreeProps): React.JSX.Element {
   const champion = championName(bracket)
   const tree = columns(bracket.matches)
+  const numbers = numbering(bracket.matches)
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 pb-2">
@@ -99,7 +137,22 @@ export function BracketTree({
 
                 return (
                   <li key={slot.match.id}>
-                    <MatchBox match={slot.match} />
+                    <MatchBox
+                      match={slot.match}
+                      number={numbers.get(slot.match.id)}
+                      homePending={feederLabel(
+                        bracket.matches,
+                        numbers,
+                        slot.match,
+                        'home',
+                      )}
+                      awayPending={feederLabel(
+                        bracket.matches,
+                        numbers,
+                        slot.match,
+                        'away',
+                      )}
+                    />
                     {renderActions?.(slot.match)}
                   </li>
                 )
@@ -129,22 +182,40 @@ export function BracketTree({
   )
 }
 
-/** Uma partida: os dois lados, o placar e quem seguiu. */
+type MatchBoxProps = Readonly<{
+  match: IBracketMatch
+  number: number | undefined
+  /** O texto da vaga vazia: "Vencedor do Jogo N". */
+  homePending: string
+  awayPending: string
+}>
+
+/** Uma partida: o número, os dois lados, o placar e quem seguiu. */
 function MatchBox({
   match,
-}: Readonly<{ match: IBracketMatch }>): React.JSX.Element {
+  number,
+  homePending,
+  awayPending,
+}: MatchBoxProps): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
 
   return (
     <div className="bg-card overflow-hidden rounded-lg border text-sm shadow-xs">
+      {number && (
+        <p className="text-muted-foreground border-b px-3 py-1 text-xs font-medium">
+          Jogo {number}
+        </p>
+      )}
       <TeamRow
         name={match.homeName}
+        pending={homePending}
         score={match.homeScore}
         finished={finished}
         won={finished && match.winnerTeamId === match.homeTeamId}
       />
       <TeamRow
         name={match.awayName}
+        pending={awayPending}
         score={match.awayScore}
         finished={finished}
         won={finished && match.winnerTeamId === match.awayTeamId}
@@ -161,6 +232,7 @@ function MatchBox({
 
 type TeamRowProps = Readonly<{
   name: string | null
+  pending: string
   score: number | null
   finished: boolean
   won: boolean
@@ -168,6 +240,7 @@ type TeamRowProps = Readonly<{
 
 function TeamRow({
   name,
+  pending,
   score,
   finished,
   won,
@@ -188,7 +261,7 @@ function TeamRow({
           lost && 'text-muted-foreground line-through decoration-1',
         )}
       >
-        {name ?? 'A definir'}
+        {name ?? pending}
       </span>
       {won && (
         <span className="text-primary flex items-center gap-0.5 text-xs">
