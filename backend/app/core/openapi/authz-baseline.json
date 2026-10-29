@@ -26,6 +26,10 @@
   "GET /administrator/matches/{id}/athletes": "ADMINISTRATOR",
   "PUT /administrator/matches/{id}/score": "ADMINISTRATOR",
   "DELETE /administrator/matches/{id}/score": "ADMINISTRATOR",
+  "GET /administrator/photos": "ADMINISTRATOR",
+  "POST /administrator/photos": "ADMINISTRATOR",
+  "DELETE /administrator/photos/{id}": "ADMINISTRATOR",
+  "PUT /administrator/photos/{id}/review": "ADMINISTRATOR",
   "GET /administrator/site": "ADMINISTRATOR",
   "PUT /administrator/site": "ADMINISTRATOR",
   "GET /administrator/sports": "ADMINISTRATOR",
@@ -44,6 +48,9 @@
   "GET /advisor/classrooms": "ADMINISTRATOR, ADVISOR",
   "GET /advisor/enrollments": "ADMINISTRATOR, ADVISOR",
   "PUT /advisor/enrollments": "ADMINISTRATOR, ADVISOR",
+  "GET /advisor/photos": "ADMINISTRATOR, ADVISOR",
+  "POST /advisor/photos": "ADMINISTRATOR, ADVISOR",
+  "DELETE /advisor/photos/{id}": "ADMINISTRATOR, ADVISOR",
   "GET /advisor/students": "ADMINISTRATOR, ADVISOR",
   "POST /advisor/students": "ADMINISTRATOR, ADVISOR",
   "PUT /advisor/students/{id}": "ADMINISTRATOR, ADVISOR",
@@ -64,6 +71,7 @@
   "GET /storefront/brackets": "anonima",
   "GET /storefront/brackets/{id}": "anonima",
   "GET /storefront/matches": "anonima",
+  "GET /storefront/photos": "anonima",
   "GET /storefront/site": "anonima",
   "GET /storefront/sports": "anonima"
 }

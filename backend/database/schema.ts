@@ -183,6 +183,29 @@ export class MatchSchema extends BaseModel {
   declare winnerTeamId: string | null
 }
 
+export class PhotoSchema extends BaseModel {
+  static $columns = ['authorId', 'caption', 'createdAt', 'id', 'reviewedAt', 'reviewedById', 'status', 'storageId', 'updatedAt'] as const
+  $columns = PhotoSchema.$columns
+  @column()
+  declare authorId: string | null
+  @column()
+  declare caption: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare reviewedAt: DateTime | null
+  @column()
+  declare reviewedById: string | null
+  @column()
+  declare status: string
+  @column()
+  declare storageId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class RateLimitSchema extends BaseModel {
   static $columns = ['expire', 'key', 'points'] as const
   $columns = RateLimitSchema.$columns

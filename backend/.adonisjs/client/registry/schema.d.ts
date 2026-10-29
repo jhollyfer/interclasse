@@ -91,6 +91,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/site/show/show.controller').default['handle']>>>
     }
   }
+  'storefront.photos': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/photos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/photos/paginate/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/photos/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'storefront.brackets.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/storefront/brackets'
@@ -377,6 +389,54 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/sports/delete/delete.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.photos.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/photos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#features/administrator/photos/photos.validator').PhotoPaginateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/paginate/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.photos.create': {
+    methods: ["POST"]
+    pattern: '/administrator/photos'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#features/administrator/photos/photos.validator').PhotoCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#features/administrator/photos/photos.validator').PhotoCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/create/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.photos.review': {
+    methods: ["PUT"]
+    pattern: '/administrator/photos/:id/review'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#features/administrator/photos/photos.validator').PhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#features/administrator/photos/photos.validator').PhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/review/review.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/review/review.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.photos.delete': {
+    methods: ["DELETE"]
+    pattern: '/administrator/photos/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/delete/delete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'administrator.site.show': {
@@ -797,6 +857,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/students/delete/delete.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/students/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'advisor.photos.paginate': {
+    methods: ["GET","HEAD"]
+    pattern: '/advisor/photos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#features/advisor/photos/photos.validator').PhotoPaginateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/photos/paginate/paginate.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/photos/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'advisor.photos.create': {
+    methods: ["POST"]
+    pattern: '/advisor/photos'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#features/advisor/photos/photos.validator').PhotoCreateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#features/advisor/photos/photos.validator').PhotoCreateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/photos/create/create.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/photos/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'advisor.photos.delete': {
+    methods: ["DELETE"]
+    pattern: '/advisor/photos/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/photos/delete/delete.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/photos/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'advisor.enrollments.show': {

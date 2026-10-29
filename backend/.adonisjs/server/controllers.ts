@@ -102,6 +102,20 @@ export const controllers = {
         Update: () => import('#features/administrator/matches/update/update.controller'),
       },
     },
+    photos: {
+      create: {
+        Create: () => import('#features/administrator/photos/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/photos/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/photos/paginate/paginate.controller'),
+      },
+      review: {
+        Review: () => import('#features/administrator/photos/review/review.controller'),
+      },
+    },
     site: {
       show: {
         Show: () => import('#features/administrator/site/show/show.controller'),
@@ -168,6 +182,17 @@ export const controllers = {
       },
       update: {
         Update: () => import('#features/advisor/enrollments/update/update.controller'),
+      },
+    },
+    photos: {
+      create: {
+        Create: () => import('#features/advisor/photos/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/advisor/photos/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/advisor/photos/paginate/paginate.controller'),
       },
     },
     students: {
@@ -263,6 +288,11 @@ export const controllers = {
     matches: {
       paginate: {
         Paginate: () => import('#features/storefront/matches/paginate/paginate.controller'),
+      },
+    },
+    photos: {
+      paginate: {
+        Paginate: () => import('#features/storefront/photos/paginate/paginate.controller'),
       },
     },
     site: {

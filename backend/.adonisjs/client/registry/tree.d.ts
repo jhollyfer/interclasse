@@ -12,6 +12,7 @@ export interface ApiDefinition {
     announcements: typeof routes['storefront.announcements']
     matches: typeof routes['storefront.matches']
     site: typeof routes['storefront.site']
+    photos: typeof routes['storefront.photos']
     brackets: {
       paginate: typeof routes['storefront.brackets.paginate']
       show: typeof routes['storefront.brackets.show']
@@ -49,6 +50,12 @@ export interface ApiDefinition {
       show: typeof routes['administrator.sports.show']
       update: typeof routes['administrator.sports.update']
       delete: typeof routes['administrator.sports.delete']
+    }
+    photos: {
+      paginate: typeof routes['administrator.photos.paginate']
+      create: typeof routes['administrator.photos.create']
+      review: typeof routes['administrator.photos.review']
+      delete: typeof routes['administrator.photos.delete']
     }
     site: {
       show: typeof routes['administrator.site.show']
@@ -106,6 +113,11 @@ export interface ApiDefinition {
       create: typeof routes['advisor.students.create']
       update: typeof routes['advisor.students.update']
       delete: typeof routes['advisor.students.delete']
+    }
+    photos: {
+      paginate: typeof routes['advisor.photos.paginate']
+      create: typeof routes['advisor.photos.create']
+      delete: typeof routes['advisor.photos.delete']
     }
     enrollments: {
       show: typeof routes['advisor.enrollments.show']
