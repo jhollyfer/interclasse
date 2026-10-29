@@ -1,0 +1,7 @@
+{
+  "not_found": "Archivo no encontrado",
+  "in_use": "Archivo en uso",
+  "in_use_field": "Archivo en uso en: {places}. Desvincúlalo antes de borrarlo.",
+  "incomplete": "Archivo incompleto",
+  "size_mismatch_field": "El archivo enviado tiene {received} bytes, y se declararon {declared}."
+}

@@ -1,33 +1,47 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Actor,
+  type AccountProfileShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
-import User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
+import { UserRepository } from '#repositories/user/user.repository'
 
-type Payload = { actor: User }
-type Response = Either<HTTPException, User>
+type Payload = { actor: Actor }
+type Response = Either<HTTPException, AccountProfileShowResponse>
 
 /**
  * A leitura da própria conta: o `actor` da sessão (_standards/backend.md §4.3).
  *
- * Sem nova consulta por id: o guard já leu a conta nesta requisição, com o
- * filtro de arquivado e de inativo - quem foi arquivado não chega até aqui.
+ * O guard já leu a conta nesta requisição, com o filtro de arquivado e de
+ * inativo - quem foi arquivado não chega até aqui. O que se lê de novo é a
+ * conta com o avatar, a `url` dele já assinada.
  */
 @inject()
 export default class AccountProfileShowUseCase {
-  async execute(payload: Payload): Promise<Response> {
-    try {
-      // `avatar` carregado: é parte do recurso, e a `url` dele é derivada na
-      // serialização pelo model `Storage`.
-      await payload.actor.load('avatar')
+  constructor(
+    private readonly users: UserRepository,
+    private readonly i18n: I18n,
+  ) {}
 
-      return right(payload.actor)
+  async execute({ actor }: Payload): Promise<Response> {
+    try {
+      const profile = await this.users.detail(actor.id)
+
+      if (!profile)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+
+      return right(profile)
     } catch (error) {
       logger.error({ err: error }, '[profile > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'PROFILE_SHOW_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'PROFILE_SHOW_ERROR'),
       )
     }
   }

@@ -1,0 +1,6 @@
+{
+  "missing": "Sessão não encontrada",
+  "invalid": "Sessão inválida",
+  "invalid_credentials": "Credenciais inválidas",
+  "invalid_credentials_field": "Dados de acesso inválidos"
+}

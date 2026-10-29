@@ -1,17 +1,18 @@
-import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { DateTime } from 'luxon'
 import { left, right, type Either } from '@interclasse/shared'
 
-import User from '#models/user'
-import SessionService from '#services/session/session.service'
-import ClassroomService from '#services/classroom/classroom.service'
 import HTTPException from '#exceptions/http.exception'
+import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
+import { UserRepository } from '#repositories/user/user.repository'
+import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
+import { SessionContract } from '#services/session/session.contract'
+import { UserRefusal } from '#features/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, User>
+type Response = Either<HTTPException, null>
 
 /**
  * Envia a conta para a lixeira. Usuário já arquivado é indistinguível de
@@ -23,47 +24,50 @@ type Response = Either<HTTPException, User>
  * token vencer - e arquivar não desligaria ninguém.
  *
  * A própria conta não chega aqui: a `UserPolicy`, checada pelo controller com
- * `ctx.bouncer`, a recusa com `403` antes de qualquer leitura. É a guarda de auto-trancamento do projeto
- * de referência, que mantém intocável a conta que ninguém mais consegue
- * restaurar; sem um terceiro papel para reservá-la, aqui o intocável é
- * quem está fazendo a requisição. Como todo administrador vivo é protegido de
- * si mesmo, o último deles nunca cai - a guarda de identidade já entrega o que
- * uma contagem entregaria.
+ * `ctx.bouncer`, a recusa com `403` antes de qualquer leitura. É a guarda de
+ * auto-trancamento do projeto de referência, que mantém intocável a conta que
+ * ninguém mais consegue restaurar; sem um terceiro papel para reservá-la, aqui
+ * o intocável é quem está fazendo a requisição. Como todo administrador vivo é
+ * protegido de si mesmo, o último deles nunca cai - a guarda de identidade já
+ * entrega o que uma contagem entregaria.
  */
 @inject()
 export default class AdministratorUserArchiveUseCase {
   constructor(
-    private readonly classrooms: ClassroomService,
-    private readonly session: SessionService,
+    private readonly users: UserRepository,
+    private readonly sessions: SessionContract,
+    private readonly classrooms: ClassroomDetachContract,
+    private readonly unitOfWork: UnitOfWork,
+    private readonly i18n: I18n,
   ) {}
 
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const user = await User.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .first()
+      const user = await this.users.findById(id)
 
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
+      if (!user)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+
+      const archived = user.archive(new Date())
+      if (archived.isLeft()) return left(UserRefusal.http(archived.value, this.i18n))
 
       // Arquivar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
       // falha do segundo passo deixaria a conta arquivada com sessão viva.
-      await db.transaction(async (trx) => {
-        user.useTransaction(trx)
-        user.deletedAt = DateTime.now()
-        await user.save()
-
-        await this.session.revokeAll(user, trx)
+      await this.unitOfWork.run(async () => {
+        await this.users.save(user)
+        await this.sessions.revokeAll(id)
         // Conta arquivada não aconselha nem representa turma nenhuma.
-        await this.classrooms.detach(user, trx)
+        await this.classrooms.detach(id)
+
+        return right(null)
       })
 
-      return right(user)
+      return right(null)
     } catch (error) {
       logger.error({ err: error }, '[users > archive][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_ARCHIVE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_ARCHIVE_ERROR'),
       )
     }
   }

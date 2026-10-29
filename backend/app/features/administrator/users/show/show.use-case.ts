@@ -1,34 +1,39 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either } from '@interclasse/shared'
+import { left, right, type AdministratorUserShowResponse, type Either } from '@interclasse/shared'
 
-import User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
+import { UserRepository } from '#repositories/user/user.repository'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, User>
+type Response = Either<HTTPException, AdministratorUserShowResponse>
 
 @inject()
 export default class AdministratorUserShowUseCase {
+  constructor(
+    private readonly users: UserRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
       // Usuário arquivado é indistinguível de inexistente aqui, porque o filtro
       // é o mesmo que a listagem padrão aplica. Para alcançá-lo, liste com
       // `?trashed`.
-      const user = await User.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .preload('avatar')
-        .first()
+      const user = await this.users.detail(id)
 
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
+      if (!user)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
       return right(user)
     } catch (error) {
       logger.error({ err: error }, '[users > show][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'USER_SHOW_ERROR'))
+      return left(
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_SHOW_ERROR'),
+      )
     }
   }
 }

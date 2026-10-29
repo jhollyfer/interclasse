@@ -2,8 +2,8 @@ import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 
 import Storage from '#models/storage'
-import { PART_SIZE } from '#services/multipart/multipart-contract.service'
-import { FileCreateValidator } from '#validators/storages/files.validator'
+import { PART_SIZE } from '#services/multipart/multipart.contract'
+import { StoragesFileCreateValidator } from '#validators/storages/files.validator'
 import { type StorageMimetype } from '#core/validator'
 import { UPLOAD_MAX_SIZE } from '#validators/storages/files.validator'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
@@ -44,7 +44,7 @@ async function open(
 test.group('storages > validator', () => {
   test('recusa mimetype fora da lista', async ({ assert }) => {
     await assert.rejects(() =>
-      FileCreateValidator.validate({
+      StoragesFileCreateValidator.validate({
         fileName: 'script.sh',
         mimetype: 'application/x-sh',
         size: 128,
@@ -59,7 +59,7 @@ test.group('storages > validator', () => {
    */
   test('recusa tamanho acima do teto do ambiente', async ({ assert }) => {
     await assert.rejects(() =>
-      FileCreateValidator.validate({
+      StoragesFileCreateValidator.validate({
         fileName: 'gigante.pdf',
         mimetype: 'application/pdf',
         size: UPLOAD_MAX_SIZE + 1,
@@ -68,7 +68,7 @@ test.group('storages > validator', () => {
   })
 
   test('aceita o tamanho no teto', async ({ assert }) => {
-    const payload = await FileCreateValidator.validate({
+    const payload = await StoragesFileCreateValidator.validate({
       fileName: 'grande.pdf',
       mimetype: 'application/pdf',
       size: UPLOAD_MAX_SIZE,

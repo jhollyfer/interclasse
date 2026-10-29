@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
 import type { ApiClient } from '@japa/api-client'
 
 import Storage from '#models/storage'
-import { MultipartContract, PART_SIZE } from '#services/multipart/multipart-contract.service'
+import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
 import StoragesPrune from '#commands/storages-prune.command'
 import { type StorageMimetype } from '#core/validator'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'

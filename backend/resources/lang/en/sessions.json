@@ -1,0 +1,6 @@
+{
+  "missing": "Session not found",
+  "invalid": "Invalid session",
+  "invalid_credentials": "Invalid credentials",
+  "invalid_credentials_field": "Invalid access data"
+}

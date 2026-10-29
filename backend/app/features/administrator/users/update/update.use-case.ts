@@ -1,19 +1,28 @@
-import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { ACTIVE_STATUS, left, right, type Either, type Merge } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorUserShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import User from '#models/user'
-import SessionService from '#services/session/session.service'
-import ClassroomService from '#services/classroom/classroom.service'
-import { StorageContract } from '#services/storage/storage-contract.service'
 import HTTPException from '#exceptions/http.exception'
+import { StorageRepository } from '#repositories/storage/storage.repository'
+import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
+import { UserRepository } from '#repositories/user/user.repository'
+import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
+import { SessionContract } from '#services/session/session.contract'
+import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
+import { UserRefusal } from '#features/_shared.user-refusal'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { UserUpdatePayload } from '#validators/administrator/users.validator'
+import type { AdministratorUserUpdatePayload } from '#validators/administrator/users.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<UserUpdatePayload, IdentifierPayload>
-type Response = Either<HTTPException, User>
+type Payload = Merge<AdministratorUserUpdatePayload, IdentifierPayload>
+type Response = Either<HTTPException, AdministratorUserShowResponse>
 
 /**
  * Edita a conta. Nome, e-mail, senha e foto valem para qualquer alvo; papel e
@@ -30,89 +39,64 @@ type Response = Either<HTTPException, User>
 @inject()
 export default class AdministratorUserUpdateUseCase {
   constructor(
-    private readonly storage: StorageContract,
-    private readonly classrooms: ClassroomService,
-    private readonly session: SessionService,
+    private readonly users: UserRepository,
+    private readonly storages: StorageRepository,
+    private readonly sessions: SessionContract,
+    private readonly classrooms: ClassroomDetachContract,
+    private readonly unitOfWork: UnitOfWork,
+    private readonly i18n: I18n,
   ) {}
 
-  async execute({ id, ...payload }: Payload): Promise<Response> {
+  async execute({ id, ...changes }: Payload): Promise<Response> {
     try {
-      const user = await User.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .first()
+      const user = await this.users.findById(id)
 
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
+      if (!user)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      if (payload.email && payload.email !== user.email) {
-        // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
-        // inteira, então sem esta checagem o save estouraria a constraint e
-        // viraria `500`.
-        const exist = await User.query().where('email', payload.email).whereNot('id', id).first()
+      // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela inteira,
+      // então sem esta checagem o save estouraria a constraint e viraria `500`.
+      if (
+        changes.email &&
+        changes.email !== user.snapshot().email &&
+        (await this.users.existsByEmail(changes.email, id))
+      )
+        return left(UserRefusal.alreadyExists(this.i18n))
 
-        if (exist)
-          return left(
-            HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
-              email: 'Já existe um usuário com este e-mail',
-            }),
-          )
-      }
+      if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
+        return left(AttachmentRefusal.notFound('avatarId', this.i18n))
 
-      if (payload.avatarId) {
-        const avatar = await this.storage.assertExist('avatarId', [payload.avatarId])
+      // Trocar e-mail ou senha, mudar o papel e desativar a conta derrubam as
+      // sessões do alvo, e mudar o papel solta as turmas: a entidade diz o que
+      // a edição obriga a fazer.
+      const effects = user.update(changes, new Date())
 
-        if (avatar.isLeft()) return left(avatar.value)
-      }
+      // Gravar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
+      // falha de um deixaria a conta mudada com sessão ou turma do papel antigo.
+      await this.unitOfWork.run(async () => {
+        await this.users.save(user)
 
-      // Trocar e-mail ou senha derruba todas as sessões do alvo: sem isso um
-      // token anterior à troca de acesso sobreviveria, e desligar o acesso de
-      // alguém não desligaria nada. Avaliado antes do merge, enquanto
-      // `user.email` ainda é o valor atual.
-      //
-      // Desativar a conta e trocar o papel também derrubam: o guard não lê
-      // `status`, e um conselheiro desativado seguiria editando listas até o
-      // token vencer.
-      const roleChanged = Boolean(payload.role && payload.role !== user.role)
-      const shouldRevoke =
-        Boolean(payload.email && payload.email !== user.email) ||
-        Boolean(payload.password) ||
-        roleChanged ||
-        payload.status === ACTIVE_STATUS.INACTIVE
+        if (effects.revokesSessions) await this.sessions.revokeAll(id)
+        if (effects.roleChanged) await this.classrooms.detach(id)
 
-      // `merge` só escreve as chaves presentes: campo ausente no payload não
-      // vira `undefined` na linha. É o que faz o `PUT` ser parcial de verdade
-      //.
-      await db.transaction(async (trx) => {
-        user.useTransaction(trx)
-        user.merge(payload)
-        await user.save()
-
-        // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
-        if (shouldRevoke) await this.session.revokeAll(user, trx)
-        if (roleChanged) await this.classrooms.detach(user, trx)
+        return right(null)
       })
 
       // Recarrega antes de responder: quem acabou de editar recebe a linha como
-      // ela ficou no banco, com `updated_at` e a foto nova, sem uma segunda
-      // requisição.
-      await user.refresh()
-      await user.load('avatar')
+      // ela ficou no banco, com `updated_at` e a foto nova.
+      const detail = await this.users.detail(id)
+      if (!detail) throw new Error('a conta gravada não foi encontrada')
 
-      return right(user)
+      return right(detail)
     } catch (error) {
       // A checagem de e-mail acima não fecha a corrida: o segundo de dois
       // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
-            email: 'Usuário já existe',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(UserRefusal.alreadyExists(this.i18n))
 
       logger.error({ err: error }, '[users > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_UPDATE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_UPDATE_ERROR'),
       )
     }
   }
