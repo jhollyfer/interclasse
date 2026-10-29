@@ -3,7 +3,7 @@ import { CATEGORY } from '@interclasse/shared'
 
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { SportFactory } from '#database/factories/sport.factory'
-import { body, resetDatabase } from '#tests/helpers'
+import { body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('storefront brackets > paginate', (group) => {
   group.each.setup(() => resetDatabase())

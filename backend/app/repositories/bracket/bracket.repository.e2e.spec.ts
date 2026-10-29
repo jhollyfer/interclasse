@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { test } from '@japa/runner'
 import { BRACKET_STATUS, CATEGORY, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { BracketArrangements, type BracketHarness as Harness } from '#tests/bracket-harness'
 
 /**

@@ -3,13 +3,18 @@ import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
 import { DateTime } from 'luxon'
 import type { ApiClient } from '@japa/api-client'
+import type { StorageMimetype } from '@interclasse/shared'
 
 import Storage from '#models/storage'
 import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
 import StoragesPrune from '#commands/storages-prune.command'
-import { type StorageMimetype } from '#core/validator'
-import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
-import type { Session } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  type ResponseBody,
+} from '#tests/http-fixtures'
+import type { Session } from '#tests/http-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao

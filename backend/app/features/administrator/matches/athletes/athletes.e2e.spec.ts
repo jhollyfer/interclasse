@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('matches > athletes', (group) => {
   group.each.setup(() => resetDatabase())

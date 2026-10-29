@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import { SportFactory } from '#database/factories/sport.factory'
-import { body, resetDatabase } from '#tests/helpers'
+import { body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('sports > paginate (site)', (group) => {
   group.each.setup(() => resetDatabase())

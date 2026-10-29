@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 
 import MatchCard from '#models/match-card'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
-import { body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 
 test.group('advisor cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())

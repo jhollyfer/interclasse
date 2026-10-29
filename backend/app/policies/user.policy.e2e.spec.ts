@@ -3,7 +3,12 @@ import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
 import User from '#models/user'
 import { UserFactory } from '#database/factories/user.factory'
-import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import {
+  ADMINISTRATOR,
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
 

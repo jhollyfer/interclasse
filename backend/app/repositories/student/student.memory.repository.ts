@@ -8,6 +8,7 @@ import {
 import { StudentRepository, type StudentListCriteria } from './student.repository.ts'
 
 import { Student, type StudentProps } from '#domain/student/student.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case
@@ -61,22 +62,11 @@ export class StudentMemoryRepository extends StudentRepository {
       .filter((row) => !criteria.classroomId || row.classroomId === criteria.classroomId)
       .filter((row) => !search || row.name.toLowerCase().includes(search))
       .sort((a, b) => a.name.localeCompare(b.name))
-    const start = (criteria.page - 1) * criteria.perPage
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
-      data: all.slice(start, start + criteria.perPage).map((row) => ({
+      meta: page.meta,
+      data: page.data.map((row) => ({
         id: row.id,
         classroomId: row.classroomId,
         name: row.name,

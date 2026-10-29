@@ -8,7 +8,7 @@ import { EnrollmentLucidRepository } from './enrollment.lucid.repository.ts'
 import { EnrollmentMemoryRepository } from './enrollment.memory.repository.ts'
 import type { EnrollmentRepository } from './enrollment.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { Enrollment } from '#domain/enrollment/enrollment.entity'
 import { BracketFactory } from '#database/factories/bracket.factory'

@@ -4,6 +4,7 @@ import type { Paginated, SortDirection, StoragesFileShowResponse } from '@interc
 import { StorageRepository, type StorageListCriteria } from './storage.repository.ts'
 
 import { Storage, type StorageProps } from '#domain/storage/storage.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
@@ -82,22 +83,11 @@ export class StorageMemoryRepository extends StorageRepository {
           ),
       )
       .sort((a, b) => sign * this.compare(a, b, criteria.sort))
-    const start = (criteria.page - 1) * criteria.perPage
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
-      data: all.slice(start, start + criteria.perPage).map((row) => this.toResponse(row)),
+      meta: page.meta,
+      data: page.data.map((row) => this.toResponse(row)),
     }
   }
 

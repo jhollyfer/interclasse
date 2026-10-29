@@ -8,7 +8,7 @@ import {
   authenticateAsAdministrator,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 /**
  * A atualização parcial, e as duas regras que a acompanham.

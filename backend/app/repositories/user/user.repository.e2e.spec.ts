@@ -6,7 +6,7 @@ import { UserLucidRepository } from './user.lucid.repository.ts'
 import { UserMemoryRepository } from './user.memory.repository.ts'
 import type { UserRepository } from './user.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Storage } from '#domain/storage/storage.entity'
 import { User } from '#domain/user/user.entity'
 import { StorageLucidRepository } from '#repositories/storage/storage.lucid.repository'

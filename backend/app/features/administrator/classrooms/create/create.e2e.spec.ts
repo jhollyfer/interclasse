@@ -1,7 +1,12 @@
 import { test } from '@japa/runner'
 import { CATEGORY } from '@interclasse/shared'
 
-import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  signInWithFactory,
+} from '#tests/http-fixtures'
 
 /**
  * O caminho dos jogos de ponta a ponta, por HTTP: turmas, alunos, inscrições,

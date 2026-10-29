@@ -11,7 +11,7 @@ import type { ReportRepository } from './report.repository.ts'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 
 /**
  * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4). Cada

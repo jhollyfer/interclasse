@@ -4,7 +4,12 @@ import { test } from '@japa/runner'
 
 import { StudentFactory } from '#database/factories/student.factory'
 import { signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  signInWithFactory,
+} from '#tests/http-fixtures'
 
 test.group('students > update', (group) => {
   group.each.setup(() => resetDatabase())

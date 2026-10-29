@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { LOCALES } from '@interclasse/shared'
 
-import { body } from '#tests/helpers'
+import { body } from '#tests/http-fixtures'
 import { RULE_MESSAGES } from '#core/validator'
 
 /**

@@ -5,7 +5,7 @@ import { StorageLucidRepository } from './storage.lucid.repository.ts'
 import { StorageMemoryRepository } from './storage.memory.repository.ts'
 import type { StorageRepository } from './storage.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Storage } from '#domain/storage/storage.entity'
 import { UserFactory } from '#database/factories/user.factory'
 import UserModel from '#models/user'

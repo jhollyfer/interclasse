@@ -3,6 +3,7 @@ import type { AdministratorSportShowResponse, Paginated, SortDirection } from '@
 import { SportRepository, type SportListCriteria } from './sport.repository.ts'
 
 import { Sport, type SportProps } from '#domain/sport/sport.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case
@@ -65,22 +66,11 @@ export class SportMemoryRepository extends SportRepository {
     const all = [...this.rows.values()]
       .filter((row) => !search || row.name.toLowerCase().includes(search))
       .sort((a, b) => sign * String(a[criteria.sort]).localeCompare(String(b[criteria.sort])))
-    const start = (criteria.page - 1) * criteria.perPage
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
-      data: all.slice(start, start + criteria.perPage).map((row) => ({
+      meta: page.meta,
+      data: page.data.map((row) => ({
         id: row.id,
         name: row.name,
         slug: row.slug,

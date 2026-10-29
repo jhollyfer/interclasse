@@ -7,7 +7,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 const payload = { name: 'Vôlei de Praia', minAthletes: 2, maxAthletes: 4 }
 

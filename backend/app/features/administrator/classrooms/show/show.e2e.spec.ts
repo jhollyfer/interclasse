@@ -9,7 +9,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 test.group('classrooms > show', (group) => {
   group.each.setup(() => resetDatabase())

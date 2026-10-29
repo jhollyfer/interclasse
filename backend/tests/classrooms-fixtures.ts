@@ -8,7 +8,7 @@ import { MatchFactory } from '#database/factories/match.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { TeamFactory } from '#database/factories/team.factory'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
-import { signInWithFactory } from '#tests/helpers'
+import { signInWithFactory } from '#tests/http-fixtures'
 
 /**
  * Um professor conselheiro com sessão e a turma que ele aconselha. É o ponto de

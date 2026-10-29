@@ -10,7 +10,7 @@ import type { MatchCardRepository } from './match-card.repository.ts'
 
 import { MatchCard } from '#domain/match-card/match-card.entity'
 import { BracketArrangements, type BracketHarness } from '#tests/bracket-harness'
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 
 /**
  * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4). O

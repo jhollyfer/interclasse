@@ -8,7 +8,7 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
-import { body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 
 test.group('students > delete', (group) => {
   group.each.setup(() => resetDatabase())

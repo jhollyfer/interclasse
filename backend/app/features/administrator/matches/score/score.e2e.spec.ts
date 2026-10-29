@@ -11,7 +11,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 test.group('matches > score', (group) => {
   group.each.setup(() => resetDatabase())

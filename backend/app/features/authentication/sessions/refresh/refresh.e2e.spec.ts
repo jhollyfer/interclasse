@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
 /**
  * O guard confere o `name` do token, e não só a assinatura.

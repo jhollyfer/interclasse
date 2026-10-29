@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import { BRACKET_STATUS, MATCH_PHASE } from '@interclasse/shared'
 
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('storefront brackets > show', (group) => {
   group.each.setup(() => resetDatabase())

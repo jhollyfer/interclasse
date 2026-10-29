@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 
 import { AnnouncementFactory } from '#database/factories/announcement.factory'
 import { announcementTimeline } from '#tests/announcements-fixtures'
-import { body, resetDatabase } from '#tests/helpers'
+import { body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('announcements > paginate (site)', (group) => {
   group.each.setup(() => resetDatabase())

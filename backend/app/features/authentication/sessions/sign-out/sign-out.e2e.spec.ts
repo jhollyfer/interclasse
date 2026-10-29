@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
 /**
  * Sair tem de valer no servidor, e não só na tela.

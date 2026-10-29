@@ -6,7 +6,7 @@ import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import Storage from '#models/storage'
 import { UserFactory } from '#database/factories/user.factory'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
 function upload() {

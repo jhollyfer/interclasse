@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import { CATEGORY, MATCH_PHASE } from '@interclasse/shared'
 
 import { createSport, draw, enrolledClassrooms } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 /**
  * O sorteio, por HTTP: turmas, alunos e inscrições pela rota, porque é delas
