@@ -75,7 +75,9 @@ const typed = {
 /**
  * Colaborador vem do container, nunca de `new` (_standards/backend.md §2.1). O
  * seletor pega só o que é colaborador pelo nome; stdlib, value object, entidade
- * Lucid e comando de SDK ficam de fora de propósito.
+ * Lucid e comando de SDK ficam de fora de propósito. A implementação em memória
+ * de um repository (`*MemoryRepository`) também: o teste unitário a monta com
+ * `new`, e é ela que ele passa ao use-case (_standards/domain.md §5.3).
  */
 const injection = {
   files: ['**/*.ts'],
@@ -84,7 +86,7 @@ const injection = {
       'error',
       {
         selector:
-          'NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]',
+          'NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]:not([callee.name=/MemoryRepository$/])',
         message:
           'Colaborador vem do container, não de `new`. Injete por construtor com @inject(). ' +
           'Composition root de verdade: mova para lá com um override de `files`.',

@@ -1,105 +1,74 @@
 import { inject } from '@adonisjs/core'
-import db from '@adonisjs/lucid/services/db'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type Merge } from '@interclasse/shared'
+import {
+  Slug,
+  left,
+  right,
+  type AdministratorSportShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import Sport from '#models/sport'
-import SlugService from '#services/slug/slug.service'
+import { SportPresenter } from '../sports.presenter.ts'
+import { SportRefusal } from '../_shared.sport-refusal.ts'
+
+import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { SportUpdatePayload } from '#validators/administrator/sports.validator'
 import type { IdentifierPayload } from '#core/validator'
+import type { AdministratorSportUpdatePayload } from '#validators/administrator/sports.validator'
 
-type Payload = Merge<SportUpdatePayload, IdentifierPayload>
-type Response = Either<HTTPException, Sport>
+type Payload = Merge<AdministratorSportUpdatePayload, IdentifierPayload>
+type Response = Either<HTTPException, AdministratorSportShowResponse>
 
+/**
+ * Renomeia e muda os limites. Campo ausente é "não mexer". O máximo não desce
+ * abaixo do maior elenco já inscrito (regra da entidade).
+ */
 @inject()
 export default class AdministratorSportUpdateUseCase {
-  constructor(private readonly slug: SlugService) {}
+  constructor(
+    private readonly sports: SportRepository,
+    private readonly i18n: I18n,
+  ) {}
 
-  async execute({ id, ...payload }: Payload): Promise<Response> {
+  async execute({ id, ...changes }: Payload): Promise<Response> {
     try {
-      const sport = await Sport.find(id)
-
+      const sport = await this.sports.findById(id)
       if (!sport)
-        return left(HTTPException.NotFound('Modalidade não encontrada', 'SPORT_NOT_FOUND'))
+        return left(HTTPException.NotFound(this.i18n.t('sports.not_found'), 'SPORT_NOT_FOUND'))
 
-      if ((payload.minAthletes ?? sport.minAthletes) > (payload.maxAthletes ?? sport.maxAthletes))
-        return left(
-          HTTPException.UnprocessableEntity(
-            'Limites de atletas inválidos',
-            'SPORT_INVALID_LIMITS',
-            {
-              minAthletes: 'O mínimo não pode passar do máximo',
-            },
-          ),
-        )
+      if (
+        sport.renamesTo(changes.name) &&
+        (await this.sports.existsByNameOrSlug(changes.name, Slug.from(changes.name).value, id))
+      )
+        return left(this.alreadyExists())
 
-      // Baixar o teto abaixo de uma lista já inscrita deixava a turma acima do
-      // limite sem conseguir salvar nada: toda gravação dela seria recusada.
-      if (payload.maxAthletes !== undefined && payload.maxAthletes < sport.maxAthletes) {
-        const largest: { total: string | number } | null = await db
-          .from('enrollments')
-          .join('students', 'students.id', 'enrollments.student_id')
-          .where('enrollments.sport_id', sport.id)
-          .groupBy('students.classroom_id')
-          .count('* as total')
-          .orderBy('total', 'desc')
-          .first()
+      const largestRoster = await this.sports.largestRoster(id)
+      const updated = sport.update(changes, { largestRoster, now: new Date() })
+      if (updated.isLeft()) return left(SportRefusal.http(updated.value, this.i18n))
 
-        if (largest && Number(largest.total) > payload.maxAthletes)
-          return left(
-            HTTPException.Conflict(
-              'Há turma com mais atletas inscritos que o novo máximo',
-              'SPORT_ROSTER_ABOVE_LIMIT',
-              {
-                maxAthletes: `Uma turma já tem ${Number(largest.total)} atletas inscritos; reduza a lista antes`,
-              },
-            ),
-          )
-      }
+      await this.sports.save(sport)
 
-      if (payload.name && payload.name !== sport.name) {
-        const slug = this.slug.normalize(payload.name)
-        const existing = await Sport.query()
-          .whereNot('id', sport.id)
-          .where((builder) => {
-            builder.where('name', payload.name ?? '').orWhere('slug', slug)
-          })
-          .first()
-
-        if (existing)
-          return left(
-            HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
-              name: 'Já existe uma modalidade com este nome',
-            }),
-          )
-
-        sport.slug = slug
-      }
-
-      sport.merge(payload)
-      await sport.save()
-
-      return right(sport)
+      return right(SportPresenter.show(sport))
     } catch (error) {
-      // A checagem acima não fecha a corrida: o segundo de dois pedidos
-      // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
-            name: 'Já existe uma modalidade com este nome',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(this.alreadyExists())
 
-      logger.error({ err: error }, '[sports > update][error]')
+      logger.error({ err: error }, '[administrator/sports > update][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_SPORT_UPDATE_ERROR',
         ),
       )
     }
+  }
+
+  private alreadyExists(): HTTPException {
+    return HTTPException.Conflict(this.i18n.t('sports.already_exists'), 'SPORT_ALREADY_EXISTS', {
+      name: this.i18n.t('sports.name_taken'),
+    })
   }
 }
