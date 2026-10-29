@@ -13,6 +13,9 @@ export default class AdministratorBracketDeleteController {
       '**Irreversível**: apaga a chave com todos os times, partidas e placares, e reabre as ' +
       'inscrições da modalidade naquela categoria. É o caminho para refazer um sorteio.\n\n' +
       'Chave com placar lançado responde `409`: desfaça os placares antes.',
+    // Nasce na entidade e é traduzido em `_shared.bracket-refusal.ts`, fora da
+    // pasta da ação: o introspector não o lê sozinho.
+    errors: { 409: ['BRACKET_HAS_RESULTS'] },
   })
 
   constructor(private readonly useCase: AdministratorBracketDeleteUseCase) {}
