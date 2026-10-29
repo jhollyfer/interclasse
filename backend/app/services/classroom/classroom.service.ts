@@ -21,8 +21,8 @@ export default class ClassroomService {
    * Sem a checagem de papel, um representante indicado como conselheiro
    * ganharia o cadastro de alunos da turma inteira.
    *
-   * `current` é a turma sendo editada: o representante só pode ter uma turma,
-   * e a própria não conta como conflito.
+   * `current` é a turma sendo editada: conselheiro e representante só podem
+   * ter uma turma cada, e a própria não conta como conflito.
    */
   async assertPeople(people: People, current?: Classroom): Promise<Either<HTTPException, true>> {
     // Na edição só se confere o vínculo que mudou: o que já estava gravado foi
@@ -35,6 +35,13 @@ export default class ClassroomService {
         return left(
           HTTPException.UnprocessableEntity('Conselheiro não encontrado', 'ADVISOR_NOT_FOUND', {
             advisorId: 'Selecione um professor conselheiro',
+          }),
+        )
+
+      if (await this.taken('advisorId', people.advisorId, classroomId))
+        return left(
+          HTTPException.Conflict('Conselheiro já vinculado a outra turma', 'ADVISOR_TAKEN', {
+            advisorId: 'Este conselheiro já está em outra turma',
           }),
         )
     }
@@ -51,10 +58,7 @@ export default class ClassroomService {
           ),
         )
 
-      const taken = Classroom.query().where('representativeId', people.representativeId)
-      if (classroomId) taken.whereNot('id', classroomId)
-
-      if (await taken.first())
+      if (await this.taken('representativeId', people.representativeId, classroomId))
         return left(
           HTTPException.Conflict(
             'Representante já vinculado a outra turma',
@@ -81,6 +85,18 @@ export default class ClassroomService {
     await Classroom.query({ client })
       .where('representativeId', user.id)
       .update({ representativeId: null })
+  }
+
+  /** Outra turma, que não a `except`, já tem esta pessoa no vínculo. */
+  private async taken(
+    column: 'advisorId' | 'representativeId',
+    userId: string,
+    except?: string,
+  ): Promise<boolean> {
+    const query = Classroom.query().where(column, userId)
+    if (except) query.whereNot('id', except)
+
+    return Boolean(await query.first())
   }
 
   private person(id: string, role: UserRole): Promise<User | null> {

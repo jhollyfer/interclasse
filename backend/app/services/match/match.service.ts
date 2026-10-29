@@ -6,6 +6,7 @@ import type { Category, MatchPhase, MatchStatus } from '#core/entity'
 
 export type MatchFilters = {
   readonly bracketId?: string
+  readonly classroomId?: string
   readonly sportId?: string
   readonly category?: Category
   readonly phase?: MatchPhase
@@ -52,6 +53,18 @@ export default class MatchService {
 
     if (filters.bracketId) query.where('bracketId', filters.bracketId)
     if (filters.phase) query.where('phase', filters.phase)
+    if (filters.classroomId) {
+      const classroomId = filters.classroomId
+      query.where((sides) => {
+        sides
+          .whereHas('homeTeam', (team) => {
+            team.where('classroomId', classroomId)
+          })
+          .orWhereHas('awayTeam', (team) => {
+            team.where('classroomId', classroomId)
+          })
+      })
+    }
     if (filters.status) query.where('status', filters.status)
 
     if (filters.sportId || filters.category) {

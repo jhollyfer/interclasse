@@ -8,7 +8,7 @@ import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
 import { type Merge } from '#core/entity'
-import { categoryOf } from '#features/administrator/_shared.classroom'
+import { categoryOf, classroomConflict } from '#features/administrator/_shared.classroom'
 import type { ClassroomUpdatePayload } from '#features/administrator/classrooms/classrooms.validator'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -67,12 +67,7 @@ export default class AdministratorClassroomUpdateUseCase {
     } catch (error) {
       // A checagem acima não fecha a corrida: o segundo de dois pedidos
       // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
-            name: 'Já existe uma turma com este nome',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(classroomConflict(error))
 
       logger.error({ err: error }, '[classrooms > update][error]')
 

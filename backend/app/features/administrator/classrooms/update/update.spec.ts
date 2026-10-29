@@ -126,6 +126,21 @@ test.group('classrooms > update', (group) => {
     assert.equal(body(response).code, 'REPRESENTATIVE_TAKEN')
   })
 
+  test('conselheiro de outra turma responde 409', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const advisor = await UserFactory.create()
+    await ClassroomFactory.merge({ advisorId: advisor.id }).create()
+    const classroom = await ClassroomFactory.create()
+
+    const response = await client
+      .put(`/administrator/classrooms/${classroom.id}`)
+      .cookies(session)
+      .json({ advisorId: advisor.id })
+
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'ADVISOR_TAKEN')
+  })
+
   test('turma sorteada não muda de categoria, mas muda de ano dentro dela', async ({
     client,
     assert,

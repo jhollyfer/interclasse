@@ -25,6 +25,24 @@ test.group('storefront matches > paginate', (group) => {
     assert.notProperty(body(response).data[0].homeTeam.classroom, 'representativeId')
   })
 
+  test('?classroomId lista só os jogos da turma, como mandante ou visitante', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const { classroomIds } = await drawnBracket(client, admin, 4)
+    const [classroomId] = classroomIds
+    if (!classroomId) throw new Error('fixture sem turma')
+
+    const response = await client.get('/storefront/matches').qs({ classroomId })
+
+    response.assertStatus(200)
+    // Chave de 4: a turma joga só a semifinal dela; a final ainda não tem times.
+    assert.lengthOf(body(response).data, 1)
+    const [match] = body(response).data
+    assert.include([match.homeTeam.classroom.id, match.awayTeam.classroom.id], classroomId)
+  })
+
   test('?status=FINISHED lista o resultado mais recente primeiro', async ({ client, assert }) => {
     const antigo = await scheduledMatch()
     const recente = await scheduledMatch()

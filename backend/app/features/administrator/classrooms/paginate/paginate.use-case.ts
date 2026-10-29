@@ -17,7 +17,18 @@ type Response = Either<HTTPException, Paginated<ModelObject>>
 export default class AdministratorClassroomPaginateUseCase {
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Classroom.query().preload('advisor').preload('representative')
+      // Os totais do cartão da turma, contados no banco sem carregar alunos nem
+      // inscrições (_doc-lib/lucid.md#relationships, `withCount`/`withAggregate`).
+      const query = Classroom.query()
+        .preload('advisor')
+        .preload('representative')
+        .withCount('students')
+        .withAggregate('enrollments', (enrollments) => {
+          enrollments.countDistinct('enrollments.student_id').as('athletes_count')
+        })
+        .withAggregate('enrollments', (enrollments) => {
+          enrollments.countDistinct('enrollments.sport_id').as('sports_count')
+        })
 
       if (payload.category) query.where('category', payload.category)
       if (payload.search) query.whereILike('name', `%${payload.search}%`)
@@ -26,7 +37,15 @@ export default class AdministratorClassroomPaginateUseCase {
         .orderBy(...sortOrder(payload, 'name'))
         .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
 
-      return right({ meta: classrooms.getMeta(), data: classrooms.all() })
+      return right({
+        meta: classrooms.getMeta(),
+        data: classrooms.all().map((classroom) => ({
+          ...classroom.serialize(),
+          studentsCount: Number(classroom.$extras.students_count),
+          athletesCount: Number(classroom.$extras.athletes_count),
+          sportsCount: Number(classroom.$extras.sports_count),
+        })),
+      })
     } catch (error) {
       logger.error({ err: error }, '[classrooms > paginate][error]')
 

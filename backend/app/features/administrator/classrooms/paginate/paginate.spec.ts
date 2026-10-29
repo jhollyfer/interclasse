@@ -3,6 +3,7 @@ import { test } from '@japa/runner'
 import { CATEGORY } from '#core/entity'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { UserFactory } from '#database/factories/user.factory'
+import { createSport, enrolledClassrooms } from '#tests/brackets-fixtures'
 import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 
 test.group('classrooms > paginate', (group) => {
@@ -32,6 +33,29 @@ test.group('classrooms > paginate', (group) => {
     )
     assert.equal(body(response).data[0].advisor.id, advisor.id)
     assert.isNull(body(response).data[1].advisor)
+  })
+
+  test('cada turma traz os totais de alunos, atletas e modalidades', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const futsal = await createSport(client, session)
+    const volei = await createSport(client, session, 1, 'Vôlei')
+    const [classroomId] = await enrolledClassrooms(client, session, futsal.id, 1)
+    // O mesmo aluno também no vôlei, e um segundo aluno que não joga nada.
+    const students = await client.get('/advisor/students').qs({ classroomId }).cookies(session)
+    await client
+      .put('/advisor/enrollments')
+      .cookies(session)
+      .json({ classroomId, sportId: volei.id, studentIds: [body(students).data[0].id] })
+    await client.post('/advisor/students').cookies(session).json({ classroomId, name: 'Reserva' })
+
+    const response = await client.get('/administrator/classrooms').cookies(session)
+
+    response.assertStatus(200)
+    assert.deepInclude(body(response).data[0], {
+      studentsCount: 2,
+      athletesCount: 1,
+      sportsCount: 2,
+    })
   })
 
   test('`?category` e `?search` recortam a lista', async ({ client, assert }) => {

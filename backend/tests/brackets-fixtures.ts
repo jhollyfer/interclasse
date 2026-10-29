@@ -15,11 +15,16 @@ import { body, type Session } from '#tests/helpers'
  * uma linha com os dois times.
  */
 
-export async function createSport(client: ApiClient, admin: Session, minAthletes = 1) {
+export async function createSport(
+  client: ApiClient,
+  admin: Session,
+  minAthletes = 1,
+  name = 'Futsal',
+) {
   const response = await client
     .post('/administrator/sports')
     .cookies(admin)
-    .json({ name: 'Futsal', minAthletes, maxAthletes: 3 })
+    .json({ name, minAthletes, maxAthletes: 3 })
 
   response.assertStatus(201)
 
