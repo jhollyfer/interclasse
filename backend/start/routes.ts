@@ -56,6 +56,7 @@ router
       .as('announcements')
     router.get('matches', [controllers.storefront.matches.paginate.Paginate]).as('matches')
     router.get('site', [controllers.storefront.site.show.Show]).as('site')
+    router.get('photos', [controllers.storefront.photos.paginate.Paginate]).as('photos')
 
     router
       .group(() => {
@@ -182,6 +183,16 @@ router
       })
       .prefix('sports')
       .as('sports')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.photos.paginate.Paginate])
+        router.post('/', [controllers.administrator.photos.create.Create])
+        router.put(':id/review', [controllers.administrator.photos.review.Review]).as('review')
+        router.delete(':id', [controllers.administrator.photos.delete.Delete])
+      })
+      .prefix('photos')
+      .as('photos')
 
     router
       .group(() => {
@@ -321,6 +332,15 @@ router
       })
       .prefix('students')
       .as('students')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.advisor.photos.paginate.Paginate])
+        router.post('/', [controllers.advisor.photos.create.Create])
+        router.delete(':id', [controllers.advisor.photos.delete.Delete])
+      })
+      .prefix('photos')
+      .as('photos')
 
     router
       .group(() => {

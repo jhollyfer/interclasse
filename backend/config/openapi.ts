@@ -104,6 +104,15 @@ const tags: TagRule[] = [
     plural: 'avisos',
   },
   {
+    prefix: '/administrator/photos',
+    name: 'Painel · Fotos',
+    description:
+      'As fotos do carrossel do site. As do conselheiro chegam pendentes e só vão ao ar ' +
+      'depois de aprovadas.',
+    singular: 'foto',
+    plural: 'fotos',
+  },
+  {
     prefix: '/administrator/site',
     name: 'Painel · Site',
     description:
