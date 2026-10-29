@@ -94,10 +94,22 @@ export abstract class BracketRepository {
   abstract paginateMatches(
     criteria: MatchListCriteria,
   ): Promise<Paginated<AdministratorMatchPaginateResponse>>
-  /** A partida com os dois times, as turmas inteiras e a chave com a modalidade. */
-  abstract findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null>
+  /**
+   * As partidas com os dois times, as turmas inteiras e a chave com a modalidade,
+   * pelo id. Em lote para o cartão buscar as de uma página numa ida só.
+   */
+  abstract findMatchResponses(
+    matchIds: ReadonlyArray<string>,
+  ): Promise<Map<string, AdministratorMatchUpdateResponse>>
   /** Os alunos das duas turmas da partida, os inscritos na modalidade primeiro. */
   abstract matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null>
+
+  /** A partida com os dois times, as turmas inteiras e a chave com a modalidade. */
+  async findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null> {
+    const responses = await this.findMatchResponses([matchId])
+
+    return responses.get(matchId) ?? null
+  }
 
   /**
    * A chave inteira como a tela a desenha: as partidas de cada fase com o nome

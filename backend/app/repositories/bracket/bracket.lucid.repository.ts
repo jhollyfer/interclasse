@@ -313,9 +313,11 @@ export class BracketLucidRepository extends BracketRepository {
     }
   }
 
-  async findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null> {
-    const row = await MatchModel.query({ client: this.transaction.client() })
-      .where('id', matchId)
+  async findMatchResponses(
+    matchIds: ReadonlyArray<string>,
+  ): Promise<Map<string, AdministratorMatchUpdateResponse>> {
+    const rows = await MatchModel.query({ client: this.transaction.client() })
+      .whereIn('id', [...matchIds])
       .preload('homeTeam', (team) => {
         team.preload('classroom')
       })
@@ -325,15 +327,18 @@ export class BracketLucidRepository extends BracketRepository {
       .preload('bracket', (bracket) => {
         bracket.preload('sport')
       })
-      .first()
-    if (!row) return null
 
-    return {
-      ...this.toMatchColumnsResponse(row),
-      homeTeam: this.toFullTeam(row.homeTeam),
-      awayTeam: this.toFullTeam(row.awayTeam),
-      bracket: this.toListItem(row.bracket),
-    }
+    return new Map(
+      rows.map((row) => [
+        row.id,
+        {
+          ...this.toMatchColumnsResponse(row),
+          homeTeam: this.toFullTeam(row.homeTeam),
+          awayTeam: this.toFullTeam(row.awayTeam),
+          bracket: this.toListItem(row.bracket),
+        },
+      ]),
+    )
   }
 
   async matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null> {

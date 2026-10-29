@@ -262,6 +262,34 @@ test.group('Bracket > desfazer placar', () => {
   })
 })
 
+test.group('Bracket > escalação', () => {
+  test('diz os dois times da partida e o time da turma entre eles', ({ assert }) => {
+    const bracket = draw(4)
+    const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
+    const home = bracket.snapshot().teams.find((team) => team.id === semi.homeTeamId)
+
+    const lineup = bracket.lineupOf(semi.id, home?.classroomId ?? null)
+
+    assert.deepEqual(lineup, {
+      homeTeamId: semi.homeTeamId,
+      awayTeamId: semi.awayTeamId,
+      classroomTeamId: semi.homeTeamId,
+    })
+  })
+
+  test('turma que não joga a partida fica sem time, e partida alheia é null', ({ assert }) => {
+    const bracket = draw(4)
+    const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
+    const outsider = bracket
+      .snapshot()
+      .teams.find((team) => team.id !== semi.homeTeamId && team.id !== semi.awayTeamId)
+
+    assert.isNull(bracket.lineupOf(semi.id, outsider?.classroomId ?? null)?.classroomTeamId)
+    assert.isNull(bracket.lineupOf(semi.id, null)?.classroomTeamId)
+    assert.isNull(bracket.lineupOf('nao-existe', null))
+  })
+})
+
 test.group('Bracket > agenda e exclusão', () => {
   test('agenda data e local, e null desmarca', ({ assert }) => {
     const bracket = draw(4)

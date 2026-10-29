@@ -1,130 +1,27 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
-import app from '@adonisjs/core/services/app'
-import db from '@adonisjs/lucid/services/db'
-import {
-  BRACKET_STATUS,
-  CATEGORY,
-  MATCH_PHASE,
-  MATCH_STATUS,
-  type AdministratorSportShowResponse,
-} from '@interclasse/shared'
-
-import { BracketLucidRepository } from './bracket.lucid.repository.ts'
-import {
-  BracketMemoryRepository,
-  type ClassroomView,
-  type StudentView,
-} from './bracket.memory.repository.ts'
-import type { BracketRepository } from './bracket.repository.ts'
+import { BRACKET_STATUS, CATEGORY, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import { resetDatabase } from '#tests/helpers'
-import { Bracket } from '#domain/bracket/bracket.entity'
+import { BracketArrangements, type BracketHarness as Harness } from '#tests/bracket-harness'
 
 /**
  * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
  * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
- *
- * Modalidade, turma, aluno e inscrição são o que a chave só lê: cada
- * implementação os arranja do seu jeito (linhas no banco, ou o mapa da memória).
+ * contra um dublê que mente. O arranjo do que a chave só lê está em
+ * `tests/bracket-harness.ts`.
  */
-type Harness = {
-  readonly repository: BracketRepository
-  sport(sport: AdministratorSportShowResponse): Promise<void>
-  classroom(classroom: ClassroomView): Promise<void>
-  student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void>
-}
-
-class LucidHarness implements Harness {
-  constructor(readonly repository: BracketRepository) {}
-
-  async sport(sport: AdministratorSportShowResponse): Promise<void> {
-    await db.table('sports').insert({
-      id: sport.id,
-      name: sport.name,
-      slug: sport.slug,
-      min_athletes: sport.minAthletes,
-      max_athletes: sport.maxAthletes,
-      created_at: new Date(sport.createdAt),
-    })
-  }
-
-  async classroom(classroom: ClassroomView): Promise<void> {
-    await db.table('classrooms').insert({
-      id: classroom.id,
-      name: classroom.name,
-      grade: classroom.grade,
-      category: classroom.category,
-      created_at: classroom.createdAt,
-    })
-  }
-
-  async student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void> {
-    await db.table('students').insert({
-      id: student.id,
-      name: student.name,
-      classroom_id: student.classroomId,
-      created_at: new Date(),
-    })
-    for (const sportId of enrolledIn)
-      await db.table('enrollments').insert({
-        student_id: student.id,
-        sport_id: sportId,
-        created_at: new Date(),
-      })
-  }
-}
-
-class MemoryHarness implements Harness {
-  constructor(readonly repository: BracketMemoryRepository) {}
-
-  async sport(sport: AdministratorSportShowResponse): Promise<void> {
-    this.repository.withSport(sport)
-  }
-
-  async classroom(classroom: ClassroomView): Promise<void> {
-    this.repository.withClassroom(classroom)
-  }
-
-  async student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void> {
-    this.repository.withStudent(student, enrolledIn)
-  }
-}
-
 const IMPLEMENTATIONS = {
-  lucid: async () => new LucidHarness(await app.container.make(BracketLucidRepository)),
-  memory: async () => new MemoryHarness(new BracketMemoryRepository()),
+  lucid: () => BracketArrangements.lucid(),
+  memory: async () => BracketArrangements.memory(),
 } satisfies Record<string, () => Promise<Harness>>
 
-const NOW = new Date('2026-10-29T12:00:00.000Z')
 const LATER = new Date('2026-10-29T15:00:00.000Z')
+const NOW = BracketArrangements.NOW
 
-function sportView(name: string, minAthletes = 1): AdministratorSportShowResponse {
-  return {
-    id: randomUUID(),
-    name,
-    slug: name.toLowerCase(),
-    minAthletes,
-    maxAthletes: 10,
-    createdAt: NOW.toISOString(),
-    updatedAt: null,
-  }
-}
-
-function classroomView(name: string, grade = 8): ClassroomView {
-  return {
-    id: randomUUID(),
-    name,
-    grade,
-    category: CATEGORY.F2,
-    advisorId: null,
-    representativeId: null,
-    createdAt: NOW,
-    updatedAt: null,
-  }
-}
+const sportView = BracketArrangements.sport.bind(BracketArrangements)
+const classroomView = BracketArrangements.classroom.bind(BracketArrangements)
 
 /** A chave gravada, como a entidade a vê; `undefined` se não há. */
 async function savedOf(harness: Harness, id: string) {
@@ -133,36 +30,7 @@ async function savedOf(harness: Harness, id: string) {
   return bracket?.snapshot()
 }
 
-/** A modalidade, `names.length` turmas com um atleta inscrito cada, e o sorteio gravado. */
-async function drawn(harness: Harness, names: string[], sportName = 'Futsal') {
-  const sport = sportView(sportName)
-  await harness.sport(sport)
-
-  const classrooms = names.map((name) => classroomView(name))
-  for (const classroom of classrooms) {
-    await harness.classroom(classroom)
-    await harness.student(
-      { id: randomUUID(), name: `Aluno ${classroom.name}`, classroomId: classroom.id },
-      [sport.id],
-    )
-  }
-
-  const result = Bracket.draw({
-    id: randomUUID(),
-    sportId: sport.id,
-    category: CATEGORY.F2,
-    minAthletes: 1,
-    classroomIds: classrooms.map((classroom) => classroom.id),
-    newId: () => randomUUID(),
-    random: () => 0,
-    now: NOW,
-  })
-  if (result.isLeft()) throw new Error('sorteio inválido no arranjo')
-
-  await harness.repository.save(result.value)
-
-  return { sport, classrooms, bracket: result.value }
-}
+const drawn = BracketArrangements.drawn.bind(BracketArrangements)
 
 for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`BracketRepository (${name})`, (group) => {
