@@ -15,10 +15,10 @@ import Bracket from '#models/bracket'
 import Match from '#models/match'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
 import HTTPException from '#exceptions/http.exception'
-import type { MatchScorePayload } from '#validators/administrator/matches.validator'
+import type { AdministratorMatchScorePayload } from '#validators/administrator/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<MatchScorePayload, IdentifierPayload>
+type Payload = Merge<AdministratorMatchScorePayload, IdentifierPayload>
 type Response = Either<HTTPException, Match>
 
 /**

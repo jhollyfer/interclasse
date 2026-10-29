@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorCardCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { CardCreateValidator } from '#validators/administrator/cards.validator'
+import { AdministratorCardCreateValidator } from '#validators/administrator/cards.validator'
 
 @inject()
 export default class AdministratorCardCreateController {
@@ -17,7 +17,7 @@ export default class AdministratorCardCreateController {
   constructor(private readonly useCase: AdministratorCardCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(CardCreateValidator)
+    const payload = await context.request.validateUsing(AdministratorCardCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

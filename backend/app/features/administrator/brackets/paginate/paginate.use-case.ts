@@ -5,9 +5,9 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 
 import Bracket from '#models/bracket'
 import HTTPException from '#exceptions/http.exception'
-import type { BracketPaginatePayload } from '#validators/administrator/brackets.validator'
+import type { AdministratorBracketPaginatePayload } from '#validators/administrator/brackets.validator'
 
-type Payload = BracketPaginatePayload
+type Payload = AdministratorBracketPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
 
 @inject()

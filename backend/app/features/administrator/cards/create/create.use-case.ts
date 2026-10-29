@@ -8,9 +8,9 @@ import Student from '#models/student'
 import Team from '#models/team'
 import CardService from '#services/card/card.service'
 import HTTPException from '#exceptions/http.exception'
-import type { CardCreatePayload } from '#validators/administrator/cards.validator'
+import type { AdministratorCardCreatePayload } from '#validators/administrator/cards.validator'
 
-type Payload = CardCreatePayload
+type Payload = AdministratorCardCreatePayload
 type Response = Either<HTTPException, MatchCard>
 
 /**

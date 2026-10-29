@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorMatchPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchPaginateValidator } from '#validators/administrator/matches.validator'
+import { AdministratorMatchPaginateValidator } from '#validators/administrator/matches.validator'
 
 @inject()
 export default class AdministratorMatchPaginateController {
@@ -17,7 +17,7 @@ export default class AdministratorMatchPaginateController {
   constructor(private readonly useCase: AdministratorMatchPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(MatchPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorMatchPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)
