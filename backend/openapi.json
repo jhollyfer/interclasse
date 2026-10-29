@@ -7313,110 +7313,137 @@
       "AdministratorAnnouncementsCreateResponse201": {
         "type": "object",
         "properties": {
-          "body": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
+          "body": {
             "type": "string"
           },
           "pinned": {
             "type": "boolean"
           },
-          "title": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updatedAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "body",
-          "createdAt",
           "id",
-          "pinned",
           "title",
+          "body",
+          "pinned",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorAnnouncementsPaginateItem": {
         "type": "object",
         "properties": {
-          "body": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
+          "body": {
             "type": "string"
           },
           "pinned": {
             "type": "boolean"
           },
-          "title": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updatedAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "body",
-          "createdAt",
           "id",
-          "pinned",
           "title",
+          "body",
+          "pinned",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorAnnouncementsShowResponse200": {
         "type": "object",
         "properties": {
-          "body": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
+          "body": {
             "type": "string"
           },
           "pinned": {
             "type": "boolean"
           },
-          "title": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updatedAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "body",
-          "createdAt",
           "id",
-          "pinned",
           "title",
+          "body",
+          "pinned",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorAnnouncementsUpdateBody": {
         "type": "object",
@@ -7442,38 +7469,47 @@
       "AdministratorAnnouncementsUpdateResponse200": {
         "type": "object",
         "properties": {
-          "body": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
+          "body": {
             "type": "string"
           },
           "pinned": {
             "type": "boolean"
           },
-          "title": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updatedAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "body",
-          "createdAt",
           "id",
-          "pinned",
           "title",
+          "body",
+          "pinned",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorBracketsCreateBody": {
         "type": "object",
@@ -12719,36 +12755,16 @@
       "AdministratorSiteShowResponse200": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "about": {
             "type": [
               "string",
               "null"
             ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "developerInstagram": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "edition": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "firstEditionYear": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "id": {
-            "type": "string"
           },
           "organizer": {
             "type": [
@@ -12756,10 +12772,28 @@
               "null"
             ]
           },
-          "regulationId": {
-            "type": [
-              "string",
-              "null"
+          "firstEditionYear": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "schoolInstagram": {
@@ -12768,106 +12802,161 @@
               "null"
             ]
           },
-          "updatedAt": {
+          "developerInstagram": {
             "type": [
               "string",
               "null"
-            ],
-            "format": "date-time"
+            ]
+          },
+          "regulationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "regulation": {
-            "type": "object",
-            "properties": {
-              "createdAt": {
-                "type": [
-                  "string",
-                  "null"
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "deletedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "filename",
+                  "originalName",
+                  "mimetype",
+                  "size",
+                  "path",
+                  "status",
+                  "partSize",
+                  "uploadId",
+                  "createdAt",
+                  "updatedAt",
+                  "deletedAt"
                 ],
-                "format": "date-time"
+                "additionalProperties": false
               },
-              "deletedAt": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              },
-              "filename": {
-                "type": "string"
-              },
-              "id": {
-                "type": "string"
-              },
-              "mimetype": {
-                "type": "string"
-              },
-              "originalName": {
-                "type": "string"
-              },
-              "partSize": {
-                "type": [
-                  "number",
-                  "null"
-                ]
-              },
-              "path": {
-                "type": "string"
-              },
-              "size": {
-                "type": "number"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "PENDING",
-                  "UPLOADED"
-                ]
-              },
-              "updatedAt": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              },
-              "uploadId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "url": {
-                "type": "string"
+              {
+                "type": "null"
               }
-            },
-            "required": [
-              "createdAt",
-              "deletedAt",
-              "filename",
-              "id",
-              "mimetype",
-              "originalName",
-              "partSize",
-              "path",
-              "size",
-              "status",
-              "updatedAt",
-              "uploadId"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
         "required": [
-          "about",
-          "createdAt",
-          "developerInstagram",
-          "edition",
-          "firstEditionYear",
           "id",
+          "about",
           "organizer",
-          "regulationId",
+          "firstEditionYear",
+          "edition",
           "schoolInstagram",
+          "developerInstagram",
+          "regulationId",
+          "regulation",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorSiteUpdateBody": {
         "type": "object",
@@ -12930,36 +13019,16 @@
       "AdministratorSiteUpdateResponse200": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "about": {
             "type": [
               "string",
               "null"
             ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "developerInstagram": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "edition": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "firstEditionYear": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "id": {
-            "type": "string"
           },
           "organizer": {
             "type": [
@@ -12967,10 +13036,28 @@
               "null"
             ]
           },
-          "regulationId": {
-            "type": [
-              "string",
-              "null"
+          "firstEditionYear": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "schoolInstagram": {
@@ -12979,106 +13066,161 @@
               "null"
             ]
           },
-          "updatedAt": {
+          "developerInstagram": {
             "type": [
               "string",
               "null"
-            ],
-            "format": "date-time"
+            ]
+          },
+          "regulationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "regulation": {
-            "type": "object",
-            "properties": {
-              "createdAt": {
-                "type": [
-                  "string",
-                  "null"
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "mimetype": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "UPLOADED"
+                    ]
+                  },
+                  "partSize": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "uploadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updatedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "deletedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "filename",
+                  "originalName",
+                  "mimetype",
+                  "size",
+                  "path",
+                  "status",
+                  "partSize",
+                  "uploadId",
+                  "createdAt",
+                  "updatedAt",
+                  "deletedAt"
                 ],
-                "format": "date-time"
+                "additionalProperties": false
               },
-              "deletedAt": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              },
-              "filename": {
-                "type": "string"
-              },
-              "id": {
-                "type": "string"
-              },
-              "mimetype": {
-                "type": "string"
-              },
-              "originalName": {
-                "type": "string"
-              },
-              "partSize": {
-                "type": [
-                  "number",
-                  "null"
-                ]
-              },
-              "path": {
-                "type": "string"
-              },
-              "size": {
-                "type": "number"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "PENDING",
-                  "UPLOADED"
-                ]
-              },
-              "updatedAt": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "format": "date-time"
-              },
-              "uploadId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "url": {
-                "type": "string"
+              {
+                "type": "null"
               }
-            },
-            "required": [
-              "createdAt",
-              "deletedAt",
-              "filename",
-              "id",
-              "mimetype",
-              "originalName",
-              "partSize",
-              "path",
-              "size",
-              "status",
-              "updatedAt",
-              "uploadId"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
         "required": [
-          "about",
-          "createdAt",
-          "developerInstagram",
-          "edition",
-          "firstEditionYear",
           "id",
+          "about",
           "organizer",
-          "regulationId",
+          "firstEditionYear",
+          "edition",
           "schoolInstagram",
+          "developerInstagram",
+          "regulationId",
+          "regulation",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "AdministratorSportsCreateBody": {
         "type": "object",
@@ -21055,38 +21197,47 @@
       "StorefrontAnnouncementsItem": {
         "type": "object",
         "properties": {
-          "body": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
             "type": "string"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
+          "body": {
             "type": "string"
           },
           "pinned": {
             "type": "boolean"
           },
-          "title": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updatedAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "body",
-          "createdAt",
           "id",
-          "pinned",
           "title",
+          "body",
+          "pinned",
+          "createdAt",
           "updatedAt"
-        ]
+        ],
+        "additionalProperties": false
       },
       "StorefrontBracketsPaginateItem": {
         "type": "object",
@@ -21730,15 +21881,27 @@
             ]
           },
           "firstEditionYear": {
-            "type": [
-              "number",
-              "null"
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "edition": {
-            "type": [
-              "number",
-              "null"
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "schoolInstagram": {
@@ -21754,30 +21917,42 @@
             ]
           },
           "regulation": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "properties": {
-              "url": {
-                "type": "string"
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "originalName": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "url",
+                  "originalName",
+                  "size"
+                ],
+                "additionalProperties": false
               },
-              "originalName": {
-                "type": "string"
-              },
-              "size": {
-                "type": "number"
+              {
+                "type": "null"
               }
-            },
-            "required": [
-              "url",
-              "originalName",
-              "size"
-            ],
-            "additionalProperties": false
+            ]
           }
         },
-        "required": [],
+        "required": [
+          "about",
+          "organizer",
+          "firstEditionYear",
+          "edition",
+          "schoolInstagram",
+          "developerInstagram",
+          "regulation"
+        ],
         "additionalProperties": false
       },
       "StorefrontSportsItem": {
