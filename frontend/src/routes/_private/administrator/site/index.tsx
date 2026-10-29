@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { siteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export const Route = createFileRoute('/_private/administrator/site/')({
   loader: ({ context }) =>

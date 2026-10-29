@@ -20,7 +20,7 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations'
+import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations/advisor'
 import {
   StudentCreateValidator,
   StudentUpdateValidator,
@@ -47,11 +47,11 @@ import {
   useStudentCreate,
   useStudentDelete,
   useStudentUpdate,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/advisor'
 import {
   advisorEnrollmentsQueryOptions,
   studentsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/advisor'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import type { IEnrollmentBoard, IStudent } from '#/lib/interfaces'
 

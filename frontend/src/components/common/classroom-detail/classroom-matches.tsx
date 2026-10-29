@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Agenda } from '#/components/common/match-agenda'
 import { Skeleton } from '#/components/ui/skeleton'
-import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 /**
  * Os jogos da turma, marcados e já jogados, na ordem da agenda. Da rota do

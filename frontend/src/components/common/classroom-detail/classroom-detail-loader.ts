@@ -6,7 +6,7 @@ import {
   advisorClassroomsQueryOptions,
   advisorEnrollmentsQueryOptions,
   studentsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/advisor'
 
 /** A lista de alunos inteira: uma turma não passa de 40. */
 export function studentsOf(classroomId: string) {

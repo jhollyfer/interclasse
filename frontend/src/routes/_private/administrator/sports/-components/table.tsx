@@ -20,7 +20,7 @@ import {
   TableToolbar,
   useTable,
 } from '#/components/common/table'
-import { sportsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { sportsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 import { sportColumns } from './columns'
 import { SportRowActions } from './row-actions'

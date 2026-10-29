@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useClassroomDelete } from '#/integrations/tanstack-query/mutations'
+import { useClassroomDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import type { IClassroom } from '#/lib/interfaces'
 
 /**

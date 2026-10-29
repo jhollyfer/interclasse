@@ -10,8 +10,8 @@ import {
 } from '#/components/common/page-shell'
 import { GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useCardDelete } from '#/integrations/tanstack-query/mutations'
-import { cardsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useCardDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { cardsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
 import { plural } from '#/lib/labels'
 

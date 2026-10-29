@@ -6,7 +6,7 @@ import {
   storefrontAnnouncementsQueryOptions,
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/storefront'
 import { Agenda } from '#/components/common/match-agenda'
 
 import {

@@ -11,7 +11,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations'
+import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations/authentication'
 import { SITE_DESCRIPTION } from '#/lib/constant'
 import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
 import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'

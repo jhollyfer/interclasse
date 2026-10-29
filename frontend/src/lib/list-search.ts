@@ -1,4 +1,5 @@
 import type { SortDirection, TrashedMode } from './entity'
+import type { Merge } from './interfaces'
 
 /**
  * Os filtros de qualquer listagem do painel, na URL.
@@ -176,4 +177,73 @@ export function validateStorefrontSearch(
   const { trashed: _trashed, ...common } = validateListSearch(search)
 
   return common
+}
+
+/**
+ * Os filtros próprios de cada listagem, por cima dos que toda listagem tem.
+ *
+ * Os valores são `string` e não o enum do domínio: quem sai da URL é texto, e
+ * quem recusa valor fora da lista é a API, com 422 apontando o campo.
+ */
+export type UserListSearch = Merge<
+  ListSearch,
+  { role?: string; status?: string }
+>
+
+export type ClassroomListSearch = Merge<ListSearch, { category?: string }>
+
+export type BracketListSearch = Merge<
+  StorefrontSearch,
+  { sportId?: string; category?: string; status?: string }
+>
+
+export type MatchListSearch = Merge<
+  StorefrontSearch,
+  {
+    bracketId?: string
+    classroomId?: string
+    sportId?: string
+    category?: string
+    phase?: string
+    status?: string
+  }
+>
+
+export type PhotoListSearch = Merge<ListSearch, { status?: string }>
+
+export type StudentListSearch = Merge<ListSearch, { classroomId?: string }>
+
+export type CardListSearch = Merge<
+  ListSearch,
+  { matchId?: string; classroomId?: string; studentId?: string }
+>
+
+export type RemovalListSearch = Merge<ListSearch, { pending?: boolean }>
+
+/**
+ * Monta a query string ignorando o que não foi preenchido.
+ *
+ * Descarta por falsidade e não por `!== undefined`: o valor pode chegar `null`
+ * (o search param existe e está limpo) ou `''`, e `String(null)` viraria o texto
+ * "null" no filtro. `page` e `perPage` são `min(1)` no validator, mas número é
+ * testado por tipo e não por verdade - um filtro numérico que aceite `0` não
+ * pode sumir por ser falso.
+ *
+ * Aceita toda forma de filtro do painel e a da vitrine. Tipar só como
+ * `ListSearch` compilaria -
+ * todo campo dela é opcional, então as demais passam por assinabilidade -, mas a
+ * assinatura estaria mentindo sobre quem entra aqui.
+ */
+export function queryString(params: Record<string, unknown>): string {
+  const entries = Object.entries(params).filter(
+    ([, value]) => typeof value === 'number' || Boolean(value),
+  )
+
+  if (entries.length === 0) return ''
+
+  return '?'.concat(
+    new URLSearchParams(
+      entries.map(([key, value]) => [key, String(value)]),
+    ).toString(),
+  )
 }

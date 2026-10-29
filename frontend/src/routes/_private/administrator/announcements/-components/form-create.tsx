@@ -14,7 +14,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
 import type { IAnnouncement } from '#/lib/interfaces'
 import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
-import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations'
+import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 

@@ -14,7 +14,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { ISport } from '#/lib/interfaces'
 import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
-import { useSportCreate } from '#/integrations/tanstack-query/mutations'
+import { useSportCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 

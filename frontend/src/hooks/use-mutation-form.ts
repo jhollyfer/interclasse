@@ -21,7 +21,7 @@ import { applyMutationError } from '#/lib/form-errors'
 /**
  * O hook de mutation do recurso, como o formulário o recebe.
  *
- * Todos os de `integrations/tanstack-query/mutations.ts` têm esta forma: aceitam
+ * Todos os de `integrations/tanstack-query/mutations/` têm esta forma: aceitam
  * as opções do `useMutation` menos a `mutationFn`, que é o que eles próprios
  * fornecem. É o que permite passar o hook como argumento em vez de chamá-lo no
  * arquivo do formulário.
