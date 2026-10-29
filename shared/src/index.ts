@@ -15,10 +15,12 @@ export * from './enums/match-phase.js'
 export * from './enums/match-status.js'
 export * from './enums/photo-status.js'
 export * from './enums/sort-direction.js'
+export * from './enums/storage-mimetype.js'
 export * from './enums/trashed-mode.js'
 export * from './enums/upload-status.js'
 export * from './enums/user-role.js'
 
+export * from './records/actor.js'
 export * from './records/pagination.js'
 export * from './records/utility.js'
 
@@ -30,3 +32,12 @@ export * from './validators/administrator/sports.validator.js'
 
 export * from './responses/administrator/sports.response.js'
 export * from './responses/storefront/sports.response.js'
+
+export * from './validators/account/profile.validator.js'
+export * from './validators/administrator/users.validator.js'
+export * from './validators/authentication/sessions.validator.js'
+export * from './validators/storages/files.validator.js'
+
+export * from './responses/account/profile.response.js'
+export * from './responses/administrator/users.response.js'
+export * from './responses/storages/files.response.js'
