@@ -30,3 +30,19 @@ export * from './validators/administrator/sports.validator.js'
 
 export * from './responses/administrator/sports.response.js'
 export * from './responses/storefront/sports.response.js'
+
+export * from './records/actor.js'
+
+export * from './validators/administrator/classrooms.validator.js'
+export * from './validators/administrator/enrollment-removals.validator.js'
+export * from './validators/advisor/classrooms.validator.js'
+export * from './validators/advisor/enrollments.validator.js'
+export * from './validators/advisor/students.validator.js'
+export * from './validators/representative/enrollments.validator.js'
+
+export * from './responses/administrator/classrooms.response.js'
+export * from './responses/administrator/enrollment-removals.response.js'
+export * from './responses/advisor/classrooms.response.js'
+export * from './responses/advisor/enrollments.response.js'
+export * from './responses/advisor/students.response.js'
+export * from './responses/representative/enrollments.response.js'
