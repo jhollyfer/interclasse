@@ -4,6 +4,7 @@ import {
   CardsIcon,
   ChalkboardTeacherIcon,
   GaugeIcon,
+  GlobeIcon,
   IdentificationCardIcon,
   ListChecksIcon,
   MegaphoneIcon,
@@ -46,6 +47,7 @@ const ORGANIZATION = linkOptions([
     icon: MegaphoneIcon,
   },
   { to: '/administrator/users', label: 'Usuários', icon: UsersIcon },
+  { to: '/administrator/site', label: 'Site', icon: GlobeIcon },
 ])
 
 const ADVISOR = linkOptions([

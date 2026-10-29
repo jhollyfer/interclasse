@@ -50,10 +50,6 @@ pnpm dev:frontend                       # site em http://localhost:3001
 Portas deslocadas de propósito: os irmãos ocupam 3000, 5432 e 5433 nesta máquina.
 O MinIO vem do fork `pgsty/*` - as imagens `minio/*` saíram do Docker Hub.
 
-## Fora do escopo por enquanto
-
-- Galeria de fotos e página "Sobre"/edições do site anterior.
-
 ## Deploy
 
 `main.yml` no push para `main`: checa o backend, builda o frontend, publica

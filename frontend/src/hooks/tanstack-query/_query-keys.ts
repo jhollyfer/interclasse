@@ -20,6 +20,8 @@ export const queryKeys = {
 
   administrator: {
     all: ['administrator'] as const,
+    /** A configuração do site: uma só, sem parâmetro. */
+    site: ['administrator', 'site'] as const,
     users: {
       all: ['administrator', 'users'] as const,
       list: (params: ListSearch) =>
@@ -129,6 +131,7 @@ export const queryKeys = {
         ['storefront', 'brackets', 'list', params] as const,
       detail: (id: string) => ['storefront', 'brackets', 'detail', id] as const,
     },
+    site: ['storefront', 'site'] as const,
   },
 }
 
@@ -165,6 +168,7 @@ export const DEPENDENTS = {
     queryKeys.storefront.all,
   ],
   announcements: [queryKeys.storefront.all],
+  site: [queryKeys.storefront.all],
   games: [
     queryKeys.advisor.enrollments.all,
     queryKeys.representative.enrollments.all,

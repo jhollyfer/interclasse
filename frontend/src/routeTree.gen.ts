@@ -26,6 +26,7 @@ import { Route as PrivateRepresentativeIndexRouteImport } from './routes/_privat
 import { Route as PublicAvisosIndexRouteImport } from './routes/_public/avisos/index'
 import { Route as PublicClassificacaoIndexRouteImport } from './routes/_public/classificacao/index'
 import { Route as PublicJogosIndexRouteImport } from './routes/_public/jogos/index'
+import { Route as PublicSobreIndexRouteImport } from './routes/_public/sobre/index'
 import { Route as AuthenticationSignInIndexRouteImport } from './routes/authentication/_sign-in/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
@@ -34,6 +35,7 @@ import { Route as PrivateAdministratorClassroomsIndexRouteImport } from './route
 import { Route as PrivateAdministratorMatchesIndexRouteImport } from './routes/_private/administrator/matches/index'
 import { Route as PrivateAdministratorProfileIndexRouteImport } from './routes/_private/administrator/profile/index'
 import { Route as PrivateAdministratorRemovalsIndexRouteImport } from './routes/_private/administrator/removals/index'
+import { Route as PrivateAdministratorSiteIndexRouteImport } from './routes/_private/administrator/site/index'
 import { Route as PrivateAdministratorSportsIndexRouteImport } from './routes/_private/administrator/sports/index'
 import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_private/administrator/users/index'
 import { Route as PrivateAdvisorClassroomIdIndexRouteImport } from './routes/_private/advisor/$classroomId/index'
@@ -153,6 +155,13 @@ const PublicJogosIndexRoute = PublicJogosIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_public/jogos/index.lazy').then((d) => d.Route),
 )
+const PublicSobreIndexRoute = PublicSobreIndexRouteImport.update({
+  id: '/sobre/',
+  path: '/sobre/',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/sobre/index.lazy').then((d) => d.Route),
+)
 const AuthenticationSignInIndexRoute =
   AuthenticationSignInIndexRouteImport.update({
     id: '/_sign-in/',
@@ -224,6 +233,16 @@ const PrivateAdministratorRemovalsIndexRoute =
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
     import('./routes/_private/administrator/removals/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdministratorSiteIndexRoute =
+  PrivateAdministratorSiteIndexRouteImport.update({
+    id: '/site/',
+    path: '/site/',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/site/index.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -401,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/avisos/': typeof PublicAvisosIndexRoute
   '/classificacao/': typeof PublicClassificacaoIndexRoute
   '/jogos/': typeof PublicJogosIndexRoute
+  '/sobre/': typeof PublicSobreIndexRoute
   '/authentication/': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
@@ -409,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/administrator/matches/': typeof PrivateAdministratorMatchesIndexRoute
   '/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
   '/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
+  '/administrator/site/': typeof PrivateAdministratorSiteIndexRoute
   '/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -438,6 +459,7 @@ export interface FileRoutesByTo {
   '/avisos': typeof PublicAvisosIndexRoute
   '/classificacao': typeof PublicClassificacaoIndexRoute
   '/jogos': typeof PublicJogosIndexRoute
+  '/sobre': typeof PublicSobreIndexRoute
   '/authentication': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets': typeof PrivateAdministratorBracketsIndexRoute
@@ -446,6 +468,7 @@ export interface FileRoutesByTo {
   '/administrator/matches': typeof PrivateAdministratorMatchesIndexRoute
   '/administrator/profile': typeof PrivateAdministratorProfileIndexRoute
   '/administrator/removals': typeof PrivateAdministratorRemovalsIndexRoute
+  '/administrator/site': typeof PrivateAdministratorSiteIndexRoute
   '/administrator/sports': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users': typeof PrivateAdministratorUsersIndexRoute
   '/advisor/$classroomId': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -482,6 +505,7 @@ export interface FileRoutesById {
   '/_public/avisos/': typeof PublicAvisosIndexRoute
   '/_public/classificacao/': typeof PublicClassificacaoIndexRoute
   '/_public/jogos/': typeof PublicJogosIndexRoute
+  '/_public/sobre/': typeof PublicSobreIndexRoute
   '/authentication/_sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/_private/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
@@ -490,6 +514,7 @@ export interface FileRoutesById {
   '/_private/administrator/matches/': typeof PrivateAdministratorMatchesIndexRoute
   '/_private/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
   '/_private/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
+  '/_private/administrator/site/': typeof PrivateAdministratorSiteIndexRoute
   '/_private/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/_private/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
   '/_private/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
@@ -525,6 +550,7 @@ export interface FileRouteTypes {
     | '/avisos/'
     | '/classificacao/'
     | '/jogos/'
+    | '/sobre/'
     | '/authentication/'
     | '/administrator/announcements/'
     | '/administrator/brackets/'
@@ -533,6 +559,7 @@ export interface FileRouteTypes {
     | '/administrator/matches/'
     | '/administrator/profile/'
     | '/administrator/removals/'
+    | '/administrator/site/'
     | '/administrator/sports/'
     | '/administrator/users/'
     | '/advisor/$classroomId/'
@@ -562,6 +589,7 @@ export interface FileRouteTypes {
     | '/avisos'
     | '/classificacao'
     | '/jogos'
+    | '/sobre'
     | '/authentication'
     | '/administrator/announcements'
     | '/administrator/brackets'
@@ -570,6 +598,7 @@ export interface FileRouteTypes {
     | '/administrator/matches'
     | '/administrator/profile'
     | '/administrator/removals'
+    | '/administrator/site'
     | '/administrator/sports'
     | '/administrator/users'
     | '/advisor/$classroomId'
@@ -605,6 +634,7 @@ export interface FileRouteTypes {
     | '/_public/avisos/'
     | '/_public/classificacao/'
     | '/_public/jogos/'
+    | '/_public/sobre/'
     | '/authentication/_sign-in/'
     | '/_private/administrator/announcements/'
     | '/_private/administrator/brackets/'
@@ -613,6 +643,7 @@ export interface FileRouteTypes {
     | '/_private/administrator/matches/'
     | '/_private/administrator/profile/'
     | '/_private/administrator/removals/'
+    | '/_private/administrator/site/'
     | '/_private/administrator/sports/'
     | '/_private/administrator/users/'
     | '/_private/advisor/$classroomId/'
@@ -759,6 +790,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicJogosIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
+    '/_public/sobre/': {
+      id: '/_public/sobre/'
+      path: '/sobre'
+      fullPath: '/sobre/'
+      preLoaderRoute: typeof PublicSobreIndexRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
     '/authentication/_sign-in/': {
       id: '/authentication/_sign-in/'
       path: '/'
@@ -813,6 +851,13 @@ declare module '@tanstack/react-router' {
       path: '/removals'
       fullPath: '/administrator/removals/'
       preLoaderRoute: typeof PrivateAdministratorRemovalsIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
+    '/_private/administrator/site/': {
+      id: '/_private/administrator/site/'
+      path: '/site'
+      fullPath: '/administrator/site/'
+      preLoaderRoute: typeof PrivateAdministratorSiteIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/sports/': {
@@ -939,6 +984,7 @@ interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorMatchesIndexRoute: typeof PrivateAdministratorMatchesIndexRoute
   PrivateAdministratorProfileIndexRoute: typeof PrivateAdministratorProfileIndexRoute
   PrivateAdministratorRemovalsIndexRoute: typeof PrivateAdministratorRemovalsIndexRoute
+  PrivateAdministratorSiteIndexRoute: typeof PrivateAdministratorSiteIndexRoute
   PrivateAdministratorSportsIndexRoute: typeof PrivateAdministratorSportsIndexRoute
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
   PrivateAdministratorAnnouncementsNewIndexRoute: typeof PrivateAdministratorAnnouncementsNewIndexRoute
@@ -970,6 +1016,7 @@ const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteCh
       PrivateAdministratorProfileIndexRoute,
     PrivateAdministratorRemovalsIndexRoute:
       PrivateAdministratorRemovalsIndexRoute,
+    PrivateAdministratorSiteIndexRoute: PrivateAdministratorSiteIndexRoute,
     PrivateAdministratorSportsIndexRoute: PrivateAdministratorSportsIndexRoute,
     PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
     PrivateAdministratorAnnouncementsNewIndexRoute:
@@ -1057,6 +1104,7 @@ interface PublicLayoutRouteChildren {
   PublicAvisosIndexRoute: typeof PublicAvisosIndexRoute
   PublicClassificacaoIndexRoute: typeof PublicClassificacaoIndexRoute
   PublicJogosIndexRoute: typeof PublicJogosIndexRoute
+  PublicSobreIndexRoute: typeof PublicSobreIndexRoute
   PublicClassificacaoIdIndexRoute: typeof PublicClassificacaoIdIndexRoute
 }
 
@@ -1066,6 +1114,7 @@ const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
   PublicAvisosIndexRoute: PublicAvisosIndexRoute,
   PublicClassificacaoIndexRoute: PublicClassificacaoIndexRoute,
   PublicJogosIndexRoute: PublicJogosIndexRoute,
+  PublicSobreIndexRoute: PublicSobreIndexRoute,
   PublicClassificacaoIdIndexRoute: PublicClassificacaoIdIndexRoute,
 }
 

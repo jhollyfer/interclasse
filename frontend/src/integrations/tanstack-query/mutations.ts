@@ -34,9 +34,11 @@ import type {
   IEnrollmentBoard,
   IEnrollmentRemoval,
   IMatchCard,
+  ISiteSetting,
   Merge,
 } from '#/lib/interfaces'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
+import type { SiteUpdatePayload } from '#/validators/administrator/site.validator'
 import type {
   AnnouncementCreatePayload,
   AnnouncementUpdatePayload,
@@ -671,6 +673,21 @@ export function useRepresentativeEnrollmentUpdate(
     ...options,
     mutationFn: function (payload) {
       return request<IEnrollmentBoard>('/representative/enrollments', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+/** Grava o "Sobre" e o regulamento. Campo ausente não muda; `null` apaga. */
+export function useSiteUpdate(
+  options?: MutationProps<ISiteSetting, SiteUpdatePayload>,
+) {
+  return useMutation<ISiteSetting, HTTPError, SiteUpdatePayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<ISiteSetting>('/administrator/site', {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

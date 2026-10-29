@@ -14,6 +14,8 @@ const STANDINGS = linkOptions({ to: '/classificacao', label: 'Classificação' }
 
 const ANNOUNCEMENTS = linkOptions({ to: '/avisos', label: 'Avisos' })
 
+const ABOUT = linkOptions({ to: '/sobre', label: 'Sobre' })
+
 const SIGN_IN = linkOptions({ to: '/authentication', label: 'Entrar' })
 
 export type MenuItem =
@@ -21,6 +23,7 @@ export type MenuItem =
   | typeof GAMES
   | typeof STANDINGS
   | typeof ANNOUNCEMENTS
+  | typeof ABOUT
   | typeof SIGN_IN
 
 export const NAVIGATION: ReadonlyArray<MenuItem> = [
@@ -28,6 +31,7 @@ export const NAVIGATION: ReadonlyArray<MenuItem> = [
   GAMES,
   STANDINGS,
   ANNOUNCEMENTS,
+  ABOUT,
 ]
 
 /** A porta do painel. Fica fora de `NAVIGATION`: é ação, e não destino de leitura. */

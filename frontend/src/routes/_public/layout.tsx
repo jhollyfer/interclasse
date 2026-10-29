@@ -1,6 +1,8 @@
 import type * as React from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries'
+
 import { Footer } from './-components/footer'
 import { Header } from './-components/header'
 
@@ -24,6 +26,12 @@ const MAIN_ID = 'conteudo'
  * mais na URL.
  */
 export const Route = createFileRoute('/_public')({
+  // O "Sobre" e o regulamento aparecem no rodapé de toda página. Falha engolida:
+  // a API fora do ar tira o botão, não a página.
+  loader: ({ context }) =>
+    context.queryClient
+      .query(storefrontSiteQueryOptions())
+      .catch(() => undefined),
   component: RouteComponent,
 })
 
