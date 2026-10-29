@@ -5,7 +5,10 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 
 import * as core from '#core/validator'
-import { FIELD_LABELS } from '#core/validator'
+import { FIELD_LABELS as LABELS_BY_LOCALE } from '#core/validator'
+
+/** O pt-BR é a referência: o compilador já cobra as mesmas chaves em es e en. */
+const FIELD_LABELS = LABELS_BY_LOCALE['pt-BR']
 
 /**
  * As auditorias estáticas dos validators, todas pelo `toJSONSchema()`.
@@ -50,7 +53,9 @@ function branch(node: unknown, key: string): Array<unknown> {
  * é o que deixa quebrar o validator por recurso sem perder a rede.
  */
 const modulos: Array<Record<string, unknown>> = [core]
-for await (const arquivo of glob('app/validators/**/*.validator.ts', { cwd: app.appRoot.pathname })) {
+for await (const arquivo of glob('app/validators/**/*.validator.ts', {
+  cwd: app.appRoot.pathname,
+})) {
   modulos.push(await import(pathToFileURL(app.makePath(arquivo)).href))
 }
 
@@ -154,7 +159,7 @@ const SEM_CAMPO_NO_SCHEMA = ['passwordConfirmation']
  * exatamente por isso que a cobrança precisa ser automática.
  */
 test.group('validator > rótulos', () => {
-  test('todo campo dos validators tem nome em português', ({ assert }) => {
+  test('todo campo dos validators tem nome nos três idiomas', ({ assert }) => {
     // O nome cru serve de fallback do VineJS, então basta o último segmento ter
     // rótulo - `parts.etag` cai em `etag` se o caminho completo não estiver
     // listado. Os dois valem, e o caminho completo ganha quando existe.

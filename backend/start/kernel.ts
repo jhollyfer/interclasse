@@ -33,6 +33,9 @@ server.use([
  * requests with a registered route.
  */
 router.use([
+  // Primeiro: todo erro abaixo (CORS, origem, sessão, papel) já sai no idioma
+  // de quem pediu (_standards/i18n.md §3).
+  () => import('#middleware/detect-user-locale.middleware'),
   /**
    * Antes do bodyparser, de propósito.
    *

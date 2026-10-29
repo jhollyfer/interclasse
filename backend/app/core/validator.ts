@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
+import { BASE_LOCALE, type Locale } from '@interclasse/shared'
 import type { FieldContext, Infer } from '@vinejs/vine/types'
 import {
   ACTIVE_STATUSES,
@@ -288,7 +289,7 @@ export function athleteListFields() {
  * teste cobra rótulo para todo campo dos validators e acusa rótulo órfão, então
  * campo novo em `#core/validator` nasce vermelho até entrar aqui.
  */
-export const FIELD_LABELS = {
+const PT_BR_FIELD_LABELS = {
   // Identidade e conta
   name: 'o nome',
   email: 'o e-mail',
@@ -361,15 +362,136 @@ export const FIELD_LABELS = {
   trashed: 'o filtro de arquivados',
 }
 
+/** As chaves de `PT_BR_FIELD_LABELS`: o compilador cobra a mesma lista nos outros idiomas. */
+type FieldLabels = Record<keyof typeof PT_BR_FIELD_LABELS, string>
+
 /**
- * A frase de cada regra de validação.
+ * O nome amigável de cada campo, por idioma, na forma que cai bem depois de
+ * "Informe" (pt-BR), "Ingresa" (es) e "Enter" (en) - `_standards/i18n.md` §3.
  *
- * É exportado pelo mesmo motivo de `FIELD_LABELS`:
- * `app/core/validator-messages.spec.ts` precisa importá-lo pelo nome para cobrar
- * que toda regra usada pelos validators tenha tradução e que nenhuma frase
- * tenha escapado em inglês.
+ * É exportado porque `app/core/validator.unit.spec.ts` cobra rótulo para todo
+ * campo dos validators e acusa rótulo órfão, então campo novo nasce vermelho
+ * até entrar aqui, nos três idiomas.
  */
-export const RULE_MESSAGES = {
+export const FIELD_LABELS = {
+  'pt-BR': PT_BR_FIELD_LABELS,
+  'es': {
+    name: 'el nombre',
+    email: 'el correo electrónico',
+    password: 'la contraseña',
+    passwordConfirmation: 'la confirmación de la contraseña',
+    currentPassword: 'la contraseña actual',
+    role: 'el rol',
+    status: 'el estado',
+    avatarId: 'el avatar',
+    id: 'el identificador',
+    grade: 'el año escolar',
+    category: 'la categoría',
+    advisorId: 'el profesor consejero',
+    representativeId: 'el alumno representante',
+    classroomId: 'el grupo',
+    minAthletes: 'el mínimo de atletas',
+    maxAthletes: 'el máximo de atletas',
+    sportId: 'la modalidad',
+    studentIds: 'los atletas',
+    studentId: 'el atleta',
+    reason: 'el motivo',
+    pending: 'el filtro de pendientes',
+    about: 'el texto de Acerca de',
+    organizer: 'quién organiza',
+    firstEditionYear: 'el año de la primera edición',
+    edition: 'la edición',
+    schoolInstagram: 'el Instagram de la escuela',
+    developerInstagram: 'el Instagram de quien desarrolló',
+    regulationId: 'el reglamento',
+    storageId: 'el archivo',
+    caption: 'la leyenda',
+    title: 'el título',
+    body: 'el texto',
+    pinned: 'el destacado',
+    bracketId: 'la llave',
+    phase: 'la fase',
+    scheduledAt: 'la fecha y hora',
+    location: 'el lugar',
+    homeScore: 'el marcador del local',
+    awayScore: 'el marcador del visitante',
+    winnerTeamId: 'el ganador',
+    matchId: 'el partido',
+    color: 'el color de la tarjeta',
+    note: 'la observación',
+    fileName: 'el nombre del archivo',
+    mimetype: 'el tipo de archivo',
+    size: 'el tamaño',
+    parts: 'las partes',
+    partNumber: 'el número de la parte',
+    etag: 'el ETag',
+    page: 'la página',
+    perPage: 'el total por página',
+    search: 'la búsqueda',
+    sort: 'el orden',
+    direction: 'la dirección del orden',
+    trashed: 'el filtro de archivados',
+  },
+  'en': {
+    name: 'the name',
+    email: 'the email',
+    password: 'the password',
+    passwordConfirmation: 'the password confirmation',
+    currentPassword: 'the current password',
+    role: 'the role',
+    status: 'the status',
+    avatarId: 'the avatar',
+    id: 'the identifier',
+    grade: 'the grade',
+    category: 'the category',
+    advisorId: 'the advisor teacher',
+    representativeId: 'the student representative',
+    classroomId: 'the class',
+    minAthletes: 'the minimum number of athletes',
+    maxAthletes: 'the maximum number of athletes',
+    sportId: 'the sport',
+    studentIds: 'the athletes',
+    studentId: 'the athlete',
+    reason: 'the reason',
+    pending: 'the pending filter',
+    about: 'the About text',
+    organizer: 'who organizes',
+    firstEditionYear: 'the year of the first edition',
+    edition: 'the edition',
+    schoolInstagram: "the school's Instagram",
+    developerInstagram: "the developer's Instagram",
+    regulationId: 'the rules',
+    storageId: 'the file',
+    caption: 'the caption',
+    title: 'the title',
+    body: 'the text',
+    pinned: 'the highlight',
+    bracketId: 'the bracket',
+    phase: 'the stage',
+    scheduledAt: 'the date and time',
+    location: 'the venue',
+    homeScore: 'the home score',
+    awayScore: 'the away score',
+    winnerTeamId: 'the winner',
+    matchId: 'the match',
+    color: 'the card color',
+    note: 'the note',
+    fileName: 'the file name',
+    mimetype: 'the file type',
+    size: 'the size',
+    parts: 'the parts',
+    partNumber: 'the part number',
+    etag: 'the ETag',
+    page: 'the page',
+    perPage: 'the page size',
+    search: 'the search',
+    sort: 'the sort order',
+    direction: 'the sort direction',
+    trashed: 'the archived filter',
+  },
+} satisfies Record<Locale, FieldLabels>
+
+const PT_BR_RULE_MESSAGES = {
   // Genéricas
   // O `{{ field }}` só aparece onde a frase começa por verbo. Os rótulos
   // carregam artigo ("o resumo"), então campo no início da frase sairia em
@@ -406,4 +528,75 @@ export const RULE_MESSAGES = {
   'passwordConfirmation.confirmed': 'As senhas não são iguais',
 }
 
-vine.messagesProvider = new SimpleMessagesProvider(RULE_MESSAGES, FIELD_LABELS)
+type RuleMessages = Record<keyof typeof PT_BR_RULE_MESSAGES, string>
+
+/**
+ * A frase de cada regra de validação, por idioma. Exportado pelo mesmo motivo
+ * de `FIELD_LABELS`: a meta-spec cobra que toda regra usada pelos validators
+ * tenha tradução nos três idiomas.
+ */
+export const RULE_MESSAGES = {
+  'pt-BR': PT_BR_RULE_MESSAGES,
+  'es': {
+    'required': 'Ingresa {{ field }}',
+    'string': 'Ingresa {{ field }}',
+    'enum': 'Selecciona {{ field }}',
+    'email': 'Ingresa un correo electrónico válido',
+    'number': 'Ingresa un número válido',
+    'boolean': 'Indica verdadero o falso',
+    'array': 'Ingresa una lista',
+    'object': 'Ingresa un objeto',
+    'uuid': 'Selecciona una opción válida',
+    'url': 'Ingresa un enlace válido',
+    'minLength': 'Ingresa al menos {{ min }} caracteres',
+    'maxLength': 'Ingresa como máximo {{ max }} caracteres',
+    'min': 'Ingresa un valor mayor o igual a {{ min }}',
+    'max': 'Ingresa un valor menor o igual a {{ max }}',
+    'positive': 'Ingresa un valor mayor que cero',
+    'withoutDecimals': 'Ingresa un número entero',
+    'array.maxLength': 'Ingresa como máximo {{ max }} elementos',
+    'isoDateTime': 'Ingresa fecha y hora en ISO 8601 con zona horaria',
+    'password.regex': 'La contraseña necesita minúscula, mayúscula, número y carácter especial',
+    'password.minLength': 'La contraseña debe tener al menos {{ min }} caracteres',
+    'password.maxLength': 'La contraseña debe tener como máximo {{ max }} caracteres',
+    'passwordConfirmation.confirmed': 'Las contraseñas no coinciden',
+  },
+  'en': {
+    'required': 'Enter {{ field }}',
+    'string': 'Enter {{ field }}',
+    'enum': 'Select {{ field }}',
+    'email': 'Enter a valid email',
+    'number': 'Enter a valid number',
+    'boolean': 'Enter true or false',
+    'array': 'Enter a list',
+    'object': 'Enter an object',
+    'uuid': 'Select a valid option',
+    'url': 'Enter a valid link',
+    'minLength': 'Enter at least {{ min }} characters',
+    'maxLength': 'Enter at most {{ max }} characters',
+    'min': 'Enter a value greater than or equal to {{ min }}',
+    'max': 'Enter a value less than or equal to {{ max }}',
+    'positive': 'Enter a value greater than zero',
+    'withoutDecimals': 'Enter a whole number',
+    'array.maxLength': 'Enter at most {{ max }} items',
+    'isoDateTime': 'Enter date and time in ISO 8601 with time zone',
+    'password.regex':
+      'The password needs a lowercase letter, an uppercase letter, a number and a special character',
+    'password.minLength': 'The password must have at least {{ min }} characters',
+    'password.maxLength': 'The password must have at most {{ max }} characters',
+    'passwordConfirmation.confirmed': 'The passwords do not match',
+  },
+} satisfies Record<Locale, RuleMessages>
+
+/**
+ * Um provider de mensagens por idioma. O middleware de idioma escolhe o da
+ * requisição (`detect-user-locale.middleware.ts`); fora de requisição vale o
+ * idioma base (_doc-lib/vinejs.md#custom_error_messages).
+ */
+export const VALIDATION_MESSAGES = {
+  'pt-BR': new SimpleMessagesProvider(RULE_MESSAGES['pt-BR'], FIELD_LABELS['pt-BR']),
+  'es': new SimpleMessagesProvider(RULE_MESSAGES.es, FIELD_LABELS.es),
+  'en': new SimpleMessagesProvider(RULE_MESSAGES.en, FIELD_LABELS.en),
+} satisfies Record<Locale, SimpleMessagesProvider>
+
+vine.messagesProvider = VALIDATION_MESSAGES[BASE_LOCALE]

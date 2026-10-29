@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { LOCALES } from '@interclasse/shared'
 
 import { body } from '#tests/helpers'
 import { RULE_MESSAGES } from '#core/validator'
@@ -44,7 +45,11 @@ test.group('mensagens > provider de validação', () => {
       'passwordConfirmation.confirmed',
     ]
 
-    const faltando = obrigatorias.filter((rule) => !(rule in RULE_MESSAGES))
+    const faltando = LOCALES.flatMap((locale) =>
+      obrigatorias
+        .filter((rule) => !(rule in RULE_MESSAGES[locale]))
+        .map((rule) => `${locale}:${rule}`),
+    )
 
     assert.deepEqual(faltando, [])
   })
@@ -52,7 +57,7 @@ test.group('mensagens > provider de validação', () => {
   test('nenhuma mensagem escapou em inglês', ({ assert }) => {
     // `{{ field }}` é o marcador do VineJS, e não texto exibido - sai antes da
     // busca, senão toda mensagem que nomeia o campo seria acusada de inglesa.
-    const suspeitas = Object.entries(RULE_MESSAGES).filter(([, message]) =>
+    const suspeitas = Object.entries(RULE_MESSAGES['pt-BR']).filter(([, message]) =>
       /\b(the|must|field|should|at least|at most|invalid|value)\b/i.test(
         message.replace(/\{\{.*?\}\}/g, ''),
       ),
@@ -72,5 +77,19 @@ test.group('mensagens > provider de validação', () => {
     response.assertStatus(422)
 
     assert.deepEqual(body(response).errors, { email: 'Informe um e-mail válido' })
+  })
+
+  test('a 422 sai no idioma do Accept-Language', async ({ client, assert }) => {
+    const english = await client
+      .post('/authentication/sign-in')
+      .header('accept-language', 'en-US,en;q=0.9')
+      .json({ email: 'nao-e-email', password: 'Qualquer1!' })
+    const spanish = await client
+      .post('/authentication/sign-in')
+      .header('accept-language', 'es')
+      .json({ email: 'nao-e-email', password: 'Qualquer1!' })
+
+    assert.deepEqual(body(english).errors, { email: 'Enter a valid email' })
+    assert.deepEqual(body(spanish).errors, { email: 'Ingresa un correo electrónico válido' })
   })
 })
