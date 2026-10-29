@@ -1,89 +1,100 @@
 # Design system
 
-**<Projeto>** · <três palavras de direção, ex.: simples, claro, rápido de usar no balcão>
+**Interclasse** · esportivo, claro, legível no celular
 
 > Registra a **decisão**: que valor, por quê, onde usar. O valor que o código lê mora no tema
-> (`styles.css`, `components.json`); componente usa token semântico, nunca hex nem valor arbitrário
-> em classe (`_standards/frontend.md` §6). Token mudou aqui, muda no tema no mesmo commit.
-> A identidade (cor, família, ícone, raio) é deste projeto e é escolhida de propósito: nenhum
-> valor abaixo vem preenchido. Os anti-padrões que valem para todo projeto estão em
-> `_standards/frontend.md` §10.8; aqui só se aponta.
+> (`frontend/src/styles.css`, `frontend/components.json`); componente usa token semântico, nunca hex
+> nem valor arbitrário em classe (`_standards/frontend.md` §6). Token mudou aqui, muda no tema no
+> mesmo commit. Os anti-padrões que valem para todo projeto estão em `_standards/frontend.md` §10.8;
+> aqui só se aponta.
 
 ## 1. Visão geral
 
-- Direção: <o que a interface precisa transmitir e para quem>.
-- Modo dominante: <Operar (painel, tarefa repetida) | Convencer (vitrine, página pública) | Ler (conteúdo longo)>.
-  Tela de operação usa padrão familiar; ousadia visual fica para a página pública.
-- Tema: <só claro | claro e escuro>. Se houver escuro, o tema vem do servidor por cookie, sem
-  flash, e uma página não troca de tema no meio.
+- Direção: a identidade do site antigo dos jogos (`site-jogos-estudantis`): verde da quadra, verde-noite no cabeçalho e no rodapé, amarelo do placar. Transmite competição escolar sem perder a leitura de tabela e de placar.
+- Modo dominante: **Convencer e Ler** no site público (jogos, classificação, avisos); **Operar** no painel (tabelas, formulários, sorteio, placar). O painel usa padrão familiar de shadcn; a ousadia visual (display condensado em itálico) fica no site público.
+- Tema: claro e escuro. Hoje o tema vem do `next-themes` (classe `.dark`, padrão do sistema, `defaultTheme="system"`), escolhido no navegador e não por cookie no servidor; o `suppressHydrationWarning` em `routes/__root.tsx` cobre o atraso. Desvio da régua (`frontend.md`, tema pelo servidor) registrado como tarefa em aberto.
 
 ## 2. Cores
 
-Dois níveis: primitivo (opcional) e semântico. Componente só consome o semântico; o modo escuro
-redefine só o semântico. Cada cor tem papel escrito, não só o valor.
+Dois níveis: primitivo (`--brand`, `--brand-ink`, `--field`) e semântico (`--primary`, `--accent`…). Componente só consome o semântico; o modo escuro redefine só o semântico. O amarelo é **acento** (anel de foco, item ativo, placar); a ação primária é o verde da quadra.
 
 | Token semântico | Claro | Escuro | Papel (onde e por quê) |
 |---|---|---|---|
-| `primary` | <cor> | <cor> | <ação principal; regra, ex.: no máximo uma por área> |
-| `secondary` | <cor> | <cor> | <ação secundária> |
-| `success` | <cor> | <cor> | <confirmação, concluído> |
-| `warning` | <cor> | <cor> | <atenção que não bloqueia> |
-| `destructive` | <cor> | <cor> | <erro e ação que apaga> |
-| `background` | <cor> | <cor> | <fundo da página> |
-| `card` | <cor> | <cor> | <superfície elevada> |
-| `foreground` | <cor> | <cor> | <texto principal> |
-| `muted-foreground` | <cor> | <cor> | <texto de apoio> |
+| `primary` | `#0f7a34` (`--field`) | `#3fb866` | ação principal; um botão `default` por área. O verde foi escurecido um tom em relação ao site antigo (`#12873a` dava 4,4:1 sobre o fundo claro) |
+| `primary-foreground` | `oklch(0.985 0.003 85)` | `#04260f` | texto sobre `primary` |
+| `accent` | `#ffd400` (`--brand`) | `#ffd400` | amarelo do placar e dos destaques: item ativo e destaque de leitura, nunca texto sobre fundo claro |
+| `accent-foreground` | `#04260f` (`--brand-ink`) | `#04260f` | tinta verde-noite sobre o amarelo |
+| `ring` | `#ffd400` | `#ffd400` | anel de foco |
+| `secondary` | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` | ação secundária |
+| `destructive` | `oklch(0.5 0.21 27.325)` | `oklch(0.704 0.191 22.216)` | erro e ação que apaga |
+| `background` | `#f6fbf7` | `#08150d` | fundo da página (verde bem claro / verde-noite) |
+| `card` | `oklch(1 0 0)` | `oklch(0.205 0 0)` | superfície elevada |
+| `foreground` | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` | texto principal |
+| `muted-foreground` | `oklch(0.556 0 0)` | `oklch(0.708 0 0)` | texto de apoio |
+| `border` | `oklch(0.922 0 0)` | `oklch(1 0 0 / 10%)` | contornos |
+| `brand-ink` | `#04260f` | `#04260f` | faixa do cabeçalho e do rodapé; **não inverte com o tema**, e a tinta clara dela (`brand-ink-foreground` `#ffffff`) também não |
+| `badge-neutral` | `oklch(0.95 0.008 150)` / texto `oklch(0.4 0.02 150)` | `oklch(0.28 0.014 150)` / `oklch(0.85 0.02 150)` | estado sem juízo (por exemplo, agendada) |
+| `badge-info` | `oklch(0.94 0.04 235)` / texto `oklch(0.42 0.1 245)` | `oklch(0.28 0.05 235)` / `oklch(0.85 0.09 240)` | informação |
+| `badge-success` | `oklch(0.94 0.05 165)` / texto `oklch(0.4 0.1 168)` | `oklch(0.28 0.06 165)` / `oklch(0.85 0.11 168)` | concluído, aprovada |
+| `badge-warning` | `oklch(0.94 0.06 95)` / texto `oklch(0.4 0.09 95)` | `oklch(0.28 0.06 95)` / `oklch(0.85 0.11 95)` | pendente, atenção que não bloqueia |
+| `surface-warm`, `surface-elevated` | `oklch(0.98 0.005 60)`, `oklch(1 0 0)` | `oklch(0.16 0.005 60)`, `oklch(0.205 0 0)` | blocos sem borda; superfície do cartão |
 
-Contraste conferido (AA): texto 4,5:1, texto grande e componente 3:1, nos dois temas e em todo
-estado (hover, disabled legível, placeholder). Ferramenta e data da conferência: <…>.
+Cada par de badge é fundo pálido com tinta escura do mesmo matiz, calibrado para texto pequeno; os dois lados andam juntos e o `Badge` recebe só o nome da variante.
+
+Contraste (AA): o `primary` claro passa de 4,5:1 sobre o fundo claro (comentário do `styles.css`). A conferência dos demais pares e estados, nos dois temas, com data e ferramenta: não feita.
 
 ## 3. Tipografia
 
-Família: <família> (<fallback com métrica ajustada>), pesos carregados: <só os usados>.
+Famílias (`@fontsource`, só os pesos usados):
 
-Escala fixa em `rem`, nome por papel, nunca por tamanho (`--text-body`, não `--font-size-16`):
+| Papel | Família | Pesos carregados | Onde |
+|---|---|---|---|
+| Corpo (`--font-sans`) | Barlow | 400, 600 | texto, formulário, tabela |
+| Display (`--font-display`) | Barlow Condensed, com Barlow de reserva | 700 itálico, 800 itálico | títulos do site público e placar |
 
-| Papel | Token | Tamanho / altura | Peso | Onde |
-|---|---|---|---|---|
-| Display | `--text-display` | <…> | <…> | <só página pública; único lugar onde `clamp` vale> |
-| Título | `--text-heading` | <…> | <…> | <h1 da tela> |
-| Subtítulo | `--text-subheading` | <…> | <…> | <h2, título de card> |
-| Corpo | `--text-body` | ≥ 1rem / <…> | <…> | <texto e input; nunca abaixo de 16 px> |
-| Secundário | `--text-secondary` | <…> | <…> | <texto de apoio> |
-| Legenda | `--text-caption` | <…> | <…> | <rótulo pequeno, metadado> |
-
-Prosa com medida de 65 a 75 caracteres; coluna numérica com `tabular-nums`.
+A escala hoje usa os utilitários de tamanho do Tailwind direto nos componentes, sem tokens
+`--text-*` nomeados por papel; o desvio da régua (`frontend.md` §6) é tarefa aberta.
+Recursos de fonte: `font-feature-settings: 'ss01', 'cv01', 'cv11'`, `font-synthesis: none`.
 
 ## 4. Layout
 
-- Breakpoints (`--breakpoint-*`): <…>. Celular primeiro: base sem prefixo, camadas em `md:`/`lg:`.
-- Contêiner: <largura máxima, gutter>.
-- Escala de espaço (`--spacing-*`): <…>; densidade <confortável | compacta> em <quais telas>.
+- Breakpoints: o padrão do Tailwind; o hook `useIsBelow` usa 768 px (celular) e 1024 px (tablet) para a barra lateral do painel (`hooks/use-mobile.ts`). Celular primeiro: base sem prefixo, camadas em `md:` e `lg:`.
+- Respiro entre seções do site público: `--space-section: clamp(5rem, 8vw, 8rem)` (`py-section`).
+- Painel: barra lateral recolhível e cabeçalho com migalhas; no site público, cabeçalho e rodapé desenham a mesma lista de destinos (`routes/_public/-components/menu.ts`).
 - Sem rolagem horizontal da página a 320 px; uso a 200% de zoom.
 
 ## 5. Elevação e camadas
 
-- Sombra por papel: <plano, sem sombra | `--shadow-popover`, `--shadow-dialog`>.
-- Escala de z-index nomeada em token, nunca `z-50` solto:
-  `dropdown` < `sticky` < `overlay` < `modal` < `toast` < `tooltip`.
+- Sombra por papel: `shadow-card` (cartão em repouso), `shadow-card-hover` e `shadow-card-elevated`. Cada uma soma um anel de 1 px, que dá contorno sem segunda borda. Os tokens `--elevation-*` viram `--shadow-card*` no `@theme inline` por causa de colisão de nome.
+- Escala de z-index nomeada em token: não definida em `styles.css`; usa os valores do shadcn nos componentes de `components/ui/`.
 
 ## 6. Formas
 
-- Raio (`--radius-*`): <um valor, ou a regra quando há mais de um, ex.: input <…>, card <…>>.
+- Raio: `--radius: 0.5rem`; `rounded-sm`, `-md`, `-lg` e `-xl` derivam dele (`radius - 4px`, `- 2px`, `radius`, `+ 4px`).
 
 ## 7. Componentes
 
-Vêm de `components/ui/` (shadcn, variante `cva` marcada `// casa:`) e do kit `components/common/`
-(`_standards/frontend.md` §8). Componente novo do kit entra aqui no mesmo commit.
+Vêm de `components/ui/` (shadcn, estilo `base-mira`, sobre Base UI) e do kit `components/common/`.
+Ícones: Phosphor, uma família só.
 
 | Componente | Variantes usadas | Regra |
 |---|---|---|
-| Button | `default`, `secondary`, `outline`, `ghost`, `destructive` | um `default` por área; `destructive` só na ação que apaga ("Excluir post"); "Cancelar"/"Manter" é `ghost` ou `outline`, nunca `destructive` |
-| Input | padrão, com erro | rótulo visível acima; placeholder é exemplo, não rótulo; erro abaixo, ligado por `aria-describedby` |
-| Badge | por status (lookup de variante) | cor nunca sozinha: sempre com rótulo |
-| Alert | <…> | |
-| ConfirmDialog | — | só para ação irreversível, cara ou em lote; recuperável usa "Desfazer" no toast |
-| Dialog / Sheet | — | `dialog-pattern` / `sheet-pattern`; modal não é primeira opção |
+| `Button` | `default`, `secondary`, `outline`, `ghost`, `destructive`, `link`; tamanhos `default`, `xs`, `sm`, `lg`, `icon` | um `default` por área; `destructive` só na ação que apaga; "Cancelar" é `ghost` ou `outline` |
+| `Input`, `Textarea`, `Field` | padrão, com erro | rótulo visível acima; erro abaixo, ligado por `aria-describedby` |
+| `Badge` | `neutral`, `info`, `success`, `warning` além das de botão | cor nunca sozinha: sempre com rótulo |
+| `Alert`, `Empty`, `Skeleton`, `Spinner` | | estados de tela (§8) |
+| `Dialog`, `Sheet`, `AlertDialog` | | modal não é primeira opção; dentro de `Dialog` o seletor é `select` nativo, porque o popup do combobox abre atrás do overlay |
+| `Tabs` | | classificação do site: aba por categoria e por modalidade, sem sair da página |
+| `ConfirmDialog` (`common/confirm-dialog`) | | só para ação irreversível, cara ou em lote (excluir chave, excluir conta, sair) |
+| `Table` (`common/table`) | | tabela do painel com ordenação, coluna alternável e seleção em lote; contexto da tabela por prop |
+| `CardList` (`common/card-list`) | | lista em cartões; as turmas do painel em dois grupos (F1 e F2) |
+| `ClassroomDetail` (`common/classroom-detail`) | | página da turma com conselheiro, representante, alunos e inscrições |
+| `EnrollmentBoard` (`common/enrollment-board`) | | coluna de caixas marcadas por modalidade; manda a lista inteira |
+| `BracketTree` (`common/bracket-tree`) | | árvore do mata-mata, das oitavas à final |
+| `MatchAgenda`, `MatchDialogs` | | agenda, placar e cartões |
+| `PhotoGallery` (`common/photo-gallery`) | | grade e envio de fotos |
+| `OptionCombobox`, `ImageField`, `InputPassword`, `FormShell`, `SubmitButton`, `RowActions`, `PageShell`, `NotFoundPage` | | kit de formulário e página do painel |
+| `LocaleSwitch`, `BrandMark`, `MaiyuCredit` | | troca de idioma; logo decorativa (`alt` vazio, o nome ao lado diz o mesmo); crédito do desenvolvedor |
 
 Estados de todo controle: default, hover, focus-visible, active, disabled, loading, error.
 
@@ -91,50 +102,45 @@ Estados de todo controle: default, hover, focus-visible, active, disabled, loadi
 
 | Estado | Como aparece |
 |---|---|
-| Carregando | esqueleto com a forma do conteúdo; spinner só no botão que enviou |
-| Vazio | por motivo: primeiro uso (o que vai aparecer + ação de criar), filtro sem resultado (limpar filtros), sem permissão (por quê + como obter) |
-| Erro | o que houve e a recuperação (tentar de novo, voltar, entrar de novo); erro de um bloco não derruba a tela |
-| Sucesso | toast curto com o verbo no particípio |
+| Carregando | esqueleto com a forma do conteúdo; spinner só no botão que enviou; o painel mostra um spinner central até o JS montar (`ssr: 'data-only'`) |
+| Vazio | por motivo: sem conselheiro ("Sem conselheiro"), sem turma vinculada, lista sem resultado com filtro, sem chave sorteada |
+| Erro | o que houve e a recuperação; erro de um bloco não derruba a tela; `ErrorBoundary` no layout do painel com a página "Algo quebrou" |
+| Sucesso | toast curto com o verbo no particípio (`sonner`) |
 
-Ilustração de estado vazio: <estilo e onde ficam | sem ilustração>.
+Ilustração de estado vazio: sem ilustração; usa `Empty` com ícone e texto.
 
 ## 9. Movimento
 
-- Tokens (`--ease-*`, `--animate-*`): feedback <100–150 ms>, estado <150–300 ms>, overlay <300–500 ms>;
-  saída mais curta que a entrada; curva <…>.
-- Anima só `transform` e `opacity`; nunca `transition: all`.
-- `prefers-reduced-motion`: tira deslocamento, parallax e loop; mantém opacidade e o feedback de
-  ação (`motion-reduce:`/`motion-safe:`). Sem desligar toda animação com regra global.
+- Curvas: `--ease-out-expo` e `--ease-out-quart`; tracking de título `--heading-tight` e `--heading-tighter`.
+- Anima só `transform` e `opacity`; nunca `transition: all`. O `ThemeProvider` usa `disableTransitionOnChange`.
+- `prefers-reduced-motion`: tira deslocamento e loop; mantém opacidade e o feedback de ação. Conferência por tela: não feita.
 
 ## 10. Acessibilidade
 
 - Meta: WCAG 2.1 AA.
-- Foco visível em todo interativo (`focus-visible:`), contraste ≥ 3:1; nunca `outline-none` sem
-  substituto; ordem de foco igual à visual.
-- Alvo de toque: <≥ 44×44 px> *(opinião da casa; AA não exige)*; hover nunca é o único caminho.
-- Ícone: <biblioteca de ícones>, uma família, espessura única; botão só de ícone tem `aria-label`
-  por chave i18n; ícone decorativo `aria-hidden`.
-- Imagem com sentido tem `alt` que diz a informação; decorativa `alt=""`.
+- Foco visível em todo interativo (anel amarelo `--ring`); nunca `outline-none` sem substituto.
+- Alvo de toque: ≥ 44×44 px é a meta da casa *(opinião da casa; AA não exige)*; conferência por tela: não feita.
+- Ícone: Phosphor; botão só de ícone tem `aria-label` por chave i18n; ícone decorativo `aria-hidden`.
+- Imagem com sentido tem `alt` que diz a informação; a logo e a foto sem legenda usam `alt` conforme o caso; decorativa `alt=""`.
+- Cor nunca é a única pista: o estado leva rótulo no `Badge`; hover nunca é o único caminho.
 
 ## 11. Fazer / não fazer
 
 Os anti-padrões universais estão em `_standards/frontend.md` §10.8 e valem aqui sem cópia. Abaixo, só
-os que este projeto confirmou ou acrescentou:
+os que este projeto confirmou:
 
 | Fazer | Não fazer |
 |---|---|
-| <…> | <…> |
+| `DropdownMenuLabel` sempre dentro de `DropdownMenuGroup` | `DropdownMenuLabel` solto: o Base UI lança ao abrir e a tela vira "Algo quebrou" (aconteceu no menu da conta e no `table-column-toggle`) |
+| amarelo como acento (foco, item ativo, placar) | amarelo como cor de ação primária ou de texto sobre fundo claro |
+| `select` nativo dentro de `Dialog` | `option-combobox` dentro de `Dialog`: o popup abre atrás do overlay |
+| nome do aluno só no painel | nome de aluno ou atleta em qualquer tela do site público |
 
 ## 12. Referências
 
-> Referência é direção, não cópia (`frontend.md` §6.4). Cada linha diz o que se tirou dela.
-
-| Referência | Onde (Godly, Awwwards, Motionsites, Figma) | O que se tirou | Data |
+| Referência | Onde | O que se tirou | Data |
 |---|---|---|---|
-| <nome do site ou arquivo> | <url> | <ritmo de grid, tipografia de título, transição de seção…> | AAAA-MM-DD |
+| Site anterior dos jogos (`site-jogos-estudantis/codigo-fonte/base.html`) | repositório do site antigo | verde da quadra, verde-noite do cabeçalho, amarelo do placar | 2026-10-29 |
 
-Componentes trazidos de fora (21st.dev, React Bits), com licença:
-
-| Arquivo | Origem | Licença | Adaptação |
-|---|---|---|---|
-| <`components/common/hero-gradient.tsx`> | <url> | <MIT + Commons Clause> | <Radix → Base UI, cor por token, variante CSS> |
+Componentes trazidos de fora (21st.dev, React Bits): Não se aplica, nenhum componente de fora
+entrou no kit.
