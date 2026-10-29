@@ -93,6 +93,15 @@ export const FIELD_LABELS = {
   reason: 'o motivo',
 
   // Aviso
+  about: 'o texto do Sobre',
+  organizer: 'quem organiza',
+  firstEditionYear: 'o ano da primeira edição',
+  edition: 'a edição',
+  schoolInstagram: 'o Instagram da escola',
+  developerInstagram: 'o Instagram de quem desenvolveu',
+  regulationId: 'o regulamento',
+  storageId: 'o arquivo',
+  caption: 'a legenda',
   title: 'o título',
   body: 'o texto',
   pinned: 'o destaque',

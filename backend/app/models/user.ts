@@ -4,10 +4,10 @@ import { belongsTo, scope } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { type AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import { type ActiveStatus, type UserRole } from '@interclasse/shared'
 
 import Storage from '#models/storage'
 import { UserSchema } from '#database/schema'
-import type { ActiveStatus, UserRole } from '#core/entity'
 
 /**
  * O mixin faz duas coisas que precisam andar juntas: gera o hash da senha antes

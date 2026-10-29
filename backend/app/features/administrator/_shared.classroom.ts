@@ -1,5 +1,6 @@
+import { CATEGORY, type Category } from '@interclasse/shared'
+
 import HTTPException from '#exceptions/http.exception'
-import { CATEGORY, type Category } from '#core/entity'
 import { violatedConstraint } from '#features/_shared.database'
 
 /**

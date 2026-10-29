@@ -2,14 +2,13 @@ import { randomUUID } from 'node:crypto'
 
 import db from '@adonisjs/lucid/services/db'
 import drive from '@adonisjs/drive/services/main'
+import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
 
 import Storage from '#models/storage'
 import { StorageContract, type StorageMetadata } from '#services/storage/storage-contract.service'
 import { URL_TTL } from '#config/drive'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { STORAGE_EXTENSIONS, type StorageMimetype } from '#core/validator'
-import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro

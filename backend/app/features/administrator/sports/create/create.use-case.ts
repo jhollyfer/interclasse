@@ -1,9 +1,9 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Sport from '#models/sport'
 import SlugService from '#services/slug/slug.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
 import type { SportCreatePayload } from '#features/administrator/sports/sports.validator'

@@ -1,13 +1,20 @@
 import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import {
+  BRACKET_STATUS,
+  MATCH_PHASE,
+  MATCH_STATUS,
+  left,
+  right,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
 import Match from '#models/match'
 import { advanceSlot, nextPhase } from '#features/_shared.tournament'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS, type Merge } from '#core/entity'
 import type { MatchScorePayload } from '#features/administrator/matches/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
 

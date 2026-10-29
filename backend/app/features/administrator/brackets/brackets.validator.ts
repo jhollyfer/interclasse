@@ -1,6 +1,7 @@
+import { BRACKET_STATUSES, CATEGORIES } from '@interclasse/shared'
+
 import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { BRACKET_STATUSES, CATEGORIES } from '#core/entity'
 
 /**
  * O que `POST /administrator/brackets` recebe: qual competição sortear. O resto

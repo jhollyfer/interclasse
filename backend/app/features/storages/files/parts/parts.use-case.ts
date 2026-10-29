@@ -1,10 +1,10 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
 
 import type { StorageUpload } from '../create/create.use-case.ts'
 
 import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import {
@@ -14,7 +14,6 @@ import {
   type UploadedPart,
 } from '#services/multipart/multipart-contract.service'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
-import { UPLOAD_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload

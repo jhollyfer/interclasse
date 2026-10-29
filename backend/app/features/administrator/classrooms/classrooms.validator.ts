@@ -1,6 +1,7 @@
+import { CATEGORIES, GRADES } from '@interclasse/shared'
+
 import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { CATEGORIES, GRADES } from '#core/entity'
 
 export const CLASSROOM_SORT_COLUMNS = ['name', 'grade', 'category', 'createdAt'] as const
 

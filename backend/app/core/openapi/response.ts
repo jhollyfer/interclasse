@@ -1,3 +1,15 @@
+import {
+  ACTIVE_STATUSES,
+  BRACKET_STATUSES,
+  CARD_COLORS,
+  CATEGORIES,
+  MATCH_PHASES,
+  MATCH_STATUSES,
+  PHOTO_STATUSES,
+  UPLOAD_STATUSES,
+  USER_ROLES,
+} from '@interclasse/shared'
+
 import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
 import Bracket from '#models/bracket'
@@ -12,17 +24,6 @@ import Storage from '#models/storage'
 import Student from '#models/student'
 import Team from '#models/team'
 import User from '#models/user'
-import {
-  ACTIVE_STATUSES,
-  BRACKET_STATUSES,
-  CARD_COLORS,
-  CATEGORIES,
-  MATCH_PHASES,
-  MATCH_STATUSES,
-  PHOTO_STATUSES,
-  UPLOAD_STATUSES,
-  USER_ROLES,
-} from '#core/entity'
 import type { FeatureResponse, ModelResource } from '#core/openapi/types'
 
 /**

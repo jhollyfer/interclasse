@@ -1,11 +1,11 @@
 import { belongsTo, hasMany, hasManyThrough } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany, HasManyThrough } from '@adonisjs/lucid/types/relations'
+import { type Category } from '@interclasse/shared'
 
 import { ClassroomSchema } from '#database/schema'
 import Enrollment from '#models/enrollment'
 import Student from '#models/student'
 import User from '#models/user'
-import type { Category } from '#core/entity'
 
 /** A turma: a unidade que compete. Cada modalidade forma um time por turma. */
 export default class Classroom extends ClassroomSchema {

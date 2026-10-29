@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
+import { CATEGORY } from '@interclasse/shared'
 
-import { CATEGORY } from '#core/entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { body, resetDatabase } from '#tests/helpers'

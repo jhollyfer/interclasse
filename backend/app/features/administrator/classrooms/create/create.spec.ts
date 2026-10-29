@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
+import { CATEGORY } from '@interclasse/shared'
 
-import { CATEGORY } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
 
 /**

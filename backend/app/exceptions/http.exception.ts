@@ -1,7 +1,6 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
-
-import type { ErrorEnvelope } from '#core/response'
+import { type ErrorEnvelope } from '@interclasse/shared'
 
 /**
  * O corpo JSON que toda falha da API devolve. Segue a convenção do AdonisJS:

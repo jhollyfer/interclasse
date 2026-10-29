@@ -1,12 +1,11 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
 
 import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import { MultipartContract } from '#services/multipart/multipart-contract.service'
-import { UPLOAD_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload

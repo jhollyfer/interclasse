@@ -1,8 +1,9 @@
+import { BRACKET_STATUS, MATCH_PHASE } from '@interclasse/shared'
+
 import type { Infer } from '#core/validator'
 import { type BracketDetailResponse } from '#core/openapi/response'
 import Bracket from '#models/bracket'
 import type Match from '#models/match'
-import { BRACKET_STATUS, MATCH_PHASE } from '#core/entity'
 
 /** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_standards/typescript.md §2). */
 export type BracketDetail = Infer<typeof BracketDetailResponse>

@@ -2,9 +2,9 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import Storage from '#models/storage'
-import { UPLOAD_STATUS } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 

@@ -1,14 +1,11 @@
 /**
- * Either - o resultado de uma operação que pode falhar, como VALOR de retorno
- * em vez de exceção. `Left` carrega o erro, `Right` carrega o sucesso.
+ * O resultado de uma operação que pode falhar por regra de negócio: `left` é a
+ * falha esperada, `right` o sucesso. Falha de negócio é valor, não `throw`
+ * (`_standards/backend.md` §4.2) - o `throw` fica para o bug.
  *
- * `isLeft()` e `isRight()` são type guards: dentro do `if`, o TypeScript sabe
- * de qual lado está e estreita o tipo de `value` sozinho. Sem o `this is`, o
- * estreitamento não acontece e todo use-case precisaria de um cast para ler
- * `value` - que é exatamente a mentira ao compilador que este tipo evita.
+ * Mora no `shared/` porque value object, entidade e use-case devolvem o mesmo
+ * tipo, e o frontend lê os value objects daqui.
  */
-
-// ERRO
 export class Left<L, R> {
   readonly value: L
 
@@ -25,7 +22,6 @@ export class Left<L, R> {
   }
 }
 
-// SUCESSO
 export class Right<L, R> {
   readonly value: R
 

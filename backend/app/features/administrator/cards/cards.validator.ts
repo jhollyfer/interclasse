@@ -1,6 +1,7 @@
+import { CARD_COLORS } from '@interclasse/shared'
+
 import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { CARD_COLORS } from '#core/entity'
 
 export const CardPaginateValidator = vine.create({
   ...pageFields(),

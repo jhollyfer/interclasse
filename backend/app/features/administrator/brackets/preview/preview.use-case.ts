@@ -1,13 +1,13 @@
 import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
 import Sport from '#models/sport'
 import type { Infer } from '#core/validator'
 import { type DrawPreviewResponse } from '#core/openapi/response'
 import { MAX_TEAMS } from '#features/_shared.tournament'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { BracketPreviewPayload } from '#features/administrator/brackets/brackets.validator'
 

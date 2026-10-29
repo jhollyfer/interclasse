@@ -4,9 +4,9 @@ import { errors, symbols } from '@adonisjs/auth'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { AccessToken } from '@adonisjs/auth/access_tokens'
 import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
+import { ACTIVE_STATUS } from '@interclasse/shared'
 
 import User from '#models/user'
-import { ACTIVE_STATUS } from '#core/entity'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import SessionService from '#services/session/session.service'
 

@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
+import { CATEGORY } from '@interclasse/shared'
 
 import Classroom from '#models/classroom'
-import { CATEGORY } from '#core/entity'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { UserFactory } from '#database/factories/user.factory'
 import { drawnClassroom } from '#tests/classrooms-fixtures'

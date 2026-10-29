@@ -1,8 +1,8 @@
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { type Category, type MatchPhase, type MatchStatus } from '@interclasse/shared'
 
 import type Classroom from '#models/classroom'
 import Match from '#models/match'
-import type { Category, MatchPhase, MatchStatus } from '#core/entity'
 
 export type MatchFilters = {
   readonly bracketId?: string

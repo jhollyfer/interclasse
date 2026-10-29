@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { PHOTO_STATUSES } from '#core/entity'
+import { PHOTO_STATUSES } from '@interclasse/shared'
 
 /**
  * As fotos do carrossel do site: atletas, jogos, a torcida. Quem envia é o

@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
+import { USER_ROLE } from '@interclasse/shared'
 
-import { USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   authenticateAsAdministrator,

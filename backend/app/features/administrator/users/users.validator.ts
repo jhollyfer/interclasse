@@ -1,3 +1,5 @@
+import { USER_ROLES } from '@interclasse/shared'
+
 import {
   vine,
   notNull,
@@ -9,7 +11,6 @@ import {
   sortFields,
 } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { USER_ROLES } from '#core/entity'
 
 /**
  * Por quais colunas a listagem de usuários pode ser ordenada.

@@ -1,6 +1,7 @@
+import { CATEGORIES } from '@interclasse/shared'
+
 import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { CATEGORIES } from '#core/entity'
 
 export const BracketPaginateValidator = vine.create({
   ...pageFields(),

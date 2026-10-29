@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
+import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import Storage from '#models/storage'
-import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Registro de arquivo. A factory grava só a linha na tabela: nada vai para o

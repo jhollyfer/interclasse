@@ -49,6 +49,8 @@ jobs:
           file: ./frontend/Dockerfile-production
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-app:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-app:${{ github.sha }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend

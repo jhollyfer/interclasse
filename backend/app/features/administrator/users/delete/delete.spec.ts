@@ -3,10 +3,10 @@ import { randomUUID } from 'node:crypto'
 import { test } from '@japa/runner'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+import { USER_ROLE } from '@interclasse/shared'
 
 import Storage from '#models/storage'
 import User from '#models/user'
-import { USER_ROLE } from '#core/entity'
 import { StorageFactory } from '#database/factories/storage.factory'
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import {

@@ -1,0 +1,24 @@
+# O gate de commit do repositório inteiro (_standards/tooling.md §6): cada app
+# só roda o que é dele, e só quando o commit toca nele.
+#
+# O backend roda `pnpm check && pnpm test`, o mesmo alvo do CI: o hook e o
+# pipeline reprovando por motivos diferentes é como um dos dois deixa de ser
+# lido. O frontend roda lint, typecheck e testes. Mudança no `shared/` vale
+# para os dois, porque os dois o importam.
+staged=$(git diff --cached --name-only)
+
+if echo "$staged" | grep -qE '^(shared|backend)/'; then
+  pnpm --filter ./shared run build || exit 1
+fi
+
+if echo "$staged" | grep -q '^shared/'; then
+  pnpm --filter ./shared run typecheck && pnpm --filter ./shared run test || exit 1
+fi
+
+if echo "$staged" | grep -qE '^(shared|backend)/'; then
+  (cd backend && pnpm check && pnpm test) || exit 1
+fi
+
+if echo "$staged" | grep -qE '^(shared|frontend)/'; then
+  (cd frontend && pnpm lint && pnpm typecheck && pnpm test) || exit 1
+fi

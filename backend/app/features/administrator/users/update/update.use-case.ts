@@ -1,15 +1,14 @@
 import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { ACTIVE_STATUS, left, right, type Either, type Merge } from '@interclasse/shared'
 
 import User from '#models/user'
 import SessionService from '#services/session/session.service'
 import ClassroomService from '#services/classroom/classroom.service'
 import { StorageContract } from '#services/storage/storage-contract.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { ACTIVE_STATUS, type Merge } from '#core/entity'
 import type { UserUpdatePayload } from '#features/administrator/users/users.validator'
 import type { IdentifierPayload } from '#core/validator'
 

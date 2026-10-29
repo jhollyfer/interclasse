@@ -2,11 +2,11 @@ import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
+import { left, right, type Either } from '@interclasse/shared'
 
 import User from '#models/user'
 import SessionService from '#services/session/session.service'
 import ClassroomService from '#services/classroom/classroom.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 

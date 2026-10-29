@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
+import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import { storageRow } from '#tests/storages-fixtures'
-import { UPLOAD_STATUS } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
 /**

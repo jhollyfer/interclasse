@@ -7,22 +7,19 @@ import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } f
 test.group('classrooms > paginate (conselheiro)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o conselheiro vê só as turmas que aconselha, em ordem de nome', async ({
-    client,
-    assert,
-  }) => {
+  test('o conselheiro vê só a turma que aconselha', async ({ client, assert }) => {
     const { user, session } = await signInWithFactory(client)
     await ClassroomFactory.merge({ name: '9º B', advisorId: user.id }).create()
-    await ClassroomFactory.merge({ name: '7º A', advisorId: user.id }).create()
+    await ClassroomFactory.merge({ name: '7º A' }).create()
     await ClassroomFactory.merge({ name: '8º C' }).create()
 
     const response = await client.get('/advisor/classrooms').cookies(session)
 
     response.assertStatus(200)
-    assert.equal(body(response).meta.total, 2)
+    assert.equal(body(response).meta.total, 1)
     assert.deepEqual(
       body(response).data.map((classroom: { name: string }) => classroom.name),
-      ['7º A', '9º B'],
+      ['9º B'],
     )
   })
 
@@ -55,18 +52,19 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
 
   test('`?search` filtra pelo nome dentro do escopo', async ({ client, assert }) => {
     const { user, session } = await signInWithFactory(client)
-    await ClassroomFactory.merge({ name: '6º A', advisorId: user.id }).create()
     await ClassroomFactory.merge({ name: '6º B', advisorId: user.id }).create()
     // Casa a busca, mas é de outro conselheiro: o escopo vale antes do filtro.
     await ClassroomFactory.merge({ name: '7º B' }).create()
 
-    const response = await client.get('/advisor/classrooms').qs({ search: 'B' }).cookies(session)
+    const casa = await client.get('/advisor/classrooms').qs({ search: 'B' }).cookies(session)
+    const nada = await client.get('/advisor/classrooms').qs({ search: 'A' }).cookies(session)
 
-    response.assertStatus(200)
+    casa.assertStatus(200)
     assert.deepEqual(
-      body(response).data.map((classroom: { name: string }) => classroom.name),
+      body(casa).data.map((classroom: { name: string }) => classroom.name),
       ['6º B'],
     )
+    assert.lengthOf(body(nada).data, 0)
   })
 
   test('sem sessão responde 401, representante responde 403', async ({ client, assert }) => {

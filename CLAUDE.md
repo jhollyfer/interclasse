@@ -7,6 +7,10 @@ O backend foi copiado do adacaibs e o domínio trocado.
 
 - `backend/` - AdonisJS 7 + Lucid/Postgres. Ver `backend/CLAUDE.md`.
 - `frontend/` - TanStack Start + Router + Query, shadcn sobre Base UI. Ver `frontend/CLAUDE.md`.
+- `shared/` - `@interclasse/shared`: Either, `z` configurado, enums, validators Zod e
+  tipos de resposta que os dois lados usam. Sai compilado em `dist/`.
+
+Workspace pnpm na raiz, com um `pnpm-lock.yaml` só (`_standards/tooling.md` §1).
 
 ## A régua: padrão Maiyu
 
@@ -41,10 +45,10 @@ O site público (`/storefront` na API, `_public` no front) não exige conta.
 ## Rodar
 
 ```
+pnpm install                            # na raiz: os três pacotes
 cd backend && docker compose up -d     # Postgres 5434, MinIO 9004/9005
 cd backend && node ace migration:run && node ace db:seed
-pnpm dev:backend                        # API em http://localhost:3333
-pnpm dev:frontend                       # site em http://localhost:3001
+pnpm dev                                # shared (watch), API em :3333 e site em :3001
 ```
 
 Portas deslocadas de propósito: os irmãos ocupam 3000, 5432 e 5433 nesta máquina.
@@ -53,7 +57,8 @@ O MinIO vem do fork `pgsty/*` - as imagens `minio/*` saíram do Docker Hub.
 ## Deploy
 
 `main.yml` no push para `main`: checa o backend, builda o frontend, publica
-`interclasse-api` e `interclasse-app` no Docker Hub e dispara o Coolify
+`interclasse-api` (construída da raiz: `docker build -f backend/Dockerfile-production .`)
+e `interclasse-app` no Docker Hub, com as tags `latest` e o SHA do commit, e dispara o Coolify
 (`coolify.maiyu.com.br`). Site em `https://interclass.maiyu.com.br`, API em
 `https://api-interclass.maiyu.com.br`. Secrets do repositório:
 `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` e `COOLIFY_TOKEN`; os uuids das

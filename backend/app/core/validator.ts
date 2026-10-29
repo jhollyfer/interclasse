@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
 import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
 import type { FieldContext, Infer } from '@vinejs/vine/types'
-
 import {
   ACTIVE_STATUSES,
   CATEGORIES,
@@ -9,7 +8,7 @@ import {
   MATCH_STATUSES,
   SORT_DIRECTIONS,
   TRASHED_MODES,
-} from '#core/entity'
+} from '@interclasse/shared'
 
 /**
  * O `vine` configurado e o que é de todos os validators (_standards/backend.md §4.4).
@@ -316,6 +315,17 @@ export const FIELD_LABELS = {
   studentId: 'o atleta',
   reason: 'o motivo',
   pending: 'o filtro de pendentes',
+
+  // Site e fotos
+  about: 'o texto do Sobre',
+  organizer: 'quem organiza',
+  firstEditionYear: 'o ano da primeira edição',
+  edition: 'a edição',
+  schoolInstagram: 'o Instagram da escola',
+  developerInstagram: 'o Instagram de quem desenvolveu',
+  regulationId: 'o regulamento',
+  storageId: 'o arquivo',
+  caption: 'a legenda',
 
   // Aviso
   title: 'o título',

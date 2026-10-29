@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import { MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
-import { MATCH_PHASE, MATCH_STATUS } from '#core/entity'
 import { MatchFactory } from '#database/factories/match.factory'
 import { scheduledMatch } from '#tests/brackets-fixtures'
 import {

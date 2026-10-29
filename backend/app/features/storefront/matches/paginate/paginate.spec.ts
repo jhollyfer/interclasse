@@ -1,8 +1,8 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import { MATCH_STATUS } from '@interclasse/shared'
 
 import Match from '#models/match'
-import { MATCH_STATUS } from '#core/entity'
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 

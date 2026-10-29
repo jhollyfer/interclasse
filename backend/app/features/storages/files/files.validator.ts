@@ -1,6 +1,7 @@
+import { UPLOAD_STATUSES } from '@interclasse/shared'
+
 import { vine, paginationFields, sortFields, STORAGE_MIMETYPES } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { UPLOAD_STATUSES } from '#core/entity'
 import env from '#start/env'
 
 /**

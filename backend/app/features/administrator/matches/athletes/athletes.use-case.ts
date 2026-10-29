@@ -1,12 +1,12 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Enrollment from '#models/enrollment'
 import Match from '#models/match'
 import Student from '#models/student'
 import type { Infer } from '#core/validator'
 import { type MatchAthletesResponse } from '#core/openapi/response'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 

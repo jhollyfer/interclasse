@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import { USER_ROLE } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
-import { USER_ROLE } from '#core/entity'
 
 /** Quem opera o painel. */
 const STAFF: ReadonlyArray<string> = [USER_ROLE.ADMINISTRATOR]

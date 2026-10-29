@@ -1,6 +1,5 @@
 import db from '@adonisjs/lucid/services/db'
-
-import { CATEGORIES, MATCH_STATUS, type Category } from '#core/entity'
+import { CATEGORIES, MATCH_STATUS, type Category } from '@interclasse/shared'
 
 export type ClassroomReport = {
   readonly id: string

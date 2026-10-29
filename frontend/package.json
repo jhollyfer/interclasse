@@ -1,7 +1,6 @@
 {
   "name": "frontend",
   "private": true,
-  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=24"
   },
@@ -28,6 +27,7 @@
     "@fontsource/barlow": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
+    "@interclasse/shared": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-devtools": "^0.10.13",

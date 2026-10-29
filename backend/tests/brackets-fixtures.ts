@@ -1,6 +1,6 @@
 import type { ApiClient } from '@japa/api-client'
+import { CATEGORY } from '@interclasse/shared'
 
-import { CATEGORY } from '#core/entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { MatchFactory } from '#database/factories/match.factory'
 import { TeamFactory } from '#database/factories/team.factory'

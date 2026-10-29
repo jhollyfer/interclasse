@@ -1,8 +1,8 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
+import { USER_ROLE } from '@interclasse/shared'
 
-import { USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { ADMINISTRATOR, authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 

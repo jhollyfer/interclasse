@@ -1,10 +1,9 @@
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { USER_ROLE, left, right, type Either, type UserRole } from '@interclasse/shared'
 
 import Classroom from '#models/classroom'
 import User from '#models/user'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { USER_ROLE, type UserRole } from '#core/entity'
 
 type People = { advisorId?: string | null; readonly representativeId?: string | null }
 

@@ -1,9 +1,9 @@
 import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import { USER_ROLE } from '@interclasse/shared'
 
 import type Classroom from '#models/classroom'
 import type User from '#models/user'
-import { USER_ROLE } from '#core/entity'
 
 /**
  * Quem cuida de qual turma.

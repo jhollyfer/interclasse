@@ -2,6 +2,14 @@ import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import {
+  BRACKET_STATUS,
+  MATCH_PHASE,
+  left,
+  right,
+  type Either,
+  type MatchPhase,
+} from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
 import Match from '#models/match'
@@ -15,10 +23,8 @@ import {
   knockoutPhase,
   nextPhase,
 } from '#features/_shared.tournament'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { BRACKET_STATUS, MATCH_PHASE, type MatchPhase } from '#core/entity'
 import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
 
 type Payload = BracketCreatePayload
