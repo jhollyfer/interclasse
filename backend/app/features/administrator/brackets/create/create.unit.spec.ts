@@ -20,7 +20,7 @@ async function setup() {
 test.group('administrator/brackets > create (unit)', () => {
   test('sorteia a chave inteira e responde com a modalidade', async ({ assert }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C', '8º D'])
+    const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C', '8º D'])
 
     const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
 
@@ -34,7 +34,7 @@ test.group('administrator/brackets > create (unit)', () => {
 
   test('sortear de novo devolve a mesma chave, sem novo sorteio', async ({ assert }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C'])
+    const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C'])
     const first = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
 
     const again = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
@@ -61,7 +61,7 @@ test.group('administrator/brackets > create (unit)', () => {
     assert,
   }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = BracketUnitFixtures.enrolled(brackets, ['8º A'])
+    const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A'])
 
     const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
 
@@ -71,7 +71,7 @@ test.group('administrator/brackets > create (unit)', () => {
 
   test('mais de 16 turmas é 409 TOO_MANY_TEAMS', async ({ assert }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = BracketUnitFixtures.enrolled(
+    const { sport } = await BracketUnitFixtures.enrolled(
       brackets,
       Array.from({ length: 17 }, (_, index) => `8º ${index}`),
     )

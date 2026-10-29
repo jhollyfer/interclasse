@@ -204,20 +204,26 @@ export class BracketMemoryRepository extends BracketRepository {
     return MemoryPagination.of(items, criteria.page, criteria.perPage)
   }
 
-  async findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null> {
-    const bracket = this.ownerOf(matchId)
-    const match = bracket?.matches.find((candidate) => candidate.id === matchId)
-    if (!bracket || !match) return null
+  async findMatchResponses(
+    matchIds: ReadonlyArray<string>,
+  ): Promise<Map<string, AdministratorMatchUpdateResponse>> {
+    const responses = new Map<string, AdministratorMatchUpdateResponse>()
 
-    const sport = this.sports.get(bracket.sportId)
-    if (!sport) return null
+    for (const matchId of matchIds) {
+      const bracket = this.ownerOf(matchId)
+      const match = bracket?.matches.find((candidate) => candidate.id === matchId)
+      const sport = bracket && this.sports.get(bracket.sportId)
+      if (!bracket || !match || !sport) continue
 
-    return {
-      ...this.matchFields(match, bracket.id),
-      homeTeam: this.fullTeam(bracket, match.homeTeamId),
-      awayTeam: this.fullTeam(bracket, match.awayTeamId),
-      bracket: this.listItem(bracket, sport),
+      responses.set(matchId, {
+        ...this.matchFields(match, bracket.id),
+        homeTeam: this.fullTeam(bracket, match.homeTeamId),
+        awayTeam: this.fullTeam(bracket, match.awayTeamId),
+        bracket: this.listItem(bracket, sport),
+      })
     }
+
+    return responses
   }
 
   async matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null> {

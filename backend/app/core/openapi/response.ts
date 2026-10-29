@@ -1,10 +1,6 @@
 import {
   ACTIVE_STATUSES,
-  BRACKET_STATUSES,
-  CARD_COLORS,
   CATEGORIES,
-  MATCH_PHASES,
-  MATCH_STATUSES,
   PHOTO_STATUSES,
   UPLOAD_STATUSES,
   USER_ROLES,
@@ -12,6 +8,8 @@ import {
 import { AdministratorSportShowResponse, StorefrontSportShowResponse } from '@interclasse/shared'
 import {
   AdministratorBracketPaginateResponse,
+  AdministratorCardCreateResponse,
+  AdministratorCardPaginateResponse,
   AdministratorBracketPreviewResponse,
   AdministratorBracketShowResponse,
   AdministratorMatchAthletesResponse,
@@ -19,6 +17,7 @@ import {
   AdministratorMatchScoreResponse,
   AdministratorMatchUnscoreResponse,
   AdministratorMatchUpdateResponse,
+  AdvisorCardPaginateResponse,
   StorefrontBracketPaginateResponse,
   StorefrontBracketShowResponse,
   StorefrontMatchPaginateResponse,
@@ -26,17 +25,13 @@ import {
 
 import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
-import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import EnrollmentRemoval from '#models/enrollment-removal'
-import MatchCard from '#models/match-card'
 import Photo from '#models/photo'
 import SiteSetting from '#models/site-setting'
-import Match from '#models/match'
 import Sport from '#models/sport'
 import Storage from '#models/storage'
 import Student from '#models/student'
-import Team from '#models/team'
 import User from '#models/user'
 import type { FeatureResponse, ModelResource } from '#core/openapi/types'
 
@@ -109,36 +104,10 @@ const SITE_SETTING: ModelResource = {
   relations: { regulation: STORAGE },
 }
 
-/** O time é a turma dentro da competição: o nome que sai no placar vem de `classroom`. */
-const TEAM: ModelResource = {
-  model: Team,
-  relations: { classroom: CLASSROOM },
-}
-
-const BRACKET: ModelResource = {
-  model: Bracket,
-  enums: { category: CATEGORIES, status: BRACKET_STATUSES },
-  relations: { sport: SPORT },
-}
-
 /** O aviso de atleta tirado da lista: a turma, a modalidade e quem tirou. */
 const ENROLLMENT_REMOVAL: ModelResource = {
   model: EnrollmentRemoval,
   relations: { classroom: CLASSROOM, sport: SPORT, actor: PERSON },
-}
-
-/** A partida com os dois times e a competição, que é o que a tabela de jogos mostra. */
-const MATCH: ModelResource = {
-  model: Match,
-  enums: { phase: MATCH_PHASES, status: MATCH_STATUSES },
-  relations: { homeTeam: TEAM, awayTeam: TEAM, bracket: BRACKET },
-}
-
-/** O cartão com o atleta, o time por que jogava e a partida. */
-const MATCH_CARD: ModelResource = {
-  model: MatchCard,
-  enums: { color: CARD_COLORS },
-  relations: { student: STUDENT, team: TEAM, match: MATCH },
 }
 
 // ---------------------------------------------------------------------------
@@ -368,8 +337,9 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/matches/unscore': AdministratorMatchUnscoreResponse,
   'administrator/matches/athletes': AdministratorMatchAthletesResponse,
   'administrator/enrollment-removals': ENROLLMENT_REMOVAL,
-  'administrator/cards': MATCH_CARD,
-  'advisor/cards': MATCH_CARD,
+  'administrator/cards': AdministratorCardPaginateResponse,
+  'administrator/cards/create': AdministratorCardCreateResponse,
+  'advisor/cards': AdvisorCardPaginateResponse,
 
   'advisor/classrooms': CLASSROOM_WITH_PEOPLE,
   'advisor/students': STUDENT,

@@ -2,6 +2,8 @@ import type { ApplicationService } from '@adonisjs/core/types'
 
 import { BracketLucidRepository } from '#repositories/bracket/bracket.lucid.repository'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
+import { MatchCardLucidRepository } from '#repositories/match-card/match-card.lucid.repository'
+import { MatchCardRepository } from '#repositories/match-card/match-card.repository'
 import { SportLucidRepository } from '#repositories/sport/sport.lucid.repository'
 import { SportRepository } from '#repositories/sport/sport.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
@@ -21,6 +23,9 @@ export default class RepositoryProvider {
     this.app.container.bind(SportRepository, () => this.app.container.make(SportLucidRepository))
     this.app.container.bind(BracketRepository, () =>
       this.app.container.make(BracketLucidRepository),
+    )
+    this.app.container.bind(MatchCardRepository, () =>
+      this.app.container.make(MatchCardLucidRepository),
     )
   }
 }

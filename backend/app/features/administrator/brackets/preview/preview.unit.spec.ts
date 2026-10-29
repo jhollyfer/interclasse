@@ -20,7 +20,7 @@ async function setup() {
 test.group('administrator/brackets > preview (unit)', () => {
   test('conta os atletas de cada turma e marca quem entra', async ({ assert }) => {
     const { brackets, useCase } = await setup()
-    const { sport, classrooms } = BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B'])
+    const { sport, classrooms } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B'])
 
     const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
 

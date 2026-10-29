@@ -51,6 +51,13 @@ export type BracketProps = {
   readonly matches: MatchProps[]
 }
 
+/** Quem joga a partida: os dois times e, se perguntado, o time de uma turma. */
+export type Lineup = {
+  readonly homeTeamId: string | null
+  readonly awayTeamId: string | null
+  readonly classroomTeamId: string | null
+}
+
 type DrawInput = {
   readonly id: string
   readonly sportId: string
@@ -223,6 +230,25 @@ export class Bracket {
     }
 
     return right(this)
+  }
+
+  /**
+   * Os dois times da partida e, entre eles, o da turma dada: de onde o cartão
+   * tira o time do atleta. `null` se a partida não é desta chave.
+   */
+  lineupOf(matchId: string, classroomId: string | null): Lineup | null {
+    const match = this.matchOf(matchId)
+    if (!match) return null
+
+    const playing = this.props.teams.filter(
+      (team) => team.id === match.homeTeamId || team.id === match.awayTeamId,
+    )
+
+    return {
+      homeTeamId: match.homeTeamId,
+      awayTeamId: match.awayTeamId,
+      classroomTeamId: playing.find((team) => team.classroomId === classroomId)?.id ?? null,
+    }
   }
 
   /** A campeã de uma chave terminada: a vencedora da final. */
