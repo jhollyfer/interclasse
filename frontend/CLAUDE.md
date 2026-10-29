@@ -1,6 +1,6 @@
 # Frontend
 
-A régua é `_padroes/frontend.md` (com `typescript.md`, `solid.md` e `tooling.md`).
+A régua é `_standards/frontend.md` (com `typescript.md`, `solid.md` e `tooling.md`).
 Aqui fica só o que este projeto faz diferente dela, e os comandos.
 
 ## Comandos

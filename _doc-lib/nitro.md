@@ -848,7 +848,7 @@ NITRO_SHUTDOWN_TIMEOUT=10000 node .output/server/index.mjs
 Swagger servidos em dev.
 **Para que serve:** documentar os endpoints que moram no Nitro.
 **Quando usar:** só se você tiver rotas Nitro que valham documentar. **Não confundir com
-[`_padroes/openapi.md`](../_padroes/openapi.md) deste pacote**, que documenta a API do backend: são dois geradores
+[`_standards/openapi.md`](../_standards/openapi.md) deste pacote**, que documenta a API do backend: são dois geradores
 diferentes, cada um lendo as próprias rotas. É **experimental**.
 
 ```ts

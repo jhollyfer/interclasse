@@ -2,12 +2,12 @@
 
 Formulário com estado fora do React, para o formulário inteiro não re-renderizar a cada tecla.
 
-> Conferido contra `react-hook-form@7.89.0` e `@hookform/resolvers@5.9.1` (latest).
+> Conferido contra `react-hook-form@7.89.0` e `@hookform/resolvers@6.0.1` (latest).
 
 **O que é:** uma biblioteca de formulário que guarda o valor dos campos em `ref`, e não em estado do
 React. Digitar não re-renderiza: o componente só re-renderiza quando algo que ele **lê** muda — um
 erro, `isDirty`, o valor que ele pediu por `useWatch`. A validação é delegada a um *resolver*, que
-nesta stack é o do VineJS, então a regra e o tipo do formulário vêm do validator.
+nesta stack é o do Zod (`zodResolver`), então a regra e o tipo do formulário vêm do schema do `shared/`.
 
 **Para que serve:** três coisas que aparecem em todo formulário desta stack. Ligar campo a valor
 sem escrever `useState` por campo; validar no momento certo e pintar o erro no campo certo; e
@@ -21,13 +21,15 @@ pnpm add react-hook-form @hookform/resolvers
 ```
 
 ```tsx
-import { vineResolver } from '@hookform/resolvers/vine'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { CategoryValidator } from '@/lib/validator'
 import type { CategoryPayload as FormType } from '@/lib/validator'
 
+// Schema com `.default()` ou `.transform()`: entrada e saída divergem, e o certo é
+// `useForm<z.input<S>, unknown, z.output<S>>` (README do resolver, seção Zod).
 const form = useForm<FormType>({
-  resolver: vineResolver(CategoryValidator),
+  resolver: zodResolver(CategoryValidator),
   defaultValues: { name: '', slug: '', description: '', status: 'Ativa' },
 })
 
@@ -52,13 +54,20 @@ TanStack Form pelo mesmo motivo que este arquivo existe: para deixar claro que s
 que escolher uma é o ponto. Misturar as duas é a pior opção — duas convenções de formulário no mesmo
 código, e nenhuma economia.
 
-Onde este arquivo **não** entra: o schema é assunto de [`vinejs.md`](vinejs.md), e os componentes de
+Onde este arquivo **não** entra: o schema é assunto de [`zod.md`](zod.md), e os componentes de
 campo, rótulo e mensagem de erro são assunto de [`shadcn.md`](shadcn.md), na entrada
 `docs/forms/react-hook-form`. Aqui é a biblioteca de formulário em si.
 
-Uma diferença que o VineJS traz e o Zod não tinha: a mensagem de erro **não** mora no schema, e sim
-num `SimpleMessagesProvider` global, num módulo de mensagens à parte, com chave `campo.regra`. Campo
-novo sem entrada lá aparece com o nome cru na mensagem.
+Sobre o parse: o `zodResolver` roda `parseAsync` por padrão, então regra com `await` (um `refine`
+assíncrono, por exemplo) funciona sem configurar nada. A opção `mode: 'sync'`, no terceiro argumento
+(`zodResolver(schema, undefined, { mode: 'sync' })`), troca para `parse` síncrono; só serve para schema
+sem regra assíncrona. A opção `raw: true` devolve os valores de entrada em vez da saída do schema.
+Fonte: tipo publicado em `@hookform/resolvers@6.0.1/zod/dist/zod.d.ts` (`mode?: 'async' | 'sync'`).
+
+A mensagem de erro em pt-BR mora no schema do `shared/`, não no formulário: ou na própria regra
+(`z.string().min(8, { error: 'Mínimo de 8 caracteres' })`), ou no locale do Zod aplicado uma vez com
+`z.config(z.locales.ptBR())`. A ordem e as opções estão em
+[`zod.md#error-customization`](zod.md#error-customization). O formulário só exibe `error.message`.
 
 **Links:** 48. Boa parte é âncora dentro de três páginas longas — `get-started`, `ts` e
 
@@ -122,16 +131,16 @@ const { name, onChange, onBlur, ref } = register('address.cep')
 **O que é:** as regras embutidas — `required`, `min`, `max`, `minLength`, `pattern`, `validate` —
 declaradas no próprio `register`.
 **Para que serve:** validar sem biblioteca de schema, para formulário simples.
-**Quando usar:** para **reconhecer e não usar**. Nesta stack a validação mora no validator
-VineJS, e regra duplicada nos dois lugares é a origem de "o campo diz que está errado mas o schema
-aceita". Regra nova vai para o módulo de validator, nunca aqui.
+**Quando usar:** para **reconhecer e não usar**. Nesta stack a validação mora no schema
+Zod do `shared/`, e regra duplicada nos dois lugares é a origem de "o campo diz que está errado mas o schema
+aceita". Regra nova vai para o módulo de validator do `shared/`, nunca aqui.
 
 ```tsx
 // A forma da doc — não a desta stack.
 <input {...register('email', { required: true, pattern: /^\S+@\S+$/ })} />
 
-// A daqui: a regra está no validator, e o resolver a aplica.
-useForm({ resolver: vineResolver(AuthenticationSignInValidator) })
+// A daqui: a regra está no schema, e o resolver a aplica.
+useForm({ resolver: zodResolver(AuthenticationSignInValidator) })
 ```
 
 #### get-started#Integratinganexistingform
@@ -268,21 +277,23 @@ type StepAddressProps = { control: Control<AuthenticationSignUpPayload> }
 [doc](https://react-hook-form.com/ts#Resolver)
 
 **O que é:** a assinatura do resolver — a função que recebe os valores e devolve `{ values, errors
-}` — que é o contrato que o `vineResolver` implementa.
-**Para que serve:** entender que a biblioteca não conhece o VineJS: ela conhece essa interface, e o
+}` — que é o contrato que o `zodResolver` implementa.
+**Para que serve:** entender que a biblioteca não conhece o Zod: ela conhece essa interface, e o
 `@hookform/resolvers` é o adaptador.
 **Quando usar:** ao investigar por que um erro do schema não apareceu no campo. O caminho passa por
 aqui: se a chave do erro não bate com o nome do campo, a mensagem some silenciosamente.
 
-O corolário que morde no VineJS: o `vineResolver` lê `error.messages` no formato do
-`SimpleErrorReporter`. Trocar `vine.errorReporter` por um repórter próprio quebra o adaptador, e o
-sintoma é exatamente este — erro que existe e campo que não fica vermelho.
+O corolário que morde no Zod: o resolver usa `issue.path` como chave do erro (`path.join('.')`), então o
+erro só aparece no campo cujo nome bate com o caminho. Regra que olha dois campos precisa apontar o
+`path` para o campo certo, senão o erro fica no objeto e o campo não fica vermelho.
 
 ```ts
-// Por isso `confirmed({ as: 'passwordConfirmation' })` e não uma checagem
-// solta: a regra roda em `password` mas reporta o erro no campo da
-// confirmação, que é onde ele precisa aparecer. Erro na chave errada some.
-password: vine.string().minLength(8).confirmed({ as: 'passwordConfirmation' })
+// `path: ['passwordConfirmation']` leva o erro ao campo da confirmação, que é
+// onde ele precisa aparecer. Sem `path`, o erro cai na raiz do objeto e some.
+z.object({ password: z.string().min(8), passwordConfirmation: z.string() }).refine(
+  (value) => value.password === value.passwordConfirmation,
+  { error: 'As senhas não conferem', path: ['passwordConfirmation'] },
+)
 ```
 
 #### ts#SubmitHandler
@@ -382,8 +393,8 @@ preenchidos — se o mesmo trio de opções aparecer em cinco dialogs, é sinal 
 ```ts
 import type { UseFormProps } from 'react-hook-form'
 
-// Um wrapper que carrega a convenção desta stack: resolver VineJS + onTouched.
-function useVineForm<T extends FieldValues>(props: UseFormProps<T>) {
+// Um wrapper que carrega a convenção desta stack: resolver Zod + onTouched.
+function useZodForm<T extends FieldValues>(props: UseFormProps<T>) {
   return useForm<T>({ mode: 'onTouched', ...props })
 }
 ```
@@ -394,10 +405,10 @@ function useVineForm<T extends FieldValues>(props: UseFormProps<T>) {
 **O que é:** o tipo auxiliar para funções de validação escritas à mão, no formato que o `validate`
 espera.
 **Para que serve:** tipar validação imperativa quando ela existe fora do schema.
-**Quando usar:** raramente aqui, porque a validação é toda do VineJS. Vale quando a regra depende de
+**Quando usar:** raramente aqui, porque a validação é toda do Zod. Vale quando a regra depende de
 algo que o schema não alcança — outro campo já enviado, ou uma resposta de API. Mesmo assim, prefira
-resolver no validator: o VineJS já é assíncrono, então regra que precisa de `await` cabe num
-`vine.createRule` sem sair de lá.
+resolver no schema: o `zodResolver` já roda `parseAsync` por padrão, então regra que precisa de
+`await` cabe num `refine` assíncrono sem sair de lá.
 
 ```ts
 // Regra que precisa do servidor não cabe no schema síncrono.
@@ -454,7 +465,7 @@ demais.
 
 ```tsx
 const form = useForm<FormType>({
-  resolver: vineResolver(AuthenticationSignUpValidator),
+  resolver: zodResolver(AuthenticationSignUpValidator),
   defaultValues: DEFAULT_VALUES, // objeto completo: campo sem default vira não-controlado
   mode: 'onTouched',
 })
@@ -575,7 +586,7 @@ onError(error) {
   const { root, ...fields } = error.errors ?? {}
   if (root) form.setError('root', { message: root })
 
-  // 422 do VineJS e 409 do use-case chegam iguais: chave é o nome do campo,
+  // 422 de validação e 409 do use-case chegam iguais: chave é o nome do campo,
   // inclusive aninhado (`address.cep`).
   for (const [field, message] of Object.entries(fields)) {
     form.setError(field as StepField, { message })
@@ -949,18 +960,18 @@ conferir campo a campo qual mecanismo cada um usa.
 [doc](https://react-hook-form.com/advanced-usage#CustomHookwithResolver)
 
 **O que é:** a receita de embrulhar `useForm` com o resolver já configurado, num hook próprio.
-**Para que serve:** deixar de repetir `resolver: vineResolver(...)` e `mode` em cada formulário.
+**Para que serve:** deixar de repetir `resolver: zodResolver(...)` e `mode` em cada formulário.
 **Quando usar:** quando a repetição doer de verdade. Hoje são poucos formulários e cada um tem seu
 schema; um hook agora seria abstração sem ganho. Se os `*-create-dialog.tsx` passarem de meia dúzia
 com a mesma configuração, esta é a página.
 
 ```ts
 // O dia em que valer a pena, é isto — e nada mais que isto.
-function useVineForm<T extends FieldValues>(
-  validator: Parameters<typeof vineResolver>[0],
-  props?: UseFormProps<T>,
+function useZodForm<Input extends FieldValues, Output>(
+  validator: Parameters<typeof zodResolver>[0],
+  props?: UseFormProps<Input, unknown, Output>,
 ) {
-  return useForm<T>({ resolver: vineResolver(validator), mode: 'onTouched', ...props })
+  return useForm<Input, unknown, Output>({ resolver: zodResolver(validator), mode: 'onTouched', ...props })
 }
 ```
 
@@ -993,7 +1004,7 @@ precisa de `await` — `findBy*` ou `waitFor`, nunca `getBy*` logo depois do cli
 await userEvent.type(screen.getByLabelText('CEP'), '69000')
 await userEvent.click(screen.getByRole('button', { name: 'Continuar' }))
 
-// findBy, não getBy: o resolver do VineJS resolve numa promessa — o
+// findBy, não getBy: o `zodResolver` usa `parseAsync` e resolve numa promessa — o
 // `validate` da biblioteca é assíncrono por natureza.
 expect(await screen.findByText('CEP deve ter 8 dígitos')).toBeInTheDocument()
 ```

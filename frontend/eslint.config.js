@@ -17,7 +17,7 @@ export default [
   ...pluginRouter.configs['flat/recommended'],
   {
     // `projectService` no lugar do `project: true` do `tanstackConfig`: é o que
-    // `_padroes/tooling.md` §4 pede para as regras que dependem de tipo.
+    // `_standards/tooling.md` §4 pede para as regras que dependem de tipo.
     files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
       parserOptions: { project: null, projectService: true },

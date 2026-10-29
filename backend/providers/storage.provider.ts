@@ -10,7 +10,7 @@ import StorageService from '#services/storage/storage.service'
 
 /**
  * O composition root do storage: o cliente S3, os contratos de I/O externo
- * ligados aos concretos (_padroes/solid.md §2) e a URL assinada de leitura.
+ * ligados aos concretos (_standards/solid.md §2) e a URL assinada de leitura.
  *
  * `singleton` para o cliente: ele carrega o pool de conexões HTTP, e um por
  * requisição jogaria fora o keep-alive a cada upload. Os services são `bind`:
@@ -27,7 +27,7 @@ export default class StorageProvider {
 
   /**
    * A `url` de todo `Storage` lido - inclusive por `preload` - é assinada aqui,
-   * e não num hook dentro do model: o model não faz I/O (_padroes/backend.md
+   * e não num hook dentro do model: o model não faz I/O (_standards/backend.md
    * §4.7), e a assinatura passa pelo contrato, que um teste troca. É hook
    * porque `getSignedUrl` é assíncrono e `serialize()` do Lucid é síncrono.
    */

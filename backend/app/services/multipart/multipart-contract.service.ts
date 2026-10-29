@@ -1,5 +1,5 @@
 /**
- * O contrato do upload em partes (_padroes/solid.md §2): I/O externo, o S3.
+ * O contrato do upload em partes (_standards/solid.md §2): I/O externo, o S3.
  *
  * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
  * tempo. O concreto é `MultipartService`, ligado em `providers/storage.provider.ts`;

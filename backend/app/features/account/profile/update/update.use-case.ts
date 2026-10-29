@@ -28,7 +28,7 @@ export default class AccountProfileUpdateUseCase {
     try {
       // A conta é o `actor` da sessão: o guard já a leu com os filtros de
       // arquivado e inativo, e reconsultar por id pagaria a mesma pergunta duas
-      // vezes (_padroes/backend.md §4.3).
+      // vezes (_standards/backend.md §4.3).
 
       if (payload.email && payload.email !== user.email) {
         // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
@@ -109,7 +109,7 @@ export default class AccountProfileUpdateUseCase {
       return right(user)
     } catch (error) {
       // A checagem de e-mail acima não fecha a corrida: o segundo de dois
-      // pedidos simultâneos esbarra no `unique` do banco (_padroes/backend.md §4.4).
+      // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
       if (isUniqueViolation(error))
         return left(
           HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {

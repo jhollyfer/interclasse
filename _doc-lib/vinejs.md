@@ -650,7 +650,7 @@ em paralelo — é a árvore interna, e nela o `subtype` do campo sobrevive.
 
 **Um gerador que leia as rotas e os validators reais resolve isso de uma vez**,
 em vez de cada chamada de `toJSONSchema()` remendar as lacunas por conta.
-[`_padroes/openapi.md`](../_padroes/openapi.md) descreve um assim, e serve de planta: as seções
+[`_standards/openapi.md`](../_standards/openapi.md) descreve um assim, e serve de planta: as seções
 `correcoes-de-schema` e `correcoes-por-campo` listam as quatro correções antes
 de você escrever conversão própria.
 

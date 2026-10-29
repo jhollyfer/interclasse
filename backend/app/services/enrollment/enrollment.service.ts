@@ -14,7 +14,7 @@ import { USER_ROLE } from '#core/entity'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 
-/** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_padroes/typescript.md §2). */
+/** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_standards/typescript.md §2). */
 export type EnrollmentBoard = Infer<typeof EnrollmentBoardResponse>
 
 /**

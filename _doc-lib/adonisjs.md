@@ -880,19 +880,32 @@ export const paraListagem = (c: Team) => ({ id: c.id, name: c.name })
 ```
 
 #### guides/frontend/api-client
-[doc](https://docs.adonisjs.com/guides/frontend/api-client)
-**O que é:** a geração de um cliente tipado para consumir a API do backend a partir do frontend.
-**Para que serve:** tipos compartilhados entre backend e frontend sem manter definições duplicadas.
-**Quando usar:** em monorepo com frontend separado. Elimina a divergência silenciosa entre o que a
-API devolve e o que o frontend espera.
+[doc](https://docs.adonisjs.com/guides/frontend/api-client) | [markdown](https://docs.adonisjs.com/guides/frontend/api-client.md)
+**O que é:** a documentação do Tuyau 1.x, o cliente tipado gerado das rotas do AdonisJS. O registro
+sai do hook `generateRegistry()` de `@tuyau/core/hooks`, em `hooks.init` do `adonisrc.ts` (ao lado
+de `indexEntities`), e é gravado em `.adonisjs/client/`; não existe mais `node ace tuyau:generate`
+nem a sintaxe `$get` da linha 0.x. A chamada é pelo nome da rota (`client.api.posts.store(...)`,
+`client.request('posts.store', ...)`) ou pela URL (`client.get('/url', ...)`).
+**Para que serve:** tipo de request e response sem definição duplicada entre backend e frontend.
+**Quando usar:** só depois de ler `_doc-lib/tuyau.md`, que é o contrato completo e lista o que
+choca com a régua: o frontend passa a importar o backend como dependência do workspace e precisa
+de `experimentalDecorators`, e a resposta chega tipada sem validação. Na casa o Tuyau não substitui
+o contrato de `shared/` (`DECISIONS.md` #199).
 
 ```ts
-// backend: o Tuyau gera o contrato a partir das rotas e validators reais
-// node ace tuyau:generate
+// adonisrc.ts (backend): o registro é gerado pelo hook do assembler
+import { indexEntities } from '@adonisjs/core'
+import { defineConfig } from '@adonisjs/core/app'
+import { generateRegistry } from '@tuyau/core/hooks'
 
-// frontend: a chamada é tipada, e renomear uma rota no backend vira erro de
-// compilação no frontend, em vez de 404 em produção
-const { data } = await tuyau.administrator.teams.$get({ query: { page: 1 } })
+export default defineConfig({
+  hooks: {
+    init: [indexEntities({ transformers: { enabled: true } }), generateRegistry()],
+  },
+})
+
+// frontend: chamada pelo nome da rota `users.show`
+const user = await client.api.users.show({ params: { id: '1' } })
 ```
 
 #### guides/frontend/tanstack-query

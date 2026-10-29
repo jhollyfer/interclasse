@@ -1,4 +1,4 @@
-# Dependências na última versão publicada (_padroes/tooling.md §0): o Dependabot
+# Dependências na última versão publicada (_standards/tooling.md §0): o Dependabot
 # abre o PR de atualização, e o upgrade é revisado antes do merge - changelog e
 # `.d.ts` novos em major. Backend e frontend são projetos pnpm separados.
 version: 2

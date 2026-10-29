@@ -9,7 +9,7 @@ type Payload = { actor: User }
 type Response = Either<HTTPException, User>
 
 /**
- * A leitura da própria conta: o `actor` da sessão (_padroes/backend.md §4.3).
+ * A leitura da própria conta: o `actor` da sessão (_standards/backend.md §4.3).
  *
  * Sem nova consulta por id: o guard já leu a conta nesta requisição, com o
  * filtro de arquivado e de inativo - quem foi arquivado não chega até aqui.

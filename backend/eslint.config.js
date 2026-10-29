@@ -16,7 +16,7 @@ import importX from 'eslint-plugin-import-x'
 const generated = { ignores: ['database/schema.ts', '.adonisjs/**', 'build/**'] }
 
 /**
- * As regras de escrita da régua (_padroes/tooling.md §4, backend.md §2), cobradas
+ * As regras de escrita da régua (_standards/tooling.md §4, backend.md §2), cobradas
  * por lint em vez de por leitura de diff. `Merge` em vez de `&`, lookup object e
  * `async/await` não têm regra nativa e ficam na revisão.
  */
@@ -31,7 +31,7 @@ const style = {
     '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
     // Sempre `type`, nunca `interface` (declaration merging fica no bloco abaixo).
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-    // Sem `!` non-null: o tipo se estreita com guarda (_padroes/typescript.md §1).
+    // Sem `!` non-null: o tipo se estreita com guarda (_standards/typescript.md §1).
     '@typescript-eslint/no-non-null-assertion': 'error',
   },
 }
@@ -73,7 +73,7 @@ const typed = {
 }
 
 /**
- * Colaborador vem do container, nunca de `new` (_padroes/backend.md §2.1). O
+ * Colaborador vem do container, nunca de `new` (_standards/backend.md §2.1). O
  * seletor pega só o que é colaborador pelo nome; stdlib, value object, entidade
  * Lucid e comando de SDK ficam de fora de propósito.
  */
@@ -123,7 +123,7 @@ const augmentation = {
 
 /**
  * Ordem de import: externo → alias interno (`#…`) → relativo, com linha em
- * branco entre os grupos (_padroes/tooling.md §4).
+ * branco entre os grupos (_standards/tooling.md §4).
  */
 const imports = {
   files: ['**/*.ts'],

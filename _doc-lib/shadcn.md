@@ -171,6 +171,14 @@ errado.
 }
 ```
 
+Para reescrever o que já está no disco, a CLI tem `migrate icons`: troca import e JSX de ícone nos
+componentes de `ui`, instala a biblioteca de destino e grava `iconLibrary` no `components.json`
+([cli](https://ui.shadcn.com/docs/cli.md), "migrate icons"; `_doc-lib/phosphor.md#docs/cli#migrate-icons`).
+
+```bash
+pnpm dlx shadcn@latest migrate icons --from lucide --to phosphor
+```
+
 #### docs/tailwind-v4
 [doc](https://ui.shadcn.com/docs/tailwind-v4) | [markdown](https://ui.shadcn.com/docs/tailwind-v4.md)
 **O que é:** o resumo do que mudou quando o shadcn passou a gerar para Tailwind v4 + React 19: sem

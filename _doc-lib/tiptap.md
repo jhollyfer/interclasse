@@ -1,6 +1,12 @@
 # Tiptap
 
 > Conferido contra `@tiptap/core@3.31.4` (última publicada no npm).
+>
+> Ampliado em 2026-10-14 com a navegação inteira do site (índice `https://tiptap.dev/docs/llms.txt`
+> conferido contra o menu lateral de cada área): 493 páginas novas, todas baixadas na versão `.md`.
+> Tipos conferidos em `@tiptap/core`, `@tiptap/react`, `@tiptap/markdown` e `@tiptap/suggestion`
+> 3.32.0 (`npm pack` + `.d.ts`). Áreas Pro/Cloud e UI Components entram como catálogo marcado
+> "Pro/Cloud (pago, exige conta Tiptap)", com a visão geral de cada área aberta.
 
 Editor de texto rico headless para a web, construído sobre o ProseMirror.
 
@@ -104,7 +110,7 @@ Onde fica a fronteira, na prática:
   elementos React, não uma string para `dangerouslySetInnerHTML` — a injeção deixa de ser possível
   por construção, em vez de depender de você lembrar de filtrar.
 
-**Links:** 45.
+**Links:** 538.
 
 **Skills:** `maiyu-frontend`, `compound-pattern`, `react-composition-patterns`. Dispare junto com a leitura da entrada; a entrada é o contrato, a skill executa (`SKILLS-MAP.md`). Versão nova: `deprecation-and-migration`.
 
@@ -1739,6 +1745,21 @@ renderToHTMLString({ extensions: [StarterKit, UniqueId], content })
 // e só então renderizar o documento já completo
 ```
 
+**Acréscimo (2026-10-14), conteúdo rico é só Tiptap** (`frontend.md` §8, `DECISIONS.md` #196): o
+mesmo renderizador fecha os três caminhos. JSON gravado pelo editor vai direto para
+`renderToReactElement`; Markdown de fora (resposta de IA, importação, legado) vira JSON pelo
+`MarkdownManager.parse()` sem editor (entrada `markdown/api/markdown-manager`) e segue pelo mesmo
+`renderToReactElement`; exportar Markdown é `renderToMarkdown` (`@tiptap/static-renderer/pm/markdown`,
+que recebe o JSON, a lista de extensões e opções). Nenhuma outra lib de Markdown entra
+(`react-markdown`, `remark-*`, `rehype-*`). Editor, `MarkdownManager` e renderizador recebem a mesma
+constante de extensões, senão um nó lido de um lado some do outro.
+
+```ts
+import { renderToMarkdown } from '@tiptap/static-renderer/pm/markdown'
+
+const markdown = renderToMarkdown({ extensions: richTextExtensions, content })
+```
+
 ## Conteúdo, persistência e formato
 
 #### core-concepts/persistence
@@ -2231,6 +2252,935 @@ export const MinhaExtensao = Extension.create<MinhasOpcoes, MeuStorage>({
 // editor.storage.minhaExtensao.total  -> tipado
 // editor.commands.inserirAssinatura('—') -> tipado
 ```
+
+## Instalação e menus
+
+#### editor/getting-started/install
+[doc](https://tiptap.dev/docs/editor/getting-started/install) | [markdown](https://tiptap.dev/docs/editor/getting-started/install.md)
+
+**O que é:** o índice de instalação por ambiente: JavaScript puro, React, Next, Vue 3, Vue 2, Nuxt,
+Svelte, Alpine.js e PHP, mais os adaptadores da comunidade para Angular e Solid.
+**Para que serve:** achar a página do framework; a do React (`getting-started/install/react`, acima)
+é a única que vale na stack.
+**Quando usar:** ao abrir a doc pela primeira vez. As outras instalações estão em "Fora da stack",
+uma linha cada.
+
+#### editor/getting-started/style-editor/custom-menus
+[doc](https://tiptap.dev/docs/editor/getting-started/style-editor/custom-menus) | [markdown](https://tiptap.dev/docs/editor/getting-started/style-editor/custom-menus.md)
+
+**O que é:** como montar a barra do editor: menu fixo (um `<div>` seu acima do editor), bubble menu,
+floating menu e o experimento de slash command. O botão chama a cadeia
+`editor.chain().focus().toggleBold().run()`; `focus()` devolve o foco que o clique no botão tirou.
+O estado ativo vem de `editor.isActive('bold')`, com atributo (`isActive('highlight', { color })`),
+expressão regular ou só atributo (`isActive({ textAlign: 'right' })`). Seleção que cobre marcas
+mistas devolve `false`.
+**Para que serve:** a barra de ferramentas, que o Tiptap não entrega.
+**Quando usar:** ao montar `components/common/rich-editor/`. A página avisa que no React o
+`isActive()` **não é reativo**: a barra lê pelo `useEditorState` (entrada
+`getting-started/install/react`), senão o botão não acende. Os botões são `<button>` do kit
+(`components/ui`), com `aria-label` por chave i18n e navegação por teclado (`frontend.md` §10.2);
+a própria página lista teclado, ARIA e atalhos visíveis como requisito.
+
+```tsx
+const state = useEditorState({
+  editor,
+  selector: ({ editor: current }) => ({ bold: current.isActive('bold') }),
+})
+
+<Button
+  type="button"
+  aria-pressed={state.bold}
+  aria-label={m.editor_bold()}
+  onClick={() => editor.chain().focus().toggleBold().run()}
+/>
+```
+
+## Extensão própria: criar, views e estrutura
+
+#### editor/extensions/custom-extensions/create-new
+[doc](https://tiptap.dev/docs/editor/extensions/custom-extensions/create-new) | [markdown](https://tiptap.dev/docs/editor/extensions/custom-extensions/create-new.md)
+
+**O que é:** a porta de entrada para criar do zero: `Extension.create` (funcionalidade, sem schema),
+`Node.create` (conteúdo da árvore, bloco ou inline) e `Mark.create` (formatação inline). Os três
+aceitam objeto ou função que devolve o objeto (útil para guardar variável e handler fechados).
+Termina no CLI para publicar extensão avulsa.
+**Para que serve:** escolher o tipo certo antes de escrever.
+**Quando usar:** antes de toda extensão da casa. Nó e marca mudam o JSON gravado; extensão pura não.
+Os detalhes de cada um estão em `create-new/node`, `create-new/mark` (acima) e `create-new/extension`.
+
+#### editor/extensions/custom-extensions/create-new/extension
+[doc](https://tiptap.dev/docs/editor/extensions/custom-extensions/create-new/extension) | [markdown](https://tiptap.dev/docs/editor/extensions/custom-extensions/create-new/extension.md)
+
+**O que é:** a referência da Extension API: `name` (vira o nome no JSON quando é nó ou marca),
+`priority` (padrão 100; maior carrega antes e ordena plugin e schema), `addOptions`, `addStorage`,
+`addCommands`, `addKeyboardShortcuts`, `addInputRules`, `addPasteRules`, `transformPastedHTML`
+(limpa HTML colado antes do parse, em cadeia por prioridade), eventos, `dispatchTransaction`
+(middleware sobre a transação, com `next`), `addProseMirrorPlugins`, `addDecorations`,
+`addGlobalAttributes`, `addExtensions`, `extendNodeSchema`, `extendMarkSchema`, e o que existe em
+`this`.
+**Para que serve:** o contrato de tudo o que uma extensão pode fazer.
+**Quando usar:** ao escrever extensão. Tipagem de opção, storage e comando por `declare module
+'@tiptap/core'` (exemplo na entrada `guides/typescript`), nunca `as`. `transformPastedHTML` é o
+lugar de tirar estilo colado do Word ou do Google Docs; não é sanitização de exibição (o aviso do
+topo continua valendo).
+
+#### editor/extensions/custom-extensions/mark-views
+[doc](https://tiptap.dev/docs/editor/extensions/custom-extensions/mark-views) | [markdown](https://tiptap.dev/docs/editor/extensions/custom-extensions/mark-views.md)
+
+**O que é:** visão geral de mark view: a versão mais simples do node view, para marcas. Não tem
+relação com o HTML de saída, por desenho. Para renderizar componente de verdade fora do editor, a
+página manda para o Static Renderer.
+**Para que serve:** marca interativa dentro do editor (link com prévia, marcação com menu).
+**Quando usar:** só para a experiência dentro do editor. A leitura continua no
+`renderToReactElement` (`frontend.md` §8); a variante React está em `mark-views/react` (acima).
+
+#### editor/extensions/custom-extensions/node-views/examples
+[doc](https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/examples) | [markdown](https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/examples.md)
+
+**O que é:** exemplos de node view (alça de arraste, desenho em SVG) que a página declara "não
+oficialmente suportados": sem teste e sem a manutenção das extensões oficiais. O de desenho manda
+o dado inteiro a cada mudança e "derrete" o backend de WebSocket com Collaboration.
+**Para que serve:** ponto de partida para nó interativo.
+**Quando usar:** como leitura. Para arrastar bloco, a extensão oficial é `DragHandleReact`
+(catálogo de extensões), não este exemplo.
+
+#### guides/create-mark
+[doc](https://tiptap.dev/docs/guides/create-mark) | [markdown](https://tiptap.dev/docs/guides/create-mark.md)
+
+**O que é:** passo a passo de uma marca (`HighlightMark`): estrutura com `Mark.create`, `parseHTML`
+e `renderHTML`, atributos, comandos, atalho de teclado, input rule com `markInputRule` e teste com
+`new Editor` no próprio teste.
+**Para que serve:** o roteiro completo de uma marca, do schema ao teste.
+**Quando usar:** ao criar marca da casa. O teste da página instancia `Editor` sem DOM de navegador;
+na casa ele roda no Vitest com jsdom (`frontend.md` §11.1).
+
+#### guides/nested-node-view-content
+[doc](https://tiptap.dev/docs/guides/nested-node-view-content) | [markdown](https://tiptap.dev/docs/guides/nested-node-view-content.md)
+
+**O que é:** nó pai com filhos, cada um com seu node view e seu `NodeViewContent`. A regra central é
+de schema: o pai declara em `content` exatamente quais filhos aceita, e a inserção cria a estrutura
+inteira de uma vez. Versão Vue e versão React (`ReactNodeViewRenderer`, `NodeViewWrapper`,
+`NodeViewContent` de `@tiptap/react`).
+**Para que serve:** bloco composto editável (cartão com título e corpo, pergunta e resposta).
+**Quando usar:** quando um bloco tem partes editáveis separadas. Siga a metade React; a de Vue é
+fora da stack.
+
+## API: decorações, node views e utilitários
+
+#### editor/api/decorations
+[doc](https://tiptap.dev/docs/editor/api/decorations) | [markdown](https://tiptap.dev/docs/editor/api/decorations.md)
+
+**O que é:** a referência de `addDecorations` (hook de toda extensão, devolve um `DecorationSpec`
+ou `null`; o Tiptap junta todas num único plugin), as estratégias de atualização (`document` é a
+padrão e sempre correta), `Decoration.Node`, `Decoration.Inline`, `Decoration.Widget`, o comando
+`updateDecorations` (reconstrói tudo, para quando um valor fora do documento muda, como o termo de
+busca), `ReactWidgetRenderer` (widget como componente React no mesmo portal do editor, com contexto
+e hooks), `liveWidgetKeys` e `createWidgetDecoration`. Conferido no tipo de `@tiptap/core@3.32.0`.
+**Para que serve:** marcar visualmente sem mudar o documento: busca, erro de ortografia, contador.
+**Quando usar:** sempre que o destaque não deve ir para o JSON gravado. O conceito está em
+`core-concepts/decorations` (acima); esta é a API.
+
+#### editor/api/resizable-nodeviews
+[doc](https://tiptap.dev/docs/editor/api/resizable-nodeviews) | [markdown](https://tiptap.dev/docs/editor/api/resizable-nodeviews.md)
+
+**O que é:** `ResizableNodeView`, node view independente de framework que embrulha um elemento e
+acrescenta alças de redimensionamento: `directions`, limites, proporção travada, callbacks
+`onResize`/`onCommit`. Não injeta estilo: o CSS de `[data-resize-handle]` e `.is-resizing` é seu.
+**Para que serve:** imagem ou bloco redimensionável no editor.
+**Quando usar:** imagem com largura escolhida pelo autor. Estilo das alças em Tailwind; alça sem
+alternativa por teclado precisa de controle de tamanho por campo (`frontend.md` §10.2).
+
+#### editor/api/utilities
+[doc](https://tiptap.dev/docs/editor/api/utilities) | [markdown](https://tiptap.dev/docs/editor/api/utilities.md)
+
+**O que é:** o índice dos utilitários: HTML (JSON e HTML no servidor), JSX, Position, Static
+Renderer, Suggestion e Tiptap for PHP.
+**Para que serve:** saber o que existe fora da API do editor.
+**Quando usar:** consulta. Na casa, o que importa é o Static Renderer (leitura) e o Suggestion
+(menção, comando de barra).
+
+#### editor/api/utilities/jsx
+[doc](https://tiptap.dev/docs/editor/api/utilities/jsx) | [markdown](https://tiptap.dev/docs/editor/api/utilities/jsx.md)
+
+**O que é:** escrever o `renderHTML` em JSX com `/** @jsxImportSource @tiptap/core */`; `<slot />`
+marca o buraco do conteúdo editável. A página avisa que não é React: sem hook, sem estado.
+**Para que serve:** `renderHTML` legível em nó com muita marcação.
+**Quando usar:** raramente. Num projeto React o pragma por arquivo confunde quem lê; o array
+`['div', attrs, 0]` da doc de nós continua sendo o padrão.
+
+#### editor/api/utilities/position
+[doc](https://tiptap.dev/docs/editor/api/utilities/position) | [markdown](https://tiptap.dev/docs/editor/api/utilities/position.md)
+
+**O que é:** `createMappablePosition` e `getUpdatedPosition` (de `@tiptap/core`) para guardar uma
+posição e mapeá-la pelas transações; `toJSON`/`fromJSON` para gravar. `CollaborationMappablePosition`
+(de `@tiptap/extension-collaboration`) usa posição relativa do Y.js. Limite documentado: quando a
+colaboração parte um parágrafo, a posição depois do corte vai para o fim do primeiro pedaço.
+**Para que serve:** âncora que sobrevive à edição (comentário próprio, marcador).
+**Quando usar:** ao guardar posição fora do documento. Posição como número cru quebra na primeira
+edição antes dela.
+
+#### editor/api/utilities/suggestion
+[doc](https://tiptap.dev/docs/editor/api/utilities/suggestion) | [markdown](https://tiptap.dev/docs/editor/api/utilities/suggestion.md)
+
+**O que é:** o motor de autocompletar por caractere (`@tiptap/suggestion`), base de Mention e
+Emoji: `char`, `allow`, `shouldShow`, `minQueryLength`, `debounce`, `initialItems`, `items` (recebe
+`AbortSignal`, cancelado a cada tecla), `command`, `render` (`onStart`, `onUpdate`, `onKeyDown`,
+`onExit`), posição pelo Floating UI com `props.mount(element)` (`placement`, `offset`, `flip`,
+`container`), `exitSuggestion` e, em colaboração, `shouldShow` com `isChangeOrigin` para o popup
+não abrir em todos os clientes.
+**Para que serve:** menção, comando de barra, emoji, hashtag.
+**Quando usar:** ao montar menção. A busca é `queryOptions` do TanStack Query chamado de dentro de
+`items` com o `signal` repassado; `debounce` evita uma requisição por tecla. Popup dentro de Dialog
+vai com `container`. Lista com `role="listbox"` e navegação por seta no `onKeyDown`.
+
+## Markdown (`@tiptap/markdown`)
+
+A casa grava JSON e lê pelo `renderToReactElement`; Markdown de fora (resposta de IA, importação,
+conteúdo legado) entra pelo `MarkdownManager.parse()` sem editor e segue pelo mesmo renderizador
+(`frontend.md` §8, "Conteúdo rico é só Tiptap"). Nenhuma outra lib de Markdown entra
+(`react-markdown`, `remark-*`, `rehype-*`, `marked` direto). A página `markdown` (acima) declara o
+pacote *early release*: fixe a versão. Conferido contra `@tiptap/markdown@3.32.0`.
+
+#### editor/markdown/getting-started/installation
+[doc](https://tiptap.dev/docs/editor/markdown/getting-started/installation) | [markdown](https://tiptap.dev/docs/editor/markdown/getting-started/installation.md)
+
+**O que é:** `@tiptap/markdown` com a extensão `Markdown` no editor; conteúdo inicial em Markdown
+com `contentType: 'markdown'`; opções de indentação, instância própria do `marked` e opções do
+`marked`; problemas comuns (pacote não achado, Markdown que não é lido, erro de TypeScript).
+**Para que serve:** ligar o Markdown no editor ou no gerenciador avulso.
+**Quando usar:** quando o projeto recebe Markdown de fora. `pnpm add @tiptap/markdown`; o `marked`
+vem como dependência dele e não se instala nem se importa direto.
+
+#### editor/markdown/getting-started/basic-usage
+[doc](https://tiptap.dev/docs/editor/markdown/getting-started/basic-usage) | [markdown](https://tiptap.dev/docs/editor/markdown/getting-started/basic-usage.md)
+
+**O que é:** `editor.getMarkdown()`, `setContent`/`insertContent` com `contentType: 'markdown'`,
+`editor.markdown` (o `MarkdownManager`), GFM (tabela e lista de tarefa precisam das extensões
+registradas) e a seção **Handling HTML in Markdown**: HTML embutido no Markdown é lido pelas regras
+`parseHTML` das extensões registradas. Boa prática da página: sempre `contentType: 'markdown'`, senão
+o texto é lido como HTML.
+**Para que serve:** entrada e saída de Markdown pelo editor.
+**Quando usar:** "Handling HTML in Markdown" é a base da regra da casa: o schema das extensões é a
+lista de permissão do HTML embutido, sem schema de sanitização à mão. Tag que nenhuma extensão
+reconhece não vira nó. Conferido no código de `@tiptap/markdown@3.32.0` (`parseHTMLToken`): HTML não
+reconhecido vira **texto literal**, e **sem `window.DOMParser` (SSR) todo HTML embutido vira texto
+literal**, mesmo o que o schema aceitaria no navegador. Converta num lado só (no servidor, no
+loader ou na gravação) e mande JSON para a tela; converter no SSR e de novo no cliente dá saída
+diferente e erro de hidratação.
+
+#### editor/markdown/api/editor
+[doc](https://tiptap.dev/docs/editor/markdown/api/editor) | [markdown](https://tiptap.dev/docs/editor/markdown/api/editor.md)
+
+**O que é:** o que a extensão acrescenta ao editor: `getMarkdown()`, a propriedade `markdown`, as
+opções `content` e `contentType` (padrão `json`; combinação inválida cai para o tipo detectado), os
+comandos de conteúdo com `contentType`, e as chaves novas de extensão: `markdownTokenName`,
+`parseMarkdown`, `renderMarkdown`, `markdownTokenizer`, `markdownOptions`.
+**Para que serve:** a API de Markdown dentro do editor.
+**Quando usar:** ao dar suporte a Markdown numa extensão própria (`parseMarkdown` e
+`renderMarkdown` são o par de ida e volta, como `parseHTML` e `renderHTML`).
+
+#### editor/markdown/api/extension
+[doc](https://tiptap.dev/docs/editor/markdown/api/extension) | [markdown](https://tiptap.dev/docs/editor/markdown/api/extension.md)
+
+**O que é:** `Markdown.configure({ indentation, marked, markedOptions })`.
+**Para que serve:** configurar a extensão `Markdown` no editor.
+**Quando usar:** só se a indentação de lista exportada precisar de tab ou de outro tamanho.
+
+#### editor/markdown/api/markdown-manager
+[doc](https://tiptap.dev/docs/editor/markdown/api/markdown-manager) | [markdown](https://tiptap.dev/docs/editor/markdown/api/markdown-manager.md)
+
+**O que é:** a classe `MarkdownManager`, motor de parse e serialização que funciona **sem editor**:
+construtor com `extensions` (no tipo publicado é obrigatório dentro de `options`), `marked`,
+`markedOptions` e `indentation`; `registerExtension()`, `parse(markdown)` (devolve JSON do
+Tiptap), `serialize(json)` (devolve Markdown), `renderNodeToMarkdown()`, `renderNodes()`,
+`hasMarked()`, `instance`, `indentCharacter`, `indentString`.
+**Para que serve:** converter Markdown em JSON (e o contrário) fora do editor.
+**Quando usar:** é a entrada da casa para Markdown de fora (`frontend.md` §8). O componente único
+de `components/common/rich-text/` recebe JSON ou Markdown; o Markdown passa por `parse()` com as
+**mesmas extensões** que o renderizador usa, e o JSON resultante vai para `renderToReactElement`.
+Lista de extensões em uma constante só, compartilhada pelo editor, pelo manager e pelo renderizador.
+
+```tsx
+import type { JSONContent } from '@tiptap/core'
+import { MarkdownManager } from '@tiptap/markdown'
+import { renderToReactElement } from '@tiptap/static-renderer/pm/react'
+import { richTextExtensions } from '@/lib/rich-text-extensions'
+
+const markdownManager = new MarkdownManager({ extensions: richTextExtensions })
+
+type RichTextProps = Readonly<{ content: JSONContent }>
+
+export function RichText({ content }: RichTextProps): React.JSX.Element {
+  return <article>{renderToReactElement({ extensions: richTextExtensions, content })}</article>
+}
+
+// Markdown de fora vira JSON uma vez (no loader ou na gravação), não a cada render:
+// const content = markdownManager.parse(markdown)
+```
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Custom Markdown Parsing](https://tiptap.dev/docs/editor/markdown/advanced-usage/custom-parsing) | `parseMarkdown` próprio: de token do `marked` para nó do Tiptap | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Custom Markdown Serializing](https://tiptap.dev/docs/editor/markdown/advanced-usage/custom-serializing) | `renderMarkdown` próprio: de nó para texto Markdown | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Custom Markdown Tokenizers](https://tiptap.dev/docs/editor/markdown/advanced-usage/custom-tokenizer) | Tokenizador próprio para sintaxe que o `marked` não conhece | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Markdown Types API](https://tiptap.dev/docs/editor/markdown/api/types) | Tipos do pacote (`MarkdownToken`, helpers de parse e render) | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Markdown Utilities](https://tiptap.dev/docs/editor/markdown/api/utilities) | Funções auxiliares para escrever parse e render de Markdown | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Markdown Examples](https://tiptap.dev/docs/editor/markdown/examples) | Exemplos de Markdown no editor | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Markdown Glossary for Tiptap](https://tiptap.dev/docs/editor/markdown/glossary) | Glossário: token, tokenizer, parse, serialize | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Create a Admonition Block with Markdown Support](https://tiptap.dev/docs/editor/markdown/guides/create-a-admonition-block) | Bloco de aviso (admonition) com sintaxe Markdown própria | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Create an Emoji Inline Node with Markdown Support](https://tiptap.dev/docs/editor/markdown/guides/create-a-emoji-inline-block) | Nó inline de emoji com suporte a Markdown | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Create a Highlight Mark with Markdown Support](https://tiptap.dev/docs/editor/markdown/guides/create-a-highlight-mark) | Marca de destaque (`==texto==`) com suporte a Markdown | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+| [Integration Markdown in Custom Extensions](https://tiptap.dev/docs/editor/markdown/guides/integrate-markdown-in-your-extension) | Dar suporte a Markdown numa extensão própria | ao dar suporte a Markdown em nó ou marca própria, para o `parse()` da casa reconhecer |
+
+## Guias
+
+#### guides/accessibility
+[doc](https://tiptap.dev/docs/guides/accessibility) | [markdown](https://tiptap.dev/docs/guides/accessibility.md)
+
+**O que é:** orientação de acessibilidade: tudo operável por teclado (editor, seleção, menus), as
+extensões padrão produzem HTML semântico, a interface (contraste, área de clique) é sua. Pegadinhas:
+o VoiceOver junta palavras de blocos diferentes, e menu ou modal aberto por teclado não pode virar
+armadilha de foco.
+**Para que serve:** a lista do que o Tiptap resolve e do que fica com você.
+**Quando usar:** junto de `frontend.md` §10 ao montar a barra e os menus. O editor precisa de nome
+acessível (`editorProps.attributes` com `aria-label` vindo do i18n) e o Tab precisa sair dele.
+
+#### guides/faq
+[doc](https://tiptap.dev/docs/guides/faq) | [markdown](https://tiptap.dev/docs/guides/faq.md)
+
+**O que é:** perguntas frequentes: copiar gera linha em branco dupla (trocar
+`clipboardTextSerializer.blockSeparator` para `'\n'`); `react-dnd` e `react-beautiful-dnd`
+registram arraste global e quebram o arraste do editor; por que existem `parseHTML` e `renderHTML`;
+o Tiptap não edita HTML arbitrário (o que o schema não conhece sai); contexto React em NodeView
+exige o provider em volta do `EditorContent`; as `div` extras do React Node View existem porque o
+ProseMirror quer o view síncrono.
+**Para que serve:** atalho para os defeitos que todo projeto encontra.
+**Quando usar:** antes de abrir issue. Biblioteca de arraste na mesma tela (`_doc-lib/dnd-kit.md`)
+fica restrita ao seu provider, longe do editor.
+
+#### guides/spellcheck
+[doc](https://tiptap.dev/docs/guides/spellcheck) | [markdown](https://tiptap.dev/docs/guides/spellcheck.md)
+
+**O que é:** ligar o corretor do navegador com `spellcheck: 'true'` e `lang` em
+`editorProps.attributes` (string, porque é atributo de DOM), mudar em tempo de execução com
+`setOptions()`, e montar corretor próprio com `nspell` e decorações (`addDecorations`), ou com
+LanguageTool. Aviso de privacidade: serviço remoto recebe só o texto necessário e a credencial fica
+no servidor.
+**Para que serve:** correção ortográfica no idioma certo.
+**Quando usar:** sempre: `lang` do editor igual ao locale ativo do Paraglide (`i18n.md` §2),
+`spellcheck: 'true'`. Corretor próprio só com decisão do projeto.
+
+#### guides/decorations-react
+[doc](https://tiptap.dev/docs/guides/decorations-react) | [markdown](https://tiptap.dev/docs/guides/decorations-react.md)
+
+**O que é:** tutorial em React de destaque de termo com os três tipos de decoração: inline (a
+palavra), node (o bloco que contém) e widget (contador numerado com `ReactWidgetRenderer` e
+`ReactWidgetDecorationProps`). O termo fica no storage da extensão e `updateDecorations` reconstrói;
+explica por que usar a estratégia de atualização manual.
+**Para que serve:** o exemplo completo de decoração com componente React.
+**Quando usar:** ao montar busca dentro do texto ou marcação de revisão própria.
+
+#### guides/find-and-replace
+[doc](https://tiptap.dev/docs/guides/find-and-replace) | [markdown](https://tiptap.dev/docs/guides/find-and-replace.md)
+
+**O que é:** UI de localizar e substituir sobre `@tiptap/extension-find-and-replace` (público, MIT,
+3.32.0 no npm): comandos para buscar, navegar e trocar, estado em
+`editor.storage.findAndReplace`, lido no React por `useEditorState` só nos campos que a UI usa.
+**Para que serve:** busca dentro de texto longo.
+**Quando usar:** editor de artigo longo. Abrir por `Ctrl/Cmd+F` sobrepõe o atalho do navegador:
+só com foco no editor, e com rótulo e atalho visíveis.
+
+#### guides/pro-extensions
+[doc](https://tiptap.dev/docs/guides/pro-extensions) | [markdown](https://tiptap.dev/docs/guides/pro-extensions.md)
+
+**O que é:** como instalar extensão Pro: token pessoal da conta Tiptap, registro privado
+`@tiptap-pro:registry=https://registry.tiptap.dev/` e `//registry.tiptap.dev/:_authToken=${TIPTAP_PRO_TOKEN}`
+no `.npmrc` do projeto (ou configuração global, para CI), depois `@tiptap-pro/extension-*`.
+**Para que serve:** o canal de tudo o que está marcado Pro/Cloud abaixo.
+**Quando usar:** só com decisão do projeto (`docs/DECISIONS.md`). O `.npmrc` pode ser commitado (só
+referencia a variável); o token vai em `secrets` do CI (`tooling.md` §7) e no ambiente de quem
+instala, e sem ele o `pnpm install` falha para todo o time.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Tiptap Guides](https://tiptap.dev/docs/guides) | O índice dos guias (acessibilidade, colaboração, decorações, migração de outros editores, Pro) | consulta |
+| [How to upgrade Tiptap v1 to v2](https://tiptap.dev/docs/guides/upgrade-tiptap-v1) | Migração do Tiptap v1 para o v2 | não se aplica: a casa já está no v3; o caminho atual é `guides/upgrade-tiptap-v2` (acima) |
+| [Migrate from CKEditor 4 to Tiptap](https://tiptap.dev/docs/guides/migrate-from-ckeditor4) | Migração do CKEditor 4: mapa de plugin para extensão e conversão do HTML salvo | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from CKEditor 5 to Tiptap](https://tiptap.dev/docs/guides/migrate-from-ckeditor5) | Migração do CKEditor 5: equivalência de recursos e de API | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from Draft.js to Tiptap](https://tiptap.dev/docs/guides/migrate-from-draftjs) | Migração do Draft.js: do modelo de blocos e entidades para nós e marcas | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from Editor.js to Tiptap](https://tiptap.dev/docs/guides/migrate-from-editorjs) | Migração do Editor.js: do JSON de blocos dele para o JSON do Tiptap | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from Lexical to Tiptap](https://tiptap.dev/docs/guides/migrate-from-lexical) | Migração do Lexical: nós, comandos e plugins equivalentes | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from Quill to Tiptap](https://tiptap.dev/docs/guides/migrate-from-quill) | Migração do Quill: do Delta para o JSON do Tiptap | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from Slate to Tiptap](https://tiptap.dev/docs/guides/migrate-from-slate) | Migração do Slate: do modelo de nós dele para o schema do Tiptap | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+| [Migrate from TinyMCE to Tiptap](https://tiptap.dev/docs/guides/migrate-from-tinymce) | Migração do TinyMCE: do HTML livre para conteúdo com schema | só se o projeto vier desse editor; o destino é o JSON do Tiptap e o renderizador da casa (`frontend.md` §8) |
+
+## Catálogo: comandos (`api/commands`)
+
+Cada linha é uma página da referência de comandos; a visão geral (`api/commands`) e
+`content/set-content` têm entrada própria acima. Todos rodam em `editor.commands.x()` ou em cadeia
+`editor.chain().focus().x().run()`, e `editor.can().x()` testa sem aplicar (é o que desabilita botão).
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Content Editor commands](https://tiptap.dev/docs/editor/api/commands/content) | Índice dos comandos de conteúdo | consulta |
+| [clearContent command](https://tiptap.dev/docs/editor/api/commands/content/clear-content) | Apaga todo o conteúdo do documento | botão "limpar" com confirmação; `emitUpdate` decide se o `onUpdate` dispara |
+| [cut command](https://tiptap.dev/docs/editor/api/commands/content/cut) | Recorta um intervalo e o insere em outra posição | botão, atalho ou extensão própria que precisa desse efeito |
+| [insertContent command](https://tiptap.dev/docs/editor/api/commands/content/insert-content) | Insere conteúdo (texto, HTML, JSON) na seleção | inserir bloco pronto; com `@tiptap/markdown`, `contentType: 'markdown'` |
+| [insertContentAt command](https://tiptap.dev/docs/editor/api/commands/content/insert-content-at) | Insere conteúdo numa posição ou intervalo | colar resultado de upload ou de IA no ponto certo |
+| [forEach command](https://tiptap.dev/docs/editor/api/commands/for-each) | Percorre uma lista executando comandos para cada item | inserir vários nós numa transação só |
+| [List commands](https://tiptap.dev/docs/editor/api/commands/lists) | Índice dos comandos de lista | consulta |
+| [liftListItem command](https://tiptap.dev/docs/editor/api/commands/lists/lift-list-item) | Sobe o item de lista um nível | Shift+Tab na lista |
+| [sinkListItem command](https://tiptap.dev/docs/editor/api/commands/lists/sink-list-item) | Desce o item de lista um nível | Tab na lista |
+| [splitListItem command](https://tiptap.dev/docs/editor/api/commands/lists/split-list-item) | Divide o item de lista em dois | Enter dentro do item |
+| [toggleList command](https://tiptap.dev/docs/editor/api/commands/lists/toggle-list) | Liga ou desliga um tipo de lista | botão de lista |
+| [wrapInList command](https://tiptap.dev/docs/editor/api/commands/lists/wrap-in-list) | Envolve o bloco numa lista | botão, atalho ou extensão própria que precisa desse efeito |
+| [Nodes and marks commands](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks) | Índice dos comandos de nós e marcas | consulta |
+| [clearNodes command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/clear-nodes) | Converte os blocos selecionados no bloco padrão | botão "texto normal" |
+| [createParagraphNear command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/create-paragraph-near) | Cria parágrafo ao lado do bloco selecionado | botão, atalho ou extensão própria que precisa desse efeito |
+| [deleteNode command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/delete-node) | Apaga o nó de um tipo | botão, atalho ou extensão própria que precisa desse efeito |
+| [exitCode command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/exit-code) | Sai do bloco de código para um bloco padrão novo | botão, atalho ou extensão própria que precisa desse efeito |
+| [extendMarkRange command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/extend-mark-range) | Estende a seleção até o fim da marca | editar link inteiro antes de `setLink` |
+| [insertDefaultBlock command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/insert-default-block) | Insere o bloco padrão do schema numa posição | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinBackward command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-backward) | Junta o bloco com o anterior | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinDown command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-down) | Junta o bloco com o de baixo | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinForward command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-forward) | Junta o bloco com o seguinte | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinTextblockBackward command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-textblock-backward) | Junta o bloco de texto com o anterior | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinTextblockForward command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-textblock-forward) | Junta o bloco de texto com o seguinte | botão, atalho ou extensão própria que precisa desse efeito |
+| [joinUp command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/join-up) | Junta o bloco com o de cima | botão, atalho ou extensão própria que precisa desse efeito |
+| [lift command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/lift) | Tira o bloco de dentro do pai (citação, lista) | botão, atalho ou extensão própria que precisa desse efeito |
+| [liftEmptyBlock command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/lift-empty-block) | Sobe um bloco vazio um nível | botão, atalho ou extensão própria que precisa desse efeito |
+| [newlineInCode command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/newline-in-code) | Quebra de linha dentro do bloco de código | botão, atalho ou extensão própria que precisa desse efeito |
+| [resetAttributes command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/reset-attributes) | Volta atributos de nó ou marca ao padrão | botão, atalho ou extensão própria que precisa desse efeito |
+| [setMark command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/set-mark) | Aplica uma marca com atributos | botão, atalho ou extensão própria que precisa desse efeito |
+| [setNode command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/set-node) | Troca o tipo do bloco | seletor de título |
+| [setTextDirection command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/set-text-direction) | Define direção do texto (`ltr`, `rtl`, `auto`) nos nós | conteúdo em idioma da direita para a esquerda |
+| [splitBlock command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/split-block) | Divide o bloco na seleção | botão, atalho ou extensão própria que precisa desse efeito |
+| [toggleMark command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/toggle-mark) | Liga ou desliga uma marca | botão de negrito, itálico, etc. |
+| [toggleNode command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/toggle-node) | Alterna entre dois tipos de bloco | botão, atalho ou extensão própria que precisa desse efeito |
+| [toggleWrap command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/toggle-wrap) | Envolve ou desembrulha o bloco num nó | botão, atalho ou extensão própria que precisa desse efeito |
+| [undoInputRule command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/undo-input-rule) | Desfaz a última input rule aplicada | Backspace logo depois de um atalho Markdown |
+| [unsetAllMarks command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/unset-all-marks) | Remove todas as marcas da seleção | botão "limpar formatação" |
+| [unsetMark command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/unset-mark) | Remove uma marca | botão, atalho ou extensão própria que precisa desse efeito |
+| [unsetTextDirection command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/unset-text-direction) | Remove o atributo de direção dos nós | botão, atalho ou extensão própria que precisa desse efeito |
+| [updateAttributes command](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/update-attributes) | Atualiza atributos de nó ou marca | `alt` de imagem, nível de título |
+| [selectTextblockEnd command](https://tiptap.dev/docs/editor/api/commands/select-textblock-end) | Move o cursor para o fim do bloco de texto | botão, atalho ou extensão própria que precisa desse efeito |
+| [selectTextblockStart command](https://tiptap.dev/docs/editor/api/commands/select-textblock-start) | Move o cursor para o início do bloco de texto | botão, atalho ou extensão própria que precisa desse efeito |
+| [Selection commands](https://tiptap.dev/docs/editor/api/commands/selection) | Índice dos comandos de seleção | consulta |
+| [blur command](https://tiptap.dev/docs/editor/api/commands/selection/blur) | Tira o foco do editor | botão, atalho ou extensão própria que precisa desse efeito |
+| [deleteRange commands](https://tiptap.dev/docs/editor/api/commands/selection/delete-range) | Apaga um intervalo | botão, atalho ou extensão própria que precisa desse efeito |
+| [deleteSelection command](https://tiptap.dev/docs/editor/api/commands/selection/delete-selection) | Apaga a seleção | botão, atalho ou extensão própria que precisa desse efeito |
+| [enter command](https://tiptap.dev/docs/editor/api/commands/selection/enter) | Dispara o comportamento da tecla Enter | botão, atalho ou extensão própria que precisa desse efeito |
+| [focus command](https://tiptap.dev/docs/editor/api/commands/selection/focus) | Foca o editor (`start`, `end`, `all` ou posição) | toda cadeia de botão começa com `focus()` |
+| [keyboardShortcut command](https://tiptap.dev/docs/editor/api/commands/selection/keyboard-shortcut) | Dispara um atalho de teclado por código | botão, atalho ou extensão própria que precisa desse efeito |
+| [scrollIntoView command](https://tiptap.dev/docs/editor/api/commands/selection/scroll-into-view) | Rola até a seleção | botão, atalho ou extensão própria que precisa desse efeito |
+| [selectAll command](https://tiptap.dev/docs/editor/api/commands/selection/select-all) | Seleciona o documento inteiro | botão, atalho ou extensão própria que precisa desse efeito |
+| [selectNodeBackward command](https://tiptap.dev/docs/editor/api/commands/selection/select-node-backward) | Seleciona o nó anterior | botão, atalho ou extensão própria que precisa desse efeito |
+| [selectNodeForward command](https://tiptap.dev/docs/editor/api/commands/selection/select-node-forward) | Seleciona o nó seguinte | botão, atalho ou extensão própria que precisa desse efeito |
+| [selectParentNode command](https://tiptap.dev/docs/editor/api/commands/selection/select-parent-node) | Seleciona o nó pai | botão, atalho ou extensão própria que precisa desse efeito |
+| [setNodeSelection command](https://tiptap.dev/docs/editor/api/commands/selection/set-node-selection) | Seleciona um nó numa posição | botão, atalho ou extensão própria que precisa desse efeito |
+| [setTextSelection command](https://tiptap.dev/docs/editor/api/commands/selection/set-text-selection) | Define a seleção de texto (posição ou intervalo) | botão, atalho ou extensão própria que precisa desse efeito |
+| [setMeta command](https://tiptap.dev/docs/editor/api/commands/set-meta) | Grava metadado na transação atual | marcar transação vinda de fora para o `onUpdate` ignorar |
+
+## Catálogo: extensões
+
+As extensões de StarterKit, Link, Image, Placeholder, CharacterCount, BubbleMenu, FloatingMenu e
+Collaboration têm entrada própria acima. Todas as linhas abaixo sem marca Pro são pacotes públicos
+`@tiptap/extension-*` (MIT) conferidos no npm em 3.32.0. Extensão nova só entra no editor se o
+renderizador de leitura receber a mesma lista (`frontend.md` §8): extensão fora da lista some na
+leitura.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Nodes extensions](https://tiptap.dev/docs/editor/extensions/nodes) | Índice das extensões de nó | consulta |
+| [Audio extension](https://tiptap.dev/docs/editor/extensions/nodes/audio) | Nó `<audio>` nativo, com colar de URL de áudio | podcast ou áudio no corpo do texto |
+| [Blockquote extension](https://tiptap.dev/docs/editor/extensions/nodes/blockquote) | Citação (`<blockquote>`), no StarterKit | já vem no StarterKit |
+| [BulletList extension](https://tiptap.dev/docs/editor/extensions/nodes/bullet-list) | Lista com marcadores (`@tiptap/extension-list`), no StarterKit | já vem no StarterKit |
+| [CodeBlock extension](https://tiptap.dev/docs/editor/extensions/nodes/code-block) | Bloco de código sem realce, no StarterKit | já vem no StarterKit |
+| [CodeBlockLowlight extension](https://tiptap.dev/docs/editor/extensions/nodes/code-block-lowlight) | Bloco de código com realce pelo lowlight | artigo técnico; troca o `codeBlock` do StarterKit (`codeBlock: false`) |
+| [Details extension](https://tiptap.dev/docs/editor/extensions/nodes/details) | Bloco recolhível (`<details>`) | FAQ e conteúdo opcional dentro do texto |
+| [DetailsContent extension](https://tiptap.dev/docs/editor/extensions/nodes/details-content) | Conteúdo do `details` | junto com `details` |
+| [DetailsSummary extension](https://tiptap.dev/docs/editor/extensions/nodes/details-summary) | Resumo clicável do `details` | junto com `details` |
+| [Document extension](https://tiptap.dev/docs/editor/extensions/nodes/document) | Nó raiz do documento, no StarterKit | trocar só para forçar estrutura (exemplo `forced-content-structure`) |
+| [Emoji extension](https://tiptap.dev/docs/editor/extensions/nodes/emoji) | Emoji por `:nome:` com sugestão | comentário e post informal |
+| [HardBreak extension](https://tiptap.dev/docs/editor/extensions/nodes/hard-break) | Quebra de linha (`<br>`), no StarterKit | já vem no StarterKit |
+| [Heading extension](https://tiptap.dev/docs/editor/extensions/nodes/heading) | Títulos de nível 1 a 6, no StarterKit | limite `levels` ao que a página permite (o H1 é da página) |
+| [HorizontalRule extension](https://tiptap.dev/docs/editor/extensions/nodes/horizontal-rule) | Linha horizontal, no StarterKit | já vem no StarterKit |
+| [ListItem extension](https://tiptap.dev/docs/editor/extensions/nodes/list-item) | Item de lista, no StarterKit | já vem no StarterKit |
+| [Mathematics extension](https://tiptap.dev/docs/editor/extensions/nodes/mathematics) | Fórmula LaTeX inline e em bloco pelo KaTeX | conteúdo de ensino com fórmula |
+| [Mention extension](https://tiptap.dev/docs/editor/extensions/nodes/mention) | Menção por `@` com o utilitário Suggestion | marcar pessoa em comentário |
+| [OrderedList extension](https://tiptap.dev/docs/editor/extensions/nodes/ordered-list) | Lista numerada, no StarterKit | já vem no StarterKit |
+| [Paragraph extension](https://tiptap.dev/docs/editor/extensions/nodes/paragraph) | Parágrafo, no StarterKit | já vem no StarterKit |
+| [Table extension](https://tiptap.dev/docs/editor/extensions/nodes/table) | Tabela (redimensionável), parte do TableKit | conteúdo com tabela; prefira o TableKit |
+| [TableCell extension](https://tiptap.dev/docs/editor/extensions/nodes/table-cell) | Célula de tabela | via TableKit |
+| [TableHeader extension](https://tiptap.dev/docs/editor/extensions/nodes/table-header) | Célula de cabeçalho de tabela | via TableKit |
+| [TableRow extension](https://tiptap.dev/docs/editor/extensions/nodes/table-row) | Linha de tabela | via TableKit |
+| [TaskItem extension](https://tiptap.dev/docs/editor/extensions/nodes/task-item) | Item de lista de tarefas com caixa de seleção | checklist no texto |
+| [TaskList extension](https://tiptap.dev/docs/editor/extensions/nodes/task-list) | Lista de tarefas | checklist no texto |
+| [Text extension](https://tiptap.dev/docs/editor/extensions/nodes/text) | Nó de texto, no StarterKit | já vem no StarterKit |
+| [Twitch extension](https://tiptap.dev/docs/editor/extensions/nodes/twitch) | Vídeo da Twitch incorporado | só com CSP liberando o domínio (`frame-src`) |
+| [Youtube extension](https://tiptap.dev/docs/editor/extensions/nodes/youtube) | Vídeo do YouTube incorporado | só com CSP liberando `youtube-nocookie.com` (`frame-src`) |
+| [Mark extensions](https://tiptap.dev/docs/editor/extensions/marks) | Índice das extensões de marca | consulta |
+| [Bold extension](https://tiptap.dev/docs/editor/extensions/marks/bold) | Negrito, no StarterKit | já vem no StarterKit |
+| [Code extension](https://tiptap.dev/docs/editor/extensions/marks/code) | Código inline, no StarterKit | já vem no StarterKit |
+| [Highlight extension](https://tiptap.dev/docs/editor/extensions/marks/highlight) | Marca-texto, com cor opcional | destaque em texto de estudo |
+| [Italic extension](https://tiptap.dev/docs/editor/extensions/marks/italic) | Itálico, no StarterKit | já vem no StarterKit |
+| [Ruby Text extension](https://tiptap.dev/docs/editor/extensions/marks/ruby-text) | Anotação ruby (furigana) | texto em japonês ou chinês; raro na casa |
+| [Strike extension](https://tiptap.dev/docs/editor/extensions/marks/strike) | Tachado, no StarterKit | já vem no StarterKit |
+| [Subscript extension](https://tiptap.dev/docs/editor/extensions/marks/subscript) | Subscrito | fórmula química simples |
+| [Superscript extension](https://tiptap.dev/docs/editor/extensions/marks/superscript) | Sobrescrito | nota, potência |
+| [TextStyle extension](https://tiptap.dev/docs/editor/extensions/marks/text-style) | Marca `<span>` com estilo, base de cor, fonte e tamanho | só junto de Color, FontFamily, FontSize, LineHeight |
+| [Underline extension](https://tiptap.dev/docs/editor/extensions/marks/underline) | Sublinhado, no StarterKit | já vem no StarterKit; na web sublinhado parece link |
+| [Functionality extensions](https://tiptap.dev/docs/editor/extensions/functionality) | Índice das extensões de funcionalidade | consulta |
+| [Integrate basic AI workflows into your editor](https://tiptap.dev/docs/editor/extensions/functionality/ai-generation) | **Pro/Cloud (pago, exige conta Tiptap)**: geração por IA básica, documentada na área AI | fora do pedido; só com decisão do projeto |
+| [Build AI agents with document awareness and editing](https://tiptap.dev/docs/editor/extensions/functionality/ai-toolkit) | **Pro/Cloud (pago, exige conta Tiptap)**: AI Toolkit para agentes que leem e editam o documento | fora do pedido; só com decisão do projeto |
+| [Background Color extension](https://tiptap.dev/docs/editor/extensions/functionality/background-color) | Cor de fundo no texto (via TextStyle) | raro: cor livre foge do tema; prefira Highlight com cores fixas |
+| [CollaborationCaret extension](https://tiptap.dev/docs/editor/extensions/functionality/collaboration-caret) | Cursor e seleção dos outros participantes em colaboração | junto com Collaboration |
+| [Color extension](https://tiptap.dev/docs/editor/extensions/functionality/color) | Cor do texto (via TextStyle) | só com paleta fechada do tema, contraste conferido |
+| [Integrate Comments into your editor](https://tiptap.dev/docs/editor/extensions/functionality/comments) | **Pro/Cloud (pago, exige conta Tiptap)**: comentários em thread, ver área Comments | só com decisão do projeto |
+| [Drag Handle extension](https://tiptap.dev/docs/editor/extensions/functionality/drag-handle) | Alça para arrastar blocos (JavaScript puro) | a base da versão React |
+| [Drag Handle React extension](https://tiptap.dev/docs/editor/extensions/functionality/drag-handle-react) | Alça de arraste de bloco como componente React | reordenar bloco no editor; tem de ter alternativa por teclado ou menu (`frontend.md` §10.2) |
+| [Drag Handle vue extension](https://tiptap.dev/docs/editor/extensions/functionality/drag-handle-vue) | Alça de arraste para Vue | fora da stack: Vue |
+| [Dropcursor extension](https://tiptap.dev/docs/editor/extensions/functionality/dropcursor) | Indicador de onde o arrastado vai cair, no StarterKit | já vem no StarterKit |
+| [Export](https://tiptap.dev/docs/editor/extensions/functionality/export) | **Pro/Cloud (pago, exige conta Tiptap)**: exportação (legado), aponta para Conversion | não usar; legado com fim anunciado para 2026 |
+| [FileHandler extension](https://tiptap.dev/docs/editor/extensions/functionality/filehandler) | Trata arquivo solto ou colado no editor (`onDrop`, `onPaste`, tipos aceitos) | upload de imagem por arrastar e colar, enviando para o storage antes de inserir a URL |
+| [Find and Replace extension](https://tiptap.dev/docs/editor/extensions/functionality/find-and-replace) | Localizar e substituir, sem UI (ver `guides/find-and-replace`) | texto longo |
+| [Focus extension](https://tiptap.dev/docs/editor/extensions/functionality/focus) | Classe no nó que tem o foco | modo de foco em texto longo |
+| [FontFamily extension](https://tiptap.dev/docs/editor/extensions/functionality/fontfamily) | Família de fonte (via TextStyle) | raro: a fonte é do tema |
+| [FontSize extension](https://tiptap.dev/docs/editor/extensions/functionality/fontsize) | Tamanho de fonte (via TextStyle) | raro: tamanho vem do título, não de valor livre |
+| [Gapcursor extension](https://tiptap.dev/docs/editor/extensions/functionality/gapcursor) | Cursor em lugar sem texto (antes de tabela, imagem), no StarterKit | já vem no StarterKit |
+| [Import](https://tiptap.dev/docs/editor/extensions/functionality/import) | **Pro/Cloud (pago, exige conta Tiptap)**: importação (legado), aponta para Conversion | não usar; legado com fim anunciado para 2026 |
+| [InvisibleCharacters extensions](https://tiptap.dev/docs/editor/extensions/functionality/invisiblecharacters) | Mostra espaço, quebra e fim de parágrafo | editor de revisão; raro |
+| [Line Height extension](https://tiptap.dev/docs/editor/extensions/functionality/line-height) | Altura de linha (via TextStyle) | raro: vem do tema |
+| [ListKit extension](https://tiptap.dev/docs/editor/extensions/functionality/list-kit) | Todas as extensões de lista num pacote só | quando o StarterKit não está em uso |
+| [List Keymap extension](https://tiptap.dev/docs/editor/extensions/functionality/listkeymap) | Atalhos de teclado de lista (Backspace e Delete entre itens) | lista se comporta como em editor de texto comum |
+| [Professional page-based layout](https://tiptap.dev/docs/editor/extensions/functionality/pages) | **Pro/Cloud (pago, exige conta Tiptap)**: layout paginado, ver área Pages | fora do uso da casa |
+| [Paste Handler](https://tiptap.dev/docs/editor/extensions/functionality/paste-handler) | **Pro/Cloud (pago, exige conta Tiptap)**: tratamento de colagem (`@tiptap-pro/extension-paste-handler`) | `transformPastedHTML` da Extension API resolve o caso comum |
+| [Selection extension](https://tiptap.dev/docs/editor/extensions/functionality/selection) | Mantém a seleção visível quando o editor perde o foco | barra que abre popover (link) sem perder a seleção |
+| [Integrate Snapshots into your editor](https://tiptap.dev/docs/editor/extensions/functionality/snapshot) | **Pro/Cloud (pago, exige conta Tiptap)**: histórico de versões | só com decisão do projeto |
+| [Snapshot Compare Extension](https://tiptap.dev/docs/editor/extensions/functionality/snapshot-compare) | **Pro/Cloud (pago, exige conta Tiptap)**: comparar versões do histórico | só com decisão do projeto |
+| [TableKit extension](https://tiptap.dev/docs/editor/extensions/functionality/table-kit) | Tabela, linha, célula e cabeçalho num pacote | conteúdo com tabela; tabela no leitor precisa de rolagem horizontal própria |
+| [Table of Contents extension](https://tiptap.dev/docs/editor/extensions/functionality/table-of-contents) | Sumário a partir dos títulos, com ids | artigo longo; no static renderer o id não é gerado (ver armadilha de `static-renderer`) |
+| [TextStyleKit extension](https://tiptap.dev/docs/editor/extensions/functionality/text-style-kit) | TextStyle, cor, fundo, fonte, tamanho e altura de linha num pacote | raro: estilo livre foge do tema |
+| [TextAlign extension](https://tiptap.dev/docs/editor/extensions/functionality/textalign) | Alinhamento de texto em títulos e parágrafos | justificado só se o projeto pedir |
+| [Tracked Changes extension](https://tiptap.dev/docs/editor/extensions/functionality/tracked-changes) | **Pro/Cloud (pago, exige conta Tiptap)**: modo sugestão, ver área Tracked Changes | só com decisão do projeto |
+| [Trailing Node extension](https://tiptap.dev/docs/editor/extensions/functionality/trailing-node) | Garante um parágrafo vazio no fim do documento | sempre que o documento pode terminar em imagem ou tabela |
+| [Typography extension](https://tiptap.dev/docs/editor/extensions/functionality/typography) | Troca tipográfica ao digitar (aspas curvas, reticências, travessão) | cuidado: gera travessão no texto do usuário; avaliar por projeto |
+| [Undo/Redo extension](https://tiptap.dev/docs/editor/extensions/functionality/undo-redo) | Desfazer e refazer, no StarterKit | já vem no StarterKit; desligar com Collaboration (o Y.js tem o próprio) |
+| [UniqueID extension](https://tiptap.dev/docs/editor/extensions/functionality/uniqueid) | Id único em cada nó (`@tiptap/extension-unique-id`) | âncora e comentário próprio; gerar o id antes de renderizar estático |
+| [Mark views with JavaScript](https://tiptap.dev/docs/editor/extensions/custom-extensions/mark-views/javascript) | Mark view em JavaScript puro | fora da stack: na casa a variante é React (`mark-views/react`) |
+| [Mark views with Vue](https://tiptap.dev/docs/editor/extensions/custom-extensions/mark-views/vue) | Mark view em Vue | fora da stack: Vue |
+| [Node views with JavaScript](https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/javascript) | Node view em JavaScript puro | fora da stack: na casa a variante é React (`node-views/react`) |
+| [Node views with Vue](https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/vue) | Node view em Vue | fora da stack: Vue |
+
+## Catálogo: exemplos
+
+Demonstrações com código aberto. Exemplo não é extensão suportada: copie a ideia, não o arquivo.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Examples](https://tiptap.dev/docs/examples) | Índice dos exemplos | consulta |
+| [Tiptap Editor with customized extensions](https://tiptap.dev/docs/examples/advanced/clever-editor) | Editor com extensões bem customizadas | como referência ao montar o recurso equivalente |
+| [Collaborative editing implementation](https://tiptap.dev/docs/examples/advanced/collaborative-editing) | Edição colaborativa com Y.js e cursores | junto da área Collaboration (Pro/Cloud) ou de servidor próprio |
+| [Tiptap Editor with a canvas drawing node](https://tiptap.dev/docs/examples/advanced/drawing) | Nó de desenho em canvas | ver o aviso de `node-views/examples` sobre colaboração |
+| [Enforcing a content structure](https://tiptap.dev/docs/examples/advanced/forced-content-structure) | Documento com estrutura forçada (título obrigatório no topo) | campo com formato fixo (título + corpo) |
+| [Interactive React & Vue views](https://tiptap.dev/docs/examples/advanced/interactive-react-and-vue-views) | Node view interativo em React e Vue | só a metade React |
+| [Mentions in Tiptap](https://tiptap.dev/docs/examples/advanced/mentions) | Menções com o Suggestion | menção de usuário |
+| [Bubble & floating menu implementation](https://tiptap.dev/docs/examples/advanced/menus) | Bubble menu e floating menu | barra contextual |
+| [React rendering performance](https://tiptap.dev/docs/examples/advanced/react-performance) | Renderização em React com desempenho | junto de `guides/performance` |
+| [Using the CodeBlockLowlight extension in Tiptap](https://tiptap.dev/docs/examples/advanced/syntax-highlighting) | Realce de código com CodeBlockLowlight | artigo técnico |
+| [Default text editor](https://tiptap.dev/docs/examples/basics/default-text-editor) | Editor padrão com StarterKit e barra | ponto de partida |
+| [Formatting](https://tiptap.dev/docs/examples/basics/formatting) | Formatação de texto e alinhamento | como referência ao montar o recurso equivalente |
+| [Images](https://tiptap.dev/docs/examples/basics/images) | Imagens no editor | como referência ao montar o recurso equivalente |
+| [Long texts](https://tiptap.dev/docs/examples/basics/long-texts) | Texto longo e desempenho | como referência ao montar o recurso equivalente |
+| [Markdown shortcuts in Tiptap](https://tiptap.dev/docs/examples/basics/markdown-shortcuts) | Atalhos Markdown ao digitar (input rules) | como referência ao montar o recurso equivalente |
+| [Minimal setup for paragraphs & text only](https://tiptap.dev/docs/examples/basics/minimal-setup) | Só parágrafo e texto | campo de texto rico mínimo |
+| [Adding table support to Tiptap](https://tiptap.dev/docs/examples/basics/tables) | Tabelas | como referência ao montar o recurso equivalente |
+| [Task lists in Tiptap](https://tiptap.dev/docs/examples/basics/tasks) | Listas de tarefas | como referência ao montar o recurso equivalente |
+| [Text direction & RTL support](https://tiptap.dev/docs/examples/basics/text-direction) | Direção de texto e RTL | como referência ao montar o recurso equivalente |
+| [Multiple fields on collaborative document](https://tiptap.dev/docs/examples/experiments/collaborative-fields) | Vários campos num documento colaborativo | experimento |
+| [Example code editor with Figures](https://tiptap.dev/docs/examples/experiments/figure) | Figura com legenda | experimento |
+| [Image & Table figures via a generic figure](https://tiptap.dev/docs/examples/experiments/generic-figure) | Figura genérica para imagem e tabela | experimento |
+| [Integrate an iFrame into your Editor](https://tiptap.dev/docs/examples/experiments/iframe) | Nó de iframe | experimento; CSP `frame-src` restrita |
+| [Linting example in Tiptap](https://tiptap.dev/docs/examples/experiments/linting) | Linter de conteúdo com decorações | experimento; revisão de texto |
+| [Code editor with Slash Commands](https://tiptap.dev/docs/examples/experiments/slash-commands) | Comandos de barra (`/`) com o Suggestion | experimento; base de menu de inserção |
+
+## Fora da stack
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Alpine](https://tiptap.dev/docs/editor/getting-started/install/alpine) | Instalação com Alpine.js | fora da stack: o frontend da casa é React sobre TanStack Start |
+| [Next.js](https://tiptap.dev/docs/editor/getting-started/install/nextjs) | Instalação com Next.js (React com App Router e `'use client'`) | fora da stack: a casa usa TanStack Start, não Next.js; o que vale do React está em `install/react` (acima) |
+| [Nuxt](https://tiptap.dev/docs/editor/getting-started/install/nuxt) | Instalação com Nuxt | fora da stack: Vue |
+| [PHP](https://tiptap.dev/docs/editor/getting-started/install/php) | Instalação com PHP (Laravel Livewire) | fora da stack: PHP |
+| [Svelte](https://tiptap.dev/docs/editor/getting-started/install/svelte) | Instalação com Svelte | fora da stack: Svelte |
+| [Vanilla JavaScript](https://tiptap.dev/docs/editor/getting-started/install/vanilla-javascript) | Instalação com JavaScript puro (`new Editor`) | fora da stack: na casa o editor nasce do `useEditor` do `@tiptap/react` |
+| [Vue 2](https://tiptap.dev/docs/editor/getting-started/install/vue2) | Instalação com Vue 2 | fora da stack: Vue |
+| [Vue 3](https://tiptap.dev/docs/editor/getting-started/install/vue3) | Instalação com Vue 3 | fora da stack: Vue |
+| [Tiptap for PHP utility](https://tiptap.dev/docs/editor/api/utilities/tiptap-for-php) | Pacote PHP que converte JSON em HTML e sanitiza | fora da stack: o backend é Node; a casa renderiza com o static renderer |
+| [Highlight Search Terms with Decorations in Vanilla JS](https://tiptap.dev/docs/guides/decorations-vanilla) | Destaque por decorações em JavaScript puro | fora da stack: a versão React é `guides/decorations-react` |
+| [Highlight Search Terms with Decorations in Vue 3](https://tiptap.dev/docs/guides/decorations-vue) | Destaque por decorações em Vue 3 | fora da stack: Vue |
+
+## Pro/Cloud (pago, exige conta Tiptap)
+
+Tudo desta seção é **Pro/Cloud (pago, exige conta Tiptap)**: pacote `@tiptap-pro/*` do registro
+privado (`guides/pro-extensions`), serviço na Tiptap Cloud ou programa piloto com contato comercial.
+A página de visão geral de cada área foi aberta; as linhas seguem o índice oficial
+(`https://tiptap.dev/docs/llms.txt`) e o menu lateral. Nada aqui entra sem decisão do projeto em
+`docs/DECISIONS.md`, com custo, token no CI e o caminho de saída se o plano acabar.
+
+### Licença
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Tiptap Pro license](https://tiptap.dev/pro-license) | Termos da licença Tiptap Pro (extensões, UI Components e templates pagos): uso perpétuo após pagamento, só por empresa, sem redistribuir como produto avulso, cópia da licença em toda distribuição | ler antes de adotar qualquer pacote pago; a licença viaja com o produto que o embute |
+
+### UI Components
+
+A visão geral (`ui-components/getting-started/overview`) diz que o componente segue a licença da
+extensão em que se apoia: sobre extensão aberta (Bold, Heading, Image) é MIT; sobre recurso pago
+(Comments, histórico, IA) exige assinatura Cloud. Não é pacote npm: o CLI (`npx @tiptap/cli`) copia
+o código-fonte para o projeto, com `login` para os pagos; o estilo é SCSS e os primitivos são
+próprios (o Menu é sobre Ariakit). A casa usa Tailwind v4 e primitivos do shadcn sobre Base UI
+(`frontend.md` §6, §6.4): sirva-se do código como referência de comportamento; não instale o kit.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Integrate Tiptap UI Components](https://tiptap.dev/docs/ui-components/getting-started/overview) | Visão geral: licença por componente, instalação por CLI, componentes, nós e primitivos | ler antes de copiar qualquer peça |
+| [Using the Tiptap CLI](https://tiptap.dev/docs/ui-components/getting-started/cli) | CLI que copia componentes e templates, com `login` para os pagos | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Style Tiptap UI Components](https://tiptap.dev/docs/ui-components/getting-started/style) | Estilo em SCSS com variáveis e animações | conflita com Tailwind v4 da casa |
+| [changelog](https://tiptap.dev/docs/ui-components/getting-started/changelog) | Histórico de mudanças dos componentes | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Astro](https://tiptap.dev/docs/ui-components/install/astro) | Instalação em Astro | fora da stack |
+| [Laravel](https://tiptap.dev/docs/ui-components/install/laravel) | Instalação em Laravel | fora da stack |
+| [Manual Installation](https://tiptap.dev/docs/ui-components/install/manual) | Instalação manual, sem template | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Next.js](https://tiptap.dev/docs/ui-components/install/next) | Instalação em Next.js | fora da stack |
+| [React Router](https://tiptap.dev/docs/ui-components/install/react-router) | Instalação em React Router | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Vite](https://tiptap.dev/docs/ui-components/install/vite) | Instalação em Vite | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Components overview](https://tiptap.dev/docs/ui-components/components/overview) | Lista de componentes e primitivos | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [AI Ask Button](https://tiptap.dev/docs/ui-components/components/ai-ask-button) | Botão de pedir à IA sobre a seleção (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [AI Menu](https://tiptap.dev/docs/ui-components/components/ai-menu) | Menu contextual de IA (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Blockquote Button](https://tiptap.dev/docs/ui-components/components/blockquote-button) | Botão de citação | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Code Block Button](https://tiptap.dev/docs/ui-components/components/code-block-button) | Botão de bloco de código | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Color Highlight Button](https://tiptap.dev/docs/ui-components/components/color-highlight-button) | Botão de marca-texto com cores predefinidas | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Color highlight popover](https://tiptap.dev/docs/ui-components/components/color-highlight-popover) | Popover de escolha de marca-texto | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Color Text Button](https://tiptap.dev/docs/ui-components/components/color-text-button) | Botão de cor do texto | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Color Text Popover](https://tiptap.dev/docs/ui-components/components/color-text-popover) | Popover de cor de texto e de destaque com cores recentes | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Copy Anchor Link Button](https://tiptap.dev/docs/ui-components/components/copy-anchor-link-button) | Copia link de âncora para um bloco | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Copy to Clipboard Button](https://tiptap.dev/docs/ui-components/components/copy-to-clipboard-button) | Copia seleção ou nó com formatação | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Delete Node Button](https://tiptap.dev/docs/ui-components/components/delete-node-button) | Apaga o bloco selecionado | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Drag Context Menu](https://tiptap.dev/docs/ui-components/components/drag-context-menu) | Alça de arraste com menu de ações do bloco | bom modelo de alternativa ao arraste (mover por menu) |
+| [Duplicate Button](https://tiptap.dev/docs/ui-components/components/duplicate-button) | Duplica o bloco | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Emoji Dropdown Menu](https://tiptap.dev/docs/ui-components/components/emoji-dropdown-menu) | Seletor de emoji por `:` com busca | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Emoji Menu](https://tiptap.dev/docs/ui-components/components/emoji-menu) | Menu de emoji com busca | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Emoji Trigger Button](https://tiptap.dev/docs/ui-components/components/emoji-trigger-button) | Botão que insere o gatilho de emoji | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Font Family Combobox](https://tiptap.dev/docs/ui-components/components/font-family-combobox) | Combobox de família de fonte com prévia | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Heading Button](https://tiptap.dev/docs/ui-components/components/heading-button) | Botão que alterna níveis de título | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Heading Dropdown Menu](https://tiptap.dev/docs/ui-components/components/heading-dropdown-menu) | Menu de escolha de título | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Image Align Button](https://tiptap.dev/docs/ui-components/components/image-align-button) | Alinhamento de imagem | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Image Upload Button](https://tiptap.dev/docs/ui-components/components/image-upload-button) | Botão de upload e inserção de imagem | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Improve Dropdown](https://tiptap.dev/docs/ui-components/components/improve-dropdown) | Menu de melhorar texto com IA (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Link Popover](https://tiptap.dev/docs/ui-components/components/link-popover) | Popover de link | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [List Button](https://tiptap.dev/docs/ui-components/components/list-button) | Botão de lista (marcadores, numerada, tarefas) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [List Dropdown Menu](https://tiptap.dev/docs/ui-components/components/list-dropdown-menu) | Menu de tipo de lista | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Mark Button](https://tiptap.dev/docs/ui-components/components/mark-button) | Botão de marca (negrito, itálico, sublinhado) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Mention Dropdown Menu](https://tiptap.dev/docs/ui-components/components/mention-dropdown-menu) | Menu de menção de usuários | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Mention Trigger Button](https://tiptap.dev/docs/ui-components/components/mention-trigger-button) | Botão que insere o gatilho de menção | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Move Node Button](https://tiptap.dev/docs/ui-components/components/move-node-button) | Move bloco para cima ou para baixo | modelo da alternativa de um ponteiro ao arraste |
+| [Numbering Format Dropdown Menu](https://tiptap.dev/docs/ui-components/components/numbering-format-dropdown-menu) | Formato de numeração de lista ordenada | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Reset All Formatting Button](https://tiptap.dev/docs/ui-components/components/reset-all-formatting-button) | Remove toda a formatação da seleção | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Search and Replace](https://tiptap.dev/docs/ui-components/components/search-and-replace) | Painel de localizar e substituir | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Slash Command Trigger Button](https://tiptap.dev/docs/ui-components/components/slash-command-trigger-button) | Botão que insere o gatilho de comando `/` | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Slash Dropdown Menu](https://tiptap.dev/docs/ui-components/components/slash-dropdown-menu) | Paleta de comandos por `/` | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Text align button](https://tiptap.dev/docs/ui-components/components/text-align-button) | Botão de alinhamento | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Text Button](https://tiptap.dev/docs/ui-components/components/text-button) | Converte bloco em parágrafo | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Turn Into Dropdown](https://tiptap.dev/docs/ui-components/components/turn-into-dropdown) | Menu "transformar em" (título, lista, citação) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Undo Redo Button](https://tiptap.dev/docs/ui-components/components/undo-redo-button) | Botões de desfazer e refazer | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Zoom Dropdown Menu](https://tiptap.dev/docs/ui-components/components/zoom-dropdown-menu) | Controle de zoom (feito para Pages) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Blockquote Node](https://tiptap.dev/docs/ui-components/node-components/blockquote-node) | Visual do nó de citação | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Code Block Node](https://tiptap.dev/docs/ui-components/node-components/code-block-node) | Visual do bloco de código | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Heading Node](https://tiptap.dev/docs/ui-components/node-components/heading-node) | Visual dos títulos | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Horizontal Rule Node](https://tiptap.dev/docs/ui-components/node-components/horizontal-rule-node) | Visual da linha horizontal | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Image Node](https://tiptap.dev/docs/ui-components/node-components/image-node) | Visual da imagem | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Image Node Pro](https://tiptap.dev/docs/ui-components/node-components/image-node-pro) | Imagem redimensionável com legenda e alinhamento (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Image Upload Node](https://tiptap.dev/docs/ui-components/node-components/image-upload-node) | Nó de upload de imagem | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [List Node](https://tiptap.dev/docs/ui-components/node-components/list-node) | Visual das listas | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Paragraph Node](https://tiptap.dev/docs/ui-components/node-components/paragraph-node) | Visual do parágrafo | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Table Node](https://tiptap.dev/docs/ui-components/node-components/table-node) | Visual da tabela | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Table of Contents Node](https://tiptap.dev/docs/ui-components/node-components/table-of-contents-node) | Visual do sumário | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Integrate the Avatar UI component](https://tiptap.dev/docs/ui-components/primitives/avatar) | Primitivo Avatar | a casa usa o do kit |
+| [Add a badge UI component to your Editor](https://tiptap.dev/docs/ui-components/primitives/badge) | Primitivo Badge | a casa usa o do kit |
+| [Integrate a button in your Editor](https://tiptap.dev/docs/ui-components/primitives/button) | Primitivo Button | a casa usa o do kit |
+| [Integrate the Card UI component](https://tiptap.dev/docs/ui-components/primitives/card) | Primitivo Card | a casa usa o do kit |
+| [Integrate the Combobox UI component](https://tiptap.dev/docs/ui-components/primitives/combobox) | Primitivo Combobox | a casa usa o do kit |
+| [Add a dropdown menu to Tiptap](https://tiptap.dev/docs/ui-components/primitives/dropdown-menu) | Primitivo DropdownMenu | a casa usa o Menu do Base UI |
+| [Integrate the Input UI component](https://tiptap.dev/docs/ui-components/primitives/input) | Primitivo Input | a casa usa o do kit |
+| [Integrate the Label UI component](https://tiptap.dev/docs/ui-components/primitives/label) | Primitivo Label | a casa usa o do kit |
+| [Integrate the Menu UI component](https://tiptap.dev/docs/ui-components/primitives/menu) | Primitivo Menu sobre Ariakit, com busca | a casa usa o Menu do Base UI |
+| [Integrate a popover UI component](https://tiptap.dev/docs/ui-components/primitives/popover) | Primitivo Popover | a casa usa o Popover do Base UI |
+| [Add a separator into Tiptap](https://tiptap.dev/docs/ui-components/primitives/separator) | Primitivo Separator | a casa usa o do kit |
+| [Add a spacer UI component into Tiptap](https://tiptap.dev/docs/ui-components/primitives/spacer) | Primitivo Spacer | utilitário de layout do Tailwind resolve |
+| [Integrate the TextareaAutosize UI component](https://tiptap.dev/docs/ui-components/primitives/textarea-autosize) | Textarea que cresce com o conteúdo (react-textarea-autosize) | `field-sizing: content` do CSS resolve sem dependência |
+| [Add a toolbar UI component into Tiptap](https://tiptap.dev/docs/ui-components/primitives/toolbar) | Primitivo Toolbar | a casa usa o Toolbar do Base UI |
+| [Add a tooltip UI component to your Editor](https://tiptap.dev/docs/ui-components/primitives/tooltip) | Primitivo Tooltip | a casa usa o Tooltip do Base UI |
+| [DOCX Editor](https://tiptap.dev/docs/ui-components/templates/docx-editor) | Template de editor estilo Word com Pages e colaboração (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Notion-like](https://tiptap.dev/docs/ui-components/templates/notion-like-editor) | Template estilo Notion com colaboração e IA (pago) | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Simple template](https://tiptap.dev/docs/ui-components/templates/simple-editor) | Template simples só com extensões abertas (MIT) | a melhor referência de barra para o `rich-editor` da casa |
+| [Floating Element](https://tiptap.dev/docs/ui-components/utils-components/floating-element) | Elemento flutuante que acompanha a seleção | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+| [Suggestion Menu](https://tiptap.dev/docs/ui-components/utils-components/suggestion-menu) | Menu de sugestão genérico por caractere | referência de comportamento; a peça da casa vem do kit sobre Base UI |
+
+### Collaboration
+
+A visão geral tem entrada própria acima (`collaboration/getting-started/overview`). A extensão
+`@tiptap/extension-collaboration` é aberta; o que esta área documenta é o servidor e o provider da
+Tiptap Cloud (`TiptapCollabProvider`, `@tiptap-pro/provider`).
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Install Collaboration](https://tiptap.dev/docs/collaboration/getting-started/install) | Instalação da colaboração com a Tiptap Cloud | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Authenticate and authorize in Collaboration](https://tiptap.dev/docs/collaboration/getting-started/authenticate) | Autenticação e autorização por token com escopo de documento | token assinado no backend, nunca no frontend |
+| [Awareness in Collaboration](https://tiptap.dev/docs/collaboration/core-concepts/awareness) | Presença: quem está no documento e onde está o cursor | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Webhooks in Collaboration](https://tiptap.dev/docs/collaboration/core-concepts/webhooks) | Webhooks do servidor de documentos | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Manage Documents with Tiptap](https://tiptap.dev/docs/collaboration/documents) | Gestão de documentos na Cloud | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Inject content REST API](https://tiptap.dev/docs/collaboration/documents/content-injection) | API REST para injetar conteúdo JSON num documento | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Document management API](https://tiptap.dev/docs/collaboration/documents/rest-api) | API REST de gestão de documentos | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Integrate snapshots](https://tiptap.dev/docs/collaboration/documents/snapshot) | Histórico de versões manual e automático | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Compare document versions](https://tiptap.dev/docs/collaboration/documents/snapshot-compare) | Comparar versões do histórico | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Runtime configuration](https://tiptap.dev/docs/collaboration/operations/configure) | Configuração do servidor em tempo de execução | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Server metrics and statistics](https://tiptap.dev/docs/collaboration/operations/metrics) | Métricas e estatísticas do servidor | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [State and change events](https://tiptap.dev/docs/collaboration/provider/events) | Eventos de estado e de mudança do provider | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Integrate the Collaboration provider](https://tiptap.dev/docs/collaboration/provider/integration) | Configuração do provider de sincronização | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Authentication with Collaboration](https://tiptap.dev/docs/guides/authentication) | Guia de tokens de colaboração gerados no servidor | token assinado no backend, segredo no ENV |
+| [Collaboration API](https://tiptap.dev/docs/guides/collaboration-api) | API de colaboração | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Name and structure your Collaboration documents](https://tiptap.dev/docs/guides/naming-documents) | Nome e organização de documentos colaborativos (id único, fragmentos Y.js) | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+| [Add offline support to your editor](https://tiptap.dev/docs/guides/offline-support) | Edição offline com sincronização ao voltar | só com decisão do projeto por colaboração em tempo real na Tiptap Cloud |
+
+### Comments
+
+A visão geral (`comments/getting-started/overview`): comentários inline, de documento e de barra
+lateral, por extensão no editor, por API REST ou por webhook, em cima da Tiptap Cloud.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Integrate Comments into your app](https://tiptap.dev/docs/comments/getting-started/overview) | Visão geral dos comentários | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Install the Comments extension](https://tiptap.dev/docs/comments/getting-started/install) | Instalação da extensão de comentários | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Configure comments](https://tiptap.dev/docs/comments/core-concepts/configure) | Configuração do provider e das classes de thread | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Manage threads in your editor](https://tiptap.dev/docs/comments/core-concepts/manage-threads) | Gestão de threads e comentários por comandos | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Style comments in your editor](https://tiptap.dev/docs/comments/core-concepts/style-threads) | Estilo e visibilidade das threads por classes de decoração | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Thread authentication](https://tiptap.dev/docs/comments/core-concepts/thread-authentication) | Regras de dono: quem edita e apaga thread e comentário | autorização também no backend |
+| [Add comments to code](https://tiptap.dev/docs/comments/integrate/code) | Comentário em código inline e em bloco | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Create comment threads via the REST API](https://tiptap.dev/docs/comments/integrate/create-thread-via-api) | Criar thread por API REST, fora do editor | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Comments editor commands](https://tiptap.dev/docs/comments/integrate/editor-commands) | Comandos de comentário no editor | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Comments REST API](https://tiptap.dev/docs/comments/integrate/rest-api) | API REST de comentários | só com decisão do projeto por comentários na Tiptap Cloud |
+| [Comments webhook](https://tiptap.dev/docs/comments/integrate/webhook) | Webhook de thread e comentário | assinatura verificada no backend |
+
+### Compare
+
+A visão geral (`compare/getting-started/overview`): add-on comprado por contato comercial
+(`@tiptap-pro/compare`), compara dois documentos ou duas versões e mostra a diferença no editor.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Compare documents with Tiptap](https://tiptap.dev/docs/compare/getting-started/overview) | Visão geral do Compare | só com decisão do projeto e add-on contratado |
+| [Commands](https://tiptap.dev/docs/compare/api-reference/commands) | Comandos do Compare | só com decisão do projeto e add-on contratado |
+| [Styling](https://tiptap.dev/docs/compare/api-reference/styling) | Estilo das diferenças | só com decisão do projeto e add-on contratado |
+| [Types](https://tiptap.dev/docs/compare/api-reference/types) | Tipos TypeScript | só com decisão do projeto e add-on contratado |
+| [Utilities](https://tiptap.dev/docs/compare/api-reference/utilities) | Funções utilitárias | só com decisão do projeto e add-on contratado |
+| [Compare documents](https://tiptap.dev/docs/compare/guides/compare-documents) | Comparar dois documentos JSON | só com decisão do projeto e add-on contratado |
+| [Compare versions](https://tiptap.dev/docs/compare/guides/compare-versions) | Comparar duas versões da colaboração | só com decisão do projeto e add-on contratado |
+| [Compare documents on the server](https://tiptap.dev/docs/compare/guides/server-compare) | Comparar no servidor | só com decisão do projeto e add-on contratado |
+| [Split view](https://tiptap.dev/docs/compare/guides/split-view) | Revisão em dois painéis, integrada ao Tracked Changes | só com decisão do projeto e add-on contratado |
+| [Compare documents with Tracked Changes](https://tiptap.dev/docs/compare/guides/tracked-changes) | Mostrar a comparação como mudanças rastreadas | só com decisão do projeto e add-on contratado |
+
+### Composable Docs
+
+Duas áreas em programa piloto (contato comercial). `composable-docs` sozinho responde 404; as
+visões gerais abertas são `content-protection/getting-started/overview` (o que cada usuário lê ou
+edita, com política por seletor) e `slots/getting-started/overview` (modelo de documento com campos
+validados).
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Content Protection](https://tiptap.dev/docs/composable-docs/content-protection/getting-started/overview) | Visão geral do Content Protection | só com decisão do projeto e acesso ao piloto |
+| [Commands](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/commands) | Comandos de política | só com decisão do projeto e acesso ao piloto |
+| [Extension](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/extension) | Opções, storage e eventos da extensão | só com decisão do projeto e acesso ao piloto |
+| [Policy language](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/policy) | Linguagem de política: seletores, permissões, precedência | regra de acesso também no backend; o editor não é fronteira de segurança |
+| [Redacted content](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/rendering) | Marcador de conteúdo oculto e seu comportamento ao copiar e exportar | só com decisão do projeto e acesso ao piloto |
+| [Types](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/types) | Tipos | só com decisão do projeto e acesso ao piloto |
+| [Utilities](https://tiptap.dev/docs/composable-docs/content-protection/api-reference/utilities) | Validar política, checar permissão, exportar conteúdo legível | só com decisão do projeto e acesso ao piloto |
+| [Example policies](https://tiptap.dev/docs/composable-docs/content-protection/guides/example-policies) | Exemplos de política | só com decisão do projeto e acesso ao piloto |
+| [Lock selected content](https://tiptap.dev/docs/composable-docs/content-protection/guides/lock-selected-content) | Travar conteúdo selecionado | só com decisão do projeto e acesso ao piloto |
+| [Slots](https://tiptap.dev/docs/composable-docs/slots/getting-started/overview) | Visão geral de Slots | só com decisão do projeto e acesso ao piloto |
+| [Commands](https://tiptap.dev/docs/composable-docs/slots/api-reference/commands) | Comandos de criar, preencher e navegar slots | só com decisão do projeto e acesso ao piloto |
+| [Configuration](https://tiptap.dev/docs/composable-docs/slots/api-reference/concepts) | Configuração e regras de conteúdo do slot | só com decisão do projeto e acesso ao piloto |
+| [Editor events](https://tiptap.dev/docs/composable-docs/slots/api-reference/events) | Eventos do editor | só com decisão do projeto e acesso ao piloto |
+| [Extension](https://tiptap.dev/docs/composable-docs/slots/api-reference/extension) | Opções e storage da extensão | só com decisão do projeto e acesso ao piloto |
+| [Rendering and NodeViews](https://tiptap.dev/docs/composable-docs/slots/api-reference/rendering) | Marcação e NodeViews do slot | só com decisão do projeto e acesso ao piloto |
+| [Types](https://tiptap.dev/docs/composable-docs/slots/api-reference/types) | Tipos | só com decisão do projeto e acesso ao piloto |
+| [Utilities](https://tiptap.dev/docs/composable-docs/slots/api-reference/utilities) | Leitores, assinaturas e políticas de preenchimento | só com decisão do projeto e acesso ao piloto |
+| [Validation](https://tiptap.dev/docs/composable-docs/slots/api-reference/validation) | Validação embutida e própria | a validação que vale é a do VineJS no backend |
+| [Table fields example](https://tiptap.dev/docs/composable-docs/slots/examples/table-fields) | Exemplo de campos em tabela | só com decisão do projeto e acesso ao piloto |
+| [Add slots to the document](https://tiptap.dev/docs/composable-docs/slots/guides/add-slots) | Inserir, configurar, preencher e desfazer slots | só com decisão do projeto e acesso ao piloto |
+| [Allow filling only](https://tiptap.dev/docs/composable-docs/slots/guides/fill-only) | Política "só preencher" | só com decisão do projeto e acesso ao piloto |
+| [Validate Slot values](https://tiptap.dev/docs/composable-docs/slots/guides/validate-submission) | Validar valores dos slots | só com decisão do projeto e acesso ao piloto |
+
+### Conversion
+
+A visão geral (`conversion/getting-started/overview`): pipeline de conversão no serviço da Tiptap
+entre arquivo (DOCX, ODT, PDF, EPUB, Markdown) e o JSON do Tiptap, por extensão no editor ou por API
+REST; `ConvertKit` (`@tiptap-pro/extension-convert-kit`) é o kit de schema; os pacotes legados
+`extension-import`/`extension-export` têm fim anunciado para 2026. Importação de Markdown na casa
+não precisa disto: é `MarkdownManager.parse()`, aberto.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Document import and export](https://tiptap.dev/docs/conversion/getting-started/overview) | Visão geral do pipeline de conversão | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Install](https://tiptap.dev/docs/conversion/getting-started/install) | Credenciais e instalação | credencial no backend |
+| [Live demo](https://tiptap.dev/docs/conversion/getting-started/demo) | Demonstração ao vivo | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Supported features](https://tiptap.dev/docs/conversion/getting-started/feature-support-matrix) | O que é suportado na importação, no editor e na exportação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Building custom extensions for conversion](https://tiptap.dev/docs/conversion/getting-started/guides/custom-extensions) | Extensão própria para conteúdo convertido | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Debugging & inspecting conversion output](https://tiptap.dev/docs/conversion/getting-started/guides/debugging) | Avisos e inspeção do JSON intermediário | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [End-to-end walkthrough: import, edit, export](https://tiptap.dev/docs/conversion/getting-started/guides/end-to-end-walkthrough) | Ida e volta completa de DOCX | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Styling converted content](https://tiptap.dev/docs/conversion/getting-started/guides/styling-converted-content) | Por que o documento importado muda de aparência | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [_regional-endpoints](https://tiptap.dev/docs/conversion/_shared/_regional-endpoints) | Fragmento compartilhado: endpoints regionais | região do serviço importa para LGPD |
+| [Content reference](https://tiptap.dev/docs/conversion/content-types/overview) | Referência por elemento do documento | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Headers and footers](https://tiptap.dev/docs/conversion/content-types/page-layout/headers-footers) | Cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks](https://tiptap.dev/docs/conversion/content-types/page-layout/page-breaks) | Quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page structure](https://tiptap.dev/docs/conversion/content-types/page-layout/page-structure) | Seções, tamanho de página, margens e numeração | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Block elements](https://tiptap.dev/docs/conversion/content-types/structures-and-media/block-elements) | Citação, código, linha horizontal e quebra | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Comments](https://tiptap.dev/docs/conversion/content-types/structures-and-media/comments) | Comentários do DOCX como threads | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Footnotes and endnotes](https://tiptap.dev/docs/conversion/content-types/structures-and-media/footnotes-endnotes) | Notas de rodapé e de fim | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Hyperlinks and bookmarks](https://tiptap.dev/docs/conversion/content-types/structures-and-media/hyperlinks-bookmarks) | Links e marcadores internos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Images](https://tiptap.dev/docs/conversion/content-types/structures-and-media/images) | Imagens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Math and equations](https://tiptap.dev/docs/conversion/content-types/structures-and-media/math-equations) | Equações | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Tables](https://tiptap.dev/docs/conversion/content-types/structures-and-media/tables) | Tabelas, células mescladas, larguras | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Word styles](https://tiptap.dev/docs/conversion/content-types/structures-and-media/word-styles) | Estilos de parágrafo e de caractere do Word | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Bold, italic, underline, strikethrough](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/bold-italic-underline-strike) | Negrito, itálico, sublinhado e tachado | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Font family and size](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/font-family-size) | Família e tamanho de fonte | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Headings](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/headings) | Títulos de 1 a 9 | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Lists](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/lists) | Listas | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Paragraphs](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/paragraphs) | Parágrafos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Subscript and superscript](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/subscript-superscript) | Subscrito e sobrescrito | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Tabs](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/tabs) | Tabulação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Task lists](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/task-lists) | Listas de tarefas | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Text alignment](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/text-alignment) | Alinhamento | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Text color and highlight](https://tiptap.dev/docs/conversion/content-types/text-and-formatting/text-color-highlight) | Cor e destaque | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [_custom-node-conversion-guide](https://tiptap.dev/docs/conversion/export/_shared/_custom-node-conversion-guide) | Fragmento compartilhado: conversão de nó próprio na exportação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [_element-overrides-rest-api](https://tiptap.dev/docs/conversion/export/_shared/_element-overrides-rest-api) | Fragmento compartilhado: sobrescrita de elemento na API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [_export-styles-guide](https://tiptap.dev/docs/conversion/export/_shared/_export-styles-guide) | Fragmento compartilhado: estilos na exportação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom nodes to .doc](https://tiptap.dev/docs/conversion/export/doc/custom-nodes) | DOC: nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export DOC from your editor](https://tiptap.dev/docs/conversion/export/doc/editor-extension) | DOC: exportar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Extend your DOC export with Headers & Footers](https://tiptap.dev/docs/conversion/export/doc/headers-footers) | DOC: cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks in DOC export](https://tiptap.dev/docs/conversion/export/doc/page-breaks) | DOC: quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom page layouts in DOC](https://tiptap.dev/docs/conversion/export/doc/page-layout) | DOC: página e margens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export DOC via REST API](https://tiptap.dev/docs/conversion/export/doc/rest-api) | DOC: exportar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom styles to DOC](https://tiptap.dev/docs/conversion/export/doc/styles) | DOC: estilos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export editor CSS as DOCX styles](https://tiptap.dev/docs/conversion/export/docx/css-to-docx) | DOCX: CSS do editor vira estilo do Word | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom nodes to .docx](https://tiptap.dev/docs/conversion/export/docx/custom-nodes) | DOCX: nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom nodes with the JSON DSL](https://tiptap.dev/docs/conversion/export/docx/custom-nodes-dsl) | DOCX: DSL JSON para nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom-nodes DSL builder (TypeScript)](https://tiptap.dev/docs/conversion/export/docx/custom-nodes-dsl-builder) | DOCX: construtor tipado da DSL | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export .docx from your editor](https://tiptap.dev/docs/conversion/export/docx/editor-extension) | DOCX: exportar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Embed custom fonts in DOCX export](https://tiptap.dev/docs/conversion/export/docx/fonts) | DOCX: fontes embutidas | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Extend your DOCX export with Headers & Footers](https://tiptap.dev/docs/conversion/export/docx/headers-footers) | DOCX: cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Customize list numbering and bullets for DOCX export](https://tiptap.dev/docs/conversion/export/docx/ordered-list-numbering) | DOCX: numeração e marcadores de lista | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks in DOCX export](https://tiptap.dev/docs/conversion/export/docx/page-breaks) | DOCX: quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom page layouts in DOCX](https://tiptap.dev/docs/conversion/export/docx/page-layout) | DOCX: página e margens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export DOCX via REST API](https://tiptap.dev/docs/conversion/export/docx/rest-api) | DOCX: exportar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom styles to .docx](https://tiptap.dev/docs/conversion/export/docx/styles) | DOCX: estilos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export tracked changes to DOCX](https://tiptap.dev/docs/conversion/export/docx/tracked-changes) | DOCX: sugestões como revisões do Word | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom nodes to .epub](https://tiptap.dev/docs/conversion/export/epub/custom-nodes) | EPUB: nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export EPUB from your editor](https://tiptap.dev/docs/conversion/export/epub/editor-extension) | EPUB: exportar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Extend your EPUB export with Headers & Footers](https://tiptap.dev/docs/conversion/export/epub/headers-footers) | EPUB: cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks in EPUB export](https://tiptap.dev/docs/conversion/export/epub/page-breaks) | EPUB: quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom page layouts in EPUB](https://tiptap.dev/docs/conversion/export/epub/page-layout) | EPUB: página e margens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export EPUB via REST API](https://tiptap.dev/docs/conversion/export/epub/rest-api) | EPUB: exportar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom styles to EPUB](https://tiptap.dev/docs/conversion/export/epub/styles) | EPUB: estilos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export Markdown from your editor](https://tiptap.dev/docs/conversion/export/markdown/editor-extension) | Markdown: exportar pelo editor | na casa, `renderToMarkdown` do static renderer (aberto) resolve |
+| [Export Markdown via REST API](https://tiptap.dev/docs/conversion/export/markdown/rest-api) | Markdown: exportar por API REST | na casa, `renderToMarkdown` do static renderer (aberto) resolve |
+| [Export custom nodes to .odt](https://tiptap.dev/docs/conversion/export/odt/custom-nodes) | ODT: nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export ODT from your editor](https://tiptap.dev/docs/conversion/export/odt/editor-extension) | ODT: exportar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Extend your ODT export with Headers & Footers](https://tiptap.dev/docs/conversion/export/odt/headers-footers) | ODT: cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks in ODT export](https://tiptap.dev/docs/conversion/export/odt/page-breaks) | ODT: quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom page layouts in ODT](https://tiptap.dev/docs/conversion/export/odt/page-layout) | ODT: página e margens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export ODT via REST API](https://tiptap.dev/docs/conversion/export/odt/rest-api) | ODT: exportar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom styles to ODT](https://tiptap.dev/docs/conversion/export/odt/styles) | ODT: estilos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom nodes to .pdf](https://tiptap.dev/docs/conversion/export/pdf/custom-nodes) | PDF: nó próprio | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export PDF from your editor](https://tiptap.dev/docs/conversion/export/pdf/editor-extension) | PDF: exportar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Extend your PDF export with Headers & Footers](https://tiptap.dev/docs/conversion/export/pdf/headers-footers) | PDF: cabeçalho e rodapé | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Page breaks in PDF export](https://tiptap.dev/docs/conversion/export/pdf/page-breaks) | PDF: quebra de página | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Custom page layouts in PDF](https://tiptap.dev/docs/conversion/export/pdf/page-layout) | PDF: página e margens | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export PDF via REST API](https://tiptap.dev/docs/conversion/export/pdf/rest-api) | PDF: exportar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Export custom styles to PDF](https://tiptap.dev/docs/conversion/export/pdf/styles) | PDF: estilos | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [ConvertKit: DOCX-aware editor extensions](https://tiptap.dev/docs/conversion/import/docx/convertkit) | ConvertKit: extensões com schema próprio para DOCX | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Inject DOCX default styles as CSS](https://tiptap.dev/docs/conversion/import/docx/css-injection) | Estilos padrão do DOCX injetados como CSS | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import custom marks with .docx](https://tiptap.dev/docs/conversion/import/docx/custom-mark-mapping) | DOCX: marca própria na importação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import custom nodes from .docx](https://tiptap.dev/docs/conversion/import/docx/custom-node-mapping) | DOCX: nó próprio na importação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import .docx in your editor](https://tiptap.dev/docs/conversion/import/docx/editor-extension) | DOCX: importar pelo editor | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Preserve images during conversion](https://tiptap.dev/docs/conversion/import/docx/image-handling) | DOCX: imagens enviadas para o seu upload | upload para o storage da casa, nunca base64 no JSON |
+| [Page breaks in DOCX import](https://tiptap.dev/docs/conversion/import/docx/page-breaks) | DOCX: quebra de página na importação | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import DOCX via REST API](https://tiptap.dev/docs/conversion/import/docx/rest-api) | DOCX: importar por API REST | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import tracked changes from DOCX](https://tiptap.dev/docs/conversion/import/docx/tracked-changes) | DOCX: revisões do Word como sugestões | só com decisão do projeto por conversão de documentos na Tiptap Cloud |
+| [Import Markdown via REST API](https://tiptap.dev/docs/conversion/import/markdown/rest-api) | Markdown: importar por API REST | na casa, `MarkdownManager.parse()` (aberto) resolve sem serviço |
+| [Legacy DOCX Import & Export](https://tiptap.dev/docs/conversion/legacy/overview) | Importação e exportação legadas | não usar; fim anunciado para 2026 |
+| [Migrating from the legacy import/export extensions](https://tiptap.dev/docs/conversion/legacy/migration-guide) | Migração das extensões legadas para as novas | só para quem já usa o legado |
+| [Convert Markdown with Tiptap (Legacy)](https://tiptap.dev/docs/conversion/legacy/markdown/editor-extensions) | Markdown pelo editor (legado) | não usar |
+| [Convert Markdown via REST API (Legacy)](https://tiptap.dev/docs/conversion/legacy/markdown/rest-api) | Markdown por API REST (legado) | não usar |
+| [Convert ODT with Tiptap (Legacy)](https://tiptap.dev/docs/conversion/legacy/odt/editor-extensions) | ODT pelo editor (legado) | não usar |
+| [Convert ODT files via REST API (Legacy)](https://tiptap.dev/docs/conversion/legacy/odt/rest-api) | ODT por API REST (legado) | não usar |
+
+### Pages
+
+A visão geral (`pages/getting-started/overview`): layout paginado (A4, Letter, formatos próprios),
+cabeçalho, rodapé e zoom, sem schema próprio (precisa de `ConvertKit` e `PagesTableKit`); a página
+declara superfície *beta* e manda fixar versão exata.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Pages](https://tiptap.dev/docs/pages/getting-started/overview) | Visão geral do Pages | só com decisão do projeto por editor de documento paginado |
+| [Install the Pages extension](https://tiptap.dev/docs/pages/getting-started/install) | Instalação | só com decisão do projeto por editor de documento paginado |
+| [Pages Live Demo](https://tiptap.dev/docs/pages/getting-started/live-demo) | Demonstração ao vivo | só com decisão do projeto por editor de documento paginado |
+| [Endnotes](https://tiptap.dev/docs/pages/core-concepts/endnotes) | Notas de fim | só com decisão do projeto por editor de documento paginado |
+| [Footnotes](https://tiptap.dev/docs/pages/core-concepts/footnotes) | Notas de rodapé por página | só com decisão do projeto por editor de documento paginado |
+| [Layout participants](https://tiptap.dev/docs/pages/core-concepts/layout-participants) | NodeView próprio participando do cálculo de página | só com decisão do projeto por editor de documento paginado |
+| [Limitations](https://tiptap.dev/docs/pages/core-concepts/limitations) | Limitações conhecidas e contornos | só com decisão do projeto por editor de documento paginado |
+| [Pages extension API reference](https://tiptap.dev/docs/pages/core-concepts/options) | Referência de opções, comandos e storage | só com decisão do projeto por editor de documento paginado |
+| [PageBreak node](https://tiptap.dev/docs/pages/core-concepts/page-break-node) | Nó de quebra de página | só com decisão do projeto por editor de documento paginado |
+| [Page format](https://tiptap.dev/docs/pages/core-concepts/page-format) | Formato de página | só com decisão do projeto por editor de documento paginado |
+| [Page gap & background](https://tiptap.dev/docs/pages/core-concepts/page-gap) | Espaço e fundo entre páginas | só com decisão do projeto por editor de documento paginado |
+| [Page header and footer](https://tiptap.dev/docs/pages/core-concepts/page-header-footer) | Cabeçalho e rodapé, inclusive primeira página diferente | só com decisão do projeto por editor de documento paginado |
+| [Zoom](https://tiptap.dev/docs/pages/core-concepts/zoom) | Zoom | só com decisão do projeto por editor de documento paginado |
+| [Adding collaboration to Pages](https://tiptap.dev/docs/pages/guides/collaboration-with-pages) | Colaboração com Pages | só com decisão do projeto por editor de documento paginado |
+| [PageKit](https://tiptap.dev/docs/pages/guides/pagekit-usage) | PageKit: Pages e tabela num pacote | só com decisão do projeto por editor de documento paginado |
+| [PagesTableKit: tables for the Pages extension](https://tiptap.dev/docs/pages/guides/pages-tablekit) | PagesTableKit: tabelas para Pages | só com decisão do projeto por editor de documento paginado |
+| [Rows that span a page break](https://tiptap.dev/docs/pages/guides/row-fragmentation) | Linha de tabela que atravessa a quebra de página | só com decisão do projeto por editor de documento paginado |
+| [Using the TableKit extension with Pages](https://tiptap.dev/docs/pages/guides/table-with-pages) | TableKit junto com Pages | só com decisão do projeto por editor de documento paginado |
+| [From zero to print-ready: Pages & DOCX export](https://tiptap.dev/docs/pages/guides/zero-to-print-ready) | Do zero ao documento pronto para impressão e DOCX | só com decisão do projeto por editor de documento paginado |
+| [cmToPixels utility](https://tiptap.dev/docs/pages/utilities/cm-to-pixels) | `cmToPixels` | só com decisão do projeto por editor de documento paginado |
+| [inchToPixels utility](https://tiptap.dev/docs/pages/utilities/inch-to-pixels) | `inchToPixels` | só com decisão do projeto por editor de documento paginado |
+| [Page formats constants](https://tiptap.dev/docs/pages/utilities/page-formats) | Constantes de formato de página | só com decisão do projeto por editor de documento paginado |
+
+### Tracked Changes
+
+A visão geral (`tracked-changes/getting-started/overview`): modo sugestão com oito tipos de
+mudança rastreada, aceitar e rejeitar por usuário. A lista "Fora de escopo" no fim deste arquivo já
+citava esta página; a linha abaixo a cataloga.
+
+| Página | O que faz | Quando usar na casa |
+|---|---|---|
+| [Track changes in your editor](https://tiptap.dev/docs/tracked-changes/getting-started/overview) | Visão geral do Tracked Changes | só com decisão do projeto por revisão com sugestões |
+| [Install the Tracked Changes extension](https://tiptap.dev/docs/tracked-changes/getting-started/install) | Instalação | só com decisão do projeto por revisão com sugestões |
+| [Basic usage](https://tiptap.dev/docs/tracked-changes/usage/basic-usage) | Ligar o rastreio, usuários, aceitar e rejeitar | só com decisão do projeto por revisão com sugestões |
+| [Advanced usage](https://tiptap.dev/docs/tracked-changes/usage/advanced-usage) | Agrupamento, junção de exclusões, colaboração | só com decisão do projeto por revisão com sugestões |
+| [Commands](https://tiptap.dev/docs/tracked-changes/api-reference/commands) | Comandos | só com decisão do projeto por revisão com sugestões |
+| [Events](https://tiptap.dev/docs/tracked-changes/api-reference/events) | Eventos | só com decisão do projeto por revisão com sugestões |
+| [Styling](https://tiptap.dev/docs/tracked-changes/api-reference/styling) | Estilo por atributos `data-*` | só com decisão do projeto por revisão com sugestões |
+| [Types](https://tiptap.dev/docs/tracked-changes/api-reference/types) | Tipos | só com decisão do projeto por revisão com sugestões |
+| [Utilities](https://tiptap.dev/docs/tracked-changes/api-reference/utilities) | Utilitários de consulta de sugestões | só com decisão do projeto por revisão com sugestões |
+| [Tracked Changes with Collaboration](https://tiptap.dev/docs/tracked-changes/examples/collaboration) | Exemplo com colaboração Y.js | só com decisão do projeto por revisão com sugestões |
+| [Tracked Changes with Comments](https://tiptap.dev/docs/tracked-changes/examples/comments) | Exemplo com comentários | só com decisão do projeto por revisão com sugestões |
+| [Simple Tracked Changes](https://tiptap.dev/docs/tracked-changes/examples/simple) | Exemplo simples com barra de sugestões | só com decisão do projeto por revisão com sugestões |
+| [Tracked Changes with Comments](https://tiptap.dev/docs/tracked-changes/guides/comments-integration) | Revisão completa com comentários | só com decisão do projeto por revisão com sugestões |
+| [Creating an editor with Tracked Changes](https://tiptap.dev/docs/tracked-changes/guides/editor-setup) | Editor com Tracked Changes em React | só com decisão do projeto por revisão com sugestões |
+| [Using NodeViews with Tracked Changes](https://tiptap.dev/docs/tracked-changes/guides/nodeview-support) | NodeViews com rastreio | só com decisão do projeto por revisão com sugestões |
+| [Build a suggestion list](https://tiptap.dev/docs/tracked-changes/guides/suggestion-list) | Barra lateral de sugestões | só com decisão do projeto por revisão com sugestões |
 
 ## Fora de escopo
 

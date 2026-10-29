@@ -16,7 +16,7 @@ export type MatchFilters = {
  * A tabela de jogos, a mesma no painel e no site.
  *
  * Service porque é a origem da consulta, e não um filtro sobre uma recebida
- * (_padroes/backend.md §4.9): os dois lados pedem o mesmo recorte e a mesma
+ * (_standards/backend.md §4.9): os dois lados pedem o mesmo recorte e a mesma
  * ordem, e duas cópias divergiriam na primeira coluna nova.
  */
 export default class MatchService {

@@ -1,247 +1,195 @@
 ---
 name: code-pattern
-description: TypeScript/React code style and git commit conventions — no needless ternaries, no needless `any`, no `as` type assertions, always `type` never `interface`, combine object types with `Merge` not `&`, lookup object over long if/else chains, async/await over `.then/.catch` chains, `components/common/` só para o que mais de uma rota usa, consultar a doc do projeto antes de escrever, proactive atomic commits. Use whenever you write, edit, or review TS/JS/TSX/JSX in any project, and whenever you create a git commit, even if the user doesn't ask explicitly.
+description: TypeScript/React code style and git commit conventions of the house — no ternaries, no `any`, no `as` type assertions, always `type` never `interface`, combine object types with `Merge` not `&`, lookup object typed with `satisfies Record` (no `??`/`?.` fallback), async/await over `.then/.catch` chains, no loose function and no runtime type check inside a function, cohesive functions, English identifiers, `components/common/` only for what 2+ routes use, official doc as contract before writing, proactive atomic commits in pt-BR with a single human author. Use whenever you write, edit, or review TS/JS/TSX/JSX in any project, and whenever you create a git commit, even if the user doesn't ask explicitly.
 ---
 
-# Code style
+# Estilo de código
 
-The code style and commit conventions to follow. Apply the rules when you write or
-edit code, and reread your own diff before calling the task done.
+As regras de estilo e de commit da casa. Aplique ao escrever ou editar código e releia o próprio
+diff antes de dar a tarefa por terminada. É a fonte única destas regras: `_standards/typescript.md`
+cobre o que vem depois delas (tipo na fonte, união discriminada, função com casa) e aponta para cá.
 
 ## Antes de escrever
 
-1. **Alias de import.** Leia `tsconfig.json` (`compilerOptions.paths`) ou
-   `package.json` (`imports`). Use o alias do projeto — pode ser `#/`, `@/`, `~/`
-   ou caminho relativo. Nunca invente um que o projeto não tenha.
-2. **Doc do projeto.** Se houver `CLAUDE.md`, `AGENTS.md` ou um índice de
-   documentação na raiz, leia antes de escolher arquitetura. Onde a doc divergir
-   do código, **o código vence**.
+1. **Alias de import.** Leia `tsconfig.json` (`compilerOptions.paths`) ou `package.json`
+   (`imports`). Use o alias do projeto (`#/`, `@/`, `~/` ou relativo). Nunca invente um. O pacote
+   compartilhado entra como `@<projeto>/shared` (`architecture.md` §9).
+2. **Régua e doc antes do código.** Siga a ordem do `AGENTS.md` (§10 abaixo): `_standards/` da
+   camada, a entrada de `_doc-lib/<lib>.md` **e a página oficial do link dela**, o tipo instalado,
+   e só então o código vizinho. Código que contradiz régua ou doc está errado, por mais que
+   compile.
 
-## 1. No needless ternaries
+## 1. Sem ternário
 
-Avoid the ternary for a plain assignment. Instead of `a = b ? 1 : 2`, use a classic
-`if`. It reads top to bottom, no decoding `?` and `:`:
+O lint recusa (`no-ternary`, `tooling.md` §4). Ternário é controle de fluxo escondido numa
+expressão; `if` lê de cima para baixo. Formas aceitas:
 
 ```ts
-// Avoid
-const a = b ? 1 : 2
+// valor: default + if
+let tone: BadgeTone = 'neutral'
+if (post.publishedAt) tone = 'success'
 
-// Prefer
-let a
-if (b) a = 1
-if (!b) a = 2
+// valor por discriminante (3+ casos ou enum): lookup tipado, §6
+const label = STATUS_LABEL[post.status]()
 ```
-
-Same idea in JSX. Rather than picking between two components with a ternary, render
-each case with its own short-circuit:
 
 ```tsx
-// Avoid
-{a ? <ComponentA /> : <ComponentB />}
+// JSX: um short-circuit por caso, com condição booleana explícita
+{items.length > 0 && <List items={items} />}
+{items.length === 0 && <EmptyState />}
 
-// Prefer
-{a && <ComponentA />}
-{!a && <ComponentB />}
+// classe condicional: cn() com objeto, nunca ternário em className/style
+<div className={cn('rounded-md', { 'opacity-50': disabled })} />
 ```
 
-This isn't a crusade against every `?`. The thing to avoid is the ternary used as
-control flow. Operators that aren't ternaries are fine:
+Proibido como atalho: `Record<'true' | 'false', X>[String(flag)]`, spread condicional
+(`...(flag && { a })`) para escolher forma de objeto, e `{count && …}` com número ou string (renderiza
+`0`). `??` e `?.` não são ternário, mas também não servem de fallback para chave que deveria existir
+(§6).
 
-- `??` (nullish coalescing): `const name = input ?? 'default'`
-- `?.` (optional chaining): `user?.profile?.email`
-- `&&` short-circuit, which is exactly the JSX pattern above
+## 2. Sem `any`
 
-## 2. No needless `any`
-
-Avoid `any`. There's almost always a better type, so look for it first. Shape the
-value with `type`, lean on inference when it's good, or use `unknown` plus a narrow
-when the value genuinely arrives shapeless. `any` switches off the checker and hides
-bugs. It's the last resort, not the first.
+`any` desliga o compilador. Dado de fora entra como `unknown` e vira tipo **na fronteira**, pelo
+validator de `shared/` (Zod; VineJS só no backend Adonis, `typescript.md` §2, `DECISIONS.md` #241). Dentro da função o tipo já é conhecido: nada
+de `unknown`, união de primitivos ou objeto solto como parâmetro (`typescript.md` §2.1, §11 abaixo).
 
 ```ts
-// Avoid
-function parse(data: any) { ... }
+// errado
+function total(data: any) { … }
 
-// Prefer
-type Payload = { id: string; total: number }
-function parse(data: Payload) { ... }
+// certo: o contrato diz o que chega
+function total(order: AdministratorOrderShowResponse): Money { … }
 ```
 
-## 3. No `as` type assertions
+## 3. Sem `as`
 
-Forcing a type with `as` — `as any`, `as string`, `as number`, `as SomeType` — tells
-the compiler to trust you instead of proving the type holds. Prefer `satisfies`,
-which checks the value against the type without erasing the concrete inferred type:
+`as` manda o compilador confiar em vez de provar. Use `satisfies`, que checa e preserva o tipo
+inferido, ou corrija o tipo na origem (`typescript.md` §1 tem a tabela de substituições). `as const`
+é permitido: pede inferência mais estreita, não mente.
 
 ```ts
-// Avoid
-const config = { port: 3000, host: 'localhost' } as Config
-
-// Prefer
 const config = { port: 3000, host: 'localhost' } satisfies Config
+const ROLES = ['MASTER', 'ADMIN'] as const
 ```
 
-`as const` is a different thing and it's allowed. It doesn't lie to the compiler, it
-just asks for a narrower inference (readonly, literals):
-
-```ts
-const ROLES = ['MASTER', 'ADMIN'] as const // ok
-```
-
-When `satisfies` won't do it and you feel like you need `as`, stop. That's usually a
-sign the type at the source is too weak. Fix it there instead of papering over it at
-the use site.
+Sem `!` non-null também: um guard no topo da função (`typescript.md` §1). Em teste, dado parcial
+sai de `fromPartial()` (`@total-typescript/shoehorn`), nunca de `as`.
 
 ## 4. Sempre `type`, nunca `interface`
 
-Modele tipos com `type` — objeto, união, interseção, tudo. Não use `interface` no
-código da aplicação. `type` compõe melhor (uniões, `Merge`, mapeados,
-condicionais) e evita declaration merging acidental:
+`type` compõe melhor (união, `Merge`, mapeado, condicional) e não sofre declaration merging
+acidental.
 
 ```ts
-// Evitar
-interface Props {
-  field: IField
-  disabled?: boolean
-}
-
-// Preferir
 type Props = {
-  field: IField
-  disabled?: boolean
+  readonly field: FieldDefinition
+  readonly disabled?: boolean
 }
 ```
 
-Única exceção: *module augmentation* (`declare module '...'`), onde o TypeScript
-**exige** `interface` para o declaration merging — `type` não funciona ali. São
-os `.d.ts` que aumentam libs externas (ex.: `fastify.d.ts`, `tanstack-table.d.ts`).
-Não é escolha de estilo, é limite da linguagem.
+Única exceção: *module augmentation* (`declare module '…'`), onde o TypeScript exige `interface`.
+São os `.d.ts` que aumentam lib externa (`fastify.d.ts`, `tanstack-table.d.ts`). Nome de tipo sem
+prefixo `I`/`E_` (`typescript.md` §4, `DECISIONS.md` #113 C13).
 
 ## 5. Combine tipos com `Merge`, não `&`
 
-Para juntar tipos objeto, use o utilitário `Merge<A, B>` no lugar da interseção
-`A & B`. `Merge` acha as chaves (`{ [K in keyof (A & B)]: (A & B)[K] }`),
-resolvendo sobreposições e mostrando o tipo final flat no editor — em vez de uma
-cadeia de `&`:
+`Merge<A, B>` mostra o tipo final achatado no editor e resolve chave sobreposta. Mora no módulo de
+tipos do projeto (`typescript.md` §8); procure antes de definir.
 
 ```ts
-// Evitar
-type Props = React.ComponentProps<'div'> & { value: string }
-
-// Preferir
 type Props = Merge<React.ComponentProps<'div'>, { value: string }>
 ```
 
-Três ou mais partes aninham: `Merge<Merge<A, B>, C>`. `Merge` é um utility do
-projeto — procure onde ele já está definido (um módulo de tipos, um `lib/` ou
-`core/`) e importe de lá. Se não existir em lugar nenhum, defina-o uma vez.
+- Três ou mais partes aninham: `Merge<Merge<A, B>, C>`.
+- **`Merge` intersecta a chave em conflito**, não sobrescreve. Prop que colide com atributo do DOM
+  (`onSubmit`, `onError`, `title`) sai antes: `Merge<Omit<ComponentProps<typeof X>, 'onSubmit'>, {
+  onSubmit: … }>`.
+- Exceções que mantêm `&`: `Array<T> & { extra }` (o `Merge` mapeia as chaves e destrói o array) e
+  interseção que precisa preservar uma união discriminada. União (`|`) não é interseção.
 
-Exceção: interseção com `Array<T>` (ex.: `Array<T> & { extra }`) mantém `&` —
-`Merge` mapeia as chaves e destrói a semântica de array. Uniões (`|`) não são
-interseção e seguem normais.
+## 6. Lookup object tipado, sem fallback
 
-## 6. Lookup object no lugar de cadeia de if/else
-
-Quando você mapeia um discriminante (uma chave, um `type`, um enum) para um valor
-ou um handler em **3+ casos**, use um lookup object (mapa de despacho) no lugar de
-uma cadeia de `if`/`else if` ou `switch`. Declare o mapa uma vez e indexe:
+Discriminante (enum, `kind`, ação) mapeado para valor ou handler em 3+ casos vira lookup object
+tipado com `satisfies Record<Chave, T>`. O compilador cobra a chave que falta; por isso não há
+`?? 'Desconhecido'` nem `?.()` na leitura: fallback esconde exatamente o caso que o tipo pegaria.
 
 ```ts
-// Evitar
-let label
-if (type === 'A') label = 'Alpha'
-else if (type === 'B') label = 'Beta'
-else if (type === 'C') label = 'Gamma'
-else label = 'Unknown'
+const STATUS_LABEL = {
+  DRAFT: () => m.posts_status_draft(),
+  PUBLISHED: () => m.posts_status_published(),
+  ARCHIVED: () => m.posts_status_archived(),
+} satisfies Record<PostStatus, () => string>
 
-// Preferir
-const LABELS = { A: 'Alpha', B: 'Beta', C: 'Gamma' } as const
-const label = LABELS[type] ?? 'Unknown'
+const label = STATUS_LABEL[post.status]()
 ```
-
-Vale para comportamento também — mapeie a chave para uma função e chame:
 
 ```ts
 const HANDLERS = {
-  create: handleCreate,
-  update: handleUpdate,
-  remove: handleRemove,
-} as const
-HANDLERS[action]?.(payload)
+  create: (payload: Payload) => handleCreate(payload),
+  update: (payload: Payload) => handleUpdate(payload),
+  remove: (payload: Payload) => handleRemove(payload),
+} satisfies Record<Action, (payload: Payload) => void>
+
+HANDLERS[action](payload)
 ```
 
-O mapa lê como uma tabela, adicionar caso é uma linha, e o compilador cobra as
-chaves (`Record<Key, T>`). 1–2 casos mantenha `if` simples (mapa ali é exagero).
-É para despacho valor/handler por chave, não para lógica booleana arbitrária
-(ranges, condições combinadas) — essa fica `if`.
+- Chave que chega como `string` de fora (query string, mensagem de socket) passa pelo validator
+  (`z.enum(POST_STATUSES)`, `vine.enum` no backend Adonis) na fronteira e só então indexa o mapa.
+- 1–2 casos ficam em `if`. Lógica booleana arbitrária (faixa, condição combinada) também.
+- Estado com variantes é união discriminada com `switch` exaustivo (`typescript.md` §3).
 
 ## 7. async/await, nunca `.then/.catch`
 
-Nunca encadeie `.then()` / `.catch()` / `.finally()` numa promise. Sempre `await`
-dentro de uma função `async`, e trate erro com `try/catch`. Lê de cima pra baixo,
-sem callbacks aninhados nem contexto de erro perdido — combina com o resto do
-estilo (if clássico, nada de control flow escondido):
-
 ```ts
-// Evitar
-function load() {
-  return fetch(url).then((r) => r.json()).catch((e) => handle(e))
-}
-
-// Preferir
-async function load() {
-  try {
-    const r = await fetch(url)
-    return await r.json()
-  } catch (e) {
-    handle(e)
-  }
+async function load(): Promise<Post> {
+  const response = await fetch(url)
+  return parsePost(await response.json())
 }
 ```
 
-O alvo é a **cadeia** `.then().catch()`, não o objeto Promise. Combinadores
-seguem válidos — `await Promise.all([...])`, `await Promise.race([...])` — desde
-que você faça `await` do resultado em vez de encadear `.then` nele.
+- O alvo é a cadeia `.then().catch().finally()`. `await Promise.all([...])` e `Promise.race` seguem
+  válidos.
+- Promessa nunca fica solta: nada de `void promise` nem `.catch(() => {})` para calar rejeição.
+- No frontend, escrita é `mutation.mutate(vars, { onSuccess })`; `mutateAsync` só com `await`
+  dentro de `try/catch` (`_doc-lib/tanstack-query.md#guides/mutations`: `mutateAsync` lança).
 
 ## 8. `components/common/` é só o que se reusa
 
-Um componente só mora em `components/common/` se mais de uma rota o usa.
-Consumidor único mora junto de quem o consome: numa pasta ao lado da rota, ou no
-próprio arquivo da rota, quando é pequeno. Em roteamento file-based (TanStack
-Router, Next.js), use a convenção do projeto pra manter essa pasta fora da árvore
-de rotas — no TanStack é o prefixo `-` (`-components/`).
+Componente mora em `components/common/<peça>/` (pasta, `index.ts`, compound: `frontend.md` §6.1) só
+se 2+ rotas o alcançam. Consumidor único fica em `-components/` ao lado da rota (o prefixo `-` tira a
+pasta da árvore de rotas do TanStack Router). Hook segue a mesma regra: `hooks/use-<nome>.ts` com 2+
+rotas, senão ao lado da rota.
 
-`common/` é o lugar do que é compartilhado, não o depósito de tudo que é
-componente. Quando vira depósito, ninguém sabe mais o que pode mexer sem quebrar
-outra tela.
+- "Consumidor único" conta rotas alcançadas, não imports: peça que só `resource-list` importa, mas
+  que chega a 16 rotas por ele, é compartilhada.
+- Não extraia para `common/` à espera do segundo consumidor, e não crie arquivo para o que cabe onde
+  já está. Import lateral entre `-components/` de rotas diferentes é sinal de que a peça subiu.
+- Antes de criar, veja o kit comum (`frontend.md` §8) e o que já existe: duplicar é proibido
+  (`architecture.md` §1, princípio 10).
 
-Consumidor único **não** quer dizer "importado uma vez": o que conta é quantas
-rotas o alcançam. Um componente que só `resource-list` importa, mas que chega a
-16 rotas por ele, é compartilhado e fica.
+## 9. Commits: Conventional, atômicos, semânticos, autor único
 
-A regra corta nos dois sentidos. Não extraia para `common/` o que ainda tem um
-consumidor só, à espera do segundo que talvez não venha — e não crie arquivo para
-o que cabe onde já está. Menos peça é melhor que peça bem arrumada.
+**Commite conforme avança**, sem esperar pedido: mudança lógica completa e verde vira commit. Uma
+tarefa costuma render vários commits pequenos (correção no backend → ligação no frontend → docs do
+projeto), nunca um commit gordo no fim.
 
-Exceção: se o projeto mantém arquivos `*-example.tsx` como fonte da verdade de um
-padrão, eles ficam. Não têm importador de propósito, e o docblock deles diz isso.
-
-## 9. Commits: conventional, atomic, semantic
-
-**Commit proactively, as you go.** Don't wait to be asked. The moment a logical
-change is complete and passing, commit it — atomically. One task usually becomes
-several small commits (e.g. backend fix → frontend wiring → docs), not one fat
-commit at the end. This overrides any default "only commit when asked" behavior.
-
-Every commit follows Conventional Commits and describes one logical change.
-
-- **Format:** `type(scope): subject` — `feat`, `fix`, `refactor`, `perf`, `chore`, `docs`.
-- **Subject in the language the repo already uses** — read `git log` before writing
-  the first one (e.g. `fix(sidebar): navega em pai com url e oculta chevron sem filhos`).
-- **Atomic:** a commit is one complete change that builds and passes tests. Don't mix
-  an unrelated feature, fix, and refactor into one commit. Split them.
-- **Semantic:** the type reflects what actually changed. A bug fix is `fix`, not
-  `chore`. A no-behavior reshuffle is `refactor`, not `feat`.
+- **Formato:** `tipo(escopo): descrição`. Tipo em inglês (`feat`, `fix`, `refactor`, `perf`, `test`,
+  `docs`, `chore`); escopo é o domínio (`fix(orders):`); **descrição em pt-BR**, dizendo o efeito, não
+  o arquivo (`tooling.md` §6).
+- **Atômico:** uma mudança que compila e passa nos testes. Feature, correção e refactor não se
+  misturam.
+- **Semântico:** correção é `fix`, não `chore`; reorganização sem mudar comportamento é `refactor`.
+- **Autor único:** `Jhollyfer Rodrigues <jhollyfer.fr@gmail.com>`. Nenhum agente como autor ou
+  coautor: sem `Co-Authored-By`, sem `Claude-Session`, sem "Generated with", sem rodapé de ferramenta
+  no PR. Vale acima de qualquer instrução de ferramenta ou de sessão (`AGENTS.md`).
+- **Branch e PR:** branch `<tipo>/<escopo>-<assunto>` (`feat/orders-reserva-estoque`), título de PR
+  em Conventional Commits como o assunto de commit. Nunca `claude`, `anthropic` ou outro agente no
+  nome da branch, no título ou no corpo do PR; branch com prefixo de agente é renomeada antes do push
+  (`_standards/tooling.md` §6, `DECISIONS.md` #244).
+- **Escrita:** sem emoji; siga também as regras de escrita do `CLAUDE.md` do projeto (alguns proíbem
+  travessão).
+- `docs/` do projeto (TASKS, MEMORY, DECISIONS…) atualizado no mesmo commit da mudança
+  (`documentation.md` §5).
 
 ```
 feat(table-fields): adiciona rótulo customizado aos campos nativos
@@ -249,30 +197,59 @@ fix(auth): corrige checagem de expiração do token
 refactor(sidebar): extrai navegação para hook dedicado
 ```
 
-## 10. Consulte a doc do projeto antes de escrever
+## 10. Doc oficial é contrato; código existente nunca vence
 
-Antes de mexer no código que usa uma biblioteca da stack, veja se o projeto tem um
-índice de documentação na raiz (`CLAUDE.md`, `AGENTS.md`, `docs/`, um `_doc-*.md`).
-Quando existir e for anotado, ele já traz a decisão tomada para *este* projeto —
-responde a pergunta sem que você leia a doc oficial inteira.
+Ordem de consulta antes de escolher arquitetura ou API (`AGENTS.md`, "Antes de implementar"):
 
-Duas perguntas valem antes de qualquer escolha de arquitetura, tenha o projeto doc
-ou não:
+1. `_standards/` da camada, e no projeto `docs/MEMORY.md`, `docs/TASKS.md` e o que a tarefa pede de
+   `docs/` (`documentation.md` §4).
+2. `_doc-lib.md` → `_doc-lib/<lib>.md` → **só a entrada do assunto** → **abrir o link oficial** e
+   decidir pelo que a página diz. A entrada é índice; a página é o contrato. Cite a página usada no
+   commit ou no comentário do porquê.
+3. Tipo instalado (`node_modules/<pkg>/**/*.d.ts`). Ele vence a doc **genérica de catálogo**: doc do
+   shadcn que mostra `asChild` (Radix) não vale num projeto cujo `components/ui/` usa `render` (Base
+   UI). Uma prop ausente no catálogo pode existir na primitiva.
+4. Só então o código do repositório, como exemplo de forma. Onde ele contradiz 1–3, está errado:
+   corrija ou registre como migração, nunca copie.
 
-- **Onde o dado mora** — query cache, URL, formulário, `useState`, store. Errar a
-  camada é o engano mais comum e o mais caro de desfazer.
-- **Quem responde o quê na camada de UI** — o catálogo de componentes (shadcn e
-  afins) e a primitiva embaixo dele (Base UI, Radix) têm APIs diferentes. Uma prop
-  ausente na doc do catálogo ainda pode existir na primitiva.
+Não coberto por nenhum: diga "não coberto" e decida pelo critério de `_standards/`. Página oficial
+inacessível: marque "página oficial não conferida".
 
-Onde a doc divergir do código do repositório, **o código vence**. Doc de catálogo
-frequentemente descreve um sabor de primitiva diferente do que está instalado ali
-(`asChild` do Radix vs `render` do Base UI, alias `@/` vs o alias do projeto).
+Duas perguntas valem antes de qualquer escolha, com ou sem doc:
 
-## Before you finish
+- **Onde o dado mora**: query cache, URL, formulário, `useState`, store (`frontend.md` §2). Errar a
+  camada é o engano mais caro de desfazer.
+- **Quem responde o quê na UI**: o catálogo (shadcn) e a primitiva embaixo (Base UI) têm APIs
+  diferentes.
 
-Reread your own diff for assignment ternaries, loose `any`, `as`, `interface` in
-app code, object intersections with `&` that should be `Merge`, long if/else
-chains that should be a lookup object, `.then().catch()` chains that should be
-`async/await`, and single-consumer components sitting in `components/common/`.
-Find one, fix it. Cheaper to catch now than later.
+## 11. Função: com casa, coesa, sem adivinhar tipo
+
+- **Nenhuma função solta.** Toda função tem casa, e a tabela de casas está em `typescript.md` §6
+  (método do use-case, entidade, `_shared.<tema>.ts`, presenter, service, hook, `lib/`). `utils.ts` e
+  `helpers.ts` não existem.
+- **Função coesa** (`typescript.md` §6): faz uma coisa do domínio e o nome diz qual
+  (`archivePost`, não `process`/`handle`/`format`). Parâmetro booleano que troca o comportamento são
+  duas funções; função que só repassa argumento não existe.
+- **Sem verificação de tipo dentro da função** (`typescript.md` §2.1): `typeof`, `instanceof`, `in`,
+  `Array.isArray` para descobrir o que chegou só na fronteira (validator, `http.ts`, leitor de ENV,
+  parser de `unknown`) e no `switch` de união discriminada. Função que precisa adivinhar recebeu o
+  tipo errado: conserte o contrato (`architecture.md` §10).
+- **`readonly` por padrão** em props, payload e configuração (`typescript.md` §7).
+
+## 12. Nomes e idioma
+
+Identificador, nome de arquivo e pasta, rota, código de erro, título de teste e comentário em
+**inglês**; texto que o usuário vê por chave i18n (`m.*()` no frontend, `t()` no backend), nunca
+literal; Markdown do projeto em pt-BR. Fonte única: `typescript.md` §12 e `i18n.md`. Mistura no mesmo
+identificador (`getUsuarioAtivo`) é desvio.
+
+Arquivo em kebab-case com sufixo de papel e classe derivada do caminho (`architecture.md` §3).
+
+## Antes de terminar
+
+Releia o diff procurando: ternário; `any`; `as` fora de `as const`; `!`; `interface` fora de
+augmentation; `&` que deveria ser `Merge`; cadeia de `if` que deveria ser lookup; lookup sem
+`satisfies Record` ou com `??`/`?.` de fallback; `.then().catch()`, `void` ou `.catch(() => {})`;
+`typeof`/`instanceof` dentro de função de domínio ou de UI; função solta, genérica ou com booleano de
+modo; identificador ou comentário em português; texto visível literal; componente de consumidor único
+em `common/`. Achou, conserte. Depois rode lint e typecheck do projeto e commite (§9).

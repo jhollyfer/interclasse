@@ -1,5 +1,5 @@
 /**
- * Cobra as convencoes de `_padroes/backend.md` e `_padroes/arquitetura.md` que o ESLint nao alcanca.
+ * Cobra as convencoes de `_standards/backend.md` e `_standards/architecture.md` que o ESLint nao alcanca.
  *
  * O ESLint ja cobra as quatro regras de escrita (ternario, `any`, `as`,
  * `interface`) e a proibicao de `new` em servico. O que sobra e o que depende de
@@ -329,7 +329,7 @@ function checkClassName(relativePath: string, source: string): Finding[] {
 
 /**
  * Acao e pasta, sempre: `<recurso>/<acao>/<acao>.{controller,use-case,spec}.ts`
- * (_padroes/arquitetura.md §3). E onde a spec da acao mora e onde quem procura
+ * (_standards/architecture.md §3). E onde a spec da acao mora e onde quem procura
  * "arquivar usuario" encontra tudo.
  */
 function checkActionFolder(relativePath: string): Finding[] {
@@ -388,7 +388,7 @@ function checkCrossFeatureImport(relativePath: string, source: string): Finding[
 /**
  * Validator de recurso: todo export `*Validator` comeca pelo recurso no
  * singular e termina na acao - `UserCreateValidator` em `users/users.validator.ts`
- * (_padroes/backend.md §3 e §4.4).
+ * (_standards/backend.md §3 e §4.4).
  */
 function checkValidatorName(relativePath: string, source: string): Finding[] {
   const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativePath)
@@ -411,7 +411,7 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * O espelho do frontend tem os mesmos exports (_padroes/arquitetura.md §4):
+ * O espelho do frontend tem os mesmos exports (_standards/architecture.md §4):
  * `app/features/<modulo>/<recurso>/<recurso>.validator.ts` e
  * `frontend/src/validators/<modulo>/<recurso>.validator.ts`. Todo export do
  * frontend existe no backend - o frontend nao valida o que a API nao conhece.
@@ -798,7 +798,7 @@ function report(findings: Finding[]): void {
   console.log(`pattern:check: ${findings.length} violacoes\n`)
   for (const a of findings) {
     console.log(`  ${a.file}:${a.line}`)
-    console.log(`      [${a.rule}] ${a.message}  (_padroes/backend.md ${a.section})`)
+    console.log(`      [${a.rule}] ${a.message}  (_standards/backend.md ${a.section})`)
   }
 
   console.log('\n  Por regra:')
