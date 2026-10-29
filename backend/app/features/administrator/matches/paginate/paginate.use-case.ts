@@ -1,32 +1,46 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
-import { PAGINATION, left, right, type Either, type Paginated } from '@interclasse/shared'
+import {
+  PAGINATION,
+  left,
+  right,
+  type AdministratorMatchPaginateResponse,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
-import MatchService from '#services/match/match.service'
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { AdministratorMatchPaginatePayload } from '#validators/administrator/matches.validator'
 
 type Payload = AdministratorMatchPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Response = Either<HTTPException, Paginated<AdministratorMatchPaginateResponse>>
 
+/** A tabela de jogos: as marcadas por horário primeiro, depois as sem horário por rodada. */
 @inject()
 export default class AdministratorMatchPaginateUseCase {
-  constructor(private readonly matches: MatchService) {}
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const matches = await this.matches
-        .schedule(payload)
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: matches.getMeta(), data: matches.all() })
+      return right(
+        await this.brackets.paginateMatches({
+          ...payload,
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          order: 'schedule',
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[matches > paginate][error]')
+      logger.error({ err: error }, '[administrator/matches > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_MATCH_PAGINATE_ERROR',
         ),
       )

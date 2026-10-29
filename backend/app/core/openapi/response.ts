@@ -14,8 +14,14 @@ import {
   AdministratorBracketPaginateResponse,
   AdministratorBracketPreviewResponse,
   AdministratorBracketShowResponse,
+  AdministratorMatchAthletesResponse,
+  AdministratorMatchPaginateResponse,
+  AdministratorMatchScoreResponse,
+  AdministratorMatchUnscoreResponse,
+  AdministratorMatchUpdateResponse,
   StorefrontBracketPaginateResponse,
   StorefrontBracketShowResponse,
+  StorefrontMatchPaginateResponse,
 } from '@interclasse/shared'
 
 import { vine } from '#core/validator'
@@ -227,27 +233,6 @@ export const EnrollmentBoardResponse = vine.create({
   ),
 })
 
-/**
- * Os atletas que podem levar cartão numa partida: os alunos das duas turmas,
- * com os inscritos na modalidade marcados - são eles que entram em quadra.
- */
-export const MatchAthletesResponse = vine.create({
-  teams: vine.array(
-    vine.object({
-      teamId: vine.string().uuid(),
-      classroomId: vine.string().uuid(),
-      name: vine.string(),
-      students: vine.array(
-        vine.object({
-          id: vine.string().uuid(),
-          name: vine.string(),
-          enrolled: vine.boolean(),
-        }),
-      ),
-    }),
-  ),
-})
-
 // ---------------------------------------------------------------------------
 // O registro, por diretório de feature
 // ---------------------------------------------------------------------------
@@ -373,7 +358,15 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/brackets': AdministratorBracketPaginateResponse,
   'administrator/brackets/show': AdministratorBracketShowResponse,
   'administrator/brackets/preview': AdministratorBracketPreviewResponse,
-  'administrator/matches': MATCH,
+  /**
+   * A partida: a tabela de jogos traz as turmas só com o que é público; a agenda,
+   * o placar e o desfazer devolvem a partida mexida, com as turmas inteiras.
+   */
+  'administrator/matches': AdministratorMatchPaginateResponse,
+  'administrator/matches/update': AdministratorMatchUpdateResponse,
+  'administrator/matches/score': AdministratorMatchScoreResponse,
+  'administrator/matches/unscore': AdministratorMatchUnscoreResponse,
+  'administrator/matches/athletes': AdministratorMatchAthletesResponse,
   'administrator/enrollment-removals': ENROLLMENT_REMOVAL,
   'administrator/cards': MATCH_CARD,
   'advisor/cards': MATCH_CARD,
@@ -390,7 +383,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    */
   'storefront/sports': StorefrontSportShowResponse,
   'storefront/announcements': ANNOUNCEMENT,
-  'storefront/matches': MATCH,
+  'storefront/matches': StorefrontMatchPaginateResponse,
   'storefront/brackets': StorefrontBracketPaginateResponse,
   'storefront/brackets/show': StorefrontBracketShowResponse,
   'storefront/site': StorefrontSiteResponse,

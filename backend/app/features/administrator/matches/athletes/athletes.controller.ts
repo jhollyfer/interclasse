@@ -4,7 +4,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorMatchAthletesUseCase from './athletes.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchAthletesResponse } from '#core/openapi/response'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -14,7 +13,6 @@ export default class AdministratorMatchAthletesController {
     description:
       'Os alunos das duas turmas da partida, com os inscritos na modalidade marcados. É de ' +
       'onde sai o atleta de um cartão.',
-    responses: { 200: MatchAthletesResponse },
   })
 
   constructor(private readonly useCase: AdministratorMatchAthletesUseCase) {}
