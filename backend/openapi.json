@@ -4759,6 +4759,16 @@
               }
             }
           },
+          "404": {
+            "description": "Turma não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404ClassroomNotFound"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Dados inválidos",
             "content": {

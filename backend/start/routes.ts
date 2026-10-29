@@ -324,7 +324,7 @@ router
  * O professor conselheiro: alunos e inscrições das turmas que aconselha.
  *
  * O administrador entra junto para cobrir a falta de um conselheiro. Qual turma
- * cada um alcança não é regra de rota - é a `ClassroomPolicy`, por registro.
+ * cada um alcança não é regra de rota - é o escopo da consulta no `ClassroomRepository` (`findOwned`).
  */
 router
   .group(() => {
