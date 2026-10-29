@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { SignOutIcon } from '@phosphor-icons/react'
 
 import { BrandMark } from '#/components/common/brand-mark'
-import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { USER_ROLE } from '#/lib/entity'
 import {
   Sidebar as Root,

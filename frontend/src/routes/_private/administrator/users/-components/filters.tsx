@@ -8,7 +8,7 @@ import {
   USER_ROLE_LABELS,
 } from '#/lib/labels'
 import { ACTIVE_STATUSES, USER_ROLES } from '#/lib/entity'
-import type { UserListSearch } from '#/integrations/tanstack-query/queries'
+import type { UserListSearch } from '#/lib/list-search'
 
 /**
  * Os dois recortes da tela, como o `UserPaginateValidator`

@@ -5,7 +5,7 @@ import { InstagramLogoIcon } from '@phosphor-icons/react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
-import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 import { NAVIGATION } from './menu'
 import { RegulationLink } from './regulation-link'

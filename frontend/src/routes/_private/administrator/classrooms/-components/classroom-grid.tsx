@@ -19,7 +19,7 @@ import {
 } from '#/components/ui/card'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
-import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { CATEGORIES } from '#/lib/entity'
 import type { IClassroom } from '#/lib/interfaces'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS, plural } from '#/lib/labels'

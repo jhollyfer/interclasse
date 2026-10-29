@@ -32,8 +32,8 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAccountUpdate } from '#/integrations/tanstack-query/mutations'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useAccountUpdate } from '#/integrations/tanstack-query/mutations/account'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import type { IUser } from '#/lib/interfaces'
 import { initials } from '#/lib/labels'
 import { ProfileUpdateValidator } from '#/validators/account/profile.validator'

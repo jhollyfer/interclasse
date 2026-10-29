@@ -24,7 +24,7 @@ import {
   useUserArchive,
   useUserDelete,
   useUserUnarchive,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import type { IUser } from '#/lib/interfaces'
 
 import { CopyIdMenuItem } from './copy-id-menu-item'

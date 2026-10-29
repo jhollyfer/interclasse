@@ -4,7 +4,7 @@ import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import {
   storefrontBracketQueryOptions,
   storefrontBracketsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { SITE_TITLE } from '#/lib/constant'
 

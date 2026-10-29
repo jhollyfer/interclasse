@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import type { IEnrollmentBoard } from '#/lib/interfaces'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS, plural } from '#/lib/labels'
 import { cn } from '#/lib/utils'

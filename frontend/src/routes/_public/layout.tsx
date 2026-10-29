@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 import { Footer } from './-components/footer'
 import { Header } from './-components/header'

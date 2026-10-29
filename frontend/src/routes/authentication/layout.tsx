@@ -1,9 +1,10 @@
 import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
-import { validateRedirectSearch } from '#/lib/redirect-search'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { SITE_TITLE } from '#/lib/constant'
+
+import { validateSearch } from './-search'
 
 /**
  * O guard inverso: quem já tem sessão não vê o formulário de login. Fica no
@@ -11,7 +12,7 @@ import { SITE_TITLE } from '#/lib/constant'
  * coberta por estar no lugar certo.
  */
 export const Route = createFileRoute('/authentication')({
-  validateSearch: validateRedirectSearch,
+  validateSearch,
   beforeLoad: async ({ context }) => {
     try {
       await context.queryClient.query({

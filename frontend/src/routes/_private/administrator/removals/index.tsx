@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export const ADMINISTRATOR_REMOVALS = { perPage: 100 }
 

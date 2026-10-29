@@ -13,8 +13,8 @@ import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
-import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations'
-import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/representative'
+import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
 
 /** A lista de atletas da turma do representante. A turma sai da sessão. */
 export function AthletesPage(): React.JSX.Element {

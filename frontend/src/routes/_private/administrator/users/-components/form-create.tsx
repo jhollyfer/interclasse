@@ -15,7 +15,7 @@ import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { UserCreateValidator } from '#/validators/administrator/users.validator'
 import type { IUser } from '#/lib/interfaces'
 import type { UserCreatePayload } from '#/validators/administrator/users.validator'
-import { useUserCreate } from '#/integrations/tanstack-query/mutations'
+import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 

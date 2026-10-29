@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
 
 import { CardList } from '#/components/common/card-list'
-import { advisorCardsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { advisorCardsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 
 /** Os cartões que os atletas da turma levaram. Só leitura: quem lança é a organização. */
 export function ClassroomCards({

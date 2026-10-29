@@ -25,11 +25,11 @@ import {
   useMatchScore,
   useMatchUnscore,
   useMatchUpdate,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import type {
   MatchScoreVariables,
   MatchUpdateVariables,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import type { IMatch } from '#/lib/interfaces'
 import {
   MatchScoreValidator,

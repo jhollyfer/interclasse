@@ -19,7 +19,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { usePhotoCreate } from '#/integrations/tanstack-query/mutations'
+import { usePhotoCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import type { IPhoto } from '#/lib/interfaces'
 import { PhotoCreateValidator } from '#/validators/administrator/photos.validator'
 import type { PhotoCreatePayload } from '#/validators/administrator/photos.validator'

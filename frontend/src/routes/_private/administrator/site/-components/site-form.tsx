@@ -26,8 +26,8 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useSiteUpdate } from '#/integrations/tanstack-query/mutations'
-import { siteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import type { ISiteSetting } from '#/lib/interfaces'
 import { SiteUpdateValidator } from '#/validators/administrator/site.validator'
 import type { SiteUpdatePayload } from '#/validators/administrator/site.validator'

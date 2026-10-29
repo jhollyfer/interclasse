@@ -23,7 +23,7 @@ import {
   useTable,
 } from '#/components/common/table'
 import { USER_ROLE } from '#/lib/entity'
-import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
+import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 import { UserBulkActions } from './bulk-actions'
 import { userColumns } from './columns'

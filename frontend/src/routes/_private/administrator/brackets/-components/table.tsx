@@ -16,7 +16,7 @@ import {
   TableTitle,
   useTable,
 } from '#/components/common/table'
-import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 import { bracketColumns } from './columns'
 import { DrawDialog } from './draw-dialog'

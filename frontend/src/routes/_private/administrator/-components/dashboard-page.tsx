@@ -26,7 +26,7 @@ import {
   bracketsQueryOptions,
   enrollmentRemovalsQueryOptions,
   matchesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/administrator'
 import type { IMatch } from '#/lib/interfaces'
 import {
   BRACKET_STATUS_LABELS,

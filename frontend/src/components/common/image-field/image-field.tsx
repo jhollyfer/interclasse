@@ -6,7 +6,7 @@ import { notifyError } from '#/lib/form-errors'
 import {
   useStorageCreate,
   useStorageDelete,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/storages'
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/entity'
 import type { StorageMimetype } from '#/lib/entity'
