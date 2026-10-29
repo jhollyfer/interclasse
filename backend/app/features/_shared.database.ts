@@ -13,3 +13,11 @@ const UNIQUE_VIOLATION = '23505'
 export function isUniqueViolation(error: unknown): boolean {
   return error instanceof Error && 'code' in error && error.code === UNIQUE_VIOLATION
 }
+
+/** O nome do `unique` violado, quando o Postgres o informa. */
+export function violatedConstraint(error: unknown): string | undefined {
+  if (!isUniqueViolation(error) || !(error instanceof Error)) return undefined
+  if (!('constraint' in error) || typeof error.constraint !== 'string') return undefined
+
+  return error.constraint
+}

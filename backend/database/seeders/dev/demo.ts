@@ -64,10 +64,12 @@ export default class extends BaseSeeder {
 
     for (const [index, classroom] of classrooms.entries()) {
       const representative = await this.representative(classroom, password)
-      const advisor = advisors[index % advisors.length]
-      if (!advisor) throw new Error('[demo] nenhum conselheiro para distribuir as turmas')
+      // Um conselheiro por turma (índice único): as turmas além do número de
+      // professores ficam "Sem conselheiro", como fica a escola de verdade
+      // enquanto a organização não indica todos.
+      const advisor = advisors.at(index)
       classroom.merge({
-        advisorId: advisor.id,
+        advisorId: advisor?.id ?? null,
         representativeId: representative.id,
       })
       await classroom.save()
@@ -79,7 +81,7 @@ export default class extends BaseSeeder {
     await this.championship()
   }
 
-  /** Os professores conselheiros: cada um fica com quatro turmas, em média. */
+  /** Os professores conselheiros, um para cada uma das primeiras turmas. */
   private async advisors(password: string): Promise<User[]> {
     const people = [
       ['Raimunda Tananta', 'raimunda.tananta'],

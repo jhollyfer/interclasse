@@ -2340,6 +2340,15 @@
             }
           },
           {
+            "name": "classroomId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "sportId",
             "in": "query",
             "required": false,
@@ -6085,6 +6094,15 @@
           },
           {
             "name": "bracketId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "classroomId",
             "in": "query",
             "required": false,
             "schema": {

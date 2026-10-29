@@ -242,6 +242,8 @@ export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
 export function matchFilterFields() {
   return {
     bracketId: vine.string().uuid().optional(),
+    // Os jogos de uma turma: a aba "Jogos" do detalhe da turma.
+    classroomId: vine.string().uuid().optional(),
     sportId: vine.string().uuid().optional(),
     category: vine.enum(CATEGORIES).optional(),
     phase: vine.enum(MATCH_PHASES).optional(),
