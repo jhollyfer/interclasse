@@ -3,8 +3,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import AdvisorPhotoDeleteUseCase from './delete.use-case.ts'
 
-import Photo from '#models/photo'
-import PhotoPolicy from '#policies/photo.policy'
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
 
@@ -19,13 +17,10 @@ export default class AdvisorPhotoDeleteController {
   constructor(private readonly useCase: AdvisorPhotoDeleteUseCase) {}
 
   async handle(context: HttpContext) {
-    const { id } = await context.request.validateUsing(IdentifierValidator, {
+    const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const photo = await Photo.find(id)
-    await context.bouncer.with(PhotoPolicy).authorize('manage', photo)
-    if (!photo) return context.response.notFound()
-    const result = await this.useCase.execute(photo)
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }
