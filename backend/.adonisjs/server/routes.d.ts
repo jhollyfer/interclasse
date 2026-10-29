@@ -10,6 +10,7 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
@@ -34,6 +35,8 @@ export type ScannedRoutes = {
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
+    'administrator.site.update': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.create': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -79,6 +82,7 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.show': { paramsTuple?: []; params?: {} }
@@ -90,6 +94,7 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
@@ -114,6 +119,7 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.show': { paramsTuple?: []; params?: {} }
@@ -125,6 +131,7 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
@@ -160,6 +167,7 @@ export type ScannedRoutes = {
     'profile.update': { paramsTuple?: []; params?: {} }
     'administrator.classrooms.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.update': { paramsTuple?: []; params?: {} }
     'administrator.announcements.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.score': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

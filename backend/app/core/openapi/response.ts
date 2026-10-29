@@ -4,6 +4,7 @@ import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import EnrollmentRemoval from '#models/enrollment-removal'
 import MatchCard from '#models/match-card'
+import SiteSetting from '#models/site-setting'
 import Match from '#models/match'
 import Sport from '#models/sport'
 import Storage from '#models/storage'
@@ -80,6 +81,10 @@ const SPORT: ModelResource = {
 
 const ANNOUNCEMENT: ModelResource = {
   model: Announcement,
+}
+const SITE_SETTING: ModelResource = {
+  model: SiteSetting,
+  relations: { regulation: STORAGE },
 }
 
 /** O time é a turma dentro da competição: o nome que sai no placar vem de `classroom`. */
@@ -288,6 +293,22 @@ export const DrawPreviewResponse = vine.create({
 // O registro, por diretório de feature
 // ---------------------------------------------------------------------------
 
+/**
+ * O "Sobre" para o site anônimo: o recorte de `GET /storefront/site`. Do
+ * regulamento sai só o que o botão de baixar precisa, sem o caminho no bucket.
+ */
+export const StorefrontSiteResponse = vine.create({
+  about: vine.string().nullable(),
+  organizer: vine.string().nullable(),
+  firstEditionYear: vine.number().nullable(),
+  edition: vine.number().nullable(),
+  schoolInstagram: vine.string().nullable(),
+  developerInstagram: vine.string().nullable(),
+  regulation: vine
+    .object({ url: vine.string(), originalName: vine.string(), size: vine.number() })
+    .nullable(),
+})
+
 export const RESPONSES: Record<string, FeatureResponse> = {
   /**
    * `GET /account` e `PUT /account` respondem o mesmo recurso: a conta com o
@@ -329,6 +350,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/classrooms': CLASSROOM_WITH_PEOPLE,
   'administrator/sports': SPORT,
   'administrator/announcements': ANNOUNCEMENT,
+  'administrator/site': SITE_SETTING,
 
   /**
    * A competição como a listagem, o sorteio e o apagar a devolvem. `show` foge
@@ -355,4 +377,5 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'storefront/announcements': ANNOUNCEMENT,
   'storefront/matches': MATCH,
   'storefront/brackets': BRACKET,
+  'storefront/site': StorefrontSiteResponse,
 }

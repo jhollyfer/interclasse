@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/storefront/matches","type":0,"val":"storefront","end":""},{"old":"/storefront/matches","type":0,"val":"matches","end":""}],
     types: placeholder as Registry['storefront.matches']['types'],
   },
+  'storefront.site': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/site',
+    tokens: [{"old":"/storefront/site","type":0,"val":"storefront","end":""},{"old":"/storefront/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['storefront.site']['types'],
+  },
   'storefront.brackets.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/storefront/brackets',
@@ -185,6 +191,18 @@ const routes = {
     pattern: '/administrator/sports/:id',
     tokens: [{"old":"/administrator/sports/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/sports/:id","type":0,"val":"sports","end":""},{"old":"/administrator/sports/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.sports.delete']['types'],
+  },
+  'administrator.site.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/site',
+    tokens: [{"old":"/administrator/site","type":0,"val":"administrator","end":""},{"old":"/administrator/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['administrator.site.show']['types'],
+  },
+  'administrator.site.update': {
+    methods: ["PUT"],
+    pattern: '/administrator/site',
+    tokens: [{"old":"/administrator/site","type":0,"val":"administrator","end":""},{"old":"/administrator/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['administrator.site.update']['types'],
   },
   'administrator.announcements.paginate': {
     methods: ["GET","HEAD"],

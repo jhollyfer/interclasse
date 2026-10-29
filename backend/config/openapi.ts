@@ -104,6 +104,14 @@ const tags: TagRule[] = [
     plural: 'avisos',
   },
   {
+    prefix: '/administrator/site',
+    name: 'Painel · Site',
+    description:
+      'O "Sobre" dos jogos e o regulamento em PDF que o site público mostra. Uma configuração só.',
+    singular: 'configuração',
+    plural: 'configurações',
+  },
+  {
     prefix: '/administrator/brackets',
     name: 'Painel · Chaves',
     description:

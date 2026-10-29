@@ -194,6 +194,31 @@ export class RateLimitSchema extends BaseModel {
   declare points: number
 }
 
+export class SiteSettingSchema extends BaseModel {
+  static $columns = ['about', 'createdAt', 'developerInstagram', 'edition', 'firstEditionYear', 'id', 'organizer', 'regulationId', 'schoolInstagram', 'updatedAt'] as const
+  $columns = SiteSettingSchema.$columns
+  @column()
+  declare about: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare developerInstagram: string | null
+  @column()
+  declare edition: number | null
+  @column()
+  declare firstEditionYear: number | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare organizer: string | null
+  @column()
+  declare regulationId: string | null
+  @column()
+  declare schoolInstagram: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class SportSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'maxAthletes', 'minAthletes', 'name', 'slug', 'updatedAt'] as const
   $columns = SportSchema.$columns

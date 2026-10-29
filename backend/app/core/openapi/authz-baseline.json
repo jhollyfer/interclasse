@@ -26,6 +26,8 @@
   "GET /administrator/matches/{id}/athletes": "ADMINISTRATOR",
   "PUT /administrator/matches/{id}/score": "ADMINISTRATOR",
   "DELETE /administrator/matches/{id}/score": "ADMINISTRATOR",
+  "GET /administrator/site": "ADMINISTRATOR",
+  "PUT /administrator/site": "ADMINISTRATOR",
   "GET /administrator/sports": "ADMINISTRATOR",
   "POST /administrator/sports": "ADMINISTRATOR",
   "GET /administrator/sports/{id}": "ADMINISTRATOR",
@@ -62,5 +64,6 @@
   "GET /storefront/brackets": "anonima",
   "GET /storefront/brackets/{id}": "anonima",
   "GET /storefront/matches": "anonima",
+  "GET /storefront/site": "anonima",
   "GET /storefront/sports": "anonima"
 }
