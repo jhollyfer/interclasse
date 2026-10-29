@@ -17,7 +17,9 @@ export default class AdministratorBracketCreateController {
       'Quando o número de turmas não fecha uma potência de dois (4, 8, 16), as que sobram ' +
       'ficam de folga e entram direto na fase seguinte. Até 16 turmas por chave.\n\n' +
       'Depois do sorteio as inscrições da modalidade naquela categoria travam. Para refazer, ' +
-      'apague a chave.',
+      'apague a chave.\n\n' +
+      'Idempotente por modalidade e categoria: se a chave já existe, a resposta é 200 com ' +
+      'ela, sem novo sorteio - o reenvio depois de uma queda de rede leva à mesma chave.',
     // A mensagem deste código é montada com o mínimo da modalidade, e a leitura
     // de AST do gerador só colhe mensagem literal.
     errors: { 409: ['NOT_ENOUGH_TEAMS', 'TOO_MANY_TEAMS'] },
@@ -29,6 +31,8 @@ export default class AdministratorBracketCreateController {
     const payload = await context.request.validateUsing(BracketCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
-    return context.response.created(result.value)
+    const { bracket, created } = result.value
+    if (created) return context.response.created(bracket)
+    return context.response.ok(bracket)
   }
 }

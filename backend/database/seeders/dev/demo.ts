@@ -277,9 +277,12 @@ export default class extends BaseSeeder {
       const target = await sport(item.slug)
       const created = await draw.execute({ sportId: target.id, category: item.category })
       if (created.isLeft()) throw created.value
+      // Chave que já existia (seed rodado de novo): o jogo dela já foi montado.
+      if (!created.value.created) continue
 
-      day = await this.schedule(created.value.id, day)
-      await this.play(created.value.id, item.stage, score)
+      const { bracket } = created.value
+      day = await this.schedule(bracket.id, day)
+      await this.play(bracket.id, item.stage, score)
     }
   }
 

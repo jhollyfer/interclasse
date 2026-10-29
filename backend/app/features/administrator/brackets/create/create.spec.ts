@@ -71,4 +71,27 @@ test.group('brackets > create', (group) => {
     assert.isTrue(body(response).sports[0].drawn)
     assert.isFalse(body(response).sports[0].locked)
   })
+
+  test('sortear de novo a mesma modalidade e categoria devolve a chave já sorteada', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+    const sport = await createSport(client, admin)
+    await enrolledClassrooms(client, admin, sport.id, 3)
+
+    // O primeiro pedido comitou, mas o navegador desistiu antes da resposta: o
+    // reenvio tem de levar à mesma chave, e não a um erro nem a um novo sorteio.
+    const first = await draw(client, admin, sport.id)
+    const again = await client
+      .post('/administrator/brackets')
+      .cookies(admin)
+      .json({ sportId: sport.id, category: CATEGORY.F2 })
+
+    again.assertStatus(200)
+    assert.equal(body(again).id, first.id)
+
+    const list = await client.get('/administrator/brackets').cookies(admin)
+    assert.lengthOf(body(list).data, 1)
+  })
 })
