@@ -30,3 +30,11 @@ export * from './validators/administrator/sports.validator.js'
 
 export * from './responses/administrator/sports.response.js'
 export * from './responses/storefront/sports.response.js'
+
+export * from './validators/administrator/photos.validator.js'
+export * from './validators/advisor/photos.validator.js'
+
+export * from './responses/administrator/photos.response.js'
+export * from './responses/administrator/reports.response.js'
+export * from './responses/advisor/photos.response.js'
+export * from './responses/storefront/photos.response.js'
