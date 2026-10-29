@@ -3,7 +3,10 @@ import { useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
 import { toast } from 'sonner'
 import { AccountProfileUpdateValidator } from '@interclasse/shared'
-import type { AccountProfileUpdatePayload } from '@interclasse/shared'
+import type {
+  AccountProfileUpdatePayload,
+  AccountProfileShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -36,7 +39,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useAccountUpdate } from '#/integrations/tanstack-query/mutations/account'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
-import type { IUser } from '#/lib/interfaces'
 import { blankToUndefined } from '#/lib/form-values'
 import { initials } from '#/lib/labels'
 
@@ -89,7 +91,7 @@ export function ProfileFormEdit(): React.JSX.Element {
 
   const { form, onSubmit, shell } = useResourceForm<
     AccountProfileUpdatePayload,
-    IUser,
+    AccountProfileShowResponse,
     AccountProfileUpdatePayload
   >({
     formId: 'profile',

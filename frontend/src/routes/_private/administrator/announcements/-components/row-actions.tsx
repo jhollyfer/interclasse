@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -16,13 +17,12 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations/administrator'
-import type { IAnnouncement } from '#/lib/interfaces'
 
 /** Editar e apagar. O aviso some do site na hora. */
 export function AnnouncementRowActions({
   announcement,
 }: Readonly<{
-  announcement: IAnnouncement
+  announcement: AdministratorAnnouncementShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 

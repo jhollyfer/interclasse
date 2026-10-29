@@ -2,8 +2,14 @@ import { ShuffleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import * as React from 'react'
-import { AdministratorBracketCreateValidator } from '@interclasse/shared'
-import type { AdministratorBracketCreatePayload } from '@interclasse/shared'
+import {
+  AdministratorBracketCreateValidator,
+  CATEGORIES,
+} from '@interclasse/shared'
+import type {
+  AdministratorBracketCreatePayload,
+  AdministratorBracketPaginateResponse,
+} from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -28,8 +34,6 @@ import {
   bracketPreviewQueryOptions,
   sportsQueryOptions,
 } from '#/integrations/tanstack-query/queries/administrator'
-import { CATEGORIES } from '#/lib/entity'
-import type { IBracket } from '#/lib/interfaces'
 import { CATEGORY_LABELS, plural } from '#/lib/labels'
 
 const FIELDS = ['sportId', 'category'] as const
@@ -45,7 +49,7 @@ export function DrawDialog(): React.JSX.Element {
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorBracketCreatePayload,
-    IBracket,
+    AdministratorBracketPaginateResponse,
     AdministratorBracketCreatePayload
   >({
     validator: AdministratorBracketCreateValidator,

@@ -1,8 +1,9 @@
+import type { AdministratorSportShowResponse } from '@interclasse/shared'
+
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
-import type { ISport } from '#/lib/interfaces'
 
-export const sportColumns: TableColumns<ISport> = [
+export const sportColumns: TableColumns<AdministratorSportShowResponse> = [
   {
     accessorKey: 'name',
     meta: { label: 'Modalidade' },

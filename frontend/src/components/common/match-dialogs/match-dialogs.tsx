@@ -7,6 +7,8 @@ import {
 import type {
   AdministratorMatchScorePayload,
   AdministratorMatchUpdatePayload,
+  AdministratorMatchScoreResponse,
+  AdministratorMatchUpdateResponse,
 } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
@@ -39,7 +41,6 @@ import type {
   MatchScoreVariables,
   MatchUpdateVariables,
 } from '#/integrations/tanstack-query/mutations/administrator'
-import type { IMatch } from '#/lib/interfaces'
 import {
   ConfirmDialog,
   ConfirmDialogCancel,
@@ -93,7 +94,7 @@ export function MatchScoreDialog({
 }: DialogProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorMatchScorePayload,
-    IMatch,
+    AdministratorMatchScoreResponse,
     MatchScoreVariables
   >({
     validator: AdministratorMatchScoreValidator,
@@ -242,7 +243,7 @@ export function MatchScheduleDialog({
 }: DialogProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorMatchUpdatePayload,
-    IMatch,
+    AdministratorMatchUpdateResponse,
     MatchUpdateVariables
   >({
     validator: AdministratorMatchUpdateValidator,

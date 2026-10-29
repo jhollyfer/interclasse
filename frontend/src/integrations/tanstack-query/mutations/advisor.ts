@@ -3,21 +3,29 @@ import type {
   AdvisorEnrollmentUpdatePayload,
   AdvisorStudentCreatePayload,
   AdvisorStudentUpdatePayload,
+  AdvisorEnrollmentShowResponse,
+  AdvisorStudentShowResponse,
+  Merge,
 } from '@interclasse/shared'
-
-import type { IStudent, IEnrollmentBoard, Merge } from '#/lib/interfaces'
 
 import type { HTTPError } from '../http'
 import { request, send } from '../http'
 import type { MutationProps } from '../mutation-props'
 
 export function useStudentCreate(
-  options?: MutationProps<IStudent, AdvisorStudentCreatePayload>,
+  options?: MutationProps<
+    AdvisorStudentShowResponse,
+    AdvisorStudentCreatePayload
+  >,
 ) {
-  return useMutation<IStudent, HTTPError, AdvisorStudentCreatePayload>({
+  return useMutation<
+    AdvisorStudentShowResponse,
+    HTTPError,
+    AdvisorStudentCreatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
-      return request<IStudent>('/advisor/students', {
+      return request<AdvisorStudentShowResponse>('/advisor/students', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -31,15 +39,22 @@ export type StudentUpdateVariables = Merge<
 >
 
 export function useStudentUpdate(
-  options?: MutationProps<IStudent, StudentUpdateVariables>,
+  options?: MutationProps<AdvisorStudentShowResponse, StudentUpdateVariables>,
 ) {
-  return useMutation<IStudent, HTTPError, StudentUpdateVariables>({
+  return useMutation<
+    AdvisorStudentShowResponse,
+    HTTPError,
+    StudentUpdateVariables
+  >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<IStudent>('/advisor/students/'.concat(id), {
-        method: 'PUT',
-        body: JSON.stringify(body),
-      })
+      return request<AdvisorStudentShowResponse>(
+        '/advisor/students/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
     },
   })
 }
@@ -57,16 +72,19 @@ export function useStudentDelete(options?: MutationProps<void, string>) {
 
 /** Troca a lista de atletas da turma numa modalidade, inteira. */
 export function useAdvisorEnrollmentUpdate(
-  options?: MutationProps<IEnrollmentBoard, AdvisorEnrollmentUpdatePayload>,
+  options?: MutationProps<
+    AdvisorEnrollmentShowResponse,
+    AdvisorEnrollmentUpdatePayload
+  >,
 ) {
   return useMutation<
-    IEnrollmentBoard,
+    AdvisorEnrollmentShowResponse,
     HTTPError,
     AdvisorEnrollmentUpdatePayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<IEnrollmentBoard>('/advisor/enrollments', {
+      return request<AdvisorEnrollmentShowResponse>('/advisor/enrollments', {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

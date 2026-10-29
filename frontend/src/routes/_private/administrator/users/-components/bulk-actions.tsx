@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import type { AdministratorUserShowResponse } from '@interclasse/shared'
 
 import { notifyError } from '#/lib/form-errors'
 import {
@@ -7,7 +8,6 @@ import {
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchive } from '#/integrations/tanstack-query/mutations/administrator'
-import type { IUser } from '#/lib/interfaces'
 
 import { BulkArchive } from './bulk-archive'
 
@@ -20,7 +20,7 @@ import { BulkArchive } from './bulk-archive'
 export function UserBulkActions({
   users,
 }: Readonly<{
-  users: ReadonlyArray<IUser>
+  users: ReadonlyArray<AdministratorUserShowResponse>
 }>): React.JSX.Element {
   const archive = useUserArchive({
     onError: (error) => notifyError(error, { id: 'users-archive' }),

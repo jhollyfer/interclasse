@@ -1,7 +1,11 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
-import type { AdministratorClassroomCreatePayload } from '@interclasse/shared'
+import type {
+  AdministratorClassroomCreatePayload,
+  UserRole,
+} from '@interclasse/shared'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
@@ -10,8 +14,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { Input } from '#/components/ui/input'
 import { OptionCombobox } from '#/components/common/option-combobox'
-import { USER_ROLE } from '#/lib/entity'
-import type { UserRole } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export type ClassroomFormType = AdministratorClassroomCreatePayload

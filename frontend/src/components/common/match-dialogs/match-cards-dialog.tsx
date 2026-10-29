@@ -1,7 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
-import { AdministratorCardCreateValidator } from '@interclasse/shared'
-import type { AdministratorCardCreatePayload } from '@interclasse/shared'
+import {
+  AdministratorCardCreateValidator,
+  CARD_COLORS,
+} from '@interclasse/shared'
+import type {
+  AdministratorCardCreatePayload,
+  AdministratorCardPaginateResponse,
+} from '@interclasse/shared'
 
 import { CardList } from '#/components/common/card-list'
 import { Button } from '#/components/ui/button'
@@ -33,9 +39,7 @@ import {
   cardsQueryOptions,
   matchAthletesQueryOptions,
 } from '#/integrations/tanstack-query/queries/administrator'
-import { CARD_COLORS } from '#/lib/entity'
 import { notifyError } from '#/lib/form-errors'
-import type { IMatchCard } from '#/lib/interfaces'
 import { CARD_COLOR_LABELS } from '#/lib/labels'
 
 import type { MatchRef } from './match-dialogs'
@@ -72,7 +76,7 @@ export function MatchCardsDialog({
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorCardCreatePayload,
-    IMatchCard,
+    AdministratorCardPaginateResponse,
     AdministratorCardCreatePayload
   >({
     validator: AdministratorCardCreateValidator,

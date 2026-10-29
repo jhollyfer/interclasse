@@ -1,6 +1,5 @@
 import { redirect } from '@tanstack/react-router'
-
-import type { UserRole } from '#/lib/entity'
+import type { UserRole } from '@interclasse/shared'
 
 import { HOME_BY_ROLE } from './menu'
 

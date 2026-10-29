@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import type { RepresentativeEnrollmentUpdatePayload } from '@interclasse/shared'
-
-import type { IEnrollmentBoard } from '#/lib/interfaces'
+import type {
+  RepresentativeEnrollmentUpdatePayload,
+  RepresentativeEnrollmentShowResponse,
+} from '@interclasse/shared'
 
 import type { HTTPError } from '../http'
 import { request } from '../http'
@@ -10,21 +11,24 @@ import type { MutationProps } from '../mutation-props'
 /** A mesma troca, na turma do representante - que sai da sessão. */
 export function useRepresentativeEnrollmentUpdate(
   options?: MutationProps<
-    IEnrollmentBoard,
+    RepresentativeEnrollmentShowResponse,
     RepresentativeEnrollmentUpdatePayload
   >,
 ) {
   return useMutation<
-    IEnrollmentBoard,
+    RepresentativeEnrollmentShowResponse,
     HTTPError,
     RepresentativeEnrollmentUpdatePayload
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<IEnrollmentBoard>('/representative/enrollments', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
+      return request<RepresentativeEnrollmentShowResponse>(
+        '/representative/enrollments',
+        {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        },
+      )
     },
   })
 }

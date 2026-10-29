@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
+import { MATCH_STATUS } from '@interclasse/shared'
 
 import {
   CATEGORY_SHORT_LABELS,
@@ -7,30 +9,36 @@ import {
   formatDayKey,
   formatTime,
 } from '#/lib/labels'
-import { MATCH_STATUS } from '#/lib/entity'
 import { cn } from '#/lib/utils'
-import type { IMatch } from '#/lib/interfaces'
 
 /** "Quartas", "Semifinal"... */
-export function phaseLabel(match: Pick<IMatch, 'phase'>): string {
+export function phaseLabel(
+  match: Pick<AdministratorMatchPaginateResponse, 'phase'>,
+): string {
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
 /** O placar, ou o "x" de quem ainda não jogou. */
-export function scoreOf(match: IMatch): string {
+export function scoreOf(match: AdministratorMatchPaginateResponse): string {
   if (match.status === MATCH_STATUS.FINISHED)
     return `${match.homeScore} x ${match.awayScore}`
 
   return 'x'
 }
 
-type Day = { key: string; label: string; matches: Array<IMatch> }
+type Day = {
+  key: string
+  label: string
+  matches: Array<AdministratorMatchPaginateResponse>
+}
 
 /**
  * A agenda em dias, na ordem em que a API devolveu. Jogo sem horário fica
  * num grupo próprio, no fim.
  */
-export function groupByDay(matches: ReadonlyArray<IMatch>): Array<Day> {
+export function groupByDay(
+  matches: ReadonlyArray<AdministratorMatchPaginateResponse>,
+): Array<Day> {
   const days = new Map<string, Day>()
 
   for (const match of matches) {
@@ -57,7 +65,7 @@ export function groupByDay(matches: ReadonlyArray<IMatch>): Array<Day> {
  */
 export function MatchRow({
   match,
-}: Readonly<{ match: IMatch }>): React.JSX.Element {
+}: Readonly<{ match: AdministratorMatchPaginateResponse }>): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
   const bracket = match.bracket
 
@@ -71,7 +79,7 @@ export function MatchRow({
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <span className="font-display truncate text-right text-lg font-extrabold uppercase italic">
-          {match.homeTeam?.classroom.name}
+          {match.homeTeam.classroom.name}
         </span>
         <span
           className={cn(
@@ -83,15 +91,15 @@ export function MatchRow({
           {scoreOf(match)}
         </span>
         <span className="font-display truncate text-lg font-extrabold uppercase italic">
-          {match.awayTeam?.classroom.name}
+          {match.awayTeam.classroom.name}
         </span>
       </div>
 
       <p className="text-muted-foreground col-start-2 text-sm sm:col-start-3 sm:text-right">
         <span className="text-foreground font-semibold">
-          {bracket?.sport?.name}
+          {bracket.sport.name}
         </span>{' '}
-        {CATEGORY_SHORT_LABELS[bracket?.category ?? '']}, {phaseLabel(match)}
+        {CATEGORY_SHORT_LABELS[bracket.category]}, {phaseLabel(match)}
         {match.location && <span className="block">{match.location}</span>}
       </p>
     </li>
@@ -102,7 +110,7 @@ export function MatchRow({
 export function Agenda({
   matches,
 }: Readonly<{
-  matches: ReadonlyArray<IMatch>
+  matches: ReadonlyArray<AdministratorMatchPaginateResponse>
 }>): React.JSX.Element {
   return (
     <div className="flex flex-col gap-6">

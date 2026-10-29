@@ -1,9 +1,9 @@
 import { TrashIcon } from '@phosphor-icons/react'
 import type * as React from 'react'
+import type { AdministratorCardPaginateResponse } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
-import type { IMatchCard } from '#/lib/interfaces'
 import {
   CARD_COLOR_CLASSES,
   CARD_COLOR_LABELS,
@@ -14,14 +14,14 @@ import {
 import { cn } from '#/lib/utils'
 
 type CardListProps = Readonly<{
-  cards: ReadonlyArray<IMatchCard>
+  cards: ReadonlyArray<AdministratorCardPaginateResponse>
   isPending?: boolean
   /** O que dizer quando não há cartão. */
   empty: string
   /** Mostra a partida de cada cartão. Fora, quando a lista já é de uma partida só. */
   showMatch?: boolean
   /** Presente, cada linha ganha o botão de apagar. */
-  onDelete?: (card: IMatchCard) => void
+  onDelete?: (card: AdministratorCardPaginateResponse) => void
 }>
 
 /**
@@ -90,10 +90,10 @@ export function CardList({
 /** A partida do cartão em uma linha: modalidade, fase, confronto e data. */
 function MatchLine({
   card,
-}: Readonly<{ card: IMatchCard }>): React.JSX.Element {
+}: Readonly<{ card: AdministratorCardPaginateResponse }>): React.JSX.Element {
   const { match } = card
-  const sport = match.bracket?.sport?.name ?? ''
-  const category = CATEGORY_SHORT_LABELS[match.bracket?.category ?? ''] ?? ''
+  const sport = match.bracket.sport.name
+  const category = CATEGORY_SHORT_LABELS[match.bracket.category] ?? ''
   const home = match.homeTeam?.classroom.name ?? 'A definir'
   const away = match.awayTeam?.classroom.name ?? 'A definir'
 

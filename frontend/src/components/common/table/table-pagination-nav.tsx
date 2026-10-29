@@ -7,6 +7,7 @@ import {
   CaretLeftIcon,
   CaretRightIcon,
 } from '@phosphor-icons/react'
+import type { PaginationMeta } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -16,14 +17,13 @@ import {
 } from '#/components/ui/pagination'
 import { Field, FieldDescription, FieldLabel } from '#/components/ui/field'
 import { OptionCombobox } from '#/components/common/option-combobox'
-import type { IPaginationMeta } from '#/lib/interfaces'
 import type { ListSearch } from '#/lib/list-search'
 
 /** As opções de itens por página. O teto do backend é 100 (`perPage.max(100)`). */
 const PER_PAGE_OPTIONS = ['10', '20', '30', '40', '50']
 
 type PaginationProps<TSearch extends ListSearch> = Readonly<{
-  meta: IPaginationMeta
+  meta: PaginationMeta
   /** A rota desta listagem, para onde os links apontam. */
   to: string
   /**

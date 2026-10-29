@@ -1,6 +1,7 @@
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
 import type { AdministratorUserUpdatePayload } from '@interclasse/shared'
+import { ACTIVE_STATUS, ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
@@ -20,7 +21,6 @@ import {
 import { InputPassword } from '#/components/common/input-password'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import { blankToUndefined } from '#/lib/form-values'
-import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#/lib/entity'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_DOTS,

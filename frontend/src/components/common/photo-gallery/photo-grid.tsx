@@ -1,9 +1,9 @@
 import type * as React from 'react'
+import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
 
 import { Badge } from '#/components/ui/badge'
 import { Card, CardContent } from '#/components/ui/card'
 import { Skeleton } from '#/components/ui/skeleton'
-import type { IPhoto } from '#/lib/interfaces'
 import {
   PHOTO_STATUS_LABELS,
   PHOTO_STATUS_VARIANTS,
@@ -11,13 +11,13 @@ import {
 } from '#/lib/labels'
 
 type PhotoGridProps = Readonly<{
-  photos: ReadonlyArray<IPhoto>
+  photos: ReadonlyArray<AdministratorPhotoShowResponse>
   isPending: boolean
   empty: string
   /** Mostra quem enviou: a organização revisa fotos de vários conselheiros. */
   showAuthor?: boolean
   /** Os botões de cada foto - aprovar e recusar, ou só apagar. */
-  actions: (photo: IPhoto) => React.ReactNode
+  actions: (photo: AdministratorPhotoShowResponse) => React.ReactNode
 }>
 
 /** As fotos enviadas, com a situação de cada uma e as ações de quem vê. */

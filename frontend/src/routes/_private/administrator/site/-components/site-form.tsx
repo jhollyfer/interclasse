@@ -2,7 +2,10 @@ import type * as React from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { FilePdfIcon } from '@phosphor-icons/react'
 import { AdministratorSiteUpdateValidator } from '@interclasse/shared'
-import type { AdministratorSiteUpdatePayload } from '@interclasse/shared'
+import type {
+  AdministratorSiteUpdatePayload,
+  AdministratorSiteShowResponse,
+} from '@interclasse/shared'
 
 import {
   ImageField,
@@ -31,7 +34,6 @@ import {
 import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { blankToNull, nanToNull } from '#/lib/form-values'
-import type { ISiteSetting } from '#/lib/interfaces'
 
 const SITE_FIELDS = [
   'about',
@@ -47,7 +49,9 @@ const SITE_FIELDS = [
 const PDF = ['application/pdf'] as const
 
 /** O registro como o formulário o edita: tudo o que o PUT aceita. */
-function valuesOf(site: ISiteSetting): AdministratorSiteUpdatePayload {
+function valuesOf(
+  site: AdministratorSiteShowResponse,
+): AdministratorSiteUpdatePayload {
   return {
     about: site.about,
     organizer: site.organizer,
@@ -68,7 +72,7 @@ export function SiteForm(): React.JSX.Element {
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorSiteUpdatePayload,
-    ISiteSetting,
+    AdministratorSiteShowResponse,
     AdministratorSiteUpdatePayload
   >({
     validator: AdministratorSiteUpdateValidator,

@@ -2,7 +2,11 @@ import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministratorUserUpdateValidator } from '@interclasse/shared'
-import type { AdministratorUserUpdatePayload } from '@interclasse/shared'
+import type {
+  AdministratorUserUpdatePayload,
+  AdministratorUserShowResponse,
+  Merge,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -16,7 +20,6 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import type { IUser, Merge } from '#/lib/interfaces'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { useUserUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -41,7 +44,7 @@ export function UserFormEdit(): React.JSX.Element {
   // recebe.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
-    IUser,
+    AdministratorUserShowResponse,
     Merge<AdministratorUserUpdatePayload, { id: string }>
   >({
     formId: FORM_ID,

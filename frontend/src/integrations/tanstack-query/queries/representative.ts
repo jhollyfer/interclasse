@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
+import type { RepresentativeEnrollmentShowResponse } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type { IEnrollmentBoard } from '#/lib/interfaces'
 
 import { request } from '../http'
 
@@ -10,6 +10,9 @@ export const representativeEnrollmentsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.representative.enrollments.board,
     queryFn: ({ signal }) =>
-      request<IEnrollmentBoard>('/representative/enrollments', { signal }),
+      request<RepresentativeEnrollmentShowResponse>(
+        '/representative/enrollments',
+        { signal },
+      ),
     retry: false,
   })

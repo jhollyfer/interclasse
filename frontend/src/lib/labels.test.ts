@@ -1,4 +1,14 @@
 import { describe, expect, it, test } from 'vitest'
+import {
+  ACTIVE_STATUSES,
+  BRACKET_STATUSES,
+  CATEGORIES,
+  MATCH_PHASES,
+  MATCH_STATUSES,
+  STORAGE_MIMETYPES,
+  UPLOAD_STATUSES,
+  USER_ROLES,
+} from '@interclasse/shared'
 
 import {
   formatDayKey,
@@ -27,16 +37,6 @@ import {
   formatDate,
   initials,
 } from './labels'
-import {
-  ACTIVE_STATUSES,
-  BRACKET_STATUSES,
-  CATEGORIES,
-  MATCH_PHASES,
-  MATCH_STATUSES,
-  STORAGE_MIMETYPES,
-  UPLOAD_STATUSES,
-  USER_ROLES,
-} from './entity'
 
 /**
  * O `satisfies` de `labels.ts` já cobra rótulo para todo valor em tempo de

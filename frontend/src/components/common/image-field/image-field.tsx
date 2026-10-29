@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { toast } from 'sonner'
+import type { StorageMimetype } from '@interclasse/shared'
 
 import { Field } from '#/components/ui/field'
 import { notifyError } from '#/lib/form-errors'
@@ -8,8 +9,7 @@ import {
   useStorageDelete,
 } from '#/integrations/tanstack-query/mutations/storages'
 import { useRegisterUpload } from '#/components/common/uploading-context'
-import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/entity'
-import type { StorageMimetype } from '#/lib/entity'
+import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/mimetype'
 
 import { ImageFieldProvider } from './image-field-context'
 

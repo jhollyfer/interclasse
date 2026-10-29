@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
+import type { StoragesFileShowResponse } from '@interclasse/shared'
 
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
-import type { IStorage } from '#/lib/interfaces'
 
 import type { HTTPError } from '../http'
 import { send } from '../http'
@@ -34,7 +34,7 @@ import type { MutationProps } from '../mutation-props'
  * sobrava só sumia na varredura do servidor.
  */
 export function useStorageCreate(
-  options?: MutationProps<IStorage, File, Error>,
+  options?: MutationProps<StoragesFileShowResponse, File, Error>,
 ) {
   const { upload } = useMultipartUpload()
   const controller = React.useRef<AbortController | null>(null)
@@ -43,7 +43,7 @@ export function useStorageCreate(
     return () => controller.current?.abort()
   }, [])
 
-  return useMutation<IStorage, Error, File>({
+  return useMutation<StoragesFileShowResponse, Error, File>({
     ...options,
     mutationFn: function (file) {
       // Um por envio: um controller abortado não volta a valer, e reaproveitá-lo
