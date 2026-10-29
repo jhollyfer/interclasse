@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdvisorClassroomPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { PaginationValidator } from '#core/validator'
+import { AdvisorClassroomPaginateValidator } from '#validators/advisor/classrooms.validator'
 
 @inject()
 export default class AdvisorClassroomPaginateController {
@@ -16,7 +16,7 @@ export default class AdvisorClassroomPaginateController {
   constructor(private readonly useCase: AdvisorClassroomPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(PaginationValidator, {
+    const payload = await context.request.validateUsing(AdvisorClassroomPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })

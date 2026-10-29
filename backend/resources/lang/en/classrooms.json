@@ -1,0 +1,18 @@
+{
+  "not_found": "Class not found",
+  "none_linked": "No class linked",
+  "already_exists": "Class already exists",
+  "name_taken": "A class with this name already exists",
+  "invalid_grade": "Invalid grade",
+  "invalid_grade_field": "The grade goes from 3rd to 9th",
+  "advisor_not_found": "Advisor not found",
+  "advisor_not_found_field": "Select an advisor teacher",
+  "advisor_taken": "Advisor already linked to another class",
+  "advisor_taken_field": "This advisor is already in another class",
+  "representative_not_found": "Representative not found",
+  "representative_not_found_field": "Select a representative student",
+  "representative_taken": "Representative already linked to another class",
+  "representative_taken_field": "This representative is already in another class",
+  "in_competition": "The class is already in a drawn bracket",
+  "category_locked_field": "The category of a class already drawn cannot change"
+}
