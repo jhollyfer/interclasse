@@ -17,6 +17,7 @@ import {
 } from '../index'
 import { AnnouncementList } from './announcement-list'
 import { NextMatch } from './next-match'
+import { RegulationLink } from './regulation-link'
 import { ResultsTicker } from './results-ticker'
 import { StandingsExplorer } from './standings-explorer'
 import {
@@ -71,6 +72,7 @@ export function HomePage(): React.JSX.Element {
               >
                 Classificação
               </Link>
+              <RegulationLink className="skew-button border border-brand-ink-foreground/30 text-brand-ink-foreground" />
             </div>
           </div>
 

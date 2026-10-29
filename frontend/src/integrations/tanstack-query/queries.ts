@@ -17,6 +17,8 @@ import type {
   ISport,
   IStudent,
   IUser,
+  ISiteSetting,
+  IStorefrontSite,
 } from '#/lib/interfaces'
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
 
@@ -355,6 +357,27 @@ export const storefrontSportsQueryOptions = () =>
     queryKey: queryKeys.storefront.sports.all,
     queryFn: ({ signal }) =>
       request<IPaginated<ISport>>('/storefront/sports?perPage=100', { signal }),
+    staleTime: 5 * 60 * 1000,
+  })
+
+/** A configuração do site no painel. */
+export const siteQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.administrator.site,
+    queryFn: ({ signal }) =>
+      request<ISiteSetting>('/administrator/site', { signal }),
+  })
+
+/**
+ * O "Sobre" e o regulamento no site. A URL do PDF é assinada e vence em
+ * minutos: `staleTime` abaixo disso, para o botão nunca apontar para um link
+ * vencido.
+ */
+export const storefrontSiteQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.storefront.site,
+    queryFn: ({ signal }) =>
+      request<IStorefrontSite>('/storefront/site', { signal }),
     staleTime: 5 * 60 * 1000,
   })
 

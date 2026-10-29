@@ -102,6 +102,36 @@ export type IClassroom = {
   readonly updatedAt: string | null
 }
 
+/** A configuração do site, como o painel a lê: com o regulamento inteiro. */
+export type ISiteSetting = {
+  readonly id: string
+  readonly about: string | null
+  readonly organizer: string | null
+  readonly firstEditionYear: number | null
+  readonly edition: number | null
+  readonly schoolInstagram: string | null
+  readonly developerInstagram: string | null
+  readonly regulationId: string | null
+  readonly regulation: IStorage | null
+  readonly createdAt: string
+  readonly updatedAt: string | null
+}
+
+/** O "Sobre" do site anônimo: do regulamento, só o que o botão de baixar usa. */
+export type IStorefrontSite = Merge<
+  Omit<
+    ISiteSetting,
+    'id' | 'regulationId' | 'regulation' | 'createdAt' | 'updatedAt'
+  >,
+  {
+    readonly regulation: {
+      readonly url: string
+      readonly originalName: string
+      readonly size: number
+    } | null
+  }
+>
+
 export type IStudent = {
   readonly id: string
   readonly name: string
