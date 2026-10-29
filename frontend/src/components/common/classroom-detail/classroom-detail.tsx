@@ -3,6 +3,14 @@ import type { LinkProps } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import {
+  AdvisorStudentCreateValidator,
+  AdvisorStudentUpdateValidator,
+} from '@interclasse/shared'
+import type {
+  AdvisorStudentCreatePayload,
+  AdvisorStudentUpdatePayload,
+} from '@interclasse/shared'
 
 import {
   ConfirmDialog,
@@ -21,14 +29,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations/advisor'
-import {
-  StudentCreateValidator,
-  StudentUpdateValidator,
-} from '#/validators/advisor/students.validator'
-import type {
-  StudentCreatePayload,
-  StudentUpdatePayload,
-} from '#/validators/advisor/students.validator'
 import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
@@ -189,11 +189,11 @@ function Students({
   const invalidate = useInvalidate()
 
   const { form, mutation, onSubmit } = useMutationForm<
-    StudentCreatePayload,
+    AdvisorStudentCreatePayload,
     IStudent,
-    StudentCreatePayload
+    AdvisorStudentCreatePayload
   >({
-    validator: StudentCreateValidator,
+    validator: AdvisorStudentCreateValidator,
     defaults: { classroomId, name: '' },
     fields: STUDENT_FIELDS,
     mutation: useStudentCreate,
@@ -258,11 +258,11 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
   const [editing, setEditing] = React.useState(false)
 
   const { form, mutation, onSubmit } = useMutationForm<
-    StudentUpdatePayload,
+    AdvisorStudentUpdatePayload,
     IStudent,
     StudentUpdateVariables
   >({
-    validator: StudentUpdateValidator,
+    validator: AdvisorStudentUpdateValidator,
     values: { name: student.name },
     fields: STUDENT_FIELDS,
     mutation: useStudentUpdate,

@@ -1,6 +1,8 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { AdministratorUserUpdateValidator } from '@interclasse/shared'
+import type { AdministratorUserUpdatePayload } from '@interclasse/shared'
 
 import {
   FormShell,
@@ -14,9 +16,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { UserUpdateValidator } from '#/validators/administrator/users.validator'
 import type { IUser, Merge } from '#/lib/interfaces'
-import type { UserUpdatePayload } from '#/validators/administrator/users.validator'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { useUserUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -42,7 +42,7 @@ export function UserFormEdit(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     IUser,
-    Merge<UserUpdatePayload, { id: string }>
+    Merge<AdministratorUserUpdatePayload, { id: string }>
   >({
     formId: FORM_ID,
     /**
@@ -56,7 +56,7 @@ export function UserFormEdit(): React.JSX.Element {
      * sem redefinir a senha dela. É o que a referência faz em
      * `administrators/-components/form-edit.tsx`, pelo mesmo motivo.
      */
-    validator: UserUpdateValidator,
+    validator: AdministratorUserUpdateValidator,
     // Sem `defaults`: o registro chega da query e `values` já é o objeto
     // completo. Não há estado inicial a declarar que `values` não sobrescreva
     // no render seguinte.
@@ -66,8 +66,6 @@ export function UserFormEdit(): React.JSX.Element {
     values: {
       name: user.name,
       email: user.email,
-      password: '',
-      passwordConfirmation: '',
       role: user.role,
       status: user.status,
       avatarId: user.avatarId,

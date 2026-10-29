@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import { AdvisorEnrollmentUpdateValidator } from '@interclasse/shared'
+import type { AdvisorEnrollmentUpdatePayload } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -18,8 +20,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/advisor'
 import type { IEnrollmentBoard } from '#/lib/interfaces'
-import { EnrollmentUpdateValidator } from '#/validators/advisor/enrollments.validator'
-import type { EnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
 
 /** A lista que espera o motivo para ser gravada. */
 export type PendingRemoval = Readonly<{
@@ -49,11 +49,11 @@ export function RemovalReasonDialog({
   onSaved,
 }: RemovalReasonDialogProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
-    EnrollmentUpdatePayload,
+    AdvisorEnrollmentUpdatePayload,
     IEnrollmentBoard,
-    EnrollmentUpdatePayload
+    AdvisorEnrollmentUpdatePayload
   >({
-    validator: EnrollmentUpdateValidator,
+    validator: AdvisorEnrollmentUpdateValidator,
     defaults: {
       classroomId,
       sportId: pending.sportId,

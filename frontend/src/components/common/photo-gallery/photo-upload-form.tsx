@@ -1,5 +1,7 @@
 import type * as React from 'react'
 import { ImageIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react'
+import { AdministratorPhotoCreateValidator } from '@interclasse/shared'
+import type { AdministratorPhotoCreatePayload } from '@interclasse/shared'
 
 import {
   ImageField,
@@ -21,12 +23,10 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { usePhotoCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import type { IPhoto } from '#/lib/interfaces'
-import { PhotoCreateValidator } from '#/validators/administrator/photos.validator'
-import type { PhotoCreatePayload } from '#/validators/administrator/photos.validator'
 
 const PHOTO_FIELDS = ['storageId', 'caption'] as const
 
-const EMPTY: PhotoCreatePayload = { storageId: '', caption: null }
+const EMPTY: AdministratorPhotoCreatePayload = { storageId: '', caption: null }
 
 type PhotoUploadFormProps = Readonly<{
   /** Quem envia: a foto do administrador já vai ao site, a do conselheiro espera. */
@@ -46,11 +46,11 @@ export function PhotoUploadForm({
   success,
 }: PhotoUploadFormProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
-    PhotoCreatePayload,
+    AdministratorPhotoCreatePayload,
     IPhoto,
-    PhotoCreatePayload
+    AdministratorPhotoCreatePayload
   >({
-    validator: PhotoCreateValidator,
+    validator: AdministratorPhotoCreateValidator,
     defaults: EMPTY,
     fields: PHOTO_FIELDS,
     mutation: (options) => usePhotoCreate(area, options),

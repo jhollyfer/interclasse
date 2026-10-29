@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import { AdministratorUserCreateValidator } from '@interclasse/shared'
+import type { AdministratorUserCreatePayload } from '@interclasse/shared'
 
 import {
   FormShell,
@@ -12,9 +14,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { UserCreateValidator } from '#/validators/administrator/users.validator'
 import type { IUser } from '#/lib/interfaces'
-import type { UserCreatePayload } from '#/validators/administrator/users.validator'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -37,10 +37,10 @@ export function UserFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     IUser,
-    UserCreatePayload
+    AdministratorUserCreatePayload
   >({
     formId: FORM_ID,
-    validator: UserCreateValidator,
+    validator: AdministratorUserCreateValidator,
     defaults: USER_FORM_DEFAULTS,
     fields: USER_FIELDS,
     mutation: useUserCreate,
@@ -52,7 +52,9 @@ export function UserFormCreate(): React.JSX.Element {
     // de um 5xx que possa ter gravado não cria uma segunda conta - esbarra no
     // 409 e diz isso.
     retry: 'user-create-error',
-    payload: (values) => values,
+    // O resolver já validou; o `parse` devolve o tipo de criação, em que o
+    // formulário (o da atualização, tudo opcional) não prova nome, e-mail e papel.
+    payload: (values) => AdministratorUserCreateValidator.parse(values),
   })
 
   return (

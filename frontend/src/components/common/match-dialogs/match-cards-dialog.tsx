@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
+import { AdministratorCardCreateValidator } from '@interclasse/shared'
+import type { AdministratorCardCreatePayload } from '@interclasse/shared'
 
 import { CardList } from '#/components/common/card-list'
 import { Button } from '#/components/ui/button'
@@ -35,8 +37,6 @@ import { CARD_COLORS } from '#/lib/entity'
 import { notifyError } from '#/lib/form-errors'
 import type { IMatchCard } from '#/lib/interfaces'
 import { CARD_COLOR_LABELS } from '#/lib/labels'
-import { CardCreateValidator } from '#/validators/administrator/cards.validator'
-import type { CardCreatePayload } from '#/validators/administrator/cards.validator'
 
 import type { MatchRef } from './match-dialogs'
 
@@ -71,11 +71,11 @@ export function MatchCardsDialog({
   const { data: athletes } = useQuery(matchAthletesQueryOptions(match.id))
 
   const { form, mutation, onSubmit } = useMutationForm<
-    CardCreatePayload,
+    AdministratorCardCreatePayload,
     IMatchCard,
-    CardCreatePayload
+    AdministratorCardCreatePayload
   >({
-    validator: CardCreateValidator,
+    validator: AdministratorCardCreateValidator,
     defaults: { matchId: match.id, studentId: '', note: '' },
     fields: FIELDS,
     mutation: useCardCreate,

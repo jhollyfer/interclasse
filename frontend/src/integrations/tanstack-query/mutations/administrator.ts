@@ -1,4 +1,21 @@
 import { useMutation } from '@tanstack/react-query'
+import type {
+  AdministratorAnnouncementCreatePayload,
+  AdministratorAnnouncementUpdatePayload,
+  AdministratorBracketCreatePayload,
+  AdministratorCardCreatePayload,
+  AdministratorClassroomCreatePayload,
+  AdministratorClassroomUpdatePayload,
+  AdministratorMatchScorePayload,
+  AdministratorMatchUpdatePayload,
+  AdministratorPhotoCreatePayload,
+  AdministratorPhotoReviewPayload,
+  AdministratorSiteUpdatePayload,
+  AdministratorSportCreatePayload,
+  AdministratorSportUpdatePayload,
+  AdministratorUserCreatePayload,
+  AdministratorUserUpdatePayload,
+} from '@interclasse/shared'
 
 import type {
   IAnnouncement,
@@ -13,33 +30,6 @@ import type {
   ISiteSetting,
   Merge,
 } from '#/lib/interfaces'
-import type {
-  PhotoCreatePayload,
-  PhotoReviewPayload,
-} from '#/validators/administrator/photos.validator'
-import type { SiteUpdatePayload } from '#/validators/administrator/site.validator'
-import type {
-  AnnouncementCreatePayload,
-  AnnouncementUpdatePayload,
-} from '#/validators/administrator/announcements.validator'
-import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
-import type { CardCreatePayload } from '#/validators/administrator/cards.validator'
-import type {
-  ClassroomCreatePayload,
-  ClassroomUpdatePayload,
-} from '#/validators/administrator/classrooms.validator'
-import type {
-  MatchScorePayload,
-  MatchUpdatePayload,
-} from '#/validators/administrator/matches.validator'
-import type {
-  SportCreatePayload,
-  SportUpdatePayload,
-} from '#/validators/administrator/sports.validator'
-import type {
-  UserCreatePayload,
-  UserUpdatePayload,
-} from '#/validators/administrator/users.validator'
 
 import type { HTTPError } from '../http'
 import { request, send } from '../http'
@@ -49,9 +39,9 @@ import { shouldRetryQuery } from '../query-context'
 /** O módulo inteiro exige `ADMINISTRATOR`. */
 
 export function useUserCreate(
-  options?: MutationProps<IUser, UserCreatePayload>,
+  options?: MutationProps<IUser, AdministratorUserCreatePayload>,
 ) {
-  return useMutation<IUser, HTTPError, UserCreatePayload>({
+  return useMutation<IUser, HTTPError, AdministratorUserCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<IUser>('/administrator/users', {
@@ -64,7 +54,7 @@ export function useUserCreate(
 
 /** O `id` viaja com o payload porque ele vai no caminho, não no corpo. */
 export type UserUpdateVariables = Merge<
-  UserUpdatePayload,
+  AdministratorUserUpdatePayload,
   { readonly id: string }
 >
 
@@ -135,9 +125,13 @@ export function useUserDelete(options?: MutationProps<void, string>) {
  */
 
 export function useClassroomCreate(
-  options?: MutationProps<IClassroom, ClassroomCreatePayload>,
+  options?: MutationProps<IClassroom, AdministratorClassroomCreatePayload>,
 ) {
-  return useMutation<IClassroom, HTTPError, ClassroomCreatePayload>({
+  return useMutation<
+    IClassroom,
+    HTTPError,
+    AdministratorClassroomCreatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<IClassroom>('/administrator/classrooms', {
@@ -149,7 +143,7 @@ export function useClassroomCreate(
 }
 
 export type ClassroomUpdateVariables = Merge<
-  ClassroomUpdatePayload,
+  AdministratorClassroomUpdatePayload,
   { readonly id: string }
 >
 
@@ -179,9 +173,9 @@ export function useClassroomDelete(options?: MutationProps<void, string>) {
 }
 
 export function useSportCreate(
-  options?: MutationProps<ISport, SportCreatePayload>,
+  options?: MutationProps<ISport, AdministratorSportCreatePayload>,
 ) {
-  return useMutation<ISport, HTTPError, SportCreatePayload>({
+  return useMutation<ISport, HTTPError, AdministratorSportCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<ISport>('/administrator/sports', {
@@ -193,7 +187,7 @@ export function useSportCreate(
 }
 
 export type SportUpdateVariables = Merge<
-  SportUpdatePayload,
+  AdministratorSportUpdatePayload,
   { readonly id: string }
 >
 
@@ -223,9 +217,16 @@ export function useSportDelete(options?: MutationProps<void, string>) {
 }
 
 export function useAnnouncementCreate(
-  options?: MutationProps<IAnnouncement, AnnouncementCreatePayload>,
+  options?: MutationProps<
+    IAnnouncement,
+    AdministratorAnnouncementCreatePayload
+  >,
 ) {
-  return useMutation<IAnnouncement, HTTPError, AnnouncementCreatePayload>({
+  return useMutation<
+    IAnnouncement,
+    HTTPError,
+    AdministratorAnnouncementCreatePayload
+  >({
     ...options,
     mutationFn: function (payload) {
       return request<IAnnouncement>('/administrator/announcements', {
@@ -237,7 +238,7 @@ export function useAnnouncementCreate(
 }
 
 export type AnnouncementUpdateVariables = Merge<
-  AnnouncementUpdatePayload,
+  AdministratorAnnouncementUpdatePayload,
   { readonly id: string }
 >
 
@@ -271,9 +272,9 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
 
 /** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
 export function useBracketCreate(
-  options?: MutationProps<IBracket, BracketCreatePayload>,
+  options?: MutationProps<IBracket, AdministratorBracketCreatePayload>,
 ) {
-  return useMutation<IBracket, HTTPError, BracketCreatePayload>({
+  return useMutation<IBracket, HTTPError, AdministratorBracketCreatePayload>({
     // Mutation não repete por padrão, porque repetir escrita duplica. O sorteio
     // pode: a API é idempotente por modalidade e categoria e devolve a chave
     // que já existe. Sem isto, a queda de rede depois do commit mostrava erro
@@ -302,7 +303,7 @@ export function useBracketDelete(options?: MutationProps<void, string>) {
 }
 
 export type MatchUpdateVariables = Merge<
-  MatchUpdatePayload,
+  AdministratorMatchUpdatePayload,
   { readonly id: string }
 >
 
@@ -322,7 +323,7 @@ export function useMatchUpdate(
 }
 
 export type MatchScoreVariables = Merge<
-  MatchScorePayload,
+  AdministratorMatchScorePayload,
   { readonly id: string }
 >
 
@@ -355,9 +356,9 @@ export function useMatchUnscore(options?: MutationProps<IMatch, string>) {
 
 /** Lança um cartão. O time sai do atleta, no servidor. */
 export function useCardCreate(
-  options?: MutationProps<IMatchCard, CardCreatePayload>,
+  options?: MutationProps<IMatchCard, AdministratorCardCreatePayload>,
 ) {
-  return useMutation<IMatchCard, HTTPError, CardCreatePayload>({
+  return useMutation<IMatchCard, HTTPError, AdministratorCardCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<IMatchCard>('/administrator/cards', {
@@ -394,9 +395,9 @@ export function useEnrollmentRemovalAcknowledge(
 
 /** Grava o "Sobre" e o regulamento. Campo ausente não muda; `null` apaga. */
 export function useSiteUpdate(
-  options?: MutationProps<ISiteSetting, SiteUpdatePayload>,
+  options?: MutationProps<ISiteSetting, AdministratorSiteUpdatePayload>,
 ) {
-  return useMutation<ISiteSetting, HTTPError, SiteUpdatePayload>({
+  return useMutation<ISiteSetting, HTTPError, AdministratorSiteUpdatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<ISiteSetting>('/administrator/site', {
@@ -413,9 +414,9 @@ export function useSiteUpdate(
  */
 export function usePhotoCreate(
   area: 'administrator' | 'advisor',
-  options?: MutationProps<IPhoto, PhotoCreatePayload>,
+  options?: MutationProps<IPhoto, AdministratorPhotoCreatePayload>,
 ) {
-  return useMutation<IPhoto, HTTPError, PhotoCreatePayload>({
+  return useMutation<IPhoto, HTTPError, AdministratorPhotoCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<IPhoto>('/'.concat(area, '/photos'), {
@@ -426,7 +427,10 @@ export function usePhotoCreate(
   })
 }
 
-export type PhotoReviewVariables = Merge<PhotoReviewPayload, { id: string }>
+export type PhotoReviewVariables = Merge<
+  AdministratorPhotoReviewPayload,
+  { id: string }
+>
 
 /** Aprova (vai ao site) ou recusa (sai do site). A decisão se refaz. */
 export function usePhotoReview(
