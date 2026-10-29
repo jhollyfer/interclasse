@@ -20,3 +20,10 @@ allowBuilds:
   esbuild: true
   # Compilador de CSS do Tailwind 4, mesmo motivo.
   lightningcss: true
+
+# Publicadas há menos tempo que a idade mínima do pnpm e exigidas pela régua
+# (_standards/i18n.md §4: `inlang check` pede @inlang/cli 3.4+). Sai quando a
+# versão passar da idade mínima.
+minimumReleaseAgeExclude:
+  - '@inlang/cli@3.4.5'
+  - '@inlang/sdk@4.1.0'
