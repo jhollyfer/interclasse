@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { BASE_LOCALE, type Locale } from './enums/locale.js'
+import { SORT_DIRECTIONS } from './enums/sort-direction.js'
 
 /**
  * O `z` configurado da casa: todo validator do `shared/` e todo schema local do
@@ -45,5 +46,40 @@ export function useValidatorLocale(locale: Locale): void {
 }
 
 useValidatorLocale(BASE_LOCALE)
+
+/** Tetos de lista que os dois lados cobram igual. */
+export const LIST_LIMITS = {
+  /** Atletas por time numa modalidade: o maior elenco que uma turma inscreve. */
+  ATHLETES: 40,
+} as const
+
+/**
+ * Os campos de listagem, iguais em toda rota que pagina. Da query string chegam
+ * como texto: `coerce` converte antes da regra (_doc-lib/zod.md#api).
+ */
+export function pageFields() {
+  return {
+    page: z.coerce.number().int().min(1).optional(),
+    perPage: z.coerce.number().int().min(1).max(100).optional(),
+  }
+}
+
+/** Paginação com busca por texto. */
+export function paginationFields() {
+  return {
+    ...pageFields(),
+    search: z.string().trim().max(100).optional(),
+  }
+}
+
+/** A ordenação de uma listagem: as colunas que ela aceita, e o sentido. */
+export function sortFields<const TColumns extends readonly [string, ...string[]]>(
+  columns: TColumns,
+) {
+  return {
+    sort: z.enum(columns).optional(),
+    direction: z.enum(SORT_DIRECTIONS).optional(),
+  }
+}
 
 export { z }

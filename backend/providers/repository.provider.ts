@@ -1,5 +1,7 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 
+import { SportLucidRepository } from '#repositories/sport/sport.lucid.repository'
+import { SportRepository } from '#repositories/sport/sport.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UnitOfWorkLucid } from '#repositories/unit-of-work/unit-of-work.lucid'
 
@@ -14,5 +16,6 @@ export default class RepositoryProvider {
 
   register() {
     this.app.container.bind(UnitOfWork, () => this.app.container.make(UnitOfWorkLucid))
+    this.app.container.bind(SportRepository, () => this.app.container.make(SportLucidRepository))
   }
 }

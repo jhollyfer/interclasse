@@ -411,42 +411,41 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * O espelho do frontend tem os mesmos exports (_standards/architecture.md §3.2):
- * `app/validators/<modulo>/<recurso>.validator.ts` e
- * `frontend/src/validators/<modulo>/<recurso>.validator.ts`. Todo export do
- * frontend existe no backend - o frontend nao valida o que a API nao conhece.
- * Sem o frontend ao lado (clone so do backend), a regra nao roda.
+ * Paridade VineJS x Zod (_standards/architecture.md §10): todo validator de
+ * `shared/src/validators/<modulo>/<recurso>.validator.ts` tem o par em
+ * `app/validators/<modulo>/<recurso>.validator.ts`, com os mesmos nomes de
+ * `*Validator`. Sem o `shared/` ao lado, a regra nao roda.
  */
 async function checkValidatorParity(sources: Map<string, string>): Promise<Finding[]> {
-  const frontRoot = resolve(ROOT, '../frontend/src/validators')
-  if (!(await exists(frontRoot))) return []
+  const sharedRoot = resolve(ROOT, '../shared/src/validators')
+  if (!(await exists(sharedRoot))) return []
 
   const findings: Finding[] = []
-  for (const file of await tsFiles(frontRoot)) {
+  for (const file of await tsFiles(sharedRoot)) {
     if (!file.endsWith('.validator.ts')) continue
-    const logical = relative(frontRoot, file)
-    const mirror = `app/validators/${logical}`
-    const backSource = sources.get(mirror)
-    const frontSource = withoutComments(await readFile(file, 'utf8'))
+    const logical = relative(sharedRoot, file)
+    const pair = `app/validators/${logical}`
+    const backSource = sources.get(pair)
+    const sharedSource = withoutComments(await readFile(file, 'utf8'))
     if (backSource === undefined) {
       findings.push({
-        file: `../frontend/src/validators/${logical}`,
+        file: `../shared/src/validators/${logical}`,
         line: 1,
-        rule: 'validator-without-mirror',
-        section: 'arquitetura 4',
-        message: `nao ha \`${mirror}\` no backend`,
+        rule: 'validator-without-pair',
+        section: 'arquitetura 10',
+        message: `nao ha \`${pair}\` no backend`,
       })
       continue
     }
-    for (const exported of frontSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+    for (const exported of sharedSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
       const name = exported[1] ?? ''
       if (new RegExp(`export\\s+const\\s+${name}\\b`).test(backSource)) continue
       findings.push({
-        file: `../frontend/src/validators/${logical}`,
-        line: lineOf(frontSource, exported.index),
-        rule: 'validator-without-mirror',
-        section: 'arquitetura 4',
-        message: `\`${name}\` nao existe em \`${mirror}\``,
+        file: `../shared/src/validators/${logical}`,
+        line: lineOf(sharedSource, exported.index),
+        rule: 'validator-without-pair',
+        section: 'arquitetura 10',
+        message: `\`${name}\` nao existe em \`${pair}\``,
       })
     }
   }

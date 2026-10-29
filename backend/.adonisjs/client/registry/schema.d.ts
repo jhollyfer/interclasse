@@ -338,7 +338,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/sports.validator').SportPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/sports.validator').AdministratorSportPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/sports/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -347,10 +347,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/administrator/sports'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/sports.validator').SportCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/sports.validator').AdministratorSportCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/sports.validator').SportCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/sports.validator').AdministratorSportCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/sports/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -371,10 +371,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/sports/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/sports.validator').SportUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/sports.validator').AdministratorSportUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/sports.validator').SportUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/sports.validator').AdministratorSportUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/sports/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }

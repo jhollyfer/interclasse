@@ -1,30 +1,37 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either } from '@interclasse/shared'
+import { left, right, type AdministratorSportShowResponse, type Either } from '@interclasse/shared'
 
-import Sport from '#models/sport'
+import { SportPresenter } from '../sports.presenter.ts'
+
+import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, Sport>
+type Response = Either<HTTPException, AdministratorSportShowResponse>
 
 @inject()
 export default class AdministratorSportShowUseCase {
+  constructor(
+    private readonly sports: SportRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const sport = await Sport.find(id)
-
+      const sport = await this.sports.findById(id)
       if (!sport)
-        return left(HTTPException.NotFound('Modalidade não encontrada', 'SPORT_NOT_FOUND'))
+        return left(HTTPException.NotFound(this.i18n.t('sports.not_found'), 'SPORT_NOT_FOUND'))
 
-      return right(sport)
+      return right(SportPresenter.show(sport))
     } catch (error) {
-      logger.error({ err: error }, '[sports > show][error]')
+      logger.error({ err: error }, '[administrator/sports > show][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_SPORT_SHOW_ERROR',
         ),
       )

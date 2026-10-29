@@ -9,6 +9,7 @@ import {
   UPLOAD_STATUSES,
   USER_ROLES,
 } from '@interclasse/shared'
+import { AdministratorSportShowResponse, StorefrontSportShowResponse } from '@interclasse/shared'
 
 import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
@@ -408,7 +409,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/users': USER,
 
   'administrator/classrooms': CLASSROOM_WITH_PEOPLE,
-  'administrator/sports': SPORT,
+  'administrator/sports': AdministratorSportShowResponse,
   'administrator/announcements': ANNOUNCEMENT,
   'administrator/site': SITE_SETTING,
   'administrator/photos': PHOTO,
@@ -436,7 +437,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    * tabelas é privado - nome de turma, placar e aviso são
    * públicos por natureza.
    */
-  'storefront/sports': SPORT,
+  'storefront/sports': StorefrontSportShowResponse,
   'storefront/announcements': ANNOUNCEMENT,
   'storefront/matches': MATCH,
   'storefront/brackets': BRACKET,
