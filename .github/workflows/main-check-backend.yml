@@ -40,11 +40,19 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: backend/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
+      # Da raiz: um lockfile só para o workspace (_standards/tooling.md §1). O
+      # filtro com `...` instala o backend e o que ele usa do workspace.
       - name: Install dependencies
-        working-directory: ./backend
-        run: pnpm install --frozen-lockfile
+        run: pnpm --filter "{./backend}..." install --frozen-lockfile --fail-if-no-match
+
+      # O backend importa o `dist/` do `@interclasse/shared`.
+      - name: Build shared
+        run: pnpm --filter ./shared run build
+
+      - name: Check shared
+        run: pnpm --filter ./shared run typecheck && pnpm --filter ./shared run test
 
       - name: Run linter
         working-directory: ./backend

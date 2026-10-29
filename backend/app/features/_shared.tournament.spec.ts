@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { MATCH_PHASE } from '@interclasse/shared'
 
 import {
   advanceSlot,
@@ -8,7 +9,6 @@ import {
   nextPhase,
   shuffle,
 } from '#features/_shared.tournament'
-import { MATCH_PHASE } from '#core/entity'
 
 /**
  * As regras puras do mata-mata, sem banco nem HTTP.

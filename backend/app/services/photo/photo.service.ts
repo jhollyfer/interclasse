@@ -1,9 +1,9 @@
+import { UPLOAD_STATUS, left, right, type Either, type PhotoStatus } from '@interclasse/shared'
+
 import Photo from '#models/photo'
 import Storage from '#models/storage'
 import type User from '#models/user'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { UPLOAD_STATUS, type PhotoStatus } from '#core/entity'
 
 type Upload = { readonly storageId: string; readonly caption?: string | null }
 

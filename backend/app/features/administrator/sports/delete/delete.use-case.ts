@@ -1,10 +1,10 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
 import Enrollment from '#models/enrollment'
 import Sport from '#models/sport'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 

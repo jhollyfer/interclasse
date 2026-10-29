@@ -1,9 +1,9 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Classroom from '#models/classroom'
 import ClassroomService from '#services/classroom/classroom.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
 import { categoryOf, classroomConflict } from '#features/administrator/_shared.classroom'

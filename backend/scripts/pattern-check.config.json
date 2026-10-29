@@ -19,9 +19,7 @@
   ],
   "softDeleteExempt": [],
   "shape": [
-    "app/core/entity.ts",
     "app/core/validator.ts",
-    "app/core/response.ts",
     "app/core/openapi/field-patches.ts",
     "app/services/storage/storage.service.ts",
     "app/services/slug/slug.service.ts",

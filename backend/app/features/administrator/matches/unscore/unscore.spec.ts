@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
+import { MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
-import { MATCH_PHASE, MATCH_STATUS } from '#core/entity'
 import { drawnBracket, scheduledMatch, scoreAll } from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,

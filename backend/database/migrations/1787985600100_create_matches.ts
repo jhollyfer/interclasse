@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { MATCH_PHASES, MATCH_STATUSES, MATCH_STATUS } from '#core/entity'
+import { MATCH_PHASES, MATCH_STATUS, MATCH_STATUSES } from '@interclasse/shared'
 
 export default class extends BaseSchema {
   protected tableName = 'matches'

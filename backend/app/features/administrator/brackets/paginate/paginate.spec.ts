@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import { BRACKET_STATUS, CATEGORY } from '@interclasse/shared'
 
-import { BRACKET_STATUS, CATEGORY } from '#core/entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import {

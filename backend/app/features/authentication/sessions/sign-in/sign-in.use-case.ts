@@ -1,10 +1,9 @@
 import { errors as authErrors } from '@adonisjs/auth'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { ACTIVE_STATUS, left, right, type Either } from '@interclasse/shared'
 
 import User from '#models/user'
-import { ACTIVE_STATUS } from '#core/entity'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import SessionService, { type SessionTokens } from '#services/session/session.service'
 import type { SessionSignInPayload } from '#features/authentication/sessions/sessions.validator'

@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { MATCH_PHASE, type MatchPhase } from '#core/entity'
+import { MATCH_PHASE, type MatchPhase } from '@interclasse/shared'
 
 /**
  * As regras do torneio, puras: sorteio e avanço no mata-mata.

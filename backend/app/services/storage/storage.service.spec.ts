@@ -1,9 +1,8 @@
 import { test } from '@japa/runner'
+import { UPLOAD_STATUS, type UploadStatus } from '@interclasse/shared'
 
 import Storage from '#models/storage'
-import { UPLOAD_STATUS } from '#core/entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
-import type { UploadStatus } from '#core/entity'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao

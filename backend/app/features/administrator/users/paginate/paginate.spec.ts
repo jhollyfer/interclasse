@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
-import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,

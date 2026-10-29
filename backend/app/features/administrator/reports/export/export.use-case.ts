@@ -1,10 +1,9 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { CATEGORY, left, right, type Category, type Either } from '@interclasse/shared'
 
 import ReportService, { type Report } from '#services/report/report.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { CATEGORY, type Category } from '#core/entity'
 
 type Response = Either<HTTPException, string>
 

@@ -1,6 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
+import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '@interclasse/shared'
 
 import env from '#start/env'
 import Announcement from '#models/announcement'
@@ -14,7 +15,6 @@ import User from '#models/user'
 import TournamentSeeder from '#database/seeders/tournament.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
-import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '#core/entity'
 
 /**
  * Um campeonato de demonstração, no meio do caminho: contas dos três papéis,

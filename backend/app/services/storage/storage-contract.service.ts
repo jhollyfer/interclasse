@@ -1,4 +1,5 @@
-import type { Either } from '#core/either'
+import { type Either } from '@interclasse/shared'
+
 import type { StorageMimetype } from '#core/validator'
 import type HTTPException from '#exceptions/http.exception'
 import type Storage from '#models/storage'

@@ -1,4 +1,4 @@
-import { TRASHED_MODE, type TrashedMode } from '#core/entity'
+import { TRASHED_MODE, type TrashedMode } from '@interclasse/shared'
 
 /**
  * Consulta de um model com o par de scopes de soft delete (_standards/backend.md

@@ -1,9 +1,9 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
 import Classroom from '#models/classroom'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import type { EnrollmentShowPayload } from '#features/advisor/enrollments/enrollments.validator'
 

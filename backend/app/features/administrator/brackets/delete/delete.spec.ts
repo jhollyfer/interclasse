@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
+import { MATCH_PHASE } from '@interclasse/shared'
 
 import Match from '#models/match'
 import Team from '#models/team'
-import { MATCH_PHASE } from '#core/entity'
 import { drawnBracket, scoreAll } from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,

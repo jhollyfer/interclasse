@@ -1,14 +1,12 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
+import { UPLOAD_STATUS, left, right, type Either, type Merge } from '@interclasse/shared'
 
 import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import { MultipartContract } from '#services/multipart/multipart-contract.service'
-import { UPLOAD_STATUS } from '#core/entity'
-import type { Merge } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 import type { FileCompletePayload } from '#features/storages/files/files.validator'
 

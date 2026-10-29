@@ -26,11 +26,14 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        working-directory: ./frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm --filter "{./frontend}..." install --frozen-lockfile --fail-if-no-match
+
+      # O frontend importa o `dist/` do `@interclasse/shared`.
+      - name: Build shared
+        run: pnpm --filter ./shared run build
 
       # O carimbo da revisão: vira `https://interclass.maiyu.com.br/revision.txt`
       # e é o que o smoke test do deploy confere. Antes do build e em `public/`:

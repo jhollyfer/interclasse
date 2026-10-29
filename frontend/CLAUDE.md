@@ -33,8 +33,6 @@ Aqui fica só o que este projeto faz diferente dela, e os comandos.
 - **ESLint**: o `no-restricted-syntax` de `new *Controller` ignora o
   `AbortController` (API da plataforma); `import-x/order` não roda em
   `components/ui/**` (saída do shadcn).
-- **`pnpm-workspace.yaml` só com `allowBuilds`**: é onde o pnpm 12 lê a
-  aprovação de build de dependência, mesmo sem workspace.
 - **Kit comum sem `rich-editor/` e `multi-file-upload/`**: nenhuma tela do
   domínio tem texto rico nem envio de vários arquivos.
 - **Tabela sem contexto para a instância**: o `React.Context` perde o genérico

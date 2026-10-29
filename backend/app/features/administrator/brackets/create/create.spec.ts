@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
+import { CATEGORY, MATCH_PHASE } from '@interclasse/shared'
 
-import { CATEGORY, MATCH_PHASE } from '#core/entity'
 import { createSport, draw, enrolledClassrooms } from '#tests/brackets-fixtures'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 

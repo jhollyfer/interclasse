@@ -1,5 +1,6 @@
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+import { USER_ROLE, left, right, type Either } from '@interclasse/shared'
 
 import type { Infer } from '#core/validator'
 import { type EnrollmentBoardResponse } from '#core/openapi/response'
@@ -10,8 +11,6 @@ import EnrollmentRemoval from '#models/enrollment-removal'
 import Sport from '#models/sport'
 import Student from '#models/student'
 import type User from '#models/user'
-import { USER_ROLE } from '#core/entity'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
 
 /** A forma sai do schema de resposta, nunca de um tipo redigido ao lado dele (_standards/typescript.md §2). */

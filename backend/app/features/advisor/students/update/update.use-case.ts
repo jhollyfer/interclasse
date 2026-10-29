@@ -1,10 +1,9 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either, type Merge } from '@interclasse/shared'
 
 import Student from '#models/student'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import type { Merge } from '#core/entity'
 import type { StudentUpdatePayload } from '#features/advisor/students/students.validator'
 import type { IdentifierPayload } from '#core/validator'
 

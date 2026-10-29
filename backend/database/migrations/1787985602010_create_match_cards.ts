@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { CARD_COLORS } from '#core/entity'
+import { CARD_COLORS } from '@interclasse/shared'
 
 /**
  * Os cartões que um atleta levou numa partida.

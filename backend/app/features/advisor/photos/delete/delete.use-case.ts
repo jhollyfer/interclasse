@@ -1,11 +1,10 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import { USER_ROLE, left, right, type Either, type Merge } from '@interclasse/shared'
 
 import Photo from '#models/photo'
 import type User from '#models/user'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { USER_ROLE, type Merge } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<IdentifierPayload, { actor: User }>

@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#core/entity'
+import { ACTIVE_STATUS, ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 export default class extends BaseSchema {
   protected tableName = 'users'

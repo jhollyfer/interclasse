@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=24"
   },
@@ -24,7 +23,6 @@
     "openapi:generate": "node ace openapi:generate",
     "openapi:check": "node ace openapi:generate --check --strict",
     "check": "pnpm lint && pnpm typecheck && pnpm openapi:check && pnpm pattern:check && pnpm sync:check && pnpm authz:check",
-    "prepare": "cd .. && husky backend/.husky || true",
     "sync:check": "node --import @poppinss/ts-exec scripts/sync-check.ts",
     "pattern:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts",
     "authz:check": "node --import @poppinss/ts-exec scripts/authz-check.ts",
@@ -84,6 +82,7 @@
     "@adonisjs/shield": "^9.0.0",
     "@aws-sdk/client-s3": "^3.1150.0",
     "@aws-sdk/s3-request-presigner": "^3.1150.0",
+    "@interclasse/shared": "workspace:*",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
     "luxon": "^3.7.2",
@@ -95,5 +94,8 @@
       "./app/features/**/*.controller.ts",
       "./app/middleware/*.ts"
     ]
-  }
+  },
+  "files": [
+    "build"
+  ]
 }

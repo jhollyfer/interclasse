@@ -1,6 +1,7 @@
+import { PHOTO_REVIEW_STATUSES, PHOTO_STATUSES } from '@interclasse/shared'
+
 import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
-import { PHOTO_REVIEW_STATUSES, PHOTO_STATUSES } from '#core/entity'
 
 export const PhotoCreateValidator = vine.create({
   storageId: vine.string().uuid(),

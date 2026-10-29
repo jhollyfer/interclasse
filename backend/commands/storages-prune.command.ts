@@ -52,7 +52,7 @@ export default class StoragesPrune extends BaseCommand {
     const { default: Storage } = await import('#models/storage')
     const { default: StoragesFileDeleteUseCase } =
       await import('#features/storages/files/delete/delete.use-case')
-    const { UPLOAD_STATUS } = await import('#core/entity')
+    const { UPLOAD_STATUS } = await import('@interclasse/shared')
 
     const hours = this.hours ?? DEFAULT_HOURS
     const cutoff = DateTime.now().minus({ hours })

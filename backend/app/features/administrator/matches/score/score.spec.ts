@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
+import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
-import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '#core/entity'
 import { MatchFactory } from '#database/factories/match.factory'
 import { drawnBracket, scheduledMatch, scoreAll } from '#tests/brackets-fixtures'
 import {

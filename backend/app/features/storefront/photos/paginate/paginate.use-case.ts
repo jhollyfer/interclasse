@@ -1,12 +1,17 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  PHOTO_STATUS,
+  left,
+  right,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
 import Photo from '#models/photo'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION, PHOTO_STATUS } from '#core/entity'
-import { type Paginated } from '#core/response'
 import type { PagePayload } from '#core/validator'
 
 type Payload = PagePayload
