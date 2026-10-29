@@ -20,6 +20,7 @@ import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries'
 
 import { bracketColumns } from './columns'
 import { DrawDialog } from './draw-dialog'
+import { BracketRowActions } from './row-actions'
 
 const route = getRouteApi('/_private/administrator/brackets/')
 
@@ -33,6 +34,7 @@ export function BracketsTable(): React.JSX.Element {
     rows: data?.data ?? [],
     columns: bracketColumns,
     getRowId: (row) => row.id,
+    actions: (bracket) => <BracketRowActions bracket={bracket} />,
     persistKey: 'administrator:brackets',
   })
 
