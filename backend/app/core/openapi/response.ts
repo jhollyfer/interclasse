@@ -10,6 +10,13 @@ import {
   USER_ROLES,
 } from '@interclasse/shared'
 import { AdministratorSportShowResponse, StorefrontSportShowResponse } from '@interclasse/shared'
+import {
+  AdministratorBracketPaginateResponse,
+  AdministratorBracketPreviewResponse,
+  AdministratorBracketShowResponse,
+  StorefrontBracketPaginateResponse,
+  StorefrontBracketShowResponse,
+} from '@interclasse/shared'
 
 import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
@@ -188,43 +195,6 @@ export const StorageUploadResponse = vine.create({
   ),
 })
 
-/** Uma partida como a chave a desenha: os nomes das turmas já resolvidos. */
-function bracketMatchFields() {
-  return {
-    id: vine.string().uuid(),
-    phase: vine.enum(MATCH_PHASES),
-    round: vine.number(),
-    position: vine.number(),
-    status: vine.enum(MATCH_STATUSES),
-    homeTeamId: vine.string().uuid().nullable(),
-    awayTeamId: vine.string().uuid().nullable(),
-    homeName: vine.string().nullable(),
-    awayName: vine.string().nullable(),
-    homeScore: vine.number().nullable(),
-    awayScore: vine.number().nullable(),
-    winnerTeamId: vine.string().uuid().nullable(),
-    scheduledAt: vine.string().nullable(),
-    location: vine.string().nullable(),
-  }
-}
-
-/**
- * A competição inteira, numa resposta: todas as partidas, de cada fase, com os
- * nomes das turmas já resolvidos. É a tela de chave do painel e do site.
- *
- * Declarada em VineJS porque o nome da turma vem de duas relações abaixo, e a
- * resposta é achatada para quem desenha a chave.
- */
-export const BracketDetailResponse = vine.create({
-  id: vine.string().uuid(),
-  category: vine.enum(CATEGORIES),
-  status: vine.enum(BRACKET_STATUSES),
-  sport: vine.object({ id: vine.string().uuid(), name: vine.string(), slug: vine.string() }),
-  /** Nulo até a chave terminar. */
-  championTeamId: vine.string().uuid().nullable(),
-  matches: vine.array(vine.object(bracketMatchFields())),
-})
-
 /**
  * As inscrições de uma turma: as modalidades, os alunos e em quais modalidades
  * cada um está. É a matriz aluno x modalidade da tela do conselheiro e do
@@ -274,26 +244,6 @@ export const MatchAthletesResponse = vine.create({
           enrolled: vine.boolean(),
         }),
       ),
-    }),
-  ),
-})
-
-/**
- * O que o sorteio faria agora: cada turma da categoria com quantos atletas tem
- * inscritos na modalidade, e se entra. É o que o diálogo mostra antes de
- * sortear, para a turma de fora não ser surpresa.
- */
-export const DrawPreviewResponse = vine.create({
-  minAthletes: vine.number(),
-  maxTeams: vine.number(),
-  /** Já existe chave desta modalidade nesta categoria. */
-  drawn: vine.boolean(),
-  classrooms: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      athletes: vine.number(),
-      eligible: vine.boolean(),
     }),
   ),
 })
@@ -417,11 +367,12 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'advisor/photos': PHOTO,
 
   /**
-   * A competição como a listagem, o sorteio e o apagar a devolvem. `show` foge
-   * desta forma - devolve a chave inteira - e por isso declara
-   * `BracketDetailResponse` no próprio controller.
+   * A chave com a modalidade, como a listagem e o sorteio a devolvem. `show`
+   * (a chave inteira, com as partidas) e `preview` têm forma própria, por ação.
    */
-  'administrator/brackets': BRACKET,
+  'administrator/brackets': AdministratorBracketPaginateResponse,
+  'administrator/brackets/show': AdministratorBracketShowResponse,
+  'administrator/brackets/preview': AdministratorBracketPreviewResponse,
   'administrator/matches': MATCH,
   'administrator/enrollment-removals': ENROLLMENT_REMOVAL,
   'administrator/cards': MATCH_CARD,
@@ -440,7 +391,8 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'storefront/sports': StorefrontSportShowResponse,
   'storefront/announcements': ANNOUNCEMENT,
   'storefront/matches': MATCH,
-  'storefront/brackets': BRACKET,
+  'storefront/brackets': StorefrontBracketPaginateResponse,
+  'storefront/brackets/show': StorefrontBracketShowResponse,
   'storefront/site': StorefrontSiteResponse,
   'storefront/photos': StorefrontPhotoResponse,
 }

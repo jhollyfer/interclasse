@@ -20,8 +20,8 @@ export default class AdministratorBracketCreateController {
       'apague a chave.\n\n' +
       'Idempotente por modalidade e categoria: se a chave já existe, a resposta é 200 com ' +
       'ela, sem novo sorteio - o reenvio depois de uma queda de rede leva à mesma chave.',
-    // A mensagem deste código é montada com o mínimo da modalidade, e a leitura
-    // de AST do gerador só colhe mensagem literal.
+    // Nascem na entidade e são traduzidos em `_shared.bracket-refusal.ts`, fora
+    // da pasta da ação: o introspector não os lê sozinho.
     errors: { 409: ['NOT_ENOUGH_TEAMS', 'TOO_MANY_TEAMS'] },
   })
 
