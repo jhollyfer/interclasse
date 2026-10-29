@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { vine, pageFields, matchFilterFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const MatchPaginateValidator = vine.create({
+export const AdministratorMatchPaginateValidator = vine.create({
   ...pageFields(),
   ...matchFilterFields(),
 })
@@ -47,7 +47,7 @@ export function scheduledAt() {
  * A agenda da partida. A escola joga no horário local, e o servidor grava em
  * UTC; `null` desmarca.
  */
-export const MatchUpdateValidator = vine.create({
+export const AdministratorMatchUpdateValidator = vine.create({
   scheduledAt: scheduledAt(),
   location: vine.string().trim().maxLength(120).nullable().optional(),
 })
@@ -56,14 +56,14 @@ export const MatchUpdateValidator = vine.create({
  * O placar. `winnerTeamId` só é lido no mata-mata empatado - o vencedor nos
  * pênaltis; em qualquer outro caso o placar decide sozinho.
  */
-export const MatchScoreValidator = vine.create({
+export const AdministratorMatchScoreValidator = vine.create({
   homeScore: vine.number().withoutDecimals().min(0).max(999),
   awayScore: vine.number().withoutDecimals().min(0).max(999),
   winnerTeamId: vine.string().uuid().optional(),
 })
 
-export type MatchPaginatePayload = Infer<typeof MatchPaginateValidator>
+export type AdministratorMatchPaginatePayload = Infer<typeof AdministratorMatchPaginateValidator>
 
-export type MatchUpdatePayload = Infer<typeof MatchUpdateValidator>
+export type AdministratorMatchUpdatePayload = Infer<typeof AdministratorMatchUpdateValidator>
 
-export type MatchScorePayload = Infer<typeof MatchScoreValidator>
+export type AdministratorMatchScorePayload = Infer<typeof AdministratorMatchScoreValidator>

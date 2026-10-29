@@ -1,45 +1,67 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import type { DateTime } from 'luxon'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type Merge } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorMatchUpdateResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import Match from '#models/match'
+import { MatchRefusal } from '../_shared.match-refusal.ts'
+
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { MatchUpdatePayload } from '#validators/administrator/matches.validator'
+import type { AdministratorMatchUpdatePayload } from '#validators/administrator/matches.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<MatchUpdatePayload, IdentifierPayload>
-type Response = Either<HTTPException, Match>
+type Payload = Merge<AdministratorMatchUpdatePayload, IdentifierPayload>
+type Response = Either<HTTPException, AdministratorMatchUpdateResponse>
 
+/** Agenda a partida: data, hora e local. Campo ausente é "não mexer"; `null` desmarca. */
 @inject()
 export default class AdministratorMatchUpdateUseCase {
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
+
+  /** Ausente continua ausente e `null` continua `null`: só a data de verdade vira `Date`. */
+  private static dateOf(value: DateTime | null | undefined): Date | null | undefined {
+    if (value === undefined) return undefined
+    if (value === null) return null
+
+    return value.toJSDate()
+  }
+
   async execute({ id, scheduledAt, location }: Payload): Promise<Response> {
     try {
-      const match = await Match.find(id)
+      const bracket = await this.brackets.findByMatchId(id)
+      if (!bracket)
+        return left(HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'))
 
-      if (!match) return left(HTTPException.NotFound('Partida não encontrada', 'MATCH_NOT_FOUND'))
+      const scheduled = bracket.schedule(
+        id,
+        { scheduledAt: AdministratorMatchUpdateUseCase.dateOf(scheduledAt), location },
+        new Date(),
+      )
+      if (scheduled.isLeft()) return left(MatchRefusal.http(scheduled.value, this.i18n))
 
-      if (scheduledAt !== undefined) match.scheduledAt = scheduledAt
+      await this.brackets.save(bracket)
 
-      if (location !== undefined) match.location = location
+      const response = await this.brackets.findMatchResponse(id)
+      if (!response)
+        return left(HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'))
 
-      await match.save()
-      await match.load('homeTeam', (team) => {
-        team.preload('classroom')
-      })
-      await match.load('awayTeam', (team) => {
-        team.preload('classroom')
-      })
-      await match.load('bracket', (bracket) => {
-        bracket.preload('sport')
-      })
-
-      return right(match)
+      return right(response)
     } catch (error) {
-      logger.error({ err: error }, '[matches > update][error]')
+      logger.error({ err: error }, '[administrator/matches > update][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_MATCH_UPDATE_ERROR',
         ),
       )

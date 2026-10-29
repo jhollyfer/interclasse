@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorMatchUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchUpdateValidator } from '#validators/administrator/matches.validator'
+import { AdministratorMatchUpdateValidator } from '#validators/administrator/matches.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -19,7 +19,7 @@ export default class AdministratorMatchUpdateController {
   constructor(private readonly useCase: AdministratorMatchUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(MatchUpdateValidator)
+    const body = await context.request.validateUsing(AdministratorMatchUpdateValidator)
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

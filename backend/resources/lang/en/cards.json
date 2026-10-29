@@ -1,0 +1,7 @@
+{
+  "not_found": "Card not found",
+  "match_not_found": "Match not found",
+  "teams_pending": "The match does not have both teams defined yet",
+  "student_not_in_match": "Athlete is not in the match",
+  "student_not_in_match_field": "Select an athlete from one of the two classes in the match"
+}

@@ -1,0 +1,9 @@
+{
+  "not_found": "Match not found",
+  "teams_pending": "The match does not have both teams defined yet",
+  "winner_required": "Say who won",
+  "winner_required_field": "Draw: select who won on penalties",
+  "not_played": "The match has no score yet",
+  "next_played_on_score": "The next match already has a score: fix it first",
+  "next_played_on_unscore": "The next match already has a score: undo it first"
+}
