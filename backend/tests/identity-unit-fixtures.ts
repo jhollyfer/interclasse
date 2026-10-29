@@ -2,7 +2,7 @@ import { User } from '#domain/user/user.entity'
 import { StorageMemoryRepository } from '#repositories/storage/storage.memory.repository'
 import { UnitOfWorkMemory } from '#repositories/unit-of-work/unit-of-work.memory'
 import { UserMemoryRepository } from '#repositories/user/user.memory.repository'
-import { ClassroomDetachFake } from '#services/classroom-detach/classroom-detach.fake'
+import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
 import { SessionFake } from '#services/session/session.fake'
 
 export const USER_ID = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d'
@@ -17,7 +17,7 @@ export function identityDoubles() {
     storages,
     users: new UserMemoryRepository(storages),
     sessions: new SessionFake(),
-    classrooms: new ClassroomDetachFake(),
+    classrooms: new ClassroomMemoryRepository(),
     unitOfWork: new UnitOfWorkMemory(),
   }
 }

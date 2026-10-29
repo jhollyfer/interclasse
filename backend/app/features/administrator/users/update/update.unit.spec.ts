@@ -5,7 +5,7 @@ import AdministratorUserUpdateUseCase from './update.use-case.ts'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
 import { makeWithMemory } from '#tests/unit-fixtures'
 import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
@@ -17,7 +17,7 @@ async function setup() {
     [UserRepository, doubles.users],
     [StorageRepository, doubles.storages],
     [SessionContract, doubles.sessions],
-    [ClassroomDetachContract, doubles.classrooms],
+    [ClassroomRepository, doubles.classrooms],
     [UnitOfWork, doubles.unitOfWork],
   ])
 
@@ -33,7 +33,7 @@ test.group('administrator/users > update (unit)', () => {
 
     assert.deepInclude(updated, { name: 'Ana Maria', email: 'ana@mail.com' })
     assert.deepEqual(sessions.revokedAll, [])
-    assert.deepEqual(classrooms.detached, [])
+    assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
   test('trocar o papel derruba as sessões e solta as turmas', async ({ assert }) => {
@@ -44,7 +44,7 @@ test.group('administrator/users > update (unit)', () => {
 
     assert.equal(updated.role, 'REPRESENTATIVE')
     assert.deepEqual(sessions.revokedAll, [USER_ID])
-    assert.deepEqual(classrooms.detached, [USER_ID])
+    assert.deepEqual(classrooms.detachedAccounts, [USER_ID])
   })
 
   test('trocar e-mail ou desativar derruba as sessões, mas não solta turma', async ({ assert }) => {
@@ -55,7 +55,7 @@ test.group('administrator/users > update (unit)', () => {
     await useCase.execute({ id: USER_ID, status: 'INACTIVE' })
 
     assert.deepEqual(sessions.revokedAll, [USER_ID, USER_ID])
-    assert.deepEqual(classrooms.detached, [])
+    assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
   test('trocar a senha derruba as sessões', async ({ assert }) => {

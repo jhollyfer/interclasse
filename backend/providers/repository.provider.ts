@@ -24,8 +24,6 @@ import { StorageLucidRepository } from '#repositories/storage/storage.lucid.repo
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserLucidRepository } from '#repositories/user/user.lucid.repository'
 import { UserRepository } from '#repositories/user/user.repository'
-import ClassroomDetachService from '#services/classroom-detach/classroom-detach.service'
-import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
 import SessionService from '#services/session/session.service'
 import { SessionContract } from '#services/session/session.contract'
 
@@ -66,8 +64,5 @@ export default class RepositoryProvider {
     )
     this.app.container.bind(UserRepository, () => this.app.container.make(UserLucidRepository))
     this.app.container.bind(SessionContract, () => this.app.container.make(SessionService))
-    this.app.container.bind(ClassroomDetachContract, () =>
-      this.app.container.make(ClassroomDetachService),
-    )
   }
 }

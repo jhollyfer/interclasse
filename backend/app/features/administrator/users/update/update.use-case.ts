@@ -13,7 +13,7 @@ import HTTPException from '#exceptions/http.exception'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
 import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
 import { UserRefusal } from '#features/_shared.user-refusal'
@@ -42,7 +42,7 @@ export default class AdministratorUserUpdateUseCase {
     private readonly users: UserRepository,
     private readonly storages: StorageRepository,
     private readonly sessions: SessionContract,
-    private readonly classrooms: ClassroomDetachContract,
+    private readonly classrooms: ClassroomRepository,
     private readonly unitOfWork: UnitOfWork,
     private readonly i18n: I18n,
   ) {}
@@ -77,7 +77,7 @@ export default class AdministratorUserUpdateUseCase {
         await this.users.save(user)
 
         if (effects.revokesSessions) await this.sessions.revokeAll(id)
-        if (effects.roleChanged) await this.classrooms.detach(id)
+        if (effects.roleChanged) await this.classrooms.detachAccount(id)
 
         return right(null)
       })
