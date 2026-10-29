@@ -8,7 +8,7 @@ import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import { MultipartContract } from '#services/multipart/multipart-contract.service'
 import type { IdentifierPayload } from '#core/validator'
-import type { FileCompletePayload } from '#features/storages/files/files.validator'
+import type { FileCompletePayload } from '#validators/storages/files.validator'
 
 type Payload = Merge<IdentifierPayload, FileCompletePayload>
 type Response = Either<HTTPException, ModelObject>

@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorPhotoCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { PhotoCreateValidator } from '#features/administrator/photos/photos.validator'
+import { PhotoCreateValidator } from '#validators/administrator/photos.validator'
 
 @inject()
 export default class AdministratorPhotoCreateController {

@@ -85,13 +85,18 @@ export default defineConfig({
   |
   */
   tests: {
-    // Suíte única: sem repositório injetável não há o que dublar num teste
-    // unitário. Testar por HTTP exercita rota, middleware, validator, use-case e
-    // serialização de uma vez. A spec mora ao lado do que cobre - a da ação na
-    // pasta da ação (_standards/backend.md §7); `tests/` guarda só infraestrutura.
+    // Duas suítes (_standards/architecture.md §3.2 e §8): `unit` não abre banco
+    // nem HTTP e roda a regra rápido; `functional` sobe a aplicação de verdade
+    // e fala com Postgres e MinIO. O sufixo separa o runner, e a spec mora ao
+    // lado do que cobre.
     suites: [
       {
-        files: ['app/**/*.spec.{ts,js}'],
+        files: ['app/**/*.unit.spec.{ts,js}', 'scripts/**/*.unit.spec.{ts,js}'],
+        name: 'unit',
+        timeout: 5000,
+      },
+      {
+        files: ['app/**/*.e2e.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },

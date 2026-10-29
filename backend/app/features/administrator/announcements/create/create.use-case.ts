@@ -4,7 +4,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import Announcement from '#models/announcement'
 import HTTPException from '#exceptions/http.exception'
-import type { AnnouncementCreatePayload } from '#features/administrator/announcements/announcements.validator'
+import type { AnnouncementCreatePayload } from '#validators/administrator/announcements.validator'
 
 type Payload = AnnouncementCreatePayload
 type Response = Either<HTTPException, Announcement>

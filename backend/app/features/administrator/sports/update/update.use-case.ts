@@ -7,7 +7,7 @@ import Sport from '#models/sport'
 import SlugService from '#services/slug/slug.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { SportUpdatePayload } from '#features/administrator/sports/sports.validator'
+import type { SportUpdatePayload } from '#validators/administrator/sports.validator'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<SportUpdatePayload, IdentifierPayload>

@@ -411,8 +411,8 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * O espelho do frontend tem os mesmos exports (_standards/architecture.md §4):
- * `app/features/<modulo>/<recurso>/<recurso>.validator.ts` e
+ * O espelho do frontend tem os mesmos exports (_standards/architecture.md §3.2):
+ * `app/validators/<modulo>/<recurso>.validator.ts` e
  * `frontend/src/validators/<modulo>/<recurso>.validator.ts`. Todo export do
  * frontend existe no backend - o frontend nao valida o que a API nao conhece.
  * Sem o frontend ao lado (clone so do backend), a regra nao roda.
@@ -425,9 +425,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
   for (const file of await tsFiles(frontRoot)) {
     if (!file.endsWith('.validator.ts')) continue
     const logical = relative(frontRoot, file)
-    const parts = logical.replace('.validator.ts', '').split('/')
-    const resource = parts[parts.length - 1] ?? ''
-    const mirror = `app/features/${parts.join('/')}/${resource}.validator.ts`
+    const mirror = `app/validators/${logical}`
     const backSource = sources.get(mirror)
     const frontSource = withoutComments(await readFile(file, 'utf8'))
     if (backSource === undefined) {

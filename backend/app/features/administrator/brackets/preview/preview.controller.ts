@@ -5,7 +5,7 @@ import AdministratorBracketPreviewUseCase from './preview.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { DrawPreviewResponse } from '#core/openapi/response'
-import { BracketPreviewValidator } from '#features/administrator/brackets/brackets.validator'
+import { BracketPreviewValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketPreviewController {

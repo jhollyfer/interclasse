@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StorefrontBracketPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketPaginateValidator } from '#features/storefront/brackets/brackets.validator'
+import { BracketPaginateValidator } from '#validators/storefront/brackets.validator'
 
 @inject()
 export default class StorefrontBracketPaginateController {

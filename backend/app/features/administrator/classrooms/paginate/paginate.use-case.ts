@@ -6,7 +6,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 import Classroom from '#models/classroom'
 import HTTPException from '#exceptions/http.exception'
 import { sortOrder } from '#features/_shared.sort'
-import type { ClassroomPaginatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { ClassroomPaginatePayload } from '#validators/administrator/classrooms.validator'
 
 type Payload = ClassroomPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

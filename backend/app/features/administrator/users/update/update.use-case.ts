@@ -9,7 +9,7 @@ import ClassroomService from '#services/classroom/classroom.service'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { UserUpdatePayload } from '#features/administrator/users/users.validator'
+import type { UserUpdatePayload } from '#validators/administrator/users.validator'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<UserUpdatePayload, IdentifierPayload>

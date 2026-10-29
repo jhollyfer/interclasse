@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorPhotoReviewUseCase from './review.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { PhotoReviewValidator } from '#features/administrator/photos/photos.validator'
+import { PhotoReviewValidator } from '#validators/administrator/photos.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

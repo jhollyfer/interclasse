@@ -6,7 +6,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 import Bracket from '#models/bracket'
 import Sport from '#models/sport'
 import HTTPException from '#exceptions/http.exception'
-import type { BracketPaginatePayload } from '#features/storefront/brackets/brackets.validator'
+import type { BracketPaginatePayload } from '#validators/storefront/brackets.validator'
 
 type Payload = BracketPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

@@ -6,7 +6,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 import Announcement from '#models/announcement'
 import HTTPException from '#exceptions/http.exception'
 import { recentFirst } from '#features/_shared.sort'
-import type { AnnouncementPaginatePayload } from '#features/administrator/announcements/announcements.validator'
+import type { AnnouncementPaginatePayload } from '#validators/administrator/announcements.validator'
 
 type Payload = AnnouncementPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

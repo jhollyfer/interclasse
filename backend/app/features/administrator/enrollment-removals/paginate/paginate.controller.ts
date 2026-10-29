@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorEnrollmentRemovalPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { EnrollmentRemovalPaginateValidator } from '#features/administrator/enrollment-removals/enrollment-removals.validator'
+import { EnrollmentRemovalPaginateValidator } from '#validators/administrator/enrollment-removals.validator'
 
 @inject()
 export default class AdministratorEnrollmentRemovalPaginateController {

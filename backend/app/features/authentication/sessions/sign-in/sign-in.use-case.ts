@@ -6,7 +6,7 @@ import { ACTIVE_STATUS, left, right, type Either } from '@interclasse/shared'
 import User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
 import SessionService, { type SessionTokens } from '#services/session/session.service'
-import type { SessionSignInPayload } from '#features/authentication/sessions/sessions.validator'
+import type { SessionSignInPayload } from '#validators/authentication/sessions.validator'
 
 type Payload = SessionSignInPayload
 type Response = Either<HTTPException, SessionTokens>

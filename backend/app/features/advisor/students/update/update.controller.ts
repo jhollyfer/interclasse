@@ -6,7 +6,7 @@ import AdvisorStudentUpdateUseCase from './update.use-case.ts'
 import Student from '#models/student'
 import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { StudentUpdateValidator } from '#features/advisor/students/students.validator'
+import { StudentUpdateValidator } from '#validators/advisor/students.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

@@ -5,7 +5,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 
 import Photo from '#models/photo'
 import HTTPException from '#exceptions/http.exception'
-import type { PhotoPaginatePayload } from '#features/administrator/photos/photos.validator'
+import type { PhotoPaginatePayload } from '#validators/administrator/photos.validator'
 
 type Payload = PhotoPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

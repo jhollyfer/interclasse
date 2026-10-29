@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorCardPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { CardPaginateValidator } from '#features/administrator/cards/cards.validator'
+import { CardPaginateValidator } from '#validators/administrator/cards.validator'
 
 @inject()
 export default class AdministratorCardPaginateController {

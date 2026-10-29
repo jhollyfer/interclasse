@@ -3,7 +3,7 @@ import { inject } from '@adonisjs/core'
 
 import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
-import { SessionSignInValidator } from '#features/authentication/sessions/sessions.validator'
+import { SessionSignInValidator } from '#validators/authentication/sessions.validator'
 import { defineDocs } from '#core/openapi/types'
 import CookieService from '#services/cookie/cookie.service'
 

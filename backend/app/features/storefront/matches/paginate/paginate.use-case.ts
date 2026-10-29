@@ -12,7 +12,7 @@ import {
 
 import MatchService from '#services/match/match.service'
 import HTTPException from '#exceptions/http.exception'
-import type { MatchPaginatePayload } from '#features/storefront/matches/matches.validator'
+import type { MatchPaginatePayload } from '#validators/storefront/matches.validator'
 
 type Payload = MatchPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

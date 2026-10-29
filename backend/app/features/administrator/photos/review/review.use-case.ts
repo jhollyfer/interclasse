@@ -7,7 +7,7 @@ import Photo from '#models/photo'
 import type User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
-import type { PhotoReviewPayload } from '#features/administrator/photos/photos.validator'
+import type { PhotoReviewPayload } from '#validators/administrator/photos.validator'
 
 type Payload = Merge<Merge<PhotoReviewPayload, IdentifierPayload>, { actor: User }>
 type Response = Either<HTTPException, Photo>

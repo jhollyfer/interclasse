@@ -6,7 +6,7 @@ import AdvisorStudentCreateUseCase from './create.use-case.ts'
 import Classroom from '#models/classroom'
 import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { StudentCreateValidator } from '#features/advisor/students/students.validator'
+import { StudentCreateValidator } from '#validators/advisor/students.validator'
 
 @inject()
 export default class AdvisorStudentCreateController {

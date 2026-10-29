@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdvisorPhotoCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { PhotoCreateValidator } from '#features/advisor/photos/photos.validator'
+import { PhotoCreateValidator } from '#validators/advisor/photos.validator'
 
 @inject()
 export default class AdvisorPhotoCreateController {

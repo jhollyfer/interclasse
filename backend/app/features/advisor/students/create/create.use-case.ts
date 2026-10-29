@@ -5,7 +5,7 @@ import { left, right, type Either } from '@interclasse/shared'
 import Classroom from '#models/classroom'
 import Student from '#models/student'
 import HTTPException from '#exceptions/http.exception'
-import type { StudentCreatePayload } from '#features/advisor/students/students.validator'
+import type { StudentCreatePayload } from '#validators/advisor/students.validator'
 
 type Payload = StudentCreatePayload
 type Response = Either<HTTPException, Student>

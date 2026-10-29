@@ -5,7 +5,7 @@ import StoragesFileCompleteUseCase from './complete.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
-import { FileCompleteValidator } from '#features/storages/files/files.validator'
+import { FileCompleteValidator } from '#validators/storages/files.validator'
 
 @inject()
 export default class StoragesFileCompleteController {

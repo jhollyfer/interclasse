@@ -25,7 +25,7 @@ import {
 } from '#features/_shared.tournament'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
+import type { BracketCreatePayload } from '#validators/administrator/brackets.validator'
 
 type Payload = BracketCreatePayload
 /** `created` falso quando a chave já existia: o controller responde 200, não 201. */

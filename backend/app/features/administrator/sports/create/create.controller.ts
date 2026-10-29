@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorSportCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { SportCreateValidator } from '#features/administrator/sports/sports.validator'
+import { SportCreateValidator } from '#validators/administrator/sports.validator'
 
 @inject()
 export default class AdministratorSportCreateController {

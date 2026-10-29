@@ -6,7 +6,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 import Sport from '#models/sport'
 import HTTPException from '#exceptions/http.exception'
 import { sortOrder } from '#features/_shared.sort'
-import type { SportPaginatePayload } from '#features/administrator/sports/sports.validator'
+import type { SportPaginatePayload } from '#validators/administrator/sports.validator'
 
 type Payload = SportPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

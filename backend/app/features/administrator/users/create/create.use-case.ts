@@ -6,7 +6,7 @@ import User from '#models/user'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { UserCreatePayload } from '#features/administrator/users/users.validator'
+import type { UserCreatePayload } from '#validators/administrator/users.validator'
 
 type Payload = UserCreatePayload
 type Response = Either<HTTPException, User>

@@ -4,9 +4,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StoragesFileCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { FileCreateValidator } from '#features/storages/files/files.validator'
+import { FileCreateValidator } from '#validators/storages/files.validator'
 import { STORAGE_MIMETYPES } from '#core/validator'
-import { UPLOAD_MAX_SIZE } from '#features/storages/files/files.validator'
+import { UPLOAD_MAX_SIZE } from '#validators/storages/files.validator'
 import { PART_SIZE } from '#services/multipart/multipart-contract.service'
 import { StorageUploadResponse } from '#core/openapi/response'
 

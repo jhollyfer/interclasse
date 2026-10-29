@@ -7,7 +7,7 @@ import { defineDocs } from '#core/openapi/types'
 import {
   ClassroomPaginateValidator,
   CLASSROOM_SORT_COLUMNS,
-} from '#features/administrator/classrooms/classrooms.validator'
+} from '#validators/administrator/classrooms.validator'
 
 @inject()
 export default class AdministratorClassroomPaginateController {
