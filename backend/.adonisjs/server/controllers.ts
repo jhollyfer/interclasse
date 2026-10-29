@@ -116,6 +116,14 @@ export const controllers = {
         Review: () => import('#features/administrator/photos/review/review.controller'),
       },
     },
+    reports: {
+      export: {
+        Export: () => import('#features/administrator/reports/export/export.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/reports/show/show.controller'),
+      },
+    },
     site: {
       show: {
         Show: () => import('#features/administrator/site/show/show.controller'),

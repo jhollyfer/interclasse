@@ -36,6 +36,8 @@ export type ScannedRoutes = {
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
     'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
     'administrator.photos.create': { paramsTuple?: []; params?: {} }
     'administrator.photos.review': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -103,6 +105,8 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
     'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
     'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
@@ -143,6 +147,8 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
     'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
     'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }

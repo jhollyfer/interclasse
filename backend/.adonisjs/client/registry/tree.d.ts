@@ -51,6 +51,10 @@ export interface ApiDefinition {
       update: typeof routes['administrator.sports.update']
       delete: typeof routes['administrator.sports.delete']
     }
+    reports: {
+      show: typeof routes['administrator.reports.show']
+      export: typeof routes['administrator.reports.export']
+    }
     photos: {
       paginate: typeof routes['administrator.photos.paginate']
       create: typeof routes['administrator.photos.create']

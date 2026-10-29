@@ -37,6 +37,10 @@
       "description": "Os avisos que o site mostra. Fixados aparecem primeiro."
     },
     {
+      "name": "Painel · Relatórios",
+      "description": "Quantas turmas, alunos e atletas participaram dos jogos, na tela ou em CSV."
+    },
+    {
       "name": "Painel · Fotos",
       "description": "As fotos do carrossel do site. As do conselheiro chegam pendentes e só vão ao ar depois de aprovadas."
     },
@@ -3184,6 +3188,126 @@
             }
           }
         }
+      }
+    },
+    "/administrator/reports": {
+      "get": {
+        "operationId": "administratorReportsShow",
+        "summary": "Relatório dos jogos",
+        "tags": [
+          "Painel · Relatórios"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorReportsShowResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorReportShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Quantas turmas, alunos e atletas participaram: no total, por categoria, por modalidade e por turma, além das partidas jogadas e marcadas. Atleta é aluno inscrito em ao menos uma modalidade.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ]
+      }
+    },
+    "/administrator/reports/csv": {
+      "get": {
+        "operationId": "administratorReportsExport",
+        "summary": "Baixar relatório em CSV",
+        "tags": [
+          "Painel · Relatórios"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorReportsExportResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorReportExportError"
+                }
+              }
+            }
+          }
+        },
+        "description": "O relatório por turma em CSV (UTF-8 com BOM, separado por `;`), que o Excel em português abre direto em colunas. A última linha é o total.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ]
       }
     },
     "/administrator/site": {
@@ -12277,6 +12401,321 @@
           "updatedAt"
         ]
       },
+      "AdministratorReportsExportResponse200": {
+        "type": "string",
+        "properties": {
+          "totals": {
+            "type": "object",
+            "properties": {
+              "classrooms": {
+                "type": "number"
+              },
+              "students": {
+                "type": "number"
+              },
+              "athletes": {
+                "type": "number"
+              },
+              "enrollments": {
+                "type": "number"
+              },
+              "sports": {
+                "type": "number"
+              },
+              "matchesPlayed": {
+                "type": "number"
+              },
+              "matchesScheduled": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "classrooms",
+              "students",
+              "athletes",
+              "enrollments",
+              "sports",
+              "matchesPlayed",
+              "matchesScheduled"
+            ],
+            "additionalProperties": false
+          },
+          "byCategory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "enum": [
+                    "F1",
+                    "F2"
+                  ]
+                },
+                "classrooms": {
+                  "type": "number"
+                },
+                "students": {
+                  "type": "number"
+                },
+                "athletes": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "category",
+                "classrooms",
+                "students",
+                "athletes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bySport": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "athletes": {
+                  "type": "number"
+                },
+                "classrooms": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "athletes",
+                "classrooms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "classrooms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "category": {
+                  "enum": [
+                    "F1",
+                    "F2"
+                  ]
+                },
+                "advisor": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "representative": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "students": {
+                  "type": "number"
+                },
+                "athletes": {
+                  "type": "number"
+                },
+                "sports": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "category",
+                "students",
+                "athletes",
+                "sports"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "totals",
+          "byCategory",
+          "bySport",
+          "classrooms"
+        ],
+        "additionalProperties": false,
+        "description": "O arquivo CSV."
+      },
+      "AdministratorReportsShowResponse200": {
+        "type": "object",
+        "properties": {
+          "totals": {
+            "type": "object",
+            "properties": {
+              "classrooms": {
+                "type": "number"
+              },
+              "students": {
+                "type": "number"
+              },
+              "athletes": {
+                "type": "number"
+              },
+              "enrollments": {
+                "type": "number"
+              },
+              "sports": {
+                "type": "number"
+              },
+              "matchesPlayed": {
+                "type": "number"
+              },
+              "matchesScheduled": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "classrooms",
+              "students",
+              "athletes",
+              "enrollments",
+              "sports",
+              "matchesPlayed",
+              "matchesScheduled"
+            ],
+            "additionalProperties": false
+          },
+          "byCategory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "enum": [
+                    "F1",
+                    "F2"
+                  ]
+                },
+                "classrooms": {
+                  "type": "number"
+                },
+                "students": {
+                  "type": "number"
+                },
+                "athletes": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "category",
+                "classrooms",
+                "students",
+                "athletes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "bySport": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "athletes": {
+                  "type": "number"
+                },
+                "classrooms": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "athletes",
+                "classrooms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "classrooms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "category": {
+                  "enum": [
+                    "F1",
+                    "F2"
+                  ]
+                },
+                "advisor": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "representative": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "students": {
+                  "type": "number"
+                },
+                "athletes": {
+                  "type": "number"
+                },
+                "sports": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "category",
+                "students",
+                "athletes",
+                "sports"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "totals",
+          "byCategory",
+          "bySport",
+          "classrooms"
+        ],
+        "additionalProperties": false
+      },
       "AdministratorSiteShowResponse200": {
         "type": "object",
         "properties": {
@@ -17678,6 +18117,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_PHOTO_REVIEW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorReportExportError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_REPORT_EXPORT_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorReportShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_REPORT_SHOW_ERROR"
             ]
           },
           "errors": {

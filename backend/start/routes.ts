@@ -186,6 +186,14 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.administrator.reports.show.Show])
+        router.get('csv', [controllers.administrator.reports.export.Export]).as('export')
+      })
+      .prefix('reports')
+      .as('reports')
+
+    router
+      .group(() => {
         router.get('/', [controllers.administrator.photos.paginate.Paginate])
         router.post('/', [controllers.administrator.photos.create.Create])
         router.put(':id/review', [controllers.administrator.photos.review.Review]).as('review')

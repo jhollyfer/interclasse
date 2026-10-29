@@ -104,6 +104,13 @@ const tags: TagRule[] = [
     plural: 'avisos',
   },
   {
+    prefix: '/administrator/reports',
+    name: 'Painel · Relatórios',
+    description: 'Quantas turmas, alunos e atletas participaram dos jogos, na tela ou em CSV.',
+    singular: 'relatório',
+    plural: 'relatórios',
+  },
+  {
     prefix: '/administrator/photos',
     name: 'Painel · Fotos',
     description:
