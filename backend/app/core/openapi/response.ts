@@ -5,11 +5,16 @@ import {
   CATEGORIES,
   MATCH_PHASES,
   MATCH_STATUSES,
-  PHOTO_STATUSES,
   UPLOAD_STATUSES,
   USER_ROLES,
 } from '@interclasse/shared'
-import { AdministratorSportShowResponse, StorefrontSportShowResponse } from '@interclasse/shared'
+import {
+  AdministratorPhotoShowResponse,
+  AdministratorSportShowResponse,
+  AdvisorPhotoShowResponse,
+  StorefrontPhotoShowResponse,
+  StorefrontSportShowResponse,
+} from '@interclasse/shared'
 
 import { vine } from '#core/validator'
 import Announcement from '#models/announcement'
@@ -17,7 +22,6 @@ import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import EnrollmentRemoval from '#models/enrollment-removal'
 import MatchCard from '#models/match-card'
-import Photo from '#models/photo'
 import SiteSetting from '#models/site-setting'
 import Match from '#models/match'
 import Sport from '#models/sport'
@@ -85,11 +89,6 @@ const SPORT: ModelResource = {
 
 const ANNOUNCEMENT: ModelResource = {
   model: Announcement,
-}
-const PHOTO: ModelResource = {
-  model: Photo,
-  enums: { status: PHOTO_STATUSES },
-  relations: { storage: STORAGE, author: PERSON },
 }
 const SITE_SETTING: ModelResource = {
   model: SiteSetting,
@@ -318,17 +317,6 @@ export const StorefrontSiteResponse = vine.create({
     .nullable(),
 })
 
-/**
- * A foto do carrossel no site anônimo: a URL assinada e a legenda, sem quem
- * enviou nem o caminho no bucket.
- */
-export const StorefrontPhotoResponse = vine.create({
-  id: vine.string().uuid(),
-  caption: vine.string().nullable(),
-  url: vine.string(),
-  createdAt: vine.date(),
-})
-
 /** O relatório dos jogos: totais, por categoria, por modalidade e por turma. */
 export const ReportResponse = vine.create({
   totals: vine.object({
@@ -412,9 +400,9 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/sports': AdministratorSportShowResponse,
   'administrator/announcements': ANNOUNCEMENT,
   'administrator/site': SITE_SETTING,
-  'administrator/photos': PHOTO,
+  'administrator/photos': AdministratorPhotoShowResponse,
   'administrator/reports': ReportResponse,
-  'advisor/photos': PHOTO,
+  'advisor/photos': AdvisorPhotoShowResponse,
 
   /**
    * A competição como a listagem, o sorteio e o apagar a devolvem. `show` foge
@@ -442,5 +430,5 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'storefront/matches': MATCH,
   'storefront/brackets': BRACKET,
   'storefront/site': StorefrontSiteResponse,
-  'storefront/photos': StorefrontPhotoResponse,
+  'storefront/photos': StorefrontPhotoShowResponse,
 }

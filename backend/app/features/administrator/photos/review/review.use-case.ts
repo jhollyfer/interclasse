@@ -1,16 +1,24 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { DateTime } from 'luxon'
-import { left, right, type Either, type Merge } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorPhotoShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import Photo from '#models/photo'
-import type User from '#models/user'
+import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
-import type { PhotoReviewPayload } from '#validators/administrator/photos.validator'
+import type { AdministratorPhotoReviewPayload } from '#validators/administrator/photos.validator'
 
-type Payload = Merge<Merge<PhotoReviewPayload, IdentifierPayload>, { actor: User }>
-type Response = Either<HTTPException, Photo>
+type Payload = Merge<
+  Merge<AdministratorPhotoReviewPayload, IdentifierPayload>,
+  { actor: { readonly id: string } }
+>
+type Response = Either<HTTPException, AdministratorPhotoShowResponse>
 
 /**
  * Aprovar põe a foto no site; recusar tira. A decisão se refaz: foto recusada
@@ -18,24 +26,31 @@ type Response = Either<HTTPException, Photo>
  */
 @inject()
 export default class AdministratorPhotoReviewUseCase {
+  constructor(
+    private readonly photos: PhotoRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id, status, actor }: Payload): Promise<Response> {
     try {
-      const photo = await Photo.find(id)
+      const photo = await this.photos.findById(id)
+      if (!photo)
+        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
 
-      if (!photo) return left(HTTPException.NotFound('Foto não encontrada', 'PHOTO_NOT_FOUND'))
+      photo.review({ status, reviewerId: actor.id, now: new Date() })
+      await this.photos.save(photo)
 
-      photo.merge({ status, reviewedById: actor.id, reviewedAt: DateTime.now() })
-      await photo.save()
-      await photo.load('storage')
-      await photo.load('author')
+      const shown = await this.photos.show(id)
+      if (!shown)
+        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
 
-      return right(photo)
+      return right(shown)
     } catch (error) {
-      logger.error({ err: error }, '[photos > review][error]')
+      logger.error({ err: error }, '[administrator/photos > review][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_PHOTO_REVIEW_ERROR',
         ),
       )
