@@ -1,15 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { TableSkeleton } from '#/components/common/table/table-skeleton'
-import { withExtra } from '#/lib/list-search'
 import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
-const validateSearch = withExtra([
-  'sportId',
-  'category',
-  'phase',
-  'status',
-] as const)
+import { validateSearch } from './-search'
 
 export const Route = createFileRoute('/_private/administrator/matches/')({
   validateSearch,
