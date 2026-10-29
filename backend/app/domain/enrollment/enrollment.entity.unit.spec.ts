@@ -56,7 +56,10 @@ test.group('Enrollment', () => {
   })
 
   test('representante só acrescenta', ({ assert }) => {
-    const added = roster(['a']).replace({ studentIds: ['a', 'b'], writer: REPRESENTATIVE }, context())
+    const added = roster(['a']).replace(
+      { studentIds: ['a', 'b'], writer: REPRESENTATIVE },
+      context(),
+    )
     const removing = roster(['a', 'b']).replace(
       { studentIds: ['a'], writer: REPRESENTATIVE },
       context(),
@@ -87,10 +90,7 @@ test.group('Enrollment', () => {
   test('tirar atleta sem motivo é ENROLLMENT_REASON_REQUIRED', ({ assert }) => {
     const enrollment = roster(['a'])
 
-    const result = enrollment.replace(
-      { studentIds: [], writer: { role: 'advisor' } },
-      context(),
-    )
+    const result = enrollment.replace({ studentIds: [], writer: { role: 'advisor' } }, context())
 
     assert.deepEqual(result.value, { code: 'ENROLLMENT_REASON_REQUIRED' })
     assert.deepEqual(enrollment.snapshot().studentIds, ['a'])

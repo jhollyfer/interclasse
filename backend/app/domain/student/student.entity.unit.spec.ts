@@ -19,8 +19,8 @@ test.group('Student', () => {
   test('nasce com o nome aparado e a edição carimbada', ({ assert }) => {
     const created = Student.create({ id: 'id', classroomId: 'c', name: '  Bia  ', now: NOW })
 
-    assert.isTrue(created.isRight())
-    assert.deepInclude(created.isRight() ? created.value.snapshot() : {}, {
+    if (created.isLeft()) throw new Error('aluno recusado')
+    assert.deepInclude(created.value.snapshot(), {
       name: 'Bia',
       classroomId: 'c',
       updatedAt: NOW,

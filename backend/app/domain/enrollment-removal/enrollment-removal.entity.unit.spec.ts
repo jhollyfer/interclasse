@@ -1,8 +1,7 @@
 import { test } from '@japa/runner'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { EnrollmentRemoval } from './enrollment-removal.entity.ts'
-
-import { USER_ROLE } from '@interclasse/shared'
 
 const NOW = new Date('2026-10-29T12:00:00Z')
 const LATER = new Date('2026-10-30T12:00:00Z')
