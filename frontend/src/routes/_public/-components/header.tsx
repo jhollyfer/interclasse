@@ -4,6 +4,7 @@ import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { cn } from '#/lib/utils'
 
 import { AUTHENTICATION, NAVIGATION } from './menu'
@@ -150,6 +151,7 @@ export function Header(): React.JSX.Element {
           >
             {AUTHENTICATION.label}
           </Link>
+          <LocaleSwitch className="ml-1 text-brand-ink-foreground hover:bg-brand-ink-foreground/10" />
         </nav>
 
         {/*

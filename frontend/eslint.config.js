@@ -6,6 +6,8 @@ import pluginRouter from '@tanstack/eslint-plugin-router'
 import importX from 'eslint-plugin-import-x'
 
 export default [
+  // Saída do compilador do Paraglide: gerada, não versionada (_standards/i18n.md §2).
+  { ignores: ['src/paraglide/**'] },
   ...tanstackConfig,
 
   // Os dois plugins pegam a classe de erro que o TypeScript não pega: chave de

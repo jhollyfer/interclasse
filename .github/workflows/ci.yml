@@ -37,6 +37,13 @@ jobs:
       - name: Build shared
         run: pnpm --filter ./shared run build
 
+      # As mensagens do Paraglide compiladas antes de lint e typecheck: a saída
+      # (`src/paraglide/`) não é versionada (_standards/i18n.md §2), e o
+      # `inlang check` reprova tradução faltando nos três idiomas (§4).
+      - name: Compile and check messages
+        working-directory: ./frontend
+        run: pnpm i18n:compile && pnpm i18n:check
+
       - name: Run linter
         working-directory: ./frontend
         run: pnpm lint

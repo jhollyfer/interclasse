@@ -22,6 +22,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { Separator } from '#/components/ui/separator'
 import { SidebarTrigger } from '#/components/ui/sidebar'
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { initials } from '#/lib/labels'
 
@@ -148,6 +149,7 @@ export function Header(): React.JSX.Element {
         <Trail />
       </div>
       <div className="ml-auto flex items-center gap-2 px-4">
+        <LocaleSwitch />
         <ThemeToggle />
         <AccountMenu />
       </div>
