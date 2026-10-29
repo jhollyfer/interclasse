@@ -1,6 +1,8 @@
-# <Projeto> — instruções para agentes
+# Interclasse: instruções para agentes
 
-<Uma linha: o que o produto faz e para quem.>
+Sistema dos Jogos Interclasse (JIC) do CMEI Cosme Jean: turmas, inscrição de atletas, sorteio das chaves, tabela de jogos, placar, classificação e avisos, para a organização, os professores conselheiros, os alunos representantes e o público.
+
+Monorepo pnpm: `backend/` (AdonisJS 7), `frontend/` (TanStack Start) e `shared/` (`@interclasse/shared`: Either, enums, validators Zod, respostas). Comandos e o que cada app faz diferente da régua estão em `backend/CLAUDE.md` e `frontend/CLAUDE.md`; os scripts, no `package.json`.
 
 ## O padrão Maiyu é seguido estritamente
 
@@ -27,7 +29,7 @@ e se corrige, não se documenta como escolha. Regra que não serve ao projeto mu
 
 1. `docs/MEMORY.md` — onde o trabalho parou.
 2. `docs/TASKS.md` — o que está em andamento e o que vem depois.
-3. O que a tarefa pede, pela tabela de `_standards/documentation.md` §4 (PRD, USER-FLOWS, DESIGN, ENV…).
+3. O que a tarefa pede, pela tabela de `_standards/documentation.md` §4 (PRD, USER-FLOWS, DESIGN, ENV…). Sorteio, chave, inscrição ou placar: `docs/ARCHITECTURE.md` §4.1 (linguagem do domínio) e `docs/RULES.md` §3. Deploy ou variável: `docs/ENV.md` e `docs/ARCHITECTURE.md` §9.1. Rota pública ou upload: `docs/SECURITY.md`.
 4. O padrão da casa: `_standards/` e `_doc-lib/`, na ordem de `maiyu-standards`.
 
 **A `_doc-lib/` é contrato, obrigatório antes de toda decisão e de toda implementação.** Ler o
