@@ -1,21 +1,21 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 import {
   PAGINATION,
-  PHOTO_STATUS,
   left,
   right,
   type Either,
   type Paginated,
+  type StorefrontPhotoShowResponse,
 } from '@interclasse/shared'
 
-import Photo from '#models/photo'
+import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { PagePayload } from '#core/validator'
 
 type Payload = PagePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Response = Either<HTTPException, Paginated<StorefrontPhotoShowResponse>>
 
 /**
  * O carrossel do site: só as aprovadas, da mais nova à mais antiga. Sai a URL
@@ -23,29 +23,25 @@ type Response = Either<HTTPException, Paginated<ModelObject>>
  */
 @inject()
 export default class StorefrontPhotoPaginateUseCase {
+  constructor(
+    private readonly photos: PhotoRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const photos = await Photo.query()
-        .where('status', PHOTO_STATUS.APPROVED)
-        .preload('storage')
-        .orderBy('createdAt', 'desc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({
-        meta: photos.getMeta(),
-        data: photos.all().map((photo) => ({
-          id: photo.id,
-          caption: photo.caption,
-          url: photo.storage.url,
-          createdAt: photo.createdAt,
-        })),
-      })
+      return right(
+        await this.photos.paginateApproved({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[storefront > photos][error]')
+      logger.error({ err: error }, '[storefront/photos > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'STOREFRONT_PHOTO_PAGINATE_ERROR',
         ),
       )

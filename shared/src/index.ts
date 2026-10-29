@@ -38,3 +38,11 @@ export * from './responses/administrator/announcements.response.js'
 export * from './responses/administrator/site.response.js'
 export * from './responses/storefront/announcements.response.js'
 export * from './responses/storefront/site.response.js'
+
+export * from './validators/administrator/photos.validator.js'
+export * from './validators/advisor/photos.validator.js'
+
+export * from './responses/administrator/photos.response.js'
+export * from './responses/administrator/reports.response.js'
+export * from './responses/advisor/photos.response.js'
+export * from './responses/storefront/photos.response.js'

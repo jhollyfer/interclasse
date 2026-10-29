@@ -1,62 +1,33 @@
-import db from '@adonisjs/lucid/services/db'
-import { CATEGORIES, MATCH_STATUS, type Category } from '@interclasse/shared'
+import { inject } from '@adonisjs/core'
+import {
+  CATEGORIES,
+  MATCH_STATUS,
+  type AdministratorReportShowResponse,
+  type Category,
+} from '@interclasse/shared'
 
-export type ClassroomReport = {
-  readonly id: string
-  readonly name: string
-  readonly category: Category
-  readonly advisor: string | null
-  readonly representative: string | null
-  readonly students: number
-  readonly athletes: number
-  readonly sports: number
-}
+import { ReportRepository } from './report.repository.ts'
 
-export type SportReport = {
-  readonly id: string
-  readonly name: string
-  readonly athletes: number
-  readonly classrooms: number
-}
+import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
-export type CategoryReport = {
-  readonly category: Category
-  readonly classrooms: number
-  readonly students: number
-  readonly athletes: number
-}
+type ClassroomRow = AdministratorReportShowResponse['classrooms'][number]
+type SportRow = AdministratorReportShowResponse['bySport'][number]
 
-export type Report = {
-  readonly totals: {
-    readonly classrooms: number
-    readonly students: number
-    readonly athletes: number
-    readonly enrollments: number
-    readonly sports: number
-    readonly matchesPlayed: number
-    readonly matchesScheduled: number
+/** Tudo contado no banco, em consultas agregadas. */
+@inject()
+export class ReportLucidRepository extends ReportRepository {
+  constructor(private readonly transaction: TransactionContext) {
+    super()
   }
-  readonly byCategory: ReadonlyArray<CategoryReport>
-  readonly bySport: ReadonlyArray<SportReport>
-  readonly classrooms: ReadonlyArray<ClassroomReport>
-}
 
-/**
- * Os números dos jogos: quantas turmas, alunos e atletas participaram, por
- * categoria, por modalidade e por turma.
- *
- * Service porque consulta o banco e serve a duas saídas - a tela e o CSV -,
- * que precisam dar os mesmos números. Tudo contado no banco, em consultas
- * agregadas; nenhuma linha de aluno sobe para a aplicação.
- */
-export default class ReportService {
-  async build(): Promise<Report> {
+  async summarize(): Promise<AdministratorReportShowResponse> {
+    const client = this.transaction.client()
     const [classrooms, bySport, enrollments, sports, matches] = await Promise.all([
       this.classrooms(),
       this.sports(),
-      db.from('enrollments').count('* as total').first(),
-      db.from('sports').count('* as total').first(),
-      db.from('matches').select('status').count('* as total').groupBy('status'),
+      client.from('enrollments').count('* as total').first(),
+      client.from('sports').count('* as total').first(),
+      client.from('matches').select('status').count('* as total').groupBy('status'),
     ])
 
     const played = matches.find((row) => row.status === MATCH_STATUS.FINISHED)
@@ -87,12 +58,13 @@ export default class ReportService {
     }
   }
 
-  private sum(rows: ReadonlyArray<ClassroomReport>, key: 'students' | 'athletes'): number {
+  private sum(rows: ReadonlyArray<ClassroomRow>, key: 'students' | 'athletes'): number {
     return rows.reduce((total, row) => total + row[key], 0)
   }
 
   /** Cada turma com as pessoas e os totais dela, em ordem de ano e nome. */
-  private async classrooms(): Promise<Array<ClassroomReport>> {
+  private async classrooms(): Promise<ClassroomRow[]> {
+    const client = this.transaction.client()
     const rows: Array<{
       id: string
       name: string
@@ -102,7 +74,7 @@ export default class ReportService {
       students: string | number
       athletes: string | number
       sports: string | number
-    }> = await db
+    }> = await client
       .from('classrooms')
       .leftJoin('users as advisors', 'advisors.id', 'classrooms.advisor_id')
       .leftJoin('users as representatives', 'representatives.id', 'classrooms.representative_id')
@@ -118,9 +90,9 @@ export default class ReportService {
         'advisors.name as advisor',
         'representatives.name as representative',
       )
-      .select(db.raw('count(distinct students.id) as students'))
-      .select(db.raw('count(distinct enrollments.student_id) as athletes'))
-      .select(db.raw('count(distinct enrollments.sport_id) as sports'))
+      .select(client.raw('count(distinct students.id) as students'))
+      .select(client.raw('count(distinct enrollments.student_id) as athletes'))
+      .select(client.raw('count(distinct enrollments.sport_id) as sports'))
 
     return rows.map((row) => ({
       ...row,
@@ -131,21 +103,22 @@ export default class ReportService {
   }
 
   /** Cada modalidade com quantos atletas e quantas turmas têm inscritos nela. */
-  private async sports(): Promise<Array<SportReport>> {
+  private async sports(): Promise<SportRow[]> {
+    const client = this.transaction.client()
     const rows: Array<{
       id: string
       name: string
       athletes: string | number
       classrooms: string | number
-    }> = await db
+    }> = await client
       .from('sports')
       .leftJoin('enrollments', 'enrollments.sport_id', 'sports.id')
       .leftJoin('students', 'students.id', 'enrollments.student_id')
       .groupBy('sports.id')
       .orderBy('sports.name')
       .select('sports.id', 'sports.name')
-      .select(db.raw('count(distinct enrollments.student_id) as athletes'))
-      .select(db.raw('count(distinct students.classroom_id) as classrooms'))
+      .select(client.raw('count(distinct enrollments.student_id) as athletes'))
+      .select(client.raw('count(distinct students.classroom_id) as classrooms'))
 
     return rows.map((row) => ({
       ...row,
