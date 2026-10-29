@@ -9,7 +9,7 @@ import { UploadingProvider } from '#/components/common/uploading-context'
 import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Spinner } from '#/components/ui/spinner'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { SITE_TITLE } from '#/lib/constant'
 

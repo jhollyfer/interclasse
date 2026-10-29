@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 
-import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 import { HOME_PHOTOS } from '../index'
 import { Section, SectionHeader, SectionTitle } from './section'

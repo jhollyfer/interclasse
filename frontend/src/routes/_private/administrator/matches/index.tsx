@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { TableSkeleton } from '#/components/common/table/table-skeleton'
 import { withExtra } from '#/lib/list-search'
-import { matchesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 const validateSearch = withExtra([
   'sportId',

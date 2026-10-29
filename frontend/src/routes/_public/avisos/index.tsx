@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { validateStorefrontSearch } from '#/lib/list-search'
 import { SITE_TITLE } from '#/lib/constant'
 

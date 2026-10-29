@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { TableSkeleton } from '#/components/common/table/table-skeleton'
 import { validateListSearch } from '#/lib/list-search'
-import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 const validateSearch = validateListSearch
 

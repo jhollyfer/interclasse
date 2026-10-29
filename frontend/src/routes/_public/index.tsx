@@ -5,7 +5,7 @@ import {
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
   storefrontPhotosQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/storefront'
 import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
 
 /** As consultas da home, com os mesmos parâmetros no loader e na tela. */

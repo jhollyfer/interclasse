@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
 
 /**
  * Erro engolido (`.catch`): representante sem turma vinculada leva `404`, e a tela

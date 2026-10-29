@@ -37,7 +37,7 @@ import { Badge } from '#/components/ui/badge'
 import { buttonVariants } from '#/components/ui/button'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import { RowActions } from '#/components/common/row-actions'
-import { matchesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import {
   CATEGORY_SHORT_LABELS,

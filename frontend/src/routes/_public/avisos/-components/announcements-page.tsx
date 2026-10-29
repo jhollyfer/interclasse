@@ -2,7 +2,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 import { AnnouncementList } from '../../-components/announcement-list'
 import { Section, SectionHeader, SectionTitle } from '../../-components/section'

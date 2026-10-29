@@ -21,11 +21,11 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useBracketCreate } from '#/integrations/tanstack-query/mutations'
+import { useBracketCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import {
   bracketPreviewQueryOptions,
   sportsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/administrator'
 import { CATEGORIES } from '#/lib/entity'
 import type { IBracket } from '#/lib/interfaces'
 import { CATEGORY_LABELS, plural } from '#/lib/labels'

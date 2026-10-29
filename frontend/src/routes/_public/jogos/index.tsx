@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { validateStorefrontSearch } from '#/lib/list-search'
 import type { StorefrontSearch } from '#/lib/list-search'
 import type { Merge } from '#/lib/interfaces'

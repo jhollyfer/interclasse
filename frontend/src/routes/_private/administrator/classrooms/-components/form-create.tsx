@@ -14,7 +14,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
 import type { IClassroom } from '#/lib/interfaces'
 import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
-import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
+import { useClassroomCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 

@@ -20,7 +20,7 @@ import {
   TableToolbar,
   useTable,
 } from '#/components/common/table'
-import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 import { announcementColumns } from './columns'
 import { AnnouncementRowActions } from './row-actions'

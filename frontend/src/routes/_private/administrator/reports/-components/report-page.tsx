@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '#/components/ui/table'
 import { BASE_URL } from '#/integrations/tanstack-query/http'
-import { reportQueryOptions } from '#/integrations/tanstack-query/queries'
+import { reportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 
 /**

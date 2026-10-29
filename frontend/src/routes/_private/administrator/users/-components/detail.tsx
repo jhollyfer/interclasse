@@ -35,12 +35,12 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { USER_ROLE } from '#/lib/entity'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   useUserArchive,
   useUserDelete,
   useUserUnarchive,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import {
   ACCOUNT_STATUS_LABELS,

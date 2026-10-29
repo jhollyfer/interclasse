@@ -6,7 +6,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useUserArchive } from '#/integrations/tanstack-query/mutations'
+import { useUserArchive } from '#/integrations/tanstack-query/mutations/administrator'
 import type { IUser } from '#/lib/interfaces'
 
 import { BulkArchive } from './bulk-archive'

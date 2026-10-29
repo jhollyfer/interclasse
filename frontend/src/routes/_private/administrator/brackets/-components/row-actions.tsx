@@ -14,7 +14,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useBracketDelete } from '#/integrations/tanstack-query/mutations'
+import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { notifyError } from '#/lib/form-errors'
 import type { IBracket } from '#/lib/interfaces'
 import { CATEGORY_LABELS } from '#/lib/labels'
