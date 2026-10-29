@@ -821,12 +821,12 @@
           "Painel · Chaves"
         ],
         "responses": {
-          "201": {
-            "description": "Recurso criado",
+          "200": {
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdministratorBracketsCreateResponse201"
+                  "$ref": "#/components/schemas/AdministratorBracketsCreateResponse200"
                 }
               }
             }
@@ -852,11 +852,11 @@
             }
           },
           "409": {
-            "description": "Esta modalidade já foi sorteada nesta categoria",
+            "description": "Conflito com o estado atual",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409BracketAlreadyDrawnNotEnoughTeamsTooManyTeams"
+                  "$ref": "#/components/schemas/Error409NotEnoughTeamsTooManyTeams"
                 }
               }
             }
@@ -882,7 +882,7 @@
             }
           }
         },
-        "description": "O sorteio da modalidade numa categoria. Entram as turmas da categoria com ao menos `minAthletes` inscritos; elas são embaralhadas e a chave de mata-mata é montada inteira, da primeira fase à final.\n\nQuando o número de turmas não fecha uma potência de dois (4, 8, 16), as que sobram ficam de folga e entram direto na fase seguinte. Até 16 turmas por chave.\n\nDepois do sorteio as inscrições da modalidade naquela categoria travam. Para refazer, apague a chave.",
+        "description": "O sorteio da modalidade numa categoria. Entram as turmas da categoria com ao menos `minAthletes` inscritos; elas são embaralhadas e a chave de mata-mata é montada inteira, da primeira fase à final.\n\nQuando o número de turmas não fecha uma potência de dois (4, 8, 16), as que sobram ficam de folga e entram direto na fase seguinte. Até 16 turmas por chave.\n\nDepois do sorteio as inscrições da modalidade naquela categoria travam. Para refazer, apague a chave.\n\nIdempotente por modalidade e categoria: se a chave já existe, a resposta é 200 com ela, sem novo sorteio - o reenvio depois de uma queda de rede leva à mesma chave.",
         "security": [
           {
             "cookieAuth": []
@@ -6445,7 +6445,7 @@
         ],
         "additionalProperties": false
       },
-      "AdministratorBracketsCreateResponse201": {
+      "AdministratorBracketsCreateResponse200": {
         "type": "object",
         "properties": {
           "category": {
@@ -13355,42 +13355,6 @@
           "code"
         ]
       },
-      "Error409BracketAlreadyDrawnNotEnoughTeamsTooManyTeams": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "BRACKET_ALREADY_DRAWN",
-              "NOT_ENOUGH_TEAMS",
-              "TOO_MANY_TEAMS"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
       "Error409BracketHasResults": {
         "type": "object",
         "properties": {
@@ -13652,6 +13616,41 @@
             "enum": [
               "MATCH_TEAMS_PENDING",
               "NEXT_MATCH_PLAYED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409NotEnoughTeamsTooManyTeams": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "NOT_ENOUGH_TEAMS",
+              "TOO_MANY_TEAMS"
             ]
           },
           "errors": {

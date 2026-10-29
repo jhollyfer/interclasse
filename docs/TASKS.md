@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** 13 tarefas · 2 feitas · 0 em andamento · 11 a fazer — atualizado 2026-10-29
+**Resumo:** 13 tarefas · 4 feitas · 0 em andamento · 9 a fazer — atualizado 2026-10-29
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -20,13 +20,13 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 1.1 | Sync do `maiyu-pattern` (`_standards/`, `docs/`, `AGENTS.md`) | Alta | Feita | `_padroes/` removido |
 | 1.2 | Migração estrutural (`shared/`, `domain/`, `repositories/`, queries por módulo, specs por ação) | Alta | A fazer | `_standards/MIGRATIONS.md`, seção interclasse |
 
-## Fase 2 · Pedidos do Geison, 29/10 (1/9)
+## Fase 2 · Pedidos do Geison, 29/10 (3/9)
 
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 2.1 | Menu da conta derrubava a tela ("Algo quebrou", 500) | Alta | Feita | `DropdownMenuLabel` fora de `DropdownMenuGroup` |
-| 2.2 | Sorteio da chave mostra erro mas cria a chave | Alta | A fazer | timeout de 15 s do cliente |
-| 2.3 | Excluir chave pela lista | Média | A fazer | endpoint já existe |
+| 2.2 | Sorteio da chave mostra erro mas cria a chave | Alta | Feita | sorteio idempotente + retry no cliente |
+| 2.3 | Excluir chave pela lista | Média | Feita | menu da linha |
 | 2.4 | Classificação na home com abas por categoria e modalidade, sem sair da página | Alta | A fazer | |
 | 2.5 | Turmas do admin em cartões (F1/F2), detalhe com conselheiro e representante; conselheiro com uma turma só | Alta | A fazer | |
 | 2.6 | Página "Sobre o JIC" e Instagram no rodapé | Média | A fazer | |

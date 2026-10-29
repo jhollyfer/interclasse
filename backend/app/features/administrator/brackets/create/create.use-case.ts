@@ -22,7 +22,9 @@ import { BRACKET_STATUS, MATCH_PHASE, type MatchPhase } from '#core/entity'
 import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
 
 type Payload = BracketCreatePayload
-type Response = Either<HTTPException, Bracket>
+/** `created` falso quando a chave já existia: o controller responde 200, não 201. */
+type Drawn = { bracket: Bracket; created: boolean }
+type Response = Either<HTTPException, Drawn>
 
 /** Com menos de dois times não há partida a jogar. */
 const MIN_TEAMS = 2
@@ -32,6 +34,12 @@ const MIN_TEAMS = 2
  *
  * Tudo numa transação: uma chave com metade das partidas gravadas seria pior
  * que nenhuma, porque travaria as inscrições.
+ *
+ * Idempotente pela chave natural, modalidade e categoria (índice único em
+ * `brackets`): sortear de novo devolve a chave já sorteada, sem erro e sem novo
+ * sorteio (_standards/backend.md §4.11). É o que deixa o navegador repetir o
+ * pedido quando a rede cai depois do commit - antes, o administrador via erro e
+ * a chave já existia. Refazer o sorteio continua sendo apagar e sortear.
  */
 @inject()
 export default class AdministratorBracketCreateUseCase {
@@ -58,13 +66,7 @@ export default class AdministratorBracketCreateUseCase {
           .where('category', payload.category)
           .first()
 
-        if (existing)
-          return left(
-            HTTPException.Conflict(
-              'Esta modalidade já foi sorteada nesta categoria',
-              'BRACKET_ALREADY_DRAWN',
-            ),
-          )
+        if (existing) return right({ bracket: existing, created: false })
 
         // As turmas da categoria com inscritos suficientes para formar time.
         const eligible: Array<{ id: string }> = await trx
@@ -98,25 +100,18 @@ export default class AdministratorBracketCreateUseCase {
 
         await this.createMatches(created.id, pairings, trx)
 
-        return right(created)
+        return right({ bracket: created, created: true })
       })
 
       if (drawn.isLeft()) return drawn
 
-      const bracket = drawn.value
-      await bracket.load('sport')
+      await drawn.value.bracket.load('sport')
 
-      return right(bracket)
+      return drawn
     } catch (error) {
       // Dois sorteios ao mesmo tempo: o segundo esbarra no `unique` de
       // modalidade e categoria, e a resposta é a mesma do sorteio repetido.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict(
-            'Esta modalidade já foi sorteada nesta categoria',
-            'BRACKET_ALREADY_DRAWN',
-          ),
-        )
+      if (isUniqueViolation(error)) return this.existing(payload)
 
       logger.error({ err: error }, '[brackets > create][error]')
 
@@ -127,6 +122,17 @@ export default class AdministratorBracketCreateUseCase {
         ),
       )
     }
+  }
+
+  /** A chave que o sorteio concorrente gravou primeiro. */
+  private async existing(payload: Payload): Promise<Response> {
+    const bracket = await Bracket.query()
+      .where('sportId', payload.sportId)
+      .where('category', payload.category)
+      .preload('sport')
+      .firstOrFail()
+
+    return right({ bracket, created: false })
   }
 
   /**
@@ -155,6 +161,9 @@ export default class AdministratorBracketCreateUseCase {
     let round = 1
     let size = pairings.length
     const advanced = new Map<number, { home?: string; away?: string }>()
+    // Gravadas num `createMany` só, no fim: um INSERT por partida eram até 15
+    // idas ao banco com a linha da modalidade travada.
+    const matches: Array<Partial<Match>> = []
 
     // Primeira fase: só os confrontos de verdade; a folga sobe direto.
     for (const [position, pairing] of pairings.entries()) {
@@ -165,17 +174,14 @@ export default class AdministratorBracketCreateUseCase {
         continue
       }
 
-      await Match.create(
-        {
-          bracketId,
-          phase: phase ?? MATCH_PHASE.FINAL,
-          round,
-          position,
-          homeTeamId: home,
-          awayTeamId: teams.get(pairing.away),
-        },
-        { client: trx },
-      )
+      matches.push({
+        bracketId,
+        phase: phase ?? MATCH_PHASE.FINAL,
+        round,
+        position,
+        homeTeamId: home,
+        awayTeamId: teams.get(pairing.away),
+      })
     }
 
     phase = phase && nextPhase(phase)
@@ -185,22 +191,21 @@ export default class AdministratorBracketCreateUseCase {
       round += 1
       for (let position = 0; position < size; position++) {
         const filled = advanced.get(position)
-        await Match.create(
-          {
-            bracketId,
-            phase,
-            round,
-            position,
-            homeTeamId: filled?.home ?? null,
-            awayTeamId: filled?.away ?? null,
-          },
-          { client: trx },
-        )
+        matches.push({
+          bracketId,
+          phase,
+          round,
+          position,
+          homeTeamId: filled?.home ?? null,
+          awayTeamId: filled?.away ?? null,
+        })
       }
 
       advanced.clear()
       phase = nextPhase(phase)
       size /= 2
     }
+
+    await Match.createMany(matches, { client: trx })
   }
 }
