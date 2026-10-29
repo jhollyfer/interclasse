@@ -4,6 +4,10 @@ import { AnnouncementLucidRepository } from '#repositories/announcement/announce
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
 import { SiteSettingLucidRepository } from '#repositories/site-setting/site-setting.lucid.repository'
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
+import { PhotoLucidRepository } from '#repositories/photo/photo.lucid.repository'
+import { PhotoRepository } from '#repositories/photo/photo.repository'
+import { ReportLucidRepository } from '#repositories/report/report.lucid.repository'
+import { ReportRepository } from '#repositories/report/report.repository'
 import { SportLucidRepository } from '#repositories/sport/sport.lucid.repository'
 import { SportRepository } from '#repositories/sport/sport.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
@@ -27,5 +31,7 @@ export default class RepositoryProvider {
       this.app.container.make(SiteSettingLucidRepository),
     )
     this.app.container.bind(SportRepository, () => this.app.container.make(SportLucidRepository))
+    this.app.container.bind(PhotoRepository, () => this.app.container.make(PhotoLucidRepository))
+    this.app.container.bind(ReportRepository, () => this.app.container.make(ReportLucidRepository))
   }
 }

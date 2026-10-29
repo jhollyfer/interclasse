@@ -422,7 +422,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/photos.validator').PhotoPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/photos.validator').AdministratorPhotoPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -431,10 +431,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/administrator/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/photos.validator').PhotoCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/photos.validator').AdministratorPhotoCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/photos.validator').PhotoCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/photos.validator').AdministratorPhotoCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -443,10 +443,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/photos/:id/review'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/photos.validator').PhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/photos.validator').AdministratorPhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/photos.validator').PhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/photos.validator').AdministratorPhotoReviewValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/photos/review/review.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/photos/review/review.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -890,7 +890,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/photos.validator').PhotoPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/photos.validator').AdvisorPhotoPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/photos/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/photos/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -899,10 +899,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/advisor/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/advisor/photos.validator').PhotoCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/advisor/photos.validator').AdvisorPhotoCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/photos.validator').PhotoCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/photos.validator').AdvisorPhotoCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/photos/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/photos/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }

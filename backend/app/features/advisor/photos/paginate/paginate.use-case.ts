@@ -1,41 +1,46 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 import {
   PAGINATION,
   left,
   right,
+  type AdvisorPhotoShowResponse,
   type Either,
   type Merge,
   type Paginated,
 } from '@interclasse/shared'
 
-import Photo from '#models/photo'
-import type User from '#models/user'
+import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { PhotoPaginatePayload } from '#validators/advisor/photos.validator'
+import type { AdvisorPhotoPaginatePayload } from '#validators/advisor/photos.validator'
 
-type Payload = Merge<PhotoPaginatePayload, { actor: User }>
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = Merge<AdvisorPhotoPaginatePayload, { actor: { readonly id: string } }>
+type Response = Either<HTTPException, Paginated<AdvisorPhotoShowResponse>>
 
 /** As fotos que o conselheiro enviou, com a decisão da organização em cada uma. */
 @inject()
 export default class AdvisorPhotoPaginateUseCase {
+  constructor(
+    private readonly photos: PhotoRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const photos = await Photo.query()
-        .where('authorId', payload.actor.id)
-        .preload('storage')
-        .orderBy('createdAt', 'desc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: photos.getMeta(), data: photos.all() })
+      return right(
+        await this.photos.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          authorId: payload.actor.id,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[photos > paginate][error]')
+      logger.error({ err: error }, '[advisor/photos > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADVISOR_PHOTO_PAGINATE_ERROR',
         ),
       )

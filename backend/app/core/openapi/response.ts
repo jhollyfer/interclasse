@@ -5,15 +5,18 @@ import {
   CATEGORIES,
   MATCH_PHASES,
   MATCH_STATUSES,
-  PHOTO_STATUSES,
   UPLOAD_STATUSES,
   USER_ROLES,
 } from '@interclasse/shared'
 import {
   AdministratorAnnouncementShowResponse,
+  AdministratorPhotoShowResponse,
+  AdministratorReportShowResponse,
   AdministratorSiteShowResponse,
   AdministratorSportShowResponse,
+  AdvisorPhotoShowResponse,
   StorefrontAnnouncementShowResponse,
+  StorefrontPhotoShowResponse,
   StorefrontSiteShowResponse,
   StorefrontSportShowResponse,
 } from '@interclasse/shared'
@@ -23,7 +26,6 @@ import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import EnrollmentRemoval from '#models/enrollment-removal'
 import MatchCard from '#models/match-card'
-import Photo from '#models/photo'
 import Match from '#models/match'
 import Sport from '#models/sport'
 import Storage from '#models/storage'
@@ -86,12 +88,6 @@ const STUDENT: ModelResource = {
 
 const SPORT: ModelResource = {
   model: Sport,
-}
-
-const PHOTO: ModelResource = {
-  model: Photo,
-  enums: { status: PHOTO_STATUSES },
-  relations: { storage: STORAGE, author: PERSON },
 }
 
 /** O time é a turma dentro da competição: o nome que sai no placar vem de `classroom`. */
@@ -300,58 +296,6 @@ export const DrawPreviewResponse = vine.create({
 // O registro, por diretório de feature
 // ---------------------------------------------------------------------------
 
-/**
- * A foto do carrossel no site anônimo: a URL assinada e a legenda, sem quem
- * enviou nem o caminho no bucket.
- */
-export const StorefrontPhotoResponse = vine.create({
-  id: vine.string().uuid(),
-  caption: vine.string().nullable(),
-  url: vine.string(),
-  createdAt: vine.date(),
-})
-
-/** O relatório dos jogos: totais, por categoria, por modalidade e por turma. */
-export const ReportResponse = vine.create({
-  totals: vine.object({
-    classrooms: vine.number(),
-    students: vine.number(),
-    athletes: vine.number(),
-    enrollments: vine.number(),
-    sports: vine.number(),
-    matchesPlayed: vine.number(),
-    matchesScheduled: vine.number(),
-  }),
-  byCategory: vine.array(
-    vine.object({
-      category: vine.enum(CATEGORIES),
-      classrooms: vine.number(),
-      students: vine.number(),
-      athletes: vine.number(),
-    }),
-  ),
-  bySport: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      athletes: vine.number(),
-      classrooms: vine.number(),
-    }),
-  ),
-  classrooms: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      category: vine.enum(CATEGORIES),
-      advisor: vine.string().nullable(),
-      representative: vine.string().nullable(),
-      students: vine.number(),
-      athletes: vine.number(),
-      sports: vine.number(),
-    }),
-  ),
-})
-
 export const RESPONSES: Record<string, FeatureResponse> = {
   /**
    * `GET /account` e `PUT /account` respondem o mesmo recurso: a conta com o
@@ -394,9 +338,9 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/sports': AdministratorSportShowResponse,
   'administrator/announcements': AdministratorAnnouncementShowResponse,
   'administrator/site': AdministratorSiteShowResponse,
-  'administrator/photos': PHOTO,
-  'administrator/reports': ReportResponse,
-  'advisor/photos': PHOTO,
+  'administrator/photos': AdministratorPhotoShowResponse,
+  'administrator/reports': AdministratorReportShowResponse,
+  'advisor/photos': AdvisorPhotoShowResponse,
 
   /**
    * A competição como a listagem, o sorteio e o apagar a devolvem. `show` foge
@@ -424,5 +368,5 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'storefront/matches': MATCH,
   'storefront/brackets': BRACKET,
   'storefront/site': StorefrontSiteShowResponse,
-  'storefront/photos': StorefrontPhotoResponse,
+  'storefront/photos': StorefrontPhotoShowResponse,
 }
