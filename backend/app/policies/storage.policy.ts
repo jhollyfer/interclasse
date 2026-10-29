@@ -15,7 +15,7 @@ import type User from '#models/user'
  *
  * O administrador baixa tudo. Os demais papéis alcançam só o que é deles - hoje,
  * o próprio avatar, que o `actor` já carrega, sem consulta (a policy não vai ao
- * banco além do alvo, _padroes/arquitetura.md §2). Fechado por omissão.
+ * banco além do alvo, _standards/architecture.md §2). Fechado por omissão.
  *
  * A negação é `404` e não `403`, a mesma resposta de arquivo inexistente: um
  * 403 confirmaria a quem sonda que aquele uuid existe.

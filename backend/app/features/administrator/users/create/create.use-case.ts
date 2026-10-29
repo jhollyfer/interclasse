@@ -63,7 +63,7 @@ export default class AdministratorUserCreateUseCase {
       return right(user)
     } catch (error) {
       // A checagem de e-mail acima não fecha a corrida: o segundo de dois
-      // pedidos simultâneos esbarra no `unique` do banco (_padroes/backend.md §4.4).
+      // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
       if (isUniqueViolation(error))
         return left(
           HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {

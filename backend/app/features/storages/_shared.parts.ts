@@ -2,7 +2,7 @@ import { PRESIGNED_BATCH } from '#services/multipart/multipart-contract.service'
 
 /**
  * A conta das partes de um upload: função pura sobre números já em mãos, usada
- * por `create` e `parts` (_padroes/typescript.md §6, backend.md §4.9).
+ * por `create` e `parts` (_standards/typescript.md §6, backend.md §4.9).
  */
 
 /** Em quantas partes um arquivo deste tamanho é fatiado. Nunca menos que uma. */

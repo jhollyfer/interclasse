@@ -88,7 +88,7 @@ export default defineConfig({
     // Suíte única: sem repositório injetável não há o que dublar num teste
     // unitário. Testar por HTTP exercita rota, middleware, validator, use-case e
     // serialização de uma vez. A spec mora ao lado do que cobre - a da ação na
-    // pasta da ação (_padroes/backend.md §7); `tests/` guarda só infraestrutura.
+    // pasta da ação (_standards/backend.md §7); `tests/` guarda só infraestrutura.
     suites: [
       {
         files: ['app/**/*.spec.{ts,js}'],
@@ -126,7 +126,7 @@ export default defineConfig({
         },
       }),
       generateRegistry(),
-      // Policies em kebab com sufixo de papel (_padroes/arquitetura.md §3).
+      // Policies em kebab com sufixo de papel (_standards/architecture.md §3).
       indexPolicies({ glob: ['**/*.policy.ts'] }),
     ],
   },

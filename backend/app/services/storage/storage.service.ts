@@ -95,7 +95,7 @@ export default class StorageService extends StorageContract {
    */
   async references(storageId: string): Promise<string[]> {
     // O rótulo viaja junto com a contagem, no mesmo objeto: casar dois arrays
-    // pelo índice é o defeito que _padroes/backend.md §5.2 proíbe.
+    // pelo índice é o defeito que _standards/backend.md §5.2 proíbe.
     const counts = await Promise.all(
       REFERENCES.map(async (reference) => {
         const rows = await db

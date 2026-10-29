@@ -1,5 +1,5 @@
 /**
- * O contrato de resposta comum a toda a API (_padroes/backend.md §4.5): o
+ * O contrato de resposta comum a toda a API (_standards/backend.md §4.5): o
  * envelope de erro e a paginação. O registro de qual model responde por cada
  * fatia é outra coisa e mora em `core/openapi/response.ts`.
  */

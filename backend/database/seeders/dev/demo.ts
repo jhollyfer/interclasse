@@ -26,7 +26,7 @@ import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '
  *   SEED_DEMO_PASSWORD=<senha> pnpm db:seed:demo
  *
  * Mora em `dev/`, sem o sufixo `.seed.ts`, por ser seed manual de demonstração
- * (_padroes/backend.md §3).
+ * (_standards/backend.md §3).
  *
  * Banco que já tem chave sorteada é deixado em paz: o seeder não sabe distinguir
  * demonstração de campeonato real, e apagar o segundo não tem volta.
@@ -54,7 +54,7 @@ export default class extends BaseSeeder {
       return
     }
 
-    // Pelo container, não por `new` (_padroes/backend.md §2.1): o construtor do
+    // Pelo container, não por `new` (_standards/backend.md §2.1): o construtor do
     // seeder ganha dependência e a chamada continua montando o objeto inteiro.
     const tournament = await app.container.make(TournamentSeeder, [this.client])
     await tournament.run()

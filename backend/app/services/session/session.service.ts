@@ -56,7 +56,7 @@ export default class SessionService {
    * Pela tabela, e não por `User.accessTokens.deleteAll`: o provider do
    * `@adonisjs/auth` usa a conexão do model e não aceita transação, e a
    * revogação precisa cair junto com a escrita que a motivou (troca de senha,
-   * de papel, arquivamento) - duas escritas, uma transação (_padroes/backend.md §4.2).
+   * de papel, arquivamento) - duas escritas, uma transação (_standards/backend.md §4.2).
    */
   async revokeAll(user: User, client?: TransactionClientContract): Promise<void> {
     const query = client ?? db

@@ -19,7 +19,7 @@ export type HTTPExceptionPayload = ErrorEnvelope
  * deixaria de ser conferível lendo este arquivo.
  *
  * A assinatura das fábricas é posicional - `(message, code, errors?)` -, a
- * mesma em todo projeto da casa (_padroes/backend.md §5).
+ * mesma em todo projeto da casa (_standards/backend.md §5).
  *
  * O `handle()` faz esta exceção se resolver sozinha: o AdonisJS o chama quando
  * a exceção sobe de um controller, sem passar pelo handler global.

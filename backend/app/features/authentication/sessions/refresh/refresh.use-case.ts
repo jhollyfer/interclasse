@@ -25,7 +25,7 @@ export default class AuthenticationSessionRefreshUseCase {
       return left(HTTPException.Unauthorized('Sessão não encontrada', 'REFRESH_TOKEN_MISSING'))
     }
 
-    // O `try` global começa antes da primeira ida ao banco (_padroes/backend.md §4.2).
+    // O `try` global começa antes da primeira ida ao banco (_standards/backend.md §4.2).
     try {
       const refreshToken = await this.verify(payload.refreshToken)
 

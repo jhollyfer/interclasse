@@ -1,10 +1,10 @@
 /**
  * Cobra a cópia local da régua contra o upstream (`jhollyfer/maiyu-pattern`).
  *
- * `_padroes/`, `_doc-lib/`, `SKILLS-MAP.md` e as skills da casa em `.claude/skills/`
+ * `_standards/`, `_doc-lib/`, `SKILLS-MAP.md` e as skills da casa em `.claude/skills/`
  * não se editam aqui: vêm de `node <upstream>/scripts/sync-to-project.mjs <raiz>`.
  * Este script só delega ao `--check` do próprio upstream, para que a régua de
- * comparação seja uma só (_padroes/backend.md §10 e §11).
+ * comparação seja uma só (_standards/backend.md §10 e §11).
  *
  * Onde fica o upstream, nesta ordem:
  *   1. `MAIYU_PATTERN_DIR`, quando definido;

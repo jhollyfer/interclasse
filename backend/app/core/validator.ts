@@ -12,7 +12,7 @@ import {
 } from '#core/entity'
 
 /**
- * O `vine` configurado e o que é de todos os validators (_padroes/backend.md §4.4).
+ * O `vine` configurado e o que é de todos os validators (_standards/backend.md §4.4).
  *
  * Cada recurso tem o próprio `app/features/<módulo>/<recurso>/<recurso>.validator.ts`,
  * e importa daqui o `vine` - nunca de `@vinejs/vine` direto: é por este módulo
@@ -121,7 +121,7 @@ export function activeStatus() {
  * próprio, para o teto de `perPage` viver num lugar só - repetido à mão em
  * cada recurso, é uma divergência esperando acontecer.
  */
-/** Página e tamanho, para a listagem que não busca (_padroes/backend.md §4.4). */
+/** Página e tamanho, para a listagem que não busca (_standards/backend.md §4.4). */
 export function pageFields() {
   return {
     page: vine.number().min(1).optional(),

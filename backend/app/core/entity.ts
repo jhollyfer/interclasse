@@ -6,7 +6,7 @@
  * validação de divergirem sem ninguém notar.
  *
  * A forma é sempre a mesma: objeto `as const`, tipo derivado dele, e o array
- * de valores por `Object.values`. `enum` do TypeScript (_padroes/typescript.md §4)
+ * de valores por `Object.values`. `enum` do TypeScript (_standards/typescript.md §4)
  * emitiria objeto em tempo de execução, não se espalharia num `vine.enum()` sem
  * conversão e deixaria o valor gravado no banco e o literal do código livres
  * para divergirem.

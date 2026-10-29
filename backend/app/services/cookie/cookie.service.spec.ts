@@ -3,7 +3,7 @@ import app from '@adonisjs/core/services/app'
 
 import CookieService from '#services/cookie/cookie.service'
 
-/** O service vem do container, como em produção (_padroes/backend.md §2.1). */
+/** O service vem do container, como em produção (_standards/backend.md §2.1). */
 const cookie = await app.container.make(CookieService)
 
 /**

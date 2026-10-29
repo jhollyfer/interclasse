@@ -22,7 +22,7 @@ export default class AdvisorEnrollmentShowController {
     const payload = await context.request.validateUsing(EnrollmentShowValidator, {
       data: context.request.qs(),
     })
-    // A regra por registro passa pelo Bouncer (_padroes/backend.md §4.6); turma
+    // A regra por registro passa pelo Bouncer (_standards/backend.md §4.6); turma
     // alheia ou ausente é `404`, decidido pela policy.
     const classroom = await Classroom.find(payload.classroomId)
     await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)

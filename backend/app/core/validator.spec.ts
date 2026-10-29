@@ -14,7 +14,7 @@ import { FIELD_LABELS } from '#core/validator'
  * para manter em dia - campo novo em desacordo nasce vermelho.
  *
  * Ao lado de `validator.ts` porque é spec transversal: cobre todo validator do
- * projeto, e não uma ação (_padroes/backend.md §7).
+ * projeto, e não uma ação (_standards/backend.md §7).
  */
 
 type Introspectable = { toJSONSchema: () => unknown }
@@ -45,7 +45,7 @@ function branch(node: unknown, key: string): Array<unknown> {
 
 /**
  * Todo validator do projeto: os globais de `#core/validator` e o
- * `<recurso>.validator.ts` de cada recurso em `app/features` (_padroes/backend.md
+ * `<recurso>.validator.ts` de cada recurso em `app/features` (_standards/backend.md
  * §4.4). O glob
  * é o que deixa quebrar o validator por recurso sem perder a rede.
  */

@@ -10,7 +10,7 @@ export type StorageMetadata = {
 }
 
 /**
- * O contrato de arquivo (_padroes/solid.md §2): I/O externo, o bucket.
+ * O contrato de arquivo (_standards/solid.md §2): I/O externo, o bucket.
  *
  * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
  * tempo. O concreto é `StorageService`, ligado em `providers/storage.provider.ts`;

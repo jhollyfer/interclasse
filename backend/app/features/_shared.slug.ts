@@ -4,7 +4,7 @@ import string from '@adonisjs/core/helpers/string'
 const MAX_LENGTH = 255
 
 /**
- * A normalização única de slug do projeto, função pura (_padroes/backend.md
+ * A normalização única de slug do projeto, função pura (_standards/backend.md
  * §4.9): o `SlugService` a expõe por injeção, e o que precisar dela fora de
  * um container (seeder, script) a lê daqui.
  *
