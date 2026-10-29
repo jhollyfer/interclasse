@@ -7,6 +7,7 @@ import {
   TrophyIcon,
   WarningCircleIcon,
 } from '@phosphor-icons/react'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 
 import {
   MatchCardsDialog,
@@ -27,7 +28,6 @@ import {
   enrollmentRemovalsQueryOptions,
   matchesQueryOptions,
 } from '#/integrations/tanstack-query/queries/administrator'
-import type { IMatch } from '#/lib/interfaces'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
@@ -44,11 +44,11 @@ import {
 } from '../index'
 
 /** A partida no formato que os diálogos esperam: nomes já resolvidos. */
-function toRef(match: IMatch): MatchRef {
+function toRef(match: AdministratorMatchPaginateResponse): MatchRef {
   return {
     ...match,
-    homeName: match.homeTeam?.classroom.name ?? null,
-    awayName: match.awayTeam?.classroom.name ?? null,
+    homeName: match.homeTeam.classroom.name,
+    awayName: match.awayTeam.classroom.name,
   }
 }
 
@@ -108,10 +108,10 @@ export function DashboardPage(): React.JSX.Element {
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="font-medium">
-                      {`${match.homeTeam?.classroom.name ?? 'A definir'} x ${match.awayTeam?.classroom.name ?? 'A definir'}`}
+                      {`${match.homeTeam.classroom.name} x ${match.awayTeam.classroom.name}`}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {`${match.bracket?.sport?.name ?? ''} ${CATEGORY_SHORT_LABELS[match.bracket?.category ?? ''] ?? ''} · ${MATCH_PHASE_LABELS[match.phase] ?? match.phase} · ${formatWhen(match.scheduledAt)}`}
+                      {`${match.bracket.sport.name} ${CATEGORY_SHORT_LABELS[match.bracket.category] ?? ''} · ${MATCH_PHASE_LABELS[match.phase] ?? match.phase} · ${formatWhen(match.scheduledAt)}`}
                     </span>
                   </div>
                   <Button size="sm" onClick={() => setScoring(toRef(match))}>
@@ -158,7 +158,7 @@ export function DashboardPage(): React.JSX.Element {
                 className="hover:bg-muted flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
               >
                 <span className="flex-1">
-                  {`${bracket.sport?.name ?? ''} · ${CATEGORY_SHORT_LABELS[bracket.category] ?? ''}`}
+                  {`${bracket.sport.name} · ${CATEGORY_SHORT_LABELS[bracket.category] ?? ''}`}
                 </span>
                 <Badge variant={BRACKET_STATUS_VARIANTS[bracket.status]}>
                   {BRACKET_STATUS_LABELS[bracket.status]}

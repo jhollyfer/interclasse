@@ -1,20 +1,23 @@
 import { CheckIcon, TrophyIcon } from '@phosphor-icons/react'
 import type * as React from 'react'
+import type { AdministratorBracketShowResponse } from '@interclasse/shared'
+import { MATCH_STATUS } from '@interclasse/shared'
 
-import { MATCH_STATUS } from '#/lib/entity'
-import type { IBracketDetail, IBracketMatch } from '#/lib/interfaces'
 import { MATCH_PHASE_LABELS, championName, formatWhen } from '#/lib/labels'
 import { cn } from '#/lib/utils'
 
+/** Uma partida da chave, como `GET /brackets/:id` a devolve. */
+export type BracketMatch = AdministratorBracketShowResponse['matches'][number]
+
 type BracketTreeProps = Readonly<{
-  bracket: IBracketDetail
+  bracket: AdministratorBracketShowResponse
   /** O que vai embaixo de cada partida: no painel, placar, agenda e cartões. */
-  renderActions?: (match: IBracketMatch) => React.ReactNode
+  renderActions?: (match: BracketMatch) => React.ReactNode
 }>
 
 /** Uma vaga de uma fase: a partida, ou a folga de quem subiu sem jogar. */
 type Slot =
-  | { kind: 'match'; match: IBracketMatch }
+  | { kind: 'match'; match: BracketMatch }
   | { kind: 'bye'; key: string; teamName: string | null }
 
 /**
@@ -23,7 +26,7 @@ type Slot =
  * a mesma conta do `advanceSlot` do backend.
  */
 function byeTeam(
-  matches: ReadonlyArray<IBracketMatch>,
+  matches: ReadonlyArray<BracketMatch>,
   round: number,
   position: number,
 ): string | null {
@@ -41,7 +44,7 @@ function byeTeam(
  * O número de cada jogo, como na súmula do professor: em ordem de fase e de
  * posição, contando só as partidas que existem (folga não é jogo).
  */
-function numbering(matches: ReadonlyArray<IBracketMatch>): Map<string, number> {
+function numbering(matches: ReadonlyArray<BracketMatch>): Map<string, number> {
   const ordered = [...matches].sort(
     (a, b) => a.round - b.round || a.position - b.position,
   )
@@ -55,9 +58,9 @@ function numbering(matches: ReadonlyArray<IBracketMatch>): Map<string, number> {
  * do `2p + 1` - o inverso do `advanceSlot` do backend.
  */
 function feederLabel(
-  matches: ReadonlyArray<IBracketMatch>,
+  matches: ReadonlyArray<BracketMatch>,
   numbers: Map<string, number>,
-  match: IBracketMatch,
+  match: BracketMatch,
   side: 'home' | 'away',
 ): string {
   let offset = 0
@@ -75,7 +78,7 @@ function feederLabel(
 }
 
 /** As colunas da chave, uma por fase, com o número de vagas de cada uma. */
-function columns(matches: ReadonlyArray<IBracketMatch>) {
+function columns(matches: ReadonlyArray<BracketMatch>) {
   const rounds = Math.max(1, ...matches.map((match) => match.round))
 
   return Array.from({ length: rounds }, (_, index) => {
@@ -183,7 +186,7 @@ export function BracketTree({
 }
 
 type MatchBoxProps = Readonly<{
-  match: IBracketMatch
+  match: BracketMatch
   number: number | undefined
   /** O texto da vaga vazia: "Vencedor do Jogo N". */
   homePending: string

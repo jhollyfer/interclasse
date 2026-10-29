@@ -1,23 +1,24 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
+import type {
+  AdministratorAnnouncementShowResponse,
+  AdministratorBracketPaginateResponse,
+  AdministratorBracketPreviewResponse,
+  AdministratorBracketShowResponse,
+  AdministratorCardPaginateResponse,
+  AdministratorClassroomPaginateResponse,
+  AdministratorClassroomShowResponse,
+  AdministratorEnrollmentRemovalShowResponse,
+  AdministratorMatchAthletesResponse,
+  AdministratorMatchPaginateResponse,
+  AdministratorPhotoShowResponse,
+  AdministratorReportShowResponse,
+  AdministratorSiteShowResponse,
+  AdministratorSportShowResponse,
+  AdministratorUserShowResponse,
+  Paginated,
+} from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type {
-  IBracketDetail,
-  IDrawPreview,
-  IEnrollmentRemoval,
-  IMatchAthletes,
-  IMatchCard,
-  IPaginated,
-  IAnnouncement,
-  IBracket,
-  IClassroom,
-  IMatch,
-  ISport,
-  IUser,
-  IPhoto,
-  IReport,
-  ISiteSetting,
-} from '#/lib/interfaces'
 import type {
   BracketListSearch,
   CardListSearch,
@@ -40,7 +41,7 @@ export const usersQueryOptions = (params: UserListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.users.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IUser>>(
+      request<Paginated<AdministratorUserShowResponse>>(
         '/administrator/users'.concat(queryString(params)),
         {
           signal,
@@ -54,14 +55,17 @@ export const userQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.users.detail(id),
     queryFn: ({ signal }) =>
-      request<IUser>('/administrator/users/'.concat(id), { signal }),
+      request<AdministratorUserShowResponse>(
+        '/administrator/users/'.concat(id),
+        { signal },
+      ),
   })
 
 export const classroomsQueryOptions = (params: ClassroomListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.classrooms.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IClassroom>>(
+      request<Paginated<AdministratorClassroomPaginateResponse>>(
         '/administrator/classrooms'.concat(queryString(params)),
         { signal },
       ),
@@ -72,14 +76,17 @@ export const classroomQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.classrooms.detail(id),
     queryFn: ({ signal }) =>
-      request<IClassroom>('/administrator/classrooms/'.concat(id), { signal }),
+      request<AdministratorClassroomShowResponse>(
+        '/administrator/classrooms/'.concat(id),
+        { signal },
+      ),
   })
 
 export const sportsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.sports.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<ISport>>(
+      request<Paginated<AdministratorSportShowResponse>>(
         '/administrator/sports'.concat(queryString(params)),
         { signal },
       ),
@@ -90,14 +97,17 @@ export const sportQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.sports.detail(id),
     queryFn: ({ signal }) =>
-      request<ISport>('/administrator/sports/'.concat(id), { signal }),
+      request<AdministratorSportShowResponse>(
+        '/administrator/sports/'.concat(id),
+        { signal },
+      ),
   })
 
 export const announcementsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.announcements.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IAnnouncement>>(
+      request<Paginated<AdministratorAnnouncementShowResponse>>(
         '/administrator/announcements'.concat(queryString(params)),
         { signal },
       ),
@@ -108,16 +118,19 @@ export const announcementQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.announcements.detail(id),
     queryFn: ({ signal }) =>
-      request<IAnnouncement>('/administrator/announcements/'.concat(id), {
-        signal,
-      }),
+      request<AdministratorAnnouncementShowResponse>(
+        '/administrator/announcements/'.concat(id),
+        {
+          signal,
+        },
+      ),
   })
 
 export const bracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IBracket>>(
+      request<Paginated<AdministratorBracketPaginateResponse>>(
         '/administrator/brackets'.concat(queryString(params)),
         { signal },
       ),
@@ -129,16 +142,19 @@ export const bracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.detail(id),
     queryFn: ({ signal }) =>
-      request<IBracketDetail>('/administrator/brackets/'.concat(id), {
-        signal,
-      }),
+      request<AdministratorBracketShowResponse>(
+        '/administrator/brackets/'.concat(id),
+        {
+          signal,
+        },
+      ),
   })
 
 export const matchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.matches.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IMatch>>(
+      request<Paginated<AdministratorMatchPaginateResponse>>(
         '/administrator/matches'.concat(queryString(params)),
         { signal },
       ),
@@ -150,7 +166,7 @@ export const bracketPreviewQueryOptions = (sportId: string, category: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.preview(sportId, category),
     queryFn: ({ signal }) =>
-      request<IDrawPreview>(
+      request<AdministratorBracketPreviewResponse>(
         '/administrator/brackets/preview'.concat(
           queryString({ sportId, category }),
         ),
@@ -164,7 +180,7 @@ export const matchAthletesQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.matches.athletes(id),
     queryFn: ({ signal }) =>
-      request<IMatchAthletes>(
+      request<AdministratorMatchAthletesResponse>(
         '/administrator/matches/'.concat(id, '/athletes'),
         { signal },
       ),
@@ -174,7 +190,7 @@ export const cardsQueryOptions = (params: CardListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.cards.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IMatchCard>>(
+      request<Paginated<AdministratorCardPaginateResponse>>(
         '/administrator/cards'.concat(queryString(params)),
         { signal },
       ),
@@ -185,7 +201,7 @@ export const enrollmentRemovalsQueryOptions = (params: RemovalListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.enrollmentRemovals.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IEnrollmentRemoval>>(
+      request<Paginated<AdministratorEnrollmentRemovalShowResponse>>(
         '/administrator/enrollment-removals'.concat(queryString(params)),
         { signal },
       ),
@@ -197,7 +213,7 @@ export const photosQueryOptions = (params: PhotoListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.photos.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IPhoto>>(
+      request<Paginated<AdministratorPhotoShowResponse>>(
         '/administrator/photos'.concat(queryString(params)),
         { signal },
       ),
@@ -209,7 +225,9 @@ export const reportQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.reports,
     queryFn: ({ signal }) =>
-      request<IReport>('/administrator/reports', { signal }),
+      request<AdministratorReportShowResponse>('/administrator/reports', {
+        signal,
+      }),
     staleTime: 0,
   })
 
@@ -218,5 +236,5 @@ export const siteQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.site,
     queryFn: ({ signal }) =>
-      request<ISiteSetting>('/administrator/site', { signal }),
+      request<AdministratorSiteShowResponse>('/administrator/site', { signal }),
   })

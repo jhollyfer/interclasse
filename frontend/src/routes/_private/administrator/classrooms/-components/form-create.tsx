@@ -1,6 +1,9 @@
 import type * as React from 'react'
 import { AdministratorClassroomCreateValidator } from '@interclasse/shared'
-import type { AdministratorClassroomCreatePayload } from '@interclasse/shared'
+import type {
+  AdministratorClassroomCreatePayload,
+  AdministratorClassroomShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -13,7 +16,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import type { IClassroom } from '#/lib/interfaces'
 import { useClassroomCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -28,7 +30,7 @@ import {
 export function ClassroomFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
-    IClassroom,
+    AdministratorClassroomShowResponse,
     AdministratorClassroomCreatePayload
   >({
     formId: 'classroom-create',

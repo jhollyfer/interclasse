@@ -1,6 +1,9 @@
 import type * as React from 'react'
 import { AdministratorUserCreateValidator } from '@interclasse/shared'
-import type { AdministratorUserCreatePayload } from '@interclasse/shared'
+import type {
+  AdministratorUserCreatePayload,
+  AdministratorUserShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -14,7 +17,6 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import type { IUser } from '#/lib/interfaces'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -36,7 +38,7 @@ export function UserFormCreate(): React.JSX.Element {
   // profundo, e o compilador não tem como voltar dele ao tipo do formulário.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
-    IUser,
+    AdministratorUserShowResponse,
     AdministratorUserCreatePayload
   >({
     formId: FORM_ID,

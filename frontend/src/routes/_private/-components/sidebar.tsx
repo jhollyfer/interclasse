@@ -2,10 +2,10 @@ import type * as React from 'react'
 import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { SignOutIcon } from '@phosphor-icons/react'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { USER_ROLE } from '#/lib/entity'
 import {
   Sidebar as Root,
   SidebarContent,

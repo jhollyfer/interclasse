@@ -1,6 +1,7 @@
 import { CheckIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
+import type { AdministratorEnrollmentRemovalShowResponse } from '@interclasse/shared'
 
 import {
   PageHeader,
@@ -15,7 +16,6 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useEnrollmentRemovalAcknowledge } from '#/integrations/tanstack-query/mutations/administrator'
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
-import type { IEnrollmentRemoval } from '#/lib/interfaces'
 import { formatDate, plural } from '#/lib/labels'
 import { cn } from '#/lib/utils'
 
@@ -59,7 +59,9 @@ export function RemovalsPage(): React.JSX.Element {
 
 function RemovalItem({
   removal,
-}: Readonly<{ removal: IEnrollmentRemoval }>): React.JSX.Element {
+}: Readonly<{
+  removal: AdministratorEnrollmentRemovalShowResponse
+}>): React.JSX.Element {
   const invalidate = useInvalidate()
   const acknowledge = useEnrollmentRemovalAcknowledge({
     onSuccess: async () => {

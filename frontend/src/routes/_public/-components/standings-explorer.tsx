@@ -1,14 +1,16 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { TrophyIcon } from '@phosphor-icons/react'
+import type {
+  AdministratorBracketPaginateResponse,
+  Category,
+} from '@interclasse/shared'
+import { CATEGORIES } from '@interclasse/shared'
 
 import { BracketTree } from '#/components/common/bracket-tree'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import { CATEGORIES } from '#/lib/entity'
-import type { Category } from '#/lib/entity'
-import type { IBracket } from '#/lib/interfaces'
 import {
   BRACKET_STATUS_LABELS,
   CATEGORY_LABELS,
@@ -20,7 +22,7 @@ import { cn } from '#/lib/utils'
 import { Empty } from './section'
 
 type StandingsExplorerProps = Readonly<{
-  brackets: ReadonlyArray<IBracket>
+  brackets: ReadonlyArray<AdministratorBracketPaginateResponse>
   /** A chave aberta. Ausente, abre a primeira da primeira categoria sorteada. */
   selected?: string
   onSelect: (id: string) => void
@@ -95,7 +97,7 @@ export function StandingsExplorer({
               'aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground',
             )}
           >
-            <span className="font-semibold">{bracket.sport?.name}</span>
+            <span className="font-semibold">{bracket.sport.name}</span>
             <span className="text-xs opacity-80">
               {BRACKET_STATUS_LABELS[bracket.status]}
             </span>

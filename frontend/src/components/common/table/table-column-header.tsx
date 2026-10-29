@@ -8,6 +8,8 @@ import {
   PushPinSlashIcon,
 } from '@phosphor-icons/react'
 import type { Column, RowData } from '@tanstack/react-table'
+import { SORT_DIRECTION } from '@interclasse/shared'
+import type { SortDirection } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'
@@ -18,8 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { SORT_DIRECTION } from '#/lib/entity'
-import type { SortDirection } from '#/lib/entity'
 
 import type { TableFeatures } from './use-table'
 import { useTableContext } from './table-context'

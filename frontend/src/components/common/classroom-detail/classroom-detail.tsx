@@ -10,6 +10,8 @@ import {
 import type {
   AdvisorStudentCreatePayload,
   AdvisorStudentUpdatePayload,
+  AdvisorEnrollmentShowResponse,
+  AdvisorStudentShowResponse,
 } from '@interclasse/shared'
 
 import {
@@ -53,7 +55,6 @@ import {
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { IEnrollmentBoard, IStudent } from '#/lib/interfaces'
 
 import { ClassroomCards } from './classroom-cards'
 import { studentsOf } from './classroom-detail-loader'
@@ -91,7 +92,7 @@ export function ClassroomDetail({
   const queryClient = useQueryClient()
   const [pending, setPending] = React.useState<PendingRemoval | null>(null)
 
-  const store = (updated: IEnrollmentBoard) =>
+  const store = (updated: AdvisorEnrollmentShowResponse) =>
     queryClient.setQueryData(
       queryKeys.advisor.enrollments.board(classroomId),
       updated,
@@ -190,7 +191,7 @@ function Students({
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdvisorStudentCreatePayload,
-    IStudent,
+    AdvisorStudentShowResponse,
     AdvisorStudentCreatePayload
   >({
     validator: AdvisorStudentCreateValidator,
@@ -250,7 +251,7 @@ function Students({
 }
 
 type StudentRowProps = Readonly<{
-  student: IStudent
+  student: AdvisorStudentShowResponse
   onChange: () => Promise<void>
 }>
 
@@ -259,7 +260,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdvisorStudentUpdatePayload,
-    IStudent,
+    AdvisorStudentShowResponse,
     StudentUpdateVariables
   >({
     validator: AdvisorStudentUpdateValidator,

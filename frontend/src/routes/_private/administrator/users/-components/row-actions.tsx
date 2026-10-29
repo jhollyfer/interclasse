@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorUserShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -25,12 +26,11 @@ import {
   useUserDelete,
   useUserUnarchive,
 } from '#/integrations/tanstack-query/mutations/administrator'
-import type { IUser } from '#/lib/interfaces'
 
 import { CopyIdMenuItem } from './copy-id-menu-item'
 
 type UserRowActionsProps = Readonly<{
-  user: IUser
+  user: AdministratorUserShowResponse
   /** Só administrador apaga de vez. Vem da rota, que tem a conta em contexto. */
   canDelete: boolean
   /**

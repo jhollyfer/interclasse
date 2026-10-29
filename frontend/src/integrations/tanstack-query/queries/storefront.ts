@@ -1,16 +1,16 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
+import type {
+  Paginated,
+  StorefrontAnnouncementShowResponse,
+  StorefrontBracketPaginateResponse,
+  StorefrontBracketShowResponse,
+  StorefrontMatchPaginateResponse,
+  StorefrontPhotoShowResponse,
+  StorefrontSiteShowResponse,
+  StorefrontSportShowResponse,
+} from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type {
-  IBracketDetail,
-  IPaginated,
-  IAnnouncement,
-  IBracket,
-  IMatch,
-  ISport,
-  IStorefrontPhoto,
-  IStorefrontSite,
-} from '#/lib/interfaces'
 import type {
   BracketListSearch,
   MatchListSearch,
@@ -34,7 +34,10 @@ export const storefrontSportsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.storefront.sports.all,
     queryFn: ({ signal }) =>
-      request<IPaginated<ISport>>('/storefront/sports?perPage=100', { signal }),
+      request<Paginated<StorefrontSportShowResponse>>(
+        '/storefront/sports?perPage=100',
+        { signal },
+      ),
     staleTime: 5 * 60 * 1000,
   })
 
@@ -46,7 +49,7 @@ export const storefrontPhotosQueryOptions = (params: StorefrontSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.photos.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IStorefrontPhoto>>(
+      request<Paginated<StorefrontPhotoShowResponse>>(
         '/storefront/photos'.concat(queryString(params)),
         { signal },
       ),
@@ -62,7 +65,7 @@ export const storefrontSiteQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.storefront.site,
     queryFn: ({ signal }) =>
-      request<IStorefrontSite>('/storefront/site', { signal }),
+      request<StorefrontSiteShowResponse>('/storefront/site', { signal }),
     staleTime: 5 * 60 * 1000,
   })
 
@@ -70,7 +73,7 @@ export const storefrontAnnouncementsQueryOptions = (params: StorefrontSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.announcements.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IAnnouncement>>(
+      request<Paginated<StorefrontAnnouncementShowResponse>>(
         '/storefront/announcements'.concat(queryString(params)),
         { signal },
       ),
@@ -81,7 +84,7 @@ export const storefrontMatchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.matches.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IMatch>>(
+      request<Paginated<StorefrontMatchPaginateResponse>>(
         '/storefront/matches'.concat(queryString(params)),
         {
           signal,
@@ -95,7 +98,7 @@ export const storefrontBracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
     queryKey: queryKeys.storefront.brackets.list(params),
     queryFn: ({ signal }) =>
-      request<IPaginated<IBracket>>(
+      request<Paginated<StorefrontBracketPaginateResponse>>(
         '/storefront/brackets'.concat(queryString(params)),
         { signal },
       ),
@@ -105,6 +108,9 @@ export const storefrontBracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.storefront.brackets.detail(id),
     queryFn: ({ signal }) =>
-      request<IBracketDetail>('/storefront/brackets/'.concat(id), { signal }),
+      request<StorefrontBracketShowResponse>(
+        '/storefront/brackets/'.concat(id),
+        { signal },
+      ),
     refetchInterval: LIVE,
   })
