@@ -8,7 +8,7 @@ import { EnrollmentRemovalLucidRepository } from './enrollment-removal.lucid.rep
 import { EnrollmentRemovalMemoryRepository } from './enrollment-removal.memory.repository.ts'
 import type { EnrollmentRemovalRepository } from './enrollment-removal.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { EnrollmentRemoval } from '#domain/enrollment-removal/enrollment-removal.entity'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { SportFactory } from '#database/factories/sport.factory'

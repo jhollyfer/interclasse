@@ -5,7 +5,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 /**
  * `GET /documentation`: a referência navegável sobre `/openapi.json`. Mesma

@@ -18,7 +18,7 @@ import {
 
 import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
 import { Knockout } from '#domain/bracket/knockout'
-import { MemoryPagination } from '#core/memory-pagination'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /** A turma como o teste a arranja: o que a chave lê dela. */
 export type ClassroomView = {
@@ -178,7 +178,7 @@ export class BracketMemoryRepository extends BracketRepository {
       .sort((a, b) => this.compareBrackets(a, b, criteria))
       .flatMap((row) => this.toListItems(row))
 
-    return MemoryPagination.of(items, criteria.page, criteria.perPage)
+    return MemoryPagination.slice(items, criteria.page, criteria.perPage)
   }
 
   async paginateMatches(
@@ -201,7 +201,7 @@ export class BracketMemoryRepository extends BracketRepository {
       .sort((a, b) => this.compareMatches(a.match, b.match, criteria))
       .flatMap(({ bracket, match }) => this.toPaginateItems(bracket, match))
 
-    return MemoryPagination.of(items, criteria.page, criteria.perPage)
+    return MemoryPagination.slice(items, criteria.page, criteria.perPage)
   }
 
   async findMatchResponses(

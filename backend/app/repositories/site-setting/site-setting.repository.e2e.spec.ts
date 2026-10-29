@@ -8,7 +8,7 @@ import { SiteSettingLucidRepository } from './site-setting.lucid.repository.ts'
 import { SiteSettingMemoryRepository } from './site-setting.memory.repository.ts'
 import type { SiteSettingRepository } from './site-setting.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { StorageFactory } from '#database/factories/storage.factory'
 
 /**

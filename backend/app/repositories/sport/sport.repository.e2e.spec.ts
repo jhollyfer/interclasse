@@ -5,7 +5,7 @@ import { SportLucidRepository } from './sport.lucid.repository.ts'
 import { SportMemoryRepository } from './sport.memory.repository.ts'
 import type { SportRepository } from './sport.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Sport } from '#domain/sport/sport.entity'
 
 /**

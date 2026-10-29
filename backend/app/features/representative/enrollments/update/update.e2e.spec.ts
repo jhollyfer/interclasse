@@ -13,7 +13,7 @@ import {
   body,
   resetDatabase,
   signInWithFactory,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 test.group('enrollments > update', (group) => {
   group.each.setup(() => resetDatabase())

@@ -6,7 +6,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 const payload = { title: 'Troca de horário', body: 'O futsal passa para as 14h.' }
 

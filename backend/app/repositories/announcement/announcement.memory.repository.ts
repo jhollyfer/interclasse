@@ -7,6 +7,7 @@ import type {
 import { AnnouncementRepository, type AnnouncementListCriteria } from './announcement.repository.ts'
 
 import { Announcement, type AnnouncementProps } from '#domain/announcement/announcement.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
@@ -42,22 +43,11 @@ export class AnnouncementMemoryRepository extends AnnouncementRepository {
     const all = [...this.rows.values()]
       .filter((row) => !search || row.title.toLowerCase().includes(search))
       .sort((a, b) => this.compare(a, b, criteria, sign))
-    const start = (criteria.page - 1) * criteria.perPage
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
-      data: all.slice(start, start + criteria.perPage).map((row) => ({
+      meta: page.meta,
+      data: page.data.map((row) => ({
         id: row.id,
         title: row.title,
         body: row.body,

@@ -4,7 +4,12 @@ import { CATEGORY } from '@interclasse/shared'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { UserFactory } from '#database/factories/user.factory'
 import { createSport, enrolledClassrooms } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  signInWithFactory,
+} from '#tests/http-fixtures'
 
 test.group('classrooms > paginate', (group) => {
   group.each.setup(() => resetDatabase())

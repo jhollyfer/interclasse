@@ -3,7 +3,12 @@ import { test } from '@japa/runner'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase, signInWithFactory } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  signInWithFactory,
+} from '#tests/http-fixtures'
 
 test.group('students > paginate', (group) => {
   group.each.setup(() => resetDatabase())

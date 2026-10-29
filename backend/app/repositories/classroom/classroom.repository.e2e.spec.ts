@@ -8,7 +8,7 @@ import { ClassroomLucidRepository } from './classroom.lucid.repository.ts'
 import { ClassroomMemoryRepository } from './classroom.memory.repository.ts'
 import type { ClassroomRepository } from './classroom.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { TeamFactory } from '#database/factories/team.factory'

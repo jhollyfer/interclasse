@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import db from '@adonisjs/lucid/services/db'
 
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
-import { authenticate, authenticateAsAdministrator, resetDatabase } from '#tests/helpers'
+import { authenticate, authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
 /**
  * Arquivar a conta. Diferente dos recursos de conteúdo, arquivar aqui também

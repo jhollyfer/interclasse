@@ -5,7 +5,7 @@ import { AnnouncementLucidRepository } from './announcement.lucid.repository.ts'
 import { AnnouncementMemoryRepository } from './announcement.memory.repository.ts'
 import type { AnnouncementRepository } from './announcement.repository.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { Announcement } from '#domain/announcement/announcement.entity'
 
 /**

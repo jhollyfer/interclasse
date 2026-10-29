@@ -4,7 +4,7 @@ import { CATEGORY } from '@interclasse/shared'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { MatchFactory } from '#database/factories/match.factory'
 import { TeamFactory } from '#database/factories/team.factory'
-import { body, type Session } from '#tests/helpers'
+import { body, type Session } from '#tests/http-fixtures'
 
 /**
  * A montagem das specs de chave e partida.

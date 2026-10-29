@@ -1,10 +1,15 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
+import type { StorageMimetype } from '@interclasse/shared'
 
 import { PART_SIZE } from '#services/multipart/multipart.contract'
-import { type StorageMimetype } from '#core/validator'
-import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
-import type { Session } from '#tests/helpers'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  type ResponseBody,
+} from '#tests/http-fixtures'
+import type { Session } from '#tests/http-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao

@@ -21,6 +21,7 @@ import {
   type ClassroomPeopleFacts,
   type ClassroomProps,
 } from '#domain/classroom/classroom.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
@@ -205,22 +206,11 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     criteria: { readonly page: number; readonly perPage: number },
     toItem: (props: ClassroomProps) => T,
   ): Paginated<T> {
-    const start = (criteria.page - 1) * criteria.perPage
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
-      data: all.slice(start, start + criteria.perPage).map(toItem),
+      meta: page.meta,
+      data: page.data.map(toItem),
     }
   }
 

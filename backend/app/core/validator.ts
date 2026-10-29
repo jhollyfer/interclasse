@@ -193,51 +193,6 @@ export type IdentifierPayload = Infer<typeof IdentifierValidator>
 export type PagePayload = Infer<typeof PageValidator>
 export type PaginationPayload = Infer<typeof PaginationValidator>
 
-/**
- * Os tipos aceitos, e a extensão que cada um ganha na chave do objeto.
- *
- * O mapa existe porque o nome que o usuário enviou **não** é fonte confiável de
- * extensão - ele é rótulo, e `foto.png` pode ser um pdf. A extensão da chave
- * sai do `mimetype` declarado, que é o mesmo valor com que a URL é assinada e
- * que o bucket devolve na confirmação.
- *
- * `Record<StorageMimetype, string>` faz o compilador cobrar uma entrada por
- * tipo: acrescentar um mimetype na lista sem dizer que extensão ele tem quebra
- * a compilação, em vez de virar arquivo sem extensão no bucket.
- *
- * Áudio e vídeo entram porque o domínio os tem; `mp3` é o formato de áudio
- * mais comum de chegar.
- */
-export const STORAGE_MIMETYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  // `image/svg+xml` fica de fora: SVG é HTML e carrega `<script>`, e
-  // `storage.service.ts` devolve a URL assinada com o `contentType` gravado,
-  // então o navegador o executaria na origem do storage - XSS armazenado por
-  // upload.
-  'application/pdf',
-  'audio/mpeg',
-  'audio/mp4',
-  'audio/ogg',
-  'audio/wav',
-] as const
-
-export type StorageMimetype = (typeof STORAGE_MIMETYPES)[number]
-
-export const STORAGE_EXTENSIONS: Record<StorageMimetype, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-  'application/pdf': 'pdf',
-  'audio/mpeg': 'mp3',
-  'audio/mp4': 'm4a',
-  'audio/ogg': 'ogg',
-  'audio/wav': 'wav',
-}
-
 /** Os filtros da tabela de jogos, iguais no painel e no site. */
 export function matchFilterFields() {
   return {

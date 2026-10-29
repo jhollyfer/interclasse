@@ -5,7 +5,7 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('brackets > preview', (group) => {
   group.each.setup(() => resetDatabase())

@@ -6,7 +6,7 @@ import { left, right } from '@interclasse/shared'
 import { TransactionContext } from './transaction-context.ts'
 import { UnitOfWorkLucid } from './unit-of-work.lucid.ts'
 
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 
 /** Uma escrita dentro da unidade, pelo cliente que os repositories usam. */
 async function insertSport(context: TransactionContext, name: string): Promise<void> {

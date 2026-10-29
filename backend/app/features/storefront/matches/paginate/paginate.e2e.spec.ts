@@ -4,7 +4,7 @@ import { MATCH_STATUS } from '@interclasse/shared'
 
 import Match from '#models/match'
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('storefront matches > paginate', (group) => {
   group.each.setup(() => resetDatabase())

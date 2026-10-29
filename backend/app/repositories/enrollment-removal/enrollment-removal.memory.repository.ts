@@ -13,6 +13,7 @@ import {
   EnrollmentRemoval,
   type EnrollmentRemovalProps,
 } from '#domain/enrollment-removal/enrollment-removal.entity'
+import { MemoryPagination } from '#repositories/memory-pagination'
 
 type Classroom = AdministratorEnrollmentRemovalShowResponse['classroom']
 type Sport = AdministratorEnrollmentRemovalShowResponse['sport']
@@ -83,26 +84,15 @@ export class EnrollmentRemovalMemoryRepository extends EnrollmentRemovalReposito
           Number(b.acknowledgedAt === null) - Number(a.acknowledgedAt === null) ||
           b.createdAt.getTime() - a.createdAt.getTime(),
       )
+    const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
     const items: AdministratorEnrollmentRemovalShowResponse[] = []
-    const start = (criteria.page - 1) * criteria.perPage
-    for (const row of all.slice(start, start + criteria.perPage)) {
+    for (const row of page.data) {
       const detail = this.toResponse(row)
       if (detail) items.push(detail)
     }
-    const lastPage = Math.max(1, Math.ceil(all.length / criteria.perPage))
 
     return {
-      meta: {
-        total: all.length,
-        perPage: criteria.perPage,
-        currentPage: criteria.page,
-        lastPage,
-        firstPage: 1,
-        firstPageUrl: '/?page=1',
-        lastPageUrl: `/?page=${lastPage}`,
-        nextPageUrl: null,
-        previousPageUrl: null,
-      },
+      meta: page.meta,
       data: items,
     }
   }

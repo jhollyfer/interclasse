@@ -8,7 +8,7 @@ import {
   body,
   resetDatabase,
   signInWithFactory,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 /**
  * A matriz de papéis inteira, uma célula por caso.

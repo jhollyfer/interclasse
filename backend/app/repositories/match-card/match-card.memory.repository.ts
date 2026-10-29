@@ -7,7 +7,7 @@ import {
 } from './match-card.repository.ts'
 
 import { MatchCard, type MatchCardProps } from '#domain/match-card/match-card.entity'
-import { MemoryPagination } from '#core/memory-pagination'
+import { MemoryPagination } from '#repositories/memory-pagination'
 import type { BracketRepository } from '#repositories/bracket/bracket.repository'
 
 /**
@@ -67,7 +67,7 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
       if (response) responses.push(response)
     }
 
-    return MemoryPagination.of(responses, criteria.page, criteria.perPage)
+    return MemoryPagination.slice(responses, criteria.page, criteria.perPage)
   }
 
   async findResponse(id: string): Promise<AdministratorCardPaginateResponse | null> {

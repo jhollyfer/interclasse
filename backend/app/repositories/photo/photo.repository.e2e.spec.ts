@@ -10,7 +10,7 @@ import type { PhotoRepository } from './photo.repository.ts'
 
 import { StorageFactory } from '#database/factories/storage.factory'
 import { UserFactory } from '#database/factories/user.factory'
-import { resetDatabase } from '#tests/helpers'
+import { resetDatabase } from '#tests/http-fixtures'
 import { PHOTO_SENDER, Photo } from '#domain/photo/photo.entity'
 
 /**

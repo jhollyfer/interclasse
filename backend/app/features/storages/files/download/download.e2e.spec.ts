@@ -1,17 +1,17 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import type { ApiClient } from '@japa/api-client'
+import type { StorageMimetype } from '@interclasse/shared'
 
 import { StorageContract } from '#services/storage/storage.contract'
-import { type StorageMimetype } from '#core/validator'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
   body,
   resetDatabase,
   type ResponseBody,
-} from '#tests/helpers'
-import type { Session } from '#tests/helpers'
+} from '#tests/http-fixtures'
+import type { Session } from '#tests/http-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao

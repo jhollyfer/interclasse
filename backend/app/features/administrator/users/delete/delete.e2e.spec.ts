@@ -16,7 +16,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 /**
  * O payload de criação. `passwordConfirmation` acompanha a senha porque a regra

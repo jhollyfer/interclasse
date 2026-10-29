@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import { ADMINISTRATOR, body, resetDatabase } from '#tests/helpers'
+import { ADMINISTRATOR, body, resetDatabase } from '#tests/http-fixtures'
 
 /**
  * A sessão inteira pelo caminho real: o sign-in é o único jeito de obter um

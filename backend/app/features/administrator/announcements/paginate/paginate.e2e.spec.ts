@@ -7,7 +7,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 test.group('announcements > paginate', (group) => {
   group.each.setup(() => resetDatabase())

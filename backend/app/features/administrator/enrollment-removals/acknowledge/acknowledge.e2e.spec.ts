@@ -5,7 +5,7 @@ import { test } from '@japa/runner'
 import EnrollmentRemoval from '#models/enrollment-removal'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { SportFactory } from '#database/factories/sport.factory'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
+import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
 test.group('enrollment-removals > acknowledge', (group) => {
   group.each.setup(() => resetDatabase())

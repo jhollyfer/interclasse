@@ -5,7 +5,7 @@ import {
   authenticateAsAdvisor,
   body,
   resetDatabase,
-} from '#tests/helpers'
+} from '#tests/http-fixtures'
 
 /**
  * `GET /openapi.json`. Exige sessão de quem opera a instalação, mas não pode
