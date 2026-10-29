@@ -65,6 +65,11 @@ export const queryKeys = {
       athletes: (id: string) =>
         ['administrator', 'matches', 'athletes', id] as const,
     },
+    photos: {
+      all: ['administrator', 'photos'] as const,
+      list: (params: ListSearch) =>
+        ['administrator', 'photos', 'list', params] as const,
+    },
     cards: {
       all: ['administrator', 'cards'] as const,
       list: (params: ListSearch) =>
@@ -83,6 +88,11 @@ export const queryKeys = {
       all: ['advisor', 'classrooms'] as const,
       list: (params: ListSearch) =>
         ['advisor', 'classrooms', 'list', params] as const,
+    },
+    photos: {
+      all: ['advisor', 'photos'] as const,
+      list: (params: ListSearch) =>
+        ['advisor', 'photos', 'list', params] as const,
     },
     students: {
       all: ['advisor', 'students'] as const,
@@ -132,6 +142,11 @@ export const queryKeys = {
       detail: (id: string) => ['storefront', 'brackets', 'detail', id] as const,
     },
     site: ['storefront', 'site'] as const,
+    photos: {
+      all: ['storefront', 'photos'] as const,
+      list: (params: StorefrontSearch) =>
+        ['storefront', 'photos', 'list', params] as const,
+    },
   },
 }
 
@@ -169,6 +184,12 @@ export const DEPENDENTS = {
   ],
   announcements: [queryKeys.storefront.all],
   site: [queryKeys.storefront.all],
+  /** Foto enviada, aprovada ou apagada muda as três listas e o carrossel. */
+  photos: [
+    queryKeys.administrator.photos.all,
+    queryKeys.advisor.photos.all,
+    queryKeys.storefront.photos.all,
+  ],
   games: [
     queryKeys.advisor.enrollments.all,
     queryKeys.representative.enrollments.all,

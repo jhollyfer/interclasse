@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** 13 tarefas · 8 feitas · 0 em andamento · 5 a fazer — atualizado 2026-10-29
+**Resumo:** 13 tarefas · 9 feitas · 0 em andamento · 4 a fazer — atualizado 2026-10-29
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -20,7 +20,7 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 1.1 | Sync do `maiyu-pattern` (`_standards/`, `docs/`, `AGENTS.md`) | Alta | Feita | `_padroes/` removido |
 | 1.2 | Migração estrutural (`shared/`, `domain/`, `repositories/`, queries por módulo, specs por ação) | Alta | A fazer | `_standards/MIGRATIONS.md`, seção interclasse |
 
-## Fase 2 · Pedidos do Geison, 29/10 (7/9)
+## Fase 2 · Pedidos do Geison, 29/10 (8/9)
 
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
@@ -31,7 +31,7 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 2.5 | Turmas do admin em cartões (F1/F2), detalhe com conselheiro e representante; conselheiro com uma turma só | Alta | Feita | `components/common/classroom-detail` |
 | 2.6 | Página "Sobre o JIC" e Instagram no rodapé | Média | Feita | conteúdo editável em Painel › Site |
 | 2.7 | Regulamento em PDF enviado pelo admin, para baixar no site | Média | Feita | |
-| 2.8 | Carrossel de fotos: conselheiro envia, admin aprova | Média | A fazer | |
+| 2.8 | Carrossel de fotos: conselheiro envia, admin aprova | Média | Feita | |
 | 2.9 | Relatórios (turmas, alunos, atletas) com CSV | Média | A fazer | |
 
 ## Fase 3 · Achados da auditoria (0/2)

@@ -17,7 +17,9 @@ import type {
   ISport,
   IStudent,
   IUser,
+  IPhoto,
   ISiteSetting,
+  IStorefrontPhoto,
   IStorefrontSite,
 } from '#/lib/interfaces'
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
@@ -53,6 +55,8 @@ export type MatchListSearch = Merge<
     status?: string
   }
 >
+
+export type PhotoListSearch = Merge<ListSearch, { status?: string }>
 
 export type StudentListSearch = Merge<ListSearch, { classroomId?: string }>
 
@@ -357,6 +361,44 @@ export const storefrontSportsQueryOptions = () =>
     queryKey: queryKeys.storefront.sports.all,
     queryFn: ({ signal }) =>
       request<IPaginated<ISport>>('/storefront/sports?perPage=100', { signal }),
+    staleTime: 5 * 60 * 1000,
+  })
+
+/** As fotos enviadas, para a revisão da organização. `?status` recorta a fila. */
+export const photosQueryOptions = (params: PhotoListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.administrator.photos.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IPhoto>>(
+        '/administrator/photos'.concat(search(params)),
+        { signal },
+      ),
+    placeholderData: keepPreviousData,
+  })
+
+/** As fotos que o conselheiro enviou, com a decisão de cada uma. */
+export const advisorPhotosQueryOptions = (params: ListSearch) =>
+  queryOptions({
+    queryKey: queryKeys.advisor.photos.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IPhoto>>('/advisor/photos'.concat(search(params)), {
+        signal,
+      }),
+    placeholderData: keepPreviousData,
+  })
+
+/**
+ * O carrossel do site. As URLs são assinadas e vencem em minutos: `staleTime`
+ * abaixo disso, para nenhuma foto virar imagem quebrada na tela aberta.
+ */
+export const storefrontPhotosQueryOptions = (params: StorefrontSearch) =>
+  queryOptions({
+    queryKey: queryKeys.storefront.photos.list(params),
+    queryFn: ({ signal }) =>
+      request<IPaginated<IStorefrontPhoto>>(
+        '/storefront/photos'.concat(search(params)),
+        { signal },
+      ),
     staleTime: 5 * 60 * 1000,
   })
 

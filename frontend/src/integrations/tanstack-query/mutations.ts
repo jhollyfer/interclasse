@@ -34,10 +34,15 @@ import type {
   IEnrollmentBoard,
   IEnrollmentRemoval,
   IMatchCard,
+  IPhoto,
   ISiteSetting,
   Merge,
 } from '#/lib/interfaces'
 import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
+import type {
+  PhotoCreatePayload,
+  PhotoReviewPayload,
+} from '#/validators/administrator/photos.validator'
 import type { SiteUpdatePayload } from '#/validators/administrator/site.validator'
 import type {
   AnnouncementCreatePayload,
@@ -691,6 +696,55 @@ export function useSiteUpdate(
         method: 'PUT',
         body: JSON.stringify(payload),
       })
+    },
+  })
+}
+
+/**
+ * Envia uma foto para o carrossel. O caminho decide o estado em que ela nasce:
+ * a do administrador vai direto ao site, a do conselheiro espera aprovação.
+ */
+export function usePhotoCreate(
+  area: 'administrator' | 'advisor',
+  options?: MutationProps<IPhoto, PhotoCreatePayload>,
+) {
+  return useMutation<IPhoto, HTTPError, PhotoCreatePayload>({
+    ...options,
+    mutationFn: function (payload) {
+      return request<IPhoto>('/'.concat(area, '/photos'), {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export type PhotoReviewVariables = Merge<PhotoReviewPayload, { id: string }>
+
+/** Aprova (vai ao site) ou recusa (sai do site). A decisão se refaz. */
+export function usePhotoReview(
+  options?: MutationProps<IPhoto, PhotoReviewVariables>,
+) {
+  return useMutation<IPhoto, HTTPError, PhotoReviewVariables>({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<IPhoto>('/administrator/photos/'.concat(id, '/review'), {
+        method: 'PUT',
+        body: JSON.stringify(body),
+      })
+    },
+  })
+}
+
+/** Apaga a foto. O conselheiro só alcança as que enviou (as outras são 404). */
+export function usePhotoDelete(
+  area: 'administrator' | 'advisor',
+  options?: MutationProps<void, string>,
+) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/'.concat(area, '/photos/', id), { method: 'DELETE' })
     },
   })
 }

@@ -107,7 +107,7 @@ export function ImageFieldRemove({
  * padrão do `ImageField`; a tela que aceitar outro conjunto escreve o dela.
  */
 export function ImageFieldDescription({
-  children = 'JPG, PNG, WEBP, GIF ou SVG.',
+  children = 'JPG, PNG, WEBP ou GIF.',
   ...props
 }: React.ComponentProps<typeof FieldDescription>): React.JSX.Element {
   return (

@@ -70,6 +70,17 @@ export type BracketStatus = (typeof BRACKET_STATUS)[keyof typeof BRACKET_STATUS]
 
 export const BRACKET_STATUSES = Object.values(BRACKET_STATUS)
 
+/** A foto do carrossel: a do conselheiro espera a aprovação da organização. */
+export const PHOTO_STATUS = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const
+
+export type PhotoStatus = (typeof PHOTO_STATUS)[keyof typeof PHOTO_STATUS]
+
+export const PHOTO_STATUSES = Object.values(PHOTO_STATUS)
+
 export const MATCH_PHASE = {
   ROUND_OF_16: 'ROUND_OF_16',
   QUARTER: 'QUARTER',
@@ -137,7 +148,6 @@ export const STORAGE_MIMETYPES = [
   'image/png',
   'image/webp',
   'image/gif',
-  'image/svg+xml',
   'application/pdf',
   'audio/mpeg',
   'audio/mp4',

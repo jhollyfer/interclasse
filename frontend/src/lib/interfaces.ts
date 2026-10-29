@@ -5,6 +5,7 @@ import type {
   Category,
   MatchPhase,
   MatchStatus,
+  PhotoStatus,
   UploadStatus,
   UserRole,
 } from './entity'
@@ -100,6 +101,29 @@ export type IClassroom = {
   readonly sportsCount?: number
   readonly createdAt: string
   readonly updatedAt: string | null
+}
+
+/** A foto do carrossel, como o painel a lê: com o arquivo e quem enviou. */
+export type IPhoto = {
+  readonly id: string
+  readonly storageId: string
+  readonly caption: string | null
+  readonly status: PhotoStatus
+  readonly authorId: string | null
+  readonly reviewedById: string | null
+  readonly reviewedAt: string | null
+  readonly storage: IStorage
+  readonly author?: IPerson | null
+  readonly createdAt: string
+  readonly updatedAt: string | null
+}
+
+/** A foto do carrossel no site anônimo: só a imagem e a legenda. */
+export type IStorefrontPhoto = {
+  readonly id: string
+  readonly caption: string | null
+  readonly url: string
+  readonly createdAt: string
 }
 
 /** A configuração do site, como o painel a lê: com o regulamento inteiro. */

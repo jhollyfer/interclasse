@@ -278,7 +278,7 @@ export function SiteForm(): React.JSX.Element {
                       <ImageFieldUpload>Enviar PDF</ImageFieldUpload>
                       <ImageFieldRemove />
                     </ImageFieldActions>
-                    <ImageFieldDescription />
+                    <ImageFieldDescription>Somente PDF.</ImageFieldDescription>
                   </ImageFieldContent>
                 </ImageField>
               )}

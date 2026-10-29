@@ -6,6 +6,7 @@ import {
   GaugeIcon,
   GlobeIcon,
   IdentificationCardIcon,
+  ImagesIcon,
   ListChecksIcon,
   MegaphoneIcon,
   StudentIcon,
@@ -46,12 +47,14 @@ const ORGANIZATION = linkOptions([
     label: 'Avisos',
     icon: MegaphoneIcon,
   },
+  { to: '/administrator/photos', label: 'Fotos', icon: ImagesIcon },
   { to: '/administrator/users', label: 'Usuários', icon: UsersIcon },
   { to: '/administrator/site', label: 'Site', icon: GlobeIcon },
 ])
 
 const ADVISOR = linkOptions([
   { to: '/advisor', label: 'Minha turma', icon: StudentIcon },
+  { to: '/advisor/photos', label: 'Fotos dos jogos', icon: ImagesIcon },
 ])
 
 const REPRESENTATIVE = linkOptions([
