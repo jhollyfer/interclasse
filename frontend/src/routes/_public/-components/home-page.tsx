@@ -17,6 +17,7 @@ import {
 } from '../index'
 import { AnnouncementList } from './announcement-list'
 import { NextMatch } from './next-match'
+import { PhotoCarousel } from './photo-carousel'
 import { RegulationLink } from './regulation-link'
 import { ResultsTicker } from './results-ticker'
 import { StandingsExplorer } from './standings-explorer'
@@ -103,6 +104,8 @@ export function HomePage(): React.JSX.Element {
           onSelect={setBracketId}
         />
       </Section>
+
+      <PhotoCarousel />
 
       <Section>
         <SectionHeader>

@@ -10,6 +10,7 @@ import type {
   Category,
   MatchPhase,
   MatchStatus,
+  PhotoStatus,
   StorageMimetype,
   UploadStatus,
   UserRole,
@@ -98,6 +99,18 @@ export const BRACKET_STATUS_VARIANTS: Record<string, BadgeVariant> = {
   FINISHED: 'success',
 } satisfies Record<BracketStatus, BadgeVariant>
 
+export const PHOTO_STATUS_LABELS: Record<string, string | undefined> = {
+  PENDING: 'Aguardando aprovação',
+  APPROVED: 'No site',
+  REJECTED: 'Recusada',
+} satisfies Record<PhotoStatus, string>
+
+export const PHOTO_STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  PENDING: 'warning',
+  APPROVED: 'success',
+  REJECTED: 'destructive',
+} satisfies Record<PhotoStatus, BadgeVariant>
+
 export const MATCH_PHASE_LABELS: Record<string, string | undefined> = {
   ROUND_OF_16: 'Oitavas',
   QUARTER: 'Quartas',
@@ -160,7 +173,6 @@ export const STORAGE_MIMETYPE_LABELS: Record<string, string | undefined> = {
   'image/png': 'Imagem PNG',
   'image/webp': 'Imagem WebP',
   'image/gif': 'Imagem GIF',
-  'image/svg+xml': 'Imagem SVG',
   'application/pdf': 'PDF',
   'audio/mpeg': 'Áudio MP3',
   'audio/mp4': 'Áudio MP4',

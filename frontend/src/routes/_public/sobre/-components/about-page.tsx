@@ -7,7 +7,12 @@ import type { IStorefrontSite } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 
 import { RegulationLink } from '../../-components/regulation-link'
-import { Empty, Section, SectionHeader, SectionTitle  } from '../../-components/section'
+import {
+  Empty,
+  Section,
+  SectionHeader,
+  SectionTitle,
+} from '../../-components/section'
 
 /** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
 function sinceLabel(firstEditionYear: number): string {
