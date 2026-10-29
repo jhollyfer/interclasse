@@ -1,5 +1,9 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 
+import { AnnouncementLucidRepository } from '#repositories/announcement/announcement.lucid.repository'
+import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
+import { SiteSettingLucidRepository } from '#repositories/site-setting/site-setting.lucid.repository'
+import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import { SportLucidRepository } from '#repositories/sport/sport.lucid.repository'
 import { SportRepository } from '#repositories/sport/sport.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
@@ -16,6 +20,12 @@ export default class RepositoryProvider {
 
   register() {
     this.app.container.bind(UnitOfWork, () => this.app.container.make(UnitOfWorkLucid))
+    this.app.container.bind(AnnouncementRepository, () =>
+      this.app.container.make(AnnouncementLucidRepository),
+    )
+    this.app.container.bind(SiteSettingRepository, () =>
+      this.app.container.make(SiteSettingLucidRepository),
+    )
     this.app.container.bind(SportRepository, () => this.app.container.make(SportLucidRepository))
   }
 }

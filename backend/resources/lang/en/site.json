@@ -1,0 +1,5 @@
+{
+  "regulation_not_found": "File not found",
+  "regulation_not_pdf": "The rules must be a PDF",
+  "regulation_not_pdf_field": "Upload the rules as a PDF"
+}

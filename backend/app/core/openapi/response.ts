@@ -9,16 +9,21 @@ import {
   UPLOAD_STATUSES,
   USER_ROLES,
 } from '@interclasse/shared'
-import { AdministratorSportShowResponse, StorefrontSportShowResponse } from '@interclasse/shared'
+import {
+  AdministratorAnnouncementShowResponse,
+  AdministratorSiteShowResponse,
+  AdministratorSportShowResponse,
+  StorefrontAnnouncementShowResponse,
+  StorefrontSiteShowResponse,
+  StorefrontSportShowResponse,
+} from '@interclasse/shared'
 
 import { vine } from '#core/validator'
-import Announcement from '#models/announcement'
 import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import EnrollmentRemoval from '#models/enrollment-removal'
 import MatchCard from '#models/match-card'
 import Photo from '#models/photo'
-import SiteSetting from '#models/site-setting'
 import Match from '#models/match'
 import Sport from '#models/sport'
 import Storage from '#models/storage'
@@ -83,17 +88,10 @@ const SPORT: ModelResource = {
   model: Sport,
 }
 
-const ANNOUNCEMENT: ModelResource = {
-  model: Announcement,
-}
 const PHOTO: ModelResource = {
   model: Photo,
   enums: { status: PHOTO_STATUSES },
   relations: { storage: STORAGE, author: PERSON },
-}
-const SITE_SETTING: ModelResource = {
-  model: SiteSetting,
-  relations: { regulation: STORAGE },
 }
 
 /** O time é a turma dentro da competição: o nome que sai no placar vem de `classroom`. */
@@ -303,22 +301,6 @@ export const DrawPreviewResponse = vine.create({
 // ---------------------------------------------------------------------------
 
 /**
- * O "Sobre" para o site anônimo: o recorte de `GET /storefront/site`. Do
- * regulamento sai só o que o botão de baixar precisa, sem o caminho no bucket.
- */
-export const StorefrontSiteResponse = vine.create({
-  about: vine.string().nullable(),
-  organizer: vine.string().nullable(),
-  firstEditionYear: vine.number().nullable(),
-  edition: vine.number().nullable(),
-  schoolInstagram: vine.string().nullable(),
-  developerInstagram: vine.string().nullable(),
-  regulation: vine
-    .object({ url: vine.string(), originalName: vine.string(), size: vine.number() })
-    .nullable(),
-})
-
-/**
  * A foto do carrossel no site anônimo: a URL assinada e a legenda, sem quem
  * enviou nem o caminho no bucket.
  */
@@ -410,8 +392,8 @@ export const RESPONSES: Record<string, FeatureResponse> = {
 
   'administrator/classrooms': CLASSROOM_WITH_PEOPLE,
   'administrator/sports': AdministratorSportShowResponse,
-  'administrator/announcements': ANNOUNCEMENT,
-  'administrator/site': SITE_SETTING,
+  'administrator/announcements': AdministratorAnnouncementShowResponse,
+  'administrator/site': AdministratorSiteShowResponse,
   'administrator/photos': PHOTO,
   'administrator/reports': ReportResponse,
   'advisor/photos': PHOTO,
@@ -438,9 +420,9 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    * públicos por natureza.
    */
   'storefront/sports': StorefrontSportShowResponse,
-  'storefront/announcements': ANNOUNCEMENT,
+  'storefront/announcements': StorefrontAnnouncementShowResponse,
   'storefront/matches': MATCH,
   'storefront/brackets': BRACKET,
-  'storefront/site': StorefrontSiteResponse,
+  'storefront/site': StorefrontSiteShowResponse,
   'storefront/photos': StorefrontPhotoResponse,
 }
