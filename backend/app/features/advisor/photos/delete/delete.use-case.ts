@@ -1,17 +1,31 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 
-import type Photo from '#models/photo'
+import Photo from '#models/photo'
+import type User from '#models/user'
 import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { USER_ROLE, type Merge } from '#core/entity'
+import type { IdentifierPayload } from '#core/validator'
 
+type Payload = Merge<IdentifierPayload, { actor: User }>
 type Response = Either<HTTPException, Photo>
 
-/** Tira a foto do carrossel e da lista de quem enviou. O arquivo fica para o `storages:prune`. */
+/**
+ * Tira do carrossel uma foto que o próprio conselheiro enviou. A de outro é
+ * `404`, como a turma alheia: dizer "proibido" confirmaria que ela existe. O
+ * administrador apaga qualquer uma. O arquivo fica para o `storages:prune`.
+ */
 @inject()
 export default class AdvisorPhotoDeleteUseCase {
-  async execute(photo: Photo): Promise<Response> {
+  async execute({ id, actor }: Payload): Promise<Response> {
     try {
+      const query = Photo.query().where('id', id)
+      if (actor.role !== USER_ROLE.ADMINISTRATOR) query.where('authorId', actor.id)
+      const photo = await query.first()
+
+      if (!photo) return left(HTTPException.NotFound('Foto não encontrada', 'PHOTO_NOT_FOUND'))
+
       await photo.delete()
 
       return right(photo)

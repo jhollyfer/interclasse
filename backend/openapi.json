@@ -5192,6 +5192,16 @@
               }
             }
           },
+          "404": {
+            "description": "Foto não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404PhotoNotFound"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Dados inválidos",
             "content": {
