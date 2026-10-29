@@ -1,0 +1,9 @@
+{
+  "not_found": "Partida não encontrada",
+  "teams_pending": "A partida ainda não tem os dois times definidos",
+  "winner_required": "Informe quem venceu",
+  "winner_required_field": "Empate: selecione quem venceu nos pênaltis",
+  "not_played": "A partida ainda não tem placar",
+  "next_played_on_score": "A partida seguinte já tem placar: corrija-a antes",
+  "next_played_on_unscore": "A partida seguinte já tem placar: desfaça-a antes"
+}
