@@ -5,9 +5,9 @@ import type { Infer } from '#core/validator'
  * O que o site aceita na query. **Sem `trashed`**: nada daqui tem lixeira, e o
  * parâmetro seria aceito e ignorado em silêncio.
  */
-export const MatchPaginateValidator = vine.create({
+export const StorefrontMatchPaginateValidator = vine.create({
   ...pageFields(),
   ...matchFilterFields(),
 })
 
-export type MatchPaginatePayload = Infer<typeof MatchPaginateValidator>
+export type StorefrontMatchPaginatePayload = Infer<typeof StorefrontMatchPaginateValidator>

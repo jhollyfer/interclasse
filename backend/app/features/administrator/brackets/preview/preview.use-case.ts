@@ -9,9 +9,9 @@ import type { Infer } from '#core/validator'
 import { type DrawPreviewResponse } from '#core/openapi/response'
 import { MAX_TEAMS } from '#features/_shared.tournament'
 import HTTPException from '#exceptions/http.exception'
-import type { BracketPreviewPayload } from '#validators/administrator/brackets.validator'
+import type { AdministratorBracketPreviewPayload } from '#validators/administrator/brackets.validator'
 
-type Payload = BracketPreviewPayload
+type Payload = AdministratorBracketPreviewPayload
 type Response = Either<HTTPException, Infer<typeof DrawPreviewResponse>>
 
 /**

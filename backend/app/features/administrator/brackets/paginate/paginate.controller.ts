@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorBracketPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketPaginateValidator } from '#validators/administrator/brackets.validator'
+import { AdministratorBracketPaginateValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketPaginateController {
@@ -15,7 +15,7 @@ export default class AdministratorBracketPaginateController {
   constructor(private readonly useCase: AdministratorBracketPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(BracketPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorBracketPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

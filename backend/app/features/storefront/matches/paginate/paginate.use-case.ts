@@ -12,9 +12,9 @@ import {
 
 import MatchService from '#services/match/match.service'
 import HTTPException from '#exceptions/http.exception'
-import type { MatchPaginatePayload } from '#validators/storefront/matches.validator'
+import type { StorefrontMatchPaginatePayload } from '#validators/storefront/matches.validator'
 
-type Payload = MatchPaginatePayload
+type Payload = StorefrontMatchPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>
 
 @inject()

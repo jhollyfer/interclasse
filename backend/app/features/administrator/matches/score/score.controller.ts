@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorMatchScoreUseCase from './score.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchScoreValidator } from '#validators/administrator/matches.validator'
+import { AdministratorMatchScoreValidator } from '#validators/administrator/matches.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -21,7 +21,7 @@ export default class AdministratorMatchScoreController {
   constructor(private readonly useCase: AdministratorMatchScoreUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(MatchScoreValidator)
+    const body = await context.request.validateUsing(AdministratorMatchScoreValidator)
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

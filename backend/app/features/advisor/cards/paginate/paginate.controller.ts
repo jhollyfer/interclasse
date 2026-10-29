@@ -6,7 +6,7 @@ import AdvisorCardPaginateUseCase from './paginate.use-case.ts'
 import Classroom from '#models/classroom'
 import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { CardPaginateValidator } from '#validators/advisor/cards.validator'
+import { AdvisorCardPaginateValidator } from '#validators/advisor/cards.validator'
 
 @inject()
 export default class AdvisorCardPaginateController {
@@ -19,7 +19,7 @@ export default class AdvisorCardPaginateController {
   constructor(private readonly useCase: AdvisorCardPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(CardPaginateValidator, {
+    const payload = await context.request.validateUsing(AdvisorCardPaginateValidator, {
       data: context.request.qs(),
     })
     const classroom = await Classroom.find(payload.classroomId)

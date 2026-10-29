@@ -5,7 +5,7 @@ import AdministratorBracketPreviewUseCase from './preview.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { DrawPreviewResponse } from '#core/openapi/response'
-import { BracketPreviewValidator } from '#validators/administrator/brackets.validator'
+import { AdministratorBracketPreviewValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketPreviewController {
@@ -20,7 +20,7 @@ export default class AdministratorBracketPreviewController {
   constructor(private readonly useCase: AdministratorBracketPreviewUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(BracketPreviewValidator, {
+    const payload = await context.request.validateUsing(AdministratorBracketPreviewValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

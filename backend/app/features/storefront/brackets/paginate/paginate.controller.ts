@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StorefrontBracketPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketPaginateValidator } from '#validators/storefront/brackets.validator'
+import { StorefrontBracketPaginateValidator } from '#validators/storefront/brackets.validator'
 
 @inject()
 export default class StorefrontBracketPaginateController {
@@ -15,7 +15,7 @@ export default class StorefrontBracketPaginateController {
   constructor(private readonly useCase: StorefrontBracketPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(BracketPaginateValidator, {
+    const payload = await context.request.validateUsing(StorefrontBracketPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

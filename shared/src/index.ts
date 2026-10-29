@@ -30,3 +30,17 @@ export * from './validators/administrator/sports.validator.js'
 
 export * from './responses/administrator/sports.response.js'
 export * from './responses/storefront/sports.response.js'
+
+export * from './validators/administrator/brackets.validator.js'
+export * from './validators/administrator/cards.validator.js'
+export * from './validators/administrator/matches.validator.js'
+export * from './validators/advisor/cards.validator.js'
+export * from './validators/storefront/brackets.validator.js'
+export * from './validators/storefront/matches.validator.js'
+
+export * from './responses/administrator/brackets.response.js'
+export * from './responses/administrator/cards.response.js'
+export * from './responses/administrator/matches.response.js'
+export * from './responses/advisor/cards.response.js'
+export * from './responses/storefront/brackets.response.js'
+export * from './responses/storefront/matches.response.js'

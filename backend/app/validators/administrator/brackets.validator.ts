@@ -7,26 +7,28 @@ import type { Infer } from '#core/validator'
  * O que `POST /administrator/brackets` recebe: qual competição sortear. O resto
  * - times, grupos e partidas - sai das inscrições e do sorteio.
  */
-export const BracketCreateValidator = vine.create({
+export const AdministratorBracketCreateValidator = vine.create({
   sportId: vine.string().uuid(),
   category: vine.enum(CATEGORIES),
 })
 
 /** A prévia do sorteio pergunta o mesmo que o sorteio. */
-export const BracketPreviewValidator = vine.create({
+export const AdministratorBracketPreviewValidator = vine.create({
   sportId: vine.string().uuid(),
   category: vine.enum(CATEGORIES),
 })
 
-export const BracketPaginateValidator = vine.create({
+export const AdministratorBracketPaginateValidator = vine.create({
   ...pageFields(),
   sportId: vine.string().uuid().optional(),
   category: vine.enum(CATEGORIES).optional(),
   status: vine.enum(BRACKET_STATUSES).optional(),
 })
 
-export type BracketCreatePayload = Infer<typeof BracketCreateValidator>
+export type AdministratorBracketCreatePayload = Infer<typeof AdministratorBracketCreateValidator>
 
-export type BracketPaginatePayload = Infer<typeof BracketPaginateValidator>
+export type AdministratorBracketPaginatePayload = Infer<
+  typeof AdministratorBracketPaginateValidator
+>
 
-export type BracketPreviewPayload = Infer<typeof BracketPreviewValidator>
+export type AdministratorBracketPreviewPayload = Infer<typeof AdministratorBracketPreviewValidator>

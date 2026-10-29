@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorBracketCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketCreateValidator } from '#validators/administrator/brackets.validator'
+import { AdministratorBracketCreateValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketCreateController {
@@ -28,7 +28,7 @@ export default class AdministratorBracketCreateController {
   constructor(private readonly useCase: AdministratorBracketCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(BracketCreateValidator)
+    const payload = await context.request.validateUsing(AdministratorBracketCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     const { bracket, created } = result.value
