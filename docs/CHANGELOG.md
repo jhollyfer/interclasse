@@ -1,46 +1,36 @@
 # Changelog
 
-Mudanças de <Projeto> que quem usa percebe. Formato
+Mudanças de Interclasse que quem usa percebe. Formato
 [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), versões em
 [SemVer](https://semver.org/lang/pt-BR/). Regras em `_standards/documentation.md` §7.
 
-<!--
-Como escrever:
-- Release mais novo primeiro. [Não lançado] no topo acumula o que já está na branch principal.
-- Grupos, nesta ordem, só os que têm item: Adicionado, Alterado, Descontinuado, Removido,
-  Corrigido, Segurança.
-- Escreva o efeito para quem usa: "Corrigida tarefa duplicada ao clicar duas vezes em Salvar",
-  não "fix bugs".
-- Quebra de compatibilidade: item começa com **QUEBRA:** e o major sobe.
-- Nada de segredo, URL interna ou nome de cliente.
-
-Checklist de release:
-- [ ] Versão e data no título.
-- [ ] Itens agrupados por tipo.
-- [ ] Impacto para quem usa explicado.
-- [ ] Quebras marcadas.
-- [ ] Tag `vX.Y.Z` criada no commit do release.
--->
-
 ## [Não lançado]
 
-### Adicionado
+Nada além do que está em 0.1.0.
 
-- <…>
-
-## [1.0.0] - AAAA-MM-DD
+## [0.1.0] - 2026-10-29
 
 ### Adicionado
 
-- <Busca e filtro de tarefas.>
+- Página "Sobre" no site, com o texto, o organizador e a edição dos jogos. A organização edita tudo em Painel › Site.
+- Regulamento em PDF: a organização envia o arquivo e o site mostra o link para baixar.
+- Link do Instagram da escola e do desenvolvedor no rodapé do site.
+- Carrossel de fotos no site. O conselheiro envia fotos dos jogos e elas só aparecem depois que a organização aprova. A organização também pode recusar, ou tirar do ar uma foto já aprovada.
+- Relatórios de turmas, alunos e atletas no painel, com exportação em CSV que abre direto no Excel, com acentos corretos.
+- Troca de idioma no site e no painel (português, espanhol e inglês). A API passa a responder as mensagens de erro e de validação na língua escolhida; os textos das telas ainda estão só em português.
+- Excluir uma chave pela lista de chaves, no menu da linha. A chave só sai se nenhuma partida tiver placar.
+- Turmas em cartões separados por Fundamental 1 (3º ao 5º ano) e Fundamental 2 (6º ao 9º), com a página da turma mostrando conselheiro e representante.
 
 ### Alterado
 
-- <Cadastro simplificado: menos campos na primeira tela.>
+- A classificação do site agora tem abas por categoria e por modalidade, e muda de aba sem sair da página.
+- Cada conselheiro cuida de uma turma só. Quem já aconselhava mais de uma ficou com a mais antiga, e as outras voltaram para "Sem conselheiro", para a organização indicar outro professor.
+- O texto da página Sobre deixou de ser fixo: vem do que a organização salvar em Painel › Site.
 
 ### Corrigido
 
-- <Tarefa duplicada ao clicar duas vezes em Salvar.>
+- Abrir o menu da conta derrubava a tela com a mensagem "Algo quebrou". O menu abre normalmente.
+- O sorteio mostrava erro mesmo com a chave criada. Agora repetir o sorteio devolve a chave que já existe, sem erro e sem novo sorteio.
 
-[Não lançado]: <url-do-repo>/compare/v1.0.0...HEAD
-[1.0.0]: <url-do-repo>/releases/tag/v1.0.0
+[Não lançado]: https://github.com/jhollyfer/interclasse/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jhollyfer/interclasse/releases/tag/v0.1.0
