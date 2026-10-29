@@ -94,6 +94,10 @@ export type IClassroom = {
   readonly representativeId: string | null
   readonly advisor?: IPerson | null
   readonly representative?: IPerson | null
+  /** Só na lista do administrador: os totais do cartão da turma. */
+  readonly studentsCount?: number
+  readonly athletesCount?: number
+  readonly sportsCount?: number
   readonly createdAt: string
   readonly updatedAt: string | null
 }

@@ -9,6 +9,7 @@ import {
 } from '#/integrations/tanstack-query/queries'
 import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
+import { Agenda } from '#/components/common/match-agenda'
 
 import {
   Empty,
@@ -17,7 +18,6 @@ import {
   SectionTitle,
 } from '../../-components/section'
 import { Pager } from '../../-components/pager'
-import { Agenda } from '../../-components/match-row'
 
 const route = getRouteApi('/_public/jogos/')
 

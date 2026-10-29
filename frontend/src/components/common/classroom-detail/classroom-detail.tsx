@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { getRouteApi } from '@tanstack/react-router'
+import type { LinkProps } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
@@ -32,6 +32,7 @@ import type {
 import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
+  PageHeaderActions,
   PageHeaderBack,
   PageHeaderDescription,
   PageHeaderTitle,
@@ -54,21 +55,36 @@ import {
 import { CATEGORY_LABELS } from '#/lib/labels'
 import type { IEnrollmentBoard, IStudent } from '#/lib/interfaces'
 
-import { studentsOf } from '../$classroomId/index'
 import { ClassroomCards } from './classroom-cards'
+import { studentsOf } from './classroom-detail-loader'
+import { ClassroomMatches } from './classroom-matches'
+import { ClassroomSummary } from './classroom-summary'
 import { RemovalReasonDialog } from './removal-reason-dialog'
 import type { PendingRemoval } from './removal-reason-dialog'
 
-const route = getRouteApi('/_private/advisor/$classroomId/')
+type ClassroomDetailProps = Readonly<{
+  classroomId: string
+  /** Para onde o "voltar" leva. Ausente no conselheiro, que só tem esta turma. */
+  back?: LinkProps['to']
+  /** Ações do cabeçalho - o "Editar turma" do administrador. */
+  actions?: React.ReactNode
+}>
 
 /**
- * A turma do conselheiro: a lista de alunos e quem joga o quê.
+ * A turma inteira numa tela: quem aconselha e representa, os totais, quem
+ * joga o quê, os alunos, os cartões e os jogos.
  *
- * Duas abas e não duas rotas: as duas leem a mesma turma, e quem cadastra um
- * aluno quase sempre vai inscrevê-lo logo em seguida.
+ * A mesma tela no painel do administrador e no do conselheiro: os dois leem a
+ * mesma turma, e o servidor recorta o que cada um pode ver.
+ *
+ * Abas e não rotas: todas leem a mesma turma, e quem cadastra um aluno quase
+ * sempre vai inscrevê-lo logo em seguida.
  */
-export function ClassroomPage(): React.JSX.Element {
-  const { classroomId } = route.useParams()
+export function ClassroomDetail({
+  classroomId,
+  back,
+  actions,
+}: ClassroomDetailProps): React.JSX.Element {
   const { data: board } = useSuspenseQuery(
     advisorEnrollmentsQueryOptions(classroomId),
   )
@@ -92,53 +108,62 @@ export function ClassroomPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderBack to="/advisor" />
+        {back && <PageHeaderBack to={back} />}
         <PageHeaderTitle>{board.classroom.name}</PageHeaderTitle>
         <PageHeaderDescription>
           {CATEGORY_LABELS[board.classroom.category]}
         </PageHeaderDescription>
+        {actions && <PageHeaderActions>{actions}</PageHeaderActions>}
       </PageHeader>
 
-      <Tabs defaultValue="athletes">
-        <TabsList>
-          <TabsTrigger value="athletes">Atletas por modalidade</TabsTrigger>
-          <TabsTrigger value="students">Alunos</TabsTrigger>
-          <TabsTrigger value="cards">Cartões</TabsTrigger>
-        </TabsList>
-        <TabsContent value="athletes" className="pt-4">
-          <EnrollmentBoard
-            board={board}
-            savingSportId={
-              (save.isPending && save.variables.sportId) || undefined
-            }
-            onSave={(sportId, studentIds, removed) => {
-              // Tirar atleta pede o motivo antes de gravar.
-              if (removed.length > 0) {
-                const sportName =
-                  board.sports.find((sport) => sport.id === sportId)?.name ?? ''
-                setPending({ sportId, sportName, studentIds, removed })
-                return
+      <div className="grid items-start gap-4 lg:grid-cols-[1fr_18rem]">
+        <ClassroomSummary board={board} className="lg:order-last" />
+        <Tabs defaultValue="athletes" className="min-w-0">
+          <TabsList>
+            <TabsTrigger value="athletes">Atletas por modalidade</TabsTrigger>
+            <TabsTrigger value="students">Alunos</TabsTrigger>
+            <TabsTrigger value="cards">Cartões</TabsTrigger>
+            <TabsTrigger value="matches">Jogos</TabsTrigger>
+          </TabsList>
+          <TabsContent value="athletes" className="pt-4">
+            <EnrollmentBoard
+              board={board}
+              savingSportId={
+                (save.isPending && save.variables.sportId) || undefined
               }
-              save.mutate({ classroomId, sportId, studentIds })
-            }}
-          />
-          {pending && (
-            <RemovalReasonDialog
-              key={pending.sportId}
-              classroomId={classroomId}
-              pending={pending}
-              onClose={() => setPending(null)}
-              onSaved={store}
+              onSave={(sportId, studentIds, removed) => {
+                // Tirar atleta pede o motivo antes de gravar.
+                if (removed.length > 0) {
+                  const sportName =
+                    board.sports.find((sport) => sport.id === sportId)?.name ??
+                    ''
+                  setPending({ sportId, sportName, studentIds, removed })
+                  return
+                }
+                save.mutate({ classroomId, sportId, studentIds })
+              }}
             />
-          )}
-        </TabsContent>
-        <TabsContent value="students" className="pt-4">
-          <Students classroomId={classroomId} />
-        </TabsContent>
-        <TabsContent value="cards" className="pt-4">
-          <ClassroomCards classroomId={classroomId} />
-        </TabsContent>
-      </Tabs>
+            {pending && (
+              <RemovalReasonDialog
+                key={pending.sportId}
+                classroomId={classroomId}
+                pending={pending}
+                onClose={() => setPending(null)}
+                onSaved={store}
+              />
+            )}
+          </TabsContent>
+          <TabsContent value="students" className="pt-4">
+            <Students classroomId={classroomId} />
+          </TabsContent>
+          <TabsContent value="cards" className="pt-4">
+            <ClassroomCards classroomId={classroomId} />
+          </TabsContent>
+          <TabsContent value="matches" className="pt-4">
+            <ClassroomMatches classroomId={classroomId} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }

@@ -1,14 +1,24 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+import { VISIBLE_CLASSROOMS } from '#/components/common/classroom-detail'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries'
 
-/** Todas as turmas de uma vez: um conselheiro tem poucas, a escola tem 24. */
-export const ADVISOR_CLASSROOMS = { perPage: 100 }
-
+/**
+ * O conselheiro tem uma turma só (índice único em `classrooms.advisor_id`):
+ * a entrada da área leva direto a ela. Sem turma, fica o aviso desta rota.
+ */
 export const Route = createFileRoute('/_private/advisor/')({
-  loader: ({ context }) =>
-    context.queryClient.query({
-      ...advisorClassroomsQueryOptions(ADVISOR_CLASSROOMS),
-      staleTime: 'static',
-    }),
+  loader: async ({ context }) => {
+    const classrooms = await context.queryClient.query(
+      advisorClassroomsQueryOptions(VISIBLE_CLASSROOMS),
+    )
+    const [classroom] = classrooms.data
+
+    if (classroom)
+      throw redirect({
+        to: '/advisor/$classroomId',
+        params: { classroomId: classroom.id },
+        replace: true,
+      })
+  },
 })
