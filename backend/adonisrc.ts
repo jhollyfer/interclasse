@@ -57,7 +57,10 @@ export default defineConfig({
     () => import('@adonisjs/drive/drive_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('#providers/storage.provider'),
+    () => import('#providers/repository.provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
+    () => import('@adonisjs/i18n/i18n_provider'),
+    () => import('#providers/i18n.provider'),
   ],
 
   /*
@@ -118,6 +121,10 @@ export default defineConfig({
     // `/openapi.json`. Sem esta entrada o build de produção não o copia, e a rota
     // responde 500 no servidor buildado - mas funciona em desenvolvimento.
     { pattern: 'openapi.json', reloadServer: false },
+    {
+      pattern: 'resources/lang/**/*.{json,yaml,yml}',
+      reloadServer: false,
+    },
   ],
 
   hooks: {

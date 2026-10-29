@@ -28,8 +28,9 @@ export const http = defineConfig({
   allowMethodSpoofing: false,
 
   /**
-   * Enabling async local storage will let you access HTTP context
-   * from anywhere inside your application.
+   * Desligado: o idioma da requisição chega ao use-case por injeção do `I18n`
+   * (`providers/i18n.provider.ts`), a forma que a doc prefere ao async local
+   * storage (_doc-lib/adonisjs.md#guides/basics/http-context).
    */
   useAsyncLocalStorage: false,
 
