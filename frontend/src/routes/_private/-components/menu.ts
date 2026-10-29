@@ -3,6 +3,7 @@ import {
   CalendarDotsIcon,
   CardsIcon,
   ChalkboardTeacherIcon,
+  ChartBarIcon,
   GaugeIcon,
   GlobeIcon,
   IdentificationCardIcon,
@@ -49,6 +50,7 @@ const ORGANIZATION = linkOptions([
   },
   { to: '/administrator/photos', label: 'Fotos', icon: ImagesIcon },
   { to: '/administrator/users', label: 'Usuários', icon: UsersIcon },
+  { to: '/administrator/reports', label: 'Relatórios', icon: ChartBarIcon },
   { to: '/administrator/site', label: 'Site', icon: GlobeIcon },
 ])
 

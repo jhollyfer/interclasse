@@ -18,6 +18,7 @@ import type {
   IStudent,
   IUser,
   IPhoto,
+  IReport,
   ISiteSetting,
   IStorefrontPhoto,
   IStorefrontSite,
@@ -400,6 +401,15 @@ export const storefrontPhotosQueryOptions = (params: StorefrontSearch) =>
         { signal },
       ),
     staleTime: 5 * 60 * 1000,
+  })
+
+/** Os números dos jogos. Sempre do momento: o relatório é para fechar a edição. */
+export const reportQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.administrator.reports,
+    queryFn: ({ signal }) =>
+      request<IReport>('/administrator/reports', { signal }),
+    staleTime: 0,
   })
 
 /** A configuração do site no painel. */

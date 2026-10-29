@@ -22,6 +22,8 @@ export const queryKeys = {
     all: ['administrator'] as const,
     /** A configuração do site: uma só, sem parâmetro. */
     site: ['administrator', 'site'] as const,
+    /** O relatório: um só, sem parâmetro. */
+    reports: ['administrator', 'reports'] as const,
     users: {
       all: ['administrator', 'users'] as const,
       list: (params: ListSearch) =>

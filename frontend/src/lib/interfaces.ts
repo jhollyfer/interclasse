@@ -126,6 +126,41 @@ export type IStorefrontPhoto = {
   readonly createdAt: string
 }
 
+/** O relatório dos jogos: totais, por categoria, por modalidade e por turma. */
+export type IReport = {
+  readonly totals: {
+    readonly classrooms: number
+    readonly students: number
+    readonly athletes: number
+    readonly enrollments: number
+    readonly sports: number
+    readonly matchesPlayed: number
+    readonly matchesScheduled: number
+  }
+  readonly byCategory: ReadonlyArray<{
+    readonly category: Category
+    readonly classrooms: number
+    readonly students: number
+    readonly athletes: number
+  }>
+  readonly bySport: ReadonlyArray<{
+    readonly id: string
+    readonly name: string
+    readonly athletes: number
+    readonly classrooms: number
+  }>
+  readonly classrooms: ReadonlyArray<{
+    readonly id: string
+    readonly name: string
+    readonly category: Category
+    readonly advisor: string | null
+    readonly representative: string | null
+    readonly students: number
+    readonly athletes: number
+    readonly sports: number
+  }>
+}
+
 /** A configuração do site, como o painel a lê: com o regulamento inteiro. */
 export type ISiteSetting = {
   readonly id: string

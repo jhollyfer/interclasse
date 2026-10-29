@@ -36,6 +36,7 @@ import { Route as PrivateAdministratorMatchesIndexRouteImport } from './routes/_
 import { Route as PrivateAdministratorPhotosIndexRouteImport } from './routes/_private/administrator/photos/index'
 import { Route as PrivateAdministratorProfileIndexRouteImport } from './routes/_private/administrator/profile/index'
 import { Route as PrivateAdministratorRemovalsIndexRouteImport } from './routes/_private/administrator/removals/index'
+import { Route as PrivateAdministratorReportsIndexRouteImport } from './routes/_private/administrator/reports/index'
 import { Route as PrivateAdministratorSiteIndexRouteImport } from './routes/_private/administrator/site/index'
 import { Route as PrivateAdministratorSportsIndexRouteImport } from './routes/_private/administrator/sports/index'
 import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_private/administrator/users/index'
@@ -248,6 +249,16 @@ const PrivateAdministratorRemovalsIndexRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorReportsIndexRoute =
+  PrivateAdministratorReportsIndexRouteImport.update({
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/reports/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorSiteIndexRoute =
   PrivateAdministratorSiteIndexRouteImport.update({
     id: '/site/',
@@ -450,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/administrator/photos/': typeof PrivateAdministratorPhotosIndexRoute
   '/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
   '/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
+  '/administrator/reports/': typeof PrivateAdministratorReportsIndexRoute
   '/administrator/site/': typeof PrivateAdministratorSiteIndexRoute
   '/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
@@ -491,6 +503,7 @@ export interface FileRoutesByTo {
   '/administrator/photos': typeof PrivateAdministratorPhotosIndexRoute
   '/administrator/profile': typeof PrivateAdministratorProfileIndexRoute
   '/administrator/removals': typeof PrivateAdministratorRemovalsIndexRoute
+  '/administrator/reports': typeof PrivateAdministratorReportsIndexRoute
   '/administrator/site': typeof PrivateAdministratorSiteIndexRoute
   '/administrator/sports': typeof PrivateAdministratorSportsIndexRoute
   '/administrator/users': typeof PrivateAdministratorUsersIndexRoute
@@ -539,6 +552,7 @@ export interface FileRoutesById {
   '/_private/administrator/photos/': typeof PrivateAdministratorPhotosIndexRoute
   '/_private/administrator/profile/': typeof PrivateAdministratorProfileIndexRoute
   '/_private/administrator/removals/': typeof PrivateAdministratorRemovalsIndexRoute
+  '/_private/administrator/reports/': typeof PrivateAdministratorReportsIndexRoute
   '/_private/administrator/site/': typeof PrivateAdministratorSiteIndexRoute
   '/_private/administrator/sports/': typeof PrivateAdministratorSportsIndexRoute
   '/_private/administrator/users/': typeof PrivateAdministratorUsersIndexRoute
@@ -586,6 +600,7 @@ export interface FileRouteTypes {
     | '/administrator/photos/'
     | '/administrator/profile/'
     | '/administrator/removals/'
+    | '/administrator/reports/'
     | '/administrator/site/'
     | '/administrator/sports/'
     | '/administrator/users/'
@@ -627,6 +642,7 @@ export interface FileRouteTypes {
     | '/administrator/photos'
     | '/administrator/profile'
     | '/administrator/removals'
+    | '/administrator/reports'
     | '/administrator/site'
     | '/administrator/sports'
     | '/administrator/users'
@@ -674,6 +690,7 @@ export interface FileRouteTypes {
     | '/_private/administrator/photos/'
     | '/_private/administrator/profile/'
     | '/_private/administrator/removals/'
+    | '/_private/administrator/reports/'
     | '/_private/administrator/site/'
     | '/_private/administrator/sports/'
     | '/_private/administrator/users/'
@@ -892,6 +909,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorRemovalsIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
+    '/_private/administrator/reports/': {
+      id: '/_private/administrator/reports/'
+      path: '/reports'
+      fullPath: '/administrator/reports/'
+      preLoaderRoute: typeof PrivateAdministratorReportsIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
     '/_private/administrator/site/': {
       id: '/_private/administrator/site/'
       path: '/site'
@@ -1031,6 +1055,7 @@ interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorPhotosIndexRoute: typeof PrivateAdministratorPhotosIndexRoute
   PrivateAdministratorProfileIndexRoute: typeof PrivateAdministratorProfileIndexRoute
   PrivateAdministratorRemovalsIndexRoute: typeof PrivateAdministratorRemovalsIndexRoute
+  PrivateAdministratorReportsIndexRoute: typeof PrivateAdministratorReportsIndexRoute
   PrivateAdministratorSiteIndexRoute: typeof PrivateAdministratorSiteIndexRoute
   PrivateAdministratorSportsIndexRoute: typeof PrivateAdministratorSportsIndexRoute
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
@@ -1064,6 +1089,8 @@ const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteCh
       PrivateAdministratorProfileIndexRoute,
     PrivateAdministratorRemovalsIndexRoute:
       PrivateAdministratorRemovalsIndexRoute,
+    PrivateAdministratorReportsIndexRoute:
+      PrivateAdministratorReportsIndexRoute,
     PrivateAdministratorSiteIndexRoute: PrivateAdministratorSiteIndexRoute,
     PrivateAdministratorSportsIndexRoute: PrivateAdministratorSportsIndexRoute,
     PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
