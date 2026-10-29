@@ -1,12 +1,12 @@
 import factory from '@adonisjs/lucid/factories'
 
 import Classroom from '#models/classroom'
-import { categoryOf } from '#features/administrator/_shared.classroom'
+import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 import { UserFactory } from '#database/factories/user.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 
 /**
- * Turma. A categoria é derivada do ano pela mesma função do caso de uso - o
+ * Turma. A categoria é derivada do ano pela mesma regra da entidade - o
  * banco nunca recebe um par ano/categoria que a aplicação não gravaria.
  */
 export const ClassroomFactory = factory
@@ -16,7 +16,7 @@ export const ClassroomFactory = factory
     return {
       name: `${grade}º ${faker.string.alpha({ length: 4, casing: 'upper' })}`,
       grade,
-      category: categoryOf(grade),
+      category: ClassroomEntity.categoryOf(grade),
       advisorId: null,
       representativeId: null,
     }

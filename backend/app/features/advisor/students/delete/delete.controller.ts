@@ -3,8 +3,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import AdvisorStudentDeleteUseCase from './delete.use-case.ts'
 
-import Student from '#models/student'
-import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
 
@@ -13,7 +11,10 @@ export default class AdvisorStudentDeleteController {
   static docs = defineDocs({
     description:
       'Tira o aluno da turma, com as inscrições dele. Aluno inscrito numa modalidade já ' +
-      'sorteada responde `409`: o time sorteado perderia um atleta.',
+      'sorteada responde `409`: o time sorteado perderia um atleta. Aluno de turma alheia ' +
+      'responde `404`.',
+    // Nasce na entidade e é traduzido em `_shared.student-refusal.ts`, fora da pasta da ação.
+    errors: { 409: ['STUDENT_IN_COMPETITION'] },
   })
 
   constructor(private readonly useCase: AdvisorStudentDeleteUseCase) {}
@@ -22,9 +23,7 @@ export default class AdvisorStudentDeleteController {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const student = await Student.query().where('id', payload.id).preload('classroom').first()
-    await context.bouncer.with(ClassroomPolicy).authorize('manageStudent', student)
-    const result = await this.useCase.execute(payload)
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }

@@ -278,7 +278,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/classrooms.validator').ClassroomPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/classrooms.validator').AdministratorClassroomPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/classrooms/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/classrooms/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -287,10 +287,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/administrator/classrooms'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/classrooms.validator').ClassroomCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/classrooms.validator').AdministratorClassroomCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/classrooms.validator').ClassroomCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/classrooms.validator').AdministratorClassroomCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/classrooms/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/classrooms/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -311,10 +311,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/classrooms/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/classrooms.validator').ClassroomUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/classrooms.validator').AdministratorClassroomUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/classrooms.validator').ClassroomUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/classrooms.validator').AdministratorClassroomUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/classrooms/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/classrooms/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -710,7 +710,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/enrollment-removals.validator').EnrollmentRemovalPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/enrollment-removals.validator').AdministratorEnrollmentRemovalPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/enrollment-removals/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/enrollment-removals/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -818,7 +818,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#core/validator').PaginationValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/classrooms.validator').AdvisorClassroomPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/classrooms/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/classrooms/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -842,7 +842,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/students.validator').StudentPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/students.validator').AdvisorStudentPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/students/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/students/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -851,10 +851,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/advisor/students'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/advisor/students.validator').StudentCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/advisor/students.validator').AdvisorStudentCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/students.validator').StudentCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/students.validator').AdvisorStudentCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/students/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/students/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -863,10 +863,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/advisor/students/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/advisor/students.validator').StudentUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/advisor/students.validator').AdvisorStudentUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/students.validator').StudentUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/students.validator').AdvisorStudentUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/students/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/students/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -926,7 +926,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/enrollments.validator').EnrollmentShowValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/advisor/enrollments.validator').AdvisorEnrollmentShowValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/enrollments/show/show.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/enrollments/show/show.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -935,10 +935,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/advisor/enrollments'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/advisor/enrollments.validator').EnrollmentUpdateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/advisor/enrollments.validator').AdvisorEnrollmentUpdateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/enrollments.validator').EnrollmentUpdateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/advisor/enrollments.validator').AdvisorEnrollmentUpdateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/advisor/enrollments/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/advisor/enrollments/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -959,10 +959,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/representative/enrollments'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/representative/enrollments.validator').EnrollmentUpdateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/representative/enrollments.validator').RepresentativeEnrollmentUpdateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/representative/enrollments.validator').EnrollmentUpdateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/representative/enrollments.validator').RepresentativeEnrollmentUpdateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/representative/enrollments/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/representative/enrollments/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }

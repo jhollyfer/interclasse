@@ -1,46 +1,48 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
 import {
   PAGINATION,
-  USER_ROLE,
   left,
   right,
+  type Actor,
+  type AdvisorClassroomShowResponse,
   type Either,
   type Merge,
   type Paginated,
 } from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import type User from '#models/user'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { PaginationPayload } from '#core/validator'
+import type { AdvisorClassroomPaginatePayload } from '#validators/advisor/classrooms.validator'
 
-type Payload = Merge<PaginationPayload, { actor: User }>
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = Merge<AdvisorClassroomPaginatePayload, { actor: Actor }>
+type Response = Either<HTTPException, Paginated<AdvisorClassroomShowResponse>>
 
+/** As turmas ao alcance de quem age: o administrador vê todas, o conselheiro a dele. */
 @inject()
 export default class AdvisorClassroomPaginateUseCase {
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ actor, ...payload }: Payload): Promise<Response> {
     try {
-      // Quem cuida da turma vem junto: o card mostra o conselheiro e o
-      // representante de cada uma.
-      const query = Classroom.query().preload('advisor').preload('representative')
-
-      if (actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', actor.id)
-      if (payload.search) query.whereILike('name', `%${payload.search}%`)
-
-      const classrooms = await query
-        .orderBy('name', 'asc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: classrooms.getMeta(), data: classrooms.all() })
+      return right(
+        await this.classrooms.paginateOwned({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          search: payload.search,
+          actor,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[classrooms > paginate][error]')
+      logger.error({ err: error }, '[advisor/classrooms > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADVISOR_CLASSROOM_PAGINATE_ERROR',
         ),
       )

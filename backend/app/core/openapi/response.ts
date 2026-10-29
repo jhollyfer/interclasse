@@ -10,11 +10,18 @@ import {
 } from '@interclasse/shared'
 import {
   AdministratorAnnouncementShowResponse,
+  AdministratorClassroomPaginateResponse,
+  AdministratorClassroomShowResponse,
+  AdministratorEnrollmentRemovalShowResponse,
   AdministratorPhotoShowResponse,
   AdministratorReportShowResponse,
   AdministratorSiteShowResponse,
   AdministratorSportShowResponse,
+  AdvisorClassroomShowResponse,
+  AdvisorEnrollmentShowResponse,
   AdvisorPhotoShowResponse,
+  AdvisorStudentShowResponse,
+  RepresentativeEnrollmentShowResponse,
   StorefrontAnnouncementShowResponse,
   StorefrontPhotoShowResponse,
   StorefrontSiteShowResponse,
@@ -24,7 +31,6 @@ import {
 import { vine } from '#core/validator'
 import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
-import EnrollmentRemoval from '#models/enrollment-removal'
 import MatchCard from '#models/match-card'
 import Match from '#models/match'
 import Sport from '#models/sport'
@@ -64,22 +70,9 @@ const USER: ModelResource = {
   relations: { avatar: STORAGE },
 }
 
-/** A conta como vínculo de outra coisa: conselheiro ou representante, sem o avatar. */
-const PERSON: ModelResource = {
-  model: User,
-  enums: { role: USER_ROLES, status: ACTIVE_STATUSES },
-}
-
 const CLASSROOM: ModelResource = {
   model: Classroom,
   enums: { category: CATEGORIES },
-}
-
-/** A turma no painel: com quem a aconselha e quem a representa. */
-const CLASSROOM_WITH_PEOPLE: ModelResource = {
-  model: Classroom,
-  enums: { category: CATEGORIES },
-  relations: { advisor: PERSON, representative: PERSON },
 }
 
 const STUDENT: ModelResource = {
@@ -100,12 +93,6 @@ const BRACKET: ModelResource = {
   model: Bracket,
   enums: { category: CATEGORIES, status: BRACKET_STATUSES },
   relations: { sport: SPORT },
-}
-
-/** O aviso de atleta tirado da lista: a turma, a modalidade e quem tirou. */
-const ENROLLMENT_REMOVAL: ModelResource = {
-  model: EnrollmentRemoval,
-  relations: { classroom: CLASSROOM, sport: SPORT, actor: PERSON },
 }
 
 /** A partida com os dois times e a competição, que é o que a tabela de jogos mostra. */
@@ -220,38 +207,6 @@ export const BracketDetailResponse = vine.create({
 })
 
 /**
- * As inscrições de uma turma: as modalidades, os alunos e em quais modalidades
- * cada um está. É a matriz aluno x modalidade da tela do conselheiro e do
- * representante.
- *
- * `locked` diz que a modalidade já foi sorteada na categoria da turma: a lista
- * dela não muda mais.
- */
-export const EnrollmentBoardResponse = vine.create({
-  classroom: vine.object({
-    id: vine.string().uuid(),
-    name: vine.string(),
-    category: vine.enum(CATEGORIES),
-  }),
-  sports: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      minAthletes: vine.number(),
-      maxAthletes: vine.number(),
-      locked: vine.boolean(),
-    }),
-  ),
-  students: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      sportIds: vine.array(vine.string().uuid()),
-    }),
-  ),
-})
-
-/**
  * Os atletas que podem levar cartão numa partida: os alunos das duas turmas,
  * com os inscritos na modalidade marcados - são eles que entram em quadra.
  */
@@ -334,7 +289,8 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    */
   'administrator/users': USER,
 
-  'administrator/classrooms': CLASSROOM_WITH_PEOPLE,
+  'administrator/classrooms': AdministratorClassroomShowResponse,
+  'administrator/classrooms/paginate': AdministratorClassroomPaginateResponse,
   'administrator/sports': AdministratorSportShowResponse,
   'administrator/announcements': AdministratorAnnouncementShowResponse,
   'administrator/site': AdministratorSiteShowResponse,
@@ -349,14 +305,14 @@ export const RESPONSES: Record<string, FeatureResponse> = {
    */
   'administrator/brackets': BRACKET,
   'administrator/matches': MATCH,
-  'administrator/enrollment-removals': ENROLLMENT_REMOVAL,
+  'administrator/enrollment-removals': AdministratorEnrollmentRemovalShowResponse,
   'administrator/cards': MATCH_CARD,
   'advisor/cards': MATCH_CARD,
 
-  'advisor/classrooms': CLASSROOM_WITH_PEOPLE,
-  'advisor/students': STUDENT,
-  'advisor/enrollments': EnrollmentBoardResponse,
-  'representative/enrollments': EnrollmentBoardResponse,
+  'advisor/classrooms': AdvisorClassroomShowResponse,
+  'advisor/students': AdvisorStudentShowResponse,
+  'advisor/enrollments': AdvisorEnrollmentShowResponse,
+  'representative/enrollments': RepresentativeEnrollmentShowResponse,
 
   /**
    * O site. Aqui o recurso é o model serializado, sem recorte: nada destas
