@@ -1,12 +1,12 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
-import { left, right, type Either } from '@interclasse/shared'
+import { left, right, type Either, type StorefrontSiteShowResponse } from '@interclasse/shared'
 
-import SiteService from '#services/site/site.service'
+import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'
 
-type Response = Either<HTTPException, ModelObject>
+type Response = Either<HTTPException, StorefrontSiteShowResponse>
 
 /**
  * O "Sobre" e o regulamento para o site anônimo. Do arquivo sai só o que o
@@ -15,31 +15,22 @@ type Response = Either<HTTPException, ModelObject>
  */
 @inject()
 export default class StorefrontSiteShowUseCase {
-  constructor(private readonly site: SiteService) {}
+  constructor(
+    private readonly settings: SiteSettingRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(): Promise<Response> {
     try {
-      const setting = await this.site.current()
-      const regulation = setting.regulation
-
-      return right({
-        about: setting.about,
-        organizer: setting.organizer,
-        firstEditionYear: setting.firstEditionYear,
-        edition: setting.edition,
-        schoolInstagram: setting.schoolInstagram,
-        developerInstagram: setting.developerInstagram,
-        regulation: regulation && {
-          url: regulation.url,
-          originalName: regulation.originalName,
-          size: regulation.size,
-        },
-      })
+      return right(await this.settings.showPublic())
     } catch (error) {
-      logger.error({ err: error }, '[storefront > site][error]')
+      logger.error({ err: error }, '[storefront/site > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STOREFRONT_SITE_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STOREFRONT_SITE_SHOW_ERROR',
+        ),
       )
     }
   }

@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorSiteUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { SiteUpdateValidator } from '#validators/administrator/site.validator'
+import { AdministratorSiteUpdateValidator } from '#validators/administrator/site.validator'
 
 @inject()
 export default class AdministratorSiteUpdateController {
@@ -18,7 +18,7 @@ export default class AdministratorSiteUpdateController {
   constructor(private readonly useCase: AdministratorSiteUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(SiteUpdateValidator)
+    const payload = await context.request.validateUsing(AdministratorSiteUpdateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

@@ -1,66 +1,77 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
+import { left, right, type AdministratorSiteShowResponse, type Either } from '@interclasse/shared'
 
-import SiteSetting from '#models/site-setting'
-import Storage from '#models/storage'
-import SiteService from '#services/site/site.service'
+import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { SiteUpdatePayload } from '#validators/administrator/site.validator'
+import type { RegulationFile } from '#domain/site-setting/site-setting.entity'
+import type { SiteSettingError } from '#domain/site-setting/site-setting.errors'
+import type { AdministratorSiteUpdatePayload } from '#validators/administrator/site.validator'
 
-type Payload = SiteUpdatePayload
-type Response = Either<HTTPException, SiteSetting>
+type Payload = AdministratorSiteUpdatePayload
+type Response = Either<HTTPException, AdministratorSiteShowResponse>
 
-/** O regulamento é para baixar e imprimir: só PDF. */
-const REGULATION_MIMETYPE = 'application/pdf'
-
+/**
+ * Grava o que veio no payload. O regulamento é conferido pela entidade (arquivo
+ * já enviado e em PDF); o use-case só busca o arquivo e traduz a recusa.
+ */
 @inject()
 export default class AdministratorSiteUpdateUseCase {
-  constructor(private readonly site: SiteService) {}
+  constructor(
+    private readonly settings: SiteSettingRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      if (payload.regulationId) {
-        const regulation = await Storage.query()
-          .where('id', payload.regulationId)
-          .where('status', UPLOAD_STATUS.UPLOADED)
-          .withScopes((scopes) => scopes.notDeleted())
-          .first()
+      const setting = await this.settings.current()
+      let regulation: RegulationFile | null = null
+      if (setting.replacesRegulation(payload.regulationId))
+        regulation = await this.settings.findRegulationFile(payload.regulationId)
 
-        if (!regulation)
-          return left(
-            HTTPException.UnprocessableEntity('Arquivo não encontrado', 'STORAGE_NOT_FOUND', {
-              regulationId: 'Arquivo não encontrado',
-            }),
-          )
+      const updated = setting.update(payload, { regulation, now: new Date() })
+      if (updated.isLeft()) return left(this.refusal(updated.value))
 
-        if (regulation.mimetype !== REGULATION_MIMETYPE)
-          return left(
-            HTTPException.UnprocessableEntity(
-              'O regulamento precisa ser PDF',
-              'REGULATION_NOT_PDF',
-              {
-                regulationId: 'Envie o regulamento em PDF',
-              },
-            ),
-          )
-      }
+      await this.settings.save(setting)
 
-      const setting = await this.site.current()
-      setting.merge(payload)
-      await setting.save()
-      await setting.load('regulation')
-
-      return right(setting)
+      return right(await this.settings.show())
     } catch (error) {
-      logger.error({ err: error }, '[site > update][error]')
+      logger.error({ err: error }, '[administrator/site > update][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_SITE_UPDATE_ERROR',
         ),
       )
     }
+  }
+
+  /**
+   * Cada recusa da configuração como resposta HTTP (`_standards/domain.md`
+   * §2). O `never` do fim faz o compilador apontar fato novo sem tradução.
+   */
+  private refusal(error: SiteSettingError): HTTPException {
+    switch (error.code) {
+      case 'STORAGE_NOT_FOUND':
+        return HTTPException.UnprocessableEntity(
+          this.i18n.t('site.regulation_not_found'),
+          'STORAGE_NOT_FOUND',
+          { regulationId: this.i18n.t('site.regulation_not_found') },
+        )
+      case 'REGULATION_NOT_PDF':
+        return HTTPException.UnprocessableEntity(
+          this.i18n.t('site.regulation_not_pdf'),
+          'REGULATION_NOT_PDF',
+          { regulationId: this.i18n.t('site.regulation_not_pdf_field') },
+        )
+      default:
+        return this.unreachable(error)
+    }
+  }
+
+  private unreachable(error: never): never {
+    throw new Error(`Recusa da configuração do site sem tradução: ${JSON.stringify(error)}`)
   }
 }

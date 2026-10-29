@@ -8,7 +8,7 @@ const INSTAGRAM = /^[A-Za-z0-9._]{1,30}$/
  * Tudo opcional e anulável: ausente é "não mexer", `null` apaga. O site esconde
  * o que estiver vazio.
  */
-export const SiteUpdateValidator = vine.create({
+export const AdministratorSiteUpdateValidator = vine.create({
   about: vine.string().trim().maxLength(4000).nullable().optional(),
   organizer: vine.string().trim().maxLength(160).nullable().optional(),
   firstEditionYear: vine.number().withoutDecimals().min(1990).max(2100).nullable().optional(),
@@ -18,4 +18,4 @@ export const SiteUpdateValidator = vine.create({
   regulationId: vine.string().uuid().nullable().optional(),
 })
 
-export type SiteUpdatePayload = Infer<typeof SiteUpdateValidator>
+export type AdministratorSiteUpdatePayload = Infer<typeof AdministratorSiteUpdateValidator>
