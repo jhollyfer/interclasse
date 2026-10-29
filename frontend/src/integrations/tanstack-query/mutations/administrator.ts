@@ -1,44 +1,18 @@
-/**
- * Cada hook guarda um `mutationFn`, e só. O que ele aceita é o contrato da
- * própria biblioteca menos esse campo.
- *
- * `Omit<UseMutationOptions<...>, 'mutationFn'>` e não um objeto escrito à mão
- * porque `onSuccess`, `onError` e `onSettled` são decisão de tela: o mesmo hook
- * é chamado de rotas e componentes diferentes, e cada um trata o resultado do
- * seu jeito. **Nada aqui executa callback** - o hook repassa o que recebeu, e
- * um callback novo não exige editar este arquivo.
- *
- * Indexar `MutationOptions['onError']` sem argumentos não serve: os generics
- * têm default (`TVariables = void`), e com `strictFunctionTypes` o parâmetro é
- * contravariante, então a função resultante não aceita o payload. Os generics
- * precisam vir preenchidos, e é o que os aliases abaixo fazem.
- *
- * O `TError` continua explícito por ser documentação no lugar certo, mas já é o
- * default do app: `register.d.ts` declara `Register.defaultError` como `HTTPError`.
- */
-
-import * as React from 'react'
 import { useMutation } from '@tanstack/react-query'
-import type { UseMutationOptions } from '@tanstack/react-query'
 
-import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type {
   IAnnouncement,
   IBracket,
   IClassroom,
   IMatch,
   ISport,
-  IStorage,
-  IStudent,
   IUser,
-  IEnrollmentBoard,
   IEnrollmentRemoval,
   IMatchCard,
   IPhoto,
   ISiteSetting,
   Merge,
 } from '#/lib/interfaces'
-import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 import type {
   PhotoCreatePayload,
   PhotoReviewPayload,
@@ -66,181 +40,11 @@ import type {
   UserCreatePayload,
   UserUpdatePayload,
 } from '#/validators/administrator/users.validator'
-import type { EnrollmentUpdatePayload as AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
-import type {
-  StudentCreatePayload,
-  StudentUpdatePayload,
-} from '#/validators/advisor/students.validator'
-import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
-import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 
-import type { HTTPError } from './http'
-import { request, send } from './http'
-import { shouldRetryQuery } from './query-context'
-
-// ---------------------------------------------------------------------------
-// /account
-// ---------------------------------------------------------------------------
-
-/**
- * As opções que todo hook deste arquivo aceita: o contrato do TanStack Query
- * menos o `mutationFn`, que é o que o hook guarda.
- *
- * Vinte e seis tipos escreviam esta mesma forma por extenso, cada um só trocando
- * o par `<dado, payload>` — e nada garantia que continuassem iguais. Portado de
- * `lowcodejs`, que já tinha fatorado a forma.
- *
- * Os generics precisam vir preenchidos: eles têm default (`TVariables = void`) e,
- * com `strictFunctionTypes`, o parâmetro dos callbacks é contravariante — sem
- * preencher, a função resultante não aceita o payload.
- *
- * `TError` tem default `HTTPError` porque todo caminho de falha de `request()`
- * lança `HTTPError` — é o que `register.d.ts` declara em `Register.defaultError`. Quem
- * não passa por `request()` o informa: o upload multipart fala com o bucket
- * direto e pode lançar `Error` cru.
- */
-type MutationProps<TData, TPayload, TError = HTTPError> = Omit<
-  UseMutationOptions<TData, TError, TPayload>,
-  'mutationFn'
->
-
-/**
- * A própria conta. Sem `id` no payload nem no caminho: o usuário vem sempre da
- * sessão, e é a mesma razão pela qual não existe `status` nem `role` aqui -
- * ninguém se inativa nem se promove.
- *
- * Trocar a senha derruba a sessão em curso, inclusive a que fez esta
- * requisição. Quem chama decide o que fazer com isso.
- *
- * `currentPassword` só é exigido quando `password` **existe como chave** - o
- * `requiredIfExists` do backend olha a chave, não o valor. Um `password: ''`
- * vira `null` e ainda conta como presente, então o campo tem de ser **omitido**
- * do payload, e não enviado vazio.
- */
-export function useAccountUpdate(
-  options?: MutationProps<IUser, ProfileUpdatePayload>,
-) {
-  return useMutation<IUser, HTTPError, ProfileUpdatePayload>({
-    ...options,
-    mutationFn: function (payload) {
-      return request<IUser>('/account', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
-    },
-  })
-}
-
-// ---------------------------------------------------------------------------
-// /authentication
-// ---------------------------------------------------------------------------
-
-/**
- * Entra. Responde `204` e entrega os dois tokens em `Set-Cookie`, `httpOnly` -
- * não há nada a guardar na tela, e quem passa a saber quem está logado é o
- * `GET /account`.
- */
-export function useAuthenticationSignIn(
-  options?: MutationProps<void, SessionSignInPayload>,
-) {
-  // Os generics ficam explícitos: são eles que dão tipo contextual aos
-  // callbacks do chamador. A regra "tipe a queryFn, não o hook" vale para
-  // query, onde `select` e `data` dependem da inferência em cadeia.
-  return useMutation<void, HTTPError, SessionSignInPayload>({
-    ...options,
-    mutationFn: async function (payload) {
-      await send('/authentication/sign-in', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-    },
-  })
-}
-
-/** Encerra a sessão no servidor, e não só na tela. */
-export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
-  return useMutation<void, HTTPError, void>({
-    ...options,
-    mutationFn: async function () {
-      await send('/authentication/sign-out', { method: 'POST' })
-    },
-  })
-}
-
-// ---------------------------------------------------------------------------
-// /storages
-// ---------------------------------------------------------------------------
-
-/**
- * Envia um arquivo e devolve o registro com a `url` derivada.
- *
- * O envio inteiro é do `useMultipartUpload`: o binário não passa pela API, e o
- * que acontece aqui dentro são três chamadas - abrir, subir direto ao bucket,
- * confirmar. Esta mutation existe por cima dele para dar o `isPending` e os
- * callbacks a quem só quer "subiu ou não", que é o caso do campo de imagem
- * única. Quem precisa da barra de progresso e do cancelamento usa o hook
- * direto, porque `useMutation` não tem por onde entregar progresso.
- *
- * O erro é `Error` e não `HTTPError`: o hook recusa localmente o tipo de
- * arquivo antes de gastar requisição, e essa recusa não tem status HTTP.
- *
- * O arquivo nasce **sem dono**: quem anexa é que guarda a referência, passando
- * o `id` devolvido aqui em `avatarId`, `coverId` ou equivalente da entidade que
- * recebe o anexo. Por isso a mutation não invalida nada - não há listagem de
- * anexos para atualizar.
- *
- * O `AbortSignal` é de um controller que vive enquanto o componente vive, e é
- * abortado quando ele sai de cena. Antes o controller nascia e morria na mesma
- * linha da chamada, o que dava um sinal que ninguém podia disparar: sair da
- * tela no meio do envio deixava as partes subindo até o fim, gastando banda por
- * um arquivo que já não interessava a ninguém - e o registro `PENDING` que
- * sobrava só sumia na varredura do servidor.
- */
-export function useStorageCreate(
-  options?: MutationProps<IStorage, File, Error>,
-) {
-  const { upload } = useMultipartUpload()
-  const controller = React.useRef<AbortController | null>(null)
-
-  React.useEffect(() => {
-    return () => controller.current?.abort()
-  }, [])
-
-  return useMutation<IStorage, Error, File>({
-    ...options,
-    mutationFn: function (file) {
-      // Um por envio: um controller abortado não volta a valer, e reaproveitá-lo
-      // faria o envio seguinte nascer cancelado.
-      controller.current = new AbortController()
-
-      return upload(file, () => undefined, controller.current.signal)
-    },
-  })
-}
-
-/**
- * Apaga um arquivo órfão: o binário e a linha em `storages`.
- *
- * É o par do `useStorageCreate`, e fecha o buraco que ele abre: o upload
- * acontece na hora da escolha, **antes** de o formulário ser salvo, então todo
- * anexo trocado ou removido da tela ficava em disco para sempre.
- *
- * O backend recusa com `409 STORAGE_IN_USE` o arquivo que alguém referencia,
- * então chamar esta mutation sobre um anexo já salvo é seguro: a resposta é um
- * erro, não uma imagem furada em outro cadastro.
- */
-export function useStorageDelete(options?: MutationProps<void, string>) {
-  return useMutation<void, HTTPError, string>({
-    ...options,
-    mutationFn: function (id) {
-      return send('/storages/'.concat(id), { method: 'DELETE' })
-    },
-  })
-}
-
-// ---------------------------------------------------------------------------
-// /administrator/users
-// ---------------------------------------------------------------------------
+import type { HTTPError } from '../http'
+import { request, send } from '../http'
+import type { MutationProps } from '../mutation-props'
+import { shouldRetryQuery } from '../query-context'
 
 /** O módulo inteiro exige `ADMINISTRATOR`. */
 
@@ -324,10 +128,6 @@ export function useUserDelete(options?: MutationProps<void, string>) {
     },
   })
 }
-
-// ---------------------------------------------------------------------------
-// /administrator/classrooms, sports e announcements
-// ---------------------------------------------------------------------------
 
 /**
  * Sem lixeira: turma, modalidade e aviso apagam de vez. Quem protege o que já
@@ -469,10 +269,6 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
   })
 }
 
-// ---------------------------------------------------------------------------
-// /administrator/brackets e matches
-// ---------------------------------------------------------------------------
-
 /** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
 export function useBracketCreate(
   options?: MutationProps<IBracket, BracketCreatePayload>,
@@ -592,95 +388,6 @@ export function useEnrollmentRemovalAcknowledge(
         '/administrator/enrollment-removals/'.concat(id, '/acknowledge'),
         { method: 'PATCH' },
       )
-    },
-  })
-}
-
-// ---------------------------------------------------------------------------
-// /advisor e /representative
-// ---------------------------------------------------------------------------
-
-export function useStudentCreate(
-  options?: MutationProps<IStudent, StudentCreatePayload>,
-) {
-  return useMutation<IStudent, HTTPError, StudentCreatePayload>({
-    ...options,
-    mutationFn: function (payload) {
-      return request<IStudent>('/advisor/students', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-    },
-  })
-}
-
-export type StudentUpdateVariables = Merge<
-  StudentUpdatePayload,
-  { readonly id: string }
->
-
-export function useStudentUpdate(
-  options?: MutationProps<IStudent, StudentUpdateVariables>,
-) {
-  return useMutation<IStudent, HTTPError, StudentUpdateVariables>({
-    ...options,
-    mutationFn: function ({ id, ...body }) {
-      return request<IStudent>('/advisor/students/'.concat(id), {
-        method: 'PUT',
-        body: JSON.stringify(body),
-      })
-    },
-  })
-}
-
-export function useStudentDelete(options?: MutationProps<void, string>) {
-  return useMutation<void, HTTPError, string>({
-    ...options,
-    mutationFn: function (id) {
-      return send('/advisor/students/'.concat(id), {
-        method: 'DELETE',
-      })
-    },
-  })
-}
-
-/** Troca a lista de atletas da turma numa modalidade, inteira. */
-export function useAdvisorEnrollmentUpdate(
-  options?: MutationProps<IEnrollmentBoard, AdvisorEnrollmentUpdatePayload>,
-) {
-  return useMutation<
-    IEnrollmentBoard,
-    HTTPError,
-    AdvisorEnrollmentUpdatePayload
-  >({
-    ...options,
-    mutationFn: function (payload) {
-      return request<IEnrollmentBoard>('/advisor/enrollments', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
-    },
-  })
-}
-
-/** A mesma troca, na turma do representante - que sai da sessão. */
-export function useRepresentativeEnrollmentUpdate(
-  options?: MutationProps<
-    IEnrollmentBoard,
-    RepresentativeEnrollmentUpdatePayload
-  >,
-) {
-  return useMutation<
-    IEnrollmentBoard,
-    HTTPError,
-    RepresentativeEnrollmentUpdatePayload
-  >({
-    ...options,
-    mutationFn: function (payload) {
-      return request<IEnrollmentBoard>('/representative/enrollments', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      })
     },
   })
 }

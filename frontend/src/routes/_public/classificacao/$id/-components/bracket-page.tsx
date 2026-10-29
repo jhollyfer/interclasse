@@ -2,7 +2,7 @@ import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 
 import { BRACKETS_INDEX } from '../../index'
 import { StandingsExplorer } from '../../../-components/standings-explorer'

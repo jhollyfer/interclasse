@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { cardsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { cardsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 /** Todos de uma vez: um campeonato da escola não passa de poucas dezenas. */
 export const ADMINISTRATOR_CARDS = { perPage: 100 }

@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { FilePdfIcon } from '@phosphor-icons/react'
 
-import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { cn } from '#/lib/utils'
 
 /**

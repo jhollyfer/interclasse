@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useSportDelete } from '#/integrations/tanstack-query/mutations'
+import { useSportDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import type { ISport } from '#/lib/interfaces'
 
 /**

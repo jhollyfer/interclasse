@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
 
-import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import type { IStorefrontSite } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 

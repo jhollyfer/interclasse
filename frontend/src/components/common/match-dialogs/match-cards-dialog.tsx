@@ -26,11 +26,11 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
   useCardCreate,
   useCardDelete,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import {
   cardsQueryOptions,
   matchAthletesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/administrator'
 import { CARD_COLORS } from '#/lib/entity'
 import { notifyError } from '#/lib/form-errors'
 import type { IMatchCard } from '#/lib/interfaces'

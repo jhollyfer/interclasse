@@ -25,7 +25,7 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 
 /**
  * A ficha da própria conta.

@@ -26,8 +26,8 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
   usePhotoDelete,
   usePhotoReview,
-} from '#/integrations/tanstack-query/mutations'
-import { photosQueryOptions } from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/mutations/administrator'
+import { photosQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { PHOTO_STATUS, PHOTO_STATUSES } from '#/lib/entity'
 import { notifyError } from '#/lib/form-errors'
 import type { IPhoto } from '#/lib/interfaces'

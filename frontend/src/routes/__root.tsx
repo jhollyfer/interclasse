@@ -16,7 +16,6 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'
 
-
 /**
  * O que toda rota enxerga em `context`.
  *

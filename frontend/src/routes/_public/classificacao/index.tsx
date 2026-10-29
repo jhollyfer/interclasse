@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { SITE_TITLE } from '#/lib/constant'
 
 /** Todas as chaves de uma vez: cinco modalidades x duas categorias cabem em 100. */

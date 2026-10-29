@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import {
   bracketsQueryOptions,
   matchesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
+} from '#/integrations/tanstack-query/queries/administrator'
 
 import { PENDING_REMOVALS } from '../-components/menu'
 

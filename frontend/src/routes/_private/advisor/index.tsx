@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { VISIBLE_CLASSROOMS } from '#/components/common/classroom-detail'
-import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 
 /**
  * O conselheiro tem uma turma só (índice único em `classrooms.advisor_id`):

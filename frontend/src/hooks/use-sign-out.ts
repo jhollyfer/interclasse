@@ -1,7 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations'
+import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations/authentication'
 
 /**
  * Sair do painel: encerra a sessão, esvazia o cache e volta para a entrada.

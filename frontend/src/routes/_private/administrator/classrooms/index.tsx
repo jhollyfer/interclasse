@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { withExtra } from '#/lib/list-search'
-import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 const validateSearch = withExtra(['category'] as const)
 

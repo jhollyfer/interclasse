@@ -16,7 +16,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations'
+import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/advisor'
 import type { IEnrollmentBoard } from '#/lib/interfaces'
 import { EnrollmentUpdateValidator } from '#/validators/advisor/enrollments.validator'
 import type { EnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'

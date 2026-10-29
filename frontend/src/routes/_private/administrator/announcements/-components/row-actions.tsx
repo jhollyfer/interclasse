@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations'
+import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import type { IAnnouncement } from '#/lib/interfaces'
 
 /** Editar e apagar. O aviso some do site na hora. */

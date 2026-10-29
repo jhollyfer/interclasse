@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { withExtra } from '#/lib/list-search'
-import { photosQueryOptions } from '#/integrations/tanstack-query/queries'
+import { photosQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 const validateSearch = withExtra(['status'] as const)
 
