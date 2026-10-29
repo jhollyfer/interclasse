@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
+import type { RepresentativeEnrollmentUpdatePayload } from '@interclasse/shared'
 
 import type { IEnrollmentBoard } from '#/lib/interfaces'
-import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload } from '#/validators/representative/enrollments.validator'
 
 import type { HTTPError } from '../http'
 import { request } from '../http'

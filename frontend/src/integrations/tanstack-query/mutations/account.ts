@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
+import type { AccountProfileUpdatePayload } from '@interclasse/shared'
 
 import type { IUser } from '#/lib/interfaces'
-import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 
 import type { HTTPError } from '../http'
 import { request } from '../http'
@@ -21,9 +21,9 @@ import type { MutationProps } from '../mutation-props'
  * do payload, e não enviado vazio.
  */
 export function useAccountUpdate(
-  options?: MutationProps<IUser, ProfileUpdatePayload>,
+  options?: MutationProps<IUser, AccountProfileUpdatePayload>,
 ) {
-  return useMutation<IUser, HTTPError, ProfileUpdatePayload>({
+  return useMutation<IUser, HTTPError, AccountProfileUpdatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<IUser>('/account', {

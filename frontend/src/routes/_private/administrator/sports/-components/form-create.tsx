@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import { AdministratorSportCreateValidator } from '@interclasse/shared'
+import type { AdministratorSportCreatePayload } from '@interclasse/shared'
 
 import {
   FormShell,
@@ -11,9 +13,7 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { SportCreateValidator } from '#/validators/administrator/sports.validator'
 import type { ISport } from '#/lib/interfaces'
-import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
 import { useSportCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -29,10 +29,10 @@ export function SportFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     SportFormType,
     ISport,
-    SportCreatePayload
+    AdministratorSportCreatePayload
   >({
     formId: 'sport-create',
-    validator: SportCreateValidator,
+    validator: AdministratorSportCreateValidator,
     defaults: SPORT_FORM_DEFAULTS,
     fields: SPORT_FIELDS,
     mutation: useSportCreate,

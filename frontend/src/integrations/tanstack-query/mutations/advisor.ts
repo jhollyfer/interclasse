@@ -1,20 +1,20 @@
 import { useMutation } from '@tanstack/react-query'
+import type {
+  AdvisorEnrollmentUpdatePayload,
+  AdvisorStudentCreatePayload,
+  AdvisorStudentUpdatePayload,
+} from '@interclasse/shared'
 
 import type { IStudent, IEnrollmentBoard, Merge } from '#/lib/interfaces'
-import type { EnrollmentUpdatePayload as AdvisorEnrollmentUpdatePayload } from '#/validators/advisor/enrollments.validator'
-import type {
-  StudentCreatePayload,
-  StudentUpdatePayload,
-} from '#/validators/advisor/students.validator'
 
 import type { HTTPError } from '../http'
 import { request, send } from '../http'
 import type { MutationProps } from '../mutation-props'
 
 export function useStudentCreate(
-  options?: MutationProps<IStudent, StudentCreatePayload>,
+  options?: MutationProps<IStudent, AdvisorStudentCreatePayload>,
 ) {
-  return useMutation<IStudent, HTTPError, StudentCreatePayload>({
+  return useMutation<IStudent, HTTPError, AdvisorStudentCreatePayload>({
     ...options,
     mutationFn: function (payload) {
       return request<IStudent>('/advisor/students', {
@@ -26,7 +26,7 @@ export function useStudentCreate(
 }
 
 export type StudentUpdateVariables = Merge<
-  StudentUpdatePayload,
+  AdvisorStudentUpdatePayload,
   { readonly id: string }
 >
 

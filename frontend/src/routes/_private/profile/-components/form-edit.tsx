@@ -2,6 +2,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
 import { toast } from 'sonner'
+import { AccountProfileUpdateValidator } from '@interclasse/shared'
+import type { AccountProfileUpdatePayload } from '@interclasse/shared'
 
 import {
   FormShell,
@@ -35,9 +37,8 @@ import {
 import { useAccountUpdate } from '#/integrations/tanstack-query/mutations/account'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import type { IUser } from '#/lib/interfaces'
+import { blankToUndefined } from '#/lib/form-values'
 import { initials } from '#/lib/labels'
-import { ProfileUpdateValidator } from '#/validators/account/profile.validator'
-import type { ProfileUpdatePayload } from '#/validators/account/profile.validator'
 
 /**
  * Os campos que o backend pode acusar.
@@ -62,7 +63,9 @@ const FIELDS = [
  * o valor. `password: ''` vira `null` e ainda conta como presente, e a API
  * passaria a exigir `currentPassword` de quem não quis trocar senha.
  */
-function toPayload(values: ProfileUpdatePayload): ProfileUpdatePayload {
+function toPayload(
+  values: AccountProfileUpdatePayload,
+): AccountProfileUpdatePayload {
   const { password, passwordConfirmation, currentPassword, ...rest } = values
 
   if (!password) return rest
@@ -85,28 +88,22 @@ export function ProfileFormEdit(): React.JSX.Element {
   const { data: account } = useSuspenseQuery(accountQueryOptions())
 
   const { form, onSubmit, shell } = useResourceForm<
-    ProfileUpdatePayload,
+    AccountProfileUpdatePayload,
     IUser,
-    ProfileUpdatePayload
+    AccountProfileUpdatePayload
   >({
     formId: 'profile',
-    validator: ProfileUpdateValidator,
+    validator: AccountProfileUpdateValidator,
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
     defaults: {
       name: '',
       email: '',
-      password: '',
-      passwordConfirmation: '',
-      currentPassword: '',
       avatarId: null,
     },
     values: {
       name: account.name,
       email: account.email,
-      password: '',
-      passwordConfirmation: '',
-      currentPassword: '',
       avatarId: account.avatarId,
     },
     fields: FIELDS,
@@ -223,6 +220,9 @@ export function ProfileFormEdit(): React.JSX.Element {
                   {...field}
                   {...control}
                   value={field.value ?? ''}
+                  onChange={(event) =>
+                    field.onChange(blankToUndefined(event.target.value))
+                  }
                   autoComplete="new-password"
                 />
               )}
@@ -239,6 +239,9 @@ export function ProfileFormEdit(): React.JSX.Element {
                   {...field}
                   {...control}
                   value={field.value ?? ''}
+                  onChange={(event) =>
+                    field.onChange(blankToUndefined(event.target.value))
+                  }
                   autoComplete="new-password"
                 />
               )}
@@ -256,6 +259,9 @@ export function ProfileFormEdit(): React.JSX.Element {
                     {...field}
                     {...control}
                     value={field.value ?? ''}
+                    onChange={(event) =>
+                      field.onChange(blankToUndefined(event.target.value))
+                    }
                     autoComplete="current-password"
                   />
                   {/* A regra é do validator - `requiredIfExists('password')` -,
