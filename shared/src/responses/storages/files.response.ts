@@ -1,4 +1,3 @@
-import { STORAGE_MIMETYPES } from '../../enums/storage-mimetype.js'
 import { UPLOAD_STATUSES } from '../../enums/upload-status.js'
 import { z } from '../../validator.js'
 
@@ -9,7 +8,7 @@ const fileShape = {
   id: z.uuid(),
   filename: z.string(),
   originalName: z.string(),
-  mimetype: z.enum(STORAGE_MIMETYPES),
+  mimetype: z.string(),
   size: z.number(),
   path: z.string(),
   status: z.enum(UPLOAD_STATUSES),
