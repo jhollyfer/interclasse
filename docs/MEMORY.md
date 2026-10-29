@@ -1,6 +1,6 @@
 # Memória do projeto
 
-**<Projeto>** · onde a gente está, para a próxima conversa
+**Interclasse** · onde a gente está, para a próxima conversa
 
 > O agente lê **no início** de toda sessão e atualiza **no fim**. Curto: é um ponto de
 > retomada, não um diário. Histórico vai para `CHANGELOG.md` e `DECISIONS.md`.
@@ -37,7 +37,7 @@ Ex.: Tela do carrinho: falta conferir o estoque antes de fechar o pedido
 
 | Data | Erro | Regra que evita | Vale para |
 |---|---|---|---|
-| AAAA-MM-DD | <o que o agente fez de errado> | <o que fazer em vez disso> | <camada, pasta ou tipo de tarefa> |
+| 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`) | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI |
 
 ## Problemas conhecidos
 

@@ -24,6 +24,8 @@ type SignOutConfirmProps = Readonly<{
    * de **fora** do alerta.
    */
   trigger: React.ReactElement
+  /** `false` para o item do menu da conta, que não é `<button>`. */
+  nativeButton?: boolean
   children: React.ReactNode
 }>
 
@@ -45,6 +47,7 @@ type SignOutConfirmProps = Readonly<{
  */
 export function SignOutConfirm({
   trigger,
+  nativeButton,
   children,
 }: SignOutConfirmProps): React.JSX.Element {
   // `mutate` e não `mutateAsync`: ninguém espera o resultado aqui, e a promise
@@ -53,7 +56,11 @@ export function SignOutConfirm({
   const signOut = useSignOut()
 
   return (
-    <ConfirmDialog trigger={trigger} onConfirm={() => signOut.mutate()}>
+    <ConfirmDialog
+      trigger={trigger}
+      nativeButton={nativeButton}
+      onConfirm={() => signOut.mutate()}
+    >
       {children}
     </ConfirmDialog>
   )
