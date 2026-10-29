@@ -1,34 +1,58 @@
+import { randomUUID } from 'node:crypto'
+
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Actor,
+  type AdvisorStudentShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import Student from '#models/student'
+import { StudentPresenter } from '../students.presenter.ts'
+import { StudentRefusal } from '../_shared.student-refusal.ts'
+
+import { Student } from '#domain/student/student.entity'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
+import { StudentRepository } from '#repositories/student/student.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { StudentCreatePayload } from '#validators/advisor/students.validator'
+import type { AdvisorStudentCreatePayload } from '#validators/advisor/students.validator'
 
-type Payload = StudentCreatePayload
-type Response = Either<HTTPException, Student>
+type Payload = Merge<AdvisorStudentCreatePayload, { actor: Actor }>
+type Response = Either<HTTPException, AdvisorStudentShowResponse>
 
 @inject()
 export default class AdvisorStudentCreateUseCase {
-  async execute(payload: Payload): Promise<Response> {
+  constructor(
+    private readonly students: StudentRepository,
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
+
+  async execute({ actor, ...payload }: Payload): Promise<Response> {
     try {
-      const classroom = await Classroom.find(payload.classroomId)
-
       // `404` também para a turma de outro conselheiro: dizer `403` confirmaria
-      // que ela existe.
+      // que ela existe. O alcance entra na consulta (`findOwned`).
+      const classroom = await this.classrooms.findOwned({ id: payload.classroomId, actor })
       if (!classroom)
-        return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+        )
 
-      const student = await Student.create(payload)
+      const created = Student.create({ id: randomUUID(), ...payload, now: new Date() })
+      if (created.isLeft()) return left(StudentRefusal.http(created.value, this.i18n))
 
-      return right(student)
+      await this.students.save(created.value)
+
+      return right(StudentPresenter.show(created.value))
     } catch (error) {
-      logger.error({ err: error }, '[students > create][error]')
+      logger.error({ err: error }, '[advisor/students > create][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_CREATE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_CREATE_ERROR'),
       )
     }
   }

@@ -1,108 +1,28 @@
+import { inject } from '@adonisjs/core'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
-import { USER_ROLE, left, right, type Either, type UserRole } from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import User from '#models/user'
-import HTTPException from '#exceptions/http.exception'
-
-type People = { advisorId?: string | null; readonly representativeId?: string | null }
+import type User from '#models/user'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
+import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 /**
- * Os vínculos de pessoa de uma turma: conselheiro e representante.
- *
- * Service porque consulta o banco, e um só para `create` e `update` - os dois
- * recebem os mesmos campos e precisam recusar as mesmas coisas.
+ * O que o módulo de contas ainda chama da turma. A regra e a persistência da
+ * turma moram em `domain/classroom` e `repositories/classroom`; aqui fica só a
+ * ponte de `detach`, que sai quando as contas migrarem.
  */
+@inject()
 export default class ClassroomService {
-  /**
-   * Confere que cada conta indicada existe, está viva e tem o papel do vínculo.
-   *
-   * Sem a checagem de papel, um representante indicado como conselheiro
-   * ganharia o cadastro de alunos da turma inteira.
-   *
-   * `current` é a turma sendo editada: conselheiro e representante só podem
-   * ter uma turma cada, e a própria não conta como conflito.
-   */
-  async assertPeople(people: People, current?: Classroom): Promise<Either<HTTPException, true>> {
-    // Na edição só se confere o vínculo que mudou: o que já estava gravado foi
-    // aceito quando entrou, e recusá-lo agora travaria até renomear a turma.
-    const classroomId = current?.id
-    if (people.advisorId && people.advisorId !== current?.advisorId) {
-      const advisor = await this.person(people.advisorId, USER_ROLE.ADVISOR)
-
-      if (!advisor)
-        return left(
-          HTTPException.UnprocessableEntity('Conselheiro não encontrado', 'ADVISOR_NOT_FOUND', {
-            advisorId: 'Selecione um professor conselheiro',
-          }),
-        )
-
-      if (await this.taken('advisorId', people.advisorId, classroomId))
-        return left(
-          HTTPException.Conflict('Conselheiro já vinculado a outra turma', 'ADVISOR_TAKEN', {
-            advisorId: 'Este conselheiro já está em outra turma',
-          }),
-        )
-    }
-
-    if (people.representativeId && people.representativeId !== current?.representativeId) {
-      const representative = await this.person(people.representativeId, USER_ROLE.REPRESENTATIVE)
-
-      if (!representative)
-        return left(
-          HTTPException.UnprocessableEntity(
-            'Representante não encontrado',
-            'REPRESENTATIVE_NOT_FOUND',
-            { representativeId: 'Selecione um aluno representante' },
-          ),
-        )
-
-      if (await this.taken('representativeId', people.representativeId, classroomId))
-        return left(
-          HTTPException.Conflict(
-            'Representante já vinculado a outra turma',
-            'REPRESENTATIVE_TAKEN',
-            { representativeId: 'Este representante já está em outra turma' },
-          ),
-        )
-    }
-
-    return right(true)
-  }
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly transaction: TransactionContext,
+  ) {}
 
   /**
    * Desfaz os vínculos de turma de uma conta que deixou de ser o que era: o
-   * papel mudou, ou ela foi arquivada. Sem isto a turma continuaria apontando
-   * para quem não aconselha nem representa mais, e a conta recuperaria o
-   * escopo antigo se o papel voltasse.
-   *
-   * Arquivar é remoção lógica, então o `ON DELETE SET NULL` da coluna nunca
-   * dispara - quem faz o papel dele é este método.
+   * papel mudou, ou ela foi arquivada. Roda na transação do chamador (`client`),
+   * para a escrita cair junto com a que a motiva.
    */
   async detach(user: User, client: TransactionClientContract): Promise<void> {
-    await Classroom.query({ client }).where('advisorId', user.id).update({ advisorId: null })
-    await Classroom.query({ client })
-      .where('representativeId', user.id)
-      .update({ representativeId: null })
-  }
-
-  /** Outra turma, que não a `except`, já tem esta pessoa no vínculo. */
-  private async taken(
-    column: 'advisorId' | 'representativeId',
-    userId: string,
-    except?: string,
-  ): Promise<boolean> {
-    const query = Classroom.query().where(column, userId)
-    if (except) query.whereNot('id', except)
-
-    return Boolean(await query.first())
-  }
-
-  private person(id: string, role: UserRole): Promise<User | null> {
-    return User.query()
-      .where('id', id)
-      .where('role', role)
-      .withScopes((scopes) => scopes.notDeleted())
-      .first()
+    await this.transaction.run(client, () => this.classrooms.detachAccount(user.id))
   }
 }

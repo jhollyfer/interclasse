@@ -82,4 +82,18 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
   }
 }
 
+/**
+ * A lista de atletas de uma modalidade, inteira: substitui a anterior. Sem
+ * aluno repetido e com o teto de `LIST_LIMITS.ATHLETES`.
+ */
+export function athleteListFields() {
+  return {
+    sportId: z.uuid(),
+    studentIds: z
+      .array(z.uuid())
+      .max(LIST_LIMITS.ATHLETES)
+      .refine((ids) => new Set(ids).size === ids.length),
+  }
+}
+
 export { z }

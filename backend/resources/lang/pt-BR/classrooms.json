@@ -1,0 +1,18 @@
+{
+  "not_found": "Turma não encontrada",
+  "none_linked": "Nenhuma turma vinculada",
+  "already_exists": "Turma já existe",
+  "name_taken": "Já existe uma turma com este nome",
+  "invalid_grade": "Ano inválido",
+  "invalid_grade_field": "O ano vai do 3º ao 9º",
+  "advisor_not_found": "Conselheiro não encontrado",
+  "advisor_not_found_field": "Selecione um professor conselheiro",
+  "advisor_taken": "Conselheiro já vinculado a outra turma",
+  "advisor_taken_field": "Este conselheiro já está em outra turma",
+  "representative_not_found": "Representante não encontrado",
+  "representative_not_found_field": "Selecione um aluno representante",
+  "representative_taken": "Representante já vinculado a outra turma",
+  "representative_taken_field": "Este representante já está em outra turma",
+  "in_competition": "A turma já está numa chave sorteada",
+  "category_locked_field": "Não é possível mudar a categoria de uma turma já sorteada"
+}

@@ -1,44 +1,51 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
 import { left, right, type Either } from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import Team from '#models/team'
+import { ClassroomRefusal } from '../_shared.classroom-refusal.ts'
+
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, Classroom>
+type Response = Either<HTTPException, null>
 
 /**
  * Apaga a turma de vez. Sem lixeira: turma é cadastro da organização, refeito
- * em segundos, e alunos e inscrições vão junto por `CASCADE`.
+ * em segundos, e alunos e inscrições vão junto por `CASCADE`. A turma que já está
+ * numa chave sorteada fica (regra da entidade).
  */
 @inject()
 export default class AdministratorClassroomDeleteUseCase {
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const classroom = await Classroom.find(id)
-
+      const classroom = await this.classrooms.findById(id)
       if (!classroom)
-        return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
-
-      const team = await Team.findBy('classroomId', classroom.id)
-
-      if (team)
         return left(
-          HTTPException.Conflict('A turma já está numa chave sorteada', 'CLASSROOM_IN_COMPETITION'),
+          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
         )
 
-      await classroom.delete()
+      const removable = classroom.remove({
+        inCompetition: await this.classrooms.isInCompetition(id),
+      })
+      if (removable.isLeft()) return left(ClassroomRefusal.http(removable.value, this.i18n))
 
-      return right(classroom)
+      await this.classrooms.delete(classroom)
+
+      return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[classrooms > delete][error]')
+      logger.error({ err: error }, '[administrator/classrooms > delete][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CLASSROOM_DELETE_ERROR',
         ),
       )

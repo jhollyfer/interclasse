@@ -4,7 +4,7 @@ import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
-import { categoryOf } from '#features/administrator/_shared.classroom'
+import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/helpers'
 
 test.group('brackets > preview', (group) => {
@@ -15,7 +15,7 @@ test.group('brackets > preview', (group) => {
     const sport = await SportFactory.merge({ minAthletes: 2, maxAthletes: 5 }).create()
     const [cheia, vazia] = await ClassroomFactory.merge({
       grade: 4,
-      category: categoryOf(4),
+      category: ClassroomEntity.categoryOf(4),
     }).createMany(2)
     if (!cheia || !vazia) throw new Error('factory criou menos turmas que o pedido')
     const alunos = await StudentFactory.merge({ classroomId: cheia.id }).createMany(2)
