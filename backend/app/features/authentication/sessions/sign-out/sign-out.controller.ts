@@ -28,7 +28,11 @@ export default class AuthenticationSessionSignOutController {
     const actor = context.auth.getUserOrFail()
     const refreshToken = context.request.cookie(COOKIE_TOKEN.REFRESH)
 
-    const result = await this.useCase.execute({ actor, refreshToken })
+    const result = await this.useCase.execute({
+      actor,
+      accessTokenId: actor.currentAccessToken?.identifier.toString(),
+      refreshToken,
+    })
 
     if (result.isLeft()) throw result.value
 

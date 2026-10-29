@@ -1,7 +1,7 @@
 import { vine, email } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const SessionSignInValidator = vine.create({
+export const AuthenticationSessionSignInValidator = vine.create({
   email: email(),
   // Entrar não valida força: a senha só é comparada com o hash guardado.
   // Exigir o formato atual aqui trancaria fora quem cadastrou antes de a regra
@@ -9,4 +9,4 @@ export const SessionSignInValidator = vine.create({
   password: vine.string().maxLength(128),
 })
 
-export type SessionSignInPayload = Infer<typeof SessionSignInValidator>
+export type AuthenticationSessionSignInPayload = Infer<typeof AuthenticationSessionSignInValidator>

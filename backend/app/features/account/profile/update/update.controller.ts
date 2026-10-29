@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import AccountProfileUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { ProfileUpdateValidator } from '#validators/account/profile.validator'
+import { AccountProfileUpdateValidator } from '#validators/account/profile.validator'
 
 @inject()
 export default class AccountProfileUpdateController {
@@ -21,16 +21,19 @@ export default class AccountProfileUpdateController {
       'requisição.\n\n' +
       'O papel não entra: ele é definido na criação, pelo administrador, e ninguém muda o ' +
       'próprio.',
-    // Declarado à mão porque nasce fora deste par: quem levanta o
-    // `STORAGE_NOT_FOUND` é o `StorageService`, e a leitura de AST do gerador
-    // só enxerga o `HTTPException` escrito no use-case irmão.
-    errors: { 422: 'STORAGE_NOT_FOUND' },
+    // Declarados à mão porque nascem fora deste par: a entidade os recusa e os
+    // tradutores `_shared` os escrevem, e a leitura de AST do gerador só
+    // enxerga o `HTTPException` escrito no use-case irmão.
+    errors: {
+      409: 'USER_ALREADY_EXISTS',
+      422: ['CURRENT_PASSWORD_INVALID', 'PASSWORD_SAME_AS_CURRENT', 'STORAGE_NOT_FOUND'],
+    },
   })
 
   constructor(private readonly useCase: AccountProfileUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(ProfileUpdateValidator)
+    const payload = await context.request.validateUsing(AccountProfileUpdateValidator)
     const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

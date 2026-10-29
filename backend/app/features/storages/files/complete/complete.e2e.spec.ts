@@ -3,7 +3,7 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 
 import Storage from '#models/storage'
-import { PART_SIZE } from '#services/multipart/multipart-contract.service'
+import { PART_SIZE } from '#services/multipart/multipart.contract'
 import { type StorageMimetype } from '#core/validator'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 import type { Session } from '#tests/helpers'

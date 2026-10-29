@@ -1,6 +1,6 @@
-import { UPLOAD_STATUSES } from '@interclasse/shared'
+import { STORAGE_MIMETYPES, STORAGE_SORT_COLUMNS, UPLOAD_STATUSES } from '@interclasse/shared'
 
-import { vine, paginationFields, sortFields, STORAGE_MIMETYPES } from '#core/validator'
+import { vine, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 import env from '#start/env'
 
@@ -20,13 +20,13 @@ import env from '#start/env'
  */
 export const UPLOAD_MAX_SIZE = env.get('UPLOAD_MAX_SIZE')
 
-export const FileCreateValidator = vine.create({
+export const StoragesFileCreateValidator = vine.create({
   fileName: vine.string().trim().minLength(1).maxLength(255),
   mimetype: vine.enum(STORAGE_MIMETYPES),
   size: vine.number().min(1).max(UPLOAD_MAX_SIZE).withoutDecimals(),
 })
 
-export type FileCreatePayload = Infer<typeof FileCreateValidator>
+export type StoragesFileCreatePayload = Infer<typeof StoragesFileCreateValidator>
 
 /**
  * O que `POST /storages/:id/complete` recebe: o `ETag` de cada parte enviada.
@@ -34,7 +34,7 @@ export type FileCreatePayload = Infer<typeof FileCreateValidator>
  * Vazio - ou ausente - é upload de parte única, que não tem parte para
  * confirmar. O teto de dez mil é o do próprio S3.
  */
-export const FileCompleteValidator = vine.create({
+export const StoragesFileCompleteValidator = vine.create({
   parts: vine
     .array(
       vine.object({
@@ -45,19 +45,7 @@ export const FileCompleteValidator = vine.create({
     .optional(),
 })
 
-export type FileCompletePayload = Infer<typeof FileCompleteValidator>
-
-/**
- * Por quais colunas a biblioteca de arquivos pode ser ordenada.
- *
- * Tupla fechada pelo mesmo motivo das outras: o valor entra direto no
- * `orderBy`, que o compõe no SQL, e texto livre da URL seria entregar a
- * cláusula ao cliente.
- *
- * `path` e `uploadId` ficam de fora de propósito - são detalhe do bucket e do
- * multipart, e ordenar por eles não é pergunta que a tela faça.
- */
-export const STORAGE_SORT_COLUMNS = ['originalName', 'mimetype', 'size', 'createdAt'] as const
+export type StoragesFileCompletePayload = Infer<typeof StoragesFileCompleteValidator>
 
 /**
  * O que `GET /storages` recebe.
@@ -71,7 +59,7 @@ export const STORAGE_SORT_COLUMNS = ['originalName', 'mimetype', 'size', 'create
  * `DELETE /storages/:id`, que remove a linha **e** o binário. Não há lixeira de
  * arquivo para restaurar, e o parâmetro seria aceito e ignorado em silêncio.
  */
-export const FilePaginateValidator = vine.create({
+export const StoragesFilePaginateValidator = vine.create({
   ...paginationFields(),
   status: vine.enum(UPLOAD_STATUSES).optional(),
   // A lista fechada, e não texto livre: é a mesma tupla que `POST /storages`
@@ -81,4 +69,4 @@ export const FilePaginateValidator = vine.create({
   ...sortFields(STORAGE_SORT_COLUMNS),
 })
 
-export type FilePaginatePayload = Infer<typeof FilePaginateValidator>
+export type StoragesFilePaginatePayload = Infer<typeof StoragesFilePaginateValidator>

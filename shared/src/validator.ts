@@ -27,11 +27,15 @@ export const VALIDATION_MESSAGES = {
   en: { required: 'Fill in this field' },
 } satisfies Record<Locale, { readonly required: string }>
 
+/** O idioma em vigor, para as regras da casa que escrevem a própria mensagem. */
+let activeLocale: Locale = BASE_LOCALE
+
 /**
  * Troca o idioma das mensagens de validação. O frontend chama ao trocar de
  * idioma; sem chamada, vale o idioma base.
  */
 export function useValidatorLocale(locale: Locale): void {
+  activeLocale = locale
   z.config(ZOD_LOCALES[locale]())
   z.config({
     customError: (issue) => {
@@ -93,6 +97,64 @@ export function athleteListFields() {
       .array(z.uuid())
       .max(LIST_LIMITS.ATHLETES)
       .refine((ids) => new Set(ids).size === ids.length),
+  }
+}
+
+/** As mensagens das regras de identidade (senha e e-mail), por idioma. */
+export const IDENTITY_MESSAGES = {
+  'pt-BR': {
+    weakPassword: 'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
+    passwordMismatch: 'As senhas não são iguais',
+  },
+  es: {
+    weakPassword: 'La contraseña necesita minúscula, mayúscula, número y carácter especial',
+    passwordMismatch: 'Las contraseñas no coinciden',
+  },
+  en: {
+    weakPassword:
+      'The password needs a lowercase letter, an uppercase letter, a number and a special character',
+    passwordMismatch: 'The passwords do not match',
+  },
+} satisfies Record<
+  Locale,
+  { readonly weakPassword: string; readonly passwordMismatch: string }
+>
+
+/** E-mail: formato e o teto do `unique` do banco. */
+export function emailField() {
+  return z.email().max(254)
+}
+
+/**
+ * Força da senha: tamanho e uma classe de caractere por regra. A mensagem sai
+ * no idioma em vigor, lida na hora da validação.
+ */
+export function passwordField() {
+  const weak = { error: () => IDENTITY_MESSAGES[activeLocale].weakPassword }
+
+  return z
+    .string()
+    .min(8)
+    .max(32)
+    .regex(/[a-z]/, weak)
+    .regex(/[A-Z]/, weak)
+    .regex(/[0-9]/, weak)
+    .regex(/[^a-zA-Z0-9]/, weak)
+}
+
+/**
+ * Acusa `passwordConfirmation` diferente de `password`. Recebe os dois valores
+ * já lidos: o `refine` do objeto os passa, e a regra fica num lugar só.
+ */
+export function passwordsMatch(password: string | undefined, confirmation: string | undefined) {
+  return password === undefined || password === confirmation
+}
+
+/** Opções do `refine` de objeto que cobra a confirmação da senha. */
+export function passwordMismatchIssue() {
+  return {
+    path: ['passwordConfirmation'],
+    error: () => IDENTITY_MESSAGES[activeLocale].passwordMismatch,
   }
 }
 

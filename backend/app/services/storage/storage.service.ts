@@ -1,35 +1,19 @@
 import { randomUUID } from 'node:crypto'
 
-import db from '@adonisjs/lucid/services/db'
 import drive from '@adonisjs/drive/services/main'
-import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
+import { STORAGE_EXTENSIONS, type StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
-import { StorageContract, type StorageMetadata } from '#services/storage/storage-contract.service'
+import {
+  StorageContract,
+  type StorageDownload,
+  type StorageMetadata,
+} from '#services/storage/storage.contract'
 import { URL_TTL } from '#config/drive'
-import HTTPException from '#exceptions/http.exception'
-import { STORAGE_EXTENSIONS, type StorageMimetype } from '#core/validator'
 
 /**
- * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
- * mostra quando o arquivo está em uso.
- *
- * Uma lista só de objetos, e não listas casadas por índice: com duas, uma
- * inserção no meio de uma delas troca o rótulo de todas as seguintes, e o
- * compilador não tem como perceber.
- *
- * `db.from` para todas, inclusive as que têm model: o que se pergunta é a
- * contagem de uma coluna, e o model não acrescenta nada a isso.
- */
-const REFERENCES = [{ table: 'users', column: 'avatar_id', label: 'avatar de usuário' }] as const
-
-/**
- * Tudo que envolve arquivo: a chave sob a qual ele vive no bucket, o que o
- * bucket sabe sobre ele, quem o referencia e como ele sai de cena.
- *
- * É um serviço injetado, e não um punhado de funções exportadas, porque quem
- * anexa está espalhado - hoje o avatar em `account` e em `users`. Injetar deixa
- * cada use-case declarar a dependência que tem.
+ * Tudo que envolve o bucket: a chave sob a qual o arquivo vive, o que o
+ * bucket sabe sobre ele, as URLs assinadas e como o binário sai de cena. A linha
+ * em `storages` e quem a referencia são do `StorageRepository`.
  *
  * O binário **não** passa por aqui: ele vai do navegador direto ao
  * bucket por URL assinada. O que atravessa esta camada é metadado.
@@ -58,8 +42,8 @@ export default class StorageService extends StorageContract {
    * É com isto que a confirmação do upload confere o que **de fato** subiu
    * contra o que o cliente declarou ao pedir as URLs.
    */
-  async metadata(storage: Storage): Promise<StorageMetadata> {
-    return drive.use().getMetaData(storage.path)
+  async metadata(path: string): Promise<StorageMetadata> {
+    return drive.use().getMetaData(path)
   }
 
   /**
@@ -68,45 +52,13 @@ export default class StorageService extends StorageContract {
    * `@aws-sdk/s3-request-presigner`, que calcula a SigV4 localmente. Vence em
    * `URL_TTL`, e quem a guardar recebe 403 depois disso.
    */
-  async signedUrl(storage: Storage): Promise<string> {
-    return drive.use().getSignedUrl(storage.path, { expiresIn: URL_TTL })
+  async signedUrl(path: string): Promise<string> {
+    return drive.use().getSignedUrl(path, { expiresIn: URL_TTL })
   }
 
-  /** Apaga só o binário, deixando a linha. Usado quando a confirmação recusa. */
-  async discard(storage: Storage): Promise<void> {
-    await drive.use().delete(storage.path)
-  }
-
-  /**
-   * Onde um arquivo está sendo usado, em rótulos legíveis ("capa de notícia",
-   * "galeria de álbum"). Vazio quer dizer órfão, e órfão é o único que o
-   * `DELETE /storages/:id` apaga.
-   *
-   * A checagem existe porque `storages` é registro **neutro e compartilhado**:
-   * o arquivo não pertence ao formulário que o enviou. Sem ela, quem conhecesse
-   * um uuid furaria a capa de uma notícia alheia com uma requisição.
-   *
-   * Toda referência a `storages` é `SET NULL` ou `CASCADE`, então **o banco não
-   * impediria nada**: apagar a linha esvaziaria o avatar, a capa ou a galeria
-   * sem um erro no caminho. Quem impede é isto aqui, e é por isso que
-   * `REFERENCES` tem de cobrir toda coluna que aponta para cá - uma que falte é
-   * um arquivo em uso que some sem aviso.
-   */
-  async references(storageId: string): Promise<string[]> {
-    // O rótulo viaja junto com a contagem, no mesmo objeto: casar dois arrays
-    // pelo índice é o defeito que _standards/backend.md §5.2 proíbe.
-    const counts = await Promise.all(
-      REFERENCES.map(async (reference) => {
-        const rows = await db
-          .from(reference.table)
-          .where(reference.column, storageId)
-          .count('* as total')
-        // `count` do Postgres é `bigint`, e o driver o entrega como string.
-        return { label: reference.label, total: Number(rows[0]?.total ?? 0) }
-      }),
-    )
-
-    return counts.filter((count) => count.total > 0).map((count) => count.label)
+  /** Apaga o binário do bucket. */
+  async discard(path: string): Promise<void> {
+    await drive.use().delete(path)
   }
 
   /**
@@ -120,11 +72,11 @@ export default class StorageService extends StorageContract {
    * Expira em minutos porque é endereço de uma ação, não de um recurso: quem
    * quiser o arquivo de novo pede outra.
    */
-  async signedDownload(storage: Storage): Promise<string> {
-    return drive.use().getSignedUrl(storage.path, {
+  async signedDownload(file: StorageDownload): Promise<string> {
+    return drive.use().getSignedUrl(file.path, {
       expiresIn: '5 minutes',
-      contentType: storage.mimetype,
-      contentDisposition: this.contentDisposition(storage.originalName),
+      contentType: file.mimetype,
+      contentDisposition: this.contentDisposition(file.originalName),
     })
   }
 
@@ -152,59 +104,5 @@ export default class StorageService extends StorageContract {
       .replace(/["\\]|[^\u0020-\u007e]/g, '_')
 
     return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(originalName)}`
-  }
-
-  /**
-   * Apaga o binário e depois o registro, nesta ordem.
-   *
-   * Binário órfão é lixo no bucket; registro órfão é `url` quebrada na tela. Se
-   * o `delete` do bucket falhar, a linha fica - e o arquivo continua servível -
-   * em vez de o inverso.
-   *
-   * `delete()` de verdade, e não `deletedAt`: `storages` não tem lixeira, e um
-   * arquivo "removido" que continua ocupando o bucket não remove nada.
-   */
-  async remove(storage: Storage): Promise<void> {
-    await drive.use().delete(storage.path)
-
-    await storage.delete()
-  }
-
-  /**
-   * Existência dos arquivos informados num payload, antes de qualquer escrita.
-   *
-   * Deduplica preservando a ordem - a posição na galeria é o índice do array,
-   * então reordenar aqui trocaria a capa do álbum. Id inexistente, removido ou
-   * ainda `PENDING` é `422` apontando o campo, nunca `404` nem `500`: quem
-   * mandou o id errado foi o payload.
-   *
-   * `PENDING` conta como inexistente de propósito. Desde que o binário sobe
-   * direto para o bucket, a linha nasce antes de o arquivo estar
-   * íntegro - anexá-la publicaria uma notícia cuja capa ainda está a meio
-   * caminho, e a tela mostraria um 404.
-   */
-  async assertExist(
-    field: string,
-    storageIds: ReadonlyArray<string>,
-  ): Promise<Either<HTTPException, string[]>> {
-    const ids = [...new Set(storageIds)]
-
-    if (ids.length === 0) return right(ids)
-
-    const storages = await Storage.query()
-      .whereIn('id', ids)
-      .where('status', UPLOAD_STATUS.UPLOADED)
-      .withScopes((scopes) => scopes.notDeleted())
-
-    // A contagem só bate quando todos os ids deduplicados casam com um arquivo
-    // vivo.
-    if (storages.length !== ids.length)
-      return left(
-        HTTPException.UnprocessableEntity('Arquivo não encontrado', 'STORAGE_NOT_FOUND', {
-          [field]: 'Arquivo não encontrado',
-        }),
-      )
-
-    return right(ids)
   }
 }

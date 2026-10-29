@@ -13,7 +13,7 @@ import type { Infer } from '#core/validator'
  * administrador, e ninguém muda o próprio. Declará-los só para ignorar depois
  * convidaria alguém a tentar.
  */
-export const ProfileUpdateValidator = vine.create({
+export const AccountProfileUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
   email: email().optional().use(notNull()),
   password: password().optional().use(notNull()),
@@ -41,4 +41,4 @@ export const ProfileUpdateValidator = vine.create({
   avatarId: vine.string().uuid().nullable().optional(),
 })
 
-export type ProfileUpdatePayload = Infer<typeof ProfileUpdateValidator>
+export type AccountProfileUpdatePayload = Infer<typeof AccountProfileUpdateValidator>

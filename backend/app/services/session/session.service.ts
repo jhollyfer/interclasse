@@ -1,39 +1,46 @@
-import db from '@adonisjs/lucid/services/db'
-import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { inject } from '@adonisjs/core'
+import { Secret } from '@adonisjs/core/helpers'
+import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import {
+  SessionContract,
+  type RefreshGrant,
+  type SessionTokens,
+} from '#services/session/session.contract'
+import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 /** A tabela do `DbAccessTokensProvider`, criada pela migration de `auth_access_tokens`. */
 const SESSION_TABLE = 'auth_access_tokens'
 
-/** O par de tokens em claro, como sai da emissão - o único momento em que existe. */
-export type SessionTokens = {
-  readonly accessToken: string
-  readonly refreshToken: string
-}
-
 /**
- * Os tokens da sessão no banco: emitir e revogar.
+ * Os tokens da sessão no banco: emitir, ler o de refresh e revogar.
  *
  * Separado do `CookieService`, que escreve a resposta HTTP: emitir token toca o
  * banco, escrever cookie toca o transporte, e são duas razões para mudar.
  */
-export default class SessionService {
+@inject()
+export default class SessionService extends SessionContract {
+  constructor(private readonly transaction: TransactionContext) {
+    super()
+  }
+
   /**
-   * O par de tokens, emitido para o usuário.
+   * O par de tokens, emitido para a conta.
    *
    * `release()` só existe na criação: o valor em claro do token não volta do
    * banco depois, e é por isso que ele sobe até o controller, que o põe no
    * cookie.
    */
-  async issue(user: User): Promise<SessionTokens> {
-    const accessToken = await User.accessTokens.create(user, [], {
+  async issue(userId: string): Promise<SessionTokens> {
+    const tokenable = this.tokenable(userId)
+    const accessToken = await User.accessTokens.create(tokenable, [], {
       name: COOKIE_TOKEN.ACCESS,
       expiresIn: COOKIE_TOKEN.ACCESS_EXPIRY,
     })
 
-    const refreshToken = await User.accessTokens.create(user, [], {
+    const refreshToken = await User.accessTokens.create(tokenable, [], {
       name: COOKIE_TOKEN.REFRESH,
       expiresIn: COOKIE_TOKEN.REFRESH_EXPIRY,
     })
@@ -58,8 +65,39 @@ export default class SessionService {
    * revogação precisa cair junto com a escrita que a motivou (troca de senha,
    * de papel, arquivamento) - duas escritas, uma transação (_standards/backend.md §4.2).
    */
-  async revokeAll(user: User, client?: TransactionClientContract): Promise<void> {
-    const query = client ?? db
-    await query.from(SESSION_TABLE).where('tokenable_id', user.id).delete()
+  async revokeAll(userId: string): Promise<void> {
+    await this.transaction.client().from(SESSION_TABLE).where('tokenable_id', userId).delete()
+  }
+
+  async revoke(userId: string, identifier: string): Promise<boolean> {
+    const deleted = await User.accessTokens.delete(this.tokenable(userId), identifier)
+
+    return deleted !== 0
+  }
+
+  async readRefresh(value: string): Promise<RefreshGrant | null> {
+    // Um token ilegível faz o `verify` LANÇAR em vez de devolver null.
+    try {
+      const token = await User.accessTokens.verify(new Secret(value))
+
+      if (!token || token.name !== COOKIE_TOKEN.REFRESH) return null
+
+      return { userId: String(token.tokenableId), identifier: String(token.identifier) }
+    } catch (error) {
+      logger.debug({ err: error }, '[session > readRefresh] token ilegível')
+
+      return null
+    }
+  }
+
+  /**
+   * O dono do token para o provider, que só lê a chave primária dele. Montar o
+   * model com o id poupa a consulta que a emissão e a revogação não precisam.
+   */
+  private tokenable(userId: string): User {
+    const tokenable = new User()
+    tokenable.id = userId
+
+    return tokenable
   }
 }
