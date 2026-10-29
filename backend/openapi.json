@@ -37,6 +37,10 @@
       "description": "Os avisos que o site mostra. Fixados aparecem primeiro."
     },
     {
+      "name": "Painel · Site",
+      "description": "O \"Sobre\" dos jogos e o regulamento em PDF que o site público mostra. Uma configuração só."
+    },
+    {
       "name": "Painel · Chaves",
       "description": "O sorteio de uma modalidade numa categoria, que monta o mata-mata inteiro. Chave não se edita: apaga e sorteia de novo."
     },
@@ -2795,6 +2799,144 @@
             }
           }
         ]
+      }
+    },
+    "/administrator/site": {
+      "get": {
+        "operationId": "administratorSiteShow",
+        "summary": "Configuração do site",
+        "tags": [
+          "Painel · Site"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorSiteShowResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorSiteShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "O texto do \"Sobre\", a edição, o ano da primeira edição, quem organiza, os Instagrams e o regulamento em PDF. Campo vazio é o que o site não mostra.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ]
+      },
+      "put": {
+        "operationId": "administratorSiteUpdate",
+        "summary": "Atualizar configuração do site",
+        "tags": [
+          "Painel · Site"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorSiteUpdateResponse200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado. Exige um destes papéis: ADMINISTRATOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Arquivo não encontrado · O regulamento precisa ser PDF",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422RegulationNotPdfStorageNotFoundValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500AdministratorSiteUpdateError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Campo ausente é \"não mexer\"; `null` apaga. `regulationId` é um arquivo já enviado por `/storages` e precisa ser PDF.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "x-roles": [
+          "ADMINISTRATOR"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdministratorSiteUpdateBody"
+              }
+            }
+          }
+        }
       }
     },
     "/administrator/sports": {
@@ -6155,6 +6297,38 @@
             }
           }
         ]
+      }
+    },
+    "/storefront/site": {
+      "get": {
+        "operationId": "storefrontSite",
+        "summary": "Sobre os jogos",
+        "tags": [
+          "Site"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSiteResponse200"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500StorefrontSiteShowError"
+                }
+              }
+            }
+          }
+        },
+        "description": "O \"Sobre\" dos jogos e o regulamento para baixar. `regulation` é nulo enquanto a organização não enviar o PDF; a `url` é assinada e vence em minutos."
       }
     },
     "/storefront/sports": {
@@ -10704,6 +10878,370 @@
           "winnerTeamId"
         ]
       },
+      "AdministratorSiteShowResponse200": {
+        "type": "object",
+        "properties": {
+          "about": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "developerInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "edition": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "firstEditionYear": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "organizer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regulationId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schoolInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "regulation": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "about",
+          "createdAt",
+          "developerInstagram",
+          "edition",
+          "firstEditionYear",
+          "id",
+          "organizer",
+          "regulationId",
+          "schoolInstagram",
+          "updatedAt"
+        ]
+      },
+      "AdministratorSiteUpdateBody": {
+        "type": "object",
+        "properties": {
+          "about": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          },
+          "organizer": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 160
+          },
+          "firstEditionYear": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1990,
+            "maximum": 2100
+          },
+          "edition": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 99
+          },
+          "schoolInstagram": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9._]{1,30}$"
+          },
+          "developerInstagram": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9._]{1,30}$"
+          },
+          "regulationId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "AdministratorSiteUpdateResponse200": {
+        "type": "object",
+        "properties": {
+          "about": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "developerInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "edition": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "firstEditionYear": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "organizer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regulationId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schoolInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "regulation": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "deletedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "partSize": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "UPLOADED"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "uploadId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "deletedAt",
+              "filename",
+              "id",
+              "mimetype",
+              "originalName",
+              "partSize",
+              "path",
+              "size",
+              "status",
+              "updatedAt",
+              "uploadId"
+            ]
+          }
+        },
+        "required": [
+          "about",
+          "createdAt",
+          "developerInstagram",
+          "edition",
+          "firstEditionYear",
+          "id",
+          "organizer",
+          "regulationId",
+          "schoolInstagram",
+          "updatedAt"
+        ]
+      },
       "AdministratorSportsCreateBody": {
         "type": "object",
         "properties": {
@@ -14149,6 +14687,43 @@
           "errors"
         ]
       },
+      "Error422RegulationNotPdfStorageNotFoundValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REGULATION_NOT_PDF",
+              "STORAGE_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422SportInvalidLimitsValidationError": {
         "type": "object",
         "properties": {
@@ -15094,6 +15669,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_MATCH_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorSiteShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_SITE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorSiteUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_SITE_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -16080,6 +16723,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "STOREFRONT_MATCH_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StorefrontSiteShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STOREFRONT_SITE_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -18304,6 +18981,72 @@
           "updatedAt",
           "winnerTeamId"
         ]
+      },
+      "StorefrontSiteResponse200": {
+        "type": "object",
+        "properties": {
+          "about": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "organizer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "firstEditionYear": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "edition": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "schoolInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "developerInstagram": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regulation": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "originalName": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "url",
+              "originalName",
+              "size"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [],
+        "additionalProperties": false
       },
       "StorefrontSportsItem": {
         "type": "object",

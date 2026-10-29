@@ -55,6 +55,7 @@ router
       .get('announcements', [controllers.storefront.announcements.paginate.Paginate])
       .as('announcements')
     router.get('matches', [controllers.storefront.matches.paginate.Paginate]).as('matches')
+    router.get('site', [controllers.storefront.site.show.Show]).as('site')
 
     router
       .group(() => {
@@ -181,6 +182,14 @@ router
       })
       .prefix('sports')
       .as('sports')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.site.show.Show])
+        router.put('/', [controllers.administrator.site.update.Update])
+      })
+      .prefix('site')
+      .as('site')
 
     router
       .group(() => {

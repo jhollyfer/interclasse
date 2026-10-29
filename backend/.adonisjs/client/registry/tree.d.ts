@@ -11,6 +11,7 @@ export interface ApiDefinition {
     sports: typeof routes['storefront.sports']
     announcements: typeof routes['storefront.announcements']
     matches: typeof routes['storefront.matches']
+    site: typeof routes['storefront.site']
     brackets: {
       paginate: typeof routes['storefront.brackets.paginate']
       show: typeof routes['storefront.brackets.show']
@@ -48,6 +49,10 @@ export interface ApiDefinition {
       show: typeof routes['administrator.sports.show']
       update: typeof routes['administrator.sports.update']
       delete: typeof routes['administrator.sports.delete']
+    }
+    site: {
+      show: typeof routes['administrator.site.show']
+      update: typeof routes['administrator.site.update']
     }
     announcements: {
       paginate: typeof routes['administrator.announcements.paginate']

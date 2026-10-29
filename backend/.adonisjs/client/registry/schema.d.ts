@@ -79,6 +79,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/matches/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'storefront.site': {
+    methods: ["GET","HEAD"]
+    pattern: '/storefront/site'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/storefront/site/show/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/storefront/site/show/show.controller').default['handle']>>>
+    }
+  }
   'storefront.brackets.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/storefront/brackets'
@@ -365,6 +377,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/sports/delete/delete.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'administrator.site.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/site'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/site/show/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/site/show/show.controller').default['handle']>>>
+    }
+  }
+  'administrator.site.update': {
+    methods: ["PUT"]
+    pattern: '/administrator/site'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#features/administrator/site/site.validator').SiteUpdateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#features/administrator/site/site.validator').SiteUpdateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/site/update/update.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/site/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'administrator.announcements.paginate': {

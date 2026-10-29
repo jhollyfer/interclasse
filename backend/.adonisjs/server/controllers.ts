@@ -102,6 +102,14 @@ export const controllers = {
         Update: () => import('#features/administrator/matches/update/update.controller'),
       },
     },
+    site: {
+      show: {
+        Show: () => import('#features/administrator/site/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/site/update/update.controller'),
+      },
+    },
     sports: {
       create: {
         Create: () => import('#features/administrator/sports/create/create.controller'),
@@ -255,6 +263,11 @@ export const controllers = {
     matches: {
       paginate: {
         Paginate: () => import('#features/storefront/matches/paginate/paginate.controller'),
+      },
+    },
+    site: {
+      show: {
+        Show: () => import('#features/storefront/site/show/show.controller'),
       },
     },
     sports: {
