@@ -1,14 +1,12 @@
 import {
-  ACTIVE_STATUSES,
   BRACKET_STATUSES,
   CARD_COLORS,
   CATEGORIES,
   MATCH_PHASES,
   MATCH_STATUSES,
-  UPLOAD_STATUSES,
-  USER_ROLES,
 } from '@interclasse/shared'
 import {
+  AccountProfileShowResponse,
   AdministratorAnnouncementShowResponse,
   AdministratorClassroomPaginateResponse,
   AdministratorClassroomShowResponse,
@@ -17,11 +15,13 @@ import {
   AdministratorReportShowResponse,
   AdministratorSiteShowResponse,
   AdministratorSportShowResponse,
+  AdministratorUserShowResponse,
   AdvisorClassroomShowResponse,
   AdvisorEnrollmentShowResponse,
   AdvisorPhotoShowResponse,
   AdvisorStudentShowResponse,
   RepresentativeEnrollmentShowResponse,
+  StoragesFileShowResponse,
   StorefrontAnnouncementShowResponse,
   StorefrontPhotoShowResponse,
   StorefrontSiteShowResponse,
@@ -34,10 +34,8 @@ import Classroom from '#models/classroom'
 import MatchCard from '#models/match-card'
 import Match from '#models/match'
 import Sport from '#models/sport'
-import Storage from '#models/storage'
 import Student from '#models/student'
 import Team from '#models/team'
-import User from '#models/user'
 import type { FeatureResponse, ModelResource } from '#core/openapi/types'
 
 /**
@@ -58,17 +56,6 @@ import type { FeatureResponse, ModelResource } from '#core/openapi/types'
 // ---------------------------------------------------------------------------
 // Recursos reaproveitados
 // ---------------------------------------------------------------------------
-
-const STORAGE: ModelResource = {
-  model: Storage,
-  enums: { status: UPLOAD_STATUSES },
-}
-
-const USER: ModelResource = {
-  model: User,
-  enums: { role: USER_ROLES, status: ACTIVE_STATUSES },
-  relations: { avatar: STORAGE },
-}
 
 const CLASSROOM: ModelResource = {
   model: Classroom,
@@ -112,62 +99,6 @@ const MATCH_CARD: ModelResource = {
 // ---------------------------------------------------------------------------
 // O que não deriva de model
 // ---------------------------------------------------------------------------
-
-/**
- * O plano de upload que `POST /storages` e `GET /storages/:id/parts` devolvem.
- *
- * Declarado em VineJS, e não como `ModelResource`, porque a resposta **não** é
- * o arquivo: é por onde subi-lo. O registro entra dentro dela, em `storage`,
- * como um campo entre outros.
- *
- * As duas rotas respondem a mesma forma de propósito - começar um upload e
- * retomá-lo são a mesma pergunta, "para onde eu mando o quê" -, e duas formas
- * para a mesma resposta seriam dois caminhos no cliente.
- */
-export const StorageUploadResponse = vine.create({
-  storage: vine.object({
-    id: vine.string().uuid(),
-    filename: vine.string(),
-    originalName: vine.string(),
-    mimetype: vine.string(),
-    size: vine.number(),
-    path: vine.string(),
-    status: vine.enum(UPLOAD_STATUSES),
-    /**
-     * Opcional porque `POST /storages` **não** a devolve, e o documento diz a
-     * verdade sobre o endpoint em vez da que seria conveniente.
-     *
-     * A `url` é derivada pelos hooks `afterFind`/`afterFetch` do model, que só
-     * disparam em leitura. Na abertura do upload a instância acabou de ser
-     * salva, nunca foi lida, e o `@computed` devolve `undefined` - que o
-     * `serializeComputed` do Lucid então omite do JSON. `GET /storages/:id/parts`
-     * carrega a linha por consulta e traz a `url` normalmente.
-     *
-     * Não é problema para o cliente: quem acabou de abrir o upload usa
-     * `parts[].url` para subir os bytes, e o endereço final só interessa depois
-     * de `POST /storages/:id/complete`, que responde o arquivo lido do banco.
-     */
-    url: vine.string().optional(),
-    createdAt: vine.date(),
-    updatedAt: vine.date().nullable(),
-    deletedAt: vine.date().nullable(),
-  }),
-  /** Nulo quando o arquivo coube numa parte só e sobe por um `PUT` simples. */
-  uploadId: vine.string().nullable(),
-  partSize: vine.number(),
-  totalParts: vine.number(),
-  /** As URLs deste lote. Pode ser menos que `totalParts` (ver `PRESIGNED_BATCH`). */
-  parts: vine.array(vine.object({ partNumber: vine.number(), url: vine.string() })),
-  /** As partes que o bucket já tem. Sempre vazio ao iniciar. */
-  uploaded: vine.array(
-    vine.object({
-      partNumber: vine.number(),
-      size: vine.number(),
-      /** O que o `complete` exige de volta para conferir que a parte chegou. */
-      etag: vine.string(),
-    }),
-  ),
-})
 
 /** Uma partida como a chave a desenha: os nomes das turmas já resolvidos. */
 function bracketMatchFields() {
@@ -254,40 +185,29 @@ export const DrawPreviewResponse = vine.create({
 export const RESPONSES: Record<string, FeatureResponse> = {
   /**
    * `GET /account` e `PUT /account` respondem o mesmo recurso: a conta com o
-   * avatar precarregado. As duas rotas declaradas por uma entrada só é o que
-   * impede a resposta do `PUT` apagar do cache do cliente o que o `GET`
-   * acabou de entregar.
+   * avatar. As duas rotas declaradas por uma entrada só é o que impede a
+   * resposta do `PUT` apagar do cache do cliente o que o `GET` acabou de
+   * entregar. Sign-in, sign-out e refresh respondem `204` sem corpo, e por isso
+   * não têm entrada.
    */
-  'account/profile': USER,
-
-  /**
-   * Sign-in, sign-out e refresh respondem `204` sem corpo - o que
-   * importa é o `Set-Cookie`. A entrada existe mesmo assim porque o gerador
-   * resolve a feature pelo diretório, e ausência aqui seria indistinguível de
-   * um contrato esquecido.
-   */
-  'authentication/sessions': USER,
+  'account/profile': AccountProfileShowResponse,
 
   /**
    * O arquivo cru, que é o que `paginate`, `show` e `POST /storages/:id/complete`
    * devolvem - o `paginate` embrulhado em `{ meta, data }`, que o gerador deriva
-   * do retorno do use-case. As outras quatro rotas do grupo fogem desta forma -
-   * as duas do plano de upload declaram `StorageUploadResponse`, e `delete` e
+   * do retorno do use-case. As outras rotas do grupo fogem desta forma - as duas
+   * do plano de upload declaram `StoragesFileUploadResponse`, e `delete` e
    * `download` não têm corpo -, e por isso declaram `responses` no próprio
    * controller.
    */
-  'storages/files': STORAGE,
+  'storages/files': StoragesFileShowResponse,
 
   /**
-   * As sete ações de usuário respondem a mesma forma: a conta com o avatar
-   * precarregado. É o mesmo `USER` de `/account`, e não uma cópia - duas
+   * As ações de usuário que devolvem corpo respondem a mesma forma: a conta com
+   * o avatar, e nunca a senha. É a mesma de `/account`, e não uma cópia - duas
    * declarações do mesmo contrato divergem em silêncio.
-   *
-   * A senha não sai em resposta nenhuma, e não por omissão daqui: a coluna é
-   * `@column({ serializeAs: null })` no model, então nem a serialização do
-   * Lucid nem o documento derivado dele a conhecem.
    */
-  'administrator/users': USER,
+  'administrator/users': AdministratorUserShowResponse,
 
   'administrator/classrooms': AdministratorClassroomShowResponse,
   'administrator/classrooms/paginate': AdministratorClassroomPaginateResponse,

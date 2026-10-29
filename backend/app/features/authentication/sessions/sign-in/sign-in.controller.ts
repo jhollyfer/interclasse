@@ -3,7 +3,7 @@ import { inject } from '@adonisjs/core'
 
 import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
-import { SessionSignInValidator } from '#validators/authentication/sessions.validator'
+import { AuthenticationSessionSignInValidator } from '#validators/authentication/sessions.validator'
 import { defineDocs } from '#core/openapi/types'
 import CookieService from '#services/cookie/cookie.service'
 
@@ -25,7 +25,7 @@ export default class AuthenticationSessionSignInController {
   ) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(SessionSignInValidator)
+    const payload = await context.request.validateUsing(AuthenticationSessionSignInValidator)
     const result = await this.useCase.execute(payload)
 
     if (result.isLeft()) throw result.value

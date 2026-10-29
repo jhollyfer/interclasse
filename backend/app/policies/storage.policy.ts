@@ -2,7 +2,6 @@ import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 import { USER_ROLE, type UserRole } from '@interclasse/shared'
 
-import type Storage from '#models/storage'
 import type User from '#models/user'
 
 /**
@@ -28,9 +27,9 @@ import type User from '#models/user'
 const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [USER_ROLE.ADMINISTRATOR]
 
 export default class StoragePolicy extends BasePolicy {
-  download(actor: User, storage: Storage | null): AuthorizerResponse {
-    if (storage && STAFF_USER_ROLES.includes(actor.role)) return true
-    if (storage && actor.avatarId === storage.id) return true
+  download(actor: User, storageId: string): AuthorizerResponse {
+    if (STAFF_USER_ROLES.includes(actor.role)) return true
+    if (actor.avatarId === storageId) return true
 
     return AuthorizationResponse.deny('Arquivo não encontrado', 404).t('STORAGE_NOT_FOUND')
   }

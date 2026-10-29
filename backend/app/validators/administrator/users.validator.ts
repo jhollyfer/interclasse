@@ -1,4 +1,4 @@
-import { USER_ROLES } from '@interclasse/shared'
+import { USER_ROLES, USER_SORT_COLUMNS } from '@interclasse/shared'
 
 import {
   vine,
@@ -11,14 +11,6 @@ import {
   sortFields,
 } from '#core/validator'
 import type { Infer } from '#core/validator'
-
-/**
- * Por quais colunas a listagem de usuários pode ser ordenada.
- *
- * São as colunas que a tela mostra, e nada além: `password` é hash e ordenar
- * por ele não significa nada, e `avatar` é relação, que exigiria `join`.
- */
-export const USER_SORT_COLUMNS = ['name', 'email', 'role', 'status', 'createdAt'] as const
 
 /**
  * O papel de um usuário gerenciado pelo painel.
@@ -44,7 +36,7 @@ export function manageableRole() {
  * `status` é opcional porque a coluna tem `DEFAULT 'ACTIVE'`: a conta nasce
  * podendo entrar, e desativar é edição.
  */
-export const UserCreateValidator = vine.create({
+export const AdministratorUserCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
   email: email(),
   password: password(),
@@ -67,7 +59,7 @@ export const UserCreateValidator = vine.create({
  * rebaixar é o que este recurso existe para fazer, e ninguém muda o próprio
  * papel por `/account`.
  */
-export const UserUpdateValidator = vine.create({
+export const AdministratorUserUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
   email: email().optional().use(notNull()),
   password: password().optional().use(notNull()),
@@ -83,7 +75,7 @@ export const UserUpdateValidator = vine.create({
  * administra de quem edita, e `status` separa quem entra de quem foi desativado
  * sem ser arquivado.
  */
-export const UserPaginateValidator = vine.create({
+export const AdministratorUserPaginateValidator = vine.create({
   ...paginationFields(),
   ...trashedField(),
   ...sortFields(USER_SORT_COLUMNS),
@@ -91,8 +83,8 @@ export const UserPaginateValidator = vine.create({
   status: activeStatus().optional(),
 })
 
-export type UserCreatePayload = Infer<typeof UserCreateValidator>
+export type AdministratorUserCreatePayload = Infer<typeof AdministratorUserCreateValidator>
 
-export type UserUpdatePayload = Infer<typeof UserUpdateValidator>
+export type AdministratorUserUpdatePayload = Infer<typeof AdministratorUserUpdateValidator>
 
-export type UserPaginatePayload = Infer<typeof UserPaginateValidator>
+export type AdministratorUserPaginatePayload = Infer<typeof AdministratorUserPaginateValidator>

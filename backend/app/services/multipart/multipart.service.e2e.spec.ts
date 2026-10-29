@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
 
-import { MultipartContract } from '#services/multipart/multipart-contract.service'
+import { MultipartContract } from '#services/multipart/multipart.contract'
 
 /**
  * O multipart contra o bucket de verdade (o MinIO do `docker-compose.yml`).

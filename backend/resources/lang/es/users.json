@@ -1,0 +1,10 @@
+{
+  "not_found": "Usuario no encontrado",
+  "already_exists": "El usuario ya existe",
+  "email_taken": "Ya existe un usuario con este correo electrónico",
+  "not_archived": "El usuario no está archivado",
+  "not_archived_field": "Archiva al usuario antes de borrarlo",
+  "already_archived": "El usuario ya está archivado",
+  "current_password_invalid": "Contraseña actual inválida",
+  "password_same_as_current": "La nueva contraseña debe ser distinta de la actual"
+}

@@ -1,125 +1,111 @@
-import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type Merge } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AccountProfileShowResponse,
+  type Actor,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import User from '#models/user'
-import SessionService from '#services/session/session.service'
-import { StorageContract } from '#services/storage/storage-contract.service'
 import HTTPException from '#exceptions/http.exception'
+import { StorageRepository } from '#repositories/storage/storage.repository'
+import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
+import { UserRepository } from '#repositories/user/user.repository'
+import { SessionContract } from '#services/session/session.contract'
+import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
+import { UserRefusal } from '#features/_shared.user-refusal'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { ProfileUpdatePayload } from '#validators/account/profile.validator'
+import type { AccountProfileUpdatePayload } from '#validators/account/profile.validator'
 
-type Payload = Merge<ProfileUpdatePayload, { actor: User }>
-type Response = Either<HTTPException, User>
+type Payload = Merge<AccountProfileUpdatePayload, { actor: Actor }>
+type Response = Either<HTTPException, AccountProfileShowResponse>
 
+/**
+ * Edita a própria conta. A conta é o `actor` da sessão (_standards/backend.md
+ * §4.3), e por isso não há id no caminho.
+ */
 @inject()
 export default class AccountProfileUpdateUseCase {
   constructor(
-    private readonly storage: StorageContract,
-    private readonly session: SessionService,
+    private readonly users: UserRepository,
+    private readonly storages: StorageRepository,
+    private readonly sessions: SessionContract,
+    private readonly unitOfWork: UnitOfWork,
+    private readonly i18n: I18n,
   ) {}
 
   // `currentPassword` sai do payload aqui: ele é prova de identidade, não
-  // coluna, e deixá-lo passar faria o `merge()` lá embaixo tentar gravá-lo.
-  async execute({ actor: user, currentPassword, ...payload }: Payload): Promise<Response> {
+  // coluna, e deixá-lo passar faria a edição tentar gravá-lo.
+  async execute({ actor, currentPassword, ...changes }: Payload): Promise<Response> {
     try {
-      // A conta é o `actor` da sessão: o guard já a leu com os filtros de
-      // arquivado e inativo, e reconsultar por id pagaria a mesma pergunta duas
-      // vezes (_standards/backend.md §4.3).
+      const user = await this.users.findById(actor.id)
 
-      if (payload.email && payload.email !== user.email) {
-        // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
-        // inteira, então sem esta checagem o save estouraria a constraint e
-        // viraria 500.
-        const exist = await User.query()
-          .where('email', payload.email)
-          .whereNot('id', user.id)
-          .first()
+      if (!user)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-        if (exist)
-          return left(
-            HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
-              email: 'Usuário já existe',
-            }),
-          )
-      }
-
-      // Antes do merge: `avatar_id` é chave estrangeira, e sem esta checagem um
-      // uuid inexistente estouraria a constraint e viraria 500. `assertExist`
-      // também recusa o que ainda está `PENDING` - o binário sobe direto para o
-      // bucket, e anexar antes da confirmação publicaria uma foto pela metade.
-      if (payload.avatarId) {
-        const avatar = await this.storage.assertExist('avatarId', [payload.avatarId])
-
-        if (avatar.isLeft()) return left(avatar.value)
-      }
-
-      // Antes de qualquer outra regra de senha: é a prova de identidade, e o
-      // resto só faz sentido depois dela. O `middleware.auth()` prova posse do
-      // cookie, e um cookie sequestrado trocaria a senha sem que o dono da
-      // conta tivesse dito nada. `PASSWORD_SAME_AS_CURRENT` não cobre isso -
-      // ele compara a nova com o hash, e passar por ele é justamente **não**
-      // saber a atual.
-      //
-      // Que `currentPassword` exista quando `password` existe é o validator que
-      // garante (`requiredIfExists`); a checagem de ausência aqui só estreita o tipo.
+      // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
+      // inteira, então sem esta checagem o save estouraria a constraint e
+      // viraria 500.
       if (
-        payload.password &&
-        (!currentPassword || !(await hash.verify(user.password, currentPassword)))
+        changes.email &&
+        changes.email !== user.snapshot().email &&
+        (await this.users.existsByEmail(changes.email, actor.id))
       )
-        return left(
-          HTTPException.UnprocessableEntity('Senha atual inválida', 'CURRENT_PASSWORD_INVALID', {
-            currentPassword: 'Senha atual inválida',
-          }),
-        )
+        return left(UserRefusal.alreadyExists(this.i18n))
 
-      if (payload.password && (await hash.verify(user.password, payload.password)))
-        return left(
-          HTTPException.UnprocessableEntity(
-            'A nova senha deve ser diferente da atual',
-            'PASSWORD_SAME_AS_CURRENT',
-            { password: 'A nova senha deve ser diferente da atual' },
-          ),
-        )
+      // Antes da edição: `avatar_id` é chave estrangeira, e sem esta checagem um
+      // uuid inexistente estouraria a constraint e viraria 500. Também recusa o
+      // que ainda está `PENDING` - o binário sobe direto para o bucket, e anexar
+      // antes da confirmação publicaria uma foto pela metade.
+      if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
+        return left(AttachmentRefusal.notFound('avatarId', this.i18n))
 
-      // Trocar e-mail ou senha derruba todas as sessões: sem isso um token
-      // anterior à troca de acesso sobreviveria. Avaliado antes do merge,
-      // enquanto `user.email` ainda é o valor atual.
-      const shouldRevoke =
-        Boolean(payload.email && payload.email !== user.email) || Boolean(payload.password)
+      // A prova de identidade da troca de senha: a sessão prova posse do cookie,
+      // e um cookie sequestrado trocaria a senha sem que o dono dissesse nada.
+      // Que `currentPassword` exista quando `password` existe é o validator que
+      // garante (`requiredIfExists`).
+      const stored = user.snapshot().password
+      const currentConfirmed =
+        Boolean(changes.password) &&
+        currentPassword !== undefined &&
+        (await hash.verify(stored, currentPassword))
+      const sameAsCurrent =
+        currentConfirmed &&
+        changes.password !== undefined &&
+        (await hash.verify(stored, changes.password))
 
-      // `merge` só escreve as chaves presentes: campo ausente no payload não
-      // vira `undefined` na linha. É o que faz o `PUT` ser parcial de verdade.
-      await db.transaction(async (trx) => {
-        user.useTransaction(trx)
-        user.merge(payload)
-        await user.save()
+      const updated = user.updateOwn(changes, { currentConfirmed, sameAsCurrent }, new Date())
+      if (updated.isLeft()) return left(UserRefusal.http(updated.value, this.i18n))
 
-        // O mixin `withAuthFinder` já re-hasheou a senha no save acima.
-        if (shouldRevoke) await this.session.revokeAll(user, trx)
+      // Trocar e-mail ou senha derruba todas as sessões, inclusive a desta
+      // requisição: gravar e revogar caem juntos.
+      await this.unitOfWork.run(async () => {
+        await this.users.save(user)
+
+        if (updated.value.revokesSessions) await this.sessions.revokeAll(actor.id)
+
+        return right(null)
       })
 
-      // Recarrega o avatar depois do save: quem acabou de trocar a foto tem de
-      // receber a `url` nova na mesma resposta, sem uma leitura a mais.
-      await user.load('avatar')
+      // Recarrega depois de gravar: quem acabou de trocar a foto tem de receber
+      // a `url` nova na mesma resposta, sem uma leitura a mais.
+      const profile = await this.users.detail(actor.id)
+      if (!profile) throw new Error('a conta gravada não foi encontrada')
 
-      return right(user)
+      return right(profile)
     } catch (error) {
       // A checagem de e-mail acima não fecha a corrida: o segundo de dois
       // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Usuário já existe', 'USER_ALREADY_EXISTS', {
-            email: 'Usuário já existe',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(UserRefusal.alreadyExists(this.i18n))
 
       logger.error({ err: error }, '[profile > update][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'PROFILE_UPDATE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'PROFILE_UPDATE_ERROR'),
       )
     }
   }
