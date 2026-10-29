@@ -30,6 +30,8 @@
   "POST /administrator/photos": "ADMINISTRATOR",
   "DELETE /administrator/photos/{id}": "ADMINISTRATOR",
   "PUT /administrator/photos/{id}/review": "ADMINISTRATOR",
+  "GET /administrator/reports": "ADMINISTRATOR",
+  "GET /administrator/reports/csv": "ADMINISTRATOR",
   "GET /administrator/site": "ADMINISTRATOR",
   "PUT /administrator/site": "ADMINISTRATOR",
   "GET /administrator/sports": "ADMINISTRATOR",

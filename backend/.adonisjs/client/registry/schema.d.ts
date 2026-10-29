@@ -391,6 +391,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/sports/delete/delete.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'administrator.reports.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/reports'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/reports/show/show.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/reports/show/show.controller').default['handle']>>>
+    }
+  }
+  'administrator.reports.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/administrator/reports/csv'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/reports/export/export.controller').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/reports/export/export.controller').default['handle']>>>
+    }
+  }
   'administrator.photos.paginate': {
     methods: ["GET","HEAD"]
     pattern: '/administrator/photos'

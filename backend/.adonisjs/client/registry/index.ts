@@ -198,6 +198,18 @@ const routes = {
     tokens: [{"old":"/administrator/sports/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/sports/:id","type":0,"val":"sports","end":""},{"old":"/administrator/sports/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.sports.delete']['types'],
   },
+  'administrator.reports.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/reports',
+    tokens: [{"old":"/administrator/reports","type":0,"val":"administrator","end":""},{"old":"/administrator/reports","type":0,"val":"reports","end":""}],
+    types: placeholder as Registry['administrator.reports.show']['types'],
+  },
+  'administrator.reports.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/reports/csv',
+    tokens: [{"old":"/administrator/reports/csv","type":0,"val":"administrator","end":""},{"old":"/administrator/reports/csv","type":0,"val":"reports","end":""},{"old":"/administrator/reports/csv","type":0,"val":"csv","end":""}],
+    types: placeholder as Registry['administrator.reports.export']['types'],
+  },
   'administrator.photos.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/administrator/photos',
