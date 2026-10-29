@@ -479,10 +479,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/site'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/site.validator').SiteUpdateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/site.validator').AdministratorSiteUpdateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/site.validator').SiteUpdateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/site.validator').AdministratorSiteUpdateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/site/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/site/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -494,7 +494,7 @@ export interface Registry {
       body: {}
       paramsTuple: []
       params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/announcements.validator').AnnouncementPaginateValidator)>>
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/administrator/announcements.validator').AdministratorAnnouncementPaginateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/announcements/paginate/paginate.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/announcements/paginate/paginate.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -503,10 +503,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/administrator/announcements'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/announcements.validator').AnnouncementCreateValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/announcements.validator').AdministratorAnnouncementCreateValidator)>>
       paramsTuple: []
       params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/announcements.validator').AnnouncementCreateValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/announcements.validator').AdministratorAnnouncementCreateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/announcements/create/create.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/announcements/create/create.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -527,10 +527,10 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/administrator/announcements/:id'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/administrator/announcements.validator').AnnouncementUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/administrator/announcements.validator').AdministratorAnnouncementUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/announcements.validator').AnnouncementUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/administrator/announcements.validator').AdministratorAnnouncementUpdateValidator)>|InferInput<(typeof import('#core/validator').IdentifierValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#features/administrator/announcements/update/update.controller').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#features/administrator/announcements/update/update.controller').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
