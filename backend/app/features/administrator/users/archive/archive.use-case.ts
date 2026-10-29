@@ -6,7 +6,7 @@ import { left, right, type Either } from '@interclasse/shared'
 import HTTPException from '#exceptions/http.exception'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { ClassroomDetachContract } from '#services/classroom-detach/classroom-detach.contract'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
 import { UserRefusal } from '#features/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
@@ -36,7 +36,7 @@ export default class AdministratorUserArchiveUseCase {
   constructor(
     private readonly users: UserRepository,
     private readonly sessions: SessionContract,
-    private readonly classrooms: ClassroomDetachContract,
+    private readonly classrooms: ClassroomRepository,
     private readonly unitOfWork: UnitOfWork,
     private readonly i18n: I18n,
   ) {}
@@ -57,7 +57,7 @@ export default class AdministratorUserArchiveUseCase {
         await this.users.save(user)
         await this.sessions.revokeAll(id)
         // Conta arquivada não aconselha nem representa turma nenhuma.
-        await this.classrooms.detach(id)
+        await this.classrooms.detachAccount(id)
 
         return right(null)
       })

@@ -135,7 +135,11 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     this.rows.delete(classroom.id)
   }
 
+  /** As contas que o teste viu serem soltas das turmas, em ordem. */
+  readonly detachedAccounts: string[] = []
+
   async detachAccount(accountId: string): Promise<void> {
+    this.detachedAccounts.push(accountId)
     for (const props of this.rows.values()) {
       if (props.advisorId === accountId) props.advisorId = null
       if (props.representativeId === accountId) props.representativeId = null
