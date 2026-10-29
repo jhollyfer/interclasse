@@ -1,4 +1,4 @@
-import { PRESIGNED_BATCH } from '#services/multipart/multipart-contract.service'
+import { PRESIGNED_BATCH } from '#services/multipart/multipart.contract'
 
 /**
  * A conta das partes de um upload: função pura sobre números já em mãos, usada

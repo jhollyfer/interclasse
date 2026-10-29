@@ -1,11 +1,15 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { UPLOAD_STATUS, left, right, type Either } from '@interclasse/shared'
+import { left, right, type Either } from '@interclasse/shared'
 
-import Storage from '#models/storage'
+import { FileRefusal } from '../_shared.file-refusal.ts'
+
+import type { Storage } from '#domain/storage/storage.entity'
 import HTTPException from '#exceptions/http.exception'
-import { StorageContract } from '#services/storage/storage-contract.service'
-import { MultipartContract } from '#services/multipart/multipart-contract.service'
+import { StorageRepository } from '#repositories/storage/storage.repository'
+import { StorageContract } from '#services/storage/storage.contract'
+import { MultipartContract } from '#services/multipart/multipart.contract'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -23,7 +27,7 @@ type Response = Either<HTTPException, null>
  * **cancelar**: o multipart é abortado, e é isso que faz as partes já enviadas
  * sumirem. Sem o aborto elas ficam penduradas para sempre - não aparecem na
  * listagem de objetos, e continuam sendo cobradas. `UPLOADED` é o arquivo
- * pronto, e aí vale a regra de referência abaixo.
+ * pronto, e aí vale a regra de referência da entidade.
  *
  * **Só apaga o que ninguém usa.** `storages` é registro neutro e compartilhado
  * - o arquivo não pertence ao formulário que o enviou -, então a posse não
@@ -33,40 +37,34 @@ type Response = Either<HTTPException, null>
 @inject()
 export default class StoragesFileDeleteUseCase {
   constructor(
-    private readonly storage: StorageContract,
+    private readonly bucket: StorageContract,
     private readonly multipart: MultipartContract,
+    private readonly storages: StorageRepository,
+    private readonly i18n: I18n,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const storage = await Storage.query().where('id', payload.id).first()
+      const storage = await this.storages.findById(payload.id)
 
       if (!storage)
-        return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
+        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
 
-      if (storage.status === UPLOAD_STATUS.PENDING) {
-        await this.#cancel(storage)
+      const removable = storage.remove(await this.storages.usedBy(storage.id))
 
-        return right(null)
-      }
+      if (removable.isLeft()) return left(FileRefusal.http(removable.value, this.i18n))
 
-      const references = await this.storage.references(storage.id)
+      if (storage.isPending()) await this.cancel(storage)
+      else await this.bucket.discard(storage.snapshot().path)
 
-      if (references.length > 0)
-        return left(
-          HTTPException.Conflict('Arquivo em uso', 'STORAGE_IN_USE', {
-            id: `Arquivo em uso em: ${references.join(', ')}. Desvincule-o antes de apagá-lo.`,
-          }),
-        )
-
-      await this.storage.remove(storage)
+      await this.storages.delete(storage)
 
       return right(null)
     } catch (error) {
       logger.error({ err: error }, '[files > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_DELETE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_DELETE_ERROR'),
       )
     }
   }
@@ -74,28 +72,24 @@ export default class StoragesFileDeleteUseCase {
   /**
    * Cancela um upload em andamento.
    *
-   * Não passa pela regra de referência porque um `PENDING` não tem como estar
-   * referenciado: `assertExist` recusa anexar o que não está `UPLOADED`.
-   *
    * O objeto final não existe ainda - as partes vivem sob o `uploadId`, e é o
    * aborto que as descarta. No upload de parte única não há aborto, e o que
    * pode existir é o objeto inteiro, quando o `PUT` chegou a completar antes do
    * cancelamento; apagá-lo pode não encontrar nada, e não encontrar é o caso
    * comum.
    */
-  async #cancel(storage: Storage): Promise<void> {
-    if (storage.uploadId) {
-      await this.multipart.abort(storage.path, storage.uploadId)
+  private async cancel(storage: Storage): Promise<void> {
+    const { path, uploadId } = storage.snapshot()
+
+    if (uploadId) {
+      await this.multipart.abort(path, uploadId)
+      return
     }
 
-    if (!storage.uploadId) {
-      try {
-        await this.storage.discard(storage)
-      } catch {
-        // Não encontrar o objeto é o caso comum, e é o resultado que se queria.
-      }
+    try {
+      await this.bucket.discard(path)
+    } catch {
+      // Não encontrar o objeto é o caso comum, e é o resultado que se queria.
     }
-
-    await storage.delete()
   }
 }

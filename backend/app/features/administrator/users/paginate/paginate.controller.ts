@@ -1,10 +1,11 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { USER_SORT_COLUMNS } from '@interclasse/shared'
 
 import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { UserPaginateValidator, USER_SORT_COLUMNS } from '#validators/administrator/users.validator'
+import { AdministratorUserPaginateValidator } from '#validators/administrator/users.validator'
 
 @inject()
 export default class AdministratorUserPaginateController {
@@ -23,7 +24,7 @@ export default class AdministratorUserPaginateController {
   constructor(private readonly useCase: AdministratorUserPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(UserPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorUserPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

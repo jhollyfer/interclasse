@@ -1,18 +1,18 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { StoragesFileUploadResponse } from '@interclasse/shared'
 
 import StoragesFilePartsUseCase from './parts.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
-import { StorageUploadResponse } from '#core/openapi/response'
-import { PART_SIZE, PRESIGNED_BATCH } from '#services/multipart/multipart-contract.service'
+import { PART_SIZE, PRESIGNED_BATCH } from '#services/multipart/multipart.contract'
 
 @inject()
 export default class StoragesFilePartsController {
   static docs = defineDocs({
     summary: 'Retomar upload de arquivo',
-    responses: { 200: StorageUploadResponse },
+    responses: { 200: StoragesFileUploadResponse },
     description:
       'De onde continuar: em `uploaded`, o que o bucket já recebeu; em `parts`, URL nova para ' +
       'o que falta.\n\n' +

@@ -3,9 +3,9 @@ import type { ApplicationService } from '@adonisjs/core/types'
 
 import { clientConfig } from '#config/drive'
 import Storage from '#models/storage'
-import { MultipartContract } from '#services/multipart/multipart-contract.service'
+import { MultipartContract } from '#services/multipart/multipart.contract'
 import MultipartService from '#services/multipart/multipart.service'
-import { StorageContract } from '#services/storage/storage-contract.service'
+import { StorageContract } from '#services/storage/storage.contract'
 import StorageService from '#services/storage/storage.service'
 
 /**
@@ -35,12 +35,12 @@ export default class StorageProvider {
     const storage = await this.app.container.make(StorageContract)
 
     Storage.after('find', async (row) => {
-      row.$extras.url = await storage.signedUrl(row)
+      row.$extras.url = await storage.signedUrl(row.path)
     })
     Storage.after('fetch', async (rows) => {
       await Promise.all(
         rows.map(async (row) => {
-          row.$extras.url = await storage.signedUrl(row)
+          row.$extras.url = await storage.signedUrl(row.path)
         }),
       )
     })
