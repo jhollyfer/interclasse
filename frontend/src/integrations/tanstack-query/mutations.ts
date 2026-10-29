@@ -69,6 +69,7 @@ import type { EnrollmentUpdatePayload as RepresentativeEnrollmentUpdatePayload }
 
 import type { HTTPError } from './http'
 import { request, send } from './http'
+import { shouldRetryQuery } from './query-context'
 
 // ---------------------------------------------------------------------------
 // /account
@@ -470,6 +471,11 @@ export function useBracketCreate(
   options?: MutationProps<IBracket, BracketCreatePayload>,
 ) {
   return useMutation<IBracket, HTTPError, BracketCreatePayload>({
+    // Mutation não repete por padrão, porque repetir escrita duplica. O sorteio
+    // pode: a API é idempotente por modalidade e categoria e devolve a chave
+    // que já existe. Sem isto, a queda de rede depois do commit mostrava erro
+    // com a chave criada (_doc-lib/tanstack-query.md#guides/mutations, "Retry").
+    retry: shouldRetryQuery,
     ...options,
     mutationFn: function (payload) {
       return request<IBracket>('/administrator/brackets', {
