@@ -30,8 +30,8 @@ test.group('Classroom', () => {
   test('nasce com a categoria derivada e a edição carimbada', ({ assert }) => {
     const created = Classroom.create({ id: 'id', name: '4º B', grade: 4, now: NOW }, {})
 
-    assert.isTrue(created.isRight())
-    assert.deepInclude(created.isRight() ? created.value.snapshot() : {}, {
+    if (created.isLeft()) throw new Error('turma recusada')
+    assert.deepInclude(created.value.snapshot(), {
       category: 'F1',
       advisorId: null,
       representativeId: null,
@@ -41,10 +41,7 @@ test.group('Classroom', () => {
 
   test('recusa ano fora do 3º ao 9º ao nascer e ao mudar', ({ assert }) => {
     const born = Classroom.create({ id: 'id', name: '2º A', grade: 2, now: NOW }, {})
-    const changed = sevenA().update(
-      { grade: 10 },
-      { facts: {}, inCompetition: false, now: LATER },
-    )
+    const changed = sevenA().update({ grade: 10 }, { facts: {}, inCompetition: false, now: LATER })
 
     assert.deepEqual(born.value, { code: 'CLASSROOM_INVALID_GRADE' })
     assert.deepEqual(changed.value, { code: 'CLASSROOM_INVALID_GRADE' })
@@ -122,10 +119,7 @@ test.group('Classroom', () => {
 
   test('mudar o ano para outra categoria recalcula a categoria', ({ assert }) => {
     const classroom = sevenA()
-    const result = classroom.update(
-      { grade: 5 },
-      { facts: {}, inCompetition: false, now: LATER },
-    )
+    const result = classroom.update({ grade: 5 }, { facts: {}, inCompetition: false, now: LATER })
 
     assert.isTrue(result.isRight())
     assert.deepInclude(classroom.snapshot(), { grade: 5, category: 'F1', updatedAt: LATER })

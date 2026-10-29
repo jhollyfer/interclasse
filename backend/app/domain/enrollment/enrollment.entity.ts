@@ -17,8 +17,7 @@ export type EnrollmentProps = {
  * não muda a chave. Tirar atleta exige o motivo.
  */
 export type EnrollmentWriter =
-  | { readonly role: 'representative' }
-  | { readonly role: 'advisor'; readonly reason?: string }
+  { readonly role: 'representative' } | { readonly role: 'advisor'; readonly reason?: string }
 
 /** O que a troca da lista deixou para trás: quem saiu dela. */
 export type EnrollmentReplaced = { readonly removedStudentIds: string[] }

@@ -39,7 +39,8 @@ export class EnrollmentRemoval {
     readonly actorRole: UserRole
     readonly now: Date
   }): EnrollmentRemoval {
-    const byAdministrator = input.actorRole === USER_ROLE.ADMINISTRATOR
+    let acknowledgedAt: Date | null = null
+    if (input.actorRole === USER_ROLE.ADMINISTRATOR) acknowledgedAt = input.now
 
     return new EnrollmentRemoval({
       id: input.id,
@@ -49,7 +50,7 @@ export class EnrollmentRemoval {
       studentName: input.studentName,
       reason: input.reason,
       actorId: input.actorId,
-      acknowledgedAt: byAdministrator ? input.now : null,
+      acknowledgedAt,
       createdAt: input.now,
       updatedAt: input.now,
     })
