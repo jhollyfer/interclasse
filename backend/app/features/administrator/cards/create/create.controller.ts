@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorCardCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { CardCreateValidator } from '#features/administrator/cards/cards.validator'
+import { CardCreateValidator } from '#validators/administrator/cards.validator'
 
 @inject()
 export default class AdministratorCardCreateController {

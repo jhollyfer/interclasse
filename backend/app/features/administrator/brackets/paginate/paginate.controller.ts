@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorBracketPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketPaginateValidator } from '#features/administrator/brackets/brackets.validator'
+import { BracketPaginateValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketPaginateController {

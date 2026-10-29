@@ -4,10 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StoragesFilePaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import {
-  FilePaginateValidator,
-  STORAGE_SORT_COLUMNS,
-} from '#features/storages/files/files.validator'
+import { FilePaginateValidator, STORAGE_SORT_COLUMNS } from '#validators/storages/files.validator'
 import { STORAGE_MIMETYPES } from '#core/validator'
 
 @inject()

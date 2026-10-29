@@ -7,7 +7,7 @@ import User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
 import { sortOrder } from '#features/_shared.sort'
 import { applyTrashed } from '#features/_shared.trashed'
-import type { UserPaginatePayload } from '#features/administrator/users/users.validator'
+import type { UserPaginatePayload } from '#validators/administrator/users.validator'
 
 type Payload = UserPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

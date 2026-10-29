@@ -5,7 +5,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 
 import EnrollmentRemoval from '#models/enrollment-removal'
 import HTTPException from '#exceptions/http.exception'
-import type { EnrollmentRemovalPaginatePayload } from '#features/administrator/enrollment-removals/enrollment-removals.validator'
+import type { EnrollmentRemovalPaginatePayload } from '#validators/administrator/enrollment-removals.validator'
 
 type Payload = EnrollmentRemovalPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

@@ -7,7 +7,7 @@ import { defineDocs } from '#core/openapi/types'
 import {
   SportPaginateValidator,
   SPORT_SORT_COLUMNS,
-} from '#features/administrator/sports/sports.validator'
+} from '#validators/administrator/sports.validator'
 
 @inject()
 export default class AdministratorSportPaginateController {

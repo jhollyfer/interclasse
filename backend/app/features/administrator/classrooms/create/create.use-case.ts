@@ -7,7 +7,7 @@ import ClassroomService from '#services/classroom/classroom.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
 import { categoryOf, classroomConflict } from '#features/administrator/_shared.classroom'
-import type { ClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { ClassroomCreatePayload } from '#validators/administrator/classrooms.validator'
 
 type Payload = ClassroomCreatePayload
 type Response = Either<HTTPException, Classroom>

@@ -6,7 +6,7 @@ import Classroom from '#models/classroom'
 import type User from '#models/user'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import HTTPException from '#exceptions/http.exception'
-import type { EnrollmentUpdatePayload } from '#features/advisor/enrollments/enrollments.validator'
+import type { EnrollmentUpdatePayload } from '#validators/advisor/enrollments.validator'
 
 type Payload = Merge<EnrollmentUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, EnrollmentBoard>

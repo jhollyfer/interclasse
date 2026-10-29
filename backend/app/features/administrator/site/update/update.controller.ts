@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorSiteUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { SiteUpdateValidator } from '#features/administrator/site/site.validator'
+import { SiteUpdateValidator } from '#validators/administrator/site.validator'
 
 @inject()
 export default class AdministratorSiteUpdateController {

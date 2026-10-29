@@ -6,7 +6,7 @@ import AdvisorCardPaginateUseCase from './paginate.use-case.ts'
 import Classroom from '#models/classroom'
 import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { CardPaginateValidator } from '#features/advisor/cards/cards.validator'
+import { CardPaginateValidator } from '#validators/advisor/cards.validator'
 
 @inject()
 export default class AdvisorCardPaginateController {

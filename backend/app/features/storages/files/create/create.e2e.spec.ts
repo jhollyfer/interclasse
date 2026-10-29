@@ -3,9 +3,9 @@ import type { ApiClient } from '@japa/api-client'
 
 import Storage from '#models/storage'
 import { PART_SIZE } from '#services/multipart/multipart-contract.service'
-import { FileCreateValidator } from '#features/storages/files/files.validator'
+import { FileCreateValidator } from '#validators/storages/files.validator'
 import { type StorageMimetype } from '#core/validator'
-import { UPLOAD_MAX_SIZE } from '#features/storages/files/files.validator'
+import { UPLOAD_MAX_SIZE } from '#validators/storages/files.validator'
 import { authenticateAsAdministrator, body, resetDatabase, type ResponseBody } from '#tests/helpers'
 import type { Session } from '#tests/helpers'
 

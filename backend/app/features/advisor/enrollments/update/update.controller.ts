@@ -6,7 +6,7 @@ import AdvisorEnrollmentUpdateUseCase from './update.use-case.ts'
 import Classroom from '#models/classroom'
 import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { EnrollmentUpdateValidator } from '#features/advisor/enrollments/enrollments.validator'
+import { EnrollmentUpdateValidator } from '#validators/advisor/enrollments.validator'
 
 @inject()
 export default class AdvisorEnrollmentUpdateController {

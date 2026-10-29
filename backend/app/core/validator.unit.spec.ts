@@ -45,12 +45,12 @@ function branch(node: unknown, key: string): Array<unknown> {
 
 /**
  * Todo validator do projeto: os globais de `#core/validator` e o
- * `<recurso>.validator.ts` de cada recurso em `app/features` (_standards/backend.md
+ * `<recurso>.validator.ts` de cada recurso em `app/validators` (_standards/backend.md
  * §4.4). O glob
  * é o que deixa quebrar o validator por recurso sem perder a rede.
  */
 const modulos: Array<Record<string, unknown>> = [core]
-for await (const arquivo of glob('app/features/**/*.validator.ts', { cwd: app.appRoot.pathname })) {
+for await (const arquivo of glob('app/validators/**/*.validator.ts', { cwd: app.appRoot.pathname })) {
   modulos.push(await import(pathToFileURL(app.makePath(arquivo)).href))
 }
 

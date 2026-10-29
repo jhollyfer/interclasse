@@ -5,7 +5,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 
 import CardService from '#services/card/card.service'
 import HTTPException from '#exceptions/http.exception'
-import type { CardPaginatePayload } from '#features/advisor/cards/cards.validator'
+import type { CardPaginatePayload } from '#validators/advisor/cards.validator'
 
 type Payload = CardPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

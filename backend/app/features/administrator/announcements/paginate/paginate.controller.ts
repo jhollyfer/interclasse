@@ -7,7 +7,7 @@ import { defineDocs } from '#core/openapi/types'
 import {
   ANNOUNCEMENT_SORT_COLUMNS,
   AnnouncementPaginateValidator,
-} from '#features/administrator/announcements/announcements.validator'
+} from '#validators/administrator/announcements.validator'
 
 @inject()
 export default class AdministratorAnnouncementPaginateController {

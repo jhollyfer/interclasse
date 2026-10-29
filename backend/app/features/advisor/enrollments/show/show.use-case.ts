@@ -5,7 +5,7 @@ import { left, right, type Either } from '@interclasse/shared'
 import Classroom from '#models/classroom'
 import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
 import HTTPException from '#exceptions/http.exception'
-import type { EnrollmentShowPayload } from '#features/advisor/enrollments/enrollments.validator'
+import type { EnrollmentShowPayload } from '#validators/advisor/enrollments.validator'
 
 type Payload = EnrollmentShowPayload
 type Response = Either<HTTPException, EnrollmentBoard>

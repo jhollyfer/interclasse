@@ -6,7 +6,7 @@ import Sport from '#models/sport'
 import SlugService from '#services/slug/slug.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { SportCreatePayload } from '#features/administrator/sports/sports.validator'
+import type { SportCreatePayload } from '#validators/administrator/sports.validator'
 
 type Payload = SportCreatePayload
 type Response = Either<HTTPException, Sport>

@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import AccountProfileUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { ProfileUpdateValidator } from '#features/account/profile/profile.validator'
+import { ProfileUpdateValidator } from '#validators/account/profile.validator'
 
 @inject()
 export default class AccountProfileUpdateController {

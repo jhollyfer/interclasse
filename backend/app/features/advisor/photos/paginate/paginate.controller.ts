@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdvisorPhotoPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { PhotoPaginateValidator } from '#features/advisor/photos/photos.validator'
+import { PhotoPaginateValidator } from '#validators/advisor/photos.validator'
 
 @inject()
 export default class AdvisorPhotoPaginateController {

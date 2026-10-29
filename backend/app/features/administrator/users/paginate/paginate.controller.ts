@@ -4,10 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import {
-  UserPaginateValidator,
-  USER_SORT_COLUMNS,
-} from '#features/administrator/users/users.validator'
+import { UserPaginateValidator, USER_SORT_COLUMNS } from '#validators/administrator/users.validator'
 
 @inject()
 export default class AdministratorUserPaginateController {

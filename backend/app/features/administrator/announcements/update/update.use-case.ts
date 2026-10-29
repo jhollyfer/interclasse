@@ -4,7 +4,7 @@ import { left, right, type Either, type Merge } from '@interclasse/shared'
 
 import Announcement from '#models/announcement'
 import HTTPException from '#exceptions/http.exception'
-import type { AnnouncementUpdatePayload } from '#features/administrator/announcements/announcements.validator'
+import type { AnnouncementUpdatePayload } from '#validators/administrator/announcements.validator'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = Merge<AnnouncementUpdatePayload, IdentifierPayload>

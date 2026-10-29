@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorMatchScoreUseCase from './score.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchScoreValidator } from '#features/administrator/matches/matches.validator'
+import { MatchScoreValidator } from '#validators/administrator/matches.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

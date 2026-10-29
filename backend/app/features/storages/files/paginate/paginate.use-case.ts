@@ -6,7 +6,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 import Storage from '#models/storage'
 import HTTPException from '#exceptions/http.exception'
 import { recentFirst } from '#features/_shared.sort'
-import type { FilePaginatePayload } from '#features/storages/files/files.validator'
+import type { FilePaginatePayload } from '#validators/storages/files.validator'
 
 type Payload = FilePaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

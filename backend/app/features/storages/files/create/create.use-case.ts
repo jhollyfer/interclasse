@@ -12,7 +12,7 @@ import {
   type PresignedPart,
 } from '#services/multipart/multipart-contract.service'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
-import type { FileCreatePayload } from '#features/storages/files/files.validator'
+import type { FileCreatePayload } from '#validators/storages/files.validator'
 
 type Payload = FileCreatePayload
 

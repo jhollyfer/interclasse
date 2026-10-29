@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorClassroomUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { ClassroomUpdateValidator } from '#features/administrator/classrooms/classrooms.validator'
+import { ClassroomUpdateValidator } from '#validators/administrator/classrooms.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()

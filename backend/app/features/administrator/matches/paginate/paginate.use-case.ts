@@ -5,7 +5,7 @@ import { PAGINATION, left, right, type Either, type Paginated } from '@interclas
 
 import MatchService from '#services/match/match.service'
 import HTTPException from '#exceptions/http.exception'
-import type { MatchPaginatePayload } from '#features/administrator/matches/matches.validator'
+import type { MatchPaginatePayload } from '#validators/administrator/matches.validator'
 
 type Payload = MatchPaginatePayload
 type Response = Either<HTTPException, Paginated<ModelObject>>

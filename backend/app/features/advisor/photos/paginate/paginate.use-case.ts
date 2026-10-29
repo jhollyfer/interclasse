@@ -13,7 +13,7 @@ import {
 import Photo from '#models/photo'
 import type User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
-import type { PhotoPaginatePayload } from '#features/advisor/photos/photos.validator'
+import type { PhotoPaginatePayload } from '#validators/advisor/photos.validator'
 
 type Payload = Merge<PhotoPaginatePayload, { actor: User }>
 type Response = Either<HTTPException, Paginated<ModelObject>>

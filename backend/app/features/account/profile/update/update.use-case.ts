@@ -9,7 +9,7 @@ import SessionService from '#services/session/session.service'
 import { StorageContract } from '#services/storage/storage-contract.service'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { ProfileUpdatePayload } from '#features/account/profile/profile.validator'
+import type { ProfileUpdatePayload } from '#validators/account/profile.validator'
 
 type Payload = Merge<ProfileUpdatePayload, { actor: User }>
 type Response = Either<HTTPException, User>

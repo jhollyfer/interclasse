@@ -6,7 +6,7 @@ import SiteSetting from '#models/site-setting'
 import Storage from '#models/storage'
 import SiteService from '#services/site/site.service'
 import HTTPException from '#exceptions/http.exception'
-import type { SiteUpdatePayload } from '#features/administrator/site/site.validator'
+import type { SiteUpdatePayload } from '#validators/administrator/site.validator'
 
 type Payload = SiteUpdatePayload
 type Response = Either<HTTPException, SiteSetting>

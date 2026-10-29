@@ -15,7 +15,7 @@ import Classroom from '#models/classroom'
 import Student from '#models/student'
 import type User from '#models/user'
 import HTTPException from '#exceptions/http.exception'
-import type { StudentPaginatePayload } from '#features/advisor/students/students.validator'
+import type { StudentPaginatePayload } from '#validators/advisor/students.validator'
 
 type Payload = Merge<StudentPaginatePayload, { actor: User }>
 type Response = Either<HTTPException, Paginated<ModelObject>>

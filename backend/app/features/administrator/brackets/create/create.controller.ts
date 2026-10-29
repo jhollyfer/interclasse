@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorBracketCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { BracketCreateValidator } from '#features/administrator/brackets/brackets.validator'
+import { BracketCreateValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketCreateController {
