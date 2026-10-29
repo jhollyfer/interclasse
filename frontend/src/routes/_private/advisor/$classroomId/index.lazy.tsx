@@ -1,7 +1,13 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-import { ClassroomPage } from '../-components/classroom-page'
+import { ClassroomDetail } from '#/components/common/classroom-detail'
 
 export const Route = createLazyFileRoute('/_private/advisor/$classroomId/')({
-  component: ClassroomPage,
+  component: AdvisorClassroom,
 })
+
+function AdvisorClassroom(): React.JSX.Element {
+  const { classroomId } = Route.useParams()
+
+  return <ClassroomDetail classroomId={classroomId} />
+}

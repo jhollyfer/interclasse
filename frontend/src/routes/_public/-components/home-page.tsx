@@ -7,6 +7,7 @@ import {
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
 } from '#/integrations/tanstack-query/queries'
+import { Agenda } from '#/components/common/match-agenda'
 
 import {
   HOME_ANNOUNCEMENTS,
@@ -15,7 +16,6 @@ import {
   HOME_RESULTS,
 } from '../index'
 import { AnnouncementList } from './announcement-list'
-import { Agenda } from './match-row'
 import { NextMatch } from './next-match'
 import { ResultsTicker } from './results-ticker'
 import { StandingsExplorer } from './standings-explorer'

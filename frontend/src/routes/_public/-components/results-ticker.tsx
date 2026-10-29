@@ -1,8 +1,7 @@
 import type * as React from 'react'
 
 import type { IMatch } from '#/lib/interfaces'
-
-import { phaseLabel } from './match-row'
+import { phaseLabel } from '#/components/common/match-agenda'
 
 /**
  * A faixa amarela de resultados, a marca do site anterior.

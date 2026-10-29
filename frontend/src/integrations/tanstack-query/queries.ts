@@ -44,6 +44,7 @@ export type MatchListSearch = Merge<
   StorefrontSearch,
   {
     bracketId?: string
+    classroomId?: string
     sportId?: string
     category?: string
     phase?: string

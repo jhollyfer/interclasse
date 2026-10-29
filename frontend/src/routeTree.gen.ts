@@ -41,6 +41,7 @@ import { Route as PrivateProfileEditIndexRouteImport } from './routes/_private/p
 import { Route as PublicClassificacaoIdIndexRouteImport } from './routes/_public/classificacao/$id/index'
 import { Route as PrivateAdministratorAnnouncementsNewIndexRouteImport } from './routes/_private/administrator/announcements/new/index'
 import { Route as PrivateAdministratorBracketsIdIndexRouteImport } from './routes/_private/administrator/brackets/$id/index'
+import { Route as PrivateAdministratorClassroomsIdIndexRouteImport } from './routes/_private/administrator/classrooms/$id/index'
 import { Route as PrivateAdministratorClassroomsNewIndexRouteImport } from './routes/_private/administrator/classrooms/new/index'
 import { Route as PrivateAdministratorSportsNewIndexRouteImport } from './routes/_private/administrator/sports/new/index'
 import { Route as PrivateAdministratorUsersIdIndexRouteImport } from './routes/_private/administrator/users/$id/index'
@@ -293,6 +294,16 @@ const PrivateAdministratorBracketsIdIndexRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorClassroomsIdIndexRoute =
+  PrivateAdministratorClassroomsIdIndexRouteImport.update({
+    id: '/classrooms/$id/',
+    path: '/classrooms/$id/',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/classrooms/$id/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorClassroomsNewIndexRoute =
   PrivateAdministratorClassroomsNewIndexRouteImport.update({
     id: '/classrooms/new/',
@@ -405,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
   '/administrator/announcements/new/': typeof PrivateAdministratorAnnouncementsNewIndexRoute
   '/administrator/brackets/$id/': typeof PrivateAdministratorBracketsIdIndexRoute
+  '/administrator/classrooms/$id/': typeof PrivateAdministratorClassroomsIdIndexRoute
   '/administrator/classrooms/new/': typeof PrivateAdministratorClassroomsNewIndexRoute
   '/administrator/sports/new/': typeof PrivateAdministratorSportsNewIndexRoute
   '/administrator/users/$id/': typeof PrivateAdministratorUsersIdIndexRoute
@@ -441,6 +453,7 @@ export interface FileRoutesByTo {
   '/classificacao/$id': typeof PublicClassificacaoIdIndexRoute
   '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewIndexRoute
   '/administrator/brackets/$id': typeof PrivateAdministratorBracketsIdIndexRoute
+  '/administrator/classrooms/$id': typeof PrivateAdministratorClassroomsIdIndexRoute
   '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewIndexRoute
   '/administrator/sports/new': typeof PrivateAdministratorSportsNewIndexRoute
   '/administrator/users/$id': typeof PrivateAdministratorUsersIdIndexRoute
@@ -484,6 +497,7 @@ export interface FileRoutesById {
   '/_public/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
   '/_private/administrator/announcements/new/': typeof PrivateAdministratorAnnouncementsNewIndexRoute
   '/_private/administrator/brackets/$id/': typeof PrivateAdministratorBracketsIdIndexRoute
+  '/_private/administrator/classrooms/$id/': typeof PrivateAdministratorClassroomsIdIndexRoute
   '/_private/administrator/classrooms/new/': typeof PrivateAdministratorClassroomsNewIndexRoute
   '/_private/administrator/sports/new/': typeof PrivateAdministratorSportsNewIndexRoute
   '/_private/administrator/users/$id/': typeof PrivateAdministratorUsersIdIndexRoute
@@ -526,6 +540,7 @@ export interface FileRouteTypes {
     | '/classificacao/$id/'
     | '/administrator/announcements/new/'
     | '/administrator/brackets/$id/'
+    | '/administrator/classrooms/$id/'
     | '/administrator/classrooms/new/'
     | '/administrator/sports/new/'
     | '/administrator/users/$id/'
@@ -562,6 +577,7 @@ export interface FileRouteTypes {
     | '/classificacao/$id'
     | '/administrator/announcements/new'
     | '/administrator/brackets/$id'
+    | '/administrator/classrooms/$id'
     | '/administrator/classrooms/new'
     | '/administrator/sports/new'
     | '/administrator/users/$id'
@@ -604,6 +620,7 @@ export interface FileRouteTypes {
     | '/_public/classificacao/$id/'
     | '/_private/administrator/announcements/new/'
     | '/_private/administrator/brackets/$id/'
+    | '/_private/administrator/classrooms/$id/'
     | '/_private/administrator/classrooms/new/'
     | '/_private/administrator/sports/new/'
     | '/_private/administrator/users/$id/'
@@ -847,6 +864,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorBracketsIdIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
+    '/_private/administrator/classrooms/$id/': {
+      id: '/_private/administrator/classrooms/$id/'
+      path: '/classrooms/$id'
+      fullPath: '/administrator/classrooms/$id/'
+      preLoaderRoute: typeof PrivateAdministratorClassroomsIdIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
     '/_private/administrator/classrooms/new/': {
       id: '/_private/administrator/classrooms/new/'
       path: '/classrooms/new'
@@ -919,6 +943,7 @@ interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
   PrivateAdministratorAnnouncementsNewIndexRoute: typeof PrivateAdministratorAnnouncementsNewIndexRoute
   PrivateAdministratorBracketsIdIndexRoute: typeof PrivateAdministratorBracketsIdIndexRoute
+  PrivateAdministratorClassroomsIdIndexRoute: typeof PrivateAdministratorClassroomsIdIndexRoute
   PrivateAdministratorClassroomsNewIndexRoute: typeof PrivateAdministratorClassroomsNewIndexRoute
   PrivateAdministratorSportsNewIndexRoute: typeof PrivateAdministratorSportsNewIndexRoute
   PrivateAdministratorUsersIdIndexRoute: typeof PrivateAdministratorUsersIdIndexRoute
@@ -951,6 +976,8 @@ const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteCh
       PrivateAdministratorAnnouncementsNewIndexRoute,
     PrivateAdministratorBracketsIdIndexRoute:
       PrivateAdministratorBracketsIdIndexRoute,
+    PrivateAdministratorClassroomsIdIndexRoute:
+      PrivateAdministratorClassroomsIdIndexRoute,
     PrivateAdministratorClassroomsNewIndexRoute:
       PrivateAdministratorClassroomsNewIndexRoute,
     PrivateAdministratorSportsNewIndexRoute:

@@ -2,8 +2,7 @@ import type * as React from 'react'
 
 import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import type { IMatch } from '#/lib/interfaces'
-
-import { phaseLabel, scoreOf } from './match-row'
+import { phaseLabel, scoreOf } from '#/components/common/match-agenda'
 
 /**
  * O placar do herói: o próximo jogo, ou o último resultado quando não há jogo

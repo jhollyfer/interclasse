@@ -1,9 +1,9 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-import { ClassroomsTable } from './-components/table'
+import { ClassroomGrid } from './-components/classroom-grid'
 
 export const Route = createLazyFileRoute('/_private/administrator/classrooms/')(
   {
-    component: ClassroomsTable,
+    component: ClassroomGrid,
   },
 )

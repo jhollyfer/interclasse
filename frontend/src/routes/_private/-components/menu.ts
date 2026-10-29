@@ -49,7 +49,7 @@ const ORGANIZATION = linkOptions([
 ])
 
 const ADVISOR = linkOptions([
-  { to: '/advisor', label: 'Minhas turmas', icon: StudentIcon },
+  { to: '/advisor', label: 'Minha turma', icon: StudentIcon },
 ])
 
 const REPRESENTATIVE = linkOptions([
@@ -88,7 +88,9 @@ export const MENU: ReadonlyArray<MenuGroup> = [
   {
     label: 'Conselheiro',
     items: ADVISOR,
-    roles: [USER_ROLE.ADMINISTRATOR, USER_ROLE.ADVISOR],
+    // Só o conselheiro: o administrador vê todas as turmas em "Turmas", e o
+    // item repetido aqui era a mesma tela em dobro.
+    roles: [USER_ROLE.ADVISOR],
   },
   {
     label: 'Representante',
