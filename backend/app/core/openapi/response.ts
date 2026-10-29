@@ -10,6 +10,7 @@ import {
 } from '@interclasse/shared'
 import {
   AdministratorPhotoShowResponse,
+  AdministratorReportShowResponse,
   AdministratorSportShowResponse,
   AdvisorPhotoShowResponse,
   StorefrontPhotoShowResponse,
@@ -317,47 +318,6 @@ export const StorefrontSiteResponse = vine.create({
     .nullable(),
 })
 
-/** O relatório dos jogos: totais, por categoria, por modalidade e por turma. */
-export const ReportResponse = vine.create({
-  totals: vine.object({
-    classrooms: vine.number(),
-    students: vine.number(),
-    athletes: vine.number(),
-    enrollments: vine.number(),
-    sports: vine.number(),
-    matchesPlayed: vine.number(),
-    matchesScheduled: vine.number(),
-  }),
-  byCategory: vine.array(
-    vine.object({
-      category: vine.enum(CATEGORIES),
-      classrooms: vine.number(),
-      students: vine.number(),
-      athletes: vine.number(),
-    }),
-  ),
-  bySport: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      athletes: vine.number(),
-      classrooms: vine.number(),
-    }),
-  ),
-  classrooms: vine.array(
-    vine.object({
-      id: vine.string().uuid(),
-      name: vine.string(),
-      category: vine.enum(CATEGORIES),
-      advisor: vine.string().nullable(),
-      representative: vine.string().nullable(),
-      students: vine.number(),
-      athletes: vine.number(),
-      sports: vine.number(),
-    }),
-  ),
-})
-
 export const RESPONSES: Record<string, FeatureResponse> = {
   /**
    * `GET /account` e `PUT /account` respondem o mesmo recurso: a conta com o
@@ -401,7 +361,7 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/announcements': ANNOUNCEMENT,
   'administrator/site': SITE_SETTING,
   'administrator/photos': AdministratorPhotoShowResponse,
-  'administrator/reports': ReportResponse,
+  'administrator/reports': AdministratorReportShowResponse,
   'advisor/photos': AdvisorPhotoShowResponse,
 
   /**
