@@ -1,27 +1,37 @@
 import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
+/**
+ * O aviso, como o painel o publica. Par de caminho e nome do Zod de
+ * `shared/src/validators/administrator/announcements.validator.ts`.
+ */
 export const ANNOUNCEMENT_SORT_COLUMNS = ['title', 'createdAt'] as const
 
-export const AnnouncementCreateValidator = vine.create({
+export const AdministratorAnnouncementCreateValidator = vine.create({
   title: vine.string().trim().minLength(1).maxLength(160),
   body: vine.string().trim().minLength(1).maxLength(5000),
   pinned: vine.boolean().optional(),
 })
 
-export const AnnouncementUpdateValidator = vine.create({
+export const AdministratorAnnouncementUpdateValidator = vine.create({
   title: vine.string().trim().minLength(1).maxLength(160).optional().use(notNull()),
   body: vine.string().trim().minLength(1).maxLength(5000).optional().use(notNull()),
   pinned: vine.boolean().optional().use(notNull()),
 })
 
-export const AnnouncementPaginateValidator = vine.create({
+export const AdministratorAnnouncementPaginateValidator = vine.create({
   ...paginationFields(),
   ...sortFields(ANNOUNCEMENT_SORT_COLUMNS),
 })
 
-export type AnnouncementCreatePayload = Infer<typeof AnnouncementCreateValidator>
+export type AdministratorAnnouncementCreatePayload = Infer<
+  typeof AdministratorAnnouncementCreateValidator
+>
 
-export type AnnouncementUpdatePayload = Infer<typeof AnnouncementUpdateValidator>
+export type AdministratorAnnouncementUpdatePayload = Infer<
+  typeof AdministratorAnnouncementUpdateValidator
+>
 
-export type AnnouncementPaginatePayload = Infer<typeof AnnouncementPaginateValidator>
+export type AdministratorAnnouncementPaginatePayload = Infer<
+  typeof AdministratorAnnouncementPaginateValidator
+>

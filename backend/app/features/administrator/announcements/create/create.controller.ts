@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorAnnouncementCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { AnnouncementCreateValidator } from '#validators/administrator/announcements.validator'
+import { AdministratorAnnouncementCreateValidator } from '#validators/administrator/announcements.validator'
 
 @inject()
 export default class AdministratorAnnouncementCreateController {
@@ -15,7 +15,7 @@ export default class AdministratorAnnouncementCreateController {
   constructor(private readonly useCase: AdministratorAnnouncementCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AnnouncementCreateValidator)
+    const payload = await context.request.validateUsing(AdministratorAnnouncementCreateValidator)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

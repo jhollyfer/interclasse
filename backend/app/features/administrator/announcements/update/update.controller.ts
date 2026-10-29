@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorAnnouncementUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { AnnouncementUpdateValidator } from '#validators/administrator/announcements.validator'
+import { AdministratorAnnouncementUpdateValidator } from '#validators/administrator/announcements.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -16,7 +16,7 @@ export default class AdministratorAnnouncementUpdateController {
   constructor(private readonly useCase: AdministratorAnnouncementUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AnnouncementUpdateValidator)
+    const body = await context.request.validateUsing(AdministratorAnnouncementUpdateValidator)
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
