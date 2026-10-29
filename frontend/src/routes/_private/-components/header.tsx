@@ -14,6 +14,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -98,18 +99,24 @@ function AccountMenu(): React.JSX.Element {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel className="flex flex-col gap-0.5">
-          <span className="truncate font-medium">{account.name}</span>
-          <span className="truncate text-xs font-normal text-muted-foreground">
-            {account.email}
-          </span>
-        </DropdownMenuLabel>
+        {/* `DropdownMenuLabel` é o `Menu.GroupLabel` do Base UI e exige o
+            `Menu.Group` em volta: sem ele, abrir o menu lança "MenuGroupContext
+            is missing" e o ErrorBoundary do layout mostra a página de erro. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex flex-col gap-0.5">
+            <span className="truncate font-medium">{account.name}</span>
+            <span className="truncate text-xs font-normal text-muted-foreground">
+              {account.email}
+            </span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link to="/profile">Meu perfil</Link>} />
         <DropdownMenuSeparator />
         {/* `closeOnClick={false}`: o item é o gatilho do alerta, e sem isso o
             menu fecha e leva o gatilho embora antes do alerta abrir. */}
         <SignOutConfirm
+          nativeButton={false}
           trigger={
             <DropdownMenuItem closeOnClick={false}>Sair</DropdownMenuItem>
           }

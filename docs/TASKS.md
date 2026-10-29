@@ -1,48 +1,46 @@
 # Tarefas do projeto
 
-**<Projeto>** · divididas em fases
+**Interclasse** · divididas em fases
 
 > Roteiro do projeto. Detalhe de uma feature feita com `tlc-spec-driven` mora em
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** <28> tarefas · <6> feitas · <2> em andamento · <20> a fazer — atualizado AAAA-MM-DD
+**Resumo:** 13 tarefas · 2 feitas · 0 em andamento · 11 a fazer — atualizado 2026-10-29
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
 
-## Fase 1 · Base (<3/3>)
+## Fase 1 · Régua (1/2)
 
-<Objetivo da fase em uma linha.>
-
-| # | Tarefa | Prioridade | Status | Notas |
-|---|---|---|---|---|
-| 1.1 | Criar o projeto e o banco | Alta | Feita | |
-| 1.2 | Login do dono | Alta | Feita | |
-| 1.3 | Cadastro do cardápio | Média | Feita | |
-
-## Fase 2 · <Pedidos> (<0/3>)
+Trazer o projeto para o padrão Maiyu inteiro.
 
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
-| 2.1 | <Carrinho do cliente> | Alta | Em andamento | `.specs/features/carrinho/` |
-| 2.2 | <Horário de retirada> | Alta | A fazer | depende de 2.1 |
-| 2.3 | <Painel do balcão> | Média | A fazer | |
+| 1.1 | Sync do `maiyu-pattern` (`_standards/`, `docs/`, `AGENTS.md`) | Alta | Feita | `_padroes/` removido |
+| 1.2 | Migração estrutural (`shared/`, `domain/`, `repositories/`, queries por módulo, specs por ação) | Alta | A fazer | `_standards/MIGRATIONS.md`, seção interclasse |
+
+## Fase 2 · Pedidos do Geison, 29/10 (1/9)
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 2.1 | Menu da conta derrubava a tela ("Algo quebrou", 500) | Alta | Feita | `DropdownMenuLabel` fora de `DropdownMenuGroup` |
+| 2.2 | Sorteio da chave mostra erro mas cria a chave | Alta | A fazer | timeout de 15 s do cliente |
+| 2.3 | Excluir chave pela lista | Média | A fazer | endpoint já existe |
+| 2.4 | Classificação na home com abas por categoria e modalidade, sem sair da página | Alta | A fazer | |
+| 2.5 | Turmas do admin em cartões (F1/F2), detalhe com conselheiro e representante; conselheiro com uma turma só | Alta | A fazer | |
+| 2.6 | Página "Sobre o JIC" e Instagram no rodapé | Média | A fazer | |
+| 2.7 | Regulamento em PDF enviado pelo admin, para baixar no site | Média | A fazer | |
+| 2.8 | Carrossel de fotos: conselheiro envia, admin aprova | Média | A fazer | |
+| 2.9 | Relatórios (turmas, alunos, atletas) com CSV | Média | A fazer | |
+
+## Fase 3 · Achados da auditoria (0/2)
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 3.1 | Itens de `maiyu-pattern/_findings/interclasse.md` (B1–B4, I1–I5, T1–T4, C1–C6) | Média | A fazer | |
+| 3.2 | Segurança SEC-1..SEC-9 do mesmo arquivo | Alta | A fazer | SEC-1 `trustProxy` primeiro |
 
 ## Fase N · Ideias (fora do escopo atual)
 
-- <ideia> — <origem>
-
----
-
-## Como escrever uma tarefa
-
-| Campo | Exemplo |
-|---|---|
-| Tarefa | Criar formulário de tarefa |
-| Entradas | título e data de entrega |
-| Validação | título obrigatório |
-| Pronta quando | tarefa salva aparece na lista |
-
-Antes de começar, a tarefa tem: um resultado claro, dependências listadas, arquivos
-identificados e critério de aceite. Ao terminar: resultado revisado e status atualizado.
+- Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10
