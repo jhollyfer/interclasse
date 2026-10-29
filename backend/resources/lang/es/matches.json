@@ -1,0 +1,9 @@
+{
+  "not_found": "Partido no encontrado",
+  "teams_pending": "El partido aún no tiene los dos equipos definidos",
+  "winner_required": "Indica quién ganó",
+  "winner_required_field": "Empate: selecciona quién ganó en los penales",
+  "not_played": "El partido aún no tiene marcador",
+  "next_played_on_score": "El partido siguiente ya tiene marcador: corrígelo antes",
+  "next_played_on_unscore": "El partido siguiente ya tiene marcador: deshazlo antes"
+}

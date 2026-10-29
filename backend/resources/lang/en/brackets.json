@@ -1,0 +1,7 @@
+{
+  "not_found": "Bracket not found",
+  "sport_not_found": "Sport not found",
+  "not_enough_teams": "At least {minTeams} classes with {minAthletes} enrolled athletes are required",
+  "too_many_teams": "The bracket holds up to {maxTeams} classes",
+  "has_results": "The bracket already has scores: undo the scores before deleting it"
+}

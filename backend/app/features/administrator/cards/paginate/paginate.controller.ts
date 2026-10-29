@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorCardPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { CardPaginateValidator } from '#validators/administrator/cards.validator'
+import { AdministratorCardPaginateValidator } from '#validators/administrator/cards.validator'
 
 @inject()
 export default class AdministratorCardPaginateController {
@@ -17,7 +17,7 @@ export default class AdministratorCardPaginateController {
   constructor(private readonly useCase: AdministratorCardPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(CardPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorCardPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

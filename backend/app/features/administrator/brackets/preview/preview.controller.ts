@@ -4,8 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorBracketPreviewUseCase from './preview.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { DrawPreviewResponse } from '#core/openapi/response'
-import { BracketPreviewValidator } from '#validators/administrator/brackets.validator'
+import { AdministratorBracketPreviewValidator } from '#validators/administrator/brackets.validator'
 
 @inject()
 export default class AdministratorBracketPreviewController {
@@ -14,13 +13,12 @@ export default class AdministratorBracketPreviewController {
     description:
       'Quem entraria no sorteio agora: cada turma da categoria com quantos atletas inscreveu ' +
       'na modalidade, e se chegou ao mínimo. Não grava nada.',
-    responses: { 200: DrawPreviewResponse },
   })
 
   constructor(private readonly useCase: AdministratorBracketPreviewUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(BracketPreviewValidator, {
+    const payload = await context.request.validateUsing(AdministratorBracketPreviewValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)
