@@ -1,0 +1,5 @@
+{
+  "not_found": "Student not found",
+  "in_competition": "The student is enrolled in a sport already drawn",
+  "name_empty": "Enter the student name"
+}
