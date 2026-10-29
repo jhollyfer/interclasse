@@ -1,4 +1,4 @@
-import type * as React from 'react'
+import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
@@ -15,10 +15,10 @@ import {
   HOME_RESULTS,
 } from '../index'
 import { AnnouncementList } from './announcement-list'
-import { BracketIndex } from './bracket-index'
 import { Agenda } from './match-row'
 import { NextMatch } from './next-match'
 import { ResultsTicker } from './results-ticker'
+import { StandingsExplorer } from './standings-explorer'
 import {
   Empty,
   Section,
@@ -34,6 +34,7 @@ export function HomePage(): React.JSX.Element {
     storefrontAnnouncementsQueryOptions(HOME_ANNOUNCEMENTS),
   )
   const brackets = useQuery(storefrontBracketsQueryOptions(HOME_BRACKETS))
+  const [bracketId, setBracketId] = React.useState<string>()
 
   const upcoming = next.data?.data ?? []
   const finished = results.data?.data ?? []
@@ -94,7 +95,11 @@ export function HomePage(): React.JSX.Element {
         <SectionHeader>
           <SectionTitle>Classificação</SectionTitle>
         </SectionHeader>
-        <BracketIndex brackets={brackets.data?.data ?? []} />
+        <StandingsExplorer
+          brackets={brackets.data?.data ?? []}
+          selected={bracketId}
+          onSelect={setBracketId}
+        />
       </Section>
 
       <Section>
