@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "locale_switch_label": "Language",
+  "locale_pt_br": "Portuguese",
+  "locale_es": "Spanish",
+  "locale_en": "English"
+}

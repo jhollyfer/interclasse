@@ -20,5 +20,5 @@ if echo "$staged" | grep -qE '^(shared|backend)/'; then
 fi
 
 if echo "$staged" | grep -qE '^(shared|frontend)/'; then
-  (cd frontend && pnpm lint && pnpm typecheck && pnpm test) || exit 1
+  (cd frontend && pnpm i18n:compile && pnpm i18n:check && pnpm lint && pnpm typecheck && pnpm test) || exit 1
 fi

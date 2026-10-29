@@ -5,11 +5,21 @@ import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
+    // Os três idiomas (_standards/i18n.md §2): a URL é a fonte da verdade, com o
+    // pt-BR sem prefixo e `/es`, `/en` com prefixo. A estratégia é declarada: o
+    // padrão do compilador inclui `globalVariable`, que vaza o idioma entre
+    // requisições no servidor (_doc-lib/paraglide.md#/strategy, #/tanstack-start).
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/paraglide',
+      strategy: ['url', 'baseLocale'],
+    }),
     // As opções vão direto no plugin, que é a forma que o tipo declara:
     // `nitro(pluginConfig?: NitroPluginConfig)` com `NitroPluginConfig extends
     // NitroConfig` (nitro/dist/vite.d.mts).

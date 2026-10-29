@@ -11,3 +11,6 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# Saída do compilador do Paraglide: gerada no dev e no build (_standards/i18n.md §2).
+src/paraglide/

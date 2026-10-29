@@ -12,6 +12,7 @@ import {
 import { HTTPError } from '#/integrations/tanstack-query/http'
 
 import { getContext } from './integrations/tanstack-query/query-context'
+import { deLocalizeUrl, localizeUrl } from './paraglide/runtime'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -20,6 +21,12 @@ export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
     context,
+    // A árvore de rotas é uma só: `/es/jogos` entra como `/jogos` e sai com o
+    // prefixo do idioma atual (_doc-lib/tanstack-router.md#guide/url-rewrites).
+    rewrite: {
+      input: ({ url }) => deLocalizeUrl(url),
+      output: ({ url }) => localizeUrl(url),
+    },
     scrollRestoration: true,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,

@@ -10,6 +10,7 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { env } from '#/env'
+import { getLocale } from '#/paraglide/runtime'
 
 import * as server from './http.server'
 
@@ -342,7 +343,11 @@ async function perform(
    * binário vai do navegador direto ao bucket -, e um `Content-Type` esquecido
    * num envio futuro falharia do mesmo jeito.
    */
-  const headers: Record<string, string> = {}
+  // O idioma da tela vai junto (_standards/i18n.md §2): a API responde a
+  // mensagem de erro e a 422 nele. `Accept-Language` é cabeçalho da lista
+  // segura do CORS, então não cobra preflight. No SSR, `getLocale()` lê o idioma
+  // da requisição que o middleware do Paraglide abriu.
+  const headers: Record<string, string> = { 'Accept-Language': getLocale() }
   //
   // `init?.body &&` na frente: sem corpo não há tipo de conteúdo a declarar, e
   // um `Content-Type: application/json` num GET é cabeçalho que não descreve
