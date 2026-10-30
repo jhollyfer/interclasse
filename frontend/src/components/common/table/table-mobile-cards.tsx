@@ -96,7 +96,7 @@ export function TableMobileCards<TRow extends RowData>({
                   key={cell.id}
                   className="flex items-start justify-between gap-3"
                 >
-                  <dt className="max-w-[45%] shrink-0 truncate text-xs font-medium text-muted-foreground">
+                  <dt className="max-w-label shrink-0 truncate text-xs font-medium text-muted-foreground">
                     {labels.get(cell.column.id) ?? cell.column.id}
                   </dt>
                   <dd className="min-w-0 text-right text-sm break-words">

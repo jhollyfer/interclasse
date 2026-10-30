@@ -52,7 +52,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <a
         href={'#'.concat(MAIN_ID)}
-        className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+        className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-tooltip"
       >
         {m.public_skip_to_content()}
       </a>

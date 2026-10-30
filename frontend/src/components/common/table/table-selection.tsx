@@ -107,7 +107,7 @@ export function TableSelectionBar<TRow extends RowData>({
     <ButtonGroup
       data-slot="table-selection-bar"
       data-test-id="selection-bar"
-      className="sticky bottom-4 z-20 mx-auto max-w-[calc(100%-1rem)] flex-wrap items-center justify-center gap-3 rounded-lg border bg-background px-4 py-2 shadow-lg"
+      className="sticky bottom-4 z-sticky mx-auto max-w-bar flex-wrap items-center justify-center gap-3 rounded-lg border bg-background px-4 py-2 shadow-lg"
     >
       <ButtonGroupText className="border-0 bg-transparent px-0 text-sm font-medium">
         {label}

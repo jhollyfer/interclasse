@@ -93,13 +93,13 @@ export function PhotoCarousel(): React.JSX.Element | null {
         {photos.map((photo) => (
           <li
             key={photo.id}
-            className="w-full shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+            className="w-full shrink-0 snap-start sm:w-carousel-half lg:w-carousel-third"
           >
             <figure className="overflow-hidden rounded-lg border">
               <Picture
                 src={photo.url}
                 alt={photo.caption ?? m.public_photos_alt_fallback()}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-photo w-full object-cover"
                 width={800}
                 height={600}
                 placement="fold"

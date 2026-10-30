@@ -47,7 +47,7 @@ export function PhotoGrid({
             <Picture
               src={photo.storage.url}
               alt={photo.caption ?? m.common_photo_alt_default()}
-              className="aspect-[4/3] w-full object-cover"
+              className="aspect-photo w-full object-cover"
               width={800}
               height={600}
               placement="fold"

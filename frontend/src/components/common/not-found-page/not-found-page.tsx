@@ -42,7 +42,7 @@ export function NotFoundPage({
   return (
     <div
       data-slot="not-found-page"
-      className={cn('grid min-h-[70dvh] grid-cols-1 md:grid-cols-2', className)}
+      className={cn('grid min-h-stage grid-cols-1 md:grid-cols-2', className)}
       {...props}
     >
       <div className="flex flex-col justify-center bg-background px-8 py-12 md:px-16">
@@ -64,9 +64,9 @@ export function NotFoundPage({
 
       {/* O placar do site, e não um painel preto genérico: o troféu em cima,
           o código embaixo, sem um cobrir o outro. */}
-      <div className="hero relative flex h-[40dvh] flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
+      <div className="hero relative flex h-stage-half flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
         <TrophyIcon className="text-brand size-16 md:size-20" weight="fill" />
-        <span className="font-display text-brand text-[7rem] leading-none font-extrabold italic select-none md:text-[9rem]">
+        <span className="font-display text-brand text-error-code leading-none font-extrabold italic select-none md:text-error-code-lg">
           {code}
         </span>
       </div>

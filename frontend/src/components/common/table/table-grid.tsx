@@ -167,7 +167,7 @@ export function TableGrid<TRow extends RowData>({
           minWidth: '100%',
         }}
       >
-        <HeaderRoot className="sticky top-0 z-20 bg-background">
+        <HeaderRoot className="sticky top-0 z-sticky bg-background">
           {table.getHeaderGroups().map((group) => (
             <RowRoot key={group.id}>
               {group.headers.map((header) => (

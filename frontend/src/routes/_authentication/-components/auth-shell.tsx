@@ -135,7 +135,7 @@ function AuthShellAsideBody({
     <div
       data-slot="auth-shell-aside-body"
       className={cn(
-        'relative z-10 flex flex-1 flex-col items-center justify-center gap-6 py-10',
+        'relative z-dropdown flex flex-1 flex-col items-center justify-center gap-6 py-10',
         className,
       )}
       {...props}
@@ -155,10 +155,10 @@ function AuthShellTagline({
     <p
       data-slot="auth-shell-tagline"
       className={cn(
-        // A mesma largura da marca acima (`max-w-[320px]` na tela de entrada):
+        // A mesma largura da marca acima (`max-w-aside` na tela de entrada):
         // as duas peças formam um bloco só, e uma frase mais estreita que o
         // desenho leria como desalinhada em vez de centrada.
-        'max-w-[320px] text-center text-sm leading-relaxed font-light tracking-wide text-primary-foreground/60',
+        'max-w-aside text-center text-sm leading-relaxed font-light tracking-wide text-primary-foreground/60',
         className,
       )}
       {...props}

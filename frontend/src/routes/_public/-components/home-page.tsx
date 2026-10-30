@@ -60,7 +60,7 @@ export function HomePage(): React.JSX.Element {
             <p className="text-brand font-semibold">
               {m.public_home_edition()}
             </p>
-            <h1 className="font-display pb-1 text-5xl leading-[1.05] font-extrabold uppercase italic md:text-6xl">
+            <h1 className="font-display pb-1 text-5xl leading-display font-extrabold uppercase italic md:text-6xl">
               {m.public_home_title()}
             </h1>
             <p className="max-w-md text-lg text-brand-ink-foreground/80">
