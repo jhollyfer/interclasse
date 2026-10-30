@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AuthenticationSessionRefreshUseCase from './refresh.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
@@ -15,7 +15,7 @@ async function setup() {
   doubles.sessions.withRefresh('refresh-ok', GRANT)
   const useCase = await makeWithMemory(AuthenticationSessionRefreshUseCase, [
     [UserRepository, doubles.users],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
   ])
 
   return { ...doubles, useCase }

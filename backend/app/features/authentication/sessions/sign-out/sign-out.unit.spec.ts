@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 
 import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
 
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, USER_ID } from '#tests/identity-unit-fixtures'
 
@@ -13,7 +13,7 @@ async function setup() {
   doubles.sessions.withRefresh('refresh-ok', { userId: USER_ID, identifier: '8' })
   doubles.sessions.withRefresh('access-id', { userId: USER_ID, identifier: '7' })
   const useCase = await makeWithMemory(AuthenticationSessionSignOutUseCase, [
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
   ])
 
   return { ...doubles, useCase }

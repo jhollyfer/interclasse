@@ -6,7 +6,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract, type SessionTokens } from '#services/session/session.contract'
+import { SessionRepository, type SessionTokens } from '#repositories/session/session.repository'
 import type { AuthenticationSessionSignInPayload } from '#validators/authentication/sessions.validator'
 
 type Payload = AuthenticationSessionSignInPayload
@@ -24,7 +24,7 @@ type Response = Either<HTTPException, SessionTokens>
 export default class AuthenticationSessionSignInUseCase {
   constructor(
     private readonly users: UserRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly i18n: I18n,
   ) {}
 

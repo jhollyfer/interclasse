@@ -2,7 +2,7 @@ import app from '@adonisjs/core/services/app'
 import type { HttpContext } from '@adonisjs/core/http'
 
 import { corsOrigins } from '#config/cors'
-import type { SessionTokens } from '#services/session/session.contract'
+import type { SessionTokens } from '#repositories/session/session.repository'
 import env from '#start/env'
 
 /**

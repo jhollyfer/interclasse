@@ -5,7 +5,7 @@ import AdministratorUserArchiveUseCase from './archive.use-case.ts'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
@@ -13,7 +13,7 @@ async function setup() {
   const doubles = identityDoubles()
   const useCase = await makeWithMemory(AdministratorUserArchiveUseCase, [
     [UserRepository, doubles.users],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [ClassroomRepository, doubles.classrooms],
     [UnitOfWork, doubles.unitOfWork],
   ])

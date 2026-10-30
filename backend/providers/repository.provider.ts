@@ -28,8 +28,8 @@ import { StorageLucidRepository } from '#repositories/storage/storage.lucid.repo
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserLucidRepository } from '#repositories/user/user.lucid.repository'
 import { UserRepository } from '#repositories/user/user.repository'
-import SessionService from '#services/session/session.service'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionLucidRepository } from '#repositories/session/session.lucid.repository'
+import { SessionRepository } from '#repositories/session/session.repository'
 
 /**
  * O composition root da persistência (`_standards/architecture.md` §2,
@@ -67,7 +67,9 @@ export default class RepositoryProvider {
       this.app.container.make(StorageLucidRepository),
     )
     this.app.container.bind(UserRepository, () => this.app.container.make(UserLucidRepository))
-    this.app.container.bind(SessionContract, () => this.app.container.make(SessionService))
+    this.app.container.bind(SessionRepository, () =>
+      this.app.container.make(SessionLucidRepository),
+    )
     this.app.container.bind(BracketRepository, () =>
       this.app.container.make(BracketLucidRepository),
     )

@@ -5,23 +5,25 @@ import logger from '@adonisjs/core/services/logger'
 import User from '#models/user'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
 import {
-  SessionContract,
+  SessionRepository,
   type RefreshGrant,
   type SessionTokens,
-} from '#services/session/session.contract'
+} from '#repositories/session/session.repository'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 /** A tabela do `DbAccessTokensProvider`, criada pela migration de `auth_access_tokens`. */
 const SESSION_TABLE = 'auth_access_tokens'
 
 /**
- * Os tokens da sessão no banco: emitir, ler o de refresh e revogar.
+ * Os tokens da sessão no banco: emitir, ler o de refresh e revogar. A
+ * revogação em lote passa pela transação em curso, e é por isso que mora num
+ * repository e não num service de I/O externo.
  *
  * Separado do `CookieService`, que escreve a resposta HTTP: emitir token toca o
  * banco, escrever cookie toca o transporte, e são duas razões para mudar.
  */
 @inject()
-export default class SessionService extends SessionContract {
+export class SessionLucidRepository extends SessionRepository {
   constructor(private readonly transaction: TransactionContext) {
     super()
   }

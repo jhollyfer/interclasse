@@ -15,7 +15,7 @@ import HTTPException from '#exceptions/http.exception'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { FileRefusal } from '#features/storages/files/_shared.file-refusal'
 import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { AccountProfileUpdatePayload } from '#validators/account/profile.validator'
@@ -32,7 +32,7 @@ export default class AccountProfileUpdateUseCase {
   constructor(
     private readonly users: UserRepository,
     private readonly storages: StorageRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly unitOfWork: UnitOfWork,
     private readonly i18n: I18n,
   ) {}

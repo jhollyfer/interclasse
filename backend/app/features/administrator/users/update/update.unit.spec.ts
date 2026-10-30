@@ -7,7 +7,7 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
@@ -17,7 +17,7 @@ async function setup() {
   const useCase = await makeWithMemory(AdministratorUserUpdateUseCase, [
     [UserRepository, doubles.users],
     [StorageRepository, doubles.storages],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [ClassroomRepository, doubles.classrooms],
     [UnitOfWork, doubles.unitOfWork],
   ])

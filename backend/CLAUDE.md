@@ -16,7 +16,7 @@ use-case e da policy.
   `typescript-eslint` aceitar o 7.
 - **`moduleResolution: NodeNext`**, do preset instalado `@adonisjs/tsconfig`, e
   não `bundler` (`tooling.md` §3): o backend roda no Node, sem bundler.
-- **Revogação de sessão pela tabela.** `SessionService#revokeAll` apaga direto em
+- **Revogação de sessão pela tabela.** `SessionLucidRepository#revokeAll` apaga direto em
   `auth_access_tokens`, porque o provider do `@adonisjs/auth` não aceita
   transação e a revogação precisa cair junto com a escrita que a motiva.
 - **MinIO pelo fork `pgsty/*`.** As imagens `minio/*` saíram do Docker Hub.

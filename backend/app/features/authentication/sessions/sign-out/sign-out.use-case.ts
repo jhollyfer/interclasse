@@ -4,7 +4,7 @@ import logger from '@adonisjs/core/services/logger'
 import { left, right, type Actor, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 
 type Payload = {
   readonly actor: Actor
@@ -18,7 +18,7 @@ type Response = Either<HTTPException, null>
 @inject()
 export default class AuthenticationSessionSignOutUseCase {
   constructor(
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly i18n: I18n,
   ) {}
 

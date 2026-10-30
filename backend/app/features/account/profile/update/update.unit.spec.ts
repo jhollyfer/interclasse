@@ -6,7 +6,7 @@ import AccountProfileUpdateUseCase from './update.use-case.ts'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
 import {
   identityDoubles,
@@ -24,7 +24,7 @@ async function setup() {
   const useCase = await makeWithMemory(AccountProfileUpdateUseCase, [
     [UserRepository, doubles.users],
     [StorageRepository, doubles.storages],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [UnitOfWork, doubles.unitOfWork],
   ])
 

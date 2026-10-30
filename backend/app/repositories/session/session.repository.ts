@@ -11,14 +11,15 @@ export type RefreshGrant = {
 }
 
 /**
- * O contrato dos tokens da sessão (_standards/solid.md §2): emitir, ler o de
- * refresh e revogar. Quem escreve a resposta HTTP é o `CookieService`; quem
+ * A persistência dos tokens da sessão, por intenção (`_standards/domain.md`
+ * §5.1): emitir, ler o de refresh e revogar. É o escritor único de
+ * `auth_access_tokens`. Quem escreve a resposta HTTP é o `CookieService`; quem
  * decide quando emitir ou revogar é o use-case.
  *
  * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
- * tempo. O concreto é `SessionService`, ligado em `providers/repository.provider.ts`.
+ * tempo. O concreto é `SessionLucidRepository`, ligado em `providers/repository.provider.ts`.
  */
-export abstract class SessionContract {
+export abstract class SessionRepository {
   /** O par de tokens da conta. */
   abstract issue(userId: string): Promise<SessionTokens>
   /**

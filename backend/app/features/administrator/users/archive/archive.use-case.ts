@@ -7,7 +7,7 @@ import HTTPException from '#exceptions/http.exception'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -35,7 +35,7 @@ type Response = Either<HTTPException, null>
 export default class AdministratorUserArchiveUseCase {
   constructor(
     private readonly users: UserRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly classrooms: ClassroomRepository,
     private readonly unitOfWork: UnitOfWork,
     private readonly i18n: I18n,
