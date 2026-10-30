@@ -21,6 +21,11 @@ const bodyParserConfig = defineConfig({
      * Content types handled by the form parser.
      */
     types: ['application/x-www-form-urlencoded'],
+
+    /**
+     * Teto do corpo, explícito (_standards/backend.md §4.10).
+     */
+    limit: '1mb',
   },
 
   /**
@@ -41,36 +46,33 @@ const bodyParserConfig = defineConfig({
       'application/vnd.api+json',
       'application/csp-report',
     ],
+
+    /**
+     * Teto do corpo, explícito (_standards/backend.md §4.10).
+     */
+    limit: '1mb',
   },
 
   /**
-   * Config for the "multipart/form-data" content-type parser.
-   * File uploads are handled by the multipart parser.
+   * Nenhuma rota recebe multipart: o binário do upload vai direto ao bucket por
+   * URL assinada e nunca atravessa a API (_standards/backend.md §5.4). Por isso
+   * `autoProcess: false`: o parser não lê o corpo nem grava arquivo temporário,
+   * e um `multipart/form-data` anônimo não enche o disco do container (SEC-2).
+   * Rota que um dia precisar receber arquivo entra em `autoProcess` por padrão
+   * de rota, com limite próprio
+   * (_doc-lib/adonisjs.md#guides/basics/body-parser,
+   * https://docs.adonisjs.com/guides/basics/body-parser).
    */
   multipart: {
-    /**
-     * Automatically process uploaded files into the system tmp directory.
-     */
-    autoProcess: true,
+    autoProcess: false,
 
-    /**
-     * Normalize empty string values to null.
-     */
     convertEmptyStringsToNull: true,
 
     /**
-     * Routes where multipart processing is handled manually.
+     * Teto de corpo caso uma rota passe a processar multipart; hoje sem efeito.
      */
-    processManually: [],
+    limit: '1mb',
 
-    /**
-     * Maximum accepted payload size for multipart requests.
-     */
-    limit: '20mb',
-
-    /**
-     * Content types handled by the multipart parser.
-     */
     types: ['multipart/form-data'],
   },
 })
