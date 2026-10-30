@@ -59,7 +59,9 @@ test.group('authentication/sessions > sign-in (unit)', () => {
     assert.deepEqual(sessions.issued, [])
   })
 
-  test('falha do repositório é 500 SESSION_SIGN_IN_ERROR, e não 401', async ({ assert }) => {
+  test('falha do repositório é 500 AUTHENTICATION_SESSION_SIGN_IN_ERROR, e não 401', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     users.findByEmail = async () => {
       throw new Error('banco fora')
