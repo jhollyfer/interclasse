@@ -439,9 +439,6 @@
   "representative_description": "Check who plays each sport. A saved athlete can only be removed by the advisor teacher, and after the draw the sport is locked.",
   "representative_no_class": "No class is assigned to you. Ask the organizers to assign you as a representative.",
   "representative_load_error": "Could not load the list right now.",
-  "common_bulk_done": "{count} {verb}.",
-  "common_bulk_none": "None {verb}: {total} failed.",
-  "common_bulk_partial": "{done} of {total} {verb}; {failed} failed.",
   "upload_error_type": "File type not accepted: {type}",
   "upload_unknown_type": "unknown",
   "admin_common_select": "Select",
@@ -889,5 +886,13 @@
   "admin_users_field_email_placeholder": "person@example.org",
   "admin_users_field_email_description": "It is what the person uses to sign in to the dashboard.",
   "admin_users_field_role_description": "The administrator organizes the games. The advisor looks after the students of their own classes. The representative builds the class's athlete list.",
-  "admin_users_field_status_description": "An inactive account cannot sign in to the dashboard and stays in the list."
+  "admin_users_field_status_description": "An inactive account cannot sign in to the dashboard and stays in the list.",
+  "common_ui_sidebar_toggle": "Toggle sidebar",
+  "common_ui_sidebar_mobile": "Shows the sidebar on mobile.",
+  "common_ui_previous_page": "Go to previous page",
+  "common_ui_next_page": "Go to next page",
+  "common_ui_open_options": "Open options",
+  "common_ui_clear_selection": "Clear selection",
+  "common_error_link_moved": "If you got here from a link, it may have moved.",
+  "common_ui_sidebar_title": "Sidebar"
 }

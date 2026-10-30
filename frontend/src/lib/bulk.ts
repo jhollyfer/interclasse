@@ -1,4 +1,3 @@
-import { m } from '#/paraglide/messages'
 
 /** O resultado de uma ação em massa: quantos passaram e quantos não. */
 export type BulkOutcome = {
@@ -29,32 +28,3 @@ export async function runBulk<TItem>(
   return { done, failed: results.length - done }
 }
 
-/**
- * O texto do aviso, já flexionado e já dizendo o que falhou.
- *
- * O relato parcial é o ponto: "7 de 9 arquivados" é acionável, "erro ao
- * arquivar" depois de sete sucessos é mentira.
- *
- * `verb` vem no particípio e no masculino plural (`arquivados`, `excluídos`),
- * que é como as duas mensagens o usam.
- */
-export function bulkMessage(outcome: BulkOutcome, verb: string): string {
-  const total = outcome.done + outcome.failed
-
-  const singular = verb.replace(/s$/, '')
-
-  if (outcome.failed === 0) {
-    if (outcome.done === 1) return m.common_bulk_done({ count: 1, verb: singular })
-
-    return m.common_bulk_done({ count: outcome.done, verb })
-  }
-
-  if (outcome.done === 0) return m.common_bulk_none({ verb: singular, total })
-
-  return m.common_bulk_partial({
-    done: outcome.done,
-    total,
-    verb,
-    failed: outcome.failed,
-  })
-}
