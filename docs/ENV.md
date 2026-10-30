@@ -21,6 +21,7 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `LOG_LEVEL` | sim | não | nível do logger | `info` |
 | `APP_KEY` | sim | **sim** | chave de cifra da aplicação | `<segredo>` |
 | `APP_SERVER_URL` | sim | não | endereço público da API | `http://${HOST}:${PORT}` |
+| `TRUSTED_PROXIES` | atrás de proxy | não | proxy reverso confiável para `request.ip()`: um IP, sub-rede ou apelido do `proxy-addr` (`loopback`, `uniquelocal`); ausente vale `loopback`. Nunca `true` | `172.16.0.0/12` |
 | `SESSION_DRIVER` | sim | não | `cookie`, `memory` ou `database` | `cookie` |
 | `CORS_ORIGIN` | em produção | não | origens do navegador autorizadas, separadas por vírgula; ausente fora de desenvolvimento recusa todo pedido cross-origin | `https://interclass.maiyu.com.br` |
 | `COOKIE_DOMAIN` | em produção | não | `Domain` dos cookies de sessão: o menor domínio que cobre o site e a API | `.maiyu.com.br` |
@@ -66,6 +67,7 @@ NODE_ENV=development
 LOG_LEVEL=info
 APP_KEY=<segredo>
 APP_SERVER_URL=http://${HOST}:${PORT}
+# TRUSTED_PROXIES=172.16.0.0/12
 
 # Session
 SESSION_DRIVER=cookie

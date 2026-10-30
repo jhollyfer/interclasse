@@ -42,6 +42,19 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_KEY: Env.schema.secret(),
   APP_SERVER_URL: Env.schema.string({ format: 'url', tld: false }),
 
+  /**
+   * Quem o Adonis trata como proxy confiável, para `request.ip()` ler o
+   * `X-Forwarded-For` só de quem o proxy de fato escreveu. Um valor só, no
+   * formato do `proxy-addr`: IP, sub-rede (`10.0.0.0/8`) ou apelido
+   * (`loopback`, `linklocal`, `uniquelocal`).
+   *
+   * Opcional, e o default é seguro: ausente vale `loopback`, o do Adonis. Atrás
+   * do Traefik do Coolify (outro container) ela é **necessária**: sem ela
+   * `request.ip()` é o IP do proxy e todo limite por IP vira global. Nunca
+   * `true`: o cliente passa a forjar o `X-Forwarded-For`.
+   */
+  TRUSTED_PROXIES: Env.schema.string.optional(),
+
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
 
