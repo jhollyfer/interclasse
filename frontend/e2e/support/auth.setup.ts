@@ -14,7 +14,7 @@ import { storageStatePath } from './session'
 async function signIn(role: Role, area: string, page: Page): Promise<void> {
   const { email, password } = credentialsOf(role)
 
-  await page.goto('/authentication')
+  await page.goto('/sign-in')
   await waitForHydration(page)
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha', { exact: true }).fill(password)

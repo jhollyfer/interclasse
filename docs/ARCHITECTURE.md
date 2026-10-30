@@ -139,7 +139,7 @@ cai (`DECISIONS.md` #2).
 
 Modo de renderização do frontend (`ssr`): o site público renderiza no servidor; o grupo `_private`
 usa `ssr: 'data-only'` (dados no servidor, tela no cliente) em `routes/_private/layout.tsx`;
-`authentication/` é rota com path próprio.
+`_authentication/` é grupo pathless: o login mora em `/sign-in`.
 
 ## 7. Integrações externas
 

@@ -26,7 +26,7 @@ import {
   AuthShellTagline,
 } from '../../-components/auth-shell'
 
-const route = getRouteApi('/authentication/_sign-in/')
+const route = getRouteApi('/_authentication/sign-in/')
 
 /**
  * Os campos que este formulário sabe destacar. Uma chave de `errors` fora
@@ -37,7 +37,7 @@ const FIELDS = ['email', 'password'] as const
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter()
-  // Validado no layout pai (`authentication/layout.tsx`), que já recusou
+  // Validado no layout pai (`_authentication/layout.tsx`), que já recusou
   // qualquer destino que não seja um caminho deste app.
   const search = route.useSearch()
 

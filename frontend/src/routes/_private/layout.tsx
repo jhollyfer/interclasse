@@ -59,7 +59,7 @@ export const Route = createFileRoute('/_private')({
       // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
       // tentou renovar com o refresh token antes de deixar o erro subir.
       throw redirect({
-        to: '/authentication',
+        to: '/sign-in',
         search: { redirect: location.href },
       })
     }

@@ -9,15 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticationLayoutRouteImport } from './routes/_authentication/layout'
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
-import { Route as AuthenticationLayoutRouteImport } from './routes/authentication/layout'
 import { Route as HealthCheckRouteImport } from './routes/health-check'
 import { Route as PrivateAdministratorLayoutRouteImport } from './routes/_private/administrator/layout'
 import { Route as PrivateAdvisorLayoutRouteImport } from './routes/_private/advisor/layout'
 import { Route as PrivateRepresentativeLayoutRouteImport } from './routes/_private/representative/layout'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
+import { Route as AuthenticationSignInIndexRouteImport } from './routes/_authentication/sign-in/index'
 import { Route as PrivateAdministratorIndexRouteImport } from './routes/_private/administrator/index'
 import { Route as PrivateAdvisorIndexRouteImport } from './routes/_private/advisor/index'
 import { Route as PrivatePainelIndexRouteImport } from './routes/_private/painel/index'
@@ -27,7 +28,6 @@ import { Route as PublicAvisosIndexRouteImport } from './routes/_public/avisos/i
 import { Route as PublicClassificacaoIndexRouteImport } from './routes/_public/classificacao/index'
 import { Route as PublicJogosIndexRouteImport } from './routes/_public/jogos/index'
 import { Route as PublicSobreIndexRouteImport } from './routes/_public/sobre/index'
-import { Route as AuthenticationSignInIndexRouteImport } from './routes/authentication/_sign-in/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
 import { Route as PrivateAdministratorCardsIndexRouteImport } from './routes/_private/administrator/cards/index'
@@ -56,17 +56,16 @@ import { Route as PrivateAdministratorClassroomsIdEditIndexRouteImport } from '.
 import { Route as PrivateAdministratorSportsIdEditIndexRouteImport } from './routes/_private/administrator/sports/$id/edit/index'
 import { Route as PrivateAdministratorUsersIdEditIndexRouteImport } from './routes/_private/administrator/users/$id/edit/index'
 
+const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
+  id: '/_authentication',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivateLayoutRoute = PrivateLayoutRouteImport.update({
   id: '/_private',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicLayoutRoute = PublicLayoutRouteImport.update({
   id: '/_public',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
-  id: '/authentication',
-  path: '/authentication',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthCheckRoute = HealthCheckRouteImport.update({
@@ -101,6 +100,14 @@ const PublicSplatRoute = PublicSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => PublicLayoutRoute,
 } as any)
+const AuthenticationSignInIndexRoute =
+  AuthenticationSignInIndexRouteImport.update({
+    id: '/sign-in/',
+    path: '/sign-in/',
+    getParentRoute: () => AuthenticationLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_authentication/sign-in/index.lazy').then((d) => d.Route),
+  )
 const PrivateAdministratorIndexRoute =
   PrivateAdministratorIndexRouteImport.update({
     id: '/',
@@ -165,14 +172,6 @@ const PublicSobreIndexRoute = PublicSobreIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_public/sobre/index.lazy').then((d) => d.Route),
 )
-const AuthenticationSignInIndexRoute =
-  AuthenticationSignInIndexRouteImport.update({
-    id: '/_sign-in/',
-    path: '/',
-    getParentRoute: () => AuthenticationLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/authentication/_sign-in/index.lazy').then((d) => d.Route),
-  )
 const PrivateAdministratorAnnouncementsIndexRoute =
   PrivateAdministratorAnnouncementsIndexRouteImport.update({
     id: '/announcements/',
@@ -437,12 +436,12 @@ const PrivateAdministratorUsersIdEditIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
-  '/authentication': typeof AuthenticationLayoutRouteWithChildren
   '/health-check': typeof HealthCheckRoute
   '/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
   '/$': typeof PublicSplatRoute
+  '/sign-in/': typeof AuthenticationSignInIndexRoute
   '/administrator/': typeof PrivateAdministratorIndexRoute
   '/advisor/': typeof PrivateAdvisorIndexRoute
   '/painel/': typeof PrivatePainelIndexRoute
@@ -452,7 +451,6 @@ export interface FileRoutesByFullPath {
   '/classificacao/': typeof PublicClassificacaoIndexRoute
   '/jogos/': typeof PublicJogosIndexRoute
   '/sobre/': typeof PublicSobreIndexRoute
-  '/authentication/': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
   '/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
@@ -485,6 +483,7 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/health-check': typeof HealthCheckRoute
   '/$': typeof PublicSplatRoute
+  '/sign-in': typeof AuthenticationSignInIndexRoute
   '/administrator': typeof PrivateAdministratorIndexRoute
   '/advisor': typeof PrivateAdvisorIndexRoute
   '/painel': typeof PrivatePainelIndexRoute
@@ -494,7 +493,6 @@ export interface FileRoutesByTo {
   '/classificacao': typeof PublicClassificacaoIndexRoute
   '/jogos': typeof PublicJogosIndexRoute
   '/sobre': typeof PublicSobreIndexRoute
-  '/authentication': typeof AuthenticationSignInIndexRoute
   '/administrator/announcements': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets': typeof PrivateAdministratorBracketsIndexRoute
   '/administrator/cards': typeof PrivateAdministratorCardsIndexRoute
@@ -525,15 +523,16 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authentication': typeof AuthenticationLayoutRouteWithChildren
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
-  '/authentication': typeof AuthenticationLayoutRouteWithChildren
   '/health-check': typeof HealthCheckRoute
   '/_private/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/_private/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/_private/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
   '/_public/': typeof PublicIndexRoute
+  '/_authentication/sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/': typeof PrivateAdministratorIndexRoute
   '/_private/advisor/': typeof PrivateAdvisorIndexRoute
   '/_private/painel/': typeof PrivatePainelIndexRoute
@@ -543,7 +542,6 @@ export interface FileRoutesById {
   '/_public/classificacao/': typeof PublicClassificacaoIndexRoute
   '/_public/jogos/': typeof PublicJogosIndexRoute
   '/_public/sobre/': typeof PublicSobreIndexRoute
-  '/authentication/_sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/_private/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
   '/_private/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
@@ -576,12 +574,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/authentication'
     | '/health-check'
     | '/administrator'
     | '/advisor'
     | '/representative'
     | '/$'
+    | '/sign-in/'
     | '/administrator/'
     | '/advisor/'
     | '/painel/'
@@ -591,7 +589,6 @@ export interface FileRouteTypes {
     | '/classificacao/'
     | '/jogos/'
     | '/sobre/'
-    | '/authentication/'
     | '/administrator/announcements/'
     | '/administrator/brackets/'
     | '/administrator/cards/'
@@ -624,6 +621,7 @@ export interface FileRouteTypes {
     | '/'
     | '/health-check'
     | '/$'
+    | '/sign-in'
     | '/administrator'
     | '/advisor'
     | '/painel'
@@ -633,7 +631,6 @@ export interface FileRouteTypes {
     | '/classificacao'
     | '/jogos'
     | '/sobre'
-    | '/authentication'
     | '/administrator/announcements'
     | '/administrator/brackets'
     | '/administrator/cards'
@@ -663,15 +660,16 @@ export interface FileRouteTypes {
     | '/administrator/users/$id/edit'
   id:
     | '__root__'
+    | '/_authentication'
     | '/_private'
     | '/_public'
-    | '/authentication'
     | '/health-check'
     | '/_private/administrator'
     | '/_private/advisor'
     | '/_private/representative'
     | '/_public/$'
     | '/_public/'
+    | '/_authentication/sign-in/'
     | '/_private/administrator/'
     | '/_private/advisor/'
     | '/_private/painel/'
@@ -681,7 +679,6 @@ export interface FileRouteTypes {
     | '/_public/classificacao/'
     | '/_public/jogos/'
     | '/_public/sobre/'
-    | '/authentication/_sign-in/'
     | '/_private/administrator/announcements/'
     | '/_private/administrator/brackets/'
     | '/_private/administrator/cards/'
@@ -712,14 +709,21 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
   PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
-  AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
   HealthCheckRoute: typeof HealthCheckRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authentication': {
+      id: '/_authentication'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticationLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_private': {
       id: '/_private'
       path: ''
@@ -732,13 +736,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/authentication': {
-      id: '/authentication'
-      path: '/authentication'
-      fullPath: '/authentication'
-      preLoaderRoute: typeof AuthenticationLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health-check': {
@@ -782,6 +779,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$'
       preLoaderRoute: typeof PublicSplatRouteImport
       parentRoute: typeof PublicLayoutRoute
+    }
+    '/_authentication/sign-in/': {
+      id: '/_authentication/sign-in/'
+      path: '/sign-in'
+      fullPath: '/sign-in/'
+      preLoaderRoute: typeof AuthenticationSignInIndexRouteImport
+      parentRoute: typeof AuthenticationLayoutRoute
     }
     '/_private/administrator/': {
       id: '/_private/administrator/'
@@ -845,13 +849,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/sobre/'
       preLoaderRoute: typeof PublicSobreIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
-    }
-    '/authentication/_sign-in/': {
-      id: '/authentication/_sign-in/'
-      path: '/'
-      fullPath: '/authentication/'
-      preLoaderRoute: typeof AuthenticationSignInIndexRouteImport
-      parentRoute: typeof AuthenticationLayoutRoute
     }
     '/_private/administrator/announcements/': {
       id: '/_private/administrator/announcements/'
@@ -1045,6 +1042,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticationLayoutRouteChildren {
+  AuthenticationSignInIndexRoute: typeof AuthenticationSignInIndexRoute
+}
+
+const AuthenticationLayoutRouteChildren: AuthenticationLayoutRouteChildren = {
+  AuthenticationSignInIndexRoute: AuthenticationSignInIndexRoute,
+}
+
+const AuthenticationLayoutRouteWithChildren =
+  AuthenticationLayoutRoute._addFileChildren(AuthenticationLayoutRouteChildren)
+
 interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorIndexRoute: typeof PrivateAdministratorIndexRoute
   PrivateAdministratorAnnouncementsIndexRoute: typeof PrivateAdministratorAnnouncementsIndexRoute
@@ -1199,21 +1207,10 @@ const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(
   PublicLayoutRouteChildren,
 )
 
-interface AuthenticationLayoutRouteChildren {
-  AuthenticationSignInIndexRoute: typeof AuthenticationSignInIndexRoute
-}
-
-const AuthenticationLayoutRouteChildren: AuthenticationLayoutRouteChildren = {
-  AuthenticationSignInIndexRoute: AuthenticationSignInIndexRoute,
-}
-
-const AuthenticationLayoutRouteWithChildren =
-  AuthenticationLayoutRoute._addFileChildren(AuthenticationLayoutRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
   PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
-  AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
   HealthCheckRoute: HealthCheckRoute,
 }
 export const routeTree = rootRouteImport

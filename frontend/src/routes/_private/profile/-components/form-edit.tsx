@@ -122,7 +122,7 @@ export function ProfileFormEdit(): React.JSX.Element {
       // que já aconteceu do lado do servidor.
       if (payload.email !== account.email || payload.password) {
         toast.success(m.profile_access_updated())
-        await router.navigate({ to: '/authentication' })
+        await router.navigate({ to: '/sign-in' })
         return
       }
 

@@ -31,7 +31,7 @@ export function useSignOut() {
       // Depois de limpar, e não antes: navegar primeiro remonta o guard de
       // `_private` sobre um cache que ainda tem a sessão velha, e ele deixaria
       // passar.
-      await router.navigate({ to: '/authentication' })
+      await router.navigate({ to: '/sign-in' })
     },
   })
 }

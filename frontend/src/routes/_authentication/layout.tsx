@@ -12,7 +12,7 @@ import { validateSearch } from './-search'
  * layout pelo mesmo motivo do `_private` - tela de autenticação nova nasce
  * coberta por estar no lugar certo.
  */
-export const Route = createFileRoute('/authentication')({
+export const Route = createFileRoute('/_authentication')({
   validateSearch,
   beforeLoad: async ({ context }) => {
     try {
