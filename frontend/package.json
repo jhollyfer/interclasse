@@ -14,13 +14,14 @@
     "preview": "vite preview",
     "i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide --strategy url baseLocale",
     "i18n:check": "inlang check --project ./project.inlang",
-    "test": "vitest run",
+    "test:unit": "vitest run",
     "typecheck": "tsc --noEmit",
     "check-cycles": "node scripts/check-chunk-cycles.mjs",
-    "lint": "eslint",
-    "e2e": "playwright test --config e2e/playwright.config.ts",
+    "lint": "eslint . --max-warnings 0",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
     "format": "prettier --write . && eslint --fix",
-    "check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check": "pnpm i18n:compile && pnpm i18n:check && pnpm lint && pnpm typecheck"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -29,7 +30,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource/barlow": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
-    "@hookform/resolvers": "^5.9.1",
+    "@hookform/resolvers": "^6.0.2",
     "@interclasse/shared": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.3.3",
@@ -59,7 +60,7 @@
   "devDependencies": {
     "@inlang/cli": "^3.4.5",
     "@inlang/paraglide-js": "^2.29.3",
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.64.1",
     "@rolldown/plugin-babel": "^0.2.4",
     "@tanstack/devtools-vite": "^0.8.5",
     "@tanstack/eslint-config": "^0.4.0",
@@ -78,9 +79,8 @@
     "eslint-plugin-playwright": "^2.12.1",
     "jsdom": "^30.1.2",
     "prettier": "^3.9.10",
-    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript": "~6",
     "typescript-eslint": "^8.71.2",
-    "typescript7": "npm:typescript@^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.4"
   }
