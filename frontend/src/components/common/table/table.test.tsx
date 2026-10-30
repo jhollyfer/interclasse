@@ -119,9 +119,9 @@ describe('Table', () => {
     const { container } = render(<TableSkeleton columns={3} rows={2} />)
 
     expect(container.querySelector('[data-slot="table-skeleton"]')).toBeTruthy()
-    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(
-      0,
-    )
+    expect(
+      container.querySelectorAll('[data-slot="skeleton"]').length,
+    ).toBeGreaterThan(0)
   })
 
   it('com dados desenha o título e uma linha por registro', () => {
@@ -223,8 +223,6 @@ describe('Table', () => {
   })
 
   it('uma parte fora do Table diz qual ficou sem provider', () => {
-    expect(() => render(<TableContent>x</TableContent>)).toThrow(
-      'TableContent',
-    )
+    expect(() => render(<TableContent>x</TableContent>)).toThrow('TableContent')
   })
 })
