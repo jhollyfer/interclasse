@@ -40,7 +40,7 @@ export function AboutPage(): React.JSX.Element {
       <SectionHeader>
         <SectionTitle level="h1">{m.public_about_title()}</SectionTitle>
       </SectionHeader>
-      <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
+      <div className="grid items-start gap-8 md:grid-cols-term-value">
         <Picture
           src={logo512}
           alt={m.public_logo_alt()}

@@ -49,7 +49,7 @@ export function NextMatch({
         })}
       </p>
 
-      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="mt-6 grid grid-cols-versus items-center gap-4">
         <span className="font-display truncate text-right text-3xl font-extrabold uppercase italic sm:text-4xl">
           {match.homeTeam.classroom.name}
         </span>

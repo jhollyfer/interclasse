@@ -41,6 +41,17 @@ type TableGridProps<TRow extends RowData> = Readonly<{
 }>
 
 /**
+ * A camada de uma coluna fixada, da escala nomeada do tema (`z-*` em
+ * `styles.css`): o cabeçalho fixado fica sobre as células fixadas do corpo.
+ */
+const PIN_LAYERS = {
+  header: 'var(--z-sticky)',
+  cell: 'var(--z-dropdown)',
+} as const
+
+type PinLayer = keyof typeof PIN_LAYERS
+
+/**
  * A posição de uma coluna fixada, em propriedades **lógicas**.
  *
  * `inset-inline-start` e não `left`: na v9 a fixação é lógica (`start`/`end`), e
@@ -51,19 +62,19 @@ type TableGridProps<TRow extends RowData> = Readonly<{
 function pinnedStyle<TRow extends RowData>(
   item:
     Header<TableFeatures, TRow, unknown> | Cell<TableFeatures, TRow, unknown>,
-  zIndex: number,
+  layer: PinLayer,
 ): React.CSSProperties {
   const column = item.column
   const pinned = column.getIsPinned()
 
   const style: React.CSSProperties = {
-    width: `calc(var(--col-${column.id}-size) * 1px)`,
+    width: `var(--col-${column.id}-size)`,
   }
 
   if (!pinned) return style
 
   style.position = 'sticky'
-  style.zIndex = zIndex
+  style.zIndex = PIN_LAYERS[layer]
 
   if (pinned === 'start')
     style.insetInlineStart = `${column.getStart('start')}px`
@@ -91,9 +102,10 @@ export function TableGrid<TRow extends RowData>({
   table,
   onRowClick,
 }: TableGridProps<TRow>): React.JSX.Element | null {
-  const columnSizeVars: Record<string, number> = {}
+  const columnSizeVars: Record<string, string> = {}
   for (const header of table.getFlatHeaders()) {
-    columnSizeVars[`--col-${header.column.id}-size`] = header.column.getSize()
+    columnSizeVars[`--col-${header.column.id}-size`] =
+      `${header.column.getSize()}px`
   }
 
   const sensors = useSensors(
@@ -173,7 +185,7 @@ export function TableGrid<TRow extends RowData>({
               {group.headers.map((header) => (
                 <HeadRoot
                   key={header.id}
-                  style={pinnedStyle(header, 30)}
+                  style={pinnedStyle(header, 'header')}
                   className={cn(
                     'group/th relative',
                     header.column.getIsPinned() && 'bg-background',
@@ -209,7 +221,7 @@ export function TableGrid<TRow extends RowData>({
                 {row.getVisibleCells().map((cell) => (
                   <CellRoot
                     key={cell.id}
-                    style={pinnedStyle(cell, 10)}
+                    style={pinnedStyle(cell, 'cell')}
                     className={cn(cell.column.getIsPinned() && 'bg-background')}
                   >
                     <FlexRender cell={cell} />

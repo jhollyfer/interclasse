@@ -27,7 +27,7 @@ function TableHeader({
     <div
       data-slot="table-header"
       className={cn(
-        'grid shrink-0 auto-rows-min items-start gap-1 border-b pb-3 has-data-[slot=table-actions]:grid-cols-[1fr_auto]',
+        'grid shrink-0 auto-rows-min items-start gap-1 border-b pb-3 has-data-[slot=table-actions]:grid-cols-title-actions',
         className,
       )}
       {...props}

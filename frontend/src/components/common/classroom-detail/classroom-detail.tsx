@@ -118,7 +118,7 @@ export function ClassroomDetail({
         {actions && <PageHeaderActions>{actions}</PageHeaderActions>}
       </PageHeader>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[1fr_18rem]">
+      <div className="grid items-start gap-4 lg:grid-cols-main-aside">
         <ClassroomSummary board={board} className="lg:order-last" />
         <Tabs defaultValue="athletes" className="min-w-0">
           <TabsList>
