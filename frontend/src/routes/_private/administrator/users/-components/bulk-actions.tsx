@@ -8,6 +8,7 @@ import {
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchive } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 import { BulkArchive } from './bulk-archive'
 
@@ -31,10 +32,13 @@ export function UserBulkActions({
       items={users}
       action={(item) => archive.mutateAsync(item.id)}
       queryKey={queryKeys.administrator.users.all}
-      verb="arquivados"
     >
-      <ConfirmDialogTitle>Arquivar usuários</ConfirmDialogTitle>
-      <ConfirmDialogDescription>{`${users.length} conta(s) deixam de entrar no painel e saem da listagem. Podem ser restauradas depois.`}</ConfirmDialogDescription>
+      <ConfirmDialogTitle>
+        {m.admin_users_bulk_archive_title()}
+      </ConfirmDialogTitle>
+      <ConfirmDialogDescription>
+        {m.admin_users_bulk_archive_description({ count: users.length })}
+      </ConfirmDialogDescription>
     </BulkArchive>
   )
 }

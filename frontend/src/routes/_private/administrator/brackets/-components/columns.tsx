@@ -9,16 +9,17 @@ import {
   CATEGORY_LABELS,
   formatDate,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 /** Sem `sortKey`: a listagem de chaves não aceita `?sort`. */
-export const bracketColumns: TableColumns<AdministratorBracketPaginateResponse> =
-  [
+export function bracketColumns(): TableColumns<AdministratorBracketPaginateResponse> {
+  return [
     {
       id: 'sport',
       accessorFn: (row) => row.sport.name,
-      meta: { label: 'Modalidade' },
+      meta: { label: m.admin_common_sport() },
       size: 220,
-      header: () => 'Modalidade',
+      header: () => m.admin_common_sport(),
       cell: ({ row }) => (
         <Link
           to="/administrator/brackets/$id"
@@ -32,17 +33,17 @@ export const bracketColumns: TableColumns<AdministratorBracketPaginateResponse> 
     },
     {
       accessorKey: 'category',
-      meta: { label: 'Categoria' },
+      meta: { label: m.admin_common_category() },
       size: 160,
-      header: () => 'Categoria',
+      header: () => m.admin_common_category(),
       cell: ({ row }) =>
         CATEGORY_LABELS[row.original.category] ?? row.original.category,
     },
     {
       accessorKey: 'status',
-      meta: { label: 'Situação' },
+      meta: { label: m.admin_common_status() },
       size: 160,
-      header: () => 'Situação',
+      header: () => m.admin_common_status(),
       cell: ({ row }) => (
         <Badge variant={BRACKET_STATUS_VARIANTS[row.original.status]}>
           {BRACKET_STATUS_LABELS[row.original.status] ?? row.original.status}
@@ -51,9 +52,9 @@ export const bracketColumns: TableColumns<AdministratorBracketPaginateResponse> 
     },
     {
       accessorKey: 'createdAt',
-      meta: { label: 'Sorteada em' },
+      meta: { label: m.admin_brackets_drawn_on() },
       size: 160,
-      header: () => 'Sorteada em',
+      header: () => m.admin_brackets_drawn_on(),
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {formatDate(row.original.createdAt)}
@@ -61,3 +62,4 @@ export const bracketColumns: TableColumns<AdministratorBracketPaginateResponse> 
       ),
     },
   ]
+}

@@ -1,5 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -21,6 +21,7 @@ import {
   useTable,
 } from '#/components/common/table'
 import { announcementsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { m } from '#/paraglide/messages'
 
 import { announcementColumns } from './columns'
 import { AnnouncementRowActions } from './row-actions'
@@ -33,9 +34,11 @@ export function AnnouncementsTable(): React.JSX.Element {
     announcementsQueryOptions(search),
   )
 
+  const columns = React.useMemo(() => announcementColumns(), [])
+
   const table = useTable({
     rows: data?.data ?? [],
-    columns: announcementColumns,
+    columns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:announcements',
     actions: (announcement) => (
@@ -52,29 +55,30 @@ export function AnnouncementsTable(): React.JSX.Element {
       onRetry={() => void refetch()}
     >
       <TableHeader>
-        <TableTitle>Avisos</TableTitle>
+        <TableTitle>{m.admin_announcements_title()}</TableTitle>
         <TableActions>
           <TableCreateButton to="/administrator/announcements/new">
-            Adicionar aviso
+            {m.admin_announcements_create()}
           </TableCreateButton>
         </TableActions>
       </TableHeader>
 
       <TableToolbar>
-        <TableSearch placeholder="Buscar avisos..." />
+        <TableSearch placeholder={m.admin_announcements_search()} />
         <TableColumnToggle table={table} />
       </TableToolbar>
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>Nenhum aviso ainda</TableEmptyTitle>
+          <TableEmptyTitle>
+            {m.admin_announcements_empty_title()}
+          </TableEmptyTitle>
           <TableEmptyDescription>
-            Troca de horário, local, regra: o aviso aparece no site assim que é
-            criado.
+            {m.admin_announcements_empty_description()}
           </TableEmptyDescription>
           <TableEmptyActions>
             <TableCreateButton to="/administrator/announcements/new">
-              Adicionar aviso
+              {m.admin_announcements_create()}
             </TableCreateButton>
           </TableEmptyActions>
         </TableEmpty>

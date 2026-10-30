@@ -427,5 +427,451 @@
   "common_bulk_none": "Ninguno {verb}: fallaron {total}.",
   "common_bulk_partial": "{done} de {total} {verb}; fallaron {failed}.",
   "upload_error_type": "Tipo de archivo no aceptado: {type}",
-  "upload_unknown_type": "desconocido"
+  "upload_unknown_type": "desconocido",
+  "admin_common_select": "Selecciona",
+  "admin_common_category": "Categoría",
+  "admin_common_status": "Situación",
+  "admin_common_sport": "Modalidad",
+  "admin_common_schedule": "Programar",
+  "admin_common_cards": "Tarjetas",
+  "admin_common_brackets": "Llaves",
+  "admin_common_phase": "Fase",
+  "admin_common_when": "Cuándo",
+  "admin_common_match": "Partido",
+  "admin_common_undo_score": "Deshacer marcador",
+  "admin_common_sport_category": "{sport} · {category}",
+  "admin_common_versus": "{home} vs {away}",
+  "admin_common_acknowledged": "Enterado",
+  "admin_dashboard_title": "Panel",
+  "admin_dashboard_description": "Registra el resultado de cada partido: el ganador pasa a la fase siguiente y el perdedor queda fuera.",
+  "admin_dashboard_removals_notice": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} atletas fueron retirados de una modalidad por los consejeros. Mira el motivo.",
+        "countExact=*, countPlural=one": "{count} atleta fue retirado de una modalidad por los consejeros. Mira el motivo.",
+        "countExact=*, countPlural=*": "{count} atletas fueron retirados de una modalidad por los consejeros. Mira el motivo."
+      }
+    }
+  ],
+  "admin_dashboard_removals_link": "Ver avisos",
+  "admin_dashboard_matches_title": "Partidos para registrar resultado ({count})",
+  "admin_dashboard_matches_empty": "Ningún partido espera resultado. Sortea una llave para crear los partidos.",
+  "admin_dashboard_match_meta": "{sport} {category} · {phase} · {when}",
+  "admin_dashboard_result": "Resultado",
+  "admin_dashboard_brackets_empty": "Ninguna llave sorteada.",
+  "admin_dashboard_draw_new": "Sortear nueva llave",
+  "admin_brackets_drawn_on": "Sorteada el",
+  "admin_brackets_deleted": "Llave borrada. Las inscripciones se reabrieron.",
+  "admin_brackets_delete_trigger": "Borrar llave",
+  "admin_brackets_has_results_title": "La llave ya tiene marcador",
+  "admin_brackets_has_results_description": "Borrarla eliminaría resultados que ocurrieron en la cancha. Para rehacer el sorteo, deshaz primero los marcadores, de la final a la primera fase.",
+  "admin_brackets_understood": "Entendido",
+  "admin_brackets_delete_title": "¿Borrar la llave?",
+  "admin_brackets_delete_description": "Los equipos y los partidos desaparecen, y las inscripciones de la modalidad se reabren. Así se rehace un sorteo.",
+  "admin_brackets_champion": "Campeona: {name}",
+  "admin_brackets_help": "Los partidos nacen del sorteo. Registra el marcador y el ganador pasa solo a la fase siguiente; si hay empate, indica quién ganó en los penales.",
+  "admin_brackets_waiting_teams": "Esperando a los dos equipos",
+  "admin_brackets_score": "Marcador",
+  "admin_brackets_undo": "Deshacer",
+  "admin_brackets_unscore_locked": "El partido siguiente ya tiene marcador: deshazlo antes",
+  "admin_brackets_drawn_ok": "Llave sorteada.",
+  "admin_brackets_draw": "Sortear llave",
+  "admin_brackets_draw_confirm": "Sortear",
+  "admin_brackets_draw_description": "Entran las clases de la categoría con el mínimo de atletas inscritos. Después del sorteo, solo el profesor consejero cambia atletas de la lista.",
+  "admin_brackets_preview_already_drawn": "Esta modalidad ya fue sorteada en esta categoría. Para rehacerla, borra la llave actual.",
+  "admin_brackets_preview_eligible": [
+    {
+      "declarations": [
+        "input eligible",
+        "local eligibleExact = eligible",
+        "local eligiblePlural = eligible: plural",
+        "input min",
+        "local minExact = min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "eligibleExact",
+        "eligiblePlural",
+        "minExact",
+        "minPlural"
+      ],
+      "match": {
+        "eligibleExact=0, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} clases entran (mínimo de {min} atletas)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} clases entran (mínimo de {min} atleta)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} clases entran (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=one, minExact=0, minPlural=*": "{eligible} clase entra (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=one": "{eligible} clase entra (mínimo de {min} atleta)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=*": "{eligible} clase entra (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} clases entran (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} clases entran (mínimo de {min} atleta)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} clases entran (mínimo de {min} atletas)"
+      }
+    }
+  ],
+  "admin_brackets_preview_out": "Quedan fuera:",
+  "admin_brackets_preview_not_enough": "Se necesitan al menos 2 clases con el mínimo de atletas. Pide a los consejeros y representantes que completen las listas.",
+  "admin_brackets_open": "Abrir llave",
+  "admin_brackets_row_delete_title": "¿Borrar la llave de {sport} · {category}?",
+  "admin_brackets_row_delete_description": "Los partidos de la llave se borran y las inscripciones se reabren. Una llave con marcador registrado no se puede borrar.",
+  "admin_brackets_empty_title": "Ninguna llave sorteada",
+  "admin_brackets_empty_description": "Registra clases y modalidades, deja que las clases inscriban a los atletas y sortea la llave de cada modalidad por categoría.",
+  "admin_cards_title": "Tarjetas",
+  "admin_cards_summary": [
+    {
+      "declarations": [
+        "input cards",
+        "local cardsExact = cards",
+        "local cardsPlural = cards: plural",
+        "input red",
+        "local redExact = red",
+        "local redPlural = red: plural"
+      ],
+      "selectors": [
+        "cardsExact",
+        "cardsPlural",
+        "redExact",
+        "redPlural"
+      ],
+      "match": {
+        "cardsExact=0, cardsPlural=*, redExact=0, redPlural=*": "{cards} tarjetas, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=one": "{cards} tarjetas, {red} roja. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=*": "{cards} tarjetas, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=one, redExact=0, redPlural=*": "{cards} tarjeta, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=one": "{cards} tarjeta, {red} roja. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=*": "{cards} tarjeta, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=*, redExact=0, redPlural=*": "{cards} tarjetas, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=one": "{cards} tarjetas, {red} roja. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=*": "{cards} tarjetas, {red} rojas. Para registrarlas, abre el partido en la llave o en Partidos y usa \"Tarjetas\"."
+      }
+    }
+  ],
+  "admin_cards_deleted": "Tarjeta borrada.",
+  "admin_cards_empty": "Aún no se registró ninguna tarjeta.",
+  "admin_removals_title": "Bajas de atletas",
+  "admin_removals_description": [
+    {
+      "declarations": [
+        "input pending",
+        "local pendingExact = pending",
+        "local pendingPlural = pending: plural"
+      ],
+      "selectors": [
+        "pendingExact",
+        "pendingPlural"
+      ],
+      "match": {
+        "pendingExact=0, pendingPlural=*": "A quién sacaron los consejeros de las modalidades, y por qué. {pending} avisos pendientes.",
+        "pendingExact=*, pendingPlural=one": "A quién sacaron los consejeros de las modalidades, y por qué. {pending} aviso pendiente.",
+        "pendingExact=*, pendingPlural=*": "A quién sacaron los consejeros de las modalidades, y por qué. {pending} avisos pendientes."
+      }
+    }
+  ],
+  "admin_removals_empty": "Ningún atleta fue retirado de una modalidad.",
+  "admin_removals_item": "{student} salió de {sport}",
+  "admin_removals_by_actor": "Por {actor} el {date}",
+  "admin_removals_by_deleted": "Por cuenta eliminada el {date}",
+  "admin_matches_title": "Partidos",
+  "admin_matches_score": "Registrar marcador",
+  "admin_matches_set_up": "Crear partidos (sortear llave)",
+  "admin_matches_all_categories": "Todas las categorías",
+  "admin_matches_all_statuses": "Todas las situaciones",
+  "admin_matches_empty_title": "Ningún partido",
+  "admin_matches_empty_description": "Los partidos nacen del sorteo de cada llave: sortea la modalidad en una categoría y los partidos aparecen aquí. Quien gana avanza solo a la fase siguiente.",
+  "admin_matches_go_to_brackets": "Ir a las llaves",
+  "admin_common_edit": "Editar",
+  "admin_common_delete": "Borrar",
+  "admin_common_name": "Nombre",
+  "admin_common_title": "Título",
+  "admin_common_advisor": "Consejero",
+  "admin_common_representative": "Representante",
+  "admin_common_all": "Todas",
+  "admin_common_retry": "Intentar de nuevo",
+  "admin_common_none": "Ninguno",
+  "admin_common_edit_named": "Editar {name}",
+  "admin_common_no_advisor": "Sin consejero",
+  "admin_common_no_representative": "Sin representante",
+  "admin_common_count_athletes": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} atletas",
+        "countExact=*, countPlural=one": "{count} atleta",
+        "countExact=*, countPlural=*": "{count} atletas"
+      }
+    }
+  ],
+  "admin_common_count_students": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} alumnos",
+        "countExact=*, countPlural=one": "{count} alumno",
+        "countExact=*, countPlural=*": "{count} alumnos"
+      }
+    }
+  ],
+  "admin_common_count_sports": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} modalidades",
+        "countExact=*, countPlural=one": "{count} modalidad",
+        "countExact=*, countPlural=*": "{count} modalidades"
+      }
+    }
+  ],
+  "admin_announcements_title": "Avisos",
+  "admin_announcements_pinned": "Fijado",
+  "admin_announcements_published_on": "Publicado el",
+  "admin_announcements_field_title_placeholder": "Cambio de horario",
+  "admin_announcements_field_body": "Texto",
+  "admin_announcements_field_pinned": "Fijar en la parte superior del sitio",
+  "admin_announcements_field_pinned_description": "Un aviso fijado aparece antes que los demás.",
+  "admin_announcements_published": "Aviso publicado.",
+  "admin_announcements_saved": "Aviso guardado.",
+  "admin_announcements_create": "Agregar aviso",
+  "admin_announcements_edit": "Editar aviso",
+  "admin_announcements_removed": "Aviso eliminado.",
+  "admin_announcements_remove_title": "¿Eliminar el aviso \"{title}\"?",
+  "admin_announcements_remove_description": "Desaparece del sitio al instante. No se puede deshacer.",
+  "admin_announcements_search": "Buscar avisos…",
+  "admin_announcements_empty_title": "Aún no hay avisos",
+  "admin_announcements_empty_description": "Cambio de horario, de lugar, de regla: el aviso aparece en el sitio apenas se crea.",
+  "admin_classrooms_title": "Clases",
+  "admin_classrooms_description": "Las clases que disputan los juegos. Cada una forma un equipo por modalidad; la categoría sale del año.",
+  "admin_classrooms_create": "Agregar clase",
+  "admin_classrooms_load_error": "No fue posible cargar las clases ahora.",
+  "admin_classrooms_empty": "Aún no hay clases en esta categoría.",
+  "admin_classrooms_created": "Clase {name} creada.",
+  "admin_classrooms_saved": "Clase {name} guardada.",
+  "admin_classrooms_removed": "Clase eliminada.",
+  "admin_classrooms_remove_title": "¿Eliminar la clase {name}?",
+  "admin_classrooms_remove_description": "Los alumnos y las inscripciones de la clase se borran junto con ella. No se puede deshacer.",
+  "admin_classrooms_edit": "Editar clase",
+  "admin_classrooms_field_name_placeholder": "9.º A",
+  "admin_classrooms_field_name_description": "Es el nombre que aparece en el marcador.",
+  "admin_classrooms_field_grade": "Año",
+  "admin_classrooms_field_grade_description": "Del 3.º al 5.º es Fundamental 1; del 6.º al 9.º, Fundamental 2.",
+  "admin_classrooms_grade_option": "{grade}.º año",
+  "admin_classrooms_field_advisor": "Profesor consejero",
+  "admin_classrooms_field_representative": "Alumno representante",
+  "admin_classrooms_field_representative_description": "Las cuentas salen de Usuarios, con el rol de representante.",
+  "admin_sports_title": "Modalidades",
+  "admin_sports_athletes_per_team": "Atletas por equipo",
+  "admin_sports_range": "{min} a {max}",
+  "admin_sports_created": "Modalidad {name} creada.",
+  "admin_sports_saved": "Modalidad {name} guardada.",
+  "admin_sports_create": "Agregar modalidad",
+  "admin_sports_field_name_placeholder": "Fútbol sala",
+  "admin_sports_field_name_description": "Se convierte en la dirección de la modalidad en el sitio.",
+  "admin_sports_field_min": "Mínimo de atletas",
+  "admin_sports_field_min_description": "Una clase con menos inscritos queda fuera del sorteo.",
+  "admin_sports_field_max": "Máximo de atletas",
+  "admin_sports_removed": "Modalidad eliminada.",
+  "admin_sports_remove_title": "¿Eliminar la modalidad {name}?",
+  "admin_sports_remove_description": "Solo es posible mientras ninguna clase haya inscrito atletas en ella. No se puede deshacer.",
+  "admin_sports_search": "Buscar modalidades…",
+  "admin_sports_empty_title": "Aún no hay modalidades",
+  "admin_sports_empty_description": "Fútbol sala, voleibol, quemada… cada una con el mínimo y el máximo de atletas por equipo.",
+  "admin_photos_title": "Fotos",
+  "admin_photos_description": "Las fotos del carrusel del sitio. Las de los consejeros solo aparecen después de aprobarlas aquí.",
+  "admin_photos_upload_description": "La foto de la organización va directo al sitio.",
+  "admin_photos_upload_success": "Foto publicada en el sitio.",
+  "admin_photos_tab_pending": "En espera",
+  "admin_photos_tab_approved": "En el sitio",
+  "admin_photos_tab_rejected": "Rechazadas",
+  "admin_photos_empty": "Ninguna foto aquí.",
+  "admin_photos_approved": "Foto aprobada: ya está en el sitio.",
+  "admin_photos_rejected": "Foto rechazada: salió del sitio.",
+  "admin_photos_deleted": "Foto borrada.",
+  "admin_photos_approve": "Aprobar",
+  "admin_photos_reject": "Rechazar",
+  "admin_photos_delete_label": "Borrar foto",
+  "admin_photos_delete_title": "¿Borrar esta foto?",
+  "admin_photos_delete_description": "Desaparece del sitio y de la lista de quien la envió. No se puede deshacer.",
+  "admin_common_archive": "Archivar",
+  "admin_common_restore": "Restaurar",
+  "admin_common_remove": "Eliminar",
+  "admin_common_classrooms": "Clases",
+  "admin_common_students": "Alumnos",
+  "admin_common_athletes": "Atletas",
+  "admin_common_sports": "Modalidades",
+  "admin_common_save": "Guardar",
+  "admin_common_role": "Rol",
+  "admin_common_email": "Correo electrónico",
+  "admin_common_created_on": "Creado el",
+  "admin_reports_title": "Informes",
+  "admin_reports_description": "Quién participó en los juegos. Atleta es el alumno inscrito en al menos una modalidad.",
+  "admin_reports_download": "Descargar hoja de cálculo (CSV)",
+  "admin_reports_registrations": "Inscripciones",
+  "admin_reports_matches_played": "Partidos disputados",
+  "admin_reports_matches_scheduled": "Partidos programados",
+  "admin_reports_by_category": "Por categoría",
+  "admin_reports_by_sport": "Por modalidad",
+  "admin_reports_by_classroom": "Por clase",
+  "admin_reports_classroom": "Clase",
+  "admin_site_title": "Sitio",
+  "admin_site_description": "Lo que aparece en \"Sobre los juegos\" y en el pie del sitio, y el reglamento para descargar. Un campo vacío no aparece en el sitio.",
+  "admin_site_updated": "Sitio actualizado.",
+  "admin_site_about_card": "Sobre los juegos",
+  "admin_site_field_about": "Qué son los juegos",
+  "admin_site_field_organizer": "Quién los creó y organiza",
+  "admin_site_field_edition": "Edición actual",
+  "admin_site_field_first_edition": "Año de la primera edición",
+  "admin_site_instagram_card": "Instagram",
+  "admin_site_field_school_instagram": "De la escuela (sin @)",
+  "admin_site_field_developer_instagram": "De quien desarrolló el sitio (sin @)",
+  "admin_site_regulation_card": "Reglamento",
+  "admin_site_field_regulation": "Archivo en PDF",
+  "admin_site_upload_pdf": "Subir PDF",
+  "admin_site_pdf_only": "Solo PDF.",
+  "admin_users_title": "Usuarios",
+  "admin_users_user": "Usuario",
+  "admin_users_noun_one": "usuario",
+  "admin_users_noun_other": "usuarios",
+  "admin_users_create": "Agregar usuario",
+  "admin_users_search": "Buscar usuarios…",
+  "admin_users_all_roles": "Todos los roles",
+  "admin_users_all_statuses": "Todas las situaciones",
+  "admin_users_empty_title": "Aún no hay usuarios",
+  "admin_users_empty_description": "Esta es la única forma de crear una cuenta: no hay registro público, y el primer administrador viene del seeder.",
+  "admin_users_bulk_archive_title": "Archivar usuarios",
+  "admin_users_bulk_archive_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} cuentas dejan de entrar al panel y salen del listado. Pueden restaurarse después.",
+        "countExact=*, countPlural=one": "{count} cuenta deja de entrar al panel y sale del listado. Puede restaurarse después.",
+        "countExact=*, countPlural=*": "{count} cuentas dejan de entrar al panel y salen del listado. Pueden restaurarse después."
+      }
+    }
+  ],
+  "admin_bulk_archive_done": [
+    {
+      "declarations": [
+        "input done",
+        "local doneExact = done",
+        "local donePlural = done: plural"
+      ],
+      "selectors": [
+        "doneExact",
+        "donePlural"
+      ],
+      "match": {
+        "doneExact=0, donePlural=*": "{done} archivados.",
+        "doneExact=*, donePlural=one": "{done} archivado.",
+        "doneExact=*, donePlural=*": "{done} archivados."
+      }
+    }
+  ],
+  "admin_bulk_archive_none": [
+    {
+      "declarations": [
+        "input total",
+        "local totalExact = total",
+        "local totalPlural = total: plural"
+      ],
+      "selectors": [
+        "totalExact",
+        "totalPlural"
+      ],
+      "match": {
+        "totalExact=0, totalPlural=*": "Ninguno archivado: {total} fallaron.",
+        "totalExact=*, totalPlural=one": "Ninguno archivado: {total} falló.",
+        "totalExact=*, totalPlural=*": "Ninguno archivado: {total} fallaron."
+      }
+    }
+  ],
+  "admin_bulk_archive_partial": [
+    {
+      "declarations": [
+        "input failed",
+        "local failedExact = failed",
+        "local failedPlural = failed: plural"
+      ],
+      "selectors": [
+        "failedExact",
+        "failedPlural"
+      ],
+      "match": {
+        "failedExact=0, failedPlural=*": "{done} de {total} archivados; {failed} fallaron.",
+        "failedExact=*, failedPlural=one": "{done} de {total} archivados; {failed} falló.",
+        "failedExact=*, failedPlural=*": "{done} de {total} archivados; {failed} fallaron."
+      }
+    }
+  ],
+  "admin_users_id_copied": "ID copiado",
+  "admin_users_copy_id": "Copiar ID",
+  "admin_users_archived_badge": "Archivado",
+  "admin_users_archived_ok": "Cuenta de {name} archivada.",
+  "admin_users_restored_ok": "Cuenta de {name} restaurada.",
+  "admin_users_removed_ok": "Cuenta de {name} eliminada.",
+  "admin_users_created_ok": "Cuenta de {name} creada.",
+  "admin_users_saved_ok": "Cuenta de {name} guardada.",
+  "admin_users_archive_title": "¿Archivar la cuenta de {name}?",
+  "admin_users_archive_description": "Deja de entrar al panel y sale del listado, y puede restaurarse después.",
+  "admin_users_restore_title": "¿Restaurar la cuenta de {name}?",
+  "admin_users_restore_description": "Vuelve al listado, en la situación en que estaba.",
+  "admin_users_remove_title": "¿Eliminar la cuenta de {name}?",
+  "admin_users_remove_description": "El registro se borra definitivamente. No se puede deshacer.",
+  "admin_users_view_details": "Ver detalles",
+  "admin_users_account_card": "La cuenta",
+  "admin_users_last_changed": "Última modificación",
+  "admin_users_archived_on": "Archivado el",
+  "admin_users_identity_legend": "Identidad y acceso",
+  "admin_users_create_note": "El correo de una cuenta archivada reactiva ese registro con los datos nuevos, en lugar de crear otro.",
+  "admin_users_edit_note": "Cambiar el correo o la contraseña cierra las sesiones abiertas de esta cuenta.",
+  "admin_users_field_new_password": "Nueva contraseña (déjala en blanco para mantener la actual)",
+  "admin_users_field_password": "Contraseña",
+  "admin_users_field_password_description": "De 8 a 32 caracteres, con minúscula, mayúscula, número y un carácter especial.",
+  "admin_users_field_password_confirmation": "Confirma la contraseña",
+  "admin_users_field_photo": "Foto (opcional)",
+  "admin_users_photo_alt": "Foto de la cuenta",
+  "admin_users_upload_photo": "Subir foto",
+  "admin_users_field_name_placeholder": "Nombre de quien usa la cuenta",
+  "admin_users_field_email_placeholder": "persona@ejemplo.org",
+  "admin_users_field_email_description": "Con él la persona entra al panel.",
+  "admin_users_field_role_description": "El administrador organiza los juegos. El consejero cuida de los alumnos de sus clases. El representante arma la lista de atletas de la clase.",
+  "admin_users_field_status_description": "Una cuenta inactiva no entra al panel y sigue en el listado."
 }
