@@ -10,6 +10,7 @@ import {
   InputGroupInput,
 } from '#/components/ui/input-group.tsx'
 import { CaretDownIcon, XIcon, CheckIcon } from '@phosphor-icons/react'
+import { m } from '#/paraglide/messages'
 
 const Combobox = ComboboxPrimitive.Root
 
@@ -26,7 +27,8 @@ function ComboboxTrigger({
     <ComboboxPrimitive.Trigger
       data-slot="combobox-trigger"
       // Botão só de ícone, como o `ComboboxClear`: sem nome não se anuncia.
-      aria-label="Abrir opções"
+      // casa: rótulo traduzido (_standards/i18n.md)
+      aria-label={m.common_ui_open_options()}
       className={cn(
         "outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg:not([class*='size-'])]:size-3.5",
         className,
@@ -44,7 +46,8 @@ function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
     <ComboboxPrimitive.Clear
       data-slot="combobox-clear"
       // Botão só de ícone: sem nome, o leitor de tela anuncia "botão" e mais nada.
-      aria-label="Limpar seleção"
+      // casa: rótulo traduzido (_standards/i18n.md)
+      aria-label={m.common_ui_clear_selection()}
       render={<InputGroupButton variant="ghost" size="icon-xs" />}
       className={cn(className)}
       {...props}

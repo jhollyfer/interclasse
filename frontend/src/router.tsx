@@ -11,6 +11,7 @@ import {
   NotFoundPageTitle,
 } from '#/components/common/not-found-page'
 import { HTTPError } from '#/integrations/tanstack-query/http'
+import { m } from '#/paraglide/messages'
 
 import { getContext } from './integrations/tanstack-query/query-context'
 import { deLocalizeUrl, getLocale, localizeUrl } from './paraglide/runtime'
@@ -75,7 +76,7 @@ export function getRouter() {
           <NotFoundPage code={String(handled.status)}>
             <NotFoundPageTitle>{handled.message}</NotFoundPageTitle>
             <NotFoundPageDescription>
-              Se você chegou aqui por um link, ele pode ter mudado de lugar.
+              {m.common_error_link_moved()}
             </NotFoundPageDescription>
             <NotFoundPageActions>
               <NotFoundPageHomeButton />

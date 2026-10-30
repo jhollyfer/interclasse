@@ -423,9 +423,6 @@
   "representative_description": "Marque quem joga cada modalidade. Atleta salvo só sai da lista pelo professor conselheiro, e depois do sorteio a modalidade trava.",
   "representative_no_class": "Nenhuma turma vinculada a você. Peça à organização para indicá-lo como representante.",
   "representative_load_error": "Não foi possível carregar a lista agora.",
-  "common_bulk_done": "{count} {verb}.",
-  "common_bulk_none": "Nenhum {verb}: {total} falharam.",
-  "common_bulk_partial": "{done} de {total} {verb}; {failed} falharam.",
   "upload_error_type": "Tipo de arquivo não aceito: {type}",
   "upload_unknown_type": "desconhecido",
   "admin_common_select": "Selecione",
@@ -873,5 +870,13 @@
   "admin_users_field_email_placeholder": "pessoa@exemplo.org",
   "admin_users_field_email_description": "É por ele que a pessoa entra no painel.",
   "admin_users_field_role_description": "Administrador organiza os jogos. Conselheiro cuida dos alunos das próprias turmas. Representante monta a lista de atletas da turma.",
-  "admin_users_field_status_description": "Conta inativa não entra no painel, e continua na listagem."
+  "admin_users_field_status_description": "Conta inativa não entra no painel, e continua na listagem.",
+  "common_ui_sidebar_toggle": "Alternar barra lateral",
+  "common_ui_sidebar_mobile": "Mostra a barra lateral no celular.",
+  "common_ui_previous_page": "Ir para a página anterior",
+  "common_ui_next_page": "Ir para a próxima página",
+  "common_ui_open_options": "Abrir opções",
+  "common_ui_clear_selection": "Limpar seleção",
+  "common_error_link_moved": "Se você chegou aqui por um link, ele pode ter mudado de lugar.",
+  "common_ui_sidebar_title": "Barra lateral"
 }
