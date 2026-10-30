@@ -11,21 +11,21 @@ import User from '#models/user'
  */
 export default class extends BaseSeeder {
   /**
-   * Fora de produção: lá os administradores reais vêm do recorte de produção
-   * (`dev/demo.ts`), e este registro seria só uma credencial padrão
-   * conhecida com poder de administrador.
+   * Fora de produção: lá o primeiro administrador é criado à mão, e este
+   * registro seria só uma credencial padrão conhecida com poder de
+   * administrador.
    */
   static override environment = ['development', 'test']
 
   override async run() {
-    const email = env.get('SEED_OWNER_EMAIL') ?? 'administrator@mail.com'
-    const password = env.get('SEED_OWNER_PASSWORD')
+    const email = env.get('SEED_ADMINISTRATOR_EMAIL') ?? 'administrator@mail.com'
+    const password = env.get('SEED_ADMINISTRATOR_PASSWORD')
 
     /*
      * Sem senha o seeder para, e não inventa uma.
      *
      * Ela era literal aqui, e o repositório é o lugar errado para uma
-     * credencial: quem lesse este arquivo entrava como dono em todo ambiente
+     * credencial: quem lesse este arquivo entrava como administrador em todo ambiente
      * que tivesse rodado o seeder - inclusive o de produção. Um default,
      * mesmo "temporário", volta a ser exatamente isso.
      *
@@ -34,8 +34,8 @@ export default class extends BaseSeeder {
      */
     if (!password) {
       throw new Error(
-        'SEED_OWNER_PASSWORD ausente. Defina uma senha no ambiente antes de rodar o seeder: ' +
-          'SEED_OWNER_PASSWORD=<senha> node ace db:seed',
+        'SEED_ADMINISTRATOR_PASSWORD ausente. Defina uma senha no ambiente antes de rodar o seeder: ' +
+          'SEED_ADMINISTRATOR_PASSWORD=<senha> node ace db:seed',
       )
     }
 

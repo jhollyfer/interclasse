@@ -141,7 +141,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | `SEED_DEMO_PASSWORD` é a senha das contas do catálogo de demonstração, onde
   | houver esse catálogo. Mesma regra: sem default, e o seeder para sem ela.
   */
-  SEED_OWNER_EMAIL: Env.schema.string.optional(),
-  SEED_OWNER_PASSWORD: Env.schema.string.optional(),
+  SEED_ADMINISTRATOR_EMAIL: Env.schema.string.optional(),
+  SEED_ADMINISTRATOR_PASSWORD: Env.schema.string.optional(),
   SEED_DEMO_PASSWORD: Env.schema.string.optional(),
 })

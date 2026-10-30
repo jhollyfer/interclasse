@@ -32,8 +32,8 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `STORAGE_BUCKET` | sim | não | nome do bucket (privado) | `interclasse` |
 | `STORAGE_ENDPOINT` | sim | não | endpoint S3-compatível | `http://localhost:9004` |
 | `STORAGE_FORCE_PATH_STYLE` | não | não | `true` no MinIO; ausente em R2, S3 e Spaces | `true` |
-| `SEED_OWNER_EMAIL` | só no seeder | não | e-mail do administrador criado por `node ace db:seed` | `administrator@mail.com` |
-| `SEED_OWNER_PASSWORD` | só no seeder | **sim** | senha desse administrador; sem ela o seeder para | `<segredo>` |
+| `SEED_ADMINISTRATOR_EMAIL` | só no seeder | não | e-mail do administrador criado por `node ace db:seed` | `administrator@mail.com` |
+| `SEED_ADMINISTRATOR_PASSWORD` | só no seeder | **sim** | senha desse administrador; sem ela o seeder para | `<segredo>` |
 | `SEED_DEMO_PASSWORD` | não | **sim** | senha das contas de demonstração (`pnpm db:seed:demo`); ausente, a demonstração é pulada | `<segredo>` |
 
 ### Site (`frontend/`)
@@ -84,8 +84,8 @@ STORAGE_ENDPOINT=http://localhost:9004
 STORAGE_FORCE_PATH_STYLE=true
 
 # Semeadura
-SEED_OWNER_EMAIL=administrator@mail.com
-SEED_OWNER_PASSWORD=<segredo>
+SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
+SEED_ADMINISTRATOR_PASSWORD=<segredo>
 ```
 
 `frontend/.env.example`:
@@ -119,6 +119,6 @@ Secrets de CI no repositório: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COOLIFY
 - [ ] `cp backend/.env.example backend/.env` e preencher cada `<segredo>`.
 - [ ] Gerar `APP_KEY` com `node ace generate:key` (em `backend/`).
 - [ ] Subir os serviços locais: `cd backend && docker compose up -d`.
-- [ ] Rodar `node ace migration:run && node ace db:seed` (o seeder exige `SEED_OWNER_PASSWORD`).
+- [ ] Rodar `node ace migration:run && node ace db:seed` (o seeder exige `SEED_ADMINISTRATOR_PASSWORD`).
 - [ ] Rodar `pnpm dev` na raiz: o app valida as variáveis no boot e para se faltar alguma.
 - [ ] Reiniciar o app depois de mudar o `.env`.

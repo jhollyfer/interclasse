@@ -196,7 +196,7 @@ Health check: `GET /health-check` na API e no site.
 | CORS do bucket com PUT liberado para a origem do site e `ETag` exposto | provedor do storage | sem o `ETag` o upload multipart não fecha |
 | `uuid` das duas aplicações e o `COOLIFY_TOKEN` | `main-deploy-coolify.yml` e secrets do repositório | uuid de outro projeto redeploya o projeto errado |
 | `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` | secrets do repositório | publicar as imagens |
-| Semente do administrador (`node ace db:seed`) com `SEED_OWNER_PASSWORD` | à mão, uma vez por ambiente | o seeder para sem a senha |
+| Semente do administrador (`node ace db:seed`) com `SEED_ADMINISTRATOR_PASSWORD` | à mão, uma vez por ambiente | o seeder para sem a senha |
 
 ## 10. Escala e limites conhecidos
 
