@@ -4,18 +4,12 @@ import { defineConfig, syncDestination, targets } from '@adonisjs/core/logger'
 import env from '#start/env'
 
 /**
- * O destino síncrono, só fora de produção.
- *
- * Guarda com retorno cedo em vez de ternário: em produção não há destino a
- * montar, e `syncDestination()` é assíncrono - o ternário obrigava um `await`
- * dentro do literal de configuração para um valor que metade dos ambientes
- * descarta.
+ * O destino síncrono, só fora de produção: em produção não há destino a montar,
+ * e `syncDestination()` é assíncrono - o ternário obrigava um `await` dentro do
+ * literal de configuração para um valor que metade dos ambientes descarta.
  */
-async function developmentDestination() {
-  if (app.inProduction) return undefined
-
-  return syncDestination()
-}
+let destination: Awaited<ReturnType<typeof syncDestination>> | undefined
+if (!app.inProduction) destination = await syncDestination()
 
 const loggerConfig = defineConfig({
   /**
@@ -81,7 +75,7 @@ const loggerConfig = defineConfig({
       /**
        * Use sync destination in non-production for immediate flush.
        */
-      destination: await developmentDestination(),
+      destination: destination,
 
       /**
        * Configure where logs are written.

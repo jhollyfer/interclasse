@@ -6,7 +6,7 @@ import AdvisorStudentDeleteUseCase from './delete.use-case.ts'
 import { Student } from '#domain/student/student.entity'
 import { StudentRepository } from '#repositories/student/student.repository'
 import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const CLASSROOM = '00000000-0000-4000-8000-000000000001'

@@ -27,7 +27,7 @@ import SportModel from '#models/sport'
 import StudentModel from '#models/student'
 import TeamModel from '#models/team'
 import { Bracket, type MatchProps } from '#domain/bracket/bracket.entity'
-import { Knockout } from '#domain/bracket/knockout'
+import { Knockout } from '#domain/shared/knockout.value-object'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 @inject()

@@ -14,7 +14,7 @@ import { BracketPresenter } from '../brackets.presenter.ts'
 import { BracketRefusal } from '../_shared.bracket-refusal.ts'
 
 import { Bracket } from '#domain/bracket/bracket.entity'
-import type { Random } from '#domain/bracket/knockout'
+import type { Random } from '#domain/shared/knockout.value-object'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import HTTPException from '#exceptions/http.exception'

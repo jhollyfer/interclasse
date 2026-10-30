@@ -4,13 +4,16 @@ import { test } from '@japa/runner'
 import { BRACKET_STATUS, CATEGORY, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import { resetDatabase } from '#tests/http-fixtures'
-import { BracketArrangements, type BracketHarness as Harness } from '#tests/bracket-harness'
+import {
+  BracketArrangements,
+  type BracketHarness as Harness,
+} from '#tests/bracket-harness-fixtures'
 
 /**
  * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
  * que garante que o unitário do use-case, que roda na de memória, não passa
  * contra um dublê que mente. O arranjo do que a chave só lê está em
- * `tests/bracket-harness.ts`.
+ * `tests/bracket-harness-fixtures.ts`.
  */
 const IMPLEMENTATIONS = {
   lucid: () => BracketArrangements.lucid(),

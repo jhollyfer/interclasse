@@ -4,7 +4,7 @@ import { PHOTO_STATUS, USER_ROLE } from '@interclasse/shared'
 import AdministratorPhotoCreateUseCase from './create.use-case.ts'
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
 
 async function setup(mimetype = 'image/png') {

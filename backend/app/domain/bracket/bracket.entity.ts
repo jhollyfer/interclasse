@@ -12,7 +12,8 @@ import {
 } from '@interclasse/shared'
 
 import type { BracketError, MatchError } from './bracket.errors.ts'
-import { Knockout, type Pairing, type Random } from './knockout.ts'
+
+import { Knockout, type Pairing, type Random } from '#domain/shared/knockout.value-object'
 
 /** O time é a turma dentro da competição. */
 export type TeamProps = {

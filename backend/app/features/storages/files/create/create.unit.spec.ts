@@ -5,7 +5,7 @@ import StoragesFileCreateUseCase from './create.use-case.ts'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { StorageContract } from '#services/storage/storage.contract'
 import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { rightOf, storageDoubles } from '#tests/storages-unit-fixtures'
 
 async function setup() {

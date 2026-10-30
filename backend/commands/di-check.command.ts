@@ -31,11 +31,9 @@ export default class DiCheck extends BaseCommand {
 
     // Recursivo: service mora em `services/<nome>/<nome>.service.ts`
     // (_standards/architecture.md §3); policy continua plana.
-    const entries = await readdir(dirPath, { recursive: true }).catch(() => [])
+    const entries = await readdir(dirPath, { recursive: true })
 
-    return entries.filter(function (name) {
-      return name.endsWith(suffix)
-    })
+    return entries.filter((name) => name.endsWith(suffix))
   }
 
   override async run() {

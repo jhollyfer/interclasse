@@ -5,7 +5,7 @@ import AdministratorAnnouncementPaginateUseCase from './paginate.use-case.ts'
 import { Announcement } from '#domain/announcement/announcement.entity'
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
 import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
   const announcements = new AnnouncementMemoryRepository()

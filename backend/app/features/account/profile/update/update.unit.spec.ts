@@ -6,7 +6,7 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import {
   identityDoubles,
   OTHER_ID,

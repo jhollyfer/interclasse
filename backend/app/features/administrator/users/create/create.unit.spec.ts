@@ -4,7 +4,7 @@ import AdministratorUserCreateUseCase from './create.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { pendingFile, rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
 

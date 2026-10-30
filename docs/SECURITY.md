@@ -76,7 +76,7 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 | leitura pública | `GET /storefront/*` | internet → `/storefront` | `backend/app/features/storefront/` |
 | upload | `POST /storages`, `:id/complete`, PUT na URL assinada | navegador → bucket | `backend/app/features/storages/files/` |
 | lista de atletas | `PUT /advisor/enrollments`, `PUT /representative/enrollments` | papel → rota | `backend/app/features/advisor/enrollments/`, `representative/enrollments/` |
-| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.csv.ts` |
+| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.presenter.ts` |
 | documentação da API | `/openapi.json`, `/documentation` | internet → API | `backend/app/middleware/documentation.middleware.ts` |
 | deploy | push em `main` | CI → produção | `.github/workflows/main.yml` |
 

@@ -6,7 +6,7 @@ import StoragePolicy from './storage.policy.ts'
 
 import { USER_ID } from '#tests/identity-unit-fixtures'
 import { FILE_ID, uploadedFile } from '#tests/storages-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 function actorOf(role: UserRole, avatarId: string | null = null): Actor {
   return { id: USER_ID, role, avatarId }

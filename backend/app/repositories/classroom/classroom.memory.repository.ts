@@ -21,7 +21,7 @@ import {
   type ClassroomPeopleFacts,
   type ClassroomProps,
 } from '#domain/classroom/classroom.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>

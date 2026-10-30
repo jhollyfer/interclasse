@@ -5,7 +5,7 @@ import AdministratorAnnouncementUpdateUseCase from './update.use-case.ts'
 import { Announcement } from '#domain/announcement/announcement.entity'
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
 import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
 

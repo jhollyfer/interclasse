@@ -1,7 +1,7 @@
 import type { AdministratorReportShowResponse } from '@interclasse/shared'
 
 /** Os textos do arquivo, já no idioma da requisição (`_standards/i18n.md`). */
-export type ReportCsvLabels = {
+export type ReportPresenterLabels = {
   readonly header: ReadonlyArray<string>
   readonly total: string
   /** O texto da célula de turmas na linha de total. */
@@ -22,8 +22,8 @@ const SEPARATOR = ';'
  * linha de total no fim. Classe pura, sem I/O nem idioma próprio: o texto vem
  * pronto em `labels`, e o use-case é quem o busca no i18n.
  */
-export class ReportCsv {
-  static build(report: AdministratorReportShowResponse, labels: ReportCsvLabels): string {
+export class ReportPresenter {
+  static csv(report: AdministratorReportShowResponse, labels: ReportPresenterLabels): string {
     const rows = report.classrooms.map((classroom) => [
       classroom.name,
       labels.category(classroom.category),
@@ -47,7 +47,7 @@ export class ReportCsv {
     // "Conceição" viram lixo.
     return '\uFEFF'.concat(
       [[...labels.header], ...rows, total]
-        .map((line) => line.map((cell) => ReportCsv.cell(cell)).join(SEPARATOR))
+        .map((line) => line.map((cell) => ReportPresenter.cell(cell)).join(SEPARATOR))
         .join('\r\n'),
     )
   }

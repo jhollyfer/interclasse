@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
 
 import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, USER_ID } from '#tests/identity-unit-fixtures'
 
 const ACTOR = { id: USER_ID, role: 'ADVISOR', avatarId: null } as const

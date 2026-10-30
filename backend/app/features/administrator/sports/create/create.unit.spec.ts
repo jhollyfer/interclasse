@@ -4,7 +4,7 @@ import AdministratorSportCreateUseCase from './create.use-case.ts'
 
 import { SportRepository } from '#repositories/sport/sport.repository'
 import { SportMemoryRepository } from '#repositories/sport/sport.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
   const sports = new SportMemoryRepository()

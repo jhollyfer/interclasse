@@ -17,8 +17,8 @@ import {
 } from './bracket.repository.ts'
 
 import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
-import { Knockout } from '#domain/bracket/knockout'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { Knockout } from '#domain/shared/knockout.value-object'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /** A turma como o teste a arranja: o que a chave lê dela. */
 export type ClassroomView = {

@@ -8,7 +8,7 @@ import AdministratorCardDeleteUseCase from './delete.use-case.ts'
 import { MatchCard } from '#domain/match-card/match-card.entity'
 import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
   const brackets = new BracketMemoryRepository()

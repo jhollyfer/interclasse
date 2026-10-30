@@ -5,7 +5,7 @@ import AdministratorMatchScoreUseCase from './score.use-case.ts'
 
 import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup(total = 4) {
   const brackets = new BracketMemoryRepository()

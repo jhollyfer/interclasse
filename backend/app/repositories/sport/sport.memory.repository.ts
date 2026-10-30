@@ -3,7 +3,7 @@ import type { AdministratorSportShowResponse, Paginated, SortDirection } from '@
 import { SportRepository, type SportListCriteria } from './sport.repository.ts'
 
 import { Sport, type SportProps } from '#domain/sport/sport.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case

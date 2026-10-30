@@ -6,7 +6,7 @@ import { UserRepository, type UserListCriteria } from './user.repository.ts'
 
 import { User, type UserProps } from '#domain/user/user.entity'
 import type { StorageRepository } from '#repositories/storage/storage.repository'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>

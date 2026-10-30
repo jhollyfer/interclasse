@@ -4,7 +4,7 @@ import AdministratorAnnouncementCreateUseCase from './create.use-case.ts'
 
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
 import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
   const announcements = new AnnouncementMemoryRepository()

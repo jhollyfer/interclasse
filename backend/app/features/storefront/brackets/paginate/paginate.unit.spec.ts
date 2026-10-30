@@ -4,7 +4,7 @@ import StorefrontBracketPaginateUseCase from './paginate.use-case.ts'
 
 import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('storefront/brackets > paginate (unit)', () => {
   test('lista as chaves por nome de modalidade', async ({ assert }) => {

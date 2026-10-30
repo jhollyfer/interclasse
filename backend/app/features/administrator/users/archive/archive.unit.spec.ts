@@ -6,7 +6,7 @@ import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
 async function setup() {

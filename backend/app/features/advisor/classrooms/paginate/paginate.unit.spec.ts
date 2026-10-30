@@ -6,7 +6,7 @@ import AdvisorClassroomPaginateUseCase from './paginate.use-case.ts'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const FREE = { advisor: { exists: true, taken: false } }

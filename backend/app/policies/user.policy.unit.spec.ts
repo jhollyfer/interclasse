@@ -6,7 +6,7 @@ import UserPolicy from './user.policy.ts'
 
 import { User } from '#domain/user/user.entity'
 import { OTHER_ID, USER_ID } from '#tests/identity-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 function actorOf(role: UserRole, id = USER_ID): Actor {
   return { id, role, avatarId: null }

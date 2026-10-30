@@ -4,7 +4,7 @@ import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, PASSWORD, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 

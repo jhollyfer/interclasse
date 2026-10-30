@@ -11,7 +11,7 @@ import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.re
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = { id: randomUUID(), role: USER_ROLE.ADVISOR, avatarId: null }
 

@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 

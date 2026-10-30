@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AdministratorUserDeleteUseCase from './delete.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
 async function setup() {

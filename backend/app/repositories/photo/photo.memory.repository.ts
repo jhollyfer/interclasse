@@ -9,7 +9,7 @@ import {
 import { PhotoRepository, type PhotoListCriteria, type PhotoStorage } from './photo.repository.ts'
 
 import { Photo, type PhotoProps } from '#domain/photo/photo.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 type StorageRow = AdministratorPhotoShowResponse['storage']
 type AuthorRow = NonNullable<AdministratorPhotoShowResponse['author']>

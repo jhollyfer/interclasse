@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { MATCH_PHASE } from '@interclasse/shared'
 
-import { Knockout } from './knockout.ts'
+import { Knockout } from './knockout.value-object.ts'
 
 /**
  * As regras puras do mata-mata, sem banco nem HTTP. O sorteio recebe um gerador
