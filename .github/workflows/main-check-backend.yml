@@ -40,18 +40,21 @@ jobs:
           persist-credentials: false
 
       # Autor único e sem marca de agente (tooling.md §6, camada 3). Pega o
-      # commit feito com `--no-verify` ou numa máquina sem o hook.
+      # commit feito com `--no-verify` ou numa máquina sem o hook. Lê até o
+      # head do PR, não até o HEAD: no `pull_request` o HEAD é o merge sintético
+      # que o GitHub assina com o e-mail noreply do autor do PR.
       - name: Autor e trailer dos commits
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          commits=$(git log --format='%an <%ae>%n%B' "origin/${BASE_REF}..HEAD")
+          commits=$(git log --format='%an <%ae>%n%B' "origin/${BASE_REF}..${HEAD_SHA}")
           if printf '%s\n' "$commits" | grep -qiE '^(co-authored-by|claude-session):|generated with|noreply@anthropic\.com|anthropic\.com/claude'; then
             echo "trailer ou marca de agente em commit do PR" >&2
             exit 1
           fi
-          if git log --format='%ae' "origin/${BASE_REF}..HEAD" | grep -qvx 'jhollyfer.fr@gmail.com'; then
+          if git log --format='%ae' "origin/${BASE_REF}..${HEAD_SHA}" | grep -qvx 'jhollyfer.fr@gmail.com'; then
             echo "autor de commit diferente do dono do repositório" >&2
             exit 1
           fi
