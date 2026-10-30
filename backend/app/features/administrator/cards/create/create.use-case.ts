@@ -1,75 +1,75 @@
+import { randomUUID } from 'node:crypto'
+
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type AdministratorCardCreateResponse, type Either } from '@interclasse/shared'
 
-import Match from '#models/match'
-import MatchCard from '#models/match-card'
-import Student from '#models/student'
-import Team from '#models/team'
-import CardService from '#services/card/card.service'
-import { left, right, type Either } from '#core/either'
+import { CardRefusal } from '../_shared.card-refusal.ts'
+
+import { MatchCard } from '#domain/match-card/match-card.entity'
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
+import { MatchCardRepository } from '#repositories/match-card/match-card.repository'
 import HTTPException from '#exceptions/http.exception'
-import type { CardCreatePayload } from '#features/administrator/cards/cards.validator'
+import type { AdministratorCardCreatePayload } from '#validators/administrator/cards.validator'
 
-type Payload = CardCreatePayload
-type Response = Either<HTTPException, MatchCard>
+type Payload = AdministratorCardCreatePayload
+type Response = Either<HTTPException, AdministratorCardCreateResponse>
 
 /**
- * Lança um cartão. O atleta tem que ser de uma das duas turmas da partida: o
- * time do cartão sai daí, e não do corpo.
+ * Lança um cartão. O atleta tem que ser de uma das duas turmas da partida (regra
+ * da entidade): o time do cartão sai daí, e não do corpo.
+ *
+ * Grava só o cartão. A chave entra apenas para dizer quem joga a partida, e é o
+ * repository dela que a conhece (um agregado por transação).
  */
 @inject()
 export default class AdministratorCardCreateUseCase {
-  constructor(private readonly cards: CardService) {}
+  constructor(
+    private readonly cards: MatchCardRepository,
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const match = await Match.find(payload.matchId)
-
-      if (!match)
+      const bracket = await this.brackets.findByMatchId(payload.matchId)
+      const classroomId = await this.cards.findStudentClassroom(payload.studentId)
+      const lineup = bracket?.lineupOf(payload.matchId, classroomId)
+      if (!lineup)
         return left(
-          HTTPException.UnprocessableEntity('Partida não encontrada', 'MATCH_NOT_FOUND', {
-            matchId: 'Partida não encontrada',
-          }),
-        )
-
-      if (!match.homeTeamId || !match.awayTeamId)
-        return left(
-          HTTPException.Conflict(
-            'A partida ainda não tem os dois times definidos',
-            'MATCH_TEAMS_PENDING',
+          HTTPException.UnprocessableEntity(
+            this.i18n.t('cards.match_not_found'),
+            'MATCH_NOT_FOUND',
+            { matchId: this.i18n.t('cards.match_not_found') },
           ),
         )
 
-      const student = await Student.find(payload.studentId)
-      const team = await Team.query()
-        .whereIn('id', [match.homeTeamId, match.awayTeamId])
-        .where('classroomId', student?.classroomId ?? '')
-        .first()
-
-      if (!student || !team)
-        return left(
-          HTTPException.UnprocessableEntity('Atleta fora da partida', 'STUDENT_NOT_IN_MATCH', {
-            studentId: 'Selecione um atleta de uma das duas turmas da partida',
-          }),
-        )
-
-      const card = await MatchCard.create({
-        matchId: match.id,
-        teamId: team.id,
-        studentId: student.id,
+      const launched = MatchCard.launch({
+        id: randomUUID(),
+        matchId: payload.matchId,
+        studentId: payload.studentId,
         color: payload.color,
         note: payload.note ?? null,
+        now: new Date(),
+        homeTeamId: lineup.homeTeamId,
+        awayTeamId: lineup.awayTeamId,
+        studentTeamId: lineup.classroomTeamId,
       })
+      if (launched.isLeft()) return left(CardRefusal.http(launched.value, this.i18n))
 
-      const loaded = await this.cards.list({}).where('id', card.id).first()
+      await this.cards.save(launched.value)
 
-      return right(loaded ?? card)
+      const response = await this.cards.findResponse(launched.value.id)
+      if (!response) throw new Error('cartão gravado e não encontrado')
+
+      return right(response)
     } catch (error) {
-      logger.error({ err: error }, '[cards > create][error]')
+      logger.error({ err: error }, '[administrator/cards > create][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CARD_CREATE_ERROR',
         ),
       )

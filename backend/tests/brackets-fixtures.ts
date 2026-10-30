@@ -1,10 +1,10 @@
 import type { ApiClient } from '@japa/api-client'
+import { CATEGORY } from '@interclasse/shared'
 
-import { CATEGORY } from '#core/entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { MatchFactory } from '#database/factories/match.factory'
 import { TeamFactory } from '#database/factories/team.factory'
-import { body, type Session } from '#tests/helpers'
+import { body, type Session } from '#tests/http-fixtures'
 
 /**
  * A montagem das specs de chave e partida.
@@ -15,11 +15,16 @@ import { body, type Session } from '#tests/helpers'
  * uma linha com os dois times.
  */
 
-export async function createSport(client: ApiClient, admin: Session, minAthletes = 1) {
+export async function createSport(
+  client: ApiClient,
+  admin: Session,
+  minAthletes = 1,
+  name = 'Futsal',
+) {
   const response = await client
     .post('/administrator/sports')
     .cookies(admin)
-    .json({ name: 'Futsal', minAthletes, maxAthletes: 3 })
+    .json({ name, minAthletes, maxAthletes: 3 })
 
   response.assertStatus(201)
 

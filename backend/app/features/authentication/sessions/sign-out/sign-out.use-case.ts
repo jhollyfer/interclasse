@@ -1,14 +1,15 @@
 import { inject } from '@adonisjs/core'
-import { Secret } from '@adonisjs/core/helpers'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Actor, type Either } from '@interclasse/shared'
 
-import User from '#models/user'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { SessionContract } from '#services/session/session.contract'
 
 type Payload = {
-  readonly actor: User
+  readonly actor: Actor
+  /** O token de acesso que autenticou esta requisição. */
+  readonly accessTokenId?: string
   readonly refreshToken?: string
 }
 
@@ -16,24 +17,22 @@ type Response = Either<HTTPException, null>
 
 @inject()
 export default class AuthenticationSessionSignOutUseCase {
-  async execute({ actor, refreshToken }: Payload): Promise<Response> {
+  constructor(
+    private readonly sessions: SessionContract,
+    private readonly i18n: I18n,
+  ) {}
+
+  async execute({ actor, accessTokenId, refreshToken }: Payload): Promise<Response> {
     try {
-      if (actor.currentAccessToken) {
-        await User.accessTokens.delete(actor, actor.currentAccessToken.identifier)
-      }
+      if (accessTokenId) await this.sessions.revoke(actor.id, accessTokenId)
 
       if (refreshToken) {
         // Token de refresh ilegível não impede a saída: os cookies são
-        // limpos de qualquer forma pelo controller.
-        try {
-          const token = await User.accessTokens.verify(new Secret(refreshToken))
+        // limpos de qualquer forma pelo controller. `readRefresh` já devolve
+        // `null` para o ilegível e para o que não é de refresh.
+        const grant = await this.sessions.readRefresh(refreshToken)
 
-          if (token && token.name === COOKIE_TOKEN.REFRESH) {
-            await User.accessTokens.delete(actor, token.identifier)
-          }
-        } catch (error) {
-          logger.debug({ err: error }, '[authentication > sign-out] token de refresh ilegível')
-        }
+        if (grant) await this.sessions.revoke(actor.id, grant.identifier)
       }
 
       return right(null)
@@ -41,7 +40,7 @@ export default class AuthenticationSessionSignOutUseCase {
       logger.error({ err: error }, '[sessions > sign-out][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SESSION_SIGN_OUT_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_SIGN_OUT_ERROR'),
       )
     }
   }

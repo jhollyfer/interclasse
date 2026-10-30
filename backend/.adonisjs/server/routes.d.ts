@@ -10,6 +10,8 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
@@ -34,6 +36,14 @@ export type ScannedRoutes = {
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.photos.create': { paramsTuple?: []; params?: {} }
+    'administrator.photos.review': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
+    'administrator.site.update': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.create': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -67,6 +77,9 @@ export type ScannedRoutes = {
     'advisor.students.create': { paramsTuple?: []; params?: {} }
     'advisor.students.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.students.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'advisor.photos.paginate': { paramsTuple?: []; params?: {} }
+    'advisor.photos.create': { paramsTuple?: []; params?: {} }
+    'advisor.photos.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.enrollments.show': { paramsTuple?: []; params?: {} }
     'advisor.enrollments.update': { paramsTuple?: []; params?: {} }
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
@@ -79,6 +92,8 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.show': { paramsTuple?: []; params?: {} }
@@ -90,6 +105,10 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
@@ -104,6 +123,7 @@ export type ScannedRoutes = {
     'advisor.classrooms': { paramsTuple?: []; params?: {} }
     'advisor.cards': { paramsTuple?: []; params?: {} }
     'advisor.students.paginate': { paramsTuple?: []; params?: {} }
+    'advisor.photos.paginate': { paramsTuple?: []; params?: {} }
     'advisor.enrollments.show': { paramsTuple?: []; params?: {} }
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
   }
@@ -114,6 +134,8 @@ export type ScannedRoutes = {
     'storefront.sports': { paramsTuple?: []; params?: {} }
     'storefront.announcements': { paramsTuple?: []; params?: {} }
     'storefront.matches': { paramsTuple?: []; params?: {} }
+    'storefront.site': { paramsTuple?: []; params?: {} }
+    'storefront.photos': { paramsTuple?: []; params?: {} }
     'storefront.brackets.paginate': { paramsTuple?: []; params?: {} }
     'storefront.brackets.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.show': { paramsTuple?: []; params?: {} }
@@ -125,6 +147,10 @@ export type ScannedRoutes = {
     'administrator.classrooms.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.paginate': { paramsTuple?: []; params?: {} }
     'administrator.sports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.reports.show': { paramsTuple?: []; params?: {} }
+    'administrator.reports.export': { paramsTuple?: []; params?: {} }
+    'administrator.photos.paginate': { paramsTuple?: []; params?: {} }
+    'administrator.site.show': { paramsTuple?: []; params?: {} }
     'administrator.announcements.paginate': { paramsTuple?: []; params?: {} }
     'administrator.announcements.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.paginate': { paramsTuple?: []; params?: {} }
@@ -139,6 +165,7 @@ export type ScannedRoutes = {
     'advisor.classrooms': { paramsTuple?: []; params?: {} }
     'advisor.cards': { paramsTuple?: []; params?: {} }
     'advisor.students.paginate': { paramsTuple?: []; params?: {} }
+    'advisor.photos.paginate': { paramsTuple?: []; params?: {} }
     'advisor.enrollments.show': { paramsTuple?: []; params?: {} }
     'representative.enrollments.show': { paramsTuple?: []; params?: {} }
   }
@@ -150,16 +177,20 @@ export type ScannedRoutes = {
     'storages.complete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classrooms.create': { paramsTuple?: []; params?: {} }
     'administrator.sports.create': { paramsTuple?: []; params?: {} }
+    'administrator.photos.create': { paramsTuple?: []; params?: {} }
     'administrator.announcements.create': { paramsTuple?: []; params?: {} }
     'administrator.brackets.create': { paramsTuple?: []; params?: {} }
     'administrator.cards.create': { paramsTuple?: []; params?: {} }
     'administrator.users.create': { paramsTuple?: []; params?: {} }
     'advisor.students.create': { paramsTuple?: []; params?: {} }
+    'advisor.photos.create': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile.update': { paramsTuple?: []; params?: {} }
     'administrator.classrooms.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.review': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.site.update': { paramsTuple?: []; params?: {} }
     'administrator.announcements.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.score': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -172,12 +203,14 @@ export type ScannedRoutes = {
     'storages.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.classrooms.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.sports.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'administrator.photos.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.announcements.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.brackets.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.matches.unscore': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.cards.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'administrator.lifecycle.users.purge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'advisor.students.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'advisor.photos.delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'administrator.enrollmentRemovals.acknowledge': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

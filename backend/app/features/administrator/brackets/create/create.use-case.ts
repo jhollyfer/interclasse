@@ -1,206 +1,121 @@
-import db from '@adonisjs/lucid/services/db'
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
-import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { randomInt, randomUUID } from 'node:crypto'
 
-import Bracket from '#models/bracket'
-import Match from '#models/match'
-import Sport from '#models/sport'
-import Team from '#models/team'
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import logger from '@adonisjs/core/services/logger'
 import {
-  MAX_TEAMS,
-  advanceSlot,
-  bracketSize,
-  drawKnockout,
-  knockoutPhase,
-  nextPhase,
-} from '#features/_shared.tournament'
-import { left, right, type Either } from '#core/either'
+  left,
+  right,
+  type AdministratorBracketCreateResponse,
+  type Either,
+} from '@interclasse/shared'
+
+import { BracketPresenter } from '../brackets.presenter.ts'
+import { BracketRefusal } from '../_shared.bracket-refusal.ts'
+
+import { Bracket } from '#domain/bracket/bracket.entity'
+import type { Random } from '#domain/bracket/knockout'
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
+import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { BRACKET_STATUS, MATCH_PHASE, type MatchPhase } from '#core/entity'
-import type { BracketCreatePayload } from '#features/administrator/brackets/brackets.validator'
+import type { AdministratorBracketCreatePayload } from '#validators/administrator/brackets.validator'
 
-type Payload = BracketCreatePayload
-type Response = Either<HTTPException, Bracket>
-
-/** Com menos de dois times não há partida a jogar. */
-const MIN_TEAMS = 2
+type Payload = AdministratorBracketCreatePayload
+/** `created` falso quando a chave já existia: o controller responde 200, não 201. */
+type Drawn = { bracket: AdministratorBracketCreateResponse; created: boolean }
+type Response = Either<HTTPException, Drawn>
 
 /**
- * O sorteio: monta a chave de mata-mata inteira, da primeira fase à final.
+ * O sorteio: a entidade monta a chave de mata-mata inteira, da primeira fase à
+ * final, e o repository a grava.
  *
- * Tudo numa transação: uma chave com metade das partidas gravadas seria pior
- * que nenhuma, porque travaria as inscrições.
+ * Tudo numa unidade de trabalho, com a linha da modalidade travada: a inscrição
+ * trava a mesma linha antes de gravar, então uma lista salva no meio do sorteio
+ * não entra depois da leitura das turmas. Uma chave com metade das partidas
+ * gravadas seria pior que nenhuma, porque travaria as inscrições.
+ *
+ * Idempotente pela chave natural, modalidade e categoria (índice único em
+ * `brackets`): sortear de novo devolve a chave já sorteada, sem erro e sem novo
+ * sorteio (_standards/backend.md §4.11). É o que deixa o navegador repetir o
+ * pedido quando a rede cai depois do commit. Refazer o sorteio continua sendo
+ * apagar e sortear.
  */
 @inject()
 export default class AdministratorBracketCreateUseCase {
+  /** Aleatoriedade criptográfica: um sorteio previsível seria um sorteio contestável. */
+  private static readonly random: Random = (max) => randomInt(max)
+
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly unit: UnitOfWork,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const sport = await Sport.find(payload.sportId)
-
-      if (!sport)
-        return left(
-          HTTPException.UnprocessableEntity('Modalidade não encontrada', 'SPORT_NOT_FOUND', {
-            sportId: 'Modalidade não encontrada',
-          }),
-        )
-
-      // Tudo na mesma transação, com a linha da modalidade travada: a
-      // inscrição trava a mesma linha antes de gravar. Sem isso, uma lista
-      // salva no meio do sorteio entrava depois da leitura das turmas e ficava
-      // fora de uma chave que já tinha fechado as inscrições.
-      const drawn = await db.transaction(async (trx): Promise<Response> => {
-        await Sport.query({ client: trx }).where('id', sport.id).forUpdate().first()
-
-        const existing = await Bracket.query({ client: trx })
-          .where('sportId', sport.id)
-          .where('category', payload.category)
-          .first()
-
-        if (existing)
-          return left(
-            HTTPException.Conflict(
-              'Esta modalidade já foi sorteada nesta categoria',
-              'BRACKET_ALREADY_DRAWN',
-            ),
-          )
-
-        // As turmas da categoria com inscritos suficientes para formar time.
-        const eligible: Array<{ id: string }> = await trx
-          .from('classrooms')
-          .join('students', 'students.classroom_id', 'classrooms.id')
-          .join('enrollments', 'enrollments.student_id', 'students.id')
-          .where('classrooms.category', payload.category)
-          .where('enrollments.sport_id', sport.id)
-          .groupBy('classrooms.id')
-          .havingRaw('count(enrollments.id) >= ?', [sport.minAthletes])
-          .select('classrooms.id')
-
-        if (eligible.length < MIN_TEAMS)
-          return left(
-            HTTPException.Conflict(
-              `São necessárias ao menos ${MIN_TEAMS} turmas com ${sport.minAthletes} atletas inscritos`,
-              'NOT_ENOUGH_TEAMS',
-            ),
-          )
-
-        if (eligible.length > MAX_TEAMS)
-          return left(
-            HTTPException.Conflict(`A chave comporta até ${MAX_TEAMS} turmas`, 'TOO_MANY_TEAMS'),
-          )
-
-        const pairings = drawKnockout(eligible.map((classroom) => classroom.id))
-        const created = await Bracket.create(
-          { sportId: sport.id, category: payload.category, status: BRACKET_STATUS.KNOCKOUT },
-          { client: trx },
-        )
-
-        await this.createMatches(created.id, pairings, trx)
-
-        return right(created)
-      })
-
-      if (drawn.isLeft()) return drawn
-
-      const bracket = drawn.value
-      await bracket.load('sport')
-
-      return right(bracket)
+      return await this.unit.run(() => this.draw(payload))
     } catch (error) {
       // Dois sorteios ao mesmo tempo: o segundo esbarra no `unique` de
       // modalidade e categoria, e a resposta é a mesma do sorteio repetido.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict(
-            'Esta modalidade já foi sorteada nesta categoria',
-            'BRACKET_ALREADY_DRAWN',
-          ),
-        )
+      if (isUniqueViolation(error)) {
+        const existing = await this.existing(payload)
+        if (existing) return right(existing)
+      }
 
-      logger.error({ err: error }, '[brackets > create][error]')
+      logger.error({ err: error }, '[administrator/brackets > create][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_BRACKET_CREATE_ERROR',
         ),
       )
     }
   }
 
-  /**
-   * As partidas da chave inteira. As fases seguintes nascem vazias e vão
-   * sendo preenchidas pelos vencedores; o time de folga já entra na fase
-   * seguinte, no lugar onde o vencedor do confronto dele entraria.
-   */
-  private async createMatches(
-    bracketId: string,
-    pairings: Array<{ home: string; away: string | null }>,
-    trx: TransactionClientContract,
-  ): Promise<void> {
-    const teams = new Map<string, string>()
-    const classrooms = pairings.flatMap((pairing) => {
-      if (pairing.away) return [pairing.home, pairing.away]
-
-      return [pairing.home]
-    })
-    const created = await Team.createMany(
-      classrooms.map((classroomId) => ({ bracketId, classroomId })),
-      { client: trx },
-    )
-    for (const team of created) teams.set(team.classroomId, team.id)
-
-    let phase: MatchPhase | undefined = knockoutPhase(bracketSize(classrooms.length))
-    let round = 1
-    let size = pairings.length
-    const advanced = new Map<number, { home?: string; away?: string }>()
-
-    // Primeira fase: só os confrontos de verdade; a folga sobe direto.
-    for (const [position, pairing] of pairings.entries()) {
-      const home = teams.get(pairing.home)
-      if (!pairing.away) {
-        const slot = advanceSlot(position)
-        advanced.set(slot.position, { ...advanced.get(slot.position), [slot.side]: home })
-        continue
-      }
-
-      await Match.create(
-        {
-          bracketId,
-          phase: phase ?? MATCH_PHASE.FINAL,
-          round,
-          position,
-          homeTeamId: home,
-          awayTeamId: teams.get(pairing.away),
-        },
-        { client: trx },
+  private async draw(payload: Payload): Promise<Response> {
+    const sport = await this.brackets.lockSport(payload.sportId)
+    if (!sport)
+      return left(
+        HTTPException.UnprocessableEntity(
+          this.i18n.t('brackets.sport_not_found'),
+          'SPORT_NOT_FOUND',
+          { sportId: this.i18n.t('brackets.sport_not_found') },
+        ),
       )
-    }
 
-    phase = phase && nextPhase(phase)
-    size /= 2
+    const existing = await this.brackets.findBySportAndCategory(sport.id, payload.category)
+    if (existing)
+      return right({ bracket: BracketPresenter.created(existing, sport), created: false })
 
-    while (phase) {
-      round += 1
-      for (let position = 0; position < size; position++) {
-        const filled = advanced.get(position)
-        await Match.create(
-          {
-            bracketId,
-            phase,
-            round,
-            position,
-            homeTeamId: filled?.home ?? null,
-            awayTeamId: filled?.away ?? null,
-          },
-          { client: trx },
-        )
-      }
+    const drawn = Bracket.draw({
+      id: randomUUID(),
+      sportId: sport.id,
+      category: payload.category,
+      minAthletes: sport.minAthletes,
+      classroomIds: await this.brackets.eligibleClassroomIds(
+        sport.id,
+        payload.category,
+        sport.minAthletes,
+      ),
+      newId: () => randomUUID(),
+      random: AdministratorBracketCreateUseCase.random,
+      now: new Date(),
+    })
+    if (drawn.isLeft()) return left(BracketRefusal.http(drawn.value, this.i18n))
 
-      advanced.clear()
-      phase = nextPhase(phase)
-      size /= 2
-    }
+    await this.brackets.save(drawn.value)
+
+    return right({ bracket: BracketPresenter.created(drawn.value, sport), created: true })
+  }
+
+  /** A chave que o sorteio concorrente gravou primeiro. */
+  private async existing(payload: Payload): Promise<Drawn | null> {
+    const sport = await this.brackets.findSport(payload.sportId)
+    const bracket = await this.brackets.findBySportAndCategory(payload.sportId, payload.category)
+    if (!sport || !bracket) return null
+
+    return { bracket: BracketPresenter.created(bracket, sport), created: false }
   }
 }

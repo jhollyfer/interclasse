@@ -1,14 +1,11 @@
 import { inject } from '@adonisjs/core'
-import { Secret } from '@adonisjs/core/helpers'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { AccessToken } from '@adonisjs/auth/access_tokens'
+import { left, right, type Either } from '@interclasse/shared'
 
-import User from '#models/user'
-import { ACTIVE_STATUS } from '#core/entity'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import SessionService, { type SessionTokens } from '#services/session/session.service'
+import { UserRepository } from '#repositories/user/user.repository'
+import { SessionContract, type SessionTokens } from '#services/session/session.contract'
 
 type Payload = {
   readonly refreshToken?: string
@@ -18,63 +15,48 @@ type Response = Either<HTTPException, SessionTokens>
 
 @inject()
 export default class AuthenticationSessionRefreshUseCase {
-  constructor(private readonly session: SessionService) {}
+  constructor(
+    private readonly users: UserRepository,
+    private readonly sessions: SessionContract,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     if (!payload.refreshToken) {
-      return left(HTTPException.Unauthorized('Sessão não encontrada', 'REFRESH_TOKEN_MISSING'))
+      return left(
+        HTTPException.Unauthorized(this.i18n.t('sessions.missing'), 'REFRESH_TOKEN_MISSING'),
+      )
     }
 
-    // O `try` global começa antes da primeira ida ao banco (_padroes/backend.md §4.2).
+    // O `try` global começa antes da primeira ida ao banco (_standards/backend.md §4.2).
     try {
-      const refreshToken = await this.verify(payload.refreshToken)
+      const grant = await this.sessions.readRefresh(payload.refreshToken)
 
-      if (!refreshToken || refreshToken.name !== COOKIE_TOKEN.REFRESH) {
-        return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
-      }
+      if (!grant) return left(this.invalid())
 
-      // A mesma query do guard, e não `User.find`: renovar sem o filtro
-      // prorrogaria por escrito uma sessão que já foi encerrada.
-      const user = await User.query()
-        .where('id', String(refreshToken.tokenableId))
-        .withScopes((scopes) => scopes.notDeleted())
-        .where('status', ACTIVE_STATUS.ACTIVE)
-        .first()
+      // A mesma pergunta do guard, e não só a leitura da conta: renovar sem o
+      // filtro prorrogaria por escrito uma sessão que já foi encerrada.
+      const user = await this.users.findById(grant.userId)
 
-      if (!user) {
-        return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
-      }
+      if (!user || !user.canSignIn()) return left(this.invalid())
 
       // O `DELETE` é a seção crítica, e por isso vem antes de emitir: só quem
       // apagou a linha ganha o direito ao par novo. Sem contar as linhas
       // apagadas, duas renovações simultâneas emitiriam dois pares válidos a
       // partir do mesmo token - rotação que não rotaciona.
-      const deleted = await User.accessTokens.delete(user, refreshToken.identifier)
+      if (!(await this.sessions.revoke(user.id, grant.identifier))) return left(this.invalid())
 
-      if (deleted === 0) {
-        return left(HTTPException.Unauthorized('Sessão inválida', 'REFRESH_TOKEN_INVALID'))
-      }
-
-      return right(await this.session.issue(user))
+      return right(await this.sessions.issue(user.id))
     } catch (error) {
       logger.error({ err: error }, '[sessions > refresh][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'SESSION_REFRESH_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_REFRESH_ERROR'),
       )
     }
   }
 
-  /**
-   * Um token ilegível faz o `verify` LANÇAR em vez de devolver null. Os dois
-   * casos são a mesma coisa para quem chama: sessão inválida, não erro 500.
-   */
-  private async verify(value: string): Promise<AccessToken | null> {
-    try {
-      return await User.accessTokens.verify(new Secret(value))
-    } catch (error) {
-      logger.debug({ err: error }, '[sessions > refresh][verify] token ilegível')
-      return null
-    }
+  private invalid(): HTTPException {
+    return HTTPException.Unauthorized(this.i18n.t('sessions.invalid'), 'REFRESH_TOKEN_INVALID')
   }
 }

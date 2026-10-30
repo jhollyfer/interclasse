@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 /**
  * A mesma `queryOptions` do detalhe, com a mesma chave: quem abre a edição a

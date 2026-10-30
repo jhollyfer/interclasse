@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /**
  * O menu de uma linha da tabela.
@@ -46,7 +47,11 @@ export function RowActions({
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" size="icon" aria-label="Abrir ações">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={m.common_open_actions()}
+          >
             <DotsThreeIcon weight="bold" />
           </Button>
         }
@@ -58,7 +63,7 @@ export function RowActions({
         {...rest}
       >
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Ações</DropdownMenuLabel>
+          <DropdownMenuLabel>{m.common_actions()}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <RowActionsMenuContext.Provider value={close}>
             {children}

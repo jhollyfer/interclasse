@@ -10,6 +10,8 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { env } from '#/env'
+import { getLocale } from '#/paraglide/runtime'
+import { m } from '#/paraglide/messages'
 
 import * as server from './http.server'
 
@@ -342,7 +344,11 @@ async function perform(
    * binário vai do navegador direto ao bucket -, e um `Content-Type` esquecido
    * num envio futuro falharia do mesmo jeito.
    */
-  const headers: Record<string, string> = {}
+  // O idioma da tela vai junto (_standards/i18n.md §2): a API responde a
+  // mensagem de erro e a 422 nele. `Accept-Language` é cabeçalho da lista
+  // segura do CORS, então não cobra preflight. No SSR, `getLocale()` lê o idioma
+  // da requisição que o middleware do Paraglide abriu.
+  const headers: Record<string, string> = { 'Accept-Language': getLocale() }
   //
   // `init?.body &&` na frente: sem corpo não há tipo de conteúdo a declarar, e
   // um `Content-Type: application/json` num GET é cabeçalho que não descreve
@@ -373,7 +379,7 @@ async function perform(
   } catch {
     // `fetch` só rejeita aqui: sem resposta, logo sem status real.
     throw new HTTPError({
-      message: 'Não foi possível conectar ao servidor. Tente novamente.',
+      message: m.common_error_network(),
       status: HTTPStatus.NETWORK,
       code: HTTPErrorCode.NETWORK_ERROR,
     })
@@ -411,7 +417,7 @@ async function perform(
     }
 
     throw new HTTPError({
-      message: body?.message ?? 'Erro inesperado. Tente novamente.',
+      message: body?.message ?? m.common_error_unknown(),
       status: body?.status ?? response.status,
       code: body?.code ?? HTTPErrorCode.UNKNOWN_ERROR,
       errors: body?.errors,
@@ -433,7 +439,7 @@ export async function request<T>(
   // estouraria com um `SyntaxError`, fora do contrato de sempre `HTTPError`.
   if (response.status === HTTPStatus.NO_CONTENT) {
     throw new HTTPError({
-      message: 'A API respondeu sem corpo onde se esperava um registro.',
+      message: m.common_error_empty_response(),
       status: response.status,
       code: HTTPErrorCode.UNKNOWN_ERROR,
     })
@@ -441,7 +447,7 @@ export async function request<T>(
 
   const body: unknown = await response.json()
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (`lib/interfaces.ts` explica por quê), e o `T` é o contrato que cada `queryOptions`/mutation declara.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (sem schema de resposta no cliente), e o `T` é o contrato que cada `queryOptions`/mutation declara.
   return body as T
 }
 

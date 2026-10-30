@@ -1,34 +1,38 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either, type StoragesFileShowResponse } from '@interclasse/shared'
 
-import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { StorageRepository } from '#repositories/storage/storage.repository'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, Storage>
+type Response = Either<HTTPException, StoragesFileShowResponse>
 
 @inject()
 export default class StoragesFileShowUseCase {
+  constructor(
+    private readonly storages: StorageRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      // O mesmo filtro da listagem, pelo mesmo motivo: é o predicado que
-      // significa "arquivo vivo" em `StorageService.assertExist`, e divergir
-      // aqui mostraria na tela de detalhe um arquivo que o anexo recusa.
-      const storage = await Storage.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.notDeleted())
-        .first()
+      // Só o arquivo vivo, o mesmo predicado de quem anexa: divergir aqui
+      // mostraria na tela de detalhe um arquivo que o anexo recusa.
+      const storage = await this.storages.detail(id)
 
       if (!storage)
-        return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
+        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
 
       return right(storage)
     } catch (error) {
       logger.error({ err: error }, '[files > show][error]')
 
-      return left(HTTPException.InternalServerError('Erro interno do servidor', 'FILE_SHOW_ERROR'))
+      return left(
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_SHOW_ERROR'),
+      )
     }
   }
 }

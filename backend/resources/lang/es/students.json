@@ -1,0 +1,5 @@
+{
+  "not_found": "Alumno no encontrado",
+  "in_competition": "El alumno está inscrito en una modalidad ya sorteada",
+  "name_empty": "Indica el nombre del alumno"
+}

@@ -1,33 +1,50 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import {
+  left,
+  right,
+  type Actor,
+  type Either,
+  type RepresentativeEnrollmentShowResponse,
+} from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import type User from '#models/user'
-import EnrollmentService, { type EnrollmentBoard } from '#services/enrollment/enrollment.service'
-import { left, right, type Either } from '#core/either'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
+import { EnrollmentRepository } from '#repositories/enrollment/enrollment.repository'
 import HTTPException from '#exceptions/http.exception'
 
-type Payload = { actor: User }
-type Response = Either<HTTPException, EnrollmentBoard>
+type Payload = { actor: Actor }
+type Response = Either<HTTPException, RepresentativeEnrollmentShowResponse>
 
 @inject()
 export default class RepresentativeEnrollmentShowUseCase {
-  constructor(private readonly enrollments: EnrollmentService) {}
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly enrollments: EnrollmentRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute({ actor }: Payload): Promise<Response> {
     try {
-      const classroom = await Classroom.findBy('representativeId', actor.id)
-
+      const classroom = await this.classrooms.findOfRepresentative(actor.id)
       if (!classroom)
-        return left(HTTPException.NotFound('Nenhuma turma vinculada', 'CLASSROOM_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(this.i18n.t('classrooms.none_linked'), 'CLASSROOM_NOT_FOUND'),
+        )
 
-      return right(await this.enrollments.board(classroom, { lockAfterDraw: true }))
+      const board = await this.enrollments.board({ classroomId: classroom.id, lockAfterDraw: true })
+      if (!board)
+        return left(
+          HTTPException.NotFound(this.i18n.t('classrooms.none_linked'), 'CLASSROOM_NOT_FOUND'),
+        )
+
+      return right(board)
     } catch (error) {
-      logger.error({ err: error }, '[enrollments > show][error]')
+      logger.error({ err: error }, '[representative/enrollments > show][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'REPRESENTATIVE_ENROLLMENT_SHOW_ERROR',
         ),
       )

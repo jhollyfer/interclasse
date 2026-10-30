@@ -10,10 +10,10 @@ import {
 } from '#/components/common/page-shell'
 import { GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useCardDelete } from '#/integrations/tanstack-query/mutations'
-import { cardsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useCardDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { cardsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
-import { plural } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { ADMINISTRATOR_CARDS } from '../index'
 
@@ -29,7 +29,7 @@ export function CardsPage(): React.JSX.Element {
 
   const remove = useCardDelete({
     onSuccess: async () => {
-      toast.success('Cartão apagado.')
+      toast.success(m.admin_cards_deleted())
       await invalidate(GAME_KEYS)
     },
     onError: (error) => notifyError(error, { id: 'card-delete' }),
@@ -38,16 +38,16 @@ export function CardsPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Cartões</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_cards_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          {`${plural(cards.length, 'cartão', 'cartões')}, ${plural(red, 'vermelho', 'vermelhos')}. Para lançar, abra a partida na chave ou em Partidas e use "Cartões".`}
+          {m.admin_cards_summary({ cards: cards.length, red })}
         </PageHeaderDescription>
       </PageHeader>
 
       <CardList
         cards={cards}
         isPending={isPending}
-        empty="Nenhum cartão lançado ainda."
+        empty={m.admin_cards_empty()}
         onDelete={(card) => remove.mutate(card.id)}
       />
     </div>

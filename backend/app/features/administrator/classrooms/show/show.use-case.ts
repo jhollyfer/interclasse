@@ -1,34 +1,42 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import {
+  left,
+  right,
+  type AdministratorClassroomShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import { left, right, type Either } from '#core/either'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, Classroom>
+type Response = Either<HTTPException, AdministratorClassroomShowResponse>
 
 @inject()
 export default class AdministratorClassroomShowUseCase {
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const classroom = await Classroom.query()
-        .where('id', id)
-        .preload('advisor')
-        .preload('representative')
-        .first()
-
+      const classroom = await this.classrooms.findDetail(id)
       if (!classroom)
-        return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+        )
 
       return right(classroom)
     } catch (error) {
-      logger.error({ err: error }, '[classrooms > show][error]')
+      logger.error({ err: error }, '[administrator/classrooms > show][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CLASSROOM_SHOW_ERROR',
         ),
       )

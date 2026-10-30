@@ -1,17 +1,22 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  left,
+  right,
+  type Either,
+  type Paginated,
+  type StoragesFileShowResponse,
+} from '@interclasse/shared'
 
-import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
+import { StorageRepository } from '#repositories/storage/storage.repository'
 import { recentFirst } from '#features/_shared.sort'
-import { type Paginated } from '#core/response'
-import type { FilePaginatePayload } from '#features/storages/files/files.validator'
+import type { StoragesFilePaginatePayload } from '#validators/storages/files.validator'
 
-type Payload = FilePaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = StoragesFilePaginatePayload
+type Response = Either<HTTPException, Paginated<StoragesFileShowResponse>>
 
 /**
  * A biblioteca de arquivos do painel.
@@ -22,51 +27,33 @@ type Response = Either<HTTPException, Paginated<ModelObject>>
  */
 @inject()
 export default class StoragesFilePaginateUseCase {
+  constructor(
+    private readonly storages: StorageRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      // `whereNull` pelo mesmo critério de `StorageService.assertExist`: é o
-      // predicado que significa "arquivo vivo" no resto do código. Hoje
-      // `remove()` apaga a linha de verdade, então nunca há o que filtrar - mas
-      // divergir aqui faria a listagem oferecer um arquivo que o anexo recusa.
-      const query = Storage.query().withScopes((scopes) => scopes.notDeleted())
+      // `recentFirst` e não `sortOrder`: numa biblioteca de arquivos o que
+      // interessa é o que acabou de subir. É a ordem que `backend-old` dava.
+      const [sort, direction] = recentFirst(payload)
 
-      if (payload.status) query.where('status', payload.status)
-      if (payload.mimetype) query.where('mimetype', payload.mimetype)
-
-      // O `OR` vai **dentro** de uma subquery: encadeado direto na consulta ele
-      // escapa do `AND` anterior, e a busca anularia o filtro de status -
-      // procurar "capa" na aba dos confirmados traria os `PENDING` junto.
-      //
-      // As três colunas são as de `backend-old`, no de-para desta migração:
-      // `original_name` é o rótulo que o usuário reconhece, `filename` é o
-      // `name` de lá (o nome gerado, que aparece na URL), e `mimetype` é o que
-      // se digita para achar "pdf" sem saber o nome do arquivo.
-      if (payload.search) {
-        const search = `%${payload.search}%`
-
-        query.where(function (builder) {
-          builder
-            .whereILike('originalName', search)
-            .orWhereILike('filename', search)
-            .orWhereILike('mimetype', search)
-        })
-      }
-
-      const storages = await query
-        // `recentFirst` e não `sortOrder`: numa biblioteca de arquivos o que
-        // interessa é o que acabou de subir. É a ordem que `backend-old` dava
-        // (`storage/repository.ts:37`).
-        .orderBy(...recentFirst(payload))
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      // `{ meta, data }` montado à mão: o paginator cru levaria a classe inteira
-      // para o tipo da resposta, e `toJSON()` perderia o tipo do item num `any`.
-      return right({ meta: storages.getMeta(), data: storages.all() })
+      return right(
+        await this.storages.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          search: payload.search,
+          status: payload.status,
+          mimetype: payload.mimetype,
+          sort,
+          direction,
+        }),
+      )
     } catch (error) {
       logger.error({ err: error }, '[files > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_PAGINATE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_PAGINATE_ERROR'),
       )
     }
   }

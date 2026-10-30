@@ -1,5 +1,5 @@
 /**
- * Cobra as convencoes de `_padroes/backend.md` e `_padroes/arquitetura.md` que o ESLint nao alcanca.
+ * Cobra as convencoes de `_standards/backend.md` e `_standards/architecture.md` que o ESLint nao alcanca.
  *
  * O ESLint ja cobra as quatro regras de escrita (ternario, `any`, `as`,
  * `interface`) e a proibicao de `new` em servico. O que sobra e o que depende de
@@ -329,7 +329,7 @@ function checkClassName(relativePath: string, source: string): Finding[] {
 
 /**
  * Acao e pasta, sempre: `<recurso>/<acao>/<acao>.{controller,use-case,spec}.ts`
- * (_padroes/arquitetura.md §3). E onde a spec da acao mora e onde quem procura
+ * (_standards/architecture.md §3). E onde a spec da acao mora e onde quem procura
  * "arquivar usuario" encontra tudo.
  */
 function checkActionFolder(relativePath: string): Finding[] {
@@ -388,7 +388,7 @@ function checkCrossFeatureImport(relativePath: string, source: string): Finding[
 /**
  * Validator de recurso: todo export `*Validator` comeca pelo recurso no
  * singular e termina na acao - `UserCreateValidator` em `users/users.validator.ts`
- * (_padroes/backend.md §3 e §4.4).
+ * (_standards/backend.md §3 e §4.4).
  */
 function checkValidatorName(relativePath: string, source: string): Finding[] {
   const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativePath)
@@ -411,44 +411,41 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * O espelho do frontend tem os mesmos exports (_padroes/arquitetura.md §4):
- * `app/features/<modulo>/<recurso>/<recurso>.validator.ts` e
- * `frontend/src/validators/<modulo>/<recurso>.validator.ts`. Todo export do
- * frontend existe no backend - o frontend nao valida o que a API nao conhece.
- * Sem o frontend ao lado (clone so do backend), a regra nao roda.
+ * Paridade VineJS x Zod (_standards/architecture.md §10): todo validator de
+ * `shared/src/validators/<modulo>/<recurso>.validator.ts` tem o par em
+ * `app/validators/<modulo>/<recurso>.validator.ts`, com os mesmos nomes de
+ * `*Validator`. Sem o `shared/` ao lado, a regra nao roda.
  */
 async function checkValidatorParity(sources: Map<string, string>): Promise<Finding[]> {
-  const frontRoot = resolve(ROOT, '../frontend/src/validators')
-  if (!(await exists(frontRoot))) return []
+  const sharedRoot = resolve(ROOT, '../shared/src/validators')
+  if (!(await exists(sharedRoot))) return []
 
   const findings: Finding[] = []
-  for (const file of await tsFiles(frontRoot)) {
+  for (const file of await tsFiles(sharedRoot)) {
     if (!file.endsWith('.validator.ts')) continue
-    const logical = relative(frontRoot, file)
-    const parts = logical.replace('.validator.ts', '').split('/')
-    const resource = parts[parts.length - 1] ?? ''
-    const mirror = `app/features/${parts.join('/')}/${resource}.validator.ts`
-    const backSource = sources.get(mirror)
-    const frontSource = withoutComments(await readFile(file, 'utf8'))
+    const logical = relative(sharedRoot, file)
+    const pair = `app/validators/${logical}`
+    const backSource = sources.get(pair)
+    const sharedSource = withoutComments(await readFile(file, 'utf8'))
     if (backSource === undefined) {
       findings.push({
-        file: `../frontend/src/validators/${logical}`,
+        file: `../shared/src/validators/${logical}`,
         line: 1,
-        rule: 'validator-without-mirror',
-        section: 'arquitetura 4',
-        message: `nao ha \`${mirror}\` no backend`,
+        rule: 'validator-without-pair',
+        section: 'arquitetura 10',
+        message: `nao ha \`${pair}\` no backend`,
       })
       continue
     }
-    for (const exported of frontSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+    for (const exported of sharedSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
       const name = exported[1] ?? ''
       if (new RegExp(`export\\s+const\\s+${name}\\b`).test(backSource)) continue
       findings.push({
-        file: `../frontend/src/validators/${logical}`,
-        line: lineOf(frontSource, exported.index),
-        rule: 'validator-without-mirror',
-        section: 'arquitetura 4',
-        message: `\`${name}\` nao existe em \`${mirror}\``,
+        file: `../shared/src/validators/${logical}`,
+        line: lineOf(sharedSource, exported.index),
+        rule: 'validator-without-pair',
+        section: 'arquitetura 10',
+        message: `\`${name}\` nao existe em \`${pair}\``,
       })
     }
   }
@@ -798,7 +795,7 @@ function report(findings: Finding[]): void {
   console.log(`pattern:check: ${findings.length} violacoes\n`)
   for (const a of findings) {
     console.log(`  ${a.file}:${a.line}`)
-    console.log(`      [${a.rule}] ${a.message}  (_padroes/backend.md ${a.section})`)
+    console.log(`      [${a.rule}] ${a.message}  (_standards/backend.md ${a.section})`)
   }
 
   console.log('\n  Por regra:')

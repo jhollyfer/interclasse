@@ -2,10 +2,10 @@ import type * as React from 'react'
 import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { SignOutIcon } from '@phosphor-icons/react'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { BrandMark } from '#/components/common/brand-mark'
-import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries'
-import { USER_ROLE } from '#/lib/entity'
+import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   Sidebar as Root,
   SidebarContent,
@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '#/components/ui/sidebar'
+import { m } from '#/paraglide/messages'
 
 import { PENDING_REMOVALS, menuFor } from './menu'
 import {
@@ -189,9 +190,9 @@ export function Sidebar(): React.JSX.Element {
             */}
             <SignOutConfirm
               trigger={
-                <SidebarMenuButton tooltip="Sair">
+                <SidebarMenuButton tooltip={m.panel_sign_out()}>
                   <SignOutIcon />
-                  <span>Sair</span>
+                  <span>{m.panel_sign_out()}</span>
                 </SidebarMenuButton>
               }
             >

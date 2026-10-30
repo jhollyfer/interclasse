@@ -4,7 +4,8 @@ import { Link } from '@tanstack/react-router'
 import { BrandMark } from '#/components/common/brand-mark'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 /**
  * A moldura das telas de autenticação: lateral de marca à esquerda e o
@@ -80,7 +81,7 @@ function AuthShellBrand({
 }: React.ComponentProps<'span'>): React.JSX.Element {
   return (
     // Link para o site: quem caiu na entrada por engano volta sem digitar URL.
-    <Link to="/" aria-label="Jogos Estudantis - voltar ao site">
+    <Link to="/" aria-label={m.auth_back_to_site()}>
       <BrandMark
         data-slot="auth-shell-brand"
         className={className}

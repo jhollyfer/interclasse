@@ -1,0 +1,10 @@
+{
+  "not_found": "Sport not found",
+  "invalid_limits": "Invalid athlete limits",
+  "min_above_max": "The minimum cannot exceed the maximum",
+  "already_exists": "Sport already exists",
+  "name_taken": "A sport with this name already exists",
+  "roster_above_limit": "A class has more athletes enrolled than the new maximum",
+  "roster_above_limit_field": "A class already has {total} athletes enrolled; shorten the list first",
+  "in_use": "The sport has enrollments"
+}

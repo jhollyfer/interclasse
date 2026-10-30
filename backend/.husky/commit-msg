@@ -1,5 +1,0 @@
-# Conventional Commits em pt-BR (_padroes/tooling.md §6), contra o
-# `.commitlintrc.json` da raiz. É o mesmo comando do workflow `commitlint.yml`:
-# o hook e o CI reprovam pelo mesmo motivo. `npx -p` porque a raiz não tem
-# dependências instaladas - backend e frontend são projetos pnpm separados.
-npx --yes -p @commitlint/cli@21 -p @commitlint/config-conventional@21 commitlint --edit "$1"

@@ -1,6 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { USER_ROLE } from '@interclasse/shared'
 
 import {
   Table,
@@ -22,8 +23,8 @@ import {
   TableTrashToggle,
   useTable,
 } from '#/components/common/table'
-import { USER_ROLE } from '#/lib/entity'
-import { usersQueryOptions } from '#/integrations/tanstack-query/queries'
+import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { m } from '#/paraglide/messages'
 
 import { UserBulkActions } from './bulk-actions'
 import { userColumns } from './columns'
@@ -49,9 +50,11 @@ export function UsersTable(): React.JSX.Element {
     usersQueryOptions(search),
   )
 
+  const columns = React.useMemo(() => userColumns(), [])
+
   const table = useTable({
     rows: data?.data ?? [],
-    columns: userColumns,
+    columns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:users',
     // A própria conta não entra na seleção: arquivá-la é
@@ -79,16 +82,16 @@ export function UsersTable(): React.JSX.Element {
       onRetry={() => void refetch()}
     >
       <TableHeader>
-        <TableTitle>Usuários</TableTitle>
+        <TableTitle>{m.admin_users_title()}</TableTitle>
         <TableActions>
           <TableCreateButton to="/administrator/users/new">
-            Adicionar usuário
+            {m.admin_users_create()}
           </TableCreateButton>
         </TableActions>
       </TableHeader>
 
       <TableToolbar>
-        <TableSearch placeholder="Buscar usuários..." />
+        <TableSearch placeholder={m.admin_users_search()} />
         <UserFilters search={search} />
         <TableTrashToggle />
         <TableColumnToggle table={table} />
@@ -96,21 +99,23 @@ export function UsersTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>Nenhum usuário ainda</TableEmptyTitle>
+          <TableEmptyTitle>{m.admin_users_empty_title()}</TableEmptyTitle>
           <TableEmptyDescription>
-            Este é o único caminho de criação de conta: não há cadastro público,
-            e o primeiro administrador vem do seeder.
+            {m.admin_users_empty_description()}
           </TableEmptyDescription>
           <TableEmptyActions>
             <TableCreateButton to="/administrator/users/new">
-              Adicionar usuário
+              {m.admin_users_create()}
             </TableCreateButton>
           </TableEmptyActions>
         </TableEmpty>
 
         <TableGrid table={table} />
 
-        <TableSelectionBar table={table} noun={['usuário', 'usuários']}>
+        <TableSelectionBar
+          table={table}
+          noun={[m.admin_users_noun_one(), m.admin_users_noun_other()]}
+        >
           {(users) => <UserBulkActions users={users} />}
         </TableSelectionBar>
       </TableContent>

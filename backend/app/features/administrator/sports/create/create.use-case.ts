@@ -1,64 +1,61 @@
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
+import { randomUUID } from 'node:crypto'
 
-import Sport from '#models/sport'
-import SlugService from '#services/slug/slug.service'
-import { left, right, type Either } from '#core/either'
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import logger from '@adonisjs/core/services/logger'
+import { left, right, type AdministratorSportShowResponse, type Either } from '@interclasse/shared'
+
+import { SportPresenter } from '../sports.presenter.ts'
+import { SportRefusal } from '../_shared.sport-refusal.ts'
+
+import { Sport } from '#domain/sport/sport.entity'
+import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import type { SportCreatePayload } from '#features/administrator/sports/sports.validator'
+import type { AdministratorSportCreatePayload } from '#validators/administrator/sports.validator'
 
-type Payload = SportCreatePayload
-type Response = Either<HTTPException, Sport>
+type Payload = AdministratorSportCreatePayload
+type Response = Either<HTTPException, AdministratorSportShowResponse>
 
+/** Cadastra a modalidade: a entidade confere os limites, o repository a unicidade. */
 @inject()
 export default class AdministratorSportCreateUseCase {
-  constructor(private readonly slug: SlugService) {}
+  constructor(
+    private readonly sports: SportRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      if (payload.minAthletes > payload.maxAthletes)
-        return left(
-          HTTPException.UnprocessableEntity(
-            'Limites de atletas inválidos',
-            'SPORT_INVALID_LIMITS',
-            {
-              minAthletes: 'O mínimo não pode passar do máximo',
-            },
-          ),
-        )
+      const created = Sport.create({ id: randomUUID(), ...payload, now: new Date() })
+      if (created.isLeft()) return left(SportRefusal.http(created.value, this.i18n))
 
-      const slug = this.slug.normalize(payload.name)
-      const existing = await Sport.query().where('name', payload.name).orWhere('slug', slug).first()
+      const sport = created.value
+      if (await this.sports.existsByNameOrSlug(payload.name, sport.snapshot().slug))
+        return left(this.alreadyExists())
 
-      if (existing)
-        return left(
-          HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
-            name: 'Já existe uma modalidade com este nome',
-          }),
-        )
+      await this.sports.save(sport)
 
-      const sport = await Sport.create({ ...payload, slug })
-
-      return right(sport)
+      return right(SportPresenter.show(sport))
     } catch (error) {
       // A checagem acima não fecha a corrida: o segundo de dois pedidos
       // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Modalidade já existe', 'SPORT_ALREADY_EXISTS', {
-            name: 'Já existe uma modalidade com este nome',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(this.alreadyExists())
 
-      logger.error({ err: error }, '[sports > create][error]')
+      logger.error({ err: error }, '[administrator/sports > create][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_SPORT_CREATE_ERROR',
         ),
       )
     }
+  }
+
+  private alreadyExists(): HTTPException {
+    return HTTPException.Conflict(this.i18n.t('sports.already_exists'), 'SPORT_ALREADY_EXISTS', {
+      name: this.i18n.t('sports.name_taken'),
+    })
   }
 }

@@ -7,6 +7,7 @@ import {
   CaretLeftIcon,
   CaretRightIcon,
 } from '@phosphor-icons/react'
+import type { PaginationMeta } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -16,14 +17,14 @@ import {
 } from '#/components/ui/pagination'
 import { Field, FieldDescription, FieldLabel } from '#/components/ui/field'
 import { OptionCombobox } from '#/components/common/option-combobox'
-import type { IPaginationMeta } from '#/lib/interfaces'
 import type { ListSearch } from '#/lib/list-search'
+import { m } from '#/paraglide/messages'
 
 /** As opções de itens por página. O teto do backend é 100 (`perPage.max(100)`). */
 const PER_PAGE_OPTIONS = ['10', '20', '30', '40', '50']
 
 type PaginationProps<TSearch extends ListSearch> = Readonly<{
-  meta: IPaginationMeta
+  meta: PaginationMeta
   /** A rota desta listagem, para onde os links apontam. */
   to: string
   /**
@@ -78,7 +79,7 @@ export function Pagination<TSearch extends ListSearch>({
     >
       <Field orientation="horizontal" className="w-auto">
         <FieldLabel htmlFor={perPageId} className="flex-none text-sm">
-          Itens por página
+          {m.table_per_page()}
         </FieldLabel>
         <OptionCombobox
           id={perPageId}
@@ -96,14 +97,13 @@ export function Pagination<TSearch extends ListSearch>({
           className="w-20"
         />
         <FieldDescription className="hidden sm:block">
-          {total} registro(s)
+          {m.table_records({ total })}
         </FieldDescription>
       </Field>
 
       <div className="flex items-center gap-4">
         <span className="text-sm tabular-nums text-muted-foreground">
-          Página <strong className="text-foreground">{currentPage}</strong> /{' '}
-          <strong className="text-foreground">{lastPage}</strong>
+          {m.table_page({ current: currentPage, last: lastPage })}
         </span>
 
         <PaginationRoot className="mx-0 w-auto">
@@ -114,7 +114,7 @@ export function Pagination<TSearch extends ListSearch>({
                 variant="outline"
                 size="icon"
                 disabled={isFirst}
-                aria-label="Primeira página"
+                aria-label={m.table_first_page()}
                 render={
                   <Link
                     to={to}
@@ -133,7 +133,7 @@ export function Pagination<TSearch extends ListSearch>({
                 variant="outline"
                 size="icon"
                 disabled={isFirst}
-                aria-label="Página anterior"
+                aria-label={m.table_previous_page()}
                 render={
                   <Link
                     to={to}
@@ -152,7 +152,7 @@ export function Pagination<TSearch extends ListSearch>({
                 variant="outline"
                 size="icon"
                 disabled={isLast}
-                aria-label="Próxima página"
+                aria-label={m.table_next_page()}
                 render={
                   <Link
                     to={to}
@@ -171,7 +171,7 @@ export function Pagination<TSearch extends ListSearch>({
                 variant="outline"
                 size="icon"
                 disabled={isLast}
-                aria-label="Última página"
+                aria-label={m.table_last_page()}
                 render={
                   <Link
                     to={to}

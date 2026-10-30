@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
 /**
- * Sonda de vida do container: `GET /health-check` (_padroes/arquitetura.md §7).
+ * Sonda de vida do container: `GET /health-check` (_standards/architecture.md §7).
  *
  * Responde apenas "o processo está de pé e aceitando requisição", que é o que o
  * orquestrador precisa para decidir se manda tráfego. Sem auth, sem banco e sem

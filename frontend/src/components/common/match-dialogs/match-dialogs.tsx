@@ -1,5 +1,15 @@
 import type * as React from 'react'
 import { toast } from 'sonner'
+import {
+  AdministratorMatchScoreValidator,
+  AdministratorMatchUpdateValidator,
+} from '@interclasse/shared'
+import type {
+  AdministratorMatchScorePayload,
+  AdministratorMatchUpdatePayload,
+  AdministratorMatchScoreResponse,
+  AdministratorMatchUpdateResponse,
+} from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
@@ -15,6 +25,7 @@ import {
 import { Input } from '#/components/ui/input'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
+import { blankToNull } from '#/lib/form-values'
 import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import { useMutationForm } from '#/hooks/use-mutation-form'
 import {
@@ -25,17 +36,11 @@ import {
   useMatchScore,
   useMatchUnscore,
   useMatchUpdate,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import type {
   MatchScoreVariables,
   MatchUpdateVariables,
-} from '#/integrations/tanstack-query/mutations'
-import type { IMatch } from '#/lib/interfaces'
-import {
-  MatchScoreValidator,
-  MatchUpdateValidator,
-} from '#/validators/administrator/matches.validator'
-import type { MatchScorePayload } from '#/validators/administrator/matches.validator'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import {
   ConfirmDialog,
   ConfirmDialogCancel,
@@ -45,6 +50,7 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
+import { m } from '#/paraglide/messages'
 
 /** O mínimo de uma partida que os dois diálogos precisam. */
 export type MatchRef = Readonly<{
@@ -88,11 +94,11 @@ export function MatchScoreDialog({
   onOpenChange,
 }: DialogProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
-    MatchScorePayload,
-    IMatch,
+    AdministratorMatchScorePayload,
+    AdministratorMatchScoreResponse,
     MatchScoreVariables
   >({
-    validator: MatchScoreValidator,
+    validator: AdministratorMatchScoreValidator,
     defaults: {
       homeScore: match.homeScore ?? undefined,
       awayScore: match.awayScore ?? undefined,
@@ -100,7 +106,7 @@ export function MatchScoreDialog({
     },
     fields: SCORE_FIELDS,
     mutation: useMatchScore,
-    success: 'Placar salvo.',
+    success: m.common_match_score_saved(),
     // Placar é escrita idempotente: reenviar grava o mesmo resultado.
     retry: 'match-score',
     payload: (values) => {
@@ -121,9 +127,12 @@ export function MatchScoreDialog({
       <DialogContent>
         <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>Placar</DialogTitle>
+            <DialogTitle>{m.common_match_score_title()}</DialogTitle>
             <DialogDescription>
-              {match.homeName} x {match.awayName}
+              {m.common_match_versus({
+                home: match.homeName ?? m.common_to_be_defined(),
+                away: match.awayName ?? m.common_to_be_defined(),
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -165,7 +174,7 @@ export function MatchScoreDialog({
               control={form.control}
               name="winnerTeamId"
               id="score-winner"
-              label="Venceu nos pênaltis"
+              label={m.common_match_penalty_winner()}
             >
               {({ field, control }) => (
                 <NativeSelect
@@ -176,7 +185,9 @@ export function MatchScoreDialog({
                   }
                   onBlur={field.onBlur}
                 >
-                  <NativeSelectOption value="">Selecione</NativeSelectOption>
+                  <NativeSelectOption value="">
+                    {m.common_select_placeholder()}
+                  </NativeSelectOption>
                   <NativeSelectOption value={match.homeTeamId ?? ''}>
                     {match.homeName}
                   </NativeSelectOption>
@@ -192,7 +203,7 @@ export function MatchScoreDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
-              Salvar placar
+              {m.common_match_score_submit()}
             </Button>
           </DialogFooter>
         </form>
@@ -230,9 +241,6 @@ function ScoreInput({
   )
 }
 
-/** O que a agenda edita: o texto do `datetime-local` e o local. */
-type ScheduleForm = Readonly<{ scheduledAt: string; location: string }>
-
 /** Data, hora e local da partida. */
 export function MatchScheduleDialog({
   match,
@@ -240,26 +248,23 @@ export function MatchScheduleDialog({
   onOpenChange,
 }: DialogProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
-    ScheduleForm,
-    IMatch,
+    AdministratorMatchUpdatePayload,
+    AdministratorMatchUpdateResponse,
     MatchUpdateVariables
   >({
-    validator: MatchUpdateValidator,
-    defaults: {
-      scheduledAt: toSchoolInput(match.scheduledAt),
-      location: match.location ?? '',
-    },
+    validator: AdministratorMatchUpdateValidator,
+    // O formulário guarda o que a API recebe: ISO com fuso e o local, ou
+    // `null`. O relógio da escola é só o que o campo mostra.
+    defaults: { scheduledAt: match.scheduledAt, location: match.location },
     fields: SCHEDULE_FIELDS,
     mutation: useMatchUpdate,
-    success: 'Agenda salva.',
+    success: m.common_match_schedule_saved(),
     retry: 'match-update',
-    // O campo guarda o relógio da escola; a API recebe ISO com fuso.
-    payload: (values) => {
-      let scheduledAt: string | null = null
-      if (values.scheduledAt) scheduledAt = fromSchoolInput(values.scheduledAt)
-
-      return { id: match.id, scheduledAt, location: values.location || null }
-    },
+    payload: (values) => ({
+      id: match.id,
+      scheduledAt: values.scheduledAt ?? null,
+      location: values.location ?? null,
+    }),
     invalidate: GAME_CHANGE,
     onSuccess: () => onOpenChange(false),
   })
@@ -269,9 +274,12 @@ export function MatchScheduleDialog({
       <DialogContent>
         <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>Agendar partida</DialogTitle>
+            <DialogTitle>{m.common_match_schedule_title()}</DialogTitle>
             <DialogDescription>
-              {match.homeName ?? 'A definir'} x {match.awayName ?? 'A definir'}
+              {m.common_match_versus({
+                home: match.homeName ?? m.common_to_be_defined(),
+                away: match.awayName ?? m.common_to_be_defined(),
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -279,24 +287,38 @@ export function MatchScheduleDialog({
             control={form.control}
             name="scheduledAt"
             id="schedule-when"
-            label="Data e hora"
+            label={m.common_match_when()}
           >
             {({ field, control }) => (
-              <Input {...field} {...control} type="datetime-local" />
+              <Input
+                {...control}
+                type="datetime-local"
+                value={toSchoolInput(field.value ?? null)}
+                onChange={(event) => {
+                  const typed = event.target.value
+                  if (typed) field.onChange(fromSchoolInput(typed))
+                  else field.onChange(null)
+                }}
+                onBlur={field.onBlur}
+              />
             )}
           </AppField>
           <AppField
             control={form.control}
             name="location"
             id="schedule-location"
-            label="Local"
+            label={m.common_match_location()}
           >
             {({ field, control }) => (
               <Input
-                {...field}
                 {...control}
                 maxLength={120}
-                placeholder="Quadra principal"
+                placeholder={m.common_match_location_placeholder()}
+                value={field.value ?? ''}
+                onChange={(event) =>
+                  field.onChange(blankToNull(event.target.value))
+                }
+                onBlur={field.onBlur}
               />
             )}
           </AppField>
@@ -305,7 +327,7 @@ export function MatchScheduleDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
-              Salvar agenda
+              {m.common_match_schedule_submit()}
             </Button>
           </DialogFooter>
         </form>
@@ -326,7 +348,7 @@ export function MatchUnscoreDialog({
   const invalidate = useInvalidate()
   const unscore = useMatchUnscore({
     onSuccess: async () => {
-      toast.success('Placar desfeito.')
+      toast.success(m.common_match_unscored())
       await invalidate(GAME_CHANGE)
     },
     onError: (error) => notifyError(error, { id: 'match-unscore' }),
@@ -340,15 +362,23 @@ export function MatchUnscoreDialog({
       onConfirm={() => unscore.mutate(match.id)}
     >
       <ConfirmDialogHeader>
-        <ConfirmDialogTitle>Desfazer o placar?</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.common_match_unscore_title()}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          {`${match.homeName ?? 'A definir'} ${match.homeScore ?? '-'} x ${match.awayScore ?? '-'} ${match.awayName ?? 'A definir'}`}
-          {' volta para "a jogar", e o vencedor sai da partida seguinte.'}
+          {m.common_match_unscore_description({
+            home: match.homeName ?? m.common_to_be_defined(),
+            homeScore: match.homeScore ?? '-',
+            awayScore: match.awayScore ?? '-',
+            away: match.awayName ?? m.common_to_be_defined(),
+          })}
         </ConfirmDialogDescription>
       </ConfirmDialogHeader>
       <ConfirmDialogFooter>
         <ConfirmDialogCancel />
-        <ConfirmDialogConfirm>Desfazer</ConfirmDialogConfirm>
+        <ConfirmDialogConfirm>
+          {m.common_match_unscore_submit()}
+        </ConfirmDialogConfirm>
       </ConfirmDialogFooter>
     </ConfirmDialog>
   )

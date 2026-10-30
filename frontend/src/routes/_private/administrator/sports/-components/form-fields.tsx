@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorSportCreatePayload } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
@@ -7,9 +8,9 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
+import { m } from '#/paraglide/messages'
 
-export type SportFormType = SportCreatePayload
+export type SportFormType = AdministratorSportCreatePayload
 
 export const SPORT_FORM_DEFAULTS: DefaultValues<SportFormType> = {
   name: '',
@@ -36,13 +37,17 @@ export function SportFormFields({
         control={form.control}
         name="name"
         id={`${idPrefix}-name`}
-        label="Nome"
+        label={m.admin_common_name()}
       >
         {({ field, control }) => (
           <>
-            <Input {...field} {...control} placeholder="Futsal" />
+            <Input
+              {...field}
+              {...control}
+              placeholder={m.admin_sports_field_name_placeholder()}
+            />
             <FieldDescription>
-              Vira o endereço da modalidade no site.
+              {m.admin_sports_field_name_description()}
             </FieldDescription>
           </>
         )}
@@ -53,7 +58,7 @@ export function SportFormFields({
           control={form.control}
           name="minAthletes"
           id={`${idPrefix}-min`}
-          label="Mínimo de atletas"
+          label={m.admin_sports_field_min()}
         >
           {({ field, control }) => (
             <>
@@ -67,7 +72,7 @@ export function SportFormFields({
                 onBlur={field.onBlur}
               />
               <FieldDescription>
-                Turma com menos inscritos fica fora do sorteio.
+                {m.admin_sports_field_min_description()}
               </FieldDescription>
             </>
           )}
@@ -77,7 +82,7 @@ export function SportFormFields({
           control={form.control}
           name="maxAthletes"
           id={`${idPrefix}-max`}
-          label="Máximo de atletas"
+          label={m.admin_sports_field_max()}
         >
           {({ field, control }) => (
             <Input

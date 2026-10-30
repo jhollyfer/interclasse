@@ -1,0 +1,18 @@
+{
+  "not_found": "Grupo no encontrado",
+  "none_linked": "Ningún grupo vinculado",
+  "already_exists": "El grupo ya existe",
+  "name_taken": "Ya existe un grupo con este nombre",
+  "invalid_grade": "Año inválido",
+  "invalid_grade_field": "El año va del 3.º al 9.º",
+  "advisor_not_found": "Consejero no encontrado",
+  "advisor_not_found_field": "Selecciona un profesor consejero",
+  "advisor_taken": "Consejero ya vinculado a otro grupo",
+  "advisor_taken_field": "Este consejero ya está en otro grupo",
+  "representative_not_found": "Representante no encontrado",
+  "representative_not_found_field": "Selecciona un alumno representante",
+  "representative_taken": "Representante ya vinculado a otro grupo",
+  "representative_taken_field": "Este representante ya está en otro grupo",
+  "in_competition": "El grupo ya está en un cuadro sorteado",
+  "category_locked_field": "No se puede cambiar la categoría de un grupo ya sorteado"
+}

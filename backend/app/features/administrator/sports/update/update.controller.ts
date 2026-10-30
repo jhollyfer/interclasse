@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorSportUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { SportUpdateValidator } from '#features/administrator/sports/sports.validator'
+import { AdministratorSportUpdateValidator } from '#validators/administrator/sports.validator'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -13,12 +13,15 @@ export default class AdministratorSportUpdateController {
     description:
       'Campo ausente é "não mexer". Trocar o nome troca o `slug`, e com ele o endereço da ' +
       'modalidade no site.',
+    // Nascem na entidade e são traduzidos em `_shared.sport-refusal.ts`, fora da
+    // pasta da ação: o introspector não os lê sozinho.
+    errors: { 409: ['SPORT_ROSTER_ABOVE_LIMIT'], 422: ['SPORT_INVALID_LIMITS'] },
   })
 
   constructor(private readonly useCase: AdministratorSportUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(SportUpdateValidator)
+    const body = await context.request.validateUsing(AdministratorSportUpdateValidator)
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

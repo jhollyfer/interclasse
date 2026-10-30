@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorSportShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -15,8 +16,8 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useSportDelete } from '#/integrations/tanstack-query/mutations'
-import type { ISport } from '#/lib/interfaces'
+import { useSportDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 /**
  * Editar e apagar. Modalidade com inscrições é recusada pelo servidor com
@@ -25,14 +26,14 @@ import type { ISport } from '#/lib/interfaces'
 export function SportRowActions({
   sport,
 }: Readonly<{
-  sport: ISport
+  sport: AdministratorSportShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
   const remove = useSportDelete({
     onError: (error) => notifyError(error, { id: 'sport-delete' }),
     onSuccess: () => {
-      toast.success('Modalidade removida.')
+      toast.success(m.admin_sports_removed())
       return invalidate([
         queryKeys.administrator.sports.all,
         ...DEPENDENTS.sports,
@@ -46,16 +47,17 @@ export function SportRowActions({
         render={
           <Link to="/administrator/sports/$id/edit" params={{ id: sport.id }}>
             <PencilSimpleIcon />
-            Editar
+            {m.admin_common_edit()}
           </Link>
         }
       />
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(sport.id)}>
-        <ConfirmDialogTitle>{`Remover a modalidade ${sport.name}?`}</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.admin_sports_remove_title({ name: sport.name })}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          Só é possível enquanto nenhuma turma inscreveu atletas nela. Não dá
-          para desfazer.
+          {m.admin_sports_remove_description()}
         </ConfirmDialogDescription>
       </RowActionsDelete>
     </RowActions>

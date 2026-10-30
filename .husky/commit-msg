@@ -1,0 +1,4 @@
+# Conventional Commits em pt-BR (_standards/tooling.md §6), contra o
+# `.commitlintrc.json` da raiz. É o mesmo commitlint do workflow
+# `commitlint.yml`: o hook e o CI reprovam pelo mesmo motivo.
+pnpm exec commitlint --edit "$1"

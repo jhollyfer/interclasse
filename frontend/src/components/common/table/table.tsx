@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { PageShell } from '#/components/common/page-shell'
 import type { ListSearch } from '#/lib/list-search'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { TableProvider } from './table-context'
 

@@ -1,0 +1,13 @@
+# Um para as duas imagens (_doc-lib/pnpm.md#docker). `dist` fica de fora para a
+# imagem compilar o `shared/` do código, e não levar um `dist/` velho de quem
+# rodou o build na máquina.
+**/node_modules
+.git
+.gitignore
+*.md
+**/dist
+**/build
+**/.output
+**/coverage
+**/.env*
+!backend/.env.example

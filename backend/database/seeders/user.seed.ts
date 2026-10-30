@@ -1,8 +1,8 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
 import env from '#start/env'
 import User from '#models/user'
-import { ACTIVE_STATUS, USER_ROLE } from '#core/entity'
 
 /**
  * O primeiro administrador. Nenhum endpoint cria conta sem sessão - o painel é

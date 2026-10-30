@@ -1,62 +1,65 @@
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
+import { randomUUID } from 'node:crypto'
 
-import Classroom from '#models/classroom'
-import ClassroomService from '#services/classroom/classroom.service'
-import { left, right, type Either } from '#core/either'
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import logger from '@adonisjs/core/services/logger'
+import {
+  left,
+  right,
+  type AdministratorClassroomShowResponse,
+  type Either,
+} from '@interclasse/shared'
+
+import { ClassroomRefusal } from '../_shared.classroom-refusal.ts'
+
+import { Classroom } from '#domain/classroom/classroom.entity'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { categoryOf } from '#features/administrator/_shared.classroom'
-import type { ClassroomCreatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { AdministratorClassroomCreatePayload } from '#validators/administrator/classrooms.validator'
 
-type Payload = ClassroomCreatePayload
-type Response = Either<HTTPException, Classroom>
+type Payload = AdministratorClassroomCreatePayload
+type Response = Either<HTTPException, AdministratorClassroomShowResponse>
 
+/**
+ * Cadastra a turma: a entidade deriva a categoria e confere os vínculos pelos
+ * fatos que o repository traz, e o nome repetido é 409.
+ */
 @inject()
 export default class AdministratorClassroomCreateUseCase {
-  constructor(private readonly classrooms: ClassroomService) {}
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const existing = await Classroom.findBy('name', payload.name)
+      if (await this.classrooms.existsByName(payload.name))
+        return left(ClassroomRefusal.alreadyExists(this.i18n))
 
-      if (existing)
+      const facts = await this.classrooms.peopleFacts(payload)
+      const created = Classroom.create({ id: randomUUID(), ...payload, now: new Date() }, facts)
+      if (created.isLeft()) return left(ClassroomRefusal.http(created.value, this.i18n))
+
+      await this.classrooms.save(created.value)
+
+      const detail = await this.classrooms.findDetail(created.value.id)
+      if (!detail)
         return left(
-          HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
-            name: 'Já existe uma turma com este nome',
-          }),
+          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
         )
 
-      const people = await this.classrooms.assertPeople(payload)
-      if (people.isLeft()) return left(people.value)
-
-      const classroom = await Classroom.create({
-        ...payload,
-        category: categoryOf(payload.grade),
-      })
-
-      // O `INSERT` só devolve a chave primária: sem o refresh, os vínculos não
-      // enviados ficam `undefined` e o `load` recusa.
-      await classroom.refresh()
-      await classroom.load('advisor')
-      await classroom.load('representative')
-
-      return right(classroom)
+      return right(detail)
     } catch (error) {
       // A checagem acima não fecha a corrida: o segundo de dois pedidos
       // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
-            name: 'Já existe uma turma com este nome',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(ClassroomRefusal.race(error, this.i18n))
 
-      logger.error({ err: error }, '[classrooms > create][error]')
+      logger.error({ err: error }, '[administrator/classrooms > create][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CLASSROOM_CREATE_ERROR',
         ),
       )

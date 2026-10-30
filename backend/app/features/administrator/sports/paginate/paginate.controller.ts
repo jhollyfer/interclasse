@@ -5,9 +5,9 @@ import AdministratorSportPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import {
-  SportPaginateValidator,
+  AdministratorSportPaginateValidator,
   SPORT_SORT_COLUMNS,
-} from '#features/administrator/sports/sports.validator'
+} from '#validators/administrator/sports.validator'
 
 @inject()
 export default class AdministratorSportPaginateController {
@@ -18,7 +18,7 @@ export default class AdministratorSportPaginateController {
   constructor(private readonly useCase: AdministratorSportPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(SportPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorSportPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

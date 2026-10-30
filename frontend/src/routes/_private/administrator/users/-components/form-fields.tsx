@@ -1,5 +1,7 @@
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorUserUpdatePayload } from '@interclasse/shared'
+import { ACTIVE_STATUS, ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
@@ -18,16 +20,16 @@ import {
 } from '#/components/common/image-field'
 import { InputPassword } from '#/components/common/input-password'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
-import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#/lib/entity'
+import { blankToUndefined } from '#/lib/form-values'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_DOTS,
   USER_ROLE_LABELS,
   initials,
 } from '#/lib/labels'
-import type { UserCreatePayload } from '#/validators/administrator/users.validator'
+import { m } from '#/paraglide/messages'
 
-export type UserFormType = UserCreatePayload
+export type UserFormType = AdministratorUserUpdatePayload
 
 /**
  * O formulário vazio.
@@ -44,8 +46,6 @@ export type UserFormType = UserCreatePayload
 export const USER_FORM_DEFAULTS: DefaultValues<UserFormType> = {
   name: '',
   email: '',
-  password: '',
-  passwordConfirmation: '',
   status: ACTIVE_STATUS.ACTIVE,
   avatarId: null,
 }
@@ -103,7 +103,7 @@ export function UserFormFields({
   form,
   idPrefix,
   previewUrl,
-  passwordLabel = 'Senha',
+  passwordLabel = m.admin_users_field_password(),
 }: UserFormFieldsProps): React.JSX.Element {
   const name = form.watch('name')
 
@@ -115,7 +115,7 @@ export function UserFormFields({
         control={form.control}
         name="avatarId"
         id={`${idPrefix}-avatar`}
-        label="Foto (opcional)"
+        label={m.admin_users_field_photo()}
       >
         {({ field, control }) => (
           <ImageField
@@ -127,12 +127,14 @@ export function UserFormFields({
             {/* Sem foto e sem nome, o espaço reservado fica vazio, e é o que
                 se quer: `initials('')` é `''` e o `AvatarFallback` sabe ficar
                 em branco. */}
-            <ImageFieldPreview alt="Foto da conta">
+            <ImageFieldPreview alt={m.admin_users_photo_alt()}>
               {initials(name)}
             </ImageFieldPreview>
             <ImageFieldContent>
               <ImageFieldActions>
-                <ImageFieldUpload>Enviar foto</ImageFieldUpload>
+                <ImageFieldUpload>
+                  {m.admin_users_upload_photo()}
+                </ImageFieldUpload>
                 <ImageFieldRemove />
               </ImageFieldActions>
               <ImageFieldDescription />
@@ -145,14 +147,14 @@ export function UserFormFields({
         control={form.control}
         name="name"
         id={`${idPrefix}-name`}
-        label="Nome"
+        label={m.admin_common_name()}
       >
         {({ field, control }) => (
           <Input
             {...field}
             {...control}
             autoComplete="name"
-            placeholder="Nome de quem usa a conta"
+            placeholder={m.admin_users_field_name_placeholder()}
           />
         )}
       </AppField>
@@ -161,7 +163,7 @@ export function UserFormFields({
         control={form.control}
         name="email"
         id={`${idPrefix}-email`}
-        label="E-mail"
+        label={m.admin_common_email()}
       >
         {({ field, control }) => (
           <>
@@ -169,12 +171,12 @@ export function UserFormFields({
               {...field}
               {...control}
               autoComplete="email"
-              placeholder="pessoa@exemplo.org"
+              placeholder={m.admin_users_field_email_placeholder()}
             />
             {/* O e-mail é `UNIQUE` global, e o use-case responde `409` quando
                 já existe uma conta viva com ele. */}
             <FieldDescription>
-              É por ele que a pessoa entra no painel.
+              {m.admin_users_field_email_description()}
             </FieldDescription>
           </>
         )}
@@ -188,18 +190,21 @@ export function UserFormFields({
       >
         {({ field, control }) => (
           <>
-            {/* Sem `?? ''`: o tipo do formulário é o payload de **criação**,
-                onde a senha e a confirmação são obrigatórias. Na edição as duas
-                começam `''` e em branco significa "não trocar" - quem descarta
-                as chaves antes de enviar é o `payload` de `form-edit.tsx`. */}
+            {/* A senha e a confirmação em branco são **ausentes**, e não `''`:
+                o schema do `shared/` recusaria `''` por tamanho. O tipo do
+                formulário é o da atualização (tudo opcional); na criação é o
+                validator de criação que cobra os dois campos. */}
             <InputPassword
-              {...field}
               {...control}
+              value={field.value ?? ''}
+              onChange={(event) =>
+                field.onChange(blankToUndefined(event.target.value))
+              }
+              onBlur={field.onBlur}
               autoComplete="new-password"
             />
             <FieldDescription>
-              De 8 a 32 caracteres, com minúscula, maiúscula, número e um
-              caractere especial.
+              {m.admin_users_field_password_description()}
             </FieldDescription>
           </>
         )}
@@ -209,10 +214,18 @@ export function UserFormFields({
         control={form.control}
         name="passwordConfirmation"
         id={`${idPrefix}-password-confirmation`}
-        label="Confirme a senha"
+        label={m.admin_users_field_password_confirmation()}
       >
         {({ field, control }) => (
-          <InputPassword {...field} {...control} autoComplete="new-password" />
+          <InputPassword
+            {...control}
+            value={field.value ?? ''}
+            onChange={(event) =>
+              field.onChange(blankToUndefined(event.target.value))
+            }
+            onBlur={field.onBlur}
+            autoComplete="new-password"
+          />
         )}
       </AppField>
 
@@ -220,7 +233,7 @@ export function UserFormFields({
         control={form.control}
         name="role"
         id={`${idPrefix}-role`}
-        label="Papel"
+        label={m.admin_common_role()}
       >
         {({ field, control }) => (
           <>
@@ -234,8 +247,7 @@ export function UserFormFields({
               options={toOptions(USER_ROLES, USER_ROLE_LABELS)}
             />
             <FieldDescription>
-              Administrador organiza os jogos. Conselheiro cuida dos alunos das
-              próprias turmas. Representante monta a lista de atletas da turma.
+              {m.admin_users_field_role_description()}
             </FieldDescription>
           </>
         )}
@@ -245,7 +257,7 @@ export function UserFormFields({
         control={form.control}
         name="status"
         id={`${idPrefix}-status`}
-        label="Situação"
+        label={m.admin_common_status()}
       >
         {({ field, control }) => (
           <>
@@ -263,7 +275,7 @@ export function UserFormFields({
             {/* Inativa não é arquivada: a linha continua na listagem e o
                 registro continua vivo, só o acesso é que fecha. */}
             <FieldDescription>
-              Conta inativa não entra no painel, e continua na listagem.
+              {m.admin_users_field_status_description()}
             </FieldDescription>
           </>
         )}

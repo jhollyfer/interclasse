@@ -1,36 +1,48 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  SORT_DIRECTION,
+  left,
+  right,
+  type Either,
+  type Paginated,
+  type StorefrontSportShowResponse,
+} from '@interclasse/shared'
 
-import Sport from '#models/sport'
-import { left, right, type Either } from '#core/either'
+import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
 import type { PaginationPayload } from '#core/validator'
 
 type Payload = PaginationPayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Response = Either<HTTPException, Paginated<StorefrontSportShowResponse>>
 
+/** As modalidades do site, em ordem de nome. */
 @inject()
 export default class StorefrontSportPaginateUseCase {
+  constructor(
+    private readonly sports: SportRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Sport.query()
-
-      if (payload.search) query.whereILike('name', `%${payload.search}%`)
-
-      const sports = await query
-        .orderBy('name', 'asc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: sports.getMeta(), data: sports.all() })
+      return right(
+        await this.sports.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          search: payload.search,
+          sort: 'name',
+          direction: SORT_DIRECTION.ASC,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[sports > paginate][error]')
+      logger.error({ err: error }, '[storefront/sports > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'STOREFRONT_SPORT_PAGINATE_ERROR',
         ),
       )

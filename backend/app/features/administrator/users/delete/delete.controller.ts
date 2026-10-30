@@ -19,7 +19,7 @@ export default class AdministratorUserDeleteController {
       'intermediária.\n\n' +
       'A **própria** conta responde `403`, antes da exigência de arquivamento.',
     // Declarado à mão porque nasce fora deste par: quem nega é a `UserPolicy`.
-    errors: { 403: 'SELF_DELETE_FORBIDDEN' },
+    errors: { 403: 'SELF_DELETE_FORBIDDEN', 409: 'USER_NOT_ARCHIVED' },
   })
 
   constructor(private readonly useCase: AdministratorUserDeleteUseCase) {}

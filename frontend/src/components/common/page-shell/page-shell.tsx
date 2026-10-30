@@ -6,7 +6,8 @@ import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 /**
  * A casca de uma tela do painel: cabeçalho fixo, conteúdo que rola, rodapé fixo.
@@ -198,7 +199,7 @@ export function PageHeaderBack({
       variant="ghost"
       size="icon"
       type="button"
-      aria-label="Voltar"
+      aria-label={m.common_back()}
       className="col-start-1 row-span-2 row-start-1 self-center"
       render={
         <Link to={to} params={params}>

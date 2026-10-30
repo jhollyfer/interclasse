@@ -36,10 +36,15 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
-          context: ./backend
+          # A raiz: a imagem precisa do `shared/` e do lockfile único
+          # (_standards/tooling.md §8.2).
+          context: .
           file: ./backend/Dockerfile-production
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-api:latest
+          # `latest` e o SHA: a tag do commit faz do rollback um redeploy.
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-api:${{ github.sha }}
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend

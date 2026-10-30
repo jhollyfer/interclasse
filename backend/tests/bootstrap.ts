@@ -104,11 +104,7 @@ export const reporters: Config['reporters'] = REPORTERS[reporterMode]
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  // As migrations rodam uma vez, antes de tudo. Sem esta linha o esquema só
-  // nasceria como efeito colateral do `truncate()` de `resetDatabase()`, e os
-  // specs que não chamam `resetDatabase` - documentação, mensagens, multipart e
-  // validator - não teriam tabela nenhuma num banco recém-criado.
-  setup: [() => testUtils.db().migrate()],
+  setup: [],
   teardown: [],
 }
 
@@ -117,7 +113,13 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
+  // Só a suíte que fala com banco e HTTP os sobe: a `unit` roda sem nenhum dos
+  // dois (_standards/architecture.md §8). As migrations rodam uma vez, antes da
+  // suíte: sem isso o esquema só nasceria como efeito colateral do `truncate()`
+  // de `resetDatabase()`, e as specs que não o chamam não teriam tabela num
+  // banco recém-criado.
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    return suite.setup(() => testUtils.httpServer().start())
+    suite.setup(() => testUtils.db().migrate())
+    suite.setup(() => testUtils.httpServer().start())
   }
 }

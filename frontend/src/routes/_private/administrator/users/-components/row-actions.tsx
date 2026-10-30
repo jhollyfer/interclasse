@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorUserShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -24,13 +25,13 @@ import {
   useUserArchive,
   useUserDelete,
   useUserUnarchive,
-} from '#/integrations/tanstack-query/mutations'
-import type { IUser } from '#/lib/interfaces'
+} from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 import { CopyIdMenuItem } from './copy-id-menu-item'
 
 type UserRowActionsProps = Readonly<{
-  user: IUser
+  user: AdministratorUserShowResponse
   /** Só administrador apaga de vez. Vem da rota, que tem a conta em contexto. */
   canDelete: boolean
   /**
@@ -72,21 +73,21 @@ export function UserRowActions({
   const archive = useUserArchive({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
-      toast.success(`Conta de ${user.name} arquivada.`)
+      toast.success(m.admin_users_archived_ok({ name: user.name }))
       return invalidate()
     },
   })
   const unarchive = useUserUnarchive({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
-      toast.success(`Conta de ${user.name} restaurada.`)
+      toast.success(m.admin_users_restored_ok({ name: user.name }))
       return invalidate()
     },
   })
   const remove = useUserDelete({
     onError: (error) => notifyError(error, { id: 'user-delete' }),
     onSuccess: () => {
-      toast.success(`Conta de ${user.name} removida.`)
+      toast.success(m.admin_users_removed_ok({ name: user.name }))
       return invalidate()
     },
   })
@@ -101,7 +102,7 @@ export function UserRowActions({
             render={
               <Link to="/administrator/users/$id" params={{ id: user.id }}>
                 <EyeIcon />
-                Ver detalhes
+                {m.admin_users_view_details()}
               </Link>
             }
           />
@@ -109,7 +110,7 @@ export function UserRowActions({
             render={
               <Link to="/administrator/users/$id/edit" params={{ id: user.id }}>
                 <PencilSimpleIcon />
-                Editar
+                {m.admin_common_edit()}
               </Link>
             }
           />
@@ -119,18 +120,21 @@ export function UserRowActions({
       <DropdownMenuSeparator />
       {!user.deletedAt && !isSelf && (
         <RowActionsArchive onConfirm={() => archive.mutate(user.id)}>
-          <ConfirmDialogTitle>{`Arquivar a conta de ${user.name}?`}</ConfirmDialogTitle>
+          <ConfirmDialogTitle>
+            {m.admin_users_archive_title({ name: user.name })}
+          </ConfirmDialogTitle>
           <ConfirmDialogDescription>
-            Ela deixa de entrar no painel e sai da listagem, e pode ser
-            restaurada depois.
+            {m.admin_users_archive_description()}
           </ConfirmDialogDescription>
         </RowActionsArchive>
       )}
       {user.deletedAt && (
         <RowActionsUnarchive onConfirm={() => unarchive.mutate(user.id)}>
-          <ConfirmDialogTitle>{`Restaurar a conta de ${user.name}?`}</ConfirmDialogTitle>
+          <ConfirmDialogTitle>
+            {m.admin_users_restore_title({ name: user.name })}
+          </ConfirmDialogTitle>
           <ConfirmDialogDescription>
-            Ela volta para a listagem, na situação em que estava.
+            {m.admin_users_restore_description()}
           </ConfirmDialogDescription>
         </RowActionsUnarchive>
       )}
@@ -139,9 +143,11 @@ export function UserRowActions({
           daí é oferecer um erro. */}
       {user.deletedAt && canDelete && !isSelf && (
         <RowActionsDelete onConfirm={() => remove.mutate(user.id)}>
-          <ConfirmDialogTitle>{`Remover a conta de ${user.name}?`}</ConfirmDialogTitle>
+          <ConfirmDialogTitle>
+            {m.admin_users_remove_title({ name: user.name })}
+          </ConfirmDialogTitle>
           <ConfirmDialogDescription>
-            O registro é apagado de vez. Não dá para desfazer.
+            {m.admin_users_remove_description()}
           </ConfirmDialogDescription>
         </RowActionsDelete>
       )}

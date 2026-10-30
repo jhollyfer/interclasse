@@ -1,6 +1,12 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { AdministratorUserUpdateValidator } from '@interclasse/shared'
+import type {
+  AdministratorUserUpdatePayload,
+  AdministratorUserShowResponse,
+  Merge,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -14,13 +20,11 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { UserUpdateValidator } from '#/validators/administrator/users.validator'
-import type { IUser, Merge } from '#/lib/interfaces'
-import type { UserUpdatePayload } from '#/validators/administrator/users.validator'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries'
-import { useUserUpdate } from '#/integrations/tanstack-query/mutations'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { useUserUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { UserFormType } from './form-fields'
 import { USER_FIELDS, UserFormFields } from './form-fields'
@@ -41,8 +45,8 @@ export function UserFormEdit(): React.JSX.Element {
   // recebe.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
-    IUser,
-    Merge<UserUpdatePayload, { id: string }>
+    AdministratorUserShowResponse,
+    Merge<AdministratorUserUpdatePayload, { id: string }>
   >({
     formId: FORM_ID,
     /**
@@ -56,7 +60,7 @@ export function UserFormEdit(): React.JSX.Element {
      * sem redefinir a senha dela. É o que a referência faz em
      * `administrators/-components/form-edit.tsx`, pelo mesmo motivo.
      */
-    validator: UserUpdateValidator,
+    validator: AdministratorUserUpdateValidator,
     // Sem `defaults`: o registro chega da query e `values` já é o objeto
     // completo. Não há estado inicial a declarar que `values` não sobrescreva
     // no render seguinte.
@@ -66,8 +70,6 @@ export function UserFormEdit(): React.JSX.Element {
     values: {
       name: user.name,
       email: user.email,
-      password: '',
-      passwordConfirmation: '',
       role: user.role,
       status: user.status,
       avatarId: user.avatarId,
@@ -77,7 +79,7 @@ export function UserFormEdit(): React.JSX.Element {
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users/$id',
     backParams: { id },
-    success: (updated) => `Conta de ${updated.name} salva.`,
+    success: (updated) => m.admin_users_saved_ok({ name: updated.name }),
     // Reenviar um `PUT` é seguro: ele escreve o mesmo registro, e não um novo.
     retry: 'user-update-error',
     /**
@@ -99,7 +101,9 @@ export function UserFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar {user.name}</FormShellTitle>
+        <FormShellTitle>
+          {m.admin_common_edit_named({ name: user.name })}
+        </FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />
@@ -110,17 +114,14 @@ export function UserFormEdit(): React.JSX.Element {
         <Card>
           <CardContent>
             <FieldSet>
-              <FieldLegend>Identidade e acesso</FieldLegend>
+              <FieldLegend>{m.admin_users_identity_legend()}</FieldLegend>
               <UserFormFields
                 form={form}
                 idPrefix="edit-user"
                 previewUrl={user.avatar?.url}
-                passwordLabel="Nova senha (deixe em branco para manter)"
+                passwordLabel={m.admin_users_field_new_password()}
               />
-              <FieldDescription>
-                Trocar o e-mail ou a senha encerra as sessões abertas desta
-                conta.
-              </FieldDescription>
+              <FieldDescription>{m.admin_users_edit_note()}</FieldDescription>
             </FieldSet>
           </CardContent>
         </Card>

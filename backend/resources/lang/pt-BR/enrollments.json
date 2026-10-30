@@ -1,0 +1,11 @@
+{
+  "sport_not_found": "Modalidade não encontrada",
+  "limit_exceeded": "Atletas demais",
+  "limit_exceeded_field": "Inscreva no máximo {max} atletas",
+  "student_not_in_classroom": "Aluno não encontrado na turma",
+  "student_not_in_classroom_field": "Selecione apenas alunos desta turma",
+  "removal_forbidden": "Só o professor conselheiro tira atleta da lista",
+  "locked": "As inscrições desta modalidade estão encerradas: o sorteio já aconteceu",
+  "reason_required": "Informe o motivo da remoção",
+  "reason_required_field": "Diga por que o atleta saiu da lista"
+}

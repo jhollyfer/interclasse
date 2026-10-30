@@ -11,7 +11,7 @@ import type User from '#models/user'
  * administrador opera contas, mas não a própria por este recurso.
  *
  * `BasePolicy` do Bouncer, checada pelo controller com `ctx.bouncer`
- * (_padroes/backend.md §4.6). A negação vira `AuthorizationException`, que o
+ * (_standards/backend.md §4.6). A negação vira `AuthorizationException`, que o
  * `handler.ts` traduz para o envelope de erro; o identificador de tradução da
  * resposta é o `code` estável do envelope.
  *

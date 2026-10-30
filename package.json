@@ -4,11 +4,25 @@
   "private": true,
   "description": "Jogos Estudantis do CMEI Cosme Jean: turmas, inscrições, sorteio, placar e classificação",
   "license": "ISC",
+  "type": "module",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^12.0.0",
+      "onFail": "download"
+    }
+  },
   "scripts": {
-    "dev:backend": "pnpm --dir backend dev",
-    "dev:frontend": "pnpm --dir frontend dev"
+    "dev": "pnpm --parallel --filter ./shared --filter ./backend --filter ./frontend run dev",
+    "dev:backend": "pnpm --parallel --filter \"{./backend}...\" run dev",
+    "dev:frontend": "pnpm --parallel --filter \"{./frontend}...\" run dev",
+    "build": "pnpm --filter ./shared run build",
+    "check": "pnpm --filter ./shared run build && pnpm -r --filter ./shared --filter ./backend --filter ./frontend run typecheck",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "typescript": "^7.0.2"
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "husky": "^9.1.7"
   }
 }

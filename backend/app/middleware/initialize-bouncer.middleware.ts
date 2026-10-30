@@ -7,14 +7,14 @@ import * as abilities from '#abilities/main'
 
 /**
  * Monta o `ctx.bouncer` que os controllers usam para checar policy
- * (_padroes/backend.md §4.6). Sem Edge neste projeto, então sem helpers de view.
+ * (_standards/backend.md §4.6). Sem Edge neste projeto, então sem helpers de view.
  */
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     /**
      * Uma instância por requisição, com o usuário que o guard autenticou. É o
      * composition root do Bouncer - o único `new Bouncer` do projeto
-     * (_padroes/backend.md §2.1).
+     * (_standards/backend.md §2.1).
      */
     ctx.bouncer = new Bouncer(
       () => ctx.auth.user || null,

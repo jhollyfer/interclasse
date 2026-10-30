@@ -1,3 +1,4 @@
+import type { z } from '@interclasse/shared'
 import type { JSONSchema7 } from 'json-schema'
 import type { LucidModel } from '@adonisjs/lucid/types/model'
 
@@ -83,10 +84,12 @@ export function isListResource(value: unknown): value is ListResource {
  */
 export type PaginatedResponse = {
   kind: 'paginated'
-  item: DocumentedValidator | ModelResource
+  item: DocumentedValidator | ModelResource | z.ZodType
 }
 
-export function paginated(item: DocumentedValidator | ModelResource): PaginatedResponse {
+export function paginated(
+  item: DocumentedValidator | ModelResource | z.ZodType,
+): PaginatedResponse {
   return { kind: 'paginated', item }
 }
 
@@ -98,7 +101,7 @@ export function paginated(item: DocumentedValidator | ModelResource): PaginatedR
  * `ModelResource` ali documentaria as colunas que o `pick` deixa de fora - o
  * documento prometeria `deletedAt` e `path` de bucket que nenhuma rota devolve.
  */
-export type FeatureResponse = ModelResource | ListResource | DocumentedValidator
+export type FeatureResponse = ModelResource | ListResource | DocumentedValidator | z.ZodType
 
 /**
  * O que uma operação pode devolver num dado status.
@@ -109,7 +112,7 @@ export type FeatureResponse = ModelResource | ListResource | DocumentedValidator
  * model de `Storage`, que não é o que elas respondem.
  */
 export type ResponseBody =
-  DocumentedValidator | PaginatedResponse | ModelResource | ListResource | 'no-content'
+  DocumentedValidator | PaginatedResponse | ModelResource | ListResource | z.ZodType | 'no-content'
 
 /**
  * O contrato público de uma operação, declarado como `static docs` no

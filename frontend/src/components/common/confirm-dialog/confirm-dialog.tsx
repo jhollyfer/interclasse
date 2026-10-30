@@ -19,6 +19,12 @@ type ConfirmDialogProps = Readonly<{
    */
   trigger?: React.ReactElement
   /**
+   * `false` quando o gatilho não é `<button>` (item de menu é `<div>`): a
+   * primitiva tira a semântica de botão nativo em vez de avisar no console
+   * (`_doc-lib/base-ui.md#react/components/alert-dialog`, prop `nativeButton`).
+   */
+  nativeButton?: boolean
+  /**
    * Aberto por fora, sem gatilho: é o caso do item de menu. Como gatilho, o
    * item herdava `tabindex=0` do alerta e virava o foco inicial do menu.
    */
@@ -45,6 +51,7 @@ type ConfirmDialogProps = Readonly<{
  */
 export function ConfirmDialog({
   trigger,
+  nativeButton = true,
   onConfirm,
   destructive = false,
   open,
@@ -79,7 +86,9 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={change}>
-      {trigger && <AlertDialogTrigger render={trigger} />}
+      {trigger && (
+        <AlertDialogTrigger render={trigger} nativeButton={nativeButton} />
+      )}
       <AlertDialogContent data-slot="confirm-dialog">
         <ConfirmDialogProvider value={value}>{children}</ConfirmDialogProvider>
       </AlertDialogContent>

@@ -4,7 +4,9 @@ import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 import { AUTHENTICATION, NAVIGATION } from './menu'
 import type { MenuItem } from './menu'
@@ -47,19 +49,13 @@ const INACTIVE = {
     'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/5 hover:text-brand-ink-foreground',
 } satisfies Record<NavigationLinkVariant, string>
 
-/** Um destino da navegação, na faixa do topo ou no painel do celular. */
-/** O rótulo do botão do menu, pelo estado dele. */
-const MENU_LABEL: Record<string, string> = {
-  true: 'Fechar menu',
-  false: 'Abrir menu',
-}
-
 /** O painel do menu: aberto ocupa altura, fechado sai do fluxo de foco. */
 const MENU_PANEL: Record<string, string> = {
   true: 'py-6',
   false: 'invisible',
 }
 
+/** Um destino da navegação, na faixa do topo ou no painel do celular. */
 type NavigationLinkProps = Readonly<{
   item: MenuItem
   variant?: NavigationLinkVariant
@@ -86,7 +82,7 @@ function NavigationLink({
       inactiveProps={{ className: INACTIVE[variant] }}
       onClick={onNavigate}
     >
-      {item.label}
+      {item.label()}
     </Link>
   )
 }
@@ -116,6 +112,9 @@ function NavigationLink({
 export function Header(): React.JSX.Element {
   const [open, setOpen] = React.useState(false)
 
+  let menuLabel = m.public_menu_open()
+  if (open) menuLabel = m.public_menu_close()
+
   function close(): void {
     setOpen(false)
   }
@@ -138,7 +137,7 @@ export function Header(): React.JSX.Element {
           className="hidden items-center gap-1 rounded-full border border-brand-ink-foreground/10 bg-brand-ink-foreground/5 px-2 py-1.5 md:flex"
         >
           {NAVIGATION.map((item) => (
-            <NavigationLink key={item.label} item={item} />
+            <NavigationLink key={item.to} item={item} />
           ))}
 
           <Link
@@ -148,8 +147,9 @@ export function Header(): React.JSX.Element {
               'ml-2 bg-brand font-semibold text-brand-ink active:scale-[0.97]',
             )}
           >
-            {AUTHENTICATION.label}
+            {AUTHENTICATION.label()}
           </Link>
+          <LocaleSwitch className="ml-1 text-brand-ink-foreground hover:bg-brand-ink-foreground/10" />
         </nav>
 
         {/*
@@ -162,7 +162,7 @@ export function Header(): React.JSX.Element {
           data-slot="public-header-toggle"
           data-open={open || undefined}
           aria-expanded={open}
-          aria-label={MENU_LABEL[String(open)]}
+          aria-label={menuLabel}
           onClick={() => setOpen((previous) => !previous)}
           className="group flex size-8 flex-col items-center justify-center gap-[5px] text-brand-ink-foreground md:hidden"
         >
@@ -192,7 +192,7 @@ export function Header(): React.JSX.Element {
         >
           {NAVIGATION.map((item) => (
             <NavigationLink
-              key={item.label}
+              key={item.to}
               item={item}
               variant="panel"
               onNavigate={close}
@@ -207,8 +207,9 @@ export function Header(): React.JSX.Element {
               'mt-3 rounded-full bg-brand text-center font-semibold text-brand-ink active:scale-[0.97]',
             )}
           >
-            {AUTHENTICATION.label}
+            {AUTHENTICATION.label()}
           </Link>
+          <LocaleSwitch className="mt-2 self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10" />
         </nav>
       </div>
     </header>

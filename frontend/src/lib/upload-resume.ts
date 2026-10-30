@@ -1,3 +1,4 @@
+import type { Merge } from '#/lib/merge'
 /**
  * O que o upload precisa lembrar para sobreviver a um reload.
  *
@@ -9,8 +10,6 @@
  * `localStorage` e não a query cache do TanStack: o que se quer é justamente o
  * que atravessa o recarregamento, e a cache não atravessa.
  */
-
-import type { Merge } from '#/lib/interfaces'
 
 export type ResumeEntry = {
   storageId: string

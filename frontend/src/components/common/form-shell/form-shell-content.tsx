@@ -3,7 +3,7 @@ import type * as React from 'react'
 import { Card, CardContent } from '#/components/ui/card'
 import { PageShellContent } from '#/components/common/page-shell'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useFormShellContext } from './form-shell-context'
 

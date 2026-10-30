@@ -1,6 +1,12 @@
 import type * as React from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { AdministratorAnnouncementCreateValidator } from '@interclasse/shared'
+import type {
+  AdministratorAnnouncementUpdatePayload,
+  AdministratorAnnouncementShowResponse,
+  Merge,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -13,13 +19,11 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
-import type { IAnnouncement, Merge } from '#/lib/interfaces'
-import type { AnnouncementUpdatePayload } from '#/validators/administrator/announcements.validator'
-import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
-import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations'
+import { announcementQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { AnnouncementFormType } from './form-fields'
 import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
@@ -33,11 +37,11 @@ export function AnnouncementFormEdit(): React.JSX.Element {
 
   const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
-    IAnnouncement,
-    Merge<AnnouncementUpdatePayload, { id: string }>
+    AdministratorAnnouncementShowResponse,
+    Merge<AdministratorAnnouncementUpdatePayload, { id: string }>
   >({
     formId: 'announcement-update',
-    validator: AnnouncementCreateValidator,
+    validator: AdministratorAnnouncementCreateValidator,
     values: {
       title: announcement.title,
       body: announcement.body,
@@ -48,7 +52,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
     invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
-    success: () => 'Aviso salvo.',
+    success: () => m.admin_announcements_saved(),
     retry: 'announcement-update-error',
     payload: (values) => ({ ...values, id }),
   })
@@ -57,7 +61,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar aviso</FormShellTitle>
+        <FormShellTitle>{m.admin_announcements_edit()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

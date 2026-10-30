@@ -1,5 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
+import {
+  AdministratorCardCreateValidator,
+  CARD_COLORS,
+} from '@interclasse/shared'
+import type {
+  AdministratorCardCreatePayload,
+  AdministratorCardPaginateResponse,
+} from '@interclasse/shared'
 
 import { CardList } from '#/components/common/card-list'
 import { Button } from '#/components/ui/button'
@@ -26,17 +34,14 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
   useCardCreate,
   useCardDelete,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import {
   cardsQueryOptions,
   matchAthletesQueryOptions,
-} from '#/integrations/tanstack-query/queries'
-import { CARD_COLORS } from '#/lib/entity'
+} from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
-import type { IMatchCard } from '#/lib/interfaces'
 import { CARD_COLOR_LABELS } from '#/lib/labels'
-import { CardCreateValidator } from '#/validators/administrator/cards.validator'
-import type { CardCreatePayload } from '#/validators/administrator/cards.validator'
+import { m } from '#/paraglide/messages'
 
 import type { MatchRef } from './match-dialogs'
 
@@ -46,7 +51,7 @@ const FIELDS = ['studentId', 'color', 'note'] as const
 function athleteLabel(student: { name: string; enrolled: boolean }): string {
   if (student.enrolled) return student.name
 
-  return `${student.name} (não inscrito)`
+  return m.common_match_not_enrolled({ name: student.name })
 }
 
 type MatchCardsDialogProps = Readonly<{
@@ -71,17 +76,20 @@ export function MatchCardsDialog({
   const { data: athletes } = useQuery(matchAthletesQueryOptions(match.id))
 
   const { form, mutation, onSubmit } = useMutationForm<
-    CardCreatePayload,
-    IMatchCard,
-    CardCreatePayload
+    AdministratorCardCreatePayload,
+    AdministratorCardPaginateResponse,
+    AdministratorCardCreatePayload
   >({
-    validator: CardCreateValidator,
+    validator: AdministratorCardCreateValidator,
     defaults: { matchId: match.id, studentId: '', note: '' },
     fields: FIELDS,
     mutation: useCardCreate,
     invalidate: GAME_KEYS,
     success: (card) =>
-      `Cartão ${CARD_COLOR_LABELS[card.color]?.toLowerCase() ?? ''} para ${card.student.name}.`,
+      m.common_match_card_given({
+        color: CARD_COLOR_LABELS[card.color]?.toLowerCase() ?? '',
+        name: card.student.name,
+      }),
     payload: (values) => ({ ...values, note: values.note || null }),
     onSuccess: (): void =>
       form.reset({ matchId: match.id, studentId: '', note: '' }),
@@ -98,16 +106,19 @@ export function MatchCardsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Cartões</DialogTitle>
+          <DialogTitle>{m.common_match_cards_title()}</DialogTitle>
           <DialogDescription>
-            {match.homeName ?? 'A definir'} x {match.awayName ?? 'A definir'}
+            {m.common_match_versus({
+              home: match.homeName ?? m.common_to_be_defined(),
+              away: match.awayName ?? m.common_to_be_defined(),
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <CardList
           cards={cards?.data ?? []}
           isPending={isPending}
-          empty="Nenhum cartão nesta partida."
+          empty={m.common_match_cards_empty()}
           showMatch={false}
           onDelete={(card) => remove.mutate(card.id)}
         />
@@ -122,13 +133,15 @@ export function MatchCardsDialog({
               control={form.control}
               name="studentId"
               id="card-student"
-              label="Atleta"
+              label={m.common_match_card_athlete()}
             >
               {({ field, control }) => (
                 // `select` nativo: dentro do diálogo o popup do combobox abre
                 // atrás do overlay.
                 <NativeSelect {...field} {...control}>
-                  <NativeSelectOption value="">Selecione</NativeSelectOption>
+                  <NativeSelectOption value="">
+                    {m.common_select_placeholder()}
+                  </NativeSelectOption>
                   {(athletes?.teams ?? []).map((team) => (
                     <NativeSelectOptGroup key={team.teamId} label={team.name}>
                       {team.students.map((student) => (
@@ -145,7 +158,7 @@ export function MatchCardsDialog({
               control={form.control}
               name="color"
               id="card-color"
-              label="Cor"
+              label={m.common_match_card_color()}
             >
               {({ field, control }) => (
                 <NativeSelect
@@ -158,7 +171,9 @@ export function MatchCardsDialog({
                   }
                   onBlur={field.onBlur}
                 >
-                  <NativeSelectOption value="">Selecione</NativeSelectOption>
+                  <NativeSelectOption value="">
+                    {m.common_select_placeholder()}
+                  </NativeSelectOption>
                   {CARD_COLORS.map((value) => (
                     <NativeSelectOption key={value} value={value}>
                       {CARD_COLOR_LABELS[value]}
@@ -172,7 +187,7 @@ export function MatchCardsDialog({
             control={form.control}
             name="note"
             id="card-note"
-            label="Observação"
+            label={m.common_match_card_note()}
           >
             {({ field, control }) => (
               <Input
@@ -180,7 +195,7 @@ export function MatchCardsDialog({
                 {...control}
                 value={field.value ?? ''}
                 maxLength={200}
-                placeholder="Opcional. Ex.: falta por trás"
+                placeholder={m.common_match_card_note_placeholder()}
               />
             )}
           </AppField>
@@ -192,7 +207,7 @@ export function MatchCardsDialog({
             className="justify-self-end"
             disabled={mutation.isPending}
           >
-            Lançar cartão
+            {m.common_match_card_submit()}
           </Button>
         </form>
       </DialogContent>

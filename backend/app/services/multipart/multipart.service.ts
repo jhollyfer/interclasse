@@ -15,7 +15,7 @@ import {
   MultipartContract,
   type PresignedPart,
   type UploadedPart,
-} from '#services/multipart/multipart-contract.service'
+} from '#services/multipart/multipart.contract'
 
 /**
  * Por quanto tempo uma URL assinada vale, em segundos.

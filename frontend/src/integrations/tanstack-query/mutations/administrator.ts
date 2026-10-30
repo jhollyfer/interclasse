@@ -1,0 +1,581 @@
+import { useMutation } from '@tanstack/react-query'
+import type {
+  AdministratorAnnouncementCreatePayload,
+  AdministratorAnnouncementUpdatePayload,
+  AdministratorBracketCreatePayload,
+  AdministratorBracketCreateResponse,
+  AdministratorCardCreatePayload,
+  AdministratorCardCreateResponse,
+  AdministratorClassroomCreatePayload,
+  AdministratorClassroomUpdatePayload,
+  AdministratorMatchScorePayload,
+  AdministratorMatchScoreResponse,
+  AdministratorMatchUnscoreResponse,
+  AdministratorMatchUpdatePayload,
+  AdministratorMatchUpdateResponse,
+  AdministratorPhotoCreatePayload,
+  AdministratorPhotoReviewPayload,
+  AdministratorSiteUpdatePayload,
+  AdministratorSportCreatePayload,
+  AdministratorSportUpdatePayload,
+  AdministratorUserCreatePayload,
+  AdministratorUserUpdatePayload,
+  AdministratorAnnouncementShowResponse,
+  AdministratorClassroomShowResponse,
+  AdministratorEnrollmentRemovalShowResponse,
+  AdministratorPhotoShowResponse,
+  AdministratorSiteShowResponse,
+  AdministratorSportShowResponse,
+  AdministratorUserShowResponse,
+  Merge,
+} from '@interclasse/shared'
+
+import type { HTTPError } from '../http'
+import { request, send } from '../http'
+import type { MutationProps } from '../mutation-props'
+import { shouldRetryQuery } from '../query-context'
+
+/** O módulo inteiro exige `ADMINISTRATOR`. */
+
+export function useUserCreate(
+  options?: MutationProps<
+    AdministratorUserShowResponse,
+    AdministratorUserCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorUserShowResponse,
+    HTTPError,
+    AdministratorUserCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorUserShowResponse>('/administrator/users', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+/** O `id` viaja com o payload porque ele vai no caminho, não no corpo. */
+export type UserUpdateVariables = Merge<
+  AdministratorUserUpdatePayload,
+  { readonly id: string }
+>
+
+/**
+ * Campo ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
+ * `null` explícito.
+ *
+ * `password` entra no payload só quando há senha nova: o `confirmed` do
+ * validator olha o par, e mandar `password: ''` deixaria a chave no corpo com um
+ * valor que o servidor recusa.
+ */
+export function useUserUpdate(
+  options?: MutationProps<AdministratorUserShowResponse, UserUpdateVariables>,
+) {
+  return useMutation<
+    AdministratorUserShowResponse,
+    HTTPError,
+    UserUpdateVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorUserShowResponse>(
+        '/administrator/users/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+/** Manda para a lixeira: preenche `deletedAt`, não apaga nada. */
+export function useUserArchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/users/'.concat(id, '/archive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+/** Tira da lixeira. */
+export function useUserUnarchive(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/users/'.concat(id, '/unarchive'), {
+        method: 'PATCH',
+      })
+    },
+  })
+}
+
+/**
+ * Apaga de vez. O backend exige o registro arquivado, e recusa a própria conta
+ * de quem está logado.
+ */
+export function useUserDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/users/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+/**
+ * Sem lixeira: turma, modalidade e aviso apagam de vez. Quem protege o que já
+ * entrou numa chave é o servidor, com `409`.
+ */
+
+export function useClassroomCreate(
+  options?: MutationProps<
+    AdministratorClassroomShowResponse,
+    AdministratorClassroomCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorClassroomShowResponse,
+    HTTPError,
+    AdministratorClassroomCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorClassroomShowResponse>(
+        '/administrator/classrooms',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
+    },
+  })
+}
+
+export type ClassroomUpdateVariables = Merge<
+  AdministratorClassroomUpdatePayload,
+  { readonly id: string }
+>
+
+export function useClassroomUpdate(
+  options?: MutationProps<
+    AdministratorClassroomShowResponse,
+    ClassroomUpdateVariables
+  >,
+) {
+  return useMutation<
+    AdministratorClassroomShowResponse,
+    HTTPError,
+    ClassroomUpdateVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorClassroomShowResponse>(
+        '/administrator/classrooms/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+export function useClassroomDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/classrooms/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+export function useSportCreate(
+  options?: MutationProps<
+    AdministratorSportShowResponse,
+    AdministratorSportCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorSportShowResponse,
+    HTTPError,
+    AdministratorSportCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorSportShowResponse>('/administrator/sports', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export type SportUpdateVariables = Merge<
+  AdministratorSportUpdatePayload,
+  { readonly id: string }
+>
+
+export function useSportUpdate(
+  options?: MutationProps<AdministratorSportShowResponse, SportUpdateVariables>,
+) {
+  return useMutation<
+    AdministratorSportShowResponse,
+    HTTPError,
+    SportUpdateVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorSportShowResponse>(
+        '/administrator/sports/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+export function useSportDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/sports/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+export function useAnnouncementCreate(
+  options?: MutationProps<
+    AdministratorAnnouncementShowResponse,
+    AdministratorAnnouncementCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorAnnouncementShowResponse,
+    HTTPError,
+    AdministratorAnnouncementCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorAnnouncementShowResponse>(
+        '/administrator/announcements',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
+    },
+  })
+}
+
+export type AnnouncementUpdateVariables = Merge<
+  AdministratorAnnouncementUpdatePayload,
+  { readonly id: string }
+>
+
+export function useAnnouncementUpdate(
+  options?: MutationProps<
+    AdministratorAnnouncementShowResponse,
+    AnnouncementUpdateVariables
+  >,
+) {
+  return useMutation<
+    AdministratorAnnouncementShowResponse,
+    HTTPError,
+    AnnouncementUpdateVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorAnnouncementShowResponse>(
+        '/administrator/announcements/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+export function useAnnouncementDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/announcements/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+/** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
+export function useBracketCreate(
+  options?: MutationProps<
+    AdministratorBracketCreateResponse,
+    AdministratorBracketCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorBracketCreateResponse,
+    HTTPError,
+    AdministratorBracketCreatePayload
+  >({
+    // Mutation não repete por padrão, porque repetir escrita duplica. O sorteio
+    // pode: a API é idempotente por modalidade e categoria e devolve a chave
+    // que já existe. Sem isto, a queda de rede depois do commit mostrava erro
+    // com a chave criada (_doc-lib/tanstack-query.md#guides/mutations, "Retry").
+    retry: shouldRetryQuery,
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorBracketCreateResponse>(
+        '/administrator/brackets',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
+    },
+  })
+}
+
+/** Apaga a chave inteira e reabre as inscrições. É como se refaz um sorteio. */
+export function useBracketDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/brackets/'.concat(id), {
+        method: 'DELETE',
+      })
+    },
+  })
+}
+
+export type MatchUpdateVariables = Merge<
+  AdministratorMatchUpdatePayload,
+  { readonly id: string }
+>
+
+/** A agenda: data, hora e local. */
+export function useMatchUpdate(
+  options?: MutationProps<
+    AdministratorMatchUpdateResponse,
+    MatchUpdateVariables
+  >,
+) {
+  return useMutation<
+    AdministratorMatchUpdateResponse,
+    HTTPError,
+    MatchUpdateVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorMatchUpdateResponse>(
+        '/administrator/matches/'.concat(id),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+export type MatchScoreVariables = Merge<
+  AdministratorMatchScorePayload,
+  { readonly id: string }
+>
+
+/** O placar. No mata-mata o vencedor avança sozinho. */
+export function useMatchScore(
+  options?: MutationProps<AdministratorMatchScoreResponse, MatchScoreVariables>,
+) {
+  return useMutation<
+    AdministratorMatchScoreResponse,
+    HTTPError,
+    MatchScoreVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorMatchScoreResponse>(
+        '/administrator/matches/'.concat(id, '/score'),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+/** Desfaz o placar: a partida volta a "a jogar" e o vencedor sai da seguinte. */
+export function useMatchUnscore(
+  options?: MutationProps<AdministratorMatchUnscoreResponse, string>,
+) {
+  return useMutation<AdministratorMatchUnscoreResponse, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return request<AdministratorMatchUnscoreResponse>(
+        '/administrator/matches/'.concat(id, '/score'),
+        {
+          method: 'DELETE',
+        },
+      )
+    },
+  })
+}
+
+/** Lança um cartão. O time sai do atleta, no servidor. */
+export function useCardCreate(
+  options?: MutationProps<
+    AdministratorCardCreateResponse,
+    AdministratorCardCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorCardCreateResponse,
+    HTTPError,
+    AdministratorCardCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorCardCreateResponse>('/administrator/cards', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+export function useCardDelete(options?: MutationProps<void, string>) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/administrator/cards/'.concat(id), { method: 'DELETE' })
+    },
+  })
+}
+
+/** A ciência do aviso de remoção. Repetir não muda nada. */
+export function useEnrollmentRemovalAcknowledge(
+  options?: MutationProps<AdministratorEnrollmentRemovalShowResponse, string>,
+) {
+  return useMutation<
+    AdministratorEnrollmentRemovalShowResponse,
+    HTTPError,
+    string
+  >({
+    ...options,
+    mutationFn: function (id) {
+      return request<AdministratorEnrollmentRemovalShowResponse>(
+        '/administrator/enrollment-removals/'.concat(id, '/acknowledge'),
+        { method: 'PATCH' },
+      )
+    },
+  })
+}
+
+/** Grava o "Sobre" e o regulamento. Campo ausente não muda; `null` apaga. */
+export function useSiteUpdate(
+  options?: MutationProps<
+    AdministratorSiteShowResponse,
+    AdministratorSiteUpdatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorSiteShowResponse,
+    HTTPError,
+    AdministratorSiteUpdatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorSiteShowResponse>('/administrator/site', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
+    },
+  })
+}
+
+/**
+ * Envia uma foto para o carrossel. O caminho decide o estado em que ela nasce:
+ * a do administrador vai direto ao site, a do conselheiro espera aprovação.
+ */
+export function usePhotoCreate(
+  area: 'administrator' | 'advisor',
+  options?: MutationProps<
+    AdministratorPhotoShowResponse,
+    AdministratorPhotoCreatePayload
+  >,
+) {
+  return useMutation<
+    AdministratorPhotoShowResponse,
+    HTTPError,
+    AdministratorPhotoCreatePayload
+  >({
+    ...options,
+    mutationFn: function (payload) {
+      return request<AdministratorPhotoShowResponse>(
+        '/'.concat(area, '/photos'),
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+      )
+    },
+  })
+}
+
+export type PhotoReviewVariables = Merge<
+  AdministratorPhotoReviewPayload,
+  { id: string }
+>
+
+/** Aprova (vai ao site) ou recusa (sai do site). A decisão se refaz. */
+export function usePhotoReview(
+  options?: MutationProps<AdministratorPhotoShowResponse, PhotoReviewVariables>,
+) {
+  return useMutation<
+    AdministratorPhotoShowResponse,
+    HTTPError,
+    PhotoReviewVariables
+  >({
+    ...options,
+    mutationFn: function ({ id, ...body }) {
+      return request<AdministratorPhotoShowResponse>(
+        '/administrator/photos/'.concat(id, '/review'),
+        {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        },
+      )
+    },
+  })
+}
+
+/** Apaga a foto. O conselheiro só alcança as que enviou (as outras são 404). */
+export function usePhotoDelete(
+  area: 'administrator' | 'advisor',
+  options?: MutationProps<void, string>,
+) {
+  return useMutation<void, HTTPError, string>({
+    ...options,
+    mutationFn: function (id) {
+      return send('/'.concat(area, '/photos/', id), { method: 'DELETE' })
+    },
+  })
+}

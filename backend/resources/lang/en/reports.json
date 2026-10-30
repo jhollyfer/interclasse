@@ -1,0 +1,17 @@
+{
+  "csv": {
+    "classroom": "Class",
+    "category": "Category",
+    "advisor": "Advisor",
+    "representative": "Representative",
+    "students": "Students",
+    "athletes": "Athletes",
+    "sports": "Sports",
+    "total": "Total",
+    "total_classrooms": "{count} classes"
+  },
+  "category": {
+    "F1": "Elementary 1",
+    "F2": "Elementary 2"
+  }
+}

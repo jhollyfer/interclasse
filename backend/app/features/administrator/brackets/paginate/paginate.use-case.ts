@@ -1,38 +1,48 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  left,
+  right,
+  type AdministratorBracketPaginateResponse,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
-import Bracket from '#models/bracket'
-import { left, right, type Either } from '#core/either'
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
-import type { BracketPaginatePayload } from '#features/administrator/brackets/brackets.validator'
+import type { AdministratorBracketPaginatePayload } from '#validators/administrator/brackets.validator'
 
-type Payload = BracketPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = AdministratorBracketPaginatePayload
+type Response = Either<HTTPException, Paginated<AdministratorBracketPaginateResponse>>
 
+/** As chaves sorteadas, da mais nova para a mais antiga. */
 @inject()
 export default class AdministratorBracketPaginateUseCase {
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Bracket.query().preload('sport')
-
-      if (payload.sportId) query.where('sportId', payload.sportId)
-      if (payload.category) query.where('category', payload.category)
-      if (payload.status) query.where('status', payload.status)
-
-      const brackets = await query
-        .orderBy('createdAt', 'desc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: brackets.getMeta(), data: brackets.all() })
+      return right(
+        await this.brackets.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          sportId: payload.sportId,
+          category: payload.category,
+          status: payload.status,
+          order: 'newest',
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[brackets > paginate][error]')
+      logger.error({ err: error }, '[administrator/brackets > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_BRACKET_PAGINATE_ERROR',
         ),
       )

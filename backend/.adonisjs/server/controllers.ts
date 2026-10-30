@@ -102,6 +102,36 @@ export const controllers = {
         Update: () => import('#features/administrator/matches/update/update.controller'),
       },
     },
+    photos: {
+      create: {
+        Create: () => import('#features/administrator/photos/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/administrator/photos/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/administrator/photos/paginate/paginate.controller'),
+      },
+      review: {
+        Review: () => import('#features/administrator/photos/review/review.controller'),
+      },
+    },
+    reports: {
+      export: {
+        Export: () => import('#features/administrator/reports/export/export.controller'),
+      },
+      show: {
+        Show: () => import('#features/administrator/reports/show/show.controller'),
+      },
+    },
+    site: {
+      show: {
+        Show: () => import('#features/administrator/site/show/show.controller'),
+      },
+      update: {
+        Update: () => import('#features/administrator/site/update/update.controller'),
+      },
+    },
     sports: {
       create: {
         Create: () => import('#features/administrator/sports/create/create.controller'),
@@ -160,6 +190,17 @@ export const controllers = {
       },
       update: {
         Update: () => import('#features/advisor/enrollments/update/update.controller'),
+      },
+    },
+    photos: {
+      create: {
+        Create: () => import('#features/advisor/photos/create/create.controller'),
+      },
+      delete: {
+        Delete: () => import('#features/advisor/photos/delete/delete.controller'),
+      },
+      paginate: {
+        Paginate: () => import('#features/advisor/photos/paginate/paginate.controller'),
       },
     },
     students: {
@@ -255,6 +296,16 @@ export const controllers = {
     matches: {
       paginate: {
         Paginate: () => import('#features/storefront/matches/paginate/paginate.controller'),
+      },
+    },
+    photos: {
+      paginate: {
+        Paginate: () => import('#features/storefront/photos/paginate/paginate.controller'),
+      },
+    },
+    site: {
+      show: {
+        Show: () => import('#features/storefront/site/show/show.controller'),
       },
     },
     sports: {

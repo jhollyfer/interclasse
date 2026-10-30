@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { CATEGORIES } from '#core/entity'
+import { CATEGORIES } from '@interclasse/shared'
 
 export default class extends BaseSchema {
   protected tableName = 'classrooms'

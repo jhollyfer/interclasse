@@ -1,37 +1,47 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  SORT_DIRECTION,
+  left,
+  right,
+  type AdministratorSportShowResponse,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
-import Sport from '#models/sport'
-import { left, right, type Either } from '#core/either'
+import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { sortOrder } from '#features/_shared.sort'
-import { type Paginated } from '#core/response'
-import type { SportPaginatePayload } from '#features/administrator/sports/sports.validator'
+import type { AdministratorSportPaginatePayload } from '#validators/administrator/sports.validator'
 
-type Payload = SportPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = AdministratorSportPaginatePayload
+type Response = Either<HTTPException, Paginated<AdministratorSportShowResponse>>
 
 @inject()
 export default class AdministratorSportPaginateUseCase {
+  constructor(
+    private readonly sports: SportRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Sport.query()
-
-      if (payload.search) query.whereILike('name', `%${payload.search}%`)
-
-      const sports = await query
-        .orderBy(...sortOrder(payload, 'name'))
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: sports.getMeta(), data: sports.all() })
+      return right(
+        await this.sports.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          search: payload.search,
+          sort: payload.sort ?? 'name',
+          direction: payload.direction ?? SORT_DIRECTION.ASC,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[sports > paginate][error]')
+      logger.error({ err: error }, '[administrator/sports > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_SPORT_PAGINATE_ERROR',
         ),
       )

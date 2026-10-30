@@ -57,7 +57,7 @@ ordem alfabética não separa nada.
 
 **Marca ⚠ nas tabelas da comunidade:** repositório arquivado, sumido ou sem push há mais de dois
 anos, conferido em 2026-10 por `scripts/doc-lib/audit.mjs` (seção de repositórios do
-`_audit/RELATORIO.md`). Não quer dizer quebrado: quer dizer que o defeito que aparecer é seu.
+`_audit/REPORT.md`). Não quer dizer quebrado: quer dizer que o defeito que aparecer é seu.
 Prefira o oficial ou um sem marca que resolva o mesmo.
 
 ---
@@ -72,6 +72,79 @@ separados dos da comunidade, cada um com uma linha de descrição em inglês.
 Plugin novo aparece lá primeiro.
 **Quando usar:** ao conferir se o catálogo daqui envelheceu, e ao procurar algo que não está
 nas tabelas abaixo.
+
+---
+
+## Da comunidade, adotado pela casa
+
+Um plugin de terceiro que o padrão exige no backend Fastify (`DECISIONS.md` #241). Tem entrada
+completa em vez de linha de tabela; a linha da tabela de validação, mais abaixo, continua como
+índice do mesmo repositório.
+
+#### fastify-type-provider-zod
+[repo](https://github.com/turkerdev/fastify-type-provider-zod) | [markdown](https://raw.githubusercontent.com/turkerdev/fastify-type-provider-zod/main/README.md)
+**O que é:** o type provider do Zod para o Fastify 5. Conferido contra o README no `main` e contra o
+tipo de `fastify-type-provider-zod@7.0.0`. Peers: `fastify ^5.5.0`, `zod >=4.1.5`,
+`@fastify/swagger >=9.5.1`, `openapi-types ^12.1.3`. Quatro peças:
+`validatorCompiler` (valida a requisição com `safeParse` do Zod), `serializerCompiler` (serializa a
+resposta com `safeEncode`, depois `JSON.stringify`), o tipo `ZodTypeProvider` (infere `req.body`,
+`req.query`, `req.params` e `reply.send` do schema) e `jsonSchemaTransform` (entrega o schema ao
+`@fastify/swagger` em JSON Schema, por `z.toJSONSchema`).
+**Para que serve:** schema de rota em Zod no lugar de JSON Schema escrito à mão: o mesmo objeto valida,
+tipa o handler, serializa a resposta e gera o OpenAPI. É o que liga o `shared/` ao Fastify
+(`_doc-lib/zod.md`).
+**Quando usar:** em todo backend Fastify da casa.
+
+```ts
+import fastifySwagger from '@fastify/swagger'
+import Fastify from 'fastify'
+import {
+  jsonSchemaTransform,
+  jsonSchemaTransformObject,
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from 'fastify-type-provider-zod'
+import { SignInPayload, UserResponse } from '@acme/shared'
+
+const app = Fastify().withTypeProvider<ZodTypeProvider>()
+
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
+
+// o transform precisa estar registrado antes das rotas: rota sem ele não entra no documento
+await app.register(fastifySwagger, {
+  openapi: { info: { title: 'API', version: '1.0.0' } },
+  transform: jsonSchemaTransform,
+  transformObject: jsonSchemaTransformObject,
+})
+
+app.route({
+  method: 'POST',
+  url: '/authentication/sign-in',
+  schema: { body: SignInPayload, response: { 200: UserResponse } },
+  handler: (req, reply) => reply.send(req.body.email),
+})
+```
+
+**O que muda a experiência:**
+
+1. **A versão 7 serializa por `z.output`.** Até a 6 era `z.input`. Com `transform`, `default` ou
+   `codec` o handler entrega o tipo de **saída** e o serializador faz o `encode` (precisa do Zod
+   4.2 ou mais novo). O `Date` de um `codec` vira texto na resposta.
+2. **O validador é síncrono.** `validatorCompiler` usa `safeParse`: schema de rota com refinamento ou
+   transform `async` lança. Consulta a banco fica no use-case.
+3. **`$ref` por `id`.** `z.globalRegistry.add(schema, { id: 'User' })` (ou `.meta({ id })`) mais o
+   `jsonSchemaTransformObject` produz `components.schemas` e referências no OpenAPI.
+4. **Alvo do OpenAPI.** O padrão é `openapi-3.0` para documento `3.0.x` e `draft-2020-12` para `3.1.x`;
+   `createJsonSchemaTransform({ zodToJsonConfig: { target } })` força um. `skipList` tira rota do
+   documento. Corpo vazio é `z.undefined()` (204).
+5. **Erro tipado.** `hasZodFastifySchemaValidationErrors(err)` reconhece falha de requisição (`err.validation`
+   traz as issues) e `isResponseSerializationError(err)` a de resposta (`err.cause.issues`, 500). Os dois
+   saem do pacote e entram no `setErrorHandler`; o README usa o segundo sem importá-lo.
+6. **Plugin.** `FastifyPluginAsyncZod` e `FastifyPluginCallbackZod` herdam o provider dentro de
+   `register`; sem eles o `req.body` volta a `unknown` no plugin.
+7. **O README importa de `zod/v4`.** É o mesmo Zod 4; no código da casa o `z` vem de `shared`.
 
 ---
 
@@ -732,7 +805,6 @@ São 237, agrupados por problema.
 | [`fastify-shared-schema`](https://github.com/Adibla/fastify-shared-schema) · [md](https://raw.githubusercontent.com/Adibla/fastify-shared-schema/HEAD/README.md) | Compartilha schema entre rotas — ⚠ parado desde 2023-02 |
 | [`fastify-split-validator`](https://github.com/MetCoder95/fastify-split-validator) · [md](https://raw.githubusercontent.com/MetCoder95/fastify-split-validator/HEAD/README.md) | Um validador diferente por parte da requisição |
 | [`fastify-type-provider-effect-schema`](https://github.com/daotl/fastify-type-provider-effect-schema) · [md](https://raw.githubusercontent.com/daotl/fastify-type-provider-effect-schema/HEAD/README.md) | Type provider do `@effect/schema` |
-| [`fastify-type-provider-zod`](https://github.com/turkerdev/fastify-type-provider-zod) · [md](https://raw.githubusercontent.com/turkerdev/fastify-type-provider-zod/HEAD/README.md) | Type provider do Zod |
 
 ### Log, métrica e rastreio
 

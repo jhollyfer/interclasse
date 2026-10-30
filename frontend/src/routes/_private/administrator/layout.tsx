@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-
-import { USER_ROLE } from '#/lib/entity'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { requireRole } from '../-components/require-role'
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { cn } from '#/lib/utils.ts'
 import { Button } from '#/components/ui/button.tsx'
+import { m } from '#/paraglide/messages'
 import {
   CaretLeftIcon,
   CaretRightIcon,
@@ -72,7 +73,8 @@ function PaginationPrevious({
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      // casa: rótulo traduzido (_standards/i18n.md)
+      aria-label={m.common_ui_previous_page()}
       size="default"
       className={cn('pl-2!', className)}
       {...props}
@@ -90,7 +92,8 @@ function PaginationNext({
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      // casa: rótulo traduzido (_standards/i18n.md)
+      aria-label={m.common_ui_next_page()}
       size="default"
       className={cn('pr-2!', className)}
       {...props}

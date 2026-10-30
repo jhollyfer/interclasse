@@ -1,0 +1,10 @@
+{
+  "not_found": "Modalidad no encontrada",
+  "invalid_limits": "Límites de atletas inválidos",
+  "min_above_max": "El mínimo no puede superar el máximo",
+  "already_exists": "La modalidad ya existe",
+  "name_taken": "Ya existe una modalidad con este nombre",
+  "roster_above_limit": "Hay un grupo con más atletas inscritos que el nuevo máximo",
+  "roster_above_limit_field": "Un grupo ya tiene {total} atletas inscritos; reduce la lista antes",
+  "in_use": "La modalidad tiene inscripciones"
+}

@@ -1,38 +1,48 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  SORT_DIRECTION,
+  left,
+  right,
+  type AdministratorClassroomPaginateResponse,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import { left, right, type Either } from '#core/either'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { sortOrder } from '#features/_shared.sort'
-import { type Paginated } from '#core/response'
-import type { ClassroomPaginatePayload } from '#features/administrator/classrooms/classrooms.validator'
+import type { AdministratorClassroomPaginatePayload } from '#validators/administrator/classrooms.validator'
 
-type Payload = ClassroomPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = AdministratorClassroomPaginatePayload
+type Response = Either<HTTPException, Paginated<AdministratorClassroomPaginateResponse>>
 
 @inject()
 export default class AdministratorClassroomPaginateUseCase {
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Classroom.query().preload('advisor').preload('representative')
-
-      if (payload.category) query.where('category', payload.category)
-      if (payload.search) query.whereILike('name', `%${payload.search}%`)
-
-      const classrooms = await query
-        .orderBy(...sortOrder(payload, 'name'))
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: classrooms.getMeta(), data: classrooms.all() })
+      return right(
+        await this.classrooms.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          search: payload.search,
+          category: payload.category,
+          sort: payload.sort ?? 'name',
+          direction: payload.direction ?? SORT_DIRECTION.ASC,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[classrooms > paginate][error]')
+      logger.error({ err: error }, '[administrator/classrooms > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CLASSROOM_PAGINATE_ERROR',
         ),
       )

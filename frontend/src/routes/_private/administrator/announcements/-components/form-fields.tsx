@@ -1,6 +1,7 @@
 import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorAnnouncementCreatePayload } from '@interclasse/shared'
 
 import { Checkbox } from '#/components/ui/checkbox'
 import {
@@ -15,9 +16,9 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
+import { m } from '#/paraglide/messages'
 
-export type AnnouncementFormType = AnnouncementCreatePayload
+export type AnnouncementFormType = AdministratorAnnouncementCreatePayload
 
 export const ANNOUNCEMENT_FORM_DEFAULTS: DefaultValues<AnnouncementFormType> = {
   title: '',
@@ -44,10 +45,14 @@ export function AnnouncementFormFields({
         control={form.control}
         name="title"
         id={`${idPrefix}-title`}
-        label="Título"
+        label={m.admin_common_title()}
       >
         {({ field, control }) => (
-          <Input {...field} {...control} placeholder="Troca de horário" />
+          <Input
+            {...field}
+            {...control}
+            placeholder={m.admin_announcements_field_title_placeholder()}
+          />
         )}
       </AppField>
 
@@ -55,7 +60,7 @@ export function AnnouncementFormFields({
         control={form.control}
         name="body"
         id={`${idPrefix}-body`}
-        label="Texto"
+        label={m.admin_announcements_field_body()}
       >
         {({ field, control }) => <Textarea {...field} {...control} rows={5} />}
       </AppField>
@@ -73,10 +78,10 @@ export function AnnouncementFormFields({
               onCheckedChange={(checked) => field.onChange(checked === true)}
             />
             <FieldLabel htmlFor={`${idPrefix}-pinned`}>
-              Fixar no topo do site
+              {m.admin_announcements_field_pinned()}
             </FieldLabel>
             <FieldDescription className="sr-only">
-              Aviso fixado aparece antes dos demais.
+              {m.admin_announcements_field_pinned_description()}
             </FieldDescription>
           </Field>
         )}

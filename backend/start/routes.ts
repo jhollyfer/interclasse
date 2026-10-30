@@ -55,6 +55,8 @@ router
       .get('announcements', [controllers.storefront.announcements.paginate.Paginate])
       .as('announcements')
     router.get('matches', [controllers.storefront.matches.paginate.Paginate]).as('matches')
+    router.get('site', [controllers.storefront.site.show.Show]).as('site')
+    router.get('photos', [controllers.storefront.photos.paginate.Paginate]).as('photos')
 
     router
       .group(() => {
@@ -184,6 +186,32 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.administrator.reports.show.Show])
+        router.get('csv', [controllers.administrator.reports.export.Export]).as('export')
+      })
+      .prefix('reports')
+      .as('reports')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.photos.paginate.Paginate])
+        router.post('/', [controllers.administrator.photos.create.Create])
+        router.put(':id/review', [controllers.administrator.photos.review.Review]).as('review')
+        router.delete(':id', [controllers.administrator.photos.delete.Delete])
+      })
+      .prefix('photos')
+      .as('photos')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.administrator.site.show.Show])
+        router.put('/', [controllers.administrator.site.update.Update])
+      })
+      .prefix('site')
+      .as('site')
+
+    router
+      .group(() => {
         router.get('/', [controllers.administrator.announcements.paginate.Paginate])
         router.post('/', [controllers.administrator.announcements.create.Create])
         router.get(':id', [controllers.administrator.announcements.show.Show])
@@ -296,7 +324,7 @@ router
  * O professor conselheiro: alunos e inscrições das turmas que aconselha.
  *
  * O administrador entra junto para cobrir a falta de um conselheiro. Qual turma
- * cada um alcança não é regra de rota - é a `ClassroomPolicy`, por registro.
+ * cada um alcança não é regra de rota - é o escopo da consulta no `ClassroomRepository` (`findOwned`).
  */
 router
   .group(() => {
@@ -312,6 +340,15 @@ router
       })
       .prefix('students')
       .as('students')
+
+    router
+      .group(() => {
+        router.get('/', [controllers.advisor.photos.paginate.Paginate])
+        router.post('/', [controllers.advisor.photos.create.Create])
+        router.delete(':id', [controllers.advisor.photos.delete.Delete])
+      })
+      .prefix('photos')
+      .as('photos')
 
     router
       .group(() => {

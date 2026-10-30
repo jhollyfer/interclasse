@@ -1,44 +1,56 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  MATCH_STATUS,
+  PAGINATION,
+  left,
+  right,
+  type Either,
+  type Paginated,
+  type StorefrontMatchPaginateResponse,
+} from '@interclasse/shared'
 
-import MatchService from '#services/match/match.service'
-import { left, right, type Either } from '#core/either'
+import { BracketRepository, type MatchListOrder } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
-import { MATCH_STATUS, PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
-import type { MatchPaginatePayload } from '#features/storefront/matches/matches.validator'
+import type { StorefrontMatchPaginatePayload } from '#validators/storefront/matches.validator'
 
-type Payload = MatchPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = StorefrontMatchPaginatePayload
+type Response = Either<HTTPException, Paginated<StorefrontMatchPaginateResponse>>
 
 @inject()
 export default class StorefrontMatchPaginateUseCase {
-  constructor(private readonly matches: MatchService) {}
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = this.matches.schedule(payload)
-
-      // Resultado se lê do mais recente para trás: troca a ordem de agenda do
-      // service, em vez de só acrescentar um critério depois dela.
-      if (payload.status === MATCH_STATUS.FINISHED) query.clearOrder().orderBy('updatedAt', 'desc')
-
-      const matches = await query.paginate(
-        payload.page ?? PAGINATION.PAGE,
-        payload.perPage ?? PAGINATION.PER_PAGE,
+      return right(
+        await this.brackets.paginateMatches({
+          ...payload,
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          order: this.orderFor(payload),
+        }),
       )
-
-      return right({ meta: matches.getMeta(), data: matches.all() })
     } catch (error) {
-      logger.error({ err: error }, '[matches > paginate][error]')
+      logger.error({ err: error }, '[storefront/matches > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'STOREFRONT_MATCH_PAGINATE_ERROR',
         ),
       )
     }
+  }
+
+  /** Resultado se lê do mais recente para trás; o resto, na ordem da agenda. */
+  private orderFor(payload: Payload): MatchListOrder {
+    if (payload.status === MATCH_STATUS.FINISHED) return 'recent-results'
+
+    return 'schedule'
   }
 }

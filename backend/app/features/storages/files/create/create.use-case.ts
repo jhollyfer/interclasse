@@ -1,45 +1,26 @@
-import { inject } from '@adonisjs/core'
-import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import { randomUUID } from 'node:crypto'
 
-import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either, type StoragesFileUploadResponse } from '@interclasse/shared'
+
+import { FilePresenter } from '../files.presenter.ts'
+
+import { Storage } from '#domain/storage/storage.entity'
 import HTTPException from '#exceptions/http.exception'
-import { StorageContract } from '#services/storage/storage-contract.service'
+import { StorageRepository } from '#repositories/storage/storage.repository'
+import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
   type PresignedPart,
-} from '#services/multipart/multipart-contract.service'
+} from '#services/multipart/multipart.contract'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
-import { UPLOAD_STATUS } from '#core/entity'
-import type { FileCreatePayload } from '#features/storages/files/files.validator'
+import type { StoragesFileCreatePayload } from '#validators/storages/files.validator'
 
-type Payload = FileCreatePayload
-
-/**
- * O que o cliente precisa para subir o arquivo por conta própria.
- *
- * É a mesma forma que `GET /storages/:id/parts` devolve, de propósito: começar
- * um upload e retomá-lo são a mesma pergunta - "para onde eu mando o quê" -, e
- * duas formas para a mesma resposta seriam dois caminhos no cliente.
- */
-export type StorageUpload = {
-  readonly storage: ModelObject
-  readonly uploadId: string | null
-  readonly partSize: number
-  readonly totalParts: number
-  /** As URLs deste lote. Pode ser menos que `totalParts` (ver `PRESIGNED_BATCH`). */
-  readonly parts: ReadonlyArray<PresignedPart>
-  /** As partes que o bucket já tem. Sempre vazio ao iniciar. */
-  readonly uploaded: ReadonlyArray<{
-    readonly partNumber: number
-    readonly size: number
-    readonly etag: string
-  }>
-}
-
-type Response = Either<HTTPException, StorageUpload>
+type Payload = StoragesFileCreatePayload
+type Response = Either<HTTPException, StoragesFileUploadResponse>
 
 /**
  * Abre um upload: registra o arquivo como `PENDING` e devolve por onde subi-lo.
@@ -64,12 +45,14 @@ type Response = Either<HTTPException, StorageUpload>
 @inject()
 export default class StoragesFileCreateUseCase {
   constructor(
-    private readonly storage: StorageContract,
+    private readonly bucket: StorageContract,
     private readonly multipart: MultipartContract,
+    private readonly storages: StorageRepository,
+    private readonly i18n: I18n,
   ) {}
 
   async execute(payload: Payload): Promise<Response> {
-    const key = this.storage.key(payload.mimetype)
+    const key = this.bucket.key(payload.mimetype)
     const totalParts = countParts(payload.size, PART_SIZE)
 
     let uploadId: string | null = null
@@ -85,39 +68,39 @@ export default class StoragesFileCreateUseCase {
         parts = await this.multipart.signParts(key, uploadId, pendingParts(totalParts, []))
       }
 
-      const storage = new Storage()
-
-      storage.merge({
-        filename: key,
+      const storage = Storage.open({
+        id: randomUUID(),
+        key,
         originalName: payload.fileName,
         mimetype: payload.mimetype,
         size: payload.size,
-        path: key,
-        status: UPLOAD_STATUS.PENDING,
         uploadId,
         partSize: PART_SIZE,
+        now: new Date(),
       })
 
-      await storage.save()
+      await this.storages.save(storage)
 
-      return right({
-        storage,
-        uploadId,
-        partSize: PART_SIZE,
-        totalParts,
-        parts,
-        uploaded: [],
-      })
+      return right(
+        FilePresenter.upload({
+          storage,
+          uploadId,
+          partSize: PART_SIZE,
+          totalParts,
+          parts,
+          uploaded: [],
+        }),
+      )
     } catch (error) {
       logger.error({ err: error }, '[files > create][error]')
 
       // O multipart pode ter sido aberto antes de a linha falhar. Sem este
       // aborto ele fica pendurado no bucket para sempre: partes órfãs não
       // aparecem na listagem de objetos e continuam sendo cobradas.
-      if (uploadId) await this.#abortQuietly(key, uploadId)
+      if (uploadId) await this.abortQuietly(key, uploadId)
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_CREATE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_CREATE_ERROR'),
       )
     }
   }
@@ -126,7 +109,7 @@ export default class StoragesFileCreateUseCase {
    * Aborta sem deixar a falha do aborto encobrir a falha original - quem chama
    * já está no caminho do erro, e o que interessa reportar é o primeiro.
    */
-  async #abortQuietly(key: string, uploadId: string): Promise<void> {
+  private async abortQuietly(key: string, uploadId: string): Promise<void> {
     try {
       await this.multipart.abort(key, uploadId)
     } catch (error) {

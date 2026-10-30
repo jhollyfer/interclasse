@@ -1,21 +1,27 @@
-import type * as React from 'react'
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
-import { BracketIndex } from '../../-components/bracket-index'
+import { StandingsExplorer } from '../../-components/standings-explorer'
 import { Section, SectionHeader, SectionTitle } from '../../-components/section'
 
 export function StandingsPage(): React.JSX.Element {
   const { data } = useQuery(storefrontBracketsQueryOptions(BRACKETS_INDEX))
+  const [bracketId, setBracketId] = React.useState<string>()
 
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>Classificação</SectionTitle>
+        <SectionTitle render={<h1 />}>{m.public_nav_standings()}</SectionTitle>
       </SectionHeader>
-      <BracketIndex brackets={data?.data ?? []} />
+      <StandingsExplorer
+        brackets={data?.data ?? []}
+        selected={bracketId}
+        onSelect={setBracketId}
+      />
     </Section>
   )
 }

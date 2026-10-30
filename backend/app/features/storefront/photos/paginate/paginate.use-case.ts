@@ -1,0 +1,50 @@
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
+import logger from '@adonisjs/core/services/logger'
+import {
+  PAGINATION,
+  left,
+  right,
+  type Either,
+  type Paginated,
+  type StorefrontPhotoShowResponse,
+} from '@interclasse/shared'
+
+import { PhotoRepository } from '#repositories/photo/photo.repository'
+import HTTPException from '#exceptions/http.exception'
+import type { PagePayload } from '#core/validator'
+
+type Payload = PagePayload
+type Response = Either<HTTPException, Paginated<StorefrontPhotoShowResponse>>
+
+/**
+ * O carrossel do site: só as aprovadas, da mais nova à mais antiga. Sai a URL
+ * assinada e a legenda; quem enviou e o caminho no bucket ficam de fora.
+ */
+@inject()
+export default class StorefrontPhotoPaginateUseCase {
+  constructor(
+    private readonly photos: PhotoRepository,
+    private readonly i18n: I18n,
+  ) {}
+
+  async execute(payload: Payload): Promise<Response> {
+    try {
+      return right(
+        await this.photos.paginateApproved({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+        }),
+      )
+    } catch (error) {
+      logger.error({ err: error }, '[storefront/photos > paginate][error]')
+
+      return left(
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STOREFRONT_PHOTO_PAGINATE_ERROR',
+        ),
+      )
+    }
+  }
+}

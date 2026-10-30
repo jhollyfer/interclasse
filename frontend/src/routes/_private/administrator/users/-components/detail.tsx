@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { notifyError } from '#/lib/form-errors'
@@ -34,13 +35,12 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { USER_ROLE } from '#/lib/entity'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   useUserArchive,
   useUserDelete,
   useUserUnarchive,
-} from '#/integrations/tanstack-query/mutations'
+} from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import {
   ACCOUNT_STATUS_LABELS,
@@ -50,6 +50,7 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 const route = getRouteApi('/_private/administrator/users/$id/')
 
@@ -77,7 +78,7 @@ export function UserDetail(): React.JSX.Element {
   const archive = useUserArchive({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     async onSuccess() {
-      toast.success(`Conta de ${user.name} arquivada.`)
+      toast.success(m.admin_users_archived_ok({ name: user.name }))
       await invalidate()
       // Arquivado, o detalhe responde 404 (o backend esconde o arquivado
       // fora da lixeira): ficar aqui deixava a tela parada no estado antigo.
@@ -113,7 +114,11 @@ export function UserDetail(): React.JSX.Element {
               <Badge variant={ACTIVE_STATUS_VARIANTS[user.status]}>
                 {status}
               </Badge>
-              {user.deletedAt && <Badge variant="outline">Arquivado</Badge>}
+              {user.deletedAt && (
+                <Badge variant="outline">
+                  {m.admin_users_archived_badge()}
+                </Badge>
+              )}
             </PageHeaderBadges>
           </PageHeaderTitle>
           <PageHeaderDescription>{user.email}</PageHeaderDescription>
@@ -123,7 +128,7 @@ export function UserDetail(): React.JSX.Element {
               render={
                 <Link to="/administrator/users/$id/edit" params={{ id }}>
                   <PencilSimpleIcon />
-                  Editar
+                  {m.admin_common_edit()}
                 </Link>
               }
             />
@@ -134,20 +139,23 @@ export function UserDetail(): React.JSX.Element {
                 trigger={
                   <Button variant="outline">
                     <ArchiveIcon />
-                    Arquivar
+                    {m.admin_common_archive()}
                   </Button>
                 }
               >
                 <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>{`Arquivar a conta de ${user.name}?`}</ConfirmDialogTitle>
+                  <ConfirmDialogTitle>
+                    {m.admin_users_archive_title({ name: user.name })}
+                  </ConfirmDialogTitle>
                   <ConfirmDialogDescription>
-                    Ela deixa de entrar no painel e sai da listagem, e pode ser
-                    restaurada depois.
+                    {m.admin_users_archive_description()}
                   </ConfirmDialogDescription>
                 </ConfirmDialogHeader>
                 <ConfirmDialogFooter>
                   <ConfirmDialogCancel />
-                  <ConfirmDialogConfirm>Arquivar</ConfirmDialogConfirm>
+                  <ConfirmDialogConfirm>
+                    {m.admin_common_archive()}
+                  </ConfirmDialogConfirm>
                 </ConfirmDialogFooter>
               </ConfirmDialog>
             )}
@@ -158,19 +166,23 @@ export function UserDetail(): React.JSX.Element {
                 trigger={
                   <Button variant="outline">
                     <ArrowCounterClockwiseIcon />
-                    Restaurar
+                    {m.admin_common_restore()}
                   </Button>
                 }
               >
                 <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>{`Restaurar a conta de ${user.name}?`}</ConfirmDialogTitle>
+                  <ConfirmDialogTitle>
+                    {m.admin_users_restore_title({ name: user.name })}
+                  </ConfirmDialogTitle>
                   <ConfirmDialogDescription>
-                    Ela volta para a listagem, na situação em que estava.
+                    {m.admin_users_restore_description()}
                   </ConfirmDialogDescription>
                 </ConfirmDialogHeader>
                 <ConfirmDialogFooter>
                   <ConfirmDialogCancel />
-                  <ConfirmDialogConfirm>Restaurar</ConfirmDialogConfirm>
+                  <ConfirmDialogConfirm>
+                    {m.admin_common_restore()}
+                  </ConfirmDialogConfirm>
                 </ConfirmDialogFooter>
               </ConfirmDialog>
             )}
@@ -184,19 +196,23 @@ export function UserDetail(): React.JSX.Element {
                 trigger={
                   <Button variant="destructive">
                     <TrashIcon />
-                    Remover
+                    {m.admin_common_remove()}
                   </Button>
                 }
               >
                 <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>{`Remover a conta de ${user.name}?`}</ConfirmDialogTitle>
+                  <ConfirmDialogTitle>
+                    {m.admin_users_remove_title({ name: user.name })}
+                  </ConfirmDialogTitle>
                   <ConfirmDialogDescription>
-                    O registro é apagado de vez. Não dá para desfazer.
+                    {m.admin_users_remove_description()}
                   </ConfirmDialogDescription>
                 </ConfirmDialogHeader>
                 <ConfirmDialogFooter>
                   <ConfirmDialogCancel />
-                  <ConfirmDialogConfirm>Remover</ConfirmDialogConfirm>
+                  <ConfirmDialogConfirm>
+                    {m.admin_common_remove()}
+                  </ConfirmDialogConfirm>
                 </ConfirmDialogFooter>
               </ConfirmDialog>
             )}
@@ -207,7 +223,7 @@ export function UserDetail(): React.JSX.Element {
       <PageShellContent>
         <Card>
           <CardHeader>
-            <CardTitle>A conta</CardTitle>
+            <CardTitle>{m.admin_users_account_card()}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <div className="flex items-center gap-4">
@@ -230,25 +246,33 @@ export function UserDetail(): React.JSX.Element {
 
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <dt className="text-muted-foreground text-xs">Papel</dt>
+                <dt className="text-muted-foreground text-xs">
+                  {m.admin_common_role()}
+                </dt>
                 <dd className="text-sm">{role}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs">Situação</dt>
+                <dt className="text-muted-foreground text-xs">
+                  {m.admin_common_status()}
+                </dt>
                 <dd className="text-sm">{status}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs">Criado em</dt>
+                <dt className="text-muted-foreground text-xs">
+                  {m.admin_common_created_on()}
+                </dt>
                 <dd className="text-sm">{formatDate(user.createdAt)}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground text-xs">
-                  Última alteração
+                  {m.admin_users_last_changed()}
                 </dt>
                 <dd className="text-sm">{formatDate(user.updatedAt)}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs">Arquivado em</dt>
+                <dt className="text-muted-foreground text-xs">
+                  {m.admin_users_archived_on()}
+                </dt>
                 <dd className="text-sm">{formatDate(user.deletedAt)}</dd>
               </div>
             </dl>

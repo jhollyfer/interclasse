@@ -1,6 +1,6 @@
 # Backend
 
-AdonisJS 7 + Lucid/Postgres. **A régua é `../_padroes/`** (`arquitetura.md` e
+AdonisJS 7 + Lucid/Postgres. **A régua é `../_standards/`** (`arquitetura.md` e
 `backend.md` acima de tudo), cópia do upstream `maiyu-pattern` conferida por
 `sync:check`. Este arquivo não repete a régua: aqui fica só o que este projeto faz
 de diferente dela, e os comandos. O que cada operação faz, recebe e devolve está no

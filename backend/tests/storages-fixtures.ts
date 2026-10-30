@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
 
+import { UPLOAD_STATUS } from '@interclasse/shared'
+
 import Storage from '#models/storage'
-import { UPLOAD_STATUS } from '#core/entity'
 
 /**
  * Uma linha com os metadados escolhidos, para os testes de listagem.

@@ -9,9 +9,10 @@ import { UploadingProvider } from '#/components/common/uploading-context'
 import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Spinner } from '#/components/ui/spinner'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { SITE_TITLE } from '#/lib/constant'
+import { m } from '#/paraglide/messages'
 
 import { Sidebar } from './-components/sidebar'
 import { Header } from './-components/header'
@@ -69,7 +70,7 @@ export const Route = createFileRoute('/_private')({
     const title = breadcrumbTitle(buildBreadcrumbs(matches))
 
     return {
-      meta: [{ title: [title, SITE_TITLE].filter(Boolean).join(' | ') }],
+      meta: [{ title: [title, SITE_TITLE()].filter(Boolean).join(' | ') }],
     }
   },
   component: RouteComponent,
@@ -99,7 +100,7 @@ function RouteComponent(): React.JSX.Element {
         href={'#'.concat(MAIN_ID)}
         className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
       >
-        Pular para o conteúdo
+        {m.panel_skip_to_content()}
       </a>
 
       <Sidebar />

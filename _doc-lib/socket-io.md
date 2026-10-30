@@ -373,7 +373,7 @@ httpServer.listen(3000)   // CERTO
 
 ```ts
 // caso real — bin/server.ts: Socket.IO é serviço próprio, não vive no kernel
-// HTTP do Fastify (_padroes/backend-fastify.md §9); liga-se aqui, uma vez.
+// HTTP do Fastify (_standards/backend-fastify.md §9); liga-se aqui, uma vez.
 import { Server } from 'socket.io'
 import { buildKernel } from '@application/core/kernel.core'
 import NotificationSocketService from '@application/services/notification/notification-socket/notification-socket.service'
@@ -428,7 +428,7 @@ const io = new Server(httpServer, {
 
 ```ts
 // caso real — kernel.core.ts: opções lidas do leitor de ENV síncrono
-// (_padroes/backend-fastify.md §7), nunca hard-coded no arquivo do socket
+// (_standards/backend-fastify.md §7), nunca hard-coded no arquivo do socket
 import { Server } from 'socket.io'
 import { ENV } from '@application/core/env.core'
 
@@ -701,7 +701,7 @@ const e = io('https://api.example.com', { path: '/ws/' })
 
 ```ts
 // caso real — use-team-socket.ts: hook React 19 que abre o namespace do
-// módulo, no padrão de hooks/use-kebab-case.ts (_padroes/frontend.md §7)
+// módulo, no padrão de hooks/use-kebab-case.ts (_standards/frontend.md §7)
 import { useEffect, useRef } from 'react'
 import type { Socket } from 'socket.io-client'
 import { openSocket } from '@/lib/socket-registry'
