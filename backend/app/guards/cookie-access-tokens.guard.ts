@@ -7,7 +7,7 @@ import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
 import { ACTIVE_STATUS } from '@interclasse/shared'
 
 import User from '#models/user'
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN } from '#config/cookie'
 import { SessionContract } from '#services/session/session.contract'
 
 /**

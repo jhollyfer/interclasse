@@ -22,7 +22,7 @@ export const SECURITY_SCHEME = 'cookieAuth'
 
 /**
  * Cookie que carrega o token de acesso. Espelha `COOKIE_TOKEN.ACCESS` de
- * `app/services/cookie/cookie.service.ts`.
+ * `config/cookie.ts`.
  */
 export const SECURITY_COOKIE = 'access-token'
 

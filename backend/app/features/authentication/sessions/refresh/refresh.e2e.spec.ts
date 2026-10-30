@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN } from '#config/cookie'
 import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
 /**

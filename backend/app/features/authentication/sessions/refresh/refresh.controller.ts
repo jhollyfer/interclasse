@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import AuthenticationSessionRefreshUseCase from './refresh.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 
 @inject()
 export default class AuthenticationSessionRefreshController {
@@ -22,10 +22,7 @@ export default class AuthenticationSessionRefreshController {
       'dos três foi.',
   })
 
-  constructor(
-    private readonly cookie: CookieService,
-    private readonly useCase: AuthenticationSessionRefreshUseCase,
-  ) {}
+  constructor(private readonly useCase: AuthenticationSessionRefreshUseCase) {}
 
   async handle(context: HttpContext) {
     const refreshToken = context.request.cookie(COOKIE_TOKEN.REFRESH)
@@ -33,7 +30,9 @@ export default class AuthenticationSessionRefreshController {
 
     if (result.isLeft()) throw result.value
 
-    this.cookie.set(context, result.value)
+    context.response
+      .cookie(COOKIE_TOKEN.ACCESS, result.value.accessToken, cookieOptions.access)
+      .cookie(COOKIE_TOKEN.REFRESH, result.value.refreshToken, cookieOptions.refresh)
 
     return context.response.noContent()
   }
