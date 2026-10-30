@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { isIndexable } from '#/lib/site-environment'
 import { robotsTxt } from '#/lib/sitemap'
 
 /**
@@ -11,8 +12,8 @@ import { robotsTxt } from '#/lib/sitemap'
 export const Route = createFileRoute('/robots.txt')({
   server: {
     handlers: {
-      GET: () =>
-        new Response(robotsTxt({ indexable: import.meta.env.PROD }), {
+      GET: async () =>
+        new Response(robotsTxt({ indexable: await isIndexable() }), {
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'public, max-age=3600',

@@ -1,7 +1,7 @@
+import { USER_ROLE } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { USER_ROLE } from '@interclasse/shared'
 
 import {
   EmptyStateActions,
@@ -52,7 +52,7 @@ export function UsersTable(): React.JSX.Element {
     usersQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => userColumns(), [])
+  const columns = userColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

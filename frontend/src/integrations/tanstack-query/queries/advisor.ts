@@ -1,4 +1,3 @@
-import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import {
   AdvisorCardPaginateResponse,
   AdvisorClassroomShowResponse,
@@ -8,6 +7,7 @@ import {
   paginatedResponse,
 } from '@interclasse/shared'
 import type { Merge } from '@interclasse/shared'
+import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type { ListSearch, StudentListSearch } from '#/lib/list-search'

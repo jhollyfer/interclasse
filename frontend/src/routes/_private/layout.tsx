@@ -1,20 +1,20 @@
-import type * as React from 'react'
 import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import type * as React from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { NotFoundPageServerError } from '#/components/common/not-found-page'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
+import { NotFoundPageServerError } from '#/components/common/not-found-page'
 import { UploadingProvider } from '#/components/common/uploading-context'
-import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Spinner } from '#/components/ui/spinner'
+import { TABLET_BREAKPOINT, useIsBelow } from '#/hooks/use-mobile'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { m } from '#/paraglide/messages'
 
-import { Sidebar } from './-components/sidebar'
 import { Header } from './-components/header'
+import { Sidebar } from './-components/sidebar'
 
 /**
  * O portão do painel. Fica no layout, e não em cada tela, porque assim rota nova
@@ -71,6 +71,8 @@ export const Route = createFileRoute('/_private')({
     return {
       meta: [
         { title: [title, m.common_site_title()].filter(Boolean).join(' | ') },
+        // Área restrita fora do índice (`frontend.md` §9.7).
+        { name: 'robots', content: 'noindex, nofollow' },
       ],
     }
   },
@@ -99,7 +101,7 @@ function RouteComponent(): React.JSX.Element {
       */}
       <a
         href={'#'.concat(MAIN_ID)}
-        className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+        className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-tooltip"
       >
         {m.panel_skip_to_content()}
       </a>

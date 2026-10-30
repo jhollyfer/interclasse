@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { useEditor } from '@tiptap/react'
 import type { JSONContent } from '@tiptap/react'
+import * as React from 'react'
 
 import { RICH_TEXT_EXTENSIONS } from '#/components/common/rich-text'
 
@@ -48,13 +48,9 @@ export function RichEditor({
 
   // Antes do primeiro quadro no cliente o editor ainda não existe: nada a
   // compartilhar, e as partes não renderizam.
-  const context = React.useMemo(() => {
-    if (!editor) return null
+  if (!editor) return null
 
-    return { editor }
-  }, [editor])
-
-  if (!context) return null
+  const context = { editor }
 
   return (
     <RichEditorProvider value={context}>

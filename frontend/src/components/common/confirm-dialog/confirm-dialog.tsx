@@ -5,19 +5,19 @@ import {
   AlertDialogContent,
   AlertDialogTrigger,
 } from '#/components/ui/alert-dialog'
+import type { ConfirmHandle } from '#/lib/dialog-handle'
 
 import { ConfirmDialogProvider } from './confirm-dialog-context'
 
-type ConfirmDialogProps = Readonly<{
+type ConfirmDialogProps<TPayload> = Readonly<{
   /**
-   * O elemento visível que abre o alerta - em geral um `DropdownMenuItem` com
-   * `closeOnClick={false}`, porque sem isso o menu fecha e leva o gatilho antes
-   * do alerta aparecer.
+   * O elemento visível que abre o alerta - em geral um `Button`.
    *
    * Segue prop e não slot: é o elemento de **fora** do dialog, e a primitiva
    * precisa dele na posição de `render` para herdar os handlers de abertura.
+   * Sem ele, o alerta abre por `handle` (item de menu, linha de tabela).
    */
-  trigger?: React.ReactElement
+  render?: React.ReactElement
   /**
    * `false` quando o gatilho não é `<button>` (item de menu é `<div>`): a
    * primitiva tira a semântica de botão nativo em vez de avisar no console
@@ -25,16 +25,22 @@ type ConfirmDialogProps = Readonly<{
    */
   nativeButton?: boolean
   /**
-   * Aberto por fora, sem gatilho: é o caso do item de menu. Como gatilho, o
-   * item herdava `tabindex=0` do alerta e virava o foco inicial do menu.
+   * Abre o alerta de fora, sem gatilho: `handle.open(null)` no clique do item
+   * de menu. Um handle por alerta, criado com `createConfirmHandle`.
    */
-  open?: boolean
-  onConfirm: () => void
+  handle?: ConfirmHandle<TPayload>
+  /** O elemento que recebe o foco ao fechar, quando não há gatilho. */
+  finalFocus?: React.RefObject<HTMLElement | null>
+  /** Recebe o payload do `openWithPayload`, quando o alerta foi aberto com um. */
+  onConfirm: (payload: TPayload | undefined) => void
   /** Ação sem volta pinta o botão de confirmar de vermelho. */
   destructive?: boolean
-  /** Avisa quem contém o gatilho - o menu de linha fecha quando o alerta abre. */
-  onOpenChange?: (open: boolean) => void
-  children: React.ReactNode
+  /**
+   * O conteúdo do alerta. Em função, recebe o payload de
+   * `handle.openWithPayload(dado)`: um alerta só para a tabela inteira, e o
+   * texto sai do registro clicado.
+   */
+  children: React.ReactNode | ((payload: TPayload) => React.ReactNode)
 }>
 
 /**
@@ -44,54 +50,52 @@ type ConfirmDialogProps = Readonly<{
  * é essa a diferença que importa aqui - um clique distraído fora do dialog não
  * pode ser a resposta a "apagar de vez?".
  *
+ * Uncontrolled (`frontend.md` §6.2): abre pelo gatilho ou pelo `handle` e
+ * fecha pelo Cancelar ou pelo Confirmar, que são `Close` da primitiva. O
+ * resultado da ação chega por toast.
+ *
  * As partes são finas de propósito. Foco, Esc, portal e ARIA continuam sendo do
  * `ui/alert-dialog`, que já é compound; o que se acrescenta aqui é só o texto
  * virar slot, para a tela fora da curva pôr um `<Alert>` ou um `<Checkbox>` na
  * descrição sem que isso vire mais uma prop opcional para todas as outras.
  */
-export function ConfirmDialog({
-  trigger,
+export function ConfirmDialog<TPayload = undefined>({
+  render,
   nativeButton = true,
+  handle,
+  finalFocus,
   onConfirm,
   destructive = false,
-  open,
-  onOpenChange,
   children,
-}: ConfirmDialogProps): React.JSX.Element {
-  // Controlado sempre, por dentro ou por fora: confirmar fecha o alerta. O
-  // resultado chega por toast, e com erro o alerta ficava aberto esperando um
-  // "Cancelar".
-  const [inner, setInner] = React.useState(false)
-  const isOpen = open ?? inner
-  const change = React.useCallback(
-    (next: boolean) => {
-      setInner(next)
-      onOpenChange?.(next)
-    },
-    [onOpenChange],
-  )
-
-  // Sem `useMemo` o objeto é novo a cada render da tela e o botão de confirmar
-  // re-renderiza junto, mesmo com a ação igual.
-  const value = React.useMemo(
-    () => ({
-      onConfirm: () => {
-        change(false)
-        onConfirm()
-      },
-      destructive,
-    }),
-    [change, onConfirm, destructive],
-  )
-
+}: ConfirmDialogProps<TPayload>): React.JSX.Element {
   return (
-    <AlertDialog open={isOpen} onOpenChange={change}>
-      {trigger && (
-        <AlertDialogTrigger render={trigger} nativeButton={nativeButton} />
-      )}
-      <AlertDialogContent data-slot="confirm-dialog">
-        <ConfirmDialogProvider value={value}>{children}</ConfirmDialogProvider>
-      </AlertDialogContent>
+    <AlertDialog handle={handle}>
+      {({ payload }) => {
+        // Texto fixo passa direto; em função, só depois de haver payload.
+        let body: React.ReactNode = null
+        if (typeof children !== 'function') body = children
+        if (typeof children === 'function' && payload !== undefined)
+          body = children(payload)
+
+        // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+        const value = { onConfirm: () => onConfirm(payload), destructive }
+
+        return (
+          <React.Fragment>
+            {render && (
+              <AlertDialogTrigger render={render} nativeButton={nativeButton} />
+            )}
+            <AlertDialogContent
+              data-slot="confirm-dialog"
+              finalFocus={finalFocus}
+            >
+              <ConfirmDialogProvider value={value}>
+                {body}
+              </ConfirmDialogProvider>
+            </AlertDialogContent>
+          </React.Fragment>
+        )
+      }}
     </AlertDialog>
   )
 }

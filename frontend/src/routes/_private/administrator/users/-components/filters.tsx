@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
+import { useNavigate } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {

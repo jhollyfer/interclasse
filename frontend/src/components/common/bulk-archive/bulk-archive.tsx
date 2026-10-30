@@ -1,7 +1,7 @@
-import type * as React from 'react'
+import { ArchiveIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { QueryKey } from '@tanstack/react-query'
-import { ArchiveIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -91,7 +91,7 @@ export function BulkArchive<TItem>({
   return (
     <ConfirmDialog
       onConfirm={() => void confirm()}
-      trigger={
+      render={
         <Button variant="outline">
           <ArchiveIcon />
           {m.admin_common_archive()}

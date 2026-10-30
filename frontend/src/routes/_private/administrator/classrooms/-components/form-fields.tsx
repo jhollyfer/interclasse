@@ -1,21 +1,18 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import type { DefaultValues, UseFormReturn } from 'react-hook-form'
-import type {
-  AdministratorClassroomCreatePayload,
-  UserRole,
-} from '@interclasse/shared'
+import type { AdministratorClassroomCreatePayload } from '@interclasse/shared'
 import { USER_ROLE } from '@interclasse/shared'
+import type * as React from 'react'
+import type { DefaultValues, UseFormReturn } from 'react-hook-form'
 
+import { OptionCombobox } from '#/components/common/option-combobox'
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
+import { Input } from '#/components/ui/input'
 import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { Input } from '#/components/ui/input'
-import { OptionCombobox } from '#/components/common/option-combobox'
-import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
+
+import { PersonCombobox } from './person-combobox'
 
 export type ClassroomFormType = AdministratorClassroomCreatePayload
 
@@ -34,18 +31,6 @@ export const CLASSROOM_FIELDS = [
 
 const GRADES = [3, 4, 5, 6, 7, 8, 9]
 
-/** As contas de um papel, como opções. 100 cobre a escola inteira. */
-function usePeople(role: UserRole) {
-  const { data } = useQuery(
-    usersQueryOptions({ role, perPage: 100, sort: 'name' }),
-  )
-
-  return [
-    { value: '', label: m.admin_common_none() },
-    ...(data?.data ?? []).map((user) => ({ value: user.id, label: user.name })),
-  ]
-}
-
 type ClassroomFormFieldsProps = Readonly<{
   form: UseFormReturn<ClassroomFormType>
   idPrefix: string
@@ -55,8 +40,6 @@ export function ClassroomFormFields({
   form,
   idPrefix,
 }: ClassroomFormFieldsProps): React.JSX.Element {
-  const advisors = usePeople(USER_ROLE.ADVISOR)
-  const representatives = usePeople(USER_ROLE.REPRESENTATIVE)
   const gradeOptions = GRADES.map((grade) => ({
     value: String(grade),
     label: m.admin_classrooms_grade_option({ grade }),
@@ -117,12 +100,12 @@ export function ClassroomFormFields({
         label={m.admin_classrooms_field_advisor()}
       >
         {({ field, control }) => (
-          <OptionCombobox
+          <PersonCombobox
             {...control}
-            value={field.value ?? ''}
-            onValueChange={(value) => field.onChange(value || null)}
+            role={USER_ROLE.ADVISOR}
+            value={field.value}
+            onChange={field.onChange}
             onBlur={field.onBlur}
-            options={advisors}
           />
         )}
       </AppField>
@@ -135,12 +118,12 @@ export function ClassroomFormFields({
       >
         {({ field, control }) => (
           <>
-            <OptionCombobox
+            <PersonCombobox
               {...control}
-              value={field.value ?? ''}
-              onValueChange={(value) => field.onChange(value || null)}
+              role={USER_ROLE.REPRESENTATIVE}
+              value={field.value}
+              onChange={field.onChange}
               onBlur={field.onBlur}
-              options={representatives}
             />
             <FieldDescription>
               {m.admin_classrooms_field_representative_description()}

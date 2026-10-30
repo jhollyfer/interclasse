@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -14,6 +13,7 @@ import {
 } from '@dnd-kit/sortable'
 import { FlexRender } from '@tanstack/react-table'
 import type { Cell, Header, RowData } from '@tanstack/react-table'
+import * as React from 'react'
 
 import {
   Table as TableRoot,
@@ -167,7 +167,7 @@ export function TableGrid<TRow extends RowData>({
           minWidth: '100%',
         }}
       >
-        <HeaderRoot className="sticky top-0 z-20 bg-background">
+        <HeaderRoot className="sticky top-0 z-sticky bg-background">
           {table.getHeaderGroups().map((group) => (
             <RowRoot key={group.id}>
               {group.headers.map((header) => (

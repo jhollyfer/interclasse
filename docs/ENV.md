@@ -43,6 +43,8 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `VITE_API_URL` | não | não | endereço da API visto pelo navegador, sem barra no fim; embutida no bundle em tempo de build. Ausente em dev, usa `http://localhost:3333` | `https://api-interclass.maiyu.com.br` |
 | `VITE_SITE_URL` | não | não | endereço público do site, sem barra no fim: base do `canonical`, dos `hreflang` e do sitemap; embutida no bundle em tempo de build. Ausente em dev, usa `http://localhost:3001` | `https://interclass.maiyu.com.br` |
 | `SERVER_API_URL` | não | não | endereço da API visto de dentro do servidor de SSR (nome do serviço na rede do Docker); lida em runtime, nunca chega ao navegador. Ausente, o SSR usa `VITE_API_URL` | `http://api:3333` |
+| `VITE_STORAGE_URL` | não | não | origem pública do storage S3-compatível, sem barra no fim: entra no `connect-src` e no `img-src` do CSP (`vite.config.ts`) para o upload pré-assinado. Embutida no bundle em tempo de build. Ausente, o CSP não abre storage nenhum | `https://storage.interclass.maiyu.com.br` |
+| `SITE_ENV` | não | não | ambiente do site, lido em runtime pelo servidor de SSR (nunca chega ao navegador). Só `production` deixa o site indexável; ausente ou outro valor (`staging`, `preview`) responde `noindex, nofollow` e `Disallow: /` no `robots.txt`. Produção precisa defini-la | `production` |
 
 Regras:
 

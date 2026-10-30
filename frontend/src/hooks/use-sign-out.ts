@@ -1,5 +1,5 @@
-import { useRouter } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
 
 import { useAuthenticationSignOutMutation } from '#/integrations/tanstack-query/mutations/authentication'
 

@@ -18,6 +18,12 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado
 
+- O tema claro/escuro vem de um cookie lido no servidor: a página já abre no tema escolhido, sem piscar.
+- Fora de produção o site responde `noindex` e o `robots.txt` bloqueia tudo; produção precisa de `SITE_ENV=production` (`ENV.md`). Painel e telas de entrada ficam sempre fora dos buscadores.
+- O site manda cabeçalhos de segurança (CSP com `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, HSTS); o CSP precisa de `VITE_STORAGE_URL` para o upload de fotos.
+- Formulário com alteração não salva pergunta antes de sair da tela.
+- Listas do sorteio e das turmas buscam contas e modalidades no servidor, 20 por vez, com "Carregar mais".
+- Listas mostram um esqueleto enquanto carregam e telas de detalhe têm página própria de "não encontrado".
 - A tela de entrada do painel passa de `/authentication` para `/sign-in`.
 - `robots.txt` e `sitemap.xml` passam a ser gerados pelo servidor: o mapa do site lista as páginas públicas e as chaves, uma entrada por idioma, e fora de produção o `robots.txt` proíbe a indexação.
 - O layout salvo das tabelas (colunas escondidas, ordem, largura) volta ao padrão uma vez, porque a chave de armazenamento mudou.

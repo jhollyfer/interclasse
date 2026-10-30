@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { EditorContent } from '@tiptap/react'
+import type * as React from 'react'
 
 import { cn } from '#/lib/cn'
 

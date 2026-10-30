@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { m } from '#/paraglide/messages'
@@ -34,7 +34,11 @@ export const Route = createFileRoute('/_authentication')({
     throw redirect({ to: '/painel' })
   },
   head: () => ({
-    meta: [{ title: `${m.auth_page_title()} | ${m.common_site_title()}` }],
+    meta: [
+      { title: `${m.auth_page_title()} | ${m.common_site_title()}` },
+      // Tela de autenticação fora do índice (`frontend.md` §9.7).
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
   }),
   component: RouteComponent,
 })

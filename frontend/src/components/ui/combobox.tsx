@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Combobox as ComboboxPrimitive } from '@base-ui/react'
+import { CaretDownIcon, XIcon, CheckIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
-import { cn } from '#/lib/cn'
 import { Button } from '#/components/ui/button.tsx'
 import {
   InputGroup,
@@ -9,7 +9,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '#/components/ui/input-group.tsx'
-import { CaretDownIcon, XIcon, CheckIcon } from '@phosphor-icons/react'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 const Combobox = ComboboxPrimitive.Root
@@ -113,7 +113,7 @@ function ComboboxContent({
         align={align}
         alignOffset={alignOffset}
         anchor={anchor}
-        className="isolate z-50"
+        className="isolate z-modal"
       >
         <ComboboxPrimitive.Popup
           data-slot="combobox-content"

@@ -1,11 +1,11 @@
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { FilePdfIcon } from '@phosphor-icons/react'
 import { AdministratorSiteUpdateValidator } from '@interclasse/shared'
 import type {
   AdministratorSiteUpdatePayload,
   AdministratorSiteShowResponse,
 } from '@interclasse/shared'
+import { FilePdfIcon } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import {
   ImageField,
@@ -204,7 +204,7 @@ export function SiteForm(): React.JSX.Element {
                   <Input
                     {...control}
                     maxLength={30}
-                    placeholder="cmei_cosmejean"
+                    placeholder={m.admin_site_field_school_instagram_placeholder()}
                     value={field.value ?? ''}
                     onChange={(event) =>
                       field.onChange(blankToNull(event.target.value))

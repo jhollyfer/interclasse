@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import { Agenda } from '#/components/common/match-agenda'
 import { Skeleton } from '#/components/ui/skeleton'

@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import * as React from 'react'
 
 import { Picture } from '#/components/common/picture'
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
@@ -27,7 +27,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
   const [paused, setPaused] = React.useState(false)
   const photos = data?.data ?? []
 
-  const step = React.useCallback((direction: 1 | -1): void => {
+  function step(direction: 1 | -1): void {
     const element = track.current
     if (!element) return
 
@@ -42,7 +42,9 @@ export function PhotoCarousel(): React.JSX.Element | null {
       left: direction * element.clientWidth,
       behavior: 'smooth',
     })
-  }, [])
+  }
+
+  const advance = React.useEffectEvent((): void => step(1))
 
   React.useEffect(() => {
     const reduced = window.matchMedia(
@@ -50,9 +52,9 @@ export function PhotoCarousel(): React.JSX.Element | null {
     ).matches
     if (paused || reduced || photos.length < 2) return
 
-    const timer = window.setInterval(() => step(1), AUTOPLAY_MS)
+    const timer = window.setInterval(() => advance(), AUTOPLAY_MS)
     return () => window.clearInterval(timer)
-  }, [paused, photos.length, step])
+  }, [paused, photos.length])
 
   if (photos.length === 0) return null
 
@@ -91,13 +93,13 @@ export function PhotoCarousel(): React.JSX.Element | null {
         {photos.map((photo) => (
           <li
             key={photo.id}
-            className="w-full shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+            className="w-full shrink-0 snap-start sm:w-carousel-half lg:w-carousel-third"
           >
             <figure className="overflow-hidden rounded-lg border">
               <Picture
                 src={photo.url}
                 alt={photo.caption ?? m.public_photos_alt_fallback()}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-photo w-full object-cover"
                 width={800}
                 height={600}
                 placement="fold"

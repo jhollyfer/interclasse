@@ -1,16 +1,17 @@
-import { ShuffleIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import * as React from 'react'
 import {
   AdministratorBracketCreateValidator,
   CATEGORIES,
 } from '@interclasse/shared'
 import type {
+  Merge,
   AdministratorBracketCreatePayload,
   AdministratorBracketPaginateResponse,
 } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 
+import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import { Button } from '#/components/ui/button'
 import {
   Dialog,
@@ -21,7 +22,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
 import { Skeleton } from '#/components/ui/skeleton'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useMutationForm } from '#/hooks/use-mutation-form'
@@ -30,23 +30,52 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useBracketCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
-import {
-  bracketPreviewQueryOptions,
-  sportsQueryOptions,
-} from '#/integrations/tanstack-query/queries/administrator'
+import { bracketPreviewQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { createDialogHandle } from '#/lib/dialog-handle'
+import type { DialogHandle } from '#/lib/dialog-handle'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
+import { SportCombobox } from './sport-combobox'
+
 const FIELDS = ['sportId', 'category'] as const
+
+type DrawDialogProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof DialogTrigger>,
+    { render: React.ReactElement }
+  >
+>
 
 /**
  * O sorteio. Escolhe modalidade e categoria; o resto - quem entra, os confrontos,
  * as partidas - o servidor decide com o que as turmas inscreveram.
+ *
+ * Uncontrolled e trigger-forward (`frontend.md` §6.2): quem chama passa o botão
+ * visível em `render`. O formulário só monta aberto e fecha pelo `handle` ao
+ * sortear.
  */
-export function DrawDialog(): React.JSX.Element {
-  const [open, setOpen] = React.useState(false)
+export function DrawDialog({
+  ref,
+  render,
+  ...rest
+}: DrawDialogProps): React.JSX.Element {
+  const [handle] = React.useState(() => createDialogHandle())
+
+  return (
+    <Dialog handle={handle}>
+      <DialogTrigger {...rest} ref={ref} render={render} />
+      <DialogContent>
+        <DrawForm handle={handle} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function DrawForm({
+  handle,
+}: Readonly<{ handle: DialogHandle }>): React.JSX.Element {
   const navigate = useNavigate()
-  const { data: sports } = useQuery(sportsQueryOptions({ perPage: 100 }))
 
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorBracketCreatePayload,
@@ -61,7 +90,7 @@ export function DrawDialog(): React.JSX.Element {
     success: m.admin_brackets_drawn_ok(),
     payload: (values) => values,
     async onSuccess(bracket) {
-      setOpen(false)
+      handle.close()
       await navigate({
         to: '/administrator/brackets/$id',
         params: { id: bracket.id },
@@ -70,91 +99,63 @@ export function DrawDialog(): React.JSX.Element {
   })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button>
-            <ShuffleIcon />
-            {m.admin_brackets_draw()}
-          </Button>
-        }
-      />
-      <DialogContent>
-        <form method="post" className="grid gap-4" onSubmit={onSubmit}>
-          <DialogHeader>
-            <DialogTitle>{m.admin_brackets_draw()}</DialogTitle>
-            <DialogDescription>
-              {m.admin_brackets_draw_description()}
-            </DialogDescription>
-          </DialogHeader>
+    <form method="post" className="grid gap-4" onSubmit={onSubmit}>
+      <DialogHeader>
+        <DialogTitle>{m.admin_brackets_draw()}</DialogTitle>
+        <DialogDescription>
+          {m.admin_brackets_draw_description()}
+        </DialogDescription>
+      </DialogHeader>
 
-          <AppField
-            control={form.control}
-            name="sportId"
-            id="draw-sport"
-            label={m.admin_common_sport()}
-          >
-            {({ field, control }) => (
-              // `select` nativo: dentro do diálogo o popup do combobox abre
-              // atrás do overlay.
-              <NativeSelect {...field} {...control}>
-                <NativeSelectOption value="">
-                  {m.admin_common_select()}
-                </NativeSelectOption>
-                {(sports?.data ?? []).map((sport) => (
-                  <NativeSelectOption key={sport.id} value={sport.id}>
-                    {sport.name}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            )}
-          </AppField>
-          <AppField
-            control={form.control}
-            name="category"
-            id="draw-category"
-            label={m.admin_common_category()}
-          >
-            {({ field, control }) => (
-              <NativeSelect
-                {...control}
-                // A categoria nasce ausente: `String(undefined)` não casa com
-                // opção nenhuma, e o select mostra o "Selecione".
-                value={String(field.value)}
-                onChange={(event) =>
-                  field.onChange(
-                    CATEGORIES.find((value) => value === event.target.value),
-                  )
-                }
-                onBlur={field.onBlur}
-              >
-                <NativeSelectOption value="">
-                  {m.admin_common_select()}
-                </NativeSelectOption>
-                {CATEGORIES.map((value) => (
-                  <NativeSelectOption key={value} value={value}>
-                    {CATEGORY_LABELS[value]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            )}
-          </AppField>
-
-          <DrawPreview
-            sportId={form.watch('sportId')}
-            category={form.watch('category')}
+      <AppField
+        control={form.control}
+        name="sportId"
+        id="draw-sport"
+        label={m.admin_common_sport()}
+      >
+        {({ field, control }) => (
+          <SportCombobox
+            {...control}
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
           />
+        )}
+      </AppField>
+      <AppField
+        control={form.control}
+        name="category"
+        id="draw-category"
+        label={m.admin_common_category()}
+      >
+        {({ field, control }) => (
+          <OptionCombobox
+            {...control}
+            // A categoria nasce ausente: `String(undefined)` não casa com
+            // opção nenhuma, e o campo mostra o "Selecione".
+            value={String(field.value)}
+            onValueChange={(value) =>
+              field.onChange(CATEGORIES.find((category) => category === value))
+            }
+            onBlur={field.onBlur}
+            options={toOptions(CATEGORIES, CATEGORY_LABELS)}
+          />
+        )}
+      </AppField>
 
-          <AppFormRootError form={form} />
+      <DrawPreview
+        sportId={form.watch('sportId')}
+        category={form.watch('category')}
+      />
 
-          <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {m.admin_brackets_draw_confirm()}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <AppFormRootError form={form} />
+
+      <DialogFooter>
+        <Button type="submit" disabled={mutation.isPending}>
+          {m.admin_brackets_draw_confirm()}
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }
 

@@ -1,18 +1,18 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { useQueryClient } from '@tanstack/react-query'
-import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import type { AdministratorUserShowResponse } from '@interclasse/shared'
+import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { notifyError } from '#/lib/form-errors'
 import {
   RowActions,
   RowActionsArchive,
+  RowActionsConfirm,
   RowActionsDelete,
   RowActionsUnarchive,
 } from '#/components/common/row-actions'
@@ -26,6 +26,8 @@ import {
   useUserDeleteMutation,
   useUserUnarchiveMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
+import { createConfirmHandle } from '#/lib/dialog-handle'
+import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 import { CopyIdMenuItem } from './copy-id-menu-item'
@@ -61,6 +63,9 @@ export function UserRowActions({
   isSelf,
 }: UserRowActionsProps): React.JSX.Element {
   const queryClient = useQueryClient()
+  const [archiveHandle] = React.useState(createConfirmHandle)
+  const [unarchiveHandle] = React.useState(createConfirmHandle)
+  const [deleteHandle] = React.useState(createConfirmHandle)
 
   // A chave é a raiz do recurso, e não a página corrente: arquivar muda a
   // contagem de toda página e de todo recorte, não só do que está na tela.
@@ -93,7 +98,49 @@ export function UserRowActions({
   })
 
   return (
-    <RowActions>
+    <RowActions
+      dialogs={
+        <React.Fragment>
+          <RowActionsConfirm
+            handle={archiveHandle}
+            confirmLabel={m.common_archive()}
+            onConfirm={() => archive.mutate(user.id)}
+          >
+            <ConfirmDialogTitle>
+              {m.admin_users_archive_title({ name: user.name })}
+            </ConfirmDialogTitle>
+            <ConfirmDialogDescription>
+              {m.admin_users_archive_description()}
+            </ConfirmDialogDescription>
+          </RowActionsConfirm>
+          <RowActionsConfirm
+            handle={unarchiveHandle}
+            confirmLabel={m.common_restore()}
+            onConfirm={() => unarchive.mutate(user.id)}
+          >
+            <ConfirmDialogTitle>
+              {m.admin_users_restore_title({ name: user.name })}
+            </ConfirmDialogTitle>
+            <ConfirmDialogDescription>
+              {m.admin_users_restore_description()}
+            </ConfirmDialogDescription>
+          </RowActionsConfirm>
+          <RowActionsConfirm
+            handle={deleteHandle}
+            destructive
+            confirmLabel={m.common_remove()}
+            onConfirm={() => remove.mutate(user.id)}
+          >
+            <ConfirmDialogTitle>
+              {m.admin_users_remove_title({ name: user.name })}
+            </ConfirmDialogTitle>
+            <ConfirmDialogDescription>
+              {m.admin_users_remove_description()}
+            </ConfirmDialogDescription>
+          </RowActionsConfirm>
+        </React.Fragment>
+      }
+    >
       {/* Detalhe e edição não alcançam conta arquivada: o backend responde 404
           fora da lixeira. Na lixeira, só restaurar ou apagar. */}
       {!user.deletedAt && (
@@ -119,37 +166,14 @@ export function UserRowActions({
       <CopyIdMenuItem id={user.id} />
       <DropdownMenuSeparator />
       {!user.deletedAt && !isSelf && (
-        <RowActionsArchive onConfirm={() => archive.mutate(user.id)}>
-          <ConfirmDialogTitle>
-            {m.admin_users_archive_title({ name: user.name })}
-          </ConfirmDialogTitle>
-          <ConfirmDialogDescription>
-            {m.admin_users_archive_description()}
-          </ConfirmDialogDescription>
-        </RowActionsArchive>
+        <RowActionsArchive handle={archiveHandle} />
       )}
-      {user.deletedAt && (
-        <RowActionsUnarchive onConfirm={() => unarchive.mutate(user.id)}>
-          <ConfirmDialogTitle>
-            {m.admin_users_restore_title({ name: user.name })}
-          </ConfirmDialogTitle>
-          <ConfirmDialogDescription>
-            {m.admin_users_restore_description()}
-          </ConfirmDialogDescription>
-        </RowActionsUnarchive>
-      )}
+      {user.deletedAt && <RowActionsUnarchive handle={unarchiveHandle} />}
       {/* Apagar só aparece no que já está arquivado: o `delete.use-case.ts`
           recusa conta viva com `409 USER_NOT_ARCHIVED`. Oferecer o botão fora
           daí é oferecer um erro. */}
       {user.deletedAt && canDelete && !isSelf && (
-        <RowActionsDelete onConfirm={() => remove.mutate(user.id)}>
-          <ConfirmDialogTitle>
-            {m.admin_users_remove_title({ name: user.name })}
-          </ConfirmDialogTitle>
-          <ConfirmDialogDescription>
-            {m.admin_users_remove_description()}
-          </ConfirmDialogDescription>
-        </RowActionsDelete>
+        <RowActionsDelete handle={deleteHandle} />
       )}
     </RowActions>
   )

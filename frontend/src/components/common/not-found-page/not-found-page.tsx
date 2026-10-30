@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { TrophyIcon } from '@phosphor-icons/react'
 import type { Merge } from '@interclasse/shared'
+import { TrophyIcon } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -43,7 +42,7 @@ export function NotFoundPage({
   return (
     <div
       data-slot="not-found-page"
-      className={cn('grid min-h-[70dvh] grid-cols-1 md:grid-cols-2', className)}
+      className={cn('grid min-h-stage grid-cols-1 md:grid-cols-2', className)}
       {...props}
     >
       <div className="flex flex-col justify-center bg-background px-8 py-12 md:px-16">
@@ -65,9 +64,9 @@ export function NotFoundPage({
 
       {/* O placar do site, e não um painel preto genérico: o troféu em cima,
           o código embaixo, sem um cobrir o outro. */}
-      <div className="hero relative flex h-[40dvh] flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
+      <div className="hero relative flex h-stage-half flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
         <TrophyIcon className="text-brand size-16 md:size-20" weight="fill" />
-        <span className="font-display text-brand text-[7rem] leading-none font-extrabold italic select-none md:text-[9rem]">
+        <span className="font-display text-brand text-error-code leading-none font-extrabold italic select-none md:text-error-code-lg">
           {code}
         </span>
       </div>
@@ -77,6 +76,7 @@ export function NotFoundPage({
 
 export function NotFoundPageTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -87,7 +87,9 @@ export function NotFoundPageTitle({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 
@@ -128,20 +130,16 @@ export function NotFoundPageActions({
   if (!children) return null
 
   return (
-    // Cada ação num grupo aninhado, como em `PageHeaderActions`: o
-    // `ButtonGroup` cola os filhos diretos, e estas são saídas independentes -
-    // "voltar ao início" e "tentar de novo" não formam um controle segmentado.
-    <ButtonGroup
+    // `div` com `gap`, e não `ButtonGroup`: o grupo cola os filhos diretos, e
+    // estas são saídas independentes - "voltar ao início" e "tentar de novo" não
+    // formam um controle segmentado.
+    <div
       data-slot="not-found-page-actions"
-      className={cn('mt-8 flex-wrap items-center', className)}
+      className={cn('mt-8 flex flex-wrap items-center gap-2', className)}
       {...props}
     >
-      {React.Children.map(children, (action) => {
-        if (!action) return null
-
-        return <ButtonGroup>{action}</ButtonGroup>
-      })}
-    </ButtonGroup>
+      {children}
+    </div>
   )
 }
 

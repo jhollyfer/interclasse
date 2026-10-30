@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query'
 import {
   AdministratorAnnouncementShowResponse,
   AdministratorBracketCreateResponse,
@@ -31,6 +30,7 @@ import type {
   AdministratorUserUpdatePayload,
   Merge,
 } from '@interclasse/shared'
+import { useMutation } from '@tanstack/react-query'
 
 import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 
@@ -537,7 +537,7 @@ export function useSiteUpdateMutation(
  * Envia uma foto para o carrossel. O caminho decide o estado em que ela nasce:
  * a do administrador vai direto ao site, a do conselheiro espera aprovação.
  */
-export function usePhotoCreateMutation(
+function usePhotoCreateMutation(
   area: 'administrator' | 'advisor',
   options?: MutationProps<
     AdministratorPhotoShowResponse,
@@ -561,6 +561,26 @@ export function usePhotoCreateMutation(
       )
     },
   })
+}
+
+/** O envio de foto do administrador: vai direto ao site. */
+export function useAdministratorPhotoCreateMutation(
+  options?: MutationProps<
+    AdministratorPhotoShowResponse,
+    AdministratorPhotoCreatePayload
+  >,
+) {
+  return usePhotoCreateMutation('administrator', options)
+}
+
+/** O envio de foto do conselheiro: espera aprovação. */
+export function useAdvisorPhotoCreateMutation(
+  options?: MutationProps<
+    AdministratorPhotoShowResponse,
+    AdministratorPhotoCreatePayload
+  >,
+) {
+  return usePhotoCreateMutation('advisor', options)
 }
 
 export type PhotoReviewVariables = Merge<

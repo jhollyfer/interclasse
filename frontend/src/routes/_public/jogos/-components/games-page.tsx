@@ -1,24 +1,24 @@
-import type * as React from 'react'
-import { useNavigate, getRouteApi } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate, getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
 
+import { Agenda } from '#/components/common/match-agenda'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
   storefrontMatchesQueryOptions,
   storefrontSportsQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
-import { Agenda } from '#/components/common/match-agenda'
 import { m } from '#/paraglide/messages'
 
+import { Pager } from '../../-components/pager'
 import {
   Empty,
   Section,
   SectionHeader,
   SectionTitle,
 } from '../../-components/section'
-import { Pager } from '../../-components/pager'
 
 const route = getRouteApi('/_public/jogos/')
 
@@ -37,7 +37,7 @@ export function GamesPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_games_title()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_games_title()}</SectionTitle>
       </SectionHeader>
       <div className="grid gap-2 sm:flex sm:flex-wrap">
         <OptionCombobox

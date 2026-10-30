@@ -1,9 +1,9 @@
-import type * as React from 'react'
 import { AdvisorEnrollmentUpdateValidator } from '@interclasse/shared'
 import type {
   AdvisorEnrollmentUpdatePayload,
   AdvisorEnrollmentShowResponse,
 } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import {

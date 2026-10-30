@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
-import { renderToMarkdown } from '@tiptap/static-renderer/pm/markdown'
 import { MarkdownManager } from '@tiptap/markdown'
+import { renderToMarkdown } from '@tiptap/static-renderer/pm/markdown'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { RICH_TEXT_EXTENSIONS, RichText } from './index'
 

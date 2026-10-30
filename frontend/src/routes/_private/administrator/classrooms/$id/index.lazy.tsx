@@ -1,5 +1,5 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
+import { createLazyFileRoute, Link } from '@tanstack/react-router'
 
 import { ClassroomDetail } from '#/components/common/classroom-detail'
 import { Button } from '#/components/ui/button'

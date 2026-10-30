@@ -1,8 +1,8 @@
 import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
 
-import { Badge } from '#/components/ui/badge'
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
+import { Badge } from '#/components/ui/badge'
 import { formatDate } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 

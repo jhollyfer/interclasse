@@ -1,22 +1,27 @@
-import type * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
+import { PencilSimpleIcon } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { RowActions, RowActionsDelete } from '#/components/common/row-actions'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
+import {
+  RowActions,
+  RowActionsConfirm,
+  RowActionsDelete,
+} from '#/components/common/row-actions'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useAnnouncementDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { createConfirmHandle } from '#/lib/dialog-handle'
+import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /** Editar e apagar. O aviso some do site na hora. */
@@ -26,6 +31,7 @@ export function AnnouncementRowActions({
   announcement: AdministratorAnnouncementShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
+  const [deleteHandle] = React.useState(createConfirmHandle)
 
   const remove = useAnnouncementDeleteMutation({
     onError: (error) => notifyError(error, { id: 'announcement-delete' }),
@@ -39,7 +45,23 @@ export function AnnouncementRowActions({
   })
 
   return (
-    <RowActions>
+    <RowActions
+      dialogs={
+        <RowActionsConfirm
+          handle={deleteHandle}
+          destructive
+          confirmLabel={m.common_remove()}
+          onConfirm={() => remove.mutate(announcement.id)}
+        >
+          <ConfirmDialogTitle>
+            {m.admin_announcements_remove_title({ title: announcement.title })}
+          </ConfirmDialogTitle>
+          <ConfirmDialogDescription>
+            {m.admin_announcements_remove_description()}
+          </ConfirmDialogDescription>
+        </RowActionsConfirm>
+      }
+    >
       <DropdownMenuItem
         render={
           <Link
@@ -52,14 +74,7 @@ export function AnnouncementRowActions({
         }
       />
       <DropdownMenuSeparator />
-      <RowActionsDelete onConfirm={() => remove.mutate(announcement.id)}>
-        <ConfirmDialogTitle>
-          {m.admin_announcements_remove_title({ title: announcement.title })}
-        </ConfirmDialogTitle>
-        <ConfirmDialogDescription>
-          {m.admin_announcements_remove_description()}
-        </ConfirmDialogDescription>
-      </RowActionsDelete>
+      <RowActionsDelete handle={deleteHandle} />
     </RowActions>
   )
 }

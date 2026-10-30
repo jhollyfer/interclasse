@@ -1,5 +1,5 @@
-import { deflateSync, crc32 } from 'node:zlib'
 import type { APIRequestContext } from '@playwright/test'
+import { deflateSync, crc32 } from 'node:zlib'
 
 import { apiUrl } from './support/credentials'
 import { waitForHydration } from './support/hydration'

@@ -1,7 +1,8 @@
-import * as React from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 import { getRouteApi, Link, useMatches } from '@tanstack/react-router'
+import * as React from 'react'
 
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import {
   Breadcrumb,
@@ -22,17 +23,17 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { Separator } from '#/components/ui/separator'
 import { SidebarTrigger } from '#/components/ui/sidebar'
-import { LocaleSwitch } from '#/components/common/locale-switch'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
+import { createConfirmHandle } from '#/lib/dialog-handle'
 import { initials } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-import { ThemeToggle } from './theme-toggle'
 import {
   SignOutConfirm,
   SignOutConfirmFooter,
   SignOutConfirmHeader,
 } from './sign-out-confirm'
+import { ThemeToggle } from './theme-toggle'
 
 const route = getRouteApi('/_private')
 
@@ -77,61 +78,60 @@ function Trail(): React.JSX.Element {
  */
 function AccountMenu(): React.JSX.Element {
   const { account } = route.useRouteContext()
+  const [signOutHandle] = React.useState(createConfirmHandle)
 
   return (
-    <DropdownMenu>
-      {/*
+    <React.Fragment>
+      <DropdownMenu>
+        {/*
         `render`, e não aninhamento: o gatilho já é um `<button>`, e outro botão
         por dentro dele seria um botão dentro de outro - erro de hidratação.
       */}
-      <DropdownMenuTrigger
-        aria-label={m.panel_account_of({ name: account.name })}
-        className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
-      >
-        <Avatar className="size-7">
-          <AvatarImage src={account.avatar?.url} alt="" />
-          <AvatarFallback className="bg-brand text-xs font-semibold text-brand-ink">
-            {initials(account.name)}
-          </AvatarFallback>
-        </Avatar>
-        <span className="hidden text-xs leading-none font-semibold lg:inline">
-          {account.name}
-        </span>
-        <CaretDownIcon className="size-3 text-muted-foreground" />
-      </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          aria-label={m.panel_account_of({ name: account.name })}
+          className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
+        >
+          <Avatar className="size-7">
+            <AvatarImage src={account.avatar?.url} alt="" />
+            <AvatarFallback className="bg-brand text-xs font-semibold text-brand-ink">
+              {initials(account.name)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden text-xs leading-none font-semibold lg:inline">
+            {account.name}
+          </span>
+          <CaretDownIcon className="size-3 text-muted-foreground" />
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56" align="end">
-        {/* `DropdownMenuLabel` é o `Menu.GroupLabel` do Base UI e exige o
+        <DropdownMenuContent className="w-56" align="end">
+          {/* `DropdownMenuLabel` é o `Menu.GroupLabel` do Base UI e exige o
             `Menu.Group` em volta: sem ele, abrir o menu lança "MenuGroupContext
             is missing" e o ErrorBoundary do layout mostra a página de erro. */}
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col gap-0.5">
-            <span className="truncate font-medium">{account.name}</span>
-            <span className="truncate text-xs font-normal text-muted-foreground">
-              {account.email}
-            </span>
-          </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          render={<Link to="/profile">{m.panel_my_profile()}</Link>}
-        />
-        <DropdownMenuSeparator />
-        {/* `closeOnClick={false}`: o item é o gatilho do alerta, e sem isso o
-            menu fecha e leva o gatilho embora antes do alerta abrir. */}
-        <SignOutConfirm
-          nativeButton={false}
-          trigger={
-            <DropdownMenuItem closeOnClick={false}>
-              {m.panel_sign_out()}
-            </DropdownMenuItem>
-          }
-        >
-          <SignOutConfirmHeader />
-          <SignOutConfirmFooter />
-        </SignOutConfirm>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="flex flex-col gap-0.5">
+              <span className="truncate font-medium">{account.name}</span>
+              <span className="truncate text-xs font-normal text-muted-foreground">
+                {account.email}
+              </span>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            render={<Link to="/profile">{m.panel_my_profile()}</Link>}
+          />
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => signOutHandle.open(null)}>
+            {m.panel_sign_out()}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {/* Irmão do menu, e não dentro do conteúdo: o conteúdo desmonta ao fechar
+        e levaria o alerta junto (`frontend.md` §6.2). */}
+      <SignOutConfirm handle={signOutHandle}>
+        <SignOutConfirmHeader />
+        <SignOutConfirmFooter />
+      </SignOutConfirm>
+    </React.Fragment>
   )
 }
 

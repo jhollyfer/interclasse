@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { LinkProps } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { PageShell } from '#/components/common/page-shell'
 
@@ -37,12 +37,8 @@ export function FormShell({
   isPending = false,
   children,
 }: FormShellProps): React.JSX.Element {
-  // Sem `useMemo` o objeto é novo a cada tecla digitada no formulário, e o
-  // cabeçalho inteiro re-renderiza junto com o campo.
-  const value = React.useMemo(
-    () => ({ formId, backTo, backParams, isPending }),
-    [formId, backTo, backParams, isPending],
-  )
+  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  const value = { formId, backTo, backParams, isPending }
 
   return (
     <PageShell data-slot="form-shell">

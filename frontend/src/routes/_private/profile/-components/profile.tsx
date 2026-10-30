@@ -1,22 +1,23 @@
-import type * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   EnvelopeSimpleIcon,
   IdentificationCardIcon,
   PencilSimpleIcon,
   ShieldCheckIcon,
 } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import type * as React from 'react'
 
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { Badge } from '#/components/ui/badge'
-import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import {
   PageShell,
   PageShellContent,
   PageShellHeader,
 } from '#/components/common/page-shell'
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_VARIANTS,
@@ -25,7 +26,6 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { m } from '#/paraglide/messages'
 
 /**

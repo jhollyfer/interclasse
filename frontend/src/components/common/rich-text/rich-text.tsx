@@ -1,8 +1,8 @@
-import * as React from 'react'
-import type { JSONContent } from '@tiptap/react'
-import { MarkdownManager } from '@tiptap/markdown'
-import { renderToReactElement } from '@tiptap/static-renderer/pm/react'
 import type { Merge } from '@interclasse/shared'
+import { MarkdownManager } from '@tiptap/markdown'
+import type { JSONContent } from '@tiptap/react'
+import { renderToReactElement } from '@tiptap/static-renderer/pm/react'
+import * as React from 'react'
 
 import { cn } from '#/lib/cn'
 
@@ -47,12 +47,9 @@ export function RichText({
   className,
   ...props
 }: RichTextProps): React.JSX.Element {
-  const content = React.useMemo(() => {
-    if (json) return json
-    if (markdown) return MARKDOWN.parse(markdown)
-
-    return EMPTY_DOCUMENT
-  }, [json, markdown])
+  let content = EMPTY_DOCUMENT
+  if (markdown) content = MARKDOWN.parse(markdown)
+  if (json) content = json
 
   return (
     <div

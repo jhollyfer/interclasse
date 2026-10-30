@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 
 import {
   EmptyStateActions,
@@ -36,7 +36,7 @@ export function AnnouncementsTable(): React.JSX.Element {
     announcementsQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => announcementColumns(), [])
+  const columns = announcementColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

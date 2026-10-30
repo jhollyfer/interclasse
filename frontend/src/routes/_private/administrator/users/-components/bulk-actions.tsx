@@ -1,15 +1,15 @@
-import type * as React from 'react'
 import type { AdministratorUserShowResponse } from '@interclasse/shared'
+import type * as React from 'react'
 
-import { notifyError } from '#/lib/form-errors'
+import { BulkArchive } from '#/components/common/bulk-archive'
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchiveMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
-import { BulkArchive } from '#/components/common/bulk-archive'
 
 /**
  * As ações da barra de seleção. Só arquivar: remover em massa não existe.

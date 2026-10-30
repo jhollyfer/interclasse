@@ -1,9 +1,9 @@
-import type * as React from 'react'
 import { AdministratorAnnouncementCreateValidator } from '@interclasse/shared'
 import type {
   AdministratorAnnouncementCreatePayload,
   AdministratorAnnouncementShowResponse,
 } from '@interclasse/shared'
+import type * as React from 'react'
 
 import {
   FormShell,
@@ -16,9 +16,9 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { useAnnouncementCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { useAnnouncementCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 import type { AnnouncementFormType } from './form-fields'
@@ -43,7 +43,8 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
     success: () => m.admin_announcements_published(),
-    // Nome repetido é `409 ANNOUNCEMENT_ALREADY_EXISTS`: reenviar é seguro.
+    // Aviso repetido não é recusado pela API: sem `retry`, reenviar duplicaria
+    // o aviso, e por isso o formulário não oferece "Tentar de novo".
     payload: (values) => values,
   })
 

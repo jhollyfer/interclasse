@@ -1,5 +1,5 @@
-import StarterKit from '@tiptap/starter-kit'
 import Typography from '@tiptap/extension-typography'
+import StarterKit from '@tiptap/starter-kit'
 
 /**
  * Link só `https:`, `http:` e `mailto:` (`frontend.md` §8). O React 19 bloqueia

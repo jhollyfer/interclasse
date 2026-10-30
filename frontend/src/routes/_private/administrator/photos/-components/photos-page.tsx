@@ -1,10 +1,10 @@
-import type * as React from 'react'
-import { getRouteApi } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, TrashIcon, XIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
 import { PHOTO_STATUS, PHOTO_STATUSES } from '@interclasse/shared'
+import { CheckIcon, TrashIcon, XIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialog,
@@ -155,7 +155,7 @@ function ReviewActions({
       <ConfirmDialog
         destructive
         onConfirm={() => remove.mutate(photo.id)}
-        trigger={
+        render={
           <Button
             size="sm"
             variant="ghost"

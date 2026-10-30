@@ -1,8 +1,8 @@
-import type * as React from 'react'
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
+import type * as React from 'react'
 
-import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import { phaseLabel, scoreOf } from '#/components/common/match-agenda'
+import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /**

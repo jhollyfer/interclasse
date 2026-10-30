@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { MoonIcon, SunIcon } from '@phosphor-icons/react'
-import { useTheme } from 'next-themes'
+import * as React from 'react'
 
+import { useTheme } from '#/components/common/theme-provider'
 import { Button } from '#/components/ui/button'
 import {
   Tooltip,
@@ -21,15 +21,16 @@ import { m } from '#/paraglide/messages'
  * Por isso também não há `if (!mounted) return null`: o tema resolvido só
  * existe no cliente, mas aqui nada depende dele para renderizar. Quem decide
  * qual ícone aparece é a classe `dark` no `<html>`, que o script do
- * `next-themes` escreve antes da hidratação.
+ * `ThemeProvider` resolve antes da hidratação.
  */
 export function ThemeToggle(): React.JSX.Element {
-  const { resolvedTheme, setTheme } = useTheme()
+  const { setTheme } = useTheme('ThemeToggle')
 
   function toggle(): void {
-    // Sem ternário: cada estado é uma linha legível de cima para baixo.
-    let next = 'dark'
-    if (resolvedTheme === 'dark') next = 'light'
+    // O tema resolvido é o que a página mostra agora (a classe do `<html>`):
+    // com `system` a preferência salva não diz se está claro ou escuro.
+    let next: 'light' | 'dark' = 'dark'
+    if (document.documentElement.classList.contains('dark')) next = 'light'
 
     setTheme(next)
   }

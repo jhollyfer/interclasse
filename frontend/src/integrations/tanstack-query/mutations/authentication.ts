@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query'
 import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
+import { useMutation } from '@tanstack/react-query'
 
 import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 

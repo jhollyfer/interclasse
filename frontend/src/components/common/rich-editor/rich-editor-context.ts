@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { Editor } from '@tiptap/react'
+import * as React from 'react'
 
 /**
  * O editor que a toolbar e a área de texto compartilham. Passá-lo por prop

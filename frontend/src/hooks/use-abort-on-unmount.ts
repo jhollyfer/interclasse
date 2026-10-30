@@ -21,10 +21,10 @@ export function useAbortOnUnmount(): () => AbortSignal {
     }
   }, [])
 
-  return React.useCallback((): AbortSignal => {
+  return (): AbortSignal => {
     const controller = new AbortController()
     controllers.current.add(controller)
 
     return controller.signal
-  }, [])
+  }
 }

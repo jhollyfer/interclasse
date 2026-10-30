@@ -1,8 +1,7 @@
-import type * as React from 'react'
-import { Link } from '@tanstack/react-router'
 import type { Merge } from '@interclasse/shared'
+import { Link } from '@tanstack/react-router'
+import type * as React from 'react'
 
-import { Button } from '#/components/ui/button'
 import {
   PageHeader,
   PageHeaderActions,
@@ -11,6 +10,7 @@ import {
   PageShellHeader,
 } from '#/components/common/page-shell'
 import { SubmitButton } from '#/components/common/submit-button'
+import { Button } from '#/components/ui/button'
 import { m } from '#/paraglide/messages'
 
 import { useFormShellContext } from './form-shell-context'

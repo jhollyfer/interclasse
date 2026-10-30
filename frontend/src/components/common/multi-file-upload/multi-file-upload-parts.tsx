@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { UploadSimpleIcon, XIcon } from '@phosphor-icons/react'
 import type { Merge } from '@interclasse/shared'
+import { UploadSimpleIcon, XIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { Spinner } from '#/components/ui/spinner'

@@ -11,8 +11,8 @@ import type { z } from '@interclasse/shared'
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { env } from '#/env'
-import { getLocale } from '#/paraglide/runtime'
 import { m } from '#/paraglide/messages'
+import { getLocale } from '#/paraglide/runtime'
 
 import * as server from './http.server'
 

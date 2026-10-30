@@ -1,8 +1,8 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrashIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
+import { TrashIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialog,
@@ -74,7 +74,7 @@ function DeleteAction({
     <ConfirmDialog
       destructive
       onConfirm={() => remove.mutate(photo.id)}
-      trigger={
+      render={
         <Button size="sm" variant="ghost">
           <TrashIcon />
           {m.advisor_photo_delete()}

@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { localStoreKey } from './local-store'
 import {
   clearResume,
   readResume,
   resumeTheme,
   writeResume,
 } from './upload-resume'
-import { localStoreKey } from './local-store'
 
 /**
  * O `localStorage` não existe no ambiente de teste (roda em node), que é o

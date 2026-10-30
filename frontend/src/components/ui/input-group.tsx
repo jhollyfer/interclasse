@@ -1,13 +1,13 @@
 'use client'
 
-import * as React from 'react'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
-import { cn } from '#/lib/cn'
 import { Button } from '#/components/ui/button.tsx'
 import { Input } from '#/components/ui/input.tsx'
 import { Textarea } from '#/components/ui/textarea.tsx'
+import { cn } from '#/lib/cn'
 
 function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -50,13 +50,15 @@ function InputGroupAddon({
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- atalho de mouse: o teclado já alcança o input pelo Tab
     <div
       role="group"
       data-slot="input-group-addon"
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
       onClick={(e) => {
-        if ((e.target as HTMLElement).closest('button')) {
+        // casa: `instanceof` no lugar de `as HTMLElement`
+        if (e.target instanceof Element && e.target.closest('button')) {
           return
         }
         e.currentTarget.parentElement?.querySelector('input')?.focus()

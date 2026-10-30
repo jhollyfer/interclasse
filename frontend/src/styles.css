@@ -197,8 +197,36 @@
 }
 
 @theme inline {
-  --font-sans: 'Barlow', system-ui, sans-serif;
-  --font-display: 'Barlow Condensed', 'Barlow', sans-serif;
+  /* A família da casa, com a de métrica ajustada logo atrás: o navegador
+     mostra o fallback enquanto o woff2 baixa (`font-display: swap`), e o
+     `size-adjust` dele evita o salto de layout quando a Barlow entra. */
+  --font-sans: 'Barlow', 'Barlow Fallback', system-ui, sans-serif;
+  --font-display:
+    'Barlow Condensed', 'Barlow Condensed Fallback', 'Barlow', sans-serif;
+
+  /* Tamanhos por papel (`--text-*`), não por valor: o número gigante da tela
+     de erro e o título do herói têm nome e não aparecem como `text-[7rem]`. */
+  --text-error-code: 7rem;
+  --text-error-code-lg: 9rem;
+  --leading-display: 1.05;
+
+  /* Larguras e proporções nomeadas, no lugar do valor solto em classe. */
+  --container-aside: 20rem;
+  --aspect-photo: 4 / 3;
+
+  /* O traço do ícone de menu: o espaço entre as barras e o quanto as de
+     cima e de baixo andam para formar o X. */
+  --spacing-menu-bar: 5px;
+  --spacing-menu-bar-shift: 7px;
+
+  /* A escala de camadas, da mais baixa à mais alta. Tailwind não tem
+     namespace de z-index: o token vira variável e o `@utility` dá o nome. */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-overlay: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-tooltip: 60;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -262,6 +290,97 @@
   /* Vira `p-section`, `py-section`, `gap-section` - o espaçamento entre blocos
      de uma página da vitrine. */
   --spacing-section: var(--space-section);
+}
+
+/*
+ * Fonte de reserva com a métrica da Barlow: `size-adjust` e os overrides de
+ * ascent/descent fazem o texto da Arial ocupar a caixa da Barlow, e a troca ao
+ * carregar o woff2 não move a página. Ascent 1000, descent 200 e upm 1000 são
+ * da própria Barlow; o `size-adjust` é a razão de largura média estimada
+ * contra a Arial (conferir com a ferramenta de métrica do Capsize antes de
+ * afinar). _doc-lib/vitejs.md#assets.
+ */
+@font-face {
+  font-family: 'Barlow Fallback';
+  src: local('Arial');
+  size-adjust: 98%;
+  ascent-override: 102%;
+  descent-override: 20.4%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Barlow Condensed Fallback';
+  src: local('Arial Narrow'), local('Arial');
+  size-adjust: 88%;
+  ascent-override: 113.6%;
+  descent-override: 22.7%;
+  line-gap-override: 0%;
+}
+
+/*
+ * Camadas: da mais baixa à mais alta, `dropdown < sticky < overlay < modal <
+ * toast < tooltip`. Os popups do Base UI (menu, combobox) usam `z-modal`: eles
+ * precisam abrir por cima do dialog em que moram, e no mesmo nível o portal
+ * montado depois fica por cima.
+ */
+@utility z-dropdown {
+  z-index: var(--z-dropdown);
+}
+
+@utility z-sticky {
+  z-index: var(--z-sticky);
+}
+
+@utility z-overlay {
+  z-index: var(--z-overlay);
+}
+
+@utility z-modal {
+  z-index: var(--z-modal);
+}
+
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+
+@utility z-tooltip {
+  z-index: var(--z-tooltip);
+}
+
+/* Alturas e larguras de tela que não são espaçamento: cada uma com o papel
+   que cumpre. */
+@utility min-h-stage {
+  min-height: 70dvh;
+}
+
+@utility min-h-stage-sm {
+  min-height: 60dvh;
+}
+
+@utility h-stage-half {
+  height: 40dvh;
+}
+
+@utility max-w-label {
+  max-width: 45%;
+}
+
+@utility max-w-bar {
+  max-width: calc(100% - 1rem);
+}
+
+@utility w-carousel-half {
+  width: calc(50% - 0.5rem);
+}
+
+@utility w-carousel-third {
+  width: calc(33.333% - 0.667rem);
+}
+
+/* O botão pressionado encolhe um pouco: o retorno tátil do toque. */
+@utility scale-press {
+  scale: 0.97;
 }
 
 @layer base {

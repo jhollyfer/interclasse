@@ -28,6 +28,9 @@ export const queryKeys = {
       all: ['administrator', 'users'] as const,
       list: (params: ListSearch) =>
         ['administrator', 'users', 'list', params] as const,
+      /** A busca do combobox: páginas de 20, filtro no servidor. */
+      infinite: (params: ListSearch) =>
+        ['administrator', 'users', 'infinite', params] as const,
       detail: (id: string) => ['administrator', 'users', 'detail', id] as const,
     },
     classrooms: {
@@ -41,6 +44,9 @@ export const queryKeys = {
       all: ['administrator', 'sports'] as const,
       list: (params: ListSearch) =>
         ['administrator', 'sports', 'list', params] as const,
+      /** A busca do combobox: páginas de 20, filtro no servidor. */
+      infinite: (params: ListSearch) =>
+        ['administrator', 'sports', 'infinite', params] as const,
       detail: (id: string) =>
         ['administrator', 'sports', 'detail', id] as const,
     },

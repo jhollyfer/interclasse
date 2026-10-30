@@ -1,11 +1,10 @@
-import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { ArrowLeftIcon } from '@phosphor-icons/react'
-import type { Merge } from '@interclasse/shared'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -221,6 +220,7 @@ export function PageHeaderBack({
 
 export function PageHeaderTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -231,7 +231,9 @@ export function PageHeaderTitle({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 
@@ -289,13 +291,10 @@ export function PageHeaderDescription({
  * As ações da direita: criar, editar, arquivar, exportar - uma, três ou
  * nenhuma. `flex-wrap` porque três botões não cabem lado a lado no telefone.
  *
- * Cada ação entra num `ButtonGroup` próprio, e não solta no grupo de fora: o
- * `ButtonGroup` **cola** os filhos diretos - tira o arredondamento da direita e
- * a borda da esquerda - e é assim que se desenha um controle segmentado. Estas
- * ações não são um controle só; são botões independentes que às vezes quebram
- * linha. Um filho sozinho no grupo aninhado recebe o arredondamento de volta
- * pela regra `:not(:has(~[data-slot]))`, então desenha igual a um `Button` solto,
- * e o grupo de fora reconhece os aninhados e devolve o `gap-2`.
+ * Um `div` com `gap`, e não `ButtonGroup`: o grupo **cola** os filhos diretos -
+ * tira o arredondamento da direita e a borda da esquerda - e é assim que se
+ * desenha um controle segmentado. Estas ações não são um controle só; são
+ * botões independentes que às vezes quebram linha.
  */
 export function PageHeaderActions({
   className,
@@ -305,21 +304,17 @@ export function PageHeaderActions({
   if (!children) return null
 
   return (
-    <ButtonGroup
+    <div
       data-slot="page-header-actions"
       className={cn(
         // No celular as ações descem para a linha de baixo: na mesma linha do
         // título elas o espremiam em três linhas.
-        'col-span-full row-start-3 flex-wrap items-center justify-start max-sm:mt-2 sm:col-span-1 sm:ml-3 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:justify-end sm:self-center',
+        'col-span-full row-start-3 flex flex-wrap items-center gap-2 justify-start max-sm:mt-2 sm:col-span-1 sm:ml-3 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:justify-end sm:self-center',
         className,
       )}
       {...props}
     >
-      {React.Children.map(children, (action) => {
-        if (!action) return null
-
-        return <ButtonGroup>{action}</ButtonGroup>
-      })}
-    </ButtonGroup>
+      {children}
+    </div>
   )
 }

@@ -1,7 +1,7 @@
 import * as shared from '@interclasse/shared'
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
-import { createIsomorphicFn } from '@tanstack/react-start'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { createIsomorphicFn } from '@tanstack/react-start'
 
 import {
   NotFoundPage,

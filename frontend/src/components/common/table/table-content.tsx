@@ -1,6 +1,7 @@
-import type * as React from 'react'
 import { ArrowClockwiseIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
+import { PageShellContent } from '#/components/common/page-shell'
 import { Button } from '#/components/ui/button'
 import {
   Empty,
@@ -10,7 +11,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty'
-import { PageShellContent } from '#/components/common/page-shell'
 import { m } from '#/paraglide/messages'
 
 import { useTableContext } from './table-context'

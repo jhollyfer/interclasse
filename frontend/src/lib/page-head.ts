@@ -68,7 +68,7 @@ export function pageHead({
     { property: 'og:url', content: canonical },
     { property: 'og:locale', content: OG_LOCALES[locale] },
   ]
-  if (noindex) meta.push({ name: 'robots', content: 'noindex' })
+  if (noindex) meta.push(...noindexMeta(false))
 
   const links = [
     { rel: 'canonical', href: canonical },
@@ -85,4 +85,29 @@ export function pageHead({
   ]
 
   return { meta, links }
+}
+
+/** O meta `robots` de página fora do índice. `indexable` ausente ou `true` não gera nada. */
+export function noindexMeta(
+  indexable: boolean | undefined,
+): Array<{ name: string; content: string }> {
+  if (indexable !== false) return []
+
+  return [{ name: 'robots', content: 'noindex, nofollow' }]
+}
+
+/** JSON-LD escrito para `<script>`: o `<` escapado impede fechar a tag por dentro. */
+export function jsonLd(data: Readonly<Record<string, unknown>>): string {
+  return JSON.stringify(data).replaceAll('<', '\\u003c')
+}
+
+/** A `Organization` da raiz (`frontend.md` §9.7). */
+export function organizationJsonLd(): string {
+  return jsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: m.common_site_title(),
+    url: env.VITE_SITE_URL,
+    logo: OG_IMAGE,
+  })
 }

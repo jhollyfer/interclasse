@@ -27,7 +27,7 @@ export function UploadingProvider({
 }>): React.JSX.Element {
   const [uploads, setUploads] = React.useState<Set<string>>(new Set())
 
-  const register = React.useCallback((key: string) => {
+  function register(key: string): void {
     setUploads((previous) => {
       if (previous.has(key)) return previous
 
@@ -35,9 +35,9 @@ export function UploadingProvider({
       next.add(key)
       return next
     })
-  }, [])
+  }
 
-  const unregister = React.useCallback((key: string) => {
+  function unregister(key: string): void {
     setUploads((previous) => {
       if (!previous.has(key)) return previous
 
@@ -45,12 +45,9 @@ export function UploadingProvider({
       next.delete(key)
       return next
     })
-  }, [])
+  }
 
-  const value = React.useMemo(
-    () => ({ register, unregister, isUploading: uploads.size > 0 }),
-    [register, unregister, uploads.size],
-  )
+  const value = { register, unregister, isUploading: uploads.size > 0 }
 
   return <UploadingContext value={value}>{children}</UploadingContext>
 }
@@ -65,16 +62,24 @@ export function useRegisterUpload(active: boolean): void {
   const context = React.use(UploadingContext)
   const key = React.useId()
 
-  React.useEffect(() => {
+  // `useEffectEvent`: o efeito reage só a `active`. O contexto muda de
+  // identidade a cada render do provider (register/unregister são funções
+  // novas sem o memo manual), e tê-lo nas dependências cancelaria e refaria o
+  // registro em laço.
+  const sync = React.useEffectEvent((on: boolean): void => {
     if (!context) return
 
-    if (active) context.register(key)
-    if (!active) context.unregister(key)
+    if (on) context.register(key)
+    if (!on) context.unregister(key)
+  })
+
+  React.useEffect(() => {
+    sync(active)
 
     // Desmontar com um upload em voo tem de liberar o cadeado, senão o botão
     // de salvar fica travado para sempre.
-    return () => context.unregister(key)
-  }, [active, context, key])
+    return () => sync(false)
+  }, [active])
 }
 
 /** Há upload em andamento? Use para desabilitar o botão de salvar. */
