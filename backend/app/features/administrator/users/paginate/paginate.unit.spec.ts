@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
@@ -85,6 +85,6 @@ test.group('administrator/users > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_PAGINATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_PAGINATE_ERROR' })
   })
 })

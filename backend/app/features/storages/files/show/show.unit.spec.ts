@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import StoragesFileShowUseCase from './show.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { FILE_ID, rightOf, storageDoubles, uploadedFile } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -40,6 +40,6 @@ test.group('storages/files > show (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_SHOW_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_SHOW_ERROR' })
   })
 })

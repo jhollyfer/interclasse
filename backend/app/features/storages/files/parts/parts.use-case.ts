@@ -12,6 +12,7 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  PRESIGNED_BATCH,
   type PartToSign,
   type PresignedPart,
   type UploadedPart,
@@ -78,10 +79,11 @@ export default class StoragesFilePartsUseCase {
       }
 
       const uploaded = await this.uploaded(storage)
-      const missing = pendingParts(
+      const missing = pendingParts({
         totalParts,
-        uploaded.map((part) => part.partNumber),
-      )
+        uploaded: uploaded.map((part) => part.partNumber),
+        batch: PRESIGNED_BATCH,
+      })
       const parts = await this.sign(storage, sizedParts(missing, file.size, partSize))
 
       return right(
@@ -96,10 +98,13 @@ export default class StoragesFilePartsUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[files > parts][error]')
+      logger.error({ err: error }, '[storages/files > parts][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_PARTS_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_PARTS_ERROR',
+        ),
       )
     }
   }

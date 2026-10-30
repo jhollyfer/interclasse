@@ -2,10 +2,13 @@ import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import {
   USER_ROLE,
+  left,
+  right,
   type Actor,
   type AdministratorClassroomPaginateResponse,
   type AdministratorClassroomPersonResponse,
   type AdministratorClassroomShowResponse,
+  type Either,
   type Paginated,
   type UserRole,
 } from '@interclasse/shared'
@@ -17,6 +20,8 @@ import {
 } from './classroom.repository.ts'
 
 import ClassroomModel from '#models/classroom'
+import { PostgresError } from '#core/postgres-error'
+import type { ClassroomError } from '#domain/classroom/classroom.errors'
 import TeamModel from '#models/team'
 import UserModel from '#models/user'
 import {
@@ -119,18 +124,41 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     return Boolean(team)
   }
 
-  async save(classroom: Classroom): Promise<void> {
+  async save(classroom: Classroom): Promise<Either<ClassroomError, void>> {
     const { id, createdAt, updatedAt, ...columns } = classroom.snapshot()
 
-    await ClassroomModel.updateOrCreate(
-      { id },
-      {
-        ...columns,
-        createdAt: DateTime.fromJSDate(createdAt),
-        updatedAt: this.dateOrNull(updatedAt),
-      },
-      { client: this.transaction.client() },
-    )
+    try {
+      await ClassroomModel.updateOrCreate(
+        { id },
+        {
+          ...columns,
+          createdAt: DateTime.fromJSDate(createdAt),
+          updatedAt: this.dateOrNull(updatedAt),
+        },
+        { client: this.transaction.client() },
+      )
+
+      return right(undefined)
+    } catch (error) {
+      if (!PostgresError.isUniqueViolation(error)) throw error
+
+      return left(this.collision(error))
+    }
+  }
+
+  /**
+   * O fato do campo que colidiu: cada `unique` vira o 409 do campo dele, e o nome da
+   * turma é o que sobra. O nome do `unique` é o que a migration deu a ele.
+   */
+  private collision(error: unknown): ClassroomError {
+    switch (PostgresError.violatedConstraint(error)) {
+      case 'classrooms_advisor_id_unique':
+        return { code: 'ADVISOR_TAKEN' }
+      case 'classrooms_representative_id_unique':
+        return { code: 'REPRESENTATIVE_TAKEN' }
+      default:
+        return { code: 'CLASSROOM_ALREADY_EXISTS' }
+    }
   }
 
   async delete(classroom: Classroom): Promise<void> {

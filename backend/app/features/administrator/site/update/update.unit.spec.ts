@@ -5,7 +5,7 @@ import AdministratorSiteUpdateUseCase from './update.use-case.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import { SiteSettingMemoryRepository } from '#repositories/site-setting/site-setting.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
 const PNG_ID = '7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c1b'

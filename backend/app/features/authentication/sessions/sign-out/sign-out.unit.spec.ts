@@ -2,18 +2,18 @@ import { test } from '@japa/runner'
 
 import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
 
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, USER_ID } from '#tests/identity-unit-fixtures'
 
-const ACTOR = { id: USER_ID, role: 'ADVISOR' } as const
+const ACTOR = { id: USER_ID, role: 'ADVISOR', avatarId: null } as const
 
 async function setup() {
   const doubles = identityDoubles()
   doubles.sessions.withRefresh('refresh-ok', { userId: USER_ID, identifier: '8' })
   doubles.sessions.withRefresh('access-id', { userId: USER_ID, identifier: '7' })
   const useCase = await makeWithMemory(AuthenticationSessionSignOutUseCase, [
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
   ])
 
   return { ...doubles, useCase }
@@ -59,6 +59,6 @@ test.group('authentication/sessions > sign-out (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_SIGN_OUT_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_OUT_ERROR' })
   })
 })

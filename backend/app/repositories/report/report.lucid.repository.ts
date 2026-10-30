@@ -95,7 +95,11 @@ export class ReportLucidRepository extends ReportRepository {
       .select(client.raw('count(distinct enrollments.sport_id) as sports'))
 
     return rows.map((row) => ({
-      ...row,
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      advisor: row.advisor,
+      representative: row.representative,
       students: Number(row.students),
       athletes: Number(row.athletes),
       sports: Number(row.sports),
@@ -121,7 +125,8 @@ export class ReportLucidRepository extends ReportRepository {
       .select(client.raw('count(distinct students.classroom_id) as classrooms'))
 
     return rows.map((row) => ({
-      ...row,
+      id: row.id,
+      name: row.name,
       athletes: Number(row.athletes),
       classrooms: Number(row.classrooms),
     }))

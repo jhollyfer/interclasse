@@ -12,6 +12,7 @@ import {
 
 import { MatchRefusal } from '../_shared.match-refusal.ts'
 
+import { BracketRefusal } from '#features/administrator/brackets/_shared.bracket-refusal'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { AdministratorMatchUpdatePayload } from '#validators/administrator/matches.validator'
@@ -49,7 +50,8 @@ export default class AdministratorMatchUpdateUseCase {
       )
       if (scheduled.isLeft()) return left(MatchRefusal.http(scheduled.value, this.i18n))
 
-      await this.brackets.save(bracket)
+      const saved = await this.brackets.save(bracket)
+      if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
 
       const response = await this.brackets.findMatchResponse(id)
       if (!response)

@@ -49,10 +49,13 @@ export default class AdministratorUserPaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[users > paginate][error]')
+      logger.error({ err: error }, '[administrator/users > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_PAGINATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_PAGINATE_ERROR',
+        ),
       )
     }
   }

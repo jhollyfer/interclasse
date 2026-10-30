@@ -6,5 +6,8 @@
   "not_archived_field": "Arquive o usuário antes de apagá-lo",
   "already_archived": "Usuário já está arquivado",
   "current_password_invalid": "Senha atual inválida",
-  "password_same_as_current": "A nova senha deve ser diferente da atual"
+  "password_same_as_current": "A nova senha deve ser diferente da atual",
+  "self_access_forbidden": "Você não pode alterar o próprio papel ou status",
+  "self_archive_forbidden": "Você não pode arquivar a própria conta",
+  "self_delete_forbidden": "Você não pode apagar a própria conta"
 }

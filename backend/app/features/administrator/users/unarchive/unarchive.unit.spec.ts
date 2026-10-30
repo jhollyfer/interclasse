@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AdministratorUserUnarchiveUseCase from './unarchive.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
 async function setup() {
@@ -46,6 +46,6 @@ test.group('administrator/users > unarchive (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_UNARCHIVE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_UNARCHIVE_ERROR' })
   })
 })

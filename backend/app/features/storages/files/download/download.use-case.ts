@@ -50,10 +50,13 @@ export default class StoragesFileDownloadUseCase {
 
       return right(await this.bucket.signedDownload({ path, mimetype, originalName }))
     } catch (error) {
-      logger.error({ err: error }, '[files > download][error]')
+      logger.error({ err: error }, '[storages/files > download][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_DOWNLOAD_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_DOWNLOAD_ERROR',
+        ),
       )
     }
   }

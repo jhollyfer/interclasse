@@ -6,5 +6,8 @@
   "not_archived_field": "Archiva al usuario antes de borrarlo",
   "already_archived": "El usuario ya está archivado",
   "current_password_invalid": "Contraseña actual inválida",
-  "password_same_as_current": "La nueva contraseña debe ser distinta de la actual"
+  "password_same_as_current": "La nueva contraseña debe ser distinta de la actual",
+  "self_access_forbidden": "No puedes cambiar tu propio rol o estado",
+  "self_archive_forbidden": "No puedes archivar tu propia cuenta",
+  "self_delete_forbidden": "No puedes eliminar tu propia cuenta"
 }

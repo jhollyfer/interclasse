@@ -1,10 +1,11 @@
 import { test } from '@japa/runner'
+import { left } from '@interclasse/shared'
 
 import AdministratorUserCreateUseCase from './create.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { pendingFile, rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
 
@@ -88,11 +89,11 @@ test.group('administrator/users > create (unit)', () => {
     assert.deepInclude(created, { id: USER_ID, role: 'ADMINISTRATOR', deletedAt: null })
   })
 
-  test('a corrida no unique do banco também é 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('a corrida no unique do banco (fato do repository) também é 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
-    users.save = async () => {
-      throw Object.assign(new Error('duplicate key'), { code: '23505' })
-    }
+    users.save = async () => left({ code: 'USER_ALREADY_EXISTS' })
 
     const result = await useCase.execute(NEW_USER)
 
@@ -107,6 +108,6 @@ test.group('administrator/users > create (unit)', () => {
 
     const result = await useCase.execute(NEW_USER)
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_CREATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_CREATE_ERROR' })
   })
 })

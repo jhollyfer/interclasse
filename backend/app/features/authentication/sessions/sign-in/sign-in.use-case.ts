@@ -6,7 +6,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract, type SessionTokens } from '#services/session/session.contract'
+import { SessionRepository, type SessionTokens } from '#repositories/session/session.repository'
 import type { AuthenticationSessionSignInPayload } from '#validators/authentication/sessions.validator'
 
 type Payload = AuthenticationSessionSignInPayload
@@ -24,7 +24,7 @@ type Response = Either<HTTPException, SessionTokens>
 export default class AuthenticationSessionSignInUseCase {
   constructor(
     private readonly users: UserRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly i18n: I18n,
   ) {}
 
@@ -46,14 +46,26 @@ export default class AuthenticationSessionSignInUseCase {
 
       if (!passwordMatches || !user.canSignIn()) return left(this.invalidCredentials())
 
-      return right(await this.sessions.issue(user.id))
+      const tokens = await this.sessions.issue(user.id)
+      if (!tokens)
+        return left(
+          HTTPException.InternalServerError(
+            this.i18n.t('errors.internal'),
+            'AUTHENTICATION_SESSION_SIGN_IN_ERROR',
+          ),
+        )
+
+      return right(tokens)
     } catch (error) {
       // Só credencial errada vira 401. Qualquer outra falha (banco fora, por
       // exemplo) continua sendo erro de servidor - não vale mentir 401.
-      logger.error({ err: error }, '[sessions > sign-in][error]')
+      logger.error({ err: error }, '[authentication/sessions > sign-in][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_SIGN_IN_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'AUTHENTICATION_SESSION_SIGN_IN_ERROR',
+        ),
       )
     }
   }

@@ -9,7 +9,7 @@ import { MatchCardMemoryRepository } from './match-card.memory.repository.ts'
 import type { MatchCardRepository } from './match-card.repository.ts'
 
 import { MatchCard } from '#domain/match-card/match-card.entity'
-import { BracketArrangements, type BracketHarness } from '#tests/bracket-harness'
+import { BracketArrangements, type BracketHarness } from '#tests/bracket-harness-fixtures'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /**

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import { BracketArrangements, MemoryBracketHarness } from '#tests/bracket-harness'
+import { BracketArrangements, MemoryBracketHarness } from '#tests/bracket-harness-fixtures'
 import type {
   BracketMemoryRepository,
   StudentView,
@@ -14,7 +14,7 @@ import { UnitOfWorkMemory } from '#repositories/unit-of-work/unit-of-work.memory
 /**
  * A montagem dos testes unitários de chave, partida e cartão: a chave e o que
  * ela lê (modalidade, turmas, alunos inscritos) no repositório em memória. O
- * arranjo em si é o mesmo do teste de contrato (`tests/bracket-harness.ts`).
+ * arranjo em si é o mesmo do teste de contrato (`tests/bracket-harness-fixtures.ts`).
  */
 export class BracketUnitFixtures {
   /** Os contratos do use-case de chave trocados pelas implementações em memória. */

@@ -10,6 +10,8 @@ export type BracketError =
     }
   | { readonly code: 'TOO_MANY_TEAMS'; readonly maxTeams: number }
   | { readonly code: 'BRACKET_HAS_RESULTS' }
+  /** A modalidade já tem chave sorteada nesta categoria: a corrida de dois sorteios. */
+  | { readonly code: 'BRACKET_ALREADY_EXISTS' }
 
 /** O que a partida, filha da chave, recusa ao agendar, lançar ou desfazer o placar. */
 export type MatchError =

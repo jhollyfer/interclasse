@@ -6,12 +6,12 @@ import AdvisorStudentDeleteUseCase from './delete.use-case.ts'
 import { Student } from '#domain/student/student.entity'
 import { StudentRepository } from '#repositories/student/student.repository'
 import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const CLASSROOM = '00000000-0000-4000-8000-000000000001'
 const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
-const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR }
+const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
   const students = new StudentMemoryRepository().withClassroom(CLASSROOM, ADVISOR)
@@ -50,7 +50,11 @@ test.group('advisor/students > delete (unit)', () => {
 
     const foreign = await useCase.execute({
       id: ID,
-      actor: { id: '99999999-9999-4999-8999-999999999999', role: USER_ROLE.ADVISOR },
+      actor: {
+        id: '99999999-9999-4999-8999-999999999999',
+        role: USER_ROLE.ADVISOR,
+        avatarId: null,
+      },
     })
     const missing = await useCase.execute({
       id: '00000000-0000-4000-8000-000000000000',

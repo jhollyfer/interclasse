@@ -20,7 +20,7 @@ export default class AdvisorPhotoDeleteController {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const result = await this.useCase.execute({ ...payload, actor: context.actor })
     if (result.isLeft()) throw result.value
     return context.response.noContent()
   }

@@ -20,7 +20,7 @@ export default class AdvisorStudentPaginateController {
     const payload = await context.request.validateUsing(AdvisorStudentPaginateValidator, {
       data: context.request.qs(),
     })
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const result = await this.useCase.execute({ ...payload, actor: context.actor })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

@@ -5,7 +5,7 @@ import AdministratorClassroomDeleteUseCase from './delete.use-case.ts'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 

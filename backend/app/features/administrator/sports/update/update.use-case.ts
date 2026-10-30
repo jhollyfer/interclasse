@@ -15,7 +15,6 @@ import { SportRefusal } from '../_shared.sport-refusal.ts'
 
 import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
-import { isUniqueViolation } from '#features/_shared.database'
 import type { IdentifierPayload } from '#core/validator'
 import type { AdministratorSportUpdatePayload } from '#validators/administrator/sports.validator'
 
@@ -43,18 +42,17 @@ export default class AdministratorSportUpdateUseCase {
         sport.renamesTo(changes.name) &&
         (await this.sports.existsByNameOrSlug(changes.name, Slug.from(changes.name).value, id))
       )
-        return left(this.alreadyExists())
+        return left(SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n))
 
       const largestRoster = await this.sports.largestRoster(id)
       const updated = sport.update(changes, { largestRoster, now: new Date() })
       if (updated.isLeft()) return left(SportRefusal.http(updated.value, this.i18n))
 
-      await this.sports.save(sport)
+      const saved = await this.sports.save(sport)
+      if (saved.isLeft()) return left(SportRefusal.http(saved.value, this.i18n))
 
       return right(SportPresenter.show(sport))
     } catch (error) {
-      if (isUniqueViolation(error)) return left(this.alreadyExists())
-
       logger.error({ err: error }, '[administrator/sports > update][error]')
 
       return left(
@@ -64,11 +62,5 @@ export default class AdministratorSportUpdateUseCase {
         ),
       )
     }
-  }
-
-  private alreadyExists(): HTTPException {
-    return HTTPException.Conflict(this.i18n.t('sports.already_exists'), 'SPORT_ALREADY_EXISTS', {
-      name: this.i18n.t('sports.name_taken'),
-    })
   }
 }

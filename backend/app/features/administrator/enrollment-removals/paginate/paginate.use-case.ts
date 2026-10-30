@@ -41,7 +41,7 @@ export default class AdministratorEnrollmentRemovalPaginateUseCase {
       return left(
         HTTPException.InternalServerError(
           this.i18n.t('errors.internal'),
-          'ENROLLMENT_REMOVAL_PAGINATE_ERROR',
+          'ADMINISTRATOR_ENROLLMENT_REMOVAL_PAGINATE_ERROR',
         ),
       )
     }

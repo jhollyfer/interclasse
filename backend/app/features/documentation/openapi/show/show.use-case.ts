@@ -31,10 +31,13 @@ export default class DocumentationOpenapiShowUseCase {
 
       return right(DocumentationOpenapiShowUseCase.specification)
     } catch (error) {
-      logger.error({ err: error }, '[openapi > show][error]')
+      logger.error({ err: error }, '[documentation/openapi > show][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'OPENAPI_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          'Erro interno do servidor',
+          'DOCUMENTATION_OPENAPI_SHOW_ERROR',
+        ),
       )
     }
   }

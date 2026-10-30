@@ -5,23 +5,25 @@ import logger from '@adonisjs/core/services/logger'
 import User from '#models/user'
 import { COOKIE_TOKEN } from '#config/cookie'
 import {
-  SessionContract,
+  SessionRepository,
   type RefreshGrant,
   type SessionTokens,
-} from '#services/session/session.contract'
+} from '#repositories/session/session.repository'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 /** A tabela do `DbAccessTokensProvider`, criada pela migration de `auth_access_tokens`. */
 const SESSION_TABLE = 'auth_access_tokens'
 
 /**
- * Os tokens da sessão no banco: emitir, ler o de refresh e revogar.
+ * Os tokens da sessão no banco: emitir, ler o de refresh e revogar. A
+ * revogação em lote passa pela transação em curso, e é por isso que mora num
+ * repository e não num service de I/O externo.
  *
  * Separado do controller, que escreve a resposta HTTP: emitir token toca o
  * banco, escrever cookie toca o transporte, e são duas razões para mudar.
  */
 @inject()
-export default class SessionService extends SessionContract {
+export class SessionLucidRepository extends SessionRepository {
   constructor(private readonly transaction: TransactionContext) {
     super()
   }
@@ -33,7 +35,7 @@ export default class SessionService extends SessionContract {
    * banco depois, e é por isso que ele sobe até o controller, que o põe no
    * cookie.
    */
-  async issue(userId: string): Promise<SessionTokens> {
+  async issue(userId: string): Promise<SessionTokens | null> {
     const tokenable = this.tokenable(userId)
     const accessToken = await User.accessTokens.create(tokenable, [], {
       name: COOKIE_TOKEN.ACCESS,
@@ -47,9 +49,7 @@ export default class SessionService extends SessionContract {
 
     // `value` só é opcional no tipo porque o mesmo `AccessToken` representa o
     // token lido do banco, sem o segredo. Recém-criado, ele sempre vem.
-    if (!accessToken.value || !refreshToken.value) {
-      throw new Error('token de sessão criado sem o valor em claro')
-    }
+    if (!accessToken.value || !refreshToken.value) return null
 
     return {
       accessToken: accessToken.value.release(),

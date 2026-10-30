@@ -1,9 +1,12 @@
 import {
   USER_ROLE,
+  left,
+  right,
   type Actor,
   type AdministratorClassroomPaginateResponse,
   type AdministratorClassroomPersonResponse,
   type AdministratorClassroomShowResponse,
+  type Either,
   type Paginated,
   type SortDirection,
 } from '@interclasse/shared'
@@ -21,7 +24,8 @@ import {
   type ClassroomPeopleFacts,
   type ClassroomProps,
 } from '#domain/classroom/classroom.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import type { ClassroomError } from '#domain/classroom/classroom.errors'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
@@ -128,8 +132,24 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     return this.competing.has(id)
   }
 
-  async save(classroom: Classroom): Promise<void> {
-    this.rows.set(classroom.id, structuredClone(classroom.snapshot()))
+  async save(classroom: Classroom): Promise<Either<ClassroomError, void>> {
+    const snapshot = structuredClone(classroom.snapshot())
+    const others = [...this.rows.values()].filter((row) => row.id !== snapshot.id)
+
+    // Os três `unique` do banco: conselheiro, representante e nome.
+    if (snapshot.advisorId && others.some((row) => row.advisorId === snapshot.advisorId))
+      return left({ code: 'ADVISOR_TAKEN' })
+    if (
+      snapshot.representativeId &&
+      others.some((row) => row.representativeId === snapshot.representativeId)
+    )
+      return left({ code: 'REPRESENTATIVE_TAKEN' })
+    if (others.some((row) => row.name === snapshot.name))
+      return left({ code: 'CLASSROOM_ALREADY_EXISTS' })
+
+    this.rows.set(snapshot.id, snapshot)
+
+    return right(undefined)
   }
 
   async delete(classroom: Classroom): Promise<void> {

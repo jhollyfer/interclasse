@@ -4,7 +4,7 @@ import AdministratorSiteShowUseCase from './show.use-case.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import { SiteSettingMemoryRepository } from '#repositories/site-setting/site-setting.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('administrator/site > show (unit)', () => {
   test('na primeira leitura devolve a configuração vazia, sem regulamento', async ({ assert }) => {

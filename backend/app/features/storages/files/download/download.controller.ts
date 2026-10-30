@@ -6,6 +6,7 @@ import StoragesFileDownloadUseCase from './download.use-case.ts'
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
 import StoragePolicy from '#policies/storage.policy'
+import { StorageRepository } from '#repositories/storage/storage.repository'
 
 @inject()
 export default class StoragesFileDownloadController {
@@ -28,13 +29,17 @@ export default class StoragesFileDownloadController {
     responses: { 302: 'no-content' },
   })
 
-  constructor(private readonly useCase: StoragesFileDownloadUseCase) {}
+  constructor(
+    private readonly useCase: StoragesFileDownloadUseCase,
+    private readonly storages: StorageRepository,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    await context.bouncer.with(StoragePolicy).authorize('download', payload.id)
+    const storage = await this.storages.findById(payload.id)
+    await context.bouncer.with(StoragePolicy).authorize('download', storage)
     const result = await this.useCase.execute(payload)
 
     if (result.isLeft()) throw result.value

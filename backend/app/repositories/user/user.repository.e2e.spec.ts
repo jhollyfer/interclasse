@@ -64,6 +64,15 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await users.findById(BIA))
     })
 
+    test('save de e-mail que é de outra conta devolve USER_ALREADY_EXISTS', async ({ assert }) => {
+      const { users } = await make()
+      await users.save(account(ANA, 'Ana', 'ana@t.dev'))
+
+      const saved = await users.save(account(BIA, 'Bia', 'ana@t.dev'))
+
+      assert.deepEqual(saved.value, { code: 'USER_ALREADY_EXISTS' })
+    })
+
     test('salvar de novo sem trocar a senha não a cifra outra vez', async ({ assert }) => {
       const { users } = await make()
       await users.save(account(ANA, 'Ana', 'ana@t.dev'))

@@ -61,10 +61,13 @@ export default class StoragesFileDeleteUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[files > delete][error]')
+      logger.error({ err: error }, '[storages/files > delete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_DELETE_ERROR',
+        ),
       )
     }
   }

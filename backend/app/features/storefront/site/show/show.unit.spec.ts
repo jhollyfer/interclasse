@@ -5,7 +5,7 @@ import StorefrontSiteShowUseCase from './show.use-case.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import { SiteSettingMemoryRepository } from '#repositories/site-setting/site-setting.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
 

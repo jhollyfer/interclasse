@@ -6,8 +6,10 @@ import type {
   TrashedMode,
   UserRole,
 } from '@interclasse/shared'
+import type { Either } from '@interclasse/shared'
 
 import type { User } from '#domain/user/user.entity'
+import type { UserError } from '#domain/user/user.errors'
 
 export type UserListCriteria = {
   readonly page: number
@@ -40,7 +42,8 @@ export abstract class UserRepository {
   abstract findByEmail(email: string): Promise<User | null>
   /** Outra conta, viva ou arquivada, que não `exceptId`, já usa o e-mail. */
   abstract existsByEmail(email: string, exceptId?: string): Promise<boolean>
-  abstract save(user: User): Promise<void>
+  /** Grava a conta; o e-mail de outra conta (a corrida no `unique`) volta como `USER_ALREADY_EXISTS`. */
+  abstract save(user: User): Promise<Either<UserError, void>>
   abstract delete(user: User): Promise<void>
   /** Leitura leve da conta viva, com o avatar: a forma da resposta, sem a senha. */
   abstract detail(id: string): Promise<AdministratorUserShowResponse | null>

@@ -3,5 +3,6 @@
   "sport_not_found": "Modalidad no encontrada",
   "not_enough_teams": "Se necesitan al menos {minTeams} grupos con {minAthletes} atletas inscritos",
   "too_many_teams": "La llave admite hasta {maxTeams} grupos",
-  "has_results": "La llave ya tiene marcador registrado: deshaz los marcadores antes de borrarla"
+  "has_results": "La llave ya tiene marcador registrado: deshaz los marcadores antes de borrarla",
+  "already_exists": "El cuadro de este deporte y categoría ya fue sorteado"
 }

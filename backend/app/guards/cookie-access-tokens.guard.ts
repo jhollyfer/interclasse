@@ -8,7 +8,7 @@ import { ACTIVE_STATUS } from '@interclasse/shared'
 
 import User from '#models/user'
 import { COOKIE_TOKEN } from '#config/cookie'
-import { SessionContract } from '#services/session/session.contract'
+import { SessionRepository } from '#repositories/session/session.repository'
 
 /**
  * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.
@@ -109,8 +109,10 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
   async authenticateAsClient(user: User): Promise<AuthClientResponse> {
     // O guard nasce fora do container (factory de `config/auth.ts`); o service
     // é pedido a ele, nunca construído com `new`.
-    const session = await app.container.make(SessionContract)
+    const session = await app.container.make(SessionRepository)
     const tokens = await session.issue(user.id)
+    // Sem o valor em claro não há sessão a montar: o cliente segue sem cookie e a rota responde 401.
+    if (!tokens) return { cookies: {} }
 
     return {
       cookies: {

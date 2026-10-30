@@ -37,7 +37,10 @@ export function scheduledAt() {
     .meta({ format: 'date-time' })
     .nullable()
     .optional()
-    .transform((value) => {
+    .transform((value): DateTime | null | undefined => {
+      // O VineJS não chama o `transform` com o campo ausente, mas o tipo do campo
+      // opcional é `T | undefined`: o retorno diz os três estados.
+      if (value === undefined) return undefined
       if (value === null) return null
 
       return DateTime.fromISO(value)

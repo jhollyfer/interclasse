@@ -5,7 +5,7 @@ import AdministratorReportShowUseCase from './show.use-case.ts'
 
 import { ReportRepository } from '#repositories/report/report.repository'
 import { ReportMemoryRepository } from '#repositories/report/report.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
   const reports = new ReportMemoryRepository()

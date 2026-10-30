@@ -6,7 +6,7 @@ import AdvisorPhotoPaginateUseCase from './paginate.use-case.ts'
 
 import { Photo, PHOTO_SENDER } from '#domain/photo/photo.entity'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
 
 async function setup() {

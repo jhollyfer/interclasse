@@ -7,8 +7,8 @@ import HTTPException from '#exceptions/http.exception'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { UserRefusal } from '#features/_shared.user-refusal'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -35,7 +35,7 @@ type Response = Either<HTTPException, null>
 export default class AdministratorUserArchiveUseCase {
   constructor(
     private readonly users: UserRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly classrooms: ClassroomRepository,
     private readonly unitOfWork: UnitOfWork,
     private readonly i18n: I18n,
@@ -53,21 +53,27 @@ export default class AdministratorUserArchiveUseCase {
 
       // Arquivar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
       // falha do segundo passo deixaria a conta arquivada com sessão viva.
-      await this.unitOfWork.run(async () => {
-        await this.users.save(user)
+      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
+        const saved = await this.users.save(user)
+        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
+
         await this.sessions.revokeAll(id)
         // Conta arquivada não aconselha nem representa turma nenhuma.
         await this.classrooms.detachAccount(id)
 
         return right(null)
       })
+      if (written.isLeft()) return left(written.value)
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[users > archive][error]')
+      logger.error({ err: error }, '[administrator/users > archive][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_ARCHIVE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_ARCHIVE_ERROR',
+        ),
       )
     }
   }

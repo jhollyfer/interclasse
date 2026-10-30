@@ -76,7 +76,7 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 | leitura pública | `GET /storefront/*` | internet → `/storefront` | `backend/app/features/storefront/` |
 | upload | `POST /storages`, `:id/complete`, PUT na URL assinada | navegador → bucket | `backend/app/features/storages/files/` |
 | lista de atletas | `PUT /advisor/enrollments`, `PUT /representative/enrollments` | papel → rota | `backend/app/features/advisor/enrollments/`, `representative/enrollments/` |
-| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.csv.ts` |
+| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.presenter.ts` |
 | documentação da API | `/openapi.json`, `/documentation` | internet → API | `backend/app/middleware/documentation.middleware.ts` |
 | deploy | push em `main` | CI → produção | `.github/workflows/main.yml` |
 
@@ -114,7 +114,7 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 
 - Sessão por cookie `httpOnly`, `secure` em produção e `sameSite=lax`; cai para `none` só quando o site e a API não compartilham domínio-pai (`backend/app/services/cookie/cookie.service.ts`).
 - Par de tokens: acesso de 1 dia e refresh de 7 dias, guardados em `auth_access_tokens`.
-- Arquivar a conta, trocar a senha e mudar o papel revogam as sessões no servidor (`SessionService#revokeAll`).
+- Arquivar a conta, trocar a senha e mudar o papel revogam as sessões no servidor (`SessionLucidRepository#revokeAll`).
 - Limite de tentativas no login: 5 por minuto por IP e 20 por hora por e-mail, bloqueio de 10 minutos, com contagem no banco (`backend/start/limiter.ts`). Os achados SEC-1, SEC-7 e SEC-8 (§10) estão abertos.
 - O login responde igual para senha errada, conta arquivada e conta inativa.
 - Não há cadastro público nem recuperação de senha: a organização cria as contas.

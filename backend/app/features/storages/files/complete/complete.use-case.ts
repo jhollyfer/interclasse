@@ -82,10 +82,13 @@ export default class StoragesFileCompleteUseCase {
 
       return right(detail)
     } catch (error) {
-      logger.error({ err: error }, '[files > complete][error]')
+      logger.error({ err: error }, '[storages/files > complete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_COMPLETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_COMPLETE_ERROR',
+        ),
       )
     }
   }
@@ -102,7 +105,7 @@ export default class StoragesFileCompleteUseCase {
       await this.bucket.discard(storage.snapshot().path)
       await this.storages.delete(storage)
     } catch (error) {
-      logger.error({ err: error }, '[files > complete][discard][error]')
+      logger.error({ err: error }, '[storages/files > complete][discard][error]')
     }
   }
 

@@ -5,7 +5,7 @@ import AdministratorClassroomCreateUseCase from './create.use-case.ts'
 
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const REPRESENTATIVE = '22222222-2222-4222-8222-222222222222'

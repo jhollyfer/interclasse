@@ -8,6 +8,8 @@ export type ClassroomError =
   | { readonly code: 'CLASSROOM_CATEGORY_LOCKED' }
   /** A turma já tem time numa chave: apagar a deixaria jogando sem turma. */
   | { readonly code: 'CLASSROOM_IN_COMPETITION' }
+  /** O nome é de outra turma: a checagem antes de gravar e a corrida no `unique`. */
+  | { readonly code: 'CLASSROOM_ALREADY_EXISTS' }
   | { readonly code: 'ADVISOR_NOT_FOUND' }
   | { readonly code: 'ADVISOR_TAKEN' }
   | { readonly code: 'REPRESENTATIVE_NOT_FOUND' }

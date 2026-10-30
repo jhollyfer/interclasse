@@ -44,7 +44,10 @@ export default class AdvisorStudentUpdateUseCase {
       logger.error({ err: error }, '[advisor/students > update][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADVISOR_STUDENT_UPDATE_ERROR',
+        ),
       )
     }
   }

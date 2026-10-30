@@ -1,12 +1,13 @@
 import { test } from '@japa/runner'
+import { left } from '@interclasse/shared'
 
 import AccountProfileUpdateUseCase from './update.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import {
   identityDoubles,
   OTHER_ID,
@@ -16,14 +17,14 @@ import {
 } from '#tests/identity-unit-fixtures'
 import { pendingFile, rightOf } from '#tests/storages-unit-fixtures'
 
-const ACTOR = { id: USER_ID, role: 'ADVISOR' } as const
+const ACTOR = { id: USER_ID, role: 'ADVISOR', avatarId: null } as const
 
 async function setup() {
   const doubles = identityDoubles()
   const useCase = await makeWithMemory(AccountProfileUpdateUseCase, [
     [UserRepository, doubles.users],
     [StorageRepository, doubles.storages],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [UnitOfWork, doubles.unitOfWork],
   ])
 
@@ -118,12 +119,12 @@ test.group('account/profile > update (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('a corrida no unique do banco é 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('a corrida no unique do banco (fato do repository) é 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
-    users.save = async () => {
-      throw Object.assign(new Error('duplicate key'), { code: '23505' })
-    }
+    users.save = async () => left({ code: 'USER_ALREADY_EXISTS' })
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 
@@ -139,6 +140,6 @@ test.group('account/profile > update (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'PROFILE_UPDATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ACCOUNT_PROFILE_UPDATE_ERROR' })
   })
 })

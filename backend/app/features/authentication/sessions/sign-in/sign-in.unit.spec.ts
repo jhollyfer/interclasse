@@ -3,8 +3,8 @@ import { test } from '@japa/runner'
 import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, PASSWORD, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
@@ -12,7 +12,7 @@ async function setup() {
   const doubles = identityDoubles()
   const useCase = await makeWithMemory(AuthenticationSessionSignInUseCase, [
     [UserRepository, doubles.users],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
   ])
 
   return { ...doubles, useCase }
@@ -67,6 +67,6 @@ test.group('authentication/sessions > sign-in (unit)', () => {
 
     const result = await useCase.execute({ email: 'ana@mail.com', password: PASSWORD })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_SIGN_IN_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_IN_ERROR' })
   })
 })

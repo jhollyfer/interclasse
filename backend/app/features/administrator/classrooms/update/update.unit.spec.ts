@@ -6,7 +6,7 @@ import AdministratorClassroomUpdateUseCase from './update.use-case.ts'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
 const OTHER = '7b5a3f2e-1d0c-4b9a-9f8e-7d6c5b4a3f2e'

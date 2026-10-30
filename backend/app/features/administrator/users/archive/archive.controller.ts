@@ -5,6 +5,7 @@ import AdministratorUserArchiveUseCase from './archive.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import UserPolicy from '#policies/user.policy'
+import { UserRepository } from '#repositories/user/user.repository'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -23,13 +24,17 @@ export default class AdministratorUserArchiveController {
     errors: { 403: 'SELF_ARCHIVE_FORBIDDEN' },
   })
 
-  constructor(private readonly useCase: AdministratorUserArchiveUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorUserArchiveUseCase,
+    private readonly users: UserRepository,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    await context.bouncer.with(UserPolicy).authorize('archive', payload.id)
+    const user = await this.users.findById(payload.id)
+    await context.bouncer.with(UserPolicy).authorize('archive', user)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.noContent()

@@ -16,7 +16,7 @@
 
 ## Parou em
 
-Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
+Fase 5.4 (backend arquitetura) aplicada na branch `frente-5-4`: lint, typecheck, `pattern:check`, `authz:check`, `openapi:check` e 371 unit verdes; E2E do backend não rodou (sem banco no ambiente) e precisa rodar antes do merge. Antes disso, tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
 
 ## Próximos passos
 

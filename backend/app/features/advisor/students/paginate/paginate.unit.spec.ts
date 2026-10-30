@@ -6,12 +6,12 @@ import AdvisorStudentPaginateUseCase from './paginate.use-case.ts'
 import { Student } from '#domain/student/student.entity'
 import { StudentRepository } from '#repositories/student/student.repository'
 import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const OWN = '00000000-0000-4000-8000-000000000001'
 const FOREIGN = '00000000-0000-4000-8000-000000000002'
-const ACTOR = { id: ADVISOR, role: USER_ROLE.ADVISOR }
+const ACTOR = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
   const students = new StudentMemoryRepository()
@@ -56,7 +56,7 @@ test.group('advisor/students > paginate (unit)', () => {
 
   test('o administrador vê todos, e a busca recorta', async ({ assert }) => {
     const { useCase } = await setup()
-    const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR }
+    const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 
     const all = await useCase.execute({ actor })
     const searched = await useCase.execute({ actor, search: 'cai' })

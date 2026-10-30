@@ -201,6 +201,6 @@ Health check: `GET /health-check` na API e no site.
 ## 10. Escala e limites conhecidos
 
 - A maior chave é de oitavas de final: até 16 vagas, e a escola tem até 13 turmas por categoria (`TOO_MANY_TEAMS` acima disso).
-- Paginação em memória nos presenters que juntam várias tabelas (`backend/app/repositories/memory-pagination.ts`); serve ao volume de uma escola, não a um volume grande.
+- Paginação em memória nos presenters que juntam várias tabelas (`backend/app/core/memory-pagination.ts`); serve ao volume de uma escola, não a um volume grande.
 - Uma instância da API e uma do site; o limite de requisições usa o banco como store, então mais réplicas compartilham a contagem.
 - Atrás do proxy do Coolify, `request.ip()` é o IP do proxy até o `trustProxy` ser configurado (`SECURITY.md` §10, SEC-1).

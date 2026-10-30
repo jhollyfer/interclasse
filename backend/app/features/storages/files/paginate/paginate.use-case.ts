@@ -50,10 +50,13 @@ export default class StoragesFilePaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[files > paginate][error]')
+      logger.error({ err: error }, '[storages/files > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_PAGINATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_PAGINATE_ERROR',
+        ),
       )
     }
   }

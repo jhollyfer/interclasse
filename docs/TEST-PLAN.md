@@ -50,7 +50,7 @@ do requisito; a ligação é pelo arquivo e pelo título.
 | PRD 5 | lista inteira por turma e modalidade, dentro do máximo | unitário e E2E | `domain/enrollment/enrollment.entity.unit.spec.ts`, `advisor/enrollments/update`, `representative/enrollments/update` |
 | PRD 6 | aviso de remoção com motivo; a do administrador já nasce lida | E2E | `advisor/enrollments/update`, `administrator/enrollment-removals/*/*.e2e.spec.ts` |
 | PRD 7 | sorteio idempotente por modalidade e categoria; apagar só sem placar | E2E | `administrator/brackets/create`, `administrator/brackets/delete` |
-| PRD 7 | regras do mata-mata (potência de dois, folga, avanço) | unitário | `domain/bracket/knockout.unit.spec.ts`, `bracket.entity.unit.spec.ts` |
+| PRD 7 | regras do mata-mata (potência de dois, folga, avanço) | unitário | `domain/shared/knockout.value-object.unit.spec.ts`, `bracket.entity.unit.spec.ts` |
 | PRD 8 | placar, empate com pênaltis, desfazer, cartão só de atleta da partida | E2E e unitário | `administrator/matches/*`, `administrator/cards/*`, `domain/match-card/match-card.entity.unit.spec.ts` |
 | PRD 9 | avisos: criar, editar, apagar, fixar | E2E | `administrator/announcements/*/*.e2e.spec.ts` |
 | PRD 10 | leitura pública de jogos, chaves, avisos e modalidades | E2E | `storefront/{announcements,brackets,matches,sports}/*/*.e2e.spec.ts` |
@@ -70,7 +70,7 @@ Membros enumerados e o teste que prova cada um. Membro sem teste aparece como **
 | | `FINISHED` | `administrator/matches/score/score.e2e.spec.ts` ("do sorteio ao campeão") |
 | `MatchStatus` | `SCHEDULED` | `administrator/matches/unscore/unscore.e2e.spec.ts` |
 | | `FINISHED` | `administrator/matches/score/score.e2e.spec.ts` |
-| `MatchPhase` | `ROUND_OF_16`, `QUARTER`, `SEMI`, `FINAL` | `domain/bracket/knockout.unit.spec.ts` |
+| `MatchPhase` | `ROUND_OF_16`, `QUARTER`, `SEMI`, `FINAL` | `domain/shared/knockout.value-object.unit.spec.ts` |
 | `PhotoStatus` | `PENDING`, `APPROVED` | `administrator/photos/review/review.e2e.spec.ts` |
 | | `REJECTED` | `domain/photo/photo.entity.unit.spec.ts`, `administrator/photos/review/review.unit.spec.ts` |
 | `UserRole` | `ADMINISTRATOR` | `administrator/*` e `role.middleware.e2e.spec.ts` |

@@ -22,7 +22,7 @@ export default class AdvisorPhotoCreateController {
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(AdvisorPhotoCreateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const result = await this.useCase.execute({ ...payload, actor: context.actor })
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)
   }

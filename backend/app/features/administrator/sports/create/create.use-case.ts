@@ -11,7 +11,6 @@ import { SportRefusal } from '../_shared.sport-refusal.ts'
 import { Sport } from '#domain/sport/sport.entity'
 import { SportRepository } from '#repositories/sport/sport.repository'
 import HTTPException from '#exceptions/http.exception'
-import { isUniqueViolation } from '#features/_shared.database'
 import type { AdministratorSportCreatePayload } from '#validators/administrator/sports.validator'
 
 type Payload = AdministratorSportCreatePayload
@@ -32,16 +31,13 @@ export default class AdministratorSportCreateUseCase {
 
       const sport = created.value
       if (await this.sports.existsByNameOrSlug(payload.name, sport.snapshot().slug))
-        return left(this.alreadyExists())
+        return left(SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n))
 
-      await this.sports.save(sport)
+      const saved = await this.sports.save(sport)
+      if (saved.isLeft()) return left(SportRefusal.http(saved.value, this.i18n))
 
       return right(SportPresenter.show(sport))
     } catch (error) {
-      // A checagem acima não fecha a corrida: o segundo de dois pedidos
-      // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error)) return left(this.alreadyExists())
-
       logger.error({ err: error }, '[administrator/sports > create][error]')
 
       return left(
@@ -51,11 +47,5 @@ export default class AdministratorSportCreateUseCase {
         ),
       )
     }
-  }
-
-  private alreadyExists(): HTTPException {
-    return HTTPException.Conflict(this.i18n.t('sports.already_exists'), 'SPORT_ALREADY_EXISTS', {
-      name: this.i18n.t('sports.name_taken'),
-    })
   }
 }

@@ -13,7 +13,6 @@ import { ClassroomRefusal } from '../_shared.classroom-refusal.ts'
 
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
-import { isUniqueViolation } from '#features/_shared.database'
 import type { IdentifierPayload } from '#core/validator'
 import type { AdministratorClassroomUpdatePayload } from '#validators/administrator/classrooms.validator'
 
@@ -40,7 +39,7 @@ export default class AdministratorClassroomUpdateUseCase {
         classroom.renamesTo(changes.name) &&
         (await this.classrooms.existsByName(changes.name, id))
       )
-        return left(ClassroomRefusal.alreadyExists(this.i18n))
+        return left(ClassroomRefusal.http({ code: 'CLASSROOM_ALREADY_EXISTS' }, this.i18n))
 
       const facts = await this.classrooms.peopleFacts(classroom.changedLinks(changes), id)
       // Só vale perguntar do sorteio quando o ano levaria a turma a outra categoria.
@@ -50,17 +49,14 @@ export default class AdministratorClassroomUpdateUseCase {
       const updated = classroom.update(changes, { facts, inCompetition, now: new Date() })
       if (updated.isLeft()) return left(ClassroomRefusal.http(updated.value, this.i18n))
 
-      await this.classrooms.save(classroom)
+      const saved = await this.classrooms.save(classroom)
+      if (saved.isLeft()) return left(ClassroomRefusal.http(saved.value, this.i18n))
 
       const detail = await this.classrooms.findDetail(id)
       if (!detail) return left(this.notFound())
 
       return right(detail)
     } catch (error) {
-      // A checagem acima não fecha a corrida: o segundo de dois pedidos
-      // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error)) return left(ClassroomRefusal.race(error, this.i18n))
-
       logger.error({ err: error }, '[administrator/classrooms > update][error]')
 
       return left(

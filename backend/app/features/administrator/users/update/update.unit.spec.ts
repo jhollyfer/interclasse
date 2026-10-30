@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { left } from '@interclasse/shared'
 
 import AdministratorUserUpdateUseCase from './update.use-case.ts'
 
@@ -6,8 +7,8 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
 
@@ -16,7 +17,7 @@ async function setup() {
   const useCase = await makeWithMemory(AdministratorUserUpdateUseCase, [
     [UserRepository, doubles.users],
     [StorageRepository, doubles.storages],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [ClassroomRepository, doubles.classrooms],
     [UnitOfWork, doubles.unitOfWork],
   ])
@@ -124,12 +125,12 @@ test.group('administrator/users > update (unit)', () => {
     assert.equal(stored?.snapshot().role, 'ADVISOR')
   })
 
-  test('a corrida no unique do banco é 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('a corrida no unique do banco (fato do repository) é 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
-    users.save = async () => {
-      throw Object.assign(new Error('duplicate key'), { code: '23505' })
-    }
+    users.save = async () => left({ code: 'USER_ALREADY_EXISTS' })
 
     const result = await useCase.execute({ id: USER_ID, name: 'x' })
 
@@ -145,6 +146,6 @@ test.group('administrator/users > update (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_UPDATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_UPDATE_ERROR' })
   })
 })

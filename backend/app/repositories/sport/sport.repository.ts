@@ -1,6 +1,12 @@
-import type { AdministratorSportShowResponse, Paginated, SortDirection } from '@interclasse/shared'
+import type {
+  AdministratorSportShowResponse,
+  Either,
+  Paginated,
+  SortDirection,
+} from '@interclasse/shared'
 
 import type { Sport } from '#domain/sport/sport.entity'
+import type { SportError } from '#domain/sport/sport.errors'
 
 export type SportListCriteria = {
   readonly page: number
@@ -23,7 +29,8 @@ export abstract class SportRepository {
   abstract largestRoster(sportId: string): Promise<number>
   /** Tem inscrição ou chave: apagar deixaria as duas sem modalidade. */
   abstract isInUse(sportId: string): Promise<boolean>
-  abstract save(sport: Sport): Promise<void>
+  /** Grava a modalidade; nome ou slug de outra (a corrida no `unique`) volta como `SPORT_ALREADY_EXISTS`. */
+  abstract save(sport: Sport): Promise<Either<SportError, void>>
   abstract delete(sport: Sport): Promise<void>
   /** Leitura leve: a forma da resposta direto da query, sem hidratar entidade. */
   abstract paginate(criteria: SportListCriteria): Promise<Paginated<AdministratorSportShowResponse>>

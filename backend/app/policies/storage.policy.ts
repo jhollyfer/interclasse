@@ -1,8 +1,10 @@
+import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import { BasePolicy, AuthorizationResponse } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
-import { USER_ROLE, type UserRole } from '@interclasse/shared'
+import { USER_ROLE, type Actor, type UserRole } from '@interclasse/shared'
 
-import type User from '#models/user'
+import type { Storage } from '#domain/storage/storage.entity'
 
 /**
  * Quem baixa qual arquivo pela rota de download.
@@ -16,9 +18,11 @@ import type User from '#models/user'
  * o próprio avatar, que o `actor` já carrega, sem consulta (a policy não vai ao
  * banco além do alvo, _standards/architecture.md §2). Fechado por omissão.
  *
- * A negação é `404` e não `403`, a mesma resposta de arquivo inexistente: um
- * 403 confirmaria a quem sonda que aquele uuid existe.
+ * Recebe `(actor, arquivo | null)`. A negação é `404` e não `403`, a mesma
+ * resposta de arquivo inexistente: um 403 confirmaria a quem sonda que aquele
+ * uuid existe (_standards/backend.md §4.6).
  */
+
 /**
  * Quem opera o painel administrativo, e não só a própria turma. À parte de
  * `USER_ROLES` para que papel novo nasça de fora: entraria em `USER_ROLE` sem
@@ -26,11 +30,16 @@ import type User from '#models/user'
  */
 const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [USER_ROLE.ADMINISTRATOR]
 
+@inject()
 export default class StoragePolicy extends BasePolicy {
-  download(actor: User, storageId: string): AuthorizerResponse {
-    if (STAFF_USER_ROLES.includes(actor.role)) return true
-    if (actor.avatarId === storageId) return true
+  constructor(private readonly i18n: I18n) {
+    super()
+  }
 
-    return AuthorizationResponse.deny('Arquivo não encontrado', 404).t('STORAGE_NOT_FOUND')
+  download(actor: Actor, storage: Storage | null): AuthorizerResponse {
+    if (storage && STAFF_USER_ROLES.includes(actor.role)) return true
+    if (storage && actor.avatarId === storage.id) return true
+
+    return AuthorizationResponse.deny(this.i18n.t('files.not_found'), 404).t('STORAGE_NOT_FOUND')
   }
 }

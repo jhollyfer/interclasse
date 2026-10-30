@@ -8,12 +8,12 @@ import { ClassroomRepository } from '#repositories/classroom/classroom.repositor
 import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
 import { StudentRepository } from '#repositories/student/student.repository'
 import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const CLASSROOM = '00000000-0000-4000-8000-000000000001'
 const FOREIGN = '00000000-0000-4000-8000-000000000002'
-const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR }
+const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
   const classrooms = new ClassroomMemoryRepository()
@@ -57,7 +57,7 @@ test.group('advisor/students > create (unit)', () => {
     const listed = await students.paginate({
       page: 1,
       perPage: 10,
-      actor: { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR },
+      actor: { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null },
     })
     assert.equal(listed.meta.total, 0)
   })
@@ -68,7 +68,7 @@ test.group('advisor/students > create (unit)', () => {
     const result = await useCase.execute({
       classroomId: FOREIGN,
       name: 'Ana',
-      actor: { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR },
+      actor: { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null },
     })
 
     assert.isTrue(result.isRight())

@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AccountProfileShowUseCase from './show.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
@@ -19,7 +19,9 @@ test.group('account/profile > show (unit)', () => {
     const { users, useCase } = await setup()
     await seedUser(users)
 
-    const profile = rightOf(await useCase.execute({ actor: { id: USER_ID, role: 'ADVISOR' } }))
+    const profile = rightOf(
+      await useCase.execute({ actor: { id: USER_ID, role: 'ADVISOR', avatarId: null } }),
+    )
 
     assert.deepInclude(profile, { id: USER_ID, email: 'ana@mail.com' })
     assert.notProperty(profile, 'password')
@@ -31,8 +33,10 @@ test.group('account/profile > show (unit)', () => {
       throw new Error('banco fora')
     }
 
-    const result = await useCase.execute({ actor: { id: USER_ID, role: 'ADVISOR' } })
+    const result = await useCase.execute({
+      actor: { id: USER_ID, role: 'ADVISOR', avatarId: null },
+    })
 
-    assert.deepInclude(result.value, { status: 500, code: 'PROFILE_SHOW_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ACCOUNT_PROFILE_SHOW_ERROR' })
   })
 })

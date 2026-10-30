@@ -14,11 +14,10 @@ import { BracketPresenter } from '../brackets.presenter.ts'
 import { BracketRefusal } from '../_shared.bracket-refusal.ts'
 
 import { Bracket } from '#domain/bracket/bracket.entity'
-import type { Random } from '#domain/bracket/knockout'
+import type { Random } from '#domain/shared/knockout.value-object'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import HTTPException from '#exceptions/http.exception'
-import { isUniqueViolation } from '#features/_shared.database'
 import type { AdministratorBracketCreatePayload } from '#validators/administrator/brackets.validator'
 
 type Payload = AdministratorBracketCreatePayload
@@ -54,15 +53,17 @@ export default class AdministratorBracketCreateUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      return await this.unit.run(() => this.draw(payload))
-    } catch (error) {
-      // Dois sorteios ao mesmo tempo: o segundo esbarra no `unique` de
-      // modalidade e categoria, e a resposta é a mesma do sorteio repetido.
-      if (isUniqueViolation(error)) {
+      const result = await this.unit.run(() => this.draw(payload))
+
+      // Dois sorteios ao mesmo tempo: o segundo perde no `unique` de modalidade e
+      // categoria (o `save` devolve o fato), e a resposta é a mesma do sorteio repetido.
+      if (result.isLeft() && result.value.code === 'BRACKET_ALREADY_EXISTS') {
         const existing = await this.existing(payload)
         if (existing) return right(existing)
       }
 
+      return result
+    } catch (error) {
       logger.error({ err: error }, '[administrator/brackets > create][error]')
 
       return left(
@@ -105,7 +106,8 @@ export default class AdministratorBracketCreateUseCase {
     })
     if (drawn.isLeft()) return left(BracketRefusal.http(drawn.value, this.i18n))
 
-    await this.brackets.save(drawn.value)
+    const saved = await this.brackets.save(drawn.value)
+    if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
 
     return right({ bracket: BracketPresenter.created(drawn.value, sport), created: true })
   }

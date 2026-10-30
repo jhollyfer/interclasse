@@ -39,7 +39,10 @@ export default class AdvisorStudentDeleteUseCase {
       logger.error({ err: error }, '[advisor/students > delete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADVISOR_STUDENT_DELETE_ERROR',
+        ),
       )
     }
   }
