@@ -1,14 +1,18 @@
 import type { AdministratorSportShowResponse } from '@interclasse/shared'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { toast } from 'sonner'
 
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { RowActions, RowActionsDelete } from '#/components/common/row-actions'
+import {
+  RowActions,
+  RowActionsConfirm,
+  RowActionsDelete,
+} from '#/components/common/row-actions'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -16,6 +20,7 @@ import {
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useSportDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { createConfirmHandle } from '#/lib/dialog-handle'
 import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
@@ -29,6 +34,7 @@ export function SportRowActions({
   sport: AdministratorSportShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
+  const [deleteHandle] = React.useState(createConfirmHandle)
 
   const remove = useSportDeleteMutation({
     onError: (error) => notifyError(error, { id: 'sport-delete' }),
@@ -42,7 +48,23 @@ export function SportRowActions({
   })
 
   return (
-    <RowActions>
+    <RowActions
+      dialogs={
+        <RowActionsConfirm
+          handle={deleteHandle}
+          destructive
+          confirmLabel={m.common_remove()}
+          onConfirm={() => remove.mutate(sport.id)}
+        >
+          <ConfirmDialogTitle>
+            {m.admin_sports_remove_title({ name: sport.name })}
+          </ConfirmDialogTitle>
+          <ConfirmDialogDescription>
+            {m.admin_sports_remove_description()}
+          </ConfirmDialogDescription>
+        </RowActionsConfirm>
+      }
+    >
       <DropdownMenuItem
         render={
           <Link to="/administrator/sports/$id/edit" params={{ id: sport.id }}>
@@ -52,14 +74,7 @@ export function SportRowActions({
         }
       />
       <DropdownMenuSeparator />
-      <RowActionsDelete onConfirm={() => remove.mutate(sport.id)}>
-        <ConfirmDialogTitle>
-          {m.admin_sports_remove_title({ name: sport.name })}
-        </ConfirmDialogTitle>
-        <ConfirmDialogDescription>
-          {m.admin_sports_remove_description()}
-        </ConfirmDialogDescription>
-      </RowActionsDelete>
+      <RowActionsDelete handle={deleteHandle} />
     </RowActions>
   )
 }

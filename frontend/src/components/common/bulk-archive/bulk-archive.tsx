@@ -91,7 +91,7 @@ export function BulkArchive<TItem>({
   return (
     <ConfirmDialog
       onConfirm={() => void confirm()}
-      trigger={
+      render={
         <Button variant="outline">
           <ArchiveIcon />
           {m.admin_common_archive()}

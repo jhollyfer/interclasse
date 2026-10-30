@@ -16,7 +16,11 @@ import {
   AdministratorUserShowResponse,
   paginatedResponse,
 } from '@interclasse/shared'
-import { keepPreviousData, queryOptions } from '@tanstack/react-query'
+import {
+  infiniteQueryOptions,
+  keepPreviousData,
+  queryOptions,
+} from '@tanstack/react-query'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type {
@@ -48,6 +52,30 @@ export const usersQueryOptions = (params: UserListSearch) =>
           signal,
         },
       ),
+    placeholderData: keepPreviousData,
+  })
+
+/**
+ * As contas de um papel, página a página, para o combobox com busca no
+ * servidor (`frontend.md` §2.1). `page` é o `pageParam`, e fica fora da chave.
+ */
+export const usersInfiniteQueryOptions = (params: UserListSearch) =>
+  infiniteQueryOptions({
+    queryKey: queryKeys.administrator.users.infinite(params),
+    queryFn: ({ signal, pageParam }) =>
+      request(
+        '/administrator/users'.concat(
+          queryString({ ...params, page: pageParam }),
+        ),
+        paginatedResponse(AdministratorUserShowResponse),
+        { signal },
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (last) => {
+      if (last.meta.currentPage >= last.meta.lastPage) return undefined
+
+      return last.meta.currentPage + 1
+    },
     placeholderData: keepPreviousData,
   })
 
@@ -95,6 +123,27 @@ export const sportsQueryOptions = (params: ListSearch) =>
         paginatedResponse(AdministratorSportShowResponse),
         { signal },
       ),
+    placeholderData: keepPreviousData,
+  })
+
+/** As modalidades, página a página, para o combobox com busca no servidor. */
+export const sportsInfiniteQueryOptions = (params: ListSearch) =>
+  infiniteQueryOptions({
+    queryKey: queryKeys.administrator.sports.infinite(params),
+    queryFn: ({ signal, pageParam }) =>
+      request(
+        '/administrator/sports'.concat(
+          queryString({ ...params, page: pageParam }),
+        ),
+        paginatedResponse(AdministratorSportShowResponse),
+        { signal },
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (last) => {
+      if (last.meta.currentPage >= last.meta.lastPage) return undefined
+
+      return last.meta.currentPage + 1
+    },
     placeholderData: keepPreviousData,
   })
 

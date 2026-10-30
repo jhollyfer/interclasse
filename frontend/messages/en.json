@@ -202,6 +202,7 @@
   "common_hide_password": "Hide the password",
   "common_select_placeholder": "Select",
   "common_no_options": "No options found.",
+  "common_load_more": "Load more",
   "common_image_formats": "JPG, PNG, WEBP or GIF.",
   "common_file_type_not_accepted": "{name} is not a file type accepted in this field.",
   "table_column_options": "{column} options",

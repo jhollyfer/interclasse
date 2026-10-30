@@ -1,11 +1,7 @@
 import { ScriptOnce } from '@tanstack/react-router'
 import * as React from 'react'
 
-import {
-  SYSTEM_THEME_SCRIPT,
-  applyTheme,
-  writeTheme,
-} from '#/lib/theme'
+import { SYSTEM_THEME_SCRIPT, applyTheme, writeTheme } from '#/lib/theme'
 import type { Theme } from '#/lib/theme'
 
 import { ThemeContext } from './theme-context'

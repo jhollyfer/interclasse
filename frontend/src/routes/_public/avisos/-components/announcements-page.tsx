@@ -18,9 +18,7 @@ export function AnnouncementsPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle level="h1">
-          {m.public_nav_announcements()}
-        </SectionTitle>
+        <SectionTitle level="h1">{m.public_nav_announcements()}</SectionTitle>
       </SectionHeader>
       <AnnouncementList announcements={data?.data ?? []} />
       <Pager meta={data?.meta} />

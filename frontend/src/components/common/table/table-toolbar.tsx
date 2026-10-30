@@ -4,7 +4,6 @@ import { useNavigate } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
 import { m } from '#/paraglide/messages'
 
@@ -26,20 +25,16 @@ export function TableToolbar({
   const { isPlaceholderData } = useTableContext('TableToolbar')
 
   return (
-    // Cada controle num grupo aninhado: a barra mistura busca, filtro e ações,
-    // e são peças independentes - o `ButtonGroup` cola os filhos diretos, que é
-    // o desenho de um controle segmentado, não o de uma barra.
-    <ButtonGroup
+    // `div` com `gap`, e não `ButtonGroup`: a barra mistura busca, filtro e
+    // ações, e são peças independentes - o grupo cola os filhos diretos, que é o
+    // desenho de um controle segmentado, não o de uma barra.
+    <div
       data-slot="table-toolbar"
-      className="shrink-0 flex-wrap items-center"
+      className="flex shrink-0 flex-wrap items-center gap-2"
     >
-      {React.Children.map(children, (control) => {
-        if (!control) return null
-
-        return <ButtonGroup>{control}</ButtonGroup>
-      })}
+      {children}
       {isPlaceholderData && <Spinner className="opacity-50" />}
-    </ButtonGroup>
+    </div>
   )
 }
 

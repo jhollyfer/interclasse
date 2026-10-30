@@ -4,7 +4,10 @@ import * as React from 'react'
 import { Button } from '#/components/ui/button.tsx'
 import { cn } from '#/lib/cn'
 
-function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
+// casa: genérico no payload, para o `handle` tipado e os children em função
+function AlertDialog<TPayload = unknown>({
+  ...props
+}: AlertDialogPrimitive.Root.Props<TPayload>) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
 }
 
@@ -139,14 +142,20 @@ function AlertDialogDescription({
   )
 }
 
+// casa: a ação fecha o alerta sozinha (Close do Base UI), para o
+// `ConfirmDialog` ser uncontrolled
 function AlertDialogAction({
   className,
+  variant = 'default',
+  size = 'default',
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: AlertDialogPrimitive.Close.Props &
+  Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>) {
   return (
-    <Button
+    <AlertDialogPrimitive.Close
       data-slot="alert-dialog-action"
       className={cn(className)}
+      render={<Button variant={variant} size={size} />}
       {...props}
     />
   )

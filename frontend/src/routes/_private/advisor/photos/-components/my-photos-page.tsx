@@ -74,7 +74,7 @@ function DeleteAction({
     <ConfirmDialog
       destructive
       onConfirm={() => remove.mutate(photo.id)}
-      trigger={
+      render={
         <Button size="sm" variant="ghost">
           <TrashIcon />
           {m.advisor_photo_delete()}

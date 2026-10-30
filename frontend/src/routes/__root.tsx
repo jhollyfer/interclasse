@@ -73,7 +73,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
     links: [
       // A conexão com a API abre junto do HTML (`frontend.md` §9.5).
-      { rel: 'preconnect', href: env.VITE_API_URL, crossOrigin: 'use-credentials' },
+      {
+        rel: 'preconnect',
+        href: env.VITE_API_URL,
+        crossOrigin: 'use-credentials',
+      },
       {
         rel: 'icon',
         href: '/favicon.png',

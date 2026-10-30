@@ -1,3 +1,4 @@
+import { ShuffleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import * as React from 'react'
@@ -18,6 +19,7 @@ import {
   TableTitle,
   useTable,
 } from '#/components/common/table'
+import { Button } from '#/components/ui/button'
 import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
@@ -54,7 +56,14 @@ export function BracketsTable(): React.JSX.Element {
       <TableHeader>
         <TableTitle>{m.admin_common_brackets()}</TableTitle>
         <TableActions>
-          <DrawDialog />
+          <DrawDialog
+            render={
+              <Button>
+                <ShuffleIcon />
+                {m.admin_brackets_draw()}
+              </Button>
+            }
+          />
         </TableActions>
       </TableHeader>
 
@@ -65,7 +74,14 @@ export function BracketsTable(): React.JSX.Element {
             {m.admin_brackets_empty_description()}
           </EmptyStateDescription>
           <EmptyStateActions>
-            <DrawDialog />
+            <DrawDialog
+              render={
+                <Button>
+                  <ShuffleIcon />
+                  {m.admin_brackets_draw()}
+                </Button>
+              }
+            />
           </EmptyStateActions>
         </TableEmpty>
 

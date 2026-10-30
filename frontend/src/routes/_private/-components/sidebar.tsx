@@ -189,7 +189,7 @@ export function Sidebar(): React.JSX.Element {
               navegação para fora do `_private` desmonta o drawer no mobile.
             */}
             <SignOutConfirm
-              trigger={
+              render={
                 <SidebarMenuButton tooltip={m.panel_sign_out()}>
                   <SignOutIcon />
                   <span>{m.panel_sign_out()}</span>

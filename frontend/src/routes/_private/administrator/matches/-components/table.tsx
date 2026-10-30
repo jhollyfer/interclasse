@@ -42,6 +42,7 @@ import { Badge } from '#/components/ui/badge'
 import { buttonVariants } from '#/components/ui/button'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { createConfirmHandle, createDialogHandle } from '#/lib/dialog-handle'
 import {
   CATEGORY_SHORT_LABELS,
   CATEGORY_LABELS,
@@ -146,10 +147,10 @@ export function MatchesTable(): React.JSX.Element {
   const { data, isPlaceholderData, isError, refetch } = useQuery(
     matchesQueryOptions(search),
   )
-  const [scoring, setScoring] = React.useState<MatchRef | null>(null)
-  const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
-  const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
-  const [carding, setCarding] = React.useState<MatchRef | null>(null)
+  const [scoreHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [scheduleHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [unscoreHandle] = React.useState(() => createConfirmHandle<MatchRef>())
+  const [cardsHandle] = React.useState(() => createDialogHandle<MatchRef>())
 
   const columns = matchColumns()
 
@@ -162,20 +163,22 @@ export function MatchesTable(): React.JSX.Element {
     // de ações e o segundo ficava fora da tela.
     actions: (match) => (
       <RowActions>
-        <DropdownMenuItem onClick={() => setScheduling(toRef(match))}>
+        <DropdownMenuItem
+          onClick={() => scheduleHandle.openWithPayload(toRef(match))}
+        >
           <CalendarBlankIcon />
           {m.admin_common_schedule()}
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={!match.homeTeamId || !match.awayTeamId}
-          onClick={() => setScoring(toRef(match))}
+          onClick={() => scoreHandle.openWithPayload(toRef(match))}
         >
           <NumberSquareOneIcon />
           {m.admin_matches_score()}
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={!match.homeTeamId || !match.awayTeamId}
-          onClick={() => setCarding(toRef(match))}
+          onClick={() => cardsHandle.openWithPayload(toRef(match))}
         >
           <CardsIcon />
           {m.admin_common_cards()}
@@ -183,7 +186,7 @@ export function MatchesTable(): React.JSX.Element {
         {match.status === 'FINISHED' && (
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => setUnscoring(toRef(match))}
+            onClick={() => unscoreHandle.openWithPayload(toRef(match))}
           >
             <ArrowCounterClockwiseIcon />
             {m.admin_common_undo_score()}
@@ -270,38 +273,10 @@ export function MatchesTable(): React.JSX.Element {
 
       <TablePagination meta={data?.meta} />
 
-      {scoring && (
-        <MatchScoreDialog
-          key={scoring.id}
-          match={scoring}
-          open
-          onOpenChange={() => setScoring(null)}
-        />
-      )}
-      {scheduling && (
-        <MatchScheduleDialog
-          key={scheduling.id}
-          match={scheduling}
-          open
-          onOpenChange={() => setScheduling(null)}
-        />
-      )}
-      {carding && (
-        <MatchCardsDialog
-          key={carding.id}
-          match={carding}
-          open
-          onOpenChange={() => setCarding(null)}
-        />
-      )}
-      {unscoring && (
-        <MatchUnscoreDialog
-          key={unscoring.id}
-          match={unscoring}
-          open
-          onOpenChange={() => setUnscoring(null)}
-        />
-      )}
+      <MatchScoreDialog handle={scoreHandle} />
+      <MatchScheduleDialog handle={scheduleHandle} />
+      <MatchCardsDialog handle={cardsHandle} />
+      <MatchUnscoreDialog handle={unscoreHandle} />
     </Table>
   )
 }

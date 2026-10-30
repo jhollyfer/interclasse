@@ -4,7 +4,7 @@ import {
   ArrowCounterClockwiseIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
-import * as React from 'react'
+import type * as React from 'react'
 
 import {
   ConfirmDialog,
@@ -14,13 +14,62 @@ import {
   ConfirmDialogHeader,
 } from '#/components/common/confirm-dialog'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
+import type { ConfirmHandle } from '#/lib/dialog-handle'
 import { m } from '#/paraglide/messages'
 
-import { useCloseRowActions } from './row-actions'
-
 type RowActionsItemProps = Readonly<{
+  /** O handle do alerta que este item abre (`createConfirmHandle`). */
+  handle: ConfirmHandle
+}>
+
+type MenuConfirmProps = Readonly<
+  Merge<
+    RowActionsItemProps,
+    {
+      slot: string
+      icon: React.ReactNode
+      label: string
+      destructive?: boolean
+    }
+  >
+>
+
+/**
+ * Item de menu que pede confirmação.
+ *
+ * O item só abre o alerta: `handle.open(null)` no clique, e o menu fecha como
+ * em qualquer item. O alerta é `RowActionsConfirm`, irmão do menu.
+ */
+function MenuConfirm({
+  slot,
+  icon,
+  label,
+  destructive = false,
+  handle,
+}: MenuConfirmProps): React.JSX.Element {
+  let variant: 'destructive' | 'default' = 'default'
+  if (destructive) variant = 'destructive'
+
+  return (
+    <DropdownMenuItem
+      data-slot={slot}
+      variant={variant}
+      onClick={() => handle.open(null)}
+    >
+      {icon}
+      {label}
+    </DropdownMenuItem>
+  )
+}
+
+type RowActionsConfirmProps = Readonly<{
+  handle: ConfirmHandle
   /** A mutation da linha, já com o id: `() => archive.mutate(row.id)`. */
   onConfirm: () => void
+  /** O texto do botão que confirma. */
+  confirmLabel: string
+  /** Ação sem volta pinta o botão de confirmar de vermelho. */
+  destructive?: boolean
   /**
    * `ConfirmDialogTitle` e `ConfirmDialogDescription`.
    *
@@ -31,72 +80,26 @@ type RowActionsItemProps = Readonly<{
   children: React.ReactNode
 }>
 
-type MenuConfirmProps = Readonly<
-  Merge<
-    Omit<
-      RowActionsItemProps,
-      'slot' | 'icon' | 'label' | 'confirmLabel' | 'destructive'
-    >,
-    {
-      slot: string
-      icon: React.ReactNode
-      label: string
-      confirmLabel: string
-      destructive?: boolean
-    }
-  >
->
-
-/**
- * Item de menu que pede confirmação.
- *
- * O item é um item comum, e não o gatilho do alerta: como gatilho ele herdava
- * `tabindex=0` e virava o foco inicial do menu - abria aceso, e no "Excluir".
- * O clique abre o alerta controlado e fecha o menu; o alerta continua vivo
- * porque o menu fica montado (`keepMounted` em `RowActions`).
- */
-function MenuConfirm({
-  slot,
-  icon,
-  label,
+/** O alerta de um item de menu, para o `dialogs` do `RowActions`. */
+export function RowActionsConfirm({
+  handle,
+  onConfirm,
   confirmLabel,
   destructive = false,
-  onConfirm,
   children,
-}: MenuConfirmProps): React.JSX.Element {
-  const closeMenu = useCloseRowActions()
-  const [open, setOpen] = React.useState(false)
-
-  let variant: 'destructive' | 'default' = 'default'
-  if (destructive) variant = 'destructive'
-
+}: RowActionsConfirmProps): React.JSX.Element {
   return (
-    <React.Fragment>
-      <DropdownMenuItem
-        data-slot={slot}
-        variant={variant}
-        onClick={() => {
-          setOpen(true)
-          closeMenu()
-        }}
-      >
-        {icon}
-        {label}
-      </DropdownMenuItem>
-
-      <ConfirmDialog
-        open={open}
-        onOpenChange={setOpen}
-        destructive={destructive}
-        onConfirm={onConfirm}
-      >
-        <ConfirmDialogHeader>{children}</ConfirmDialogHeader>
-        <ConfirmDialogFooter>
-          <ConfirmDialogCancel />
-          <ConfirmDialogConfirm>{confirmLabel}</ConfirmDialogConfirm>
-        </ConfirmDialogFooter>
-      </ConfirmDialog>
-    </React.Fragment>
+    <ConfirmDialog
+      handle={handle}
+      destructive={destructive}
+      onConfirm={onConfirm}
+    >
+      <ConfirmDialogHeader>{children}</ConfirmDialogHeader>
+      <ConfirmDialogFooter>
+        <ConfirmDialogCancel />
+        <ConfirmDialogConfirm>{confirmLabel}</ConfirmDialogConfirm>
+      </ConfirmDialogFooter>
+    </ConfirmDialog>
   )
 }
 
@@ -109,7 +112,6 @@ export function RowActionsArchive(
       slot="row-actions-archive"
       icon={<ArchiveIcon />}
       label={m.common_archive()}
-      confirmLabel={m.common_archive()}
       {...props}
     />
   )
@@ -124,7 +126,6 @@ export function RowActionsUnarchive(
       slot="row-actions-unarchive"
       icon={<ArrowCounterClockwiseIcon />}
       label={m.common_restore()}
-      confirmLabel={m.common_restore()}
       {...props}
     />
   )
@@ -132,7 +133,7 @@ export function RowActionsUnarchive(
 
 type RowActionsDeleteProps = Readonly<
   Merge<
-    Omit<RowActionsItemProps, 'label'>,
+    RowActionsItemProps,
     {
       /** O texto do item. "Excluir" por padrão. */
       label?: string
@@ -155,7 +156,6 @@ export function RowActionsDelete({
       slot="row-actions-delete"
       icon={<TrashIcon />}
       label={label}
-      confirmLabel={m.common_remove()}
       destructive
       {...props}
     />

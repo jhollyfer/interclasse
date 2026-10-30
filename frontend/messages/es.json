@@ -188,6 +188,7 @@
   "common_hide_password": "Ocultar la contraseña",
   "common_select_placeholder": "Selecciona",
   "common_no_options": "No se encontró ninguna opción.",
+  "common_load_more": "Cargar más",
   "common_image_formats": "JPG, PNG, WEBP o GIF.",
   "common_file_type_not_accepted": "{name} no es un tipo de archivo aceptado en este campo.",
   "table_column_options": "Opciones de {column}",

@@ -340,7 +340,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
       <ConfirmDialog
         destructive
         onConfirm={() => remove.mutate(student.id)}
-        trigger={
+        render={
           <Button
             size="icon-sm"
             variant="ghost"

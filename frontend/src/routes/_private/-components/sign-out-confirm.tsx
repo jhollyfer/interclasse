@@ -12,21 +12,21 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { useSignOut } from '#/hooks/use-sign-out'
+import type { ConfirmHandle } from '#/lib/dialog-handle'
 import { m } from '#/paraglide/messages'
 
 type SignOutConfirmProps = Readonly<{
   /**
-   * O "Sair" visível - o botão do pé da barra lateral ou o item do menu da
-   * conta. Vai na posição de `render` da primitiva, e é por isso que o item de
-   * menu precisa de `closeOnClick={false}`: sem ele o menu fecha e leva o
-   * gatilho embora antes do alerta abrir.
+   * O "Sair" visível - o botão do pé da barra lateral. Vai na posição de
+   * `render` da primitiva.
    *
    * Segue prop e não parte, pelo mesmo motivo do `ConfirmDialog`: é o elemento
-   * de **fora** do alerta.
+   * de **fora** do alerta. O item do menu da conta não é gatilho: abre o alerta
+   * pelo `handle`, e o alerta fica irmão do menu.
    */
-  trigger: React.ReactElement
-  /** `false` para o item do menu da conta, que não é `<button>`. */
-  nativeButton?: boolean
+  render?: React.ReactElement
+  /** O alerta aberto de fora, sem gatilho (`createConfirmHandle`). */
+  handle?: ConfirmHandle
   children: React.ReactNode
 }>
 
@@ -47,8 +47,8 @@ type SignOutConfirmProps = Readonly<{
  * isso vire mais uma prop opcional aqui.
  */
 export function SignOutConfirm({
-  trigger,
-  nativeButton,
+  render,
+  handle,
   children,
 }: SignOutConfirmProps): React.JSX.Element {
   // `mutate` e não `mutateAsync`: ninguém espera o resultado aqui, e a promise
@@ -58,8 +58,8 @@ export function SignOutConfirm({
 
   return (
     <ConfirmDialog
-      trigger={trigger}
-      nativeButton={nativeButton}
+      render={render}
+      handle={handle}
       onConfirm={() => signOut.mutate()}
     >
       {children}

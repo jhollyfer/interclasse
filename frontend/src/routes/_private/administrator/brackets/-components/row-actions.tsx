@@ -1,14 +1,18 @@
 import type { AdministratorBracketPaginateResponse } from '@interclasse/shared'
 import { TreeStructureIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { toast } from 'sonner'
 
 import {
   ConfirmDialogDescription,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { RowActions, RowActionsDelete } from '#/components/common/row-actions'
+import {
+  RowActions,
+  RowActionsConfirm,
+  RowActionsDelete,
+} from '#/components/common/row-actions'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -16,6 +20,7 @@ import {
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useBracketDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { createConfirmHandle } from '#/lib/dialog-handle'
 import { notifyError } from '#/lib/form-errors'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
@@ -30,6 +35,7 @@ export function BracketRowActions({
   bracket: AdministratorBracketPaginateResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
+  const [deleteHandle] = React.useState(createConfirmHandle)
 
   const remove = useBracketDeleteMutation({
     onError: (error) => notifyError(error, { id: 'bracket-delete' }),
@@ -40,7 +46,26 @@ export function BracketRowActions({
   })
 
   return (
-    <RowActions>
+    <RowActions
+      dialogs={
+        <RowActionsConfirm
+          handle={deleteHandle}
+          destructive
+          confirmLabel={m.common_remove()}
+          onConfirm={() => remove.mutate(bracket.id)}
+        >
+          <ConfirmDialogTitle>
+            {m.admin_brackets_row_delete_title({
+              sport: bracket.sport.name,
+              category: CATEGORY_LABELS[bracket.category] ?? bracket.category,
+            })}
+          </ConfirmDialogTitle>
+          <ConfirmDialogDescription>
+            {m.admin_brackets_row_delete_description()}
+          </ConfirmDialogDescription>
+        </RowActionsConfirm>
+      }
+    >
       <DropdownMenuItem
         render={
           <Link to="/administrator/brackets/$id" params={{ id: bracket.id }}>
@@ -50,17 +75,7 @@ export function BracketRowActions({
         }
       />
       <DropdownMenuSeparator />
-      <RowActionsDelete onConfirm={() => remove.mutate(bracket.id)}>
-        <ConfirmDialogTitle>
-          {m.admin_brackets_row_delete_title({
-            sport: bracket.sport.name,
-            category: CATEGORY_LABELS[bracket.category] ?? bracket.category,
-          })}
-        </ConfirmDialogTitle>
-        <ConfirmDialogDescription>
-          {m.admin_brackets_row_delete_description()}
-        </ConfirmDialogDescription>
-      </RowActionsDelete>
+      <RowActionsDelete handle={deleteHandle} />
     </RowActions>
   )
 }

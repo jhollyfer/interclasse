@@ -4,7 +4,6 @@ import { Link } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -131,20 +130,16 @@ export function NotFoundPageActions({
   if (!children) return null
 
   return (
-    // Cada ação num grupo aninhado, como em `PageHeaderActions`: o
-    // `ButtonGroup` cola os filhos diretos, e estas são saídas independentes -
-    // "voltar ao início" e "tentar de novo" não formam um controle segmentado.
-    <ButtonGroup
+    // `div` com `gap`, e não `ButtonGroup`: o grupo cola os filhos diretos, e
+    // estas são saídas independentes - "voltar ao início" e "tentar de novo" não
+    // formam um controle segmentado.
+    <div
       data-slot="not-found-page-actions"
-      className={cn('mt-8 flex-wrap items-center', className)}
+      className={cn('mt-8 flex flex-wrap items-center gap-2', className)}
       {...props}
     >
-      {React.Children.map(children, (action) => {
-        if (!action) return null
-
-        return <ButtonGroup>{action}</ButtonGroup>
-      })}
-    </ButtonGroup>
+      {children}
+    </div>
   )
 }
 

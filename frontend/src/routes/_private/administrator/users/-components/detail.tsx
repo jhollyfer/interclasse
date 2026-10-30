@@ -136,7 +136,7 @@ export function UserDetail(): React.JSX.Element {
             {!user.deletedAt && !isSelf && (
               <ConfirmDialog
                 onConfirm={() => archive.mutate(id)}
-                trigger={
+                render={
                   <Button variant="outline">
                     <ArchiveIcon />
                     {m.admin_common_archive()}
@@ -163,7 +163,7 @@ export function UserDetail(): React.JSX.Element {
             {user.deletedAt && (
               <ConfirmDialog
                 onConfirm={() => unarchive.mutate(id)}
-                trigger={
+                render={
                   <Button variant="outline">
                     <ArrowCounterClockwiseIcon />
                     {m.admin_common_restore()}
@@ -193,7 +193,7 @@ export function UserDetail(): React.JSX.Element {
               <ConfirmDialog
                 destructive
                 onConfirm={() => remove.mutate(id)}
-                trigger={
+                render={
                   <Button variant="destructive">
                     <TrashIcon />
                     {m.admin_common_remove()}

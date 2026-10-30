@@ -28,6 +28,7 @@ import {
   enrollmentRemovalsQueryOptions,
   matchesQueryOptions,
 } from '#/integrations/tanstack-query/queries/administrator'
+import { createDialogHandle } from '#/lib/dialog-handle'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
@@ -58,9 +59,9 @@ export function DashboardPage(): React.JSX.Element {
   const { data: removals } = useQuery(
     enrollmentRemovalsQueryOptions(DASHBOARD_REMOVALS),
   )
-  const [scoring, setScoring] = React.useState<MatchRef | null>(null)
-  const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
-  const [carding, setCarding] = React.useState<MatchRef | null>(null)
+  const [scoreHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [scheduleHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [cardsHandle] = React.useState(() => createDialogHandle<MatchRef>())
 
   const pendingRemovals = removals?.meta.total ?? 0
   const toPlay = matches?.data ?? []
@@ -125,14 +126,17 @@ export function DashboardPage(): React.JSX.Element {
                       })}
                     </span>
                   </div>
-                  <Button size="sm" onClick={() => setScoring(toRef(match))}>
+                  <Button
+                    size="sm"
+                    onClick={() => scoreHandle.openWithPayload(toRef(match))}
+                  >
                     <TrophyIcon />
                     {m.admin_dashboard_result()}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setScheduling(toRef(match))}
+                    onClick={() => scheduleHandle.openWithPayload(toRef(match))}
                   >
                     <CalendarBlankIcon />
                     {m.admin_common_schedule()}
@@ -140,7 +144,7 @@ export function DashboardPage(): React.JSX.Element {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setCarding(toRef(match))}
+                    onClick={() => cardsHandle.openWithPayload(toRef(match))}
                   >
                     <CardsIcon />
                     {m.admin_common_cards()}
@@ -192,30 +196,9 @@ export function DashboardPage(): React.JSX.Element {
         </Card>
       </div>
 
-      {scoring && (
-        <MatchScoreDialog
-          key={scoring.id}
-          match={scoring}
-          open
-          onOpenChange={() => setScoring(null)}
-        />
-      )}
-      {scheduling && (
-        <MatchScheduleDialog
-          key={scheduling.id}
-          match={scheduling}
-          open
-          onOpenChange={() => setScheduling(null)}
-        />
-      )}
-      {carding && (
-        <MatchCardsDialog
-          key={carding.id}
-          match={carding}
-          open
-          onOpenChange={() => setCarding(null)}
-        />
-      )}
+      <MatchScoreDialog handle={scoreHandle} />
+      <MatchScheduleDialog handle={scheduleHandle} />
+      <MatchCardsDialog handle={cardsHandle} />
     </div>
   )
 }
