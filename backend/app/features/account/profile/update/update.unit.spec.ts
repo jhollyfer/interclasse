@@ -16,7 +16,7 @@ import {
 } from '#tests/identity-unit-fixtures'
 import { pendingFile, rightOf } from '#tests/storages-unit-fixtures'
 
-const ACTOR = { id: USER_ID, role: 'ADVISOR' } as const
+const ACTOR = { id: USER_ID, role: 'ADVISOR', avatarId: null } as const
 
 async function setup() {
   const doubles = identityDoubles()

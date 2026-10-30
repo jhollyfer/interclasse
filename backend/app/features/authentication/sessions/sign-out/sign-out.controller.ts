@@ -25,12 +25,12 @@ export default class AuthenticationSessionSignOutController {
   ) {}
 
   async handle(context: HttpContext) {
-    const actor = context.auth.getUserOrFail()
+    const { actor } = context
     const refreshToken = context.request.cookie(COOKIE_TOKEN.REFRESH)
 
     const result = await this.useCase.execute({
       actor,
-      accessTokenId: actor.currentAccessToken?.identifier.toString(),
+      accessTokenId: context.auth.user?.currentAccessToken?.identifier.toString(),
       refreshToken,
     })
 

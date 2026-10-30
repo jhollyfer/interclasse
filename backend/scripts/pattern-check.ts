@@ -427,6 +427,8 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
     const pair = `app/validators/${logical}`
     const backSource = sources.get(pair)
     const sharedSource = withoutComments(await readFile(file, 'utf8'))
+    // Schema que não é de request (o `ActorSchema`) não tem par VineJS.
+    if (!/export\s+const\s+\w+Validator\b/.test(sharedSource)) continue
     if (backSource === undefined) {
       findings.push({
         file: `../shared/src/validators/${logical}`,

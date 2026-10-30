@@ -1,3 +1,4 @@
 {
-  "internal": "Erro interno do servidor"
+  "internal": "Erro interno do servidor",
+  "unauthorized": "Sessão inválida"
 }

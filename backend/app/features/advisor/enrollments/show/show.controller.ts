@@ -20,7 +20,7 @@ export default class AdvisorEnrollmentShowController {
     const payload = await context.request.validateUsing(AdvisorEnrollmentShowValidator, {
       data: context.request.qs(),
     })
-    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
+    const result = await this.useCase.execute({ ...payload, actor: context.actor })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

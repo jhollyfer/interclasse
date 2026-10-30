@@ -13,7 +13,7 @@ import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.mem
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/unit-fixtures'
 
-const ADVISOR = { id: randomUUID(), role: USER_ROLE.ADVISOR }
+const ADVISOR = { id: randomUUID(), role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
   const brackets = new BracketMemoryRepository()
@@ -77,7 +77,7 @@ test.group('advisor/cards > paginate (unit)', () => {
 
     const other = await useCase.execute({
       classroomId,
-      actor: { id: randomUUID(), role: USER_ROLE.ADVISOR },
+      actor: { id: randomUUID(), role: USER_ROLE.ADVISOR, avatarId: null },
     })
     const missing = await useCase.execute({ classroomId: randomUUID(), actor: ADVISOR })
 

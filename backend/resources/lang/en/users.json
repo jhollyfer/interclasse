@@ -6,5 +6,8 @@
   "not_archived_field": "Archive the user before deleting",
   "already_archived": "User is already archived",
   "current_password_invalid": "Invalid current password",
-  "password_same_as_current": "The new password must be different from the current one"
+  "password_same_as_current": "The new password must be different from the current one",
+  "self_access_forbidden": "You cannot change your own role or status",
+  "self_archive_forbidden": "You cannot archive your own account",
+  "self_delete_forbidden": "You cannot delete your own account"
 }

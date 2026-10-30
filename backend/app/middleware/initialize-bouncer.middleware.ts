@@ -1,6 +1,7 @@
 import { Bouncer } from '@adonisjs/bouncer'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import type { Actor } from '@interclasse/shared'
 
 import { policies } from '#generated/policies'
 import * as abilities from '#abilities/main'
@@ -12,15 +13,14 @@ import * as abilities from '#abilities/main'
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     /**
-     * Uma instância por requisição, com o usuário que o guard autenticou. É o
-     * composition root do Bouncer - o único `new Bouncer` do projeto
-     * (_standards/backend.md §2.1).
+     * Uma instância por requisição, inicializada com o `actor` que o
+     * `auth.middleware.ts` valida - lido na hora da checagem, e não aqui, porque
+     * este middleware roda antes do auth. É o composition root do Bouncer - o
+     * único `new Bouncer` do projeto (_standards/backend.md §2.1).
      */
-    ctx.bouncer = new Bouncer(
-      () => ctx.auth.user || null,
-      abilities,
-      policies,
-    ).setContainerResolver(ctx.containerResolver)
+    ctx.bouncer = new Bouncer(() => ctx.actor, abilities, policies).setContainerResolver(
+      ctx.containerResolver,
+    )
 
     return next()
   }
@@ -28,10 +28,6 @@ export default class InitializeBouncerMiddleware {
 
 declare module '@adonisjs/core/http' {
   export interface HttpContext {
-    bouncer: Bouncer<
-      Exclude<HttpContext['auth']['user'], undefined>,
-      typeof abilities,
-      typeof policies
-    >
+    bouncer: Bouncer<Actor, typeof abilities, typeof policies>
   }
 }

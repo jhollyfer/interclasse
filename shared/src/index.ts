@@ -20,7 +20,7 @@ export * from './enums/trashed-mode.js'
 export * from './enums/upload-status.js'
 export * from './enums/user-role.js'
 
-export * from './records/actor.js'
+export * from './validators/authentication/actor.validator.js'
 export * from './records/pagination.js'
 export * from './records/utility.js'
 

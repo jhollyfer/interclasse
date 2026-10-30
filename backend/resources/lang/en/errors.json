@@ -1,3 +1,4 @@
 {
-  "internal": "Internal server error"
+  "internal": "Internal server error",
+  "unauthorized": "Invalid session"
 }
