@@ -6,7 +6,15 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ## [Não lançado]
 
-Nada além do que está em 0.1.0.
+### Segurança
+
+- A API passa a ler o IP do cliente atrás do proxy (`TRUSTED_PROXIES`), então o limite de tentativas de login conta cada pessoa e não o servidor todo.
+- Toda escrita confere a origem (`CORS_ORIGINS`), qualquer que seja o tipo de conteúdo; `CORS_ORIGIN` foi renomeada.
+- O cookie de sessão fica sempre `SameSite=Lax`.
+- Excesso de tentativas responde 429 com código estável; erro interno nunca mais devolve a mensagem crua do banco.
+- Upload prende o tamanho de cada parte na URL assinada e confere o conteúdo do arquivo antes de confirmar.
+- Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
+- `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` viram `SEED_ADMINISTRATOR_EMAIL` e `SEED_ADMINISTRATOR_PASSWORD`; `SESSION_DRIVER` deixa de existir.
 
 ## [0.1.0] - 2026-10-29
 
