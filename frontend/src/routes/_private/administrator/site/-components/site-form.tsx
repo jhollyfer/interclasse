@@ -34,6 +34,7 @@ import {
 import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { blankToNull, nanToNull } from '#/lib/form-values'
+import { m } from '#/paraglide/messages'
 
 const SITE_FIELDS = [
   'about',
@@ -80,7 +81,7 @@ export function SiteForm(): React.JSX.Element {
     fields: SITE_FIELDS,
     mutation: useSiteUpdate,
     invalidate: [queryKeys.administrator.site, ...DEPENDENTS.site],
-    success: 'Site atualizado.',
+    success: m.admin_site_updated(),
     retry: 'site-update',
     payload: (values) => values,
   })
@@ -88,10 +89,9 @@ export function SiteForm(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Site</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_site_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          O que aparece em &quot;Sobre os jogos&quot; e no rodapé do site, e o
-          regulamento para baixar. Campo vazio não aparece no site.
+          {m.admin_site_description()}
         </PageHeaderDescription>
       </PageHeader>
 
@@ -100,7 +100,7 @@ export function SiteForm(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Sobre os jogos</CardTitle>
+            <CardTitle>{m.admin_site_about_card()}</CardTitle>
           </CardHeader>
           <CardContent>
             <FieldGroup>
@@ -108,7 +108,7 @@ export function SiteForm(): React.JSX.Element {
                 control={form.control}
                 name="about"
                 id="site-about"
-                label="O que são os jogos"
+                label={m.admin_site_field_about()}
               >
                 {({ field, control }) => (
                   <Textarea
@@ -127,7 +127,7 @@ export function SiteForm(): React.JSX.Element {
                 control={form.control}
                 name="organizer"
                 id="site-organizer"
-                label="Quem criou e organiza"
+                label={m.admin_site_field_organizer()}
               >
                 {({ field, control }) => (
                   <Input
@@ -146,7 +146,7 @@ export function SiteForm(): React.JSX.Element {
                   control={form.control}
                   name="edition"
                   id="site-edition"
-                  label="Edição atual"
+                  label={m.admin_site_field_edition()}
                 >
                   {({ field, control }) => (
                     <Input
@@ -166,7 +166,7 @@ export function SiteForm(): React.JSX.Element {
                   control={form.control}
                   name="firstEditionYear"
                   id="site-first-edition"
-                  label="Ano da primeira edição"
+                  label={m.admin_site_field_first_edition()}
                 >
                   {({ field, control }) => (
                     <Input
@@ -190,7 +190,7 @@ export function SiteForm(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Instagram</CardTitle>
+            <CardTitle>{m.admin_site_instagram_card()}</CardTitle>
           </CardHeader>
           <CardContent>
             <FieldGroup className="grid gap-4 sm:grid-cols-2">
@@ -198,7 +198,7 @@ export function SiteForm(): React.JSX.Element {
                 control={form.control}
                 name="schoolInstagram"
                 id="site-school-instagram"
-                label="Da escola (sem @)"
+                label={m.admin_site_field_school_instagram()}
               >
                 {({ field, control }) => (
                   <Input
@@ -217,7 +217,7 @@ export function SiteForm(): React.JSX.Element {
                 control={form.control}
                 name="developerInstagram"
                 id="site-developer-instagram"
-                label="De quem desenvolveu o site (sem @)"
+                label={m.admin_site_field_developer_instagram()}
               >
                 {({ field, control }) => (
                   <Input
@@ -237,14 +237,14 @@ export function SiteForm(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Regulamento</CardTitle>
+            <CardTitle>{m.admin_site_regulation_card()}</CardTitle>
           </CardHeader>
           <CardContent>
             <AppField
               control={form.control}
               name="regulationId"
               id="site-regulation"
-              label="Arquivo em PDF"
+              label={m.admin_site_field_regulation()}
             >
               {({ field, control }) => (
                 <ImageField
@@ -266,10 +266,14 @@ export function SiteForm(): React.JSX.Element {
                       </a>
                     )}
                     <ImageFieldActions>
-                      <ImageFieldUpload>Enviar PDF</ImageFieldUpload>
+                      <ImageFieldUpload>
+                        {m.admin_site_upload_pdf()}
+                      </ImageFieldUpload>
                       <ImageFieldRemove />
                     </ImageFieldActions>
-                    <ImageFieldDescription>Somente PDF.</ImageFieldDescription>
+                    <ImageFieldDescription>
+                      {m.admin_site_pdf_only()}
+                    </ImageFieldDescription>
                   </ImageFieldContent>
                 </ImageField>
               )}
@@ -279,7 +283,7 @@ export function SiteForm(): React.JSX.Element {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={mutation.isPending}>
-            Salvar
+            {m.admin_common_save()}
           </Button>
         </div>
       </form>

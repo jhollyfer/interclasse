@@ -297,5 +297,157 @@
   "admin_photos_reject": "Rechazar",
   "admin_photos_delete_label": "Borrar foto",
   "admin_photos_delete_title": "¿Borrar esta foto?",
-  "admin_photos_delete_description": "Desaparece del sitio y de la lista de quien la envió. No se puede deshacer."
+  "admin_photos_delete_description": "Desaparece del sitio y de la lista de quien la envió. No se puede deshacer.",
+  "admin_common_archive": "Archivar",
+  "admin_common_restore": "Restaurar",
+  "admin_common_remove": "Eliminar",
+  "admin_common_classrooms": "Clases",
+  "admin_common_students": "Alumnos",
+  "admin_common_athletes": "Atletas",
+  "admin_common_sports": "Modalidades",
+  "admin_common_save": "Guardar",
+  "admin_common_role": "Rol",
+  "admin_common_email": "Correo electrónico",
+  "admin_common_created_on": "Creado el",
+  "admin_reports_title": "Informes",
+  "admin_reports_description": "Quién participó en los juegos. Atleta es el alumno inscrito en al menos una modalidad.",
+  "admin_reports_download": "Descargar hoja de cálculo (CSV)",
+  "admin_reports_registrations": "Inscripciones",
+  "admin_reports_matches_played": "Partidos disputados",
+  "admin_reports_matches_scheduled": "Partidos programados",
+  "admin_reports_by_category": "Por categoría",
+  "admin_reports_by_sport": "Por modalidad",
+  "admin_reports_by_classroom": "Por clase",
+  "admin_reports_classroom": "Clase",
+  "admin_site_title": "Sitio",
+  "admin_site_description": "Lo que aparece en \"Sobre los juegos\" y en el pie del sitio, y el reglamento para descargar. Un campo vacío no aparece en el sitio.",
+  "admin_site_updated": "Sitio actualizado.",
+  "admin_site_about_card": "Sobre los juegos",
+  "admin_site_field_about": "Qué son los juegos",
+  "admin_site_field_organizer": "Quién los creó y organiza",
+  "admin_site_field_edition": "Edición actual",
+  "admin_site_field_first_edition": "Año de la primera edición",
+  "admin_site_instagram_card": "Instagram",
+  "admin_site_field_school_instagram": "De la escuela (sin @)",
+  "admin_site_field_developer_instagram": "De quien desarrolló el sitio (sin @)",
+  "admin_site_regulation_card": "Reglamento",
+  "admin_site_field_regulation": "Archivo en PDF",
+  "admin_site_upload_pdf": "Subir PDF",
+  "admin_site_pdf_only": "Solo PDF.",
+  "admin_users_title": "Usuarios",
+  "admin_users_user": "Usuario",
+  "admin_users_noun_one": "usuario",
+  "admin_users_noun_other": "usuarios",
+  "admin_users_create": "Agregar usuario",
+  "admin_users_search": "Buscar usuarios…",
+  "admin_users_all_roles": "Todos los roles",
+  "admin_users_all_statuses": "Todas las situaciones",
+  "admin_users_empty_title": "Aún no hay usuarios",
+  "admin_users_empty_description": "Esta es la única forma de crear una cuenta: no hay registro público, y el primer administrador viene del seeder.",
+  "admin_users_bulk_archive_title": "Archivar usuarios",
+  "admin_users_bulk_archive_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} cuentas dejan de entrar al panel y salen del listado. Pueden restaurarse después.",
+        "countExact=*, countPlural=one": "{count} cuenta deja de entrar al panel y sale del listado. Puede restaurarse después.",
+        "countExact=*, countPlural=*": "{count} cuentas dejan de entrar al panel y salen del listado. Pueden restaurarse después."
+      }
+    }
+  ],
+  "admin_bulk_archive_done": [
+    {
+      "declarations": [
+        "input done",
+        "local doneExact = done",
+        "local donePlural = done: plural"
+      ],
+      "selectors": [
+        "doneExact",
+        "donePlural"
+      ],
+      "match": {
+        "doneExact=0, donePlural=*": "{done} archivados.",
+        "doneExact=*, donePlural=one": "{done} archivado.",
+        "doneExact=*, donePlural=*": "{done} archivados."
+      }
+    }
+  ],
+  "admin_bulk_archive_none": [
+    {
+      "declarations": [
+        "input total",
+        "local totalExact = total",
+        "local totalPlural = total: plural"
+      ],
+      "selectors": [
+        "totalExact",
+        "totalPlural"
+      ],
+      "match": {
+        "totalExact=0, totalPlural=*": "Ninguno archivado: {total} fallaron.",
+        "totalExact=*, totalPlural=one": "Ninguno archivado: {total} falló.",
+        "totalExact=*, totalPlural=*": "Ninguno archivado: {total} fallaron."
+      }
+    }
+  ],
+  "admin_bulk_archive_partial": [
+    {
+      "declarations": [
+        "input failed",
+        "local failedExact = failed",
+        "local failedPlural = failed: plural"
+      ],
+      "selectors": [
+        "failedExact",
+        "failedPlural"
+      ],
+      "match": {
+        "failedExact=0, failedPlural=*": "{done} de {total} archivados; {failed} fallaron.",
+        "failedExact=*, failedPlural=one": "{done} de {total} archivados; {failed} falló.",
+        "failedExact=*, failedPlural=*": "{done} de {total} archivados; {failed} fallaron."
+      }
+    }
+  ],
+  "admin_users_id_copied": "ID copiado",
+  "admin_users_copy_id": "Copiar ID",
+  "admin_users_archived_badge": "Archivado",
+  "admin_users_archived_ok": "Cuenta de {name} archivada.",
+  "admin_users_restored_ok": "Cuenta de {name} restaurada.",
+  "admin_users_removed_ok": "Cuenta de {name} eliminada.",
+  "admin_users_created_ok": "Cuenta de {name} creada.",
+  "admin_users_saved_ok": "Cuenta de {name} guardada.",
+  "admin_users_archive_title": "¿Archivar la cuenta de {name}?",
+  "admin_users_archive_description": "Deja de entrar al panel y sale del listado, y puede restaurarse después.",
+  "admin_users_restore_title": "¿Restaurar la cuenta de {name}?",
+  "admin_users_restore_description": "Vuelve al listado, en la situación en que estaba.",
+  "admin_users_remove_title": "¿Eliminar la cuenta de {name}?",
+  "admin_users_remove_description": "El registro se borra definitivamente. No se puede deshacer.",
+  "admin_users_view_details": "Ver detalles",
+  "admin_users_account_card": "La cuenta",
+  "admin_users_last_changed": "Última modificación",
+  "admin_users_archived_on": "Archivado el",
+  "admin_users_identity_legend": "Identidad y acceso",
+  "admin_users_create_note": "El correo de una cuenta archivada reactiva ese registro con los datos nuevos, en lugar de crear otro.",
+  "admin_users_edit_note": "Cambiar el correo o la contraseña cierra las sesiones abiertas de esta cuenta.",
+  "admin_users_field_new_password": "Nueva contraseña (déjala en blanco para mantener la actual)",
+  "admin_users_field_password": "Contraseña",
+  "admin_users_field_password_description": "De 8 a 32 caracteres, con minúscula, mayúscula, número y un carácter especial.",
+  "admin_users_field_password_confirmation": "Confirma la contraseña",
+  "admin_users_field_photo": "Foto (opcional)",
+  "admin_users_photo_alt": "Foto de la cuenta",
+  "admin_users_upload_photo": "Subir foto",
+  "admin_users_field_name_placeholder": "Nombre de quien usa la cuenta",
+  "admin_users_field_email_placeholder": "persona@ejemplo.org",
+  "admin_users_field_email_description": "Con él la persona entra al panel.",
+  "admin_users_field_role_description": "El administrador organiza los juegos. El consejero cuida de los alumnos de sus clases. El representante arma la lista de atletas de la clase.",
+  "admin_users_field_status_description": "Una cuenta inactiva no entra al panel y sigue en el listado."
 }

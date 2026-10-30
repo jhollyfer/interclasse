@@ -21,6 +21,7 @@ import {
 import { BASE_URL } from '#/integrations/tanstack-query/http'
 import { reportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 /**
  * O CSV sai direto da API: o navegador segue o link com o cookie de mesmo site,
@@ -38,29 +39,31 @@ export function ReportPage(): React.JSX.Element {
   const { totals } = report
 
   const highlights = [
-    { label: 'Turmas', value: totals.classrooms },
-    { label: 'Alunos', value: totals.students },
-    { label: 'Atletas', value: totals.athletes },
-    { label: 'Inscrições', value: totals.enrollments },
-    { label: 'Modalidades', value: totals.sports },
-    { label: 'Jogos disputados', value: totals.matchesPlayed },
-    { label: 'Jogos marcados', value: totals.matchesScheduled },
+    { label: m.admin_common_classrooms(), value: totals.classrooms },
+    { label: m.admin_common_students(), value: totals.students },
+    { label: m.admin_common_athletes(), value: totals.athletes },
+    { label: m.admin_reports_registrations(), value: totals.enrollments },
+    { label: m.admin_common_sports(), value: totals.sports },
+    { label: m.admin_reports_matches_played(), value: totals.matchesPlayed },
+    {
+      label: m.admin_reports_matches_scheduled(),
+      value: totals.matchesScheduled,
+    },
   ]
 
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Relatórios</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_reports_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          Quem participou dos jogos. Atleta é o aluno inscrito em ao menos uma
-          modalidade.
+          {m.admin_reports_description()}
         </PageHeaderDescription>
         <PageHeaderActions>
           <Button
             render={
               <a href={CSV_URL} download="relatorio-jogos.csv">
                 <DownloadSimpleIcon />
-                Baixar planilha (CSV)
+                {m.admin_reports_download()}
               </a>
             }
           />
@@ -83,16 +86,22 @@ export function ReportPage(): React.JSX.Element {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Por categoria</CardTitle>
+            <CardTitle>{m.admin_reports_by_category()}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead className="text-right">Turmas</TableHead>
-                  <TableHead className="text-right">Alunos</TableHead>
-                  <TableHead className="text-right">Atletas</TableHead>
+                  <TableHead>{m.admin_common_category()}</TableHead>
+                  <TableHead className="text-right">
+                    {m.admin_common_classrooms()}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {m.admin_common_students()}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {m.admin_common_athletes()}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -122,15 +131,19 @@ export function ReportPage(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Por modalidade</CardTitle>
+            <CardTitle>{m.admin_reports_by_sport()}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Modalidade</TableHead>
-                  <TableHead className="text-right">Turmas</TableHead>
-                  <TableHead className="text-right">Atletas</TableHead>
+                  <TableHead>{m.admin_common_sport()}</TableHead>
+                  <TableHead className="text-right">
+                    {m.admin_common_classrooms()}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {m.admin_common_athletes()}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -153,18 +166,24 @@ export function ReportPage(): React.JSX.Element {
 
       <Card>
         <CardHeader>
-          <CardTitle>Por turma</CardTitle>
+          <CardTitle>{m.admin_reports_by_classroom()}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Turma</TableHead>
-                <TableHead>Conselheiro</TableHead>
-                <TableHead>Representante</TableHead>
-                <TableHead className="text-right">Alunos</TableHead>
-                <TableHead className="text-right">Atletas</TableHead>
-                <TableHead className="text-right">Modalidades</TableHead>
+                <TableHead>{m.admin_reports_classroom()}</TableHead>
+                <TableHead>{m.admin_common_advisor()}</TableHead>
+                <TableHead>{m.admin_common_representative()}</TableHead>
+                <TableHead className="text-right">
+                  {m.admin_common_students()}
+                </TableHead>
+                <TableHead className="text-right">
+                  {m.admin_common_athletes()}
+                </TableHead>
+                <TableHead className="text-right">
+                  {m.admin_common_sports()}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -176,8 +195,12 @@ export function ReportPage(): React.JSX.Element {
                       {CATEGORY_SHORT_LABELS[row.category]}
                     </span>
                   </TableCell>
-                  <TableCell>{row.advisor ?? '—'}</TableCell>
-                  <TableCell>{row.representative ?? '—'}</TableCell>
+                  <TableCell>
+                    {row.advisor ?? m.admin_common_no_advisor()}
+                  </TableCell>
+                  <TableCell>
+                    {row.representative ?? m.admin_common_no_representative()}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">
                     {row.students}
                   </TableCell>
