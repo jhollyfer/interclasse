@@ -12,6 +12,7 @@ import {
   authenticateAsAdministrator,
   body,
   resetDatabase,
+  authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
@@ -140,5 +141,23 @@ test.group('administrador > users > criação', (group) => {
 
     const [{ count }] = await db.from('users').where('email', payload.email).count('* as count')
     assert.equal(Number(count), 0)
+  })
+})
+
+test.group('administrator/users/create > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.post('/administrator/users')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.post('/administrator/users').cookies(advisor)
+
+    response.assertStatus(403)
   })
 })

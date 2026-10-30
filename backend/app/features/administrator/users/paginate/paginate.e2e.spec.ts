@@ -156,3 +156,13 @@ test.group('administrador > users > o conselheiro não alcança o módulo', (gro
     }
   })
 })
+
+test.group('administrator/users/paginate > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get('/administrator/users')
+
+    response.assertStatus(401)
+  })
+})

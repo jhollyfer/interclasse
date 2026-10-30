@@ -72,3 +72,15 @@ test.group('sports > delete', (group) => {
     assert.isNotNull(await Sport.find(sport.id))
   })
 })
+
+test.group('administrator/sports/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/sports/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
+  })
+})

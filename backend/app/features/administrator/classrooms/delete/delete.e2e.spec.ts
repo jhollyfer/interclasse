@@ -68,3 +68,15 @@ test.group('classrooms > delete', (group) => {
     assert.isNotNull(await Classroom.find(classroom.id))
   })
 })
+
+test.group('administrator/classrooms/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/classrooms/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
+  })
+})

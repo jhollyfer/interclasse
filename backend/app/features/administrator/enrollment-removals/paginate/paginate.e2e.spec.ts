@@ -56,3 +56,13 @@ test.group('enrollment-removals > paginate', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/enrollment-removals/paginate > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get('/administrator/enrollment-removals')
+
+    response.assertStatus(401)
+  })
+})

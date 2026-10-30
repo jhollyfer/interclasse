@@ -9,6 +9,7 @@ import {
   authenticateAsAdministrator,
   body,
   resetDatabase,
+  authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
@@ -110,5 +111,25 @@ test.group('administrador > users > atualização', (group) => {
     await user.refresh()
     assert.equal(user.name, 'Original')
     assert.equal(user.role, USER_ROLE.ADVISOR)
+  })
+})
+
+test.group('administrator/users/update > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.put('/administrator/users/00000000-0000-4000-8000-000000000000')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client
+      .put('/administrator/users/00000000-0000-4000-8000-000000000000')
+      .cookies(advisor)
+
+    response.assertStatus(403)
   })
 })

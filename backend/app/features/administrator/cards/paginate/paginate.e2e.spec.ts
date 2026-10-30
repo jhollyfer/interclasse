@@ -2,7 +2,12 @@ import { test } from '@japa/runner'
 
 import MatchCard from '#models/match-card'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 test.group('cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())
@@ -27,5 +32,23 @@ test.group('cards > paginate', (group) => {
     assert.equal(body(filtered).meta.total, 1)
     assert.equal(body(filtered).data[0].student.id, homeStudent.id)
     assert.equal(body(filtered).data[0].team.classroom.name, home.name)
+  })
+})
+
+test.group('administrator/cards/paginate > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get('/administrator/cards')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.get('/administrator/cards').cookies(advisor)
+
+    response.assertStatus(403)
   })
 })

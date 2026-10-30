@@ -4,7 +4,12 @@ import { test } from '@japa/runner'
 
 import MatchCard from '#models/match-card'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 test.group('cards > delete', (group) => {
   group.each.setup(() => resetDatabase())
@@ -32,5 +37,35 @@ test.group('cards > delete', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CARD_NOT_FOUND')
+  })
+})
+
+test.group('administrator/cards/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.delete(
+      '/administrator/cards/00000000-0000-4000-8000-000000000000',
+    )
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client
+      .delete('/administrator/cards/00000000-0000-4000-8000-000000000000')
+      .cookies(advisor)
+
+    response.assertStatus(403)
+  })
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/cards/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
   })
 })
