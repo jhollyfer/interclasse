@@ -19,7 +19,7 @@ import {
 test.group('users > archive', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('arquivar duas vezes responde 404 na segunda', async ({ client }) => {
+  test('arquivar duas vezes responde 409 USER_ALREADY_ARCHIVED na segunda', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -27,7 +27,8 @@ test.group('users > archive', (group) => {
     primeira.assertStatus(204)
 
     const segunda = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
-    segunda.assertStatus(404)
+    segunda.assertStatus(409)
+    segunda.assertBodyContains({ code: 'USER_ALREADY_ARCHIVED' })
   })
 
   test('arquivar revoga as sessões da conta', async ({ client, assert }) => {

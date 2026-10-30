@@ -51,4 +51,13 @@ export abstract class StorageContract {
   ): Promise<TFile & { readonly url: string }> {
     return { ...file, url: await this.signedUrl(file.path) }
   }
+
+  /** `withUrl` do anexo opcional (avatar): sem arquivo, segue `null`. */
+  async withOptionalUrl<TFile extends { readonly path: string }>(
+    file: TFile | null,
+  ): Promise<(TFile & { readonly url: string }) | null> {
+    if (!file) return null
+
+    return this.withUrl(file)
+  }
 }

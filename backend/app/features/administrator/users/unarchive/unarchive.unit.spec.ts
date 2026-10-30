@@ -26,14 +26,16 @@ test.group('administrator/users > unarchive (unit)', () => {
     assert.isNotNull(await users.findById(USER_ID))
   })
 
-  test('conta viva ou inexistente é 404 USER_NOT_FOUND', async ({ assert }) => {
+  test('conta viva é 409 USER_NOT_ARCHIVED e inexistente é 404 USER_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
 
     const alive = await useCase.execute({ id: USER_ID })
     const missing = await useCase.execute({ id: '0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f' })
 
-    assert.deepInclude(alive.value, { status: 404, code: 'USER_NOT_FOUND' })
+    assert.deepInclude(alive.value, { status: 409, code: 'USER_NOT_ARCHIVED' })
     assert.deepInclude(missing.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 

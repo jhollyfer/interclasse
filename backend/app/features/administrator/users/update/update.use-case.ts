@@ -95,7 +95,7 @@ export default class AdministratorUserUpdateUseCase {
 
       return right({
         ...detail,
-        avatar: detail.avatar && (await this.bucket.withUrl(detail.avatar)),
+        avatar: await this.bucket.withOptionalUrl(detail.avatar),
       })
     } catch (error) {
       logger.error({ err: error }, '[administrator/users > update][error]')

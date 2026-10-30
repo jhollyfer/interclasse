@@ -104,7 +104,7 @@ export default class AccountProfileUpdateUseCase {
 
       return right({
         ...profile,
-        avatar: profile.avatar && (await this.bucket.withUrl(profile.avatar)),
+        avatar: await this.bucket.withOptionalUrl(profile.avatar),
       })
     } catch (error) {
       logger.error({ err: error }, '[account/profile > update][error]')

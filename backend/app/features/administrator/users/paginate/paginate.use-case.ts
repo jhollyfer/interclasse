@@ -54,7 +54,7 @@ export default class AdministratorUserPaginateUseCase {
         data: await Promise.all(
           page.data.map(async (user) => ({
             ...user,
-            avatar: user.avatar && (await this.bucket.withUrl(user.avatar)),
+            avatar: await this.bucket.withOptionalUrl(user.avatar),
           })),
         ),
       })

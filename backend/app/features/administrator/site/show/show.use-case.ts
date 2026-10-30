@@ -23,7 +23,7 @@ export default class AdministratorSiteShowUseCase {
 
       return right({
         ...setting,
-        regulation: setting.regulation && (await this.bucket.withUrl(setting.regulation)),
+        regulation: await this.bucket.withOptionalUrl(setting.regulation),
       })
     } catch (error) {
       logger.error({ err: error }, '[administrator/site > show][error]')

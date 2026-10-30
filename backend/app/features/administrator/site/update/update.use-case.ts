@@ -42,7 +42,7 @@ export default class AdministratorSiteUpdateUseCase {
 
       return right({
         ...shown,
-        regulation: shown.regulation && (await this.bucket.withUrl(shown.regulation)),
+        regulation: await this.bucket.withOptionalUrl(shown.regulation),
       })
     } catch (error) {
       logger.error({ err: error }, '[administrator/site > update][error]')

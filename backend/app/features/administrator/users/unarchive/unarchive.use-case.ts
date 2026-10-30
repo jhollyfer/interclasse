@@ -30,7 +30,7 @@ export default class AdministratorUserUnarchiveUseCase {
 
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const user = await this.users.findArchivedById(id)
+      const user = await this.users.findAnyById(id)
 
       if (!user)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))

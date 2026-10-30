@@ -29,7 +29,7 @@ export default class AdministratorUserShowUseCase {
       if (!user)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right({ ...user, avatar: user.avatar && (await this.bucket.withUrl(user.avatar)) })
+      return right({ ...user, avatar: await this.bucket.withOptionalUrl(user.avatar) })
     } catch (error) {
       logger.error({ err: error }, '[administrator/users > show][error]')
 

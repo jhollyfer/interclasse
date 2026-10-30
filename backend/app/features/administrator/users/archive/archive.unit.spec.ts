@@ -35,14 +35,14 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [USER_ID])
   })
 
-  test('arquivar duas vezes responde 404 USER_NOT_FOUND na segunda', async ({ assert }) => {
+  test('arquivar duas vezes responde 409 USER_ALREADY_ARCHIVED na segunda', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     await useCase.execute({ id: USER_ID })
 
     const second = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(second.value, { status: 404, code: 'USER_NOT_FOUND' })
+    assert.deepInclude(second.value, { status: 409, code: 'USER_ALREADY_ARCHIVED' })
   })
 
   test('conta inexistente não revoga nem solta nada', async ({ assert }) => {

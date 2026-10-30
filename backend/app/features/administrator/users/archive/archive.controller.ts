@@ -17,7 +17,7 @@ export default class AdministratorUserArchiveController {
       'guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do ' +
       'painel até o token vencer.\n\n' +
       'A conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por ' +
-      '`PATCH /:id/unarchive`. Usuário já arquivado responde `404`.\n\n' +
+      '`PATCH /:id/unarchive`. Usuário já arquivado responde `409`.\n\n' +
       'A **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava ' +
       'administrando, e o conserto seria rodar o seeder.',
     // Declarado à mão porque nasce fora deste par: quem nega é a `UserPolicy`.
@@ -33,7 +33,7 @@ export default class AdministratorUserArchiveController {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const user = await this.users.findById(payload.id)
+    const user = await this.users.findAnyById(payload.id)
     await context.bouncer.with(UserPolicy).authorize('archive', user)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value

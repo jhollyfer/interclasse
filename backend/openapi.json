@@ -4610,7 +4610,7 @@
             }
           }
         },
-        "description": "Envia para a lixeira: grava `deletedAt` e **revoga todas as sessões da conta**. O guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do painel até o token vencer.\n\nA conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por `PATCH /:id/unarchive`. Usuário já arquivado responde `404`.\n\nA **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava administrando, e o conserto seria rodar o seeder.",
+        "description": "Envia para a lixeira: grava `deletedAt` e **revoga todas as sessões da conta**. O guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do painel até o token vencer.\n\nA conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por `PATCH /:id/unarchive`. Usuário já arquivado responde `409`.\n\nA **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava administrando, e o conserto seria rodar o seeder.",
         "security": [
           {
             "cookieAuth": []
@@ -4694,7 +4694,7 @@
             }
           }
         },
-        "description": "Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo responde `404`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo sign-in.",
+        "description": "Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo responde `409`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo sign-in.",
         "security": [
           {
             "cookieAuth": []

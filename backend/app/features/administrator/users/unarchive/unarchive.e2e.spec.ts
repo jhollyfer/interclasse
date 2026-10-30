@@ -45,7 +45,7 @@ test.group('users > unarchive', (group) => {
     ver.assertStatus(200)
   })
 
-  test('restaurar usuário vivo responde 404', async ({ client, assert }) => {
+  test('restaurar usuário vivo responde 409 USER_NOT_ARCHIVED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -53,8 +53,8 @@ test.group('users > unarchive', (group) => {
       .patch(`/administrator/users/${user.id}/unarchive`)
       .cookies(session)
 
-    response.assertStatus(404)
-    assert.equal(body(response).code, 'USER_NOT_FOUND')
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'USER_NOT_ARCHIVED')
   })
 
   test('usuário inexistente responde 404', async ({ client, assert }) => {
