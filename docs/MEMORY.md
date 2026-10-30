@@ -16,7 +16,7 @@
 
 ## Parou em
 
-Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão). Frente 5.5 (testes do backend) feita em parte na branch `frente-5-5`: depcruise com 3 violações de repository→contrato de storage e 1 do guard, registradas em `TASKS.md` como proposta ao upstream.
+Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão). Frente 5.5 (testes do backend) feita: `pnpm depcruise` só com a violação do guard (proposta ao upstream em `TASKS.md`); URL de leitura assinada no use-case; spec sem import de model nem de implementação; matriz de status completa (restam os 409 de estado de arquivar/restaurar usuário, registrados em `TASKS.md`).
 
 ## Próximos passos
 
