@@ -24,12 +24,14 @@ export default class DocumentationMiddleware {
   async handle(context: HttpContext, next: NextFn) {
     const user = context.auth.user
 
-    if (!user) throw HTTPException.NotFound('Não encontrado', 'RESOURCE_NOT_FOUND')
+    if (!user) throw this.notFound(context)
 
-    if (!STAFF.includes(user.role)) {
-      throw HTTPException.NotFound('Não encontrado', 'RESOURCE_NOT_FOUND')
-    }
+    if (!STAFF.includes(user.role)) throw this.notFound(context)
 
     return next()
+  }
+
+  private notFound(context: HttpContext) {
+    return HTTPException.NotFound(context.i18n.t('errors.not_found'), 'RESOURCE_NOT_FOUND')
   }
 }
