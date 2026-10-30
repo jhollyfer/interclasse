@@ -22,6 +22,8 @@ export * from './enums/user-role.js'
 
 export * from './records/actor.js'
 export * from './records/pagination.js'
+export * from './records/table-layout.js'
+export * from './records/upload-resume.js'
 export * from './records/utility.js'
 
 export * from './responses/envelope.js'
