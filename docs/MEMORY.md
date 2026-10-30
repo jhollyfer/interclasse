@@ -16,7 +16,7 @@
 
 ## Parou em
 
-Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
+Frente 5.1/5.2 (tooling, CI, Docker, docs) feita na branch `frente-5-1`: lint, typecheck, `test:unit` do shared (18), frontend (187) e backend (347) e build do frontend verdes. Workflows e Dockerfiles ainda não rodaram de verdade; `pnpm depcruise` falha com 18 violações a corrigir na 5.4.
 
 ## Próximos passos
 
@@ -46,8 +46,9 @@ Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só 
 
 | Problema | Onde | Contorno |
 |---|---|---|
-| <…> | <arquivo/tela> | <…> |
+| `pnpm depcruise` acusa 18 violações de camada e ciclo (policies, guard e session service importando model; controllers de sessão importando o `CookieService`; ciclos entre models) | `backend/app` | corrigir na tarefa 5.4; o passo do CI falha até lá |
+| Dockerfiles, job E2E do frontend e workflows novos escritos sem acesso a Docker daemon nem a GitHub Actions | `.github/workflows/`, `*/Dockerfile-production` | validar no primeiro PR e na tarefa 5.8 |
 
 ## Links úteis
 
-- Repositório: <url> · Produção: <url> · Design: <url>
+- Repositório: https://github.com/jhollyfer/interclasse · Produção: https://interclass.maiyu.com.br · Design: `docs/DESIGN.md`

@@ -12,7 +12,7 @@
 
 - Direção: a identidade do site antigo dos jogos (`site-jogos-estudantis`): verde da quadra, verde-noite no cabeçalho e no rodapé, amarelo do placar. Transmite competição escolar sem perder a leitura de tabela e de placar.
 - Modo dominante: **Convencer e Ler** no site público (jogos, classificação, avisos); **Operar** no painel (tabelas, formulários, sorteio, placar). O painel usa padrão familiar de shadcn; a ousadia visual (display condensado em itálico) fica no site público.
-- Tema: claro e escuro. Hoje o tema vem do `next-themes` (classe `.dark`, padrão do sistema, `defaultTheme="system"`), escolhido no navegador e não por cookie no servidor; o `suppressHydrationWarning` em `routes/__root.tsx` cobre o atraso. Desvio da régua (`frontend.md`, tema pelo servidor) registrado como tarefa em aberto.
+- Tema: claro e escuro. A escolha do tema segue `frontend.md` (cookie lido no servidor, sem atraso na hidratação); a implementação está na tarefa 5.7 de `docs/TASKS.md`.
 
 ## 2. Cores
 
@@ -52,8 +52,8 @@ Famílias (`@fontsource`, só os pesos usados):
 | Corpo (`--font-sans`) | Barlow | 400, 600 | texto, formulário, tabela |
 | Display (`--font-display`) | Barlow Condensed, com Barlow de reserva | 700 itálico, 800 itálico | títulos do site público e placar |
 
-A escala hoje usa os utilitários de tamanho do Tailwind direto nos componentes, sem tokens
-`--text-*` nomeados por papel; o desvio da régua (`frontend.md` §6) é tarefa aberta.
+A escala é de tokens `--text-*` nomeados por papel, como manda `frontend.md` §6; a migração dos
+componentes está na tarefa 5.7 de `docs/TASKS.md`.
 Recursos de fonte: `font-feature-settings: 'ss01', 'cv01', 'cv11'`, `font-synthesis: none`.
 
 ## 4. Layout

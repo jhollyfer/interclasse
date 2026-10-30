@@ -16,8 +16,8 @@
 | `shared/` | Vitest | `shared/src/**/*.test.ts` | todo pull request e todo push em `main` |
 | Unitário do frontend | Vitest | `frontend/src/**/*.test.ts` e `frontend/scripts/**/*.test.ts` (só `.ts`: componente React não é testável hoje) | todo pull request e todo push em `main` |
 | Mensagens | `pnpm i18n:check` (inlang) | `frontend/messages/` | pull request |
-| Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm sync:check` (só local) | `backend/scripts/` | `pnpm check` e CI |
-| E2E do frontend | Playwright, `pnpm e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; fora do CI por enquanto |
+| Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm depcruise` | `backend/scripts/` | `pnpm check` e CI |
+| E2E do frontend | Playwright, `pnpm test:e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; job `e2e` do `main-check-frontend.yml` em todo PR |
 
 ## 2. Fluxos críticos
 
@@ -116,7 +116,7 @@ proibido) vale aqui sem cópia: `_standards/tooling.md` §10.1. Deste projeto:
 - Teste novo falha antes da correção e passa depois.
 - Mudança de regra de dado (índice, unique, enum) roda a suíte inteira do backend antes do commit.
 - Cobertura: o join do §3.1 sem lacuna nas rotas e enums que a mudança toca. Percentual mínimo: não exigido.
-- `pnpm check` e `pnpm test` no backend (o `pre-commit` roda os dois); `pnpm lint`, `pnpm typecheck`, `pnpm test` e `pnpm build` no frontend; `pnpm check-cycles` depois do build do frontend.
+- `pnpm check` e `pnpm test:e2e` no backend (o `pre-commit` roda `check`, que inclui o `test:unit`); `pnpm lint`, `pnpm typecheck`, `pnpm test:unit` e `pnpm build` no frontend; `pnpm check-cycles` depois do build do frontend.
 
 ## 7. Teste manual antes do release
 

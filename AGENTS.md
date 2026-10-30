@@ -2,7 +2,7 @@
 
 Sistema dos Jogos Interclasse (JIC) do CMEI Cosme Jean: turmas, inscrição de atletas, sorteio das chaves, tabela de jogos, placar, classificação e avisos, para a organização, os professores conselheiros, os alunos representantes e o público.
 
-Monorepo pnpm: `backend/` (AdonisJS 7), `frontend/` (TanStack Start) e `shared/` (`@interclasse/shared`: Either, enums, validators Zod, respostas). Comandos e o que cada app faz diferente da régua estão em `backend/CLAUDE.md` e `frontend/CLAUDE.md`; os scripts, no `package.json`.
+Monorepo pnpm: `backend/` (AdonisJS 7), `frontend/` (TanStack Start) e `shared/` (`@interclasse/shared`: Either, enums, validators Zod, respostas). Os comandos de cada app estão em `backend/AGENTS.md` e `frontend/AGENTS.md`; os scripts, no `package.json`.
 
 ## O padrão Maiyu é seguido estritamente
 
