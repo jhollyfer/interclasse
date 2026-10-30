@@ -28,3 +28,12 @@ export function credentialsOf(role: Role): Credentials {
 export function apiUrl(): string {
   return process.env.E2E_API_URL ?? 'http://localhost:3333'
 }
+
+/**
+ * `Origin` do app que o `webServer` sobe. A API recusa escrita sem origem na
+ * allowlist (`CORS_ORIGINS`, 403 `ORIGIN_NOT_ALLOWED`), e o `request` do
+ * Playwright, ao contrário do navegador, não envia o cabeçalho sozinho.
+ */
+export function writeHeaders(): Readonly<{ Origin: string }> {
+  return { Origin: `http://localhost:${process.env.E2E_PORT ?? '3010'}` }
+}

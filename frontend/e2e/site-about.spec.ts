@@ -1,4 +1,4 @@
-import { apiUrl } from './support/credentials'
+import { apiUrl, writeHeaders } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
@@ -55,6 +55,7 @@ test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta
     }
   } finally {
     const restore = await context.request.put(endpoint, {
+      headers: writeHeaders(),
       data: {
         about: originalAbout,
         organizer: original.organizer,

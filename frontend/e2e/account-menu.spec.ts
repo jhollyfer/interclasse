@@ -11,7 +11,7 @@ test('o administrador abre o menu da conta e chega ao perfil sem erro', async ({
   await page.goto('/administrator')
   await waitForHydration(page)
 
-  await page.getByRole('button', { name: /^Conta de / }).click()
+  await page.getByRole('button', { name: /^Conta:/ }).click()
   await page.getByRole('menuitem', { name: 'Meu perfil' }).click()
 
   await expect(page).toHaveURL(/\/profile\/?$/)
