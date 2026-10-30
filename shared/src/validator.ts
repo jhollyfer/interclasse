@@ -73,6 +73,10 @@ export function useValidatorLocale(locale: Locale): void {
       if (issue.code === 'invalid_format' && issue.format === 'uuid')
         return VALIDATION_MESSAGES[locale].option
 
+      // E-mail (ou outro formato) em branco é campo vazio, não formato errado.
+      if (issue.code === 'invalid_format' && issue.input === '')
+        return VALIDATION_MESSAGES[locale].required
+
       return undefined
     },
   })

@@ -43,8 +43,10 @@ describe('validator', () => {
       amount: z.number(),
       id: z.uuid(),
       kind: z.enum(['A', 'B']),
+      email: z.email(),
     })
-    const issues = schema.safeParse({ amount: Number.NaN, id: '', kind: 'C' }).error?.issues
+    const issues = schema.safeParse({ amount: Number.NaN, id: '', kind: 'C', email: '' }).error
+      ?.issues
     const messages = Object.fromEntries((issues ?? []).map((i) => [i.path.join('.'), i.message]))
     const texts = VALIDATION_MESSAGES['pt-BR']
 
@@ -53,6 +55,7 @@ describe('validator', () => {
       amount: texts.number,
       id: texts.option,
       kind: texts.option,
+      email: texts.required,
     })
   })
 })
