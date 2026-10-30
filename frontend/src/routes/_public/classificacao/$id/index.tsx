@@ -7,11 +7,7 @@ import {
 } from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { loadOrNotFound } from '#/lib/load-or-not-found'
-import {
-  breadcrumbJsonLd,
-  pageHead,
-  sportsEventJsonLd,
-} from '#/lib/page-head'
+import { breadcrumbJsonLd, pageHead, sportsEventJsonLd } from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
