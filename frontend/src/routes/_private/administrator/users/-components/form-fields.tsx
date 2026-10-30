@@ -27,6 +27,7 @@ import {
   USER_ROLE_LABELS,
   initials,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 export type UserFormType = AdministratorUserUpdatePayload
 
@@ -102,7 +103,7 @@ export function UserFormFields({
   form,
   idPrefix,
   previewUrl,
-  passwordLabel = 'Senha',
+  passwordLabel = m.admin_users_field_password(),
 }: UserFormFieldsProps): React.JSX.Element {
   const name = form.watch('name')
 
@@ -114,7 +115,7 @@ export function UserFormFields({
         control={form.control}
         name="avatarId"
         id={`${idPrefix}-avatar`}
-        label="Foto (opcional)"
+        label={m.admin_users_field_photo()}
       >
         {({ field, control }) => (
           <ImageField
@@ -126,12 +127,14 @@ export function UserFormFields({
             {/* Sem foto e sem nome, o espaço reservado fica vazio, e é o que
                 se quer: `initials('')` é `''` e o `AvatarFallback` sabe ficar
                 em branco. */}
-            <ImageFieldPreview alt="Foto da conta">
+            <ImageFieldPreview alt={m.admin_users_photo_alt()}>
               {initials(name)}
             </ImageFieldPreview>
             <ImageFieldContent>
               <ImageFieldActions>
-                <ImageFieldUpload>Enviar foto</ImageFieldUpload>
+                <ImageFieldUpload>
+                  {m.admin_users_upload_photo()}
+                </ImageFieldUpload>
                 <ImageFieldRemove />
               </ImageFieldActions>
               <ImageFieldDescription />
@@ -144,14 +147,14 @@ export function UserFormFields({
         control={form.control}
         name="name"
         id={`${idPrefix}-name`}
-        label="Nome"
+        label={m.admin_common_name()}
       >
         {({ field, control }) => (
           <Input
             {...field}
             {...control}
             autoComplete="name"
-            placeholder="Nome de quem usa a conta"
+            placeholder={m.admin_users_field_name_placeholder()}
           />
         )}
       </AppField>
@@ -160,7 +163,7 @@ export function UserFormFields({
         control={form.control}
         name="email"
         id={`${idPrefix}-email`}
-        label="E-mail"
+        label={m.admin_common_email()}
       >
         {({ field, control }) => (
           <>
@@ -168,12 +171,12 @@ export function UserFormFields({
               {...field}
               {...control}
               autoComplete="email"
-              placeholder="pessoa@exemplo.org"
+              placeholder={m.admin_users_field_email_placeholder()}
             />
             {/* O e-mail é `UNIQUE` global, e o use-case responde `409` quando
                 já existe uma conta viva com ele. */}
             <FieldDescription>
-              É por ele que a pessoa entra no painel.
+              {m.admin_users_field_email_description()}
             </FieldDescription>
           </>
         )}
@@ -201,8 +204,7 @@ export function UserFormFields({
               autoComplete="new-password"
             />
             <FieldDescription>
-              De 8 a 32 caracteres, com minúscula, maiúscula, número e um
-              caractere especial.
+              {m.admin_users_field_password_description()}
             </FieldDescription>
           </>
         )}
@@ -212,7 +214,7 @@ export function UserFormFields({
         control={form.control}
         name="passwordConfirmation"
         id={`${idPrefix}-password-confirmation`}
-        label="Confirme a senha"
+        label={m.admin_users_field_password_confirmation()}
       >
         {({ field, control }) => (
           <InputPassword
@@ -231,7 +233,7 @@ export function UserFormFields({
         control={form.control}
         name="role"
         id={`${idPrefix}-role`}
-        label="Papel"
+        label={m.admin_common_role()}
       >
         {({ field, control }) => (
           <>
@@ -245,8 +247,7 @@ export function UserFormFields({
               options={toOptions(USER_ROLES, USER_ROLE_LABELS)}
             />
             <FieldDescription>
-              Administrador organiza os jogos. Conselheiro cuida dos alunos das
-              próprias turmas. Representante monta a lista de atletas da turma.
+              {m.admin_users_field_role_description()}
             </FieldDescription>
           </>
         )}
@@ -256,7 +257,7 @@ export function UserFormFields({
         control={form.control}
         name="status"
         id={`${idPrefix}-status`}
-        label="Situação"
+        label={m.admin_common_status()}
       >
         {({ field, control }) => (
           <>
@@ -274,7 +275,7 @@ export function UserFormFields({
             {/* Inativa não é arquivada: a linha continua na listagem e o
                 registro continua vivo, só o acesso é que fecha. */}
             <FieldDescription>
-              Conta inativa não entra no painel, e continua na listagem.
+              {m.admin_users_field_status_description()}
             </FieldDescription>
           </>
         )}

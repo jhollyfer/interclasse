@@ -3,6 +3,7 @@ import { CopySimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
+import { m } from '#/paraglide/messages'
 
 type CopyIdMenuItemProps = Readonly<{
   id: string
@@ -22,13 +23,13 @@ type CopyIdMenuItemProps = Readonly<{
 export function CopyIdMenuItem({ id }: CopyIdMenuItemProps): React.JSX.Element {
   async function copy(): Promise<void> {
     await navigator.clipboard.writeText(id)
-    toast.success('ID copiado', { id: 'copy-id' })
+    toast.success(m.admin_users_id_copied(), { id: 'copy-id' })
   }
 
   return (
     <DropdownMenuItem onClick={() => void copy()}>
       <CopySimpleIcon />
-      Copiar ID
+      {m.admin_users_copy_id()}
     </DropdownMenuItem>
   )
 }

@@ -12,7 +12,9 @@ import {
   ConfirmDialogHeader,
 } from '#/components/common/confirm-dialog'
 import { Button } from '#/components/ui/button'
-import { bulkMessage, runBulk } from '#/lib/bulk'
+import { runBulk } from '#/lib/bulk'
+import type { BulkOutcome } from '#/lib/bulk'
+import { m } from '#/paraglide/messages'
 
 type BulkArchiveProps<TItem> = Readonly<{
   /** As linhas selecionadas na barra de seleção. */
@@ -27,15 +29,29 @@ type BulkArchiveProps<TItem> = Readonly<{
    * e o último é o único que conta.
    */
   queryKey: QueryKey
-  /**
-   * O particípio no plural, com o gênero do recurso: `arquivadas`,
-   * `arquivados`. É o que `bulkMessage` flexiona no aviso, e português não
-   * deixa derivar do nome.
-   */
-  verb: string
   /** `ConfirmDialogTitle` e `ConfirmDialogDescription`: o texto é markup. */
   children: React.ReactNode
 }>
+
+/**
+ * O aviso do fim do lote. O relato parcial é o ponto: "7 de 9 arquivados" é
+ * acionável, "erro ao arquivar" depois de sete sucessos é mentira. Cada caso é
+ * uma mensagem inteira, com a flexão de número dentro dela e não montada aqui.
+ */
+function bulkArchiveMessage(outcome: BulkOutcome): string {
+  const total = outcome.done + outcome.failed
+
+  if (outcome.failed === 0)
+    return m.admin_bulk_archive_done({ done: outcome.done })
+
+  if (outcome.done === 0) return m.admin_bulk_archive_none({ total })
+
+  return m.admin_bulk_archive_partial({
+    done: outcome.done,
+    total,
+    failed: outcome.failed,
+  })
+}
 
 /**
  * Arquivar as linhas selecionadas.
@@ -57,7 +73,6 @@ export function BulkArchive<TItem>({
   items,
   action,
   queryKey,
-  verb,
   children,
 }: BulkArchiveProps<TItem>): React.JSX.Element {
   const queryClient = useQueryClient()
@@ -68,7 +83,7 @@ export function BulkArchive<TItem>({
     // O aviso primeiro: `invalidateQueries` só resolve quando o refetch
     // volta, e esperá-lo aqui atrasaria o "7 de 9 arquivados" por uma ida
     // ao servidor que ninguém está olhando.
-    toast.success(bulkMessage(outcome, verb), { id: 'bulk-archive' })
+    toast.success(bulkArchiveMessage(outcome), { id: 'bulk-archive' })
 
     await queryClient.invalidateQueries({ queryKey })
   }
@@ -79,14 +94,14 @@ export function BulkArchive<TItem>({
       trigger={
         <Button variant="outline">
           <ArchiveIcon />
-          Arquivar
+          {m.admin_common_archive()}
         </Button>
       }
     >
       <ConfirmDialogHeader>{children}</ConfirmDialogHeader>
       <ConfirmDialogFooter>
         <ConfirmDialogCancel />
-        <ConfirmDialogConfirm>Arquivar</ConfirmDialogConfirm>
+        <ConfirmDialogConfirm>{m.admin_common_archive()}</ConfirmDialogConfirm>
       </ConfirmDialogFooter>
     </ConfirmDialog>
   )

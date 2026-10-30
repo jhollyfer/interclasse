@@ -297,5 +297,157 @@
   "admin_photos_reject": "Reject",
   "admin_photos_delete_label": "Delete photo",
   "admin_photos_delete_title": "Delete this photo?",
-  "admin_photos_delete_description": "It disappears from the site and from the sender's list. This cannot be undone."
+  "admin_photos_delete_description": "It disappears from the site and from the sender's list. This cannot be undone.",
+  "admin_common_archive": "Archive",
+  "admin_common_restore": "Restore",
+  "admin_common_remove": "Remove",
+  "admin_common_classrooms": "Classes",
+  "admin_common_students": "Students",
+  "admin_common_athletes": "Athletes",
+  "admin_common_sports": "Sports",
+  "admin_common_save": "Save",
+  "admin_common_role": "Role",
+  "admin_common_email": "Email",
+  "admin_common_created_on": "Created on",
+  "admin_reports_title": "Reports",
+  "admin_reports_description": "Who took part in the games. An athlete is a student registered in at least one sport.",
+  "admin_reports_download": "Download spreadsheet (CSV)",
+  "admin_reports_registrations": "Registrations",
+  "admin_reports_matches_played": "Matches played",
+  "admin_reports_matches_scheduled": "Matches scheduled",
+  "admin_reports_by_category": "By category",
+  "admin_reports_by_sport": "By sport",
+  "admin_reports_by_classroom": "By class",
+  "admin_reports_classroom": "Class",
+  "admin_site_title": "Site",
+  "admin_site_description": "What appears in \"About the games\" and in the site footer, plus the rulebook to download. An empty field does not appear on the site.",
+  "admin_site_updated": "Site updated.",
+  "admin_site_about_card": "About the games",
+  "admin_site_field_about": "What the games are",
+  "admin_site_field_organizer": "Who created and organizes them",
+  "admin_site_field_edition": "Current edition",
+  "admin_site_field_first_edition": "Year of the first edition",
+  "admin_site_instagram_card": "Instagram",
+  "admin_site_field_school_instagram": "School's (without @)",
+  "admin_site_field_developer_instagram": "Of whoever built the site (without @)",
+  "admin_site_regulation_card": "Rulebook",
+  "admin_site_field_regulation": "PDF file",
+  "admin_site_upload_pdf": "Upload PDF",
+  "admin_site_pdf_only": "PDF only.",
+  "admin_users_title": "Users",
+  "admin_users_user": "User",
+  "admin_users_noun_one": "user",
+  "admin_users_noun_other": "users",
+  "admin_users_create": "Add user",
+  "admin_users_search": "Search users…",
+  "admin_users_all_roles": "All roles",
+  "admin_users_all_statuses": "All statuses",
+  "admin_users_empty_title": "No users yet",
+  "admin_users_empty_description": "This is the only way to create an account: there is no public sign-up, and the first administrator comes from the seeder.",
+  "admin_users_bulk_archive_title": "Archive users",
+  "admin_users_bulk_archive_description": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} accounts lose access to the dashboard and leave the list. They can be restored later.",
+        "countExact=*, countPlural=one": "{count} account loses access to the dashboard and leaves the list. It can be restored later.",
+        "countExact=*, countPlural=*": "{count} accounts lose access to the dashboard and leave the list. They can be restored later."
+      }
+    }
+  ],
+  "admin_bulk_archive_done": [
+    {
+      "declarations": [
+        "input done",
+        "local doneExact = done",
+        "local donePlural = done: plural"
+      ],
+      "selectors": [
+        "doneExact",
+        "donePlural"
+      ],
+      "match": {
+        "doneExact=0, donePlural=*": "{done} archived.",
+        "doneExact=*, donePlural=one": "{done} archived.",
+        "doneExact=*, donePlural=*": "{done} archived."
+      }
+    }
+  ],
+  "admin_bulk_archive_none": [
+    {
+      "declarations": [
+        "input total",
+        "local totalExact = total",
+        "local totalPlural = total: plural"
+      ],
+      "selectors": [
+        "totalExact",
+        "totalPlural"
+      ],
+      "match": {
+        "totalExact=0, totalPlural=*": "None archived: {total} failed.",
+        "totalExact=*, totalPlural=one": "None archived: {total} failed.",
+        "totalExact=*, totalPlural=*": "None archived: {total} failed."
+      }
+    }
+  ],
+  "admin_bulk_archive_partial": [
+    {
+      "declarations": [
+        "input failed",
+        "local failedExact = failed",
+        "local failedPlural = failed: plural"
+      ],
+      "selectors": [
+        "failedExact",
+        "failedPlural"
+      ],
+      "match": {
+        "failedExact=0, failedPlural=*": "{done} of {total} archived; {failed} failed.",
+        "failedExact=*, failedPlural=one": "{done} of {total} archived; {failed} failed.",
+        "failedExact=*, failedPlural=*": "{done} of {total} archived; {failed} failed."
+      }
+    }
+  ],
+  "admin_users_id_copied": "ID copied",
+  "admin_users_copy_id": "Copy ID",
+  "admin_users_archived_badge": "Archived",
+  "admin_users_archived_ok": "{name}'s account archived.",
+  "admin_users_restored_ok": "{name}'s account restored.",
+  "admin_users_removed_ok": "{name}'s account removed.",
+  "admin_users_created_ok": "{name}'s account created.",
+  "admin_users_saved_ok": "{name}'s account saved.",
+  "admin_users_archive_title": "Archive {name}'s account?",
+  "admin_users_archive_description": "It loses access to the dashboard and leaves the list, and can be restored later.",
+  "admin_users_restore_title": "Restore {name}'s account?",
+  "admin_users_restore_description": "It returns to the list, in the status it had.",
+  "admin_users_remove_title": "Remove {name}'s account?",
+  "admin_users_remove_description": "The record is deleted permanently. This cannot be undone.",
+  "admin_users_view_details": "View details",
+  "admin_users_account_card": "The account",
+  "admin_users_last_changed": "Last changed",
+  "admin_users_archived_on": "Archived on",
+  "admin_users_identity_legend": "Identity and access",
+  "admin_users_create_note": "The email of an archived account reactivates that record with the new data instead of creating another.",
+  "admin_users_edit_note": "Changing the email or the password ends this account's open sessions.",
+  "admin_users_field_new_password": "New password (leave blank to keep the current one)",
+  "admin_users_field_password": "Password",
+  "admin_users_field_password_description": "8 to 32 characters, with a lowercase letter, an uppercase letter, a number and a special character.",
+  "admin_users_field_password_confirmation": "Confirm the password",
+  "admin_users_field_photo": "Photo (optional)",
+  "admin_users_photo_alt": "Account photo",
+  "admin_users_upload_photo": "Upload photo",
+  "admin_users_field_name_placeholder": "Name of the person using the account",
+  "admin_users_field_email_placeholder": "person@example.org",
+  "admin_users_field_email_description": "It is what the person uses to sign in to the dashboard.",
+  "admin_users_field_role_description": "The administrator organizes the games. The advisor looks after the students of their own classes. The representative builds the class's athlete list.",
+  "admin_users_field_status_description": "An inactive account cannot sign in to the dashboard and stays in the list."
 }
