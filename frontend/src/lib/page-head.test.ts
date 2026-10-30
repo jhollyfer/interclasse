@@ -4,11 +4,13 @@ import { env } from '#/env'
 import { m } from '#/paraglide/messages'
 
 import {
+  breadcrumbJsonLd,
   jsonLd,
   localizedUrl,
   noindexMeta,
   organizationJsonLd,
   pageHead,
+  sportsEventJsonLd,
 } from './page-head'
 
 describe('localizedUrl', () => {
@@ -73,6 +75,15 @@ describe('pageHead', () => {
     )
   })
 
+  it('structuredData vira script application/ld+json', () => {
+    const withData = pageHead({ pathname: '/x', structuredData: ['{"a":1}'] })
+
+    expect(withData.scripts).toEqual([
+      { type: 'application/ld+json', children: '{"a":1}' },
+    ])
+    expect(head.scripts).toEqual([])
+  })
+
   it('noindex acrescenta o robots, e a página normal não leva', () => {
     const hidden = pageHead({ pathname: '/x', noindex: true })
 
@@ -110,5 +121,63 @@ describe('jsonLd', () => {
       '@type': 'Organization',
       url: env.VITE_SITE_URL,
     })
+  })
+})
+
+describe('breadcrumbJsonLd', () => {
+  it('numera os degraus e usa a URL absoluta de cada um', () => {
+    const data: unknown = JSON.parse(
+      breadcrumbJsonLd([
+        { name: 'Início', pathname: '/' },
+        { name: 'Classificação', pathname: '/classificacao' },
+      ]),
+    )
+
+    expect(data).toMatchObject({
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { position: 1, name: 'Início', item: `${env.VITE_SITE_URL}/` },
+        {
+          position: 2,
+          name: 'Classificação',
+          item: `${env.VITE_SITE_URL}/classificacao`,
+        },
+      ],
+    })
+  })
+})
+
+describe('sportsEventJsonLd', () => {
+  const base = {
+    name: 'Futsal Sub-15',
+    description: 'Chave de futsal',
+    sport: 'Futsal',
+    pathname: '/classificacao/1',
+  }
+
+  it('usa o jogo mais cedo como startDate', () => {
+    const data: unknown = JSON.parse(
+      sportsEventJsonLd({
+        ...base,
+        scheduledAt: [
+          null,
+          '2026-05-02T10:00:00-04:00',
+          '2026-05-01T09:00:00-04:00',
+        ],
+      }),
+    )
+
+    expect(data).toMatchObject({
+      '@type': 'SportsEvent',
+      sport: 'Futsal',
+      url: `${env.VITE_SITE_URL}/classificacao/1`,
+      startDate: '2026-05-01T09:00:00.000-04:00',
+    })
+  })
+
+  it('sem jogo agendado o startDate não sai', () => {
+    const text = sportsEventJsonLd({ ...base, scheduledAt: [null] })
+
+    expect(text).not.toContain('startDate')
   })
 })

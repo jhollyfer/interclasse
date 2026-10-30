@@ -7,7 +7,11 @@ import {
 } from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { loadOrNotFound } from '#/lib/load-or-not-found'
-import { pageHead } from '#/lib/page-head'
+import {
+  breadcrumbJsonLd,
+  pageHead,
+  sportsEventJsonLd,
+} from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
@@ -39,10 +43,27 @@ export const Route = createFileRoute('/_public/classificacao/$id/')({
       category: CATEGORY_LABELS[loaderData.category] ?? loaderData.category,
     }
 
+    const title = m.public_bracket_head_title(inputs)
+    const description = m.public_bracket_head_description(inputs)
+
     return pageHead({
-      title: m.public_bracket_head_title(inputs),
-      description: m.public_bracket_head_description(inputs),
+      title,
+      description,
       pathname: match.pathname,
+      structuredData: [
+        breadcrumbJsonLd([
+          { name: m.public_nav_home(), pathname: '/' },
+          { name: m.public_nav_standings(), pathname: '/classificacao' },
+          { name: title, pathname: match.pathname },
+        ]),
+        sportsEventJsonLd({
+          name: title,
+          description,
+          sport: loaderData.sport.name,
+          pathname: match.pathname,
+          scheduledAt: loaderData.matches.map((item) => item.scheduledAt),
+        }),
+      ],
     })
   },
 })
