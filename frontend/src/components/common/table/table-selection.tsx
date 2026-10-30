@@ -5,6 +5,7 @@ import type { ColumnDef, RowData } from '@tanstack/react-table'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'
 import { Checkbox } from '#/components/ui/checkbox'
+import { m } from '#/paraglide/messages'
 
 import type { TableFeatures, TableInstance } from './use-table'
 
@@ -39,7 +40,7 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
           // `checked` - o componente aceita só booleano ali.
           indeterminate={some && !all}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Selecionar todas as linhas da página"
+          aria-label={m.table_select_all()}
         />
       )
     },
@@ -52,7 +53,7 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
           // arquivar não entra na seleção, e a caixa diz isso antes do clique.
           disabled={!row.getCanSelect()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Selecionar linha"
+          aria-label={m.table_select_row()}
         />
       </div>
     ),
@@ -94,8 +95,9 @@ export function TableSelectionBar<TRow extends RowData>({
    * gênero no `noun` seria desenho que a referência não tem; a forma sem
    * particípio concorda com os dois e diz a mesma coisa.
    */
-  let label = `Seleção: ${count} ${plural}`
-  if (count === 1) label = `Seleção: 1 ${singular}`
+  let name = plural
+  if (count === 1) name = singular
+  const label = m.table_selection({ count, noun: name })
 
   return (
     // Barra de ações sobre a seleção, e por isso `ButtonGroup`. Os filhos
@@ -116,7 +118,7 @@ export function TableSelectionBar<TRow extends RowData>({
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Limpar seleção"
+          aria-label={m.table_selection_clear()}
           onClick={() => table.resetRowSelection()}
         >
           <XIcon />

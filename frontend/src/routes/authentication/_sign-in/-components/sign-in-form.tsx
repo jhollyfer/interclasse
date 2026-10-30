@@ -14,7 +14,8 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations/authentication'
-import { SITE_DESCRIPTION } from '#/lib/constant'
+import { siteDescription } from '#/lib/constant'
+import { m } from '#/paraglide/messages'
 
 import {
   AuthShell,
@@ -81,10 +82,10 @@ export function SignInForm(): React.JSX.Element {
           {/* A logo da edição faz o papel da marca aqui: com as duas, o
               selo aparecia repetido em tamanhos diferentes. Leva ao site,
               como a marca levava. */}
-          <Link to="/" aria-label="Jogos Estudantis - voltar ao site">
+          <Link to="/" aria-label={m.auth_back_to_site()}>
             <img
               src="/logo-512.png"
-              alt="2º JIC - II Jogos Interclasse do Cosme, CMEI 2026"
+              alt={m.auth_logo_alt()}
               width={256}
               height={256}
               className="size-64"
@@ -93,7 +94,7 @@ export function SignInForm(): React.JSX.Element {
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
               anuncia: a marca desenha a sigla, e é aqui que ela é dita
               inteira. */}
-          <AuthShellTagline>{SITE_DESCRIPTION}</AuthShellTagline>
+          <AuthShellTagline>{siteDescription()}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
 
@@ -101,8 +102,8 @@ export function SignInForm(): React.JSX.Element {
         {/* `method="post"`: clique em "Entrar" antes da hidratação vira envio
             nativo, e com GET a senha iria parar na URL e no histórico. */}
         <form method="post" onSubmit={onSubmit} className="flex flex-col gap-6">
-          <AuthShellHeader title="Entre na sua conta">
-            Organização, professores conselheiros e representantes de turma.
+          <AuthShellHeader title={m.auth_sign_in_title()}>
+            {m.auth_sign_in_description()}
           </AuthShellHeader>
 
           <FieldGroup>
@@ -110,13 +111,13 @@ export function SignInForm(): React.JSX.Element {
               control={form.control}
               name="email"
               id="form-email"
-              label="E-mail"
+              label={m.common_email()}
             >
               {({ field, control }) => (
                 <Input
                   {...field}
                   {...control}
-                  placeholder="voce@escola.com"
+                  placeholder={m.auth_email_placeholder()}
                   type="email"
                   autoComplete="email"
                   className="bg-primary/5"
@@ -128,7 +129,7 @@ export function SignInForm(): React.JSX.Element {
               control={form.control}
               name="password"
               id="form-password"
-              label="Senha"
+              label={m.common_password()}
             >
               {({ field, control }) => (
                 <InputPassword
@@ -148,7 +149,7 @@ export function SignInForm(): React.JSX.Element {
                 className="w-full"
                 isPending={mutation.isPending}
               >
-                Entrar
+                {m.auth_submit()}
               </SubmitButton>
             </Field>
           </FieldGroup>

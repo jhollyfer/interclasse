@@ -14,6 +14,7 @@ import {
 } from '#/components/common/confirm-dialog'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 import { useCloseRowActions } from './row-actions'
 
@@ -104,8 +105,8 @@ export function RowActionsArchive(
     <MenuConfirm
       slot="row-actions-archive"
       icon={<ArchiveIcon />}
-      label="Arquivar"
-      confirmLabel="Arquivar"
+      label={m.common_archive()}
+      confirmLabel={m.common_archive()}
       {...props}
     />
   )
@@ -119,8 +120,8 @@ export function RowActionsUnarchive(
     <MenuConfirm
       slot="row-actions-unarchive"
       icon={<ArrowCounterClockwiseIcon />}
-      label="Restaurar"
-      confirmLabel="Restaurar"
+      label={m.common_restore()}
+      confirmLabel={m.common_restore()}
       {...props}
     />
   )
@@ -143,7 +144,7 @@ type RowActionsDeleteProps = Readonly<
  * (spec do backend, item 7): oferecer o item fora daí é oferecer um erro.
  */
 export function RowActionsDelete({
-  label = 'Excluir',
+  label = m.common_delete(),
   ...props
 }: RowActionsDeleteProps): React.JSX.Element {
   return (
@@ -151,7 +152,7 @@ export function RowActionsDelete({
       slot="row-actions-delete"
       icon={<TrashIcon />}
       label={label}
-      confirmLabel="Remover"
+      confirmLabel={m.common_remove()}
       destructive
       {...props}
     />

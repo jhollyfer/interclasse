@@ -11,6 +11,7 @@ import {
   EmptyTitle,
 } from '#/components/ui/empty'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 import type { TableInstance } from './use-table'
 import { useTableContext } from './table-context'
@@ -102,7 +103,7 @@ export function TableEmpty<TRow extends RowData>({
                 })
               }
             >
-              Limpar filtro
+              {m.table_empty_filtered_action()}
             </Button>
           </EmptyContent>
         )}
@@ -120,8 +121,8 @@ export function TableEmptyTitle({
 
   return (
     <EmptyTitle data-slot="table-empty-title" {...props}>
-      {variant === 'filtered' && 'Nada para esse filtro'}
-      {variant === 'trash' && 'A lixeira está vazia'}
+      {variant === 'filtered' && m.table_empty_filtered_title()}
+      {variant === 'trash' && m.table_empty_trash_title()}
       {variant === 'empty' && children}
     </EmptyTitle>
   )
@@ -143,7 +144,7 @@ export function TableEmptyDescription({
   if (variant === 'filtered') {
     return (
       <EmptyDescription data-slot="table-empty-description" {...props}>
-        Nada bateu com o termo buscado. Limpe o filtro para ver a lista inteira.
+        {m.table_empty_filtered_description()}
       </EmptyDescription>
     )
   }

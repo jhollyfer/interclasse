@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Agenda } from '#/components/common/match-agenda'
 import { Skeleton } from '#/components/ui/skeleton'
 import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 /**
  * Os jogos da turma, marcados e já jogados, na ordem da agenda. Da rota do
@@ -21,7 +22,7 @@ export function ClassroomMatches({
   if (!data || data.data.length === 0)
     return (
       <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        Nenhum jogo da turma ainda. Os jogos aparecem depois do sorteio.
+        {m.common_classroom_no_matches()}
       </p>
     )
 

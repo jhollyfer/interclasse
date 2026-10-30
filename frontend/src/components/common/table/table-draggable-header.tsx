@@ -7,6 +7,7 @@ import type { Header, RowData } from '@tanstack/react-table'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 import type { TableFeatures } from './use-table'
 
@@ -62,7 +63,7 @@ export function TableDraggableHeader<TRow extends RowData>({
           variant="ghost"
           size="icon-xs"
           data-test-id={`drag-${header.column.id}`}
-          aria-label={`Mover coluna ${header.column.id}`}
+          aria-label={m.table_move_column({ column: header.column.id })}
           className={cn(
             '-ml-1 size-5 cursor-grab opacity-0 transition-opacity',
             'group-hover/th:opacity-100 active:cursor-grabbing',

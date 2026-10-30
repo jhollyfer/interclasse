@@ -19,6 +19,8 @@ import { linkOptions } from '@tanstack/react-router'
 import { USER_ROLE } from '@interclasse/shared'
 import type { UserRole } from '@interclasse/shared'
 
+import { m } from '#/paraglide/messages'
+
 /**
  * Os destinos do menu, tipados contra a árvore de rotas.
  *
@@ -27,43 +29,127 @@ import type { UserRole } from '@interclasse/shared'
  * que leva a lugar nenhum.
  */
 const ORGANIZATION = linkOptions([
-  { to: '/administrator', label: 'Painel', icon: GaugeIcon },
-  { to: '/administrator/brackets', label: 'Chaves', icon: TreeStructureIcon },
-  { to: '/administrator/matches', label: 'Partidas', icon: CalendarDotsIcon },
-  { to: '/administrator/cards', label: 'Cartões', icon: CardsIcon },
+  {
+    to: '/administrator',
+    get label() {
+      return m.panel_menu_dashboard()
+    },
+    icon: GaugeIcon,
+  },
+  {
+    to: '/administrator/brackets',
+    get label() {
+      return m.panel_menu_brackets()
+    },
+    icon: TreeStructureIcon,
+  },
+  {
+    to: '/administrator/matches',
+    get label() {
+      return m.panel_menu_matches()
+    },
+    icon: CalendarDotsIcon,
+  },
+  {
+    to: '/administrator/cards',
+    get label() {
+      return m.panel_menu_cards()
+    },
+    icon: CardsIcon,
+  },
   {
     to: '/administrator/removals',
-    label: 'Remoções de atleta',
+    get label() {
+      return m.panel_menu_removals()
+    },
     icon: UserMinusIcon,
   },
   {
     to: '/administrator/classrooms',
-    label: 'Turmas',
+    get label() {
+      return m.panel_menu_classrooms()
+    },
     icon: ChalkboardTeacherIcon,
   },
-  { to: '/administrator/sports', label: 'Modalidades', icon: BasketballIcon },
+  {
+    to: '/administrator/sports',
+    get label() {
+      return m.panel_menu_sports()
+    },
+    icon: BasketballIcon,
+  },
   {
     to: '/administrator/announcements',
-    label: 'Avisos',
+    get label() {
+      return m.panel_menu_announcements()
+    },
     icon: MegaphoneIcon,
   },
-  { to: '/administrator/photos', label: 'Fotos', icon: ImagesIcon },
-  { to: '/administrator/users', label: 'Usuários', icon: UsersIcon },
-  { to: '/administrator/reports', label: 'Relatórios', icon: ChartBarIcon },
-  { to: '/administrator/site', label: 'Site', icon: GlobeIcon },
+  {
+    to: '/administrator/photos',
+    get label() {
+      return m.panel_menu_photos()
+    },
+    icon: ImagesIcon,
+  },
+  {
+    to: '/administrator/users',
+    get label() {
+      return m.panel_menu_users()
+    },
+    icon: UsersIcon,
+  },
+  {
+    to: '/administrator/reports',
+    get label() {
+      return m.panel_menu_reports()
+    },
+    icon: ChartBarIcon,
+  },
+  {
+    to: '/administrator/site',
+    get label() {
+      return m.panel_menu_site()
+    },
+    icon: GlobeIcon,
+  },
 ])
 
 const ADVISOR = linkOptions([
-  { to: '/advisor', label: 'Minha turma', icon: StudentIcon },
-  { to: '/advisor/photos', label: 'Fotos dos jogos', icon: ImagesIcon },
+  {
+    to: '/advisor',
+    get label() {
+      return m.panel_menu_advisor_class()
+    },
+    icon: StudentIcon,
+  },
+  {
+    to: '/advisor/photos',
+    get label() {
+      return m.panel_menu_advisor_photos()
+    },
+    icon: ImagesIcon,
+  },
 ])
 
 const REPRESENTATIVE = linkOptions([
-  { to: '/representative', label: 'Atletas da turma', icon: ListChecksIcon },
+  {
+    to: '/representative',
+    get label() {
+      return m.panel_menu_representative_athletes()
+    },
+    icon: ListChecksIcon,
+  },
 ])
 
 const ACCOUNT = linkOptions([
-  { to: '/profile', label: 'Perfil', icon: IdentificationCardIcon },
+  {
+    to: '/profile',
+    get label() {
+      return m.panel_menu_profile()
+    },
+    icon: IdentificationCardIcon,
+  },
 ])
 
 export type MenuItem =
@@ -87,23 +173,34 @@ export type MenuGroup = {
  */
 export const MENU: ReadonlyArray<MenuGroup> = [
   {
-    label: 'Organização',
+    get label() {
+      return m.panel_menu_group_organization()
+    },
     items: ORGANIZATION,
     roles: [USER_ROLE.ADMINISTRATOR],
   },
   {
-    label: 'Conselheiro',
+    get label() {
+      return m.panel_menu_group_advisor()
+    },
     items: ADVISOR,
     // Só o conselheiro: o administrador vê todas as turmas em "Turmas", e o
     // item repetido aqui era a mesma tela em dobro.
     roles: [USER_ROLE.ADVISOR],
   },
   {
-    label: 'Representante',
+    get label() {
+      return m.panel_menu_group_representative()
+    },
     items: REPRESENTATIVE,
     roles: [USER_ROLE.REPRESENTATIVE],
   },
-  { label: 'Conta', items: ACCOUNT },
+  {
+    get label() {
+      return m.panel_menu_group_account()
+    },
+    items: ACCOUNT,
+  },
 ]
 
 /** Os grupos que o papel vê. */

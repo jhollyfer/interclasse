@@ -6,6 +6,7 @@ import { ButtonGroup } from '#/components/ui/button-group'
 import { FieldContent, FieldDescription } from '#/components/ui/field'
 import { Spinner } from '#/components/ui/spinner'
 import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 import { useImageFieldContext } from './image-field-context'
 
@@ -76,7 +77,7 @@ export function ImageFieldUpload({
  * Sem children escreve "Remover", que é o que todos os campos dizem.
  */
 export function ImageFieldRemove({
-  children = 'Remover',
+  children = m.common_remove(),
   ...rest
 }: React.ComponentProps<typeof Button>): React.JSX.Element | null {
   const { hasImage, isPending, clear } =
@@ -107,7 +108,7 @@ export function ImageFieldRemove({
  * padrão do `ImageField`; a tela que aceitar outro conjunto escreve o dela.
  */
 export function ImageFieldDescription({
-  children = 'JPG, PNG, WEBP ou GIF.',
+  children = m.common_image_formats(),
   ...props
 }: React.ComponentProps<typeof FieldDescription>): React.JSX.Element {
   return (

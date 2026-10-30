@@ -10,7 +10,7 @@ import type { QueryClient } from '@tanstack/react-query'
 
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
+import { siteDescription, siteTitle } from '#/lib/constant'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { getLocale } from '../paraglide/runtime'
@@ -38,11 +38,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: SITE_TITLE,
+        title: siteTitle(),
       },
       {
         name: 'description',
-        content: SITE_DESCRIPTION,
+        content: siteDescription(),
       },
     ],
     links: [
