@@ -52,7 +52,7 @@ export function UsersTable(): React.JSX.Element {
     usersQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => userColumns(), [])
+  const columns = userColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

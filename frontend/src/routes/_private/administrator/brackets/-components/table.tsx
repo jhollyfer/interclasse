@@ -33,7 +33,7 @@ export function BracketsTable(): React.JSX.Element {
     bracketsQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => bracketColumns(), [])
+  const columns = bracketColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

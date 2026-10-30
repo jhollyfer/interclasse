@@ -126,7 +126,7 @@ export function ImageField({
     event.target.value = ''
   }
 
-  const clear = React.useCallback((): void => {
+  function clear(): void {
     if (orphan) {
       remove.mutate(orphan)
       setOrphan(null)
@@ -134,11 +134,11 @@ export function ImageField({
 
     onValueChange(null)
     setPreview(null)
-  }, [orphan, remove, onValueChange])
+  }
 
-  const openPicker = React.useCallback((): void => {
+  function openPicker(): void {
     inputRef.current?.click()
-  }, [])
+  }
 
   // Trava o submit enquanto o arquivo sobe: sem isso o payload sai sem o `id`
   // do anexo, e o registro nasce sem imagem.
@@ -147,19 +147,15 @@ export function ImageField({
   const shown = preview ?? previewUrl
   const hasImage = Boolean(value ?? shown)
 
-  // Sem `useMemo` o objeto é novo a cada tecla digitada no formulário em volta,
-  // e as três partes re-renderizam junto com o campo vizinho.
-  const context = React.useMemo(
-    () => ({
-      shown,
-      hasImage,
-      isPending: upload.isPending,
-      openPicker,
-      clear,
-      controlId: id,
-    }),
-    [shown, hasImage, upload.isPending, openPicker, clear, id],
-  )
+  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  const context = {
+    shown,
+    hasImage,
+    isPending: upload.isPending,
+    openPicker,
+    clear,
+    controlId: id,
+  }
 
   return (
     <Field data-slot="image-field" orientation="horizontal" className="gap-4">

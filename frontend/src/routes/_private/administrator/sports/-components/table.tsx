@@ -36,7 +36,7 @@ export function SportsTable(): React.JSX.Element {
     sportsQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => sportColumns(), [])
+  const columns = sportColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

@@ -151,7 +151,7 @@ export function MatchesTable(): React.JSX.Element {
   const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
   const [carding, setCarding] = React.useState<MatchRef | null>(null)
 
-  const columns = React.useMemo(() => matchColumns(), [])
+  const columns = matchColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

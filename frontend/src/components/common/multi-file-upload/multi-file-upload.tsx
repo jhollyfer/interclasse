@@ -48,18 +48,15 @@ export function MultiFileUpload({
     onError: () => undefined,
   })
 
-  const change = React.useCallback(
-    (key: string, patch: Partial<UploadItem>): void => {
-      setItems((previous) =>
-        previous.map((item) => {
-          if (item.key !== key) return item
+  function change(key: string, patch: Partial<UploadItem>): void {
+    setItems((previous) =>
+      previous.map((item) => {
+        if (item.key !== key) return item
 
-          return { ...item, ...patch }
-        }),
-      )
-    },
-    [],
-  )
+        return { ...item, ...patch }
+      }),
+    )
+  }
 
   async function start(file: File): Promise<void> {
     const key = crypto.randomUUID()
@@ -106,23 +103,20 @@ export function MultiFileUpload({
     event.target.value = ''
   }
 
-  const remove = React.useCallback(
-    (key: string): void => {
-      controllers.current.get(key)?.abort()
-      controllers.current.delete(key)
+  function remove(key: string): void {
+    controllers.current.get(key)?.abort()
+    controllers.current.delete(key)
 
-      const target = items.find((item) => item.key === key)
+    const target = items.find((item) => item.key === key)
 
-      if (target?.storageId) discard.mutate(target.storageId)
+    if (target?.storageId) discard.mutate(target.storageId)
 
-      setItems((previous) => previous.filter((item) => item.key !== key))
-    },
-    [items, discard],
-  )
+    setItems((previous) => previous.filter((item) => item.key !== key))
+  }
 
-  const openPicker = React.useCallback((): void => {
+  function openPicker(): void {
     inputRef.current?.click()
-  }, [])
+  }
 
   const isUploading = items.some((item) => item.status === 'uploading')
 
@@ -140,10 +134,7 @@ export function MultiFileUpload({
     notify()
   }, [doneKey])
 
-  const context = React.useMemo(
-    () => ({ items, openPicker, remove, isUploading, controlId: id }),
-    [items, openPicker, remove, isUploading, id],
-  )
+  const context = { items, openPicker, remove, isUploading, controlId: id }
 
   return (
     <div data-slot="multi-file-upload" className="flex flex-col gap-3">

@@ -46,12 +46,8 @@ export function Table({
   children,
   ...rest
 }: TableProps): React.JSX.Element {
-  // Sem `useMemo` o objeto é novo a cada render da rota e todo subcomponente
-  // re-renderiza junto, mesmo com a rota e os filtros iguais.
-  const value = React.useMemo(
-    () => ({ to, search, isPlaceholderData, isError, onRetry }),
-    [to, search, isPlaceholderData, isError, onRetry],
-  )
+  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  const value = { to, search, isPlaceholderData, isError, onRetry }
 
   return (
     <TableProvider value={value}>

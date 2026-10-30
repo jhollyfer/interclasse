@@ -28,7 +28,7 @@ export function EmptyState({
   className,
   ...props
 }: EmptyStateProps): React.JSX.Element {
-  const value = React.useMemo(() => ({ reason }), [reason])
+  const value = { reason }
 
   return (
     <EmptyStateProvider value={value}>

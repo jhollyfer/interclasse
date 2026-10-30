@@ -27,7 +27,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
   const [paused, setPaused] = React.useState(false)
   const photos = data?.data ?? []
 
-  const step = React.useCallback((direction: 1 | -1): void => {
+  function step(direction: 1 | -1): void {
     const element = track.current
     if (!element) return
 
@@ -42,7 +42,9 @@ export function PhotoCarousel(): React.JSX.Element | null {
       left: direction * element.clientWidth,
       behavior: 'smooth',
     })
-  }, [])
+  }
+
+  const advance = React.useEffectEvent((): void => step(1))
 
   React.useEffect(() => {
     const reduced = window.matchMedia(
@@ -50,9 +52,9 @@ export function PhotoCarousel(): React.JSX.Element | null {
     ).matches
     if (paused || reduced || photos.length < 2) return
 
-    const timer = window.setInterval(() => step(1), AUTOPLAY_MS)
+    const timer = window.setInterval(() => advance(), AUTOPLAY_MS)
     return () => window.clearInterval(timer)
-  }, [paused, photos.length, step])
+  }, [paused, photos.length])
 
   if (photos.length === 0) return null
 

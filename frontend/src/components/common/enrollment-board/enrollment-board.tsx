@@ -100,10 +100,7 @@ function SportCard({
   // quando a lista DESTA modalidade mudou, e não a cada refetch - que
   // apagaria o que foi marcado e ainda não salvo nos outros cartões.
   const savedKey = [...enrolled].sort().join(',')
-  const initial = React.useMemo(
-    () => new Set(savedKey.split(',').filter(Boolean)),
-    [savedKey],
-  )
+  const initial = new Set(savedKey.split(',').filter(Boolean))
   const [selected, setSelected] = React.useState(initial)
   // Reset no render, e não `useEffect` espelhando a prop (`frontend.md` §2): a
   // lista gravada mudou, o rascunho volta a ela antes de desenhar.

@@ -170,69 +170,53 @@ export function useTable<TRow extends RowData>({
   actions,
   selectable = false,
 }: UseTableOptions<TRow>) {
-  // `actions` chega como arrow inline de cada tela (`actions: (notice) =>
-  // <NoticeRowActions .../>`), então é uma função nova a cada render e a lista
-  // de dependências abaixo nunca casaria: o array de colunas era reconstruído a
-  // cada tecla digitada na busca. A ref guarda a versão de agora sem entrar na
-  // dependência, e o que decide a **forma** da tabela - ter ou não ter a coluna
-  // - é um booleano, que é estável.
-  //
-  // `enableRowSelection` continua lendo `selectable` direto, e é de propósito:
-  // ele é chamado, não memoizado, e o predicado de `users` precisa enxergar a
-  // conta de agora.
-  const actionsRef = React.useRef(actions)
-  actionsRef.current = actions
-
   const hasActions = Boolean(actions)
   const hasSelection = Boolean(selectable)
 
   // Seleção e ações são colunas montadas aqui, e não pedidas a cada tela: a
   // primeira é sempre igual e esquecê-la deixaria a barra de ações em massa
   // inalcançável; a última era, antes, uma `<TableHead/>` solta fora do modelo
-  // de colunas - invisível para fixação, largura e ordem.
-  const allColumns = React.useMemo(() => {
-    const result: TableColumns<TRow> = []
+  // de colunas - invisível para fixação, largura e ordem. Sem `useMemo`: o
+  // React Compiler memoiza o array pelas dependências que ele lê
+  // (_doc-lib/tanstack-table.md#framework/react/guide/react-compiler).
+  const allColumns: TableColumns<TRow> = []
 
-    if (hasSelection) result.push(selectionColumn<TRow>())
+  if (hasSelection) allColumns.push(selectionColumn<TRow>())
 
-    result.push(...columns)
+  allColumns.push(...columns)
 
-    if (hasActions) {
-      result.push({
-        id: '_actions',
-        size: 56,
-        enableHiding: false,
-        enableResizing: false,
-        // A coluna existe e precisa se anunciar. Sem `header` o `<th>` saía
-        // vazio: para quem lê a tabela por leitor de tela, a última coluna não
-        // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
-        // um menu de 24px que já se explica pelo ícone.
-        header: () => <span className="sr-only">{m.common_actions()}</span>,
-        cell: ({ row }) => (
-          // O menu não pode disparar o clique da linha atrás dele.
-          <div onClick={(event) => event.stopPropagation()}>
-            {actionsRef.current?.(row.original)}
-          </div>
-        ),
-      })
-    }
-
-    return result
-  }, [columns, hasSelection, hasActions])
+  if (hasActions) {
+    allColumns.push({
+      id: '_actions',
+      size: 56,
+      enableHiding: false,
+      enableResizing: false,
+      // A coluna existe e precisa se anunciar. Sem `header` o `<th>` saía
+      // vazio: para quem lê a tabela por leitor de tela, a última coluna não
+      // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
+      // um menu de 24px que já se explica pelo ícone.
+      header: () => <span className="sr-only">{m.common_actions()}</span>,
+      cell: ({ row }) => (
+        // O menu não pode disparar o clique da linha atrás dele.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
+        <div onClick={(event) => event.stopPropagation()}>
+          {actions?.(row.original)}
+        </div>
+      ),
+    })
+  }
 
   // A caixa de seleção e o menu ficam visíveis ao rolar na horizontal: sem eles
   // ancorados, marcar a linha certa numa tabela larga vira adivinhação.
-  const initialPinning = React.useMemo(() => {
-    const start: Array<string> = []
-    const end: Array<string> = []
+  const pinStart: Array<string> = []
+  const pinEnd: Array<string> = []
 
-    if (hasSelection) start.push('_select')
-    if (hasActions) end.push('_actions')
+  if (hasSelection) pinStart.push('_select')
+  if (hasActions) pinEnd.push('_actions')
 
-    if (start.length === 0 && end.length === 0) return undefined
-
-    return { start, end }
-  }, [hasSelection, hasActions])
+  let initialPinning: ColumnPinningState | undefined = undefined
+  if (pinStart.length > 0 || pinEnd.length > 0)
+    initialPinning = { start: pinStart, end: pinEnd }
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({})
@@ -248,6 +232,7 @@ export function useTable<TRow extends RowData>({
 
   const [hydrated, setHydrated] = React.useState(false)
 
+  /* eslint-disable react-hooks/set-state-in-effect -- o servidor não tem o layout salvo: lê-lo no estado inicial diverge a hidratação (frontend.md §3.2) */
   React.useEffect(() => {
     const saved = readLayout(persistKey)
 
@@ -258,6 +243,7 @@ export function useTable<TRow extends RowData>({
 
     setHydrated(true)
   }, [persistKey])
+  /* eslint-enable react-hooks/set-state-in-effect -- fim do trecho que lê o layout salvo */
 
   React.useEffect(() => {
     // Antes de hidratar o estado ainda é o default, e gravá-lo apagaria o que

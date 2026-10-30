@@ -27,7 +27,7 @@ export function UploadingProvider({
 }>): React.JSX.Element {
   const [uploads, setUploads] = React.useState<Set<string>>(new Set())
 
-  const register = React.useCallback((key: string) => {
+  function register(key: string): void {
     setUploads((previous) => {
       if (previous.has(key)) return previous
 
@@ -35,9 +35,9 @@ export function UploadingProvider({
       next.add(key)
       return next
     })
-  }, [])
+  }
 
-  const unregister = React.useCallback((key: string) => {
+  function unregister(key: string): void {
     setUploads((previous) => {
       if (!previous.has(key)) return previous
 
@@ -45,12 +45,9 @@ export function UploadingProvider({
       next.delete(key)
       return next
     })
-  }, [])
+  }
 
-  const value = React.useMemo(
-    () => ({ register, unregister, isUploading: uploads.size > 0 }),
-    [register, unregister, uploads.size],
-  )
+  const value = { register, unregister, isUploading: uploads.size > 0 }
 
   return <UploadingContext value={value}>{children}</UploadingContext>
 }

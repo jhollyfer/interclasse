@@ -36,7 +36,7 @@ export function AnnouncementsTable(): React.JSX.Element {
     announcementsQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => announcementColumns(), [])
+  const columns = announcementColumns()
 
   const table = useTable({
     rows: data?.data ?? [],

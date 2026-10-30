@@ -47,12 +47,9 @@ export function RichText({
   className,
   ...props
 }: RichTextProps): React.JSX.Element {
-  const content = React.useMemo(() => {
-    if (json) return json
-    if (markdown) return MARKDOWN.parse(markdown)
-
-    return EMPTY_DOCUMENT
-  }, [json, markdown])
+  let content = EMPTY_DOCUMENT
+  if (markdown) content = MARKDOWN.parse(markdown)
+  if (json) content = json
 
   return (
     <div
