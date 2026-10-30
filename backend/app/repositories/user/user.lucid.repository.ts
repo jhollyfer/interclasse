@@ -1,9 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { TRASHED_MODE, left, right } from '@interclasse/shared'
-import type { AdministratorUserShowResponse, Either, Paginated } from '@interclasse/shared'
+import type { Either, Paginated } from '@interclasse/shared'
 
-import { UserRepository, type UserListCriteria } from './user.repository.ts'
+import { UserRepository, type UserListCriteria, type UserRead } from './user.repository.ts'
 
 import UserModel from '#models/user'
 import { PostgresError } from '#core/postgres-error'
@@ -95,7 +95,7 @@ export class UserLucidRepository extends UserRepository {
     await this.query().where('id', user.id).delete()
   }
 
-  async detail(id: string): Promise<AdministratorUserShowResponse | null> {
+  async detail(id: string): Promise<UserRead | null> {
     const row = await this.query()
       .where('id', id)
       .withScopes((scopes) => scopes.notDeleted())
@@ -107,7 +107,7 @@ export class UserLucidRepository extends UserRepository {
     return this.toResponse(row, avatars[0] ?? null)
   }
 
-  async paginate(criteria: UserListCriteria): Promise<Paginated<AdministratorUserShowResponse>> {
+  async paginate(criteria: UserListCriteria): Promise<Paginated<UserRead>> {
     const query = this.query()
 
     if (criteria.trashed === undefined) query.withScopes((scopes) => scopes.notDeleted())
@@ -163,10 +163,7 @@ export class UserLucidRepository extends UserRepository {
     })
   }
 
-  private toResponse(
-    row: UserModel,
-    avatar: AdministratorUserShowResponse['avatar'],
-  ): AdministratorUserShowResponse {
+  private toResponse(row: UserModel, avatar: UserRead['avatar']): UserRead {
     return {
       id: row.id,
       name: row.name,

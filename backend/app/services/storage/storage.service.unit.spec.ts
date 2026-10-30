@@ -45,6 +45,15 @@ test.group('services > storage (unit)', () => {
     assert.include(header, 'filename="a_b_c.png"')
   })
 
+  test('withUrl devolve o registro com a URL assinada do próprio path', async ({ assert }) => {
+    const storage = await service()
+
+    const signed = await storage.withUrl({ path: 'a/b.png', originalName: 'b.png' })
+
+    assert.equal(signed.originalName, 'b.png')
+    assert.equal(signed.url.split('?')[0]?.endsWith('/a/b.png'), true)
+  })
+
   test('a URL assinada de leitura é calculada localmente e vence', async ({ assert }) => {
     const storage = await service()
 

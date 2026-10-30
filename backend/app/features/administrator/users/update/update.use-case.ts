@@ -10,6 +10,7 @@ import {
 } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
@@ -43,6 +44,7 @@ export default class AdministratorUserUpdateUseCase {
     private readonly sessions: SessionRepository,
     private readonly classrooms: ClassroomRepository,
     private readonly unitOfWork: UnitOfWork,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -91,7 +93,10 @@ export default class AdministratorUserUpdateUseCase {
       if (!detail)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right(detail)
+      return right({
+        ...detail,
+        avatar: detail.avatar && (await this.bucket.withUrl(detail.avatar)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[administrator/users > update][error]')
 

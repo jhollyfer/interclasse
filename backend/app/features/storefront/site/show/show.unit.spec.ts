@@ -4,7 +4,9 @@ import { UPLOAD_STATUS } from '@interclasse/shared'
 import StorefrontSiteShowUseCase from './show.use-case.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
-import { SiteSettingMemoryRepository } from '#repositories/site-setting/site-setting.memory.repository'
+import { StorageContract } from '#services/storage/storage.contract'
+import { StorageFake } from '#services/storage/storage.fake'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
@@ -12,7 +14,8 @@ const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
 test.group('storefront/site > show (unit)', () => {
   test('sem nada preenchido, o site recebe tudo vazio e sem regulamento', async ({ assert }) => {
     const useCase = await makeWithMemory(StorefrontSiteShowUseCase, [
-      [SiteSettingRepository, new SiteSettingMemoryRepository()],
+      [SiteSettingRepository, MemoryRepositories.siteSettings()],
+      [StorageContract, new StorageFake()],
     ])
 
     const result = await useCase.execute()
@@ -29,7 +32,7 @@ test.group('storefront/site > show (unit)', () => {
   })
 
   test('o regulamento sai só com URL, nome e tamanho', async ({ assert }) => {
-    const settings = new SiteSettingMemoryRepository().withFile({
+    const settings = MemoryRepositories.siteSettings().withFile({
       id: PDF_ID,
       filename: 'f.pdf',
       originalName: 'regulamento.pdf',
@@ -39,7 +42,6 @@ test.group('storefront/site > show (unit)', () => {
       status: UPLOAD_STATUS.UPLOADED,
       partSize: null,
       uploadId: null,
-      url: 'https://bucket.test/regulamento',
       createdAt: null,
       updatedAt: null,
       deletedAt: null,
@@ -52,12 +54,13 @@ test.group('storefront/site > show (unit)', () => {
     await settings.save(setting)
     const useCase = await makeWithMemory(StorefrontSiteShowUseCase, [
       [SiteSettingRepository, settings],
+      [StorageContract, new StorageFake()],
     ])
 
     const result = await useCase.execute()
 
     assert.deepEqual(result.isRight() && result.value.regulation, {
-      url: 'https://bucket.test/regulamento',
+      url: 'https://bucket.test/segredo/f.pdf?signed',
       originalName: 'regulamento.pdf',
       size: 2048,
     })

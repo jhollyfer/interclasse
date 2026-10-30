@@ -80,7 +80,7 @@ export default class StoragesFileCompleteUseCase {
 
       if (!detail) return left(this.notFound())
 
-      return right(detail)
+      return right(await this.bucket.withUrl(detail))
     } catch (error) {
       logger.error({ err: error }, '[storages/files > complete][error]')
 

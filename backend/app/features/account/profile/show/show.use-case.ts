@@ -10,6 +10,7 @@ import {
 } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { UserRepository } from '#repositories/user/user.repository'
 
 type Payload = { actor: Actor }
@@ -26,6 +27,7 @@ type Response = Either<HTTPException, AccountProfileShowResponse>
 export default class AccountProfileShowUseCase {
   constructor(
     private readonly users: UserRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -36,7 +38,10 @@ export default class AccountProfileShowUseCase {
       if (!profile)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right(profile)
+      return right({
+        ...profile,
+        avatar: profile.avatar && (await this.bucket.withUrl(profile.avatar)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[account/profile > show][error]')
 

@@ -32,7 +32,7 @@ test.group('storefront/photos > paginate (unit)', () => {
     if (result.isLeft()) throw new Error('esperava lista')
     const [item] = result.value.data
     assert.lengthOf(result.value.data, 1)
-    assert.equal(item?.url, storage.url)
+    assert.equal(item?.url, `https://bucket.test/${storage.path}?signed`)
     assert.notProperty(item ?? {}, 'authorId')
   })
 })

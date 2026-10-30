@@ -5,24 +5,25 @@ import {
   UPLOAD_STATUS,
   type AdministratorPhotoShowResponse,
   type Paginated,
-  type StorefrontPhotoShowResponse,
 } from '@interclasse/shared'
 
-import { PhotoRepository, type PhotoListCriteria, type PhotoStorage } from './photo.repository.ts'
+import {
+  PhotoRepository,
+  type ApprovedPhotoRead,
+  type PhotoListCriteria,
+  type PhotoRead,
+  type PhotoStorage,
+} from './photo.repository.ts'
 
 import PhotoModel from '#models/photo'
 import StorageModel from '#models/storage'
 import UserModel from '#models/user'
 import { Photo } from '#domain/photo/photo.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
-import { StorageContract } from '#services/storage/storage.contract'
 
 @inject()
 export class PhotoLucidRepository extends PhotoRepository {
-  constructor(
-    private readonly transaction: TransactionContext,
-    private readonly bucket: StorageContract,
-  ) {
+  constructor(private readonly transaction: TransactionContext) {
     super()
   }
 
@@ -75,7 +76,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     await PhotoModel.query({ client: this.transaction.client() }).where('id', photo.id).delete()
   }
 
-  async show(id: string): Promise<AdministratorPhotoShowResponse | null> {
+  async show(id: string): Promise<PhotoRead | null> {
     const row = await PhotoModel.query({ client: this.transaction.client() })
       .where('id', id)
       .preload('storage')
@@ -86,7 +87,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     return this.toResponse(row)
   }
 
-  async paginate(criteria: PhotoListCriteria): Promise<Paginated<AdministratorPhotoShowResponse>> {
+  async paginate(criteria: PhotoListCriteria): Promise<Paginated<PhotoRead>> {
     const query = PhotoModel.query({ client: this.transaction.client() })
       .preload('storage')
       .preload('author')
@@ -97,14 +98,14 @@ export class PhotoLucidRepository extends PhotoRepository {
 
     return {
       meta: page.getMeta(),
-      data: await Promise.all(page.all().map((row) => this.toResponse(row))),
+      data: page.all().map((row) => this.toResponse(row)),
     }
   }
 
   async paginateApproved(criteria: {
     readonly page: number
     readonly perPage: number
-  }): Promise<Paginated<StorefrontPhotoShowResponse>> {
+  }): Promise<Paginated<ApprovedPhotoRead>> {
     const page = await PhotoModel.query({ client: this.transaction.client() })
       .where('status', PHOTO_STATUS.APPROVED)
       .preload('storage')
@@ -113,14 +114,12 @@ export class PhotoLucidRepository extends PhotoRepository {
 
     return {
       meta: page.getMeta(),
-      data: await Promise.all(
-        page.all().map(async (row) => ({
-          id: row.id,
-          caption: row.caption,
-          url: await this.bucket.signedUrl(row.storage.path),
-          createdAt: this.iso(row.createdAt),
-        })),
-      ),
+      data: page.all().map((row) => ({
+        id: row.id,
+        caption: row.caption,
+        path: row.storage.path,
+        createdAt: this.iso(row.createdAt),
+      })),
     }
   }
 
@@ -138,7 +137,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     })
   }
 
-  private async toResponse(row: PhotoModel): Promise<AdministratorPhotoShowResponse> {
+  private toResponse(row: PhotoModel): PhotoRead {
     const { storage, author } = row
 
     return {
@@ -157,7 +156,6 @@ export class PhotoLucidRepository extends PhotoRepository {
         size: storage.size,
         path: storage.path,
         status: storage.status,
-        url: await this.bucket.signedUrl(storage.path),
         createdAt: storage.createdAt?.toISO() ?? null,
         updatedAt: storage.updatedAt?.toISO() ?? null,
         deletedAt: storage.deletedAt?.toISO() ?? null,

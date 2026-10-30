@@ -3,10 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { type I18n } from '@adonisjs/i18n'
 import { left, right, type AdministratorPhotoShowResponse, type Either } from '@interclasse/shared'
 
+import { PhotoReadBase } from '#features/_shared.photo-read.base'
 import { PhotoRefusal } from '#features/administrator/photos/_shared.photo-refusal'
 import { Photo, type PhotoSender } from '#domain/photo/photo.entity'
 import { type PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
+import type { StorageContract } from '#services/storage/storage.contract'
 
 type Submission = {
   readonly storageId: string
@@ -23,11 +25,10 @@ type Submission = {
  *
  * Erro de infraestrutura sobe: quem trata é o try/catch do use-case.
  */
-export abstract class PhotoSubmissionBase {
-  protected constructor(
-    protected readonly photos: PhotoRepository,
-    protected readonly i18n: I18n,
-  ) {}
+export abstract class PhotoSubmissionBase extends PhotoReadBase {
+  protected constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {
+    super(photos, bucket, i18n)
+  }
 
   protected async submit(
     input: Submission,
@@ -50,6 +51,6 @@ export abstract class PhotoSubmissionBase {
     if (!shown)
       return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
 
-    return right(shown)
+    return right(await this.signed(shown))
   }
 }

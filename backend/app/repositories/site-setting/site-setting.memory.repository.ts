@@ -1,18 +1,18 @@
 import { randomUUID } from 'node:crypto'
 
-import type {
-  AdministratorSiteRegulationResponse,
-  AdministratorSiteShowResponse,
-  StorefrontSiteShowResponse,
-} from '@interclasse/shared'
-
-import { SiteSettingRepository } from './site-setting.repository.ts'
+import {
+  SiteSettingRepository,
+  type PublicSiteSettingRead,
+  type SiteSettingRead,
+} from './site-setting.repository.ts'
 
 import {
   SiteSetting,
   type RegulationFile,
   type SiteSettingProps,
 } from '#domain/site-setting/site-setting.entity'
+
+type RegulationRow = NonNullable<SiteSettingRead['regulation']>
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case
@@ -22,10 +22,10 @@ import {
 export class SiteSettingMemoryRepository extends SiteSettingRepository {
   private row: SiteSettingProps | null = null
   /** Os arquivos enviados, por id: o que o teste arranja no lugar da tabela `storages`. */
-  private readonly files = new Map<string, AdministratorSiteRegulationResponse>()
+  private readonly files = new Map<string, RegulationRow>()
 
   /** Arranjo do teste: um arquivo enviado e não arquivado. */
-  withFile(file: AdministratorSiteRegulationResponse): this {
+  withFile(file: RegulationRow): this {
     this.files.set(file.id, file)
     return this
   }
@@ -47,7 +47,7 @@ export class SiteSettingMemoryRepository extends SiteSettingRepository {
     this.row = structuredClone(setting.snapshot())
   }
 
-  async show(): Promise<AdministratorSiteShowResponse> {
+  async show(): Promise<SiteSettingRead> {
     const row = await this.snapshot()
 
     return {
@@ -65,7 +65,7 @@ export class SiteSettingMemoryRepository extends SiteSettingRepository {
     }
   }
 
-  async showPublic(): Promise<StorefrontSiteShowResponse> {
+  async showPublic(): Promise<PublicSiteSettingRead> {
     const row = await this.snapshot()
     const regulation = this.regulationOf(row.regulationId)
 
@@ -77,7 +77,7 @@ export class SiteSettingMemoryRepository extends SiteSettingRepository {
       schoolInstagram: row.schoolInstagram,
       developerInstagram: row.developerInstagram,
       regulation: regulation && {
-        url: regulation.url ?? '',
+        path: regulation.path,
         originalName: regulation.originalName,
         size: regulation.size,
       },
@@ -90,7 +90,7 @@ export class SiteSettingMemoryRepository extends SiteSettingRepository {
     return setting.snapshot()
   }
 
-  private regulationOf(id: string | null): AdministratorSiteRegulationResponse | null {
+  private regulationOf(id: string | null): RegulationRow | null {
     if (!id) return null
 
     return this.files.get(id) ?? null

@@ -1,7 +1,11 @@
 import { UPLOAD_STATUS } from '@interclasse/shared'
-import type { Paginated, SortDirection, StoragesFileShowResponse } from '@interclasse/shared'
+import type { Paginated, SortDirection } from '@interclasse/shared'
 
-import { StorageRepository, type StorageListCriteria } from './storage.repository.ts'
+import {
+  StorageRepository,
+  type StorageFileRead,
+  type StorageListCriteria,
+} from './storage.repository.ts'
 
 import { Storage, type StorageProps } from '#domain/storage/storage.entity'
 import { MemoryPagination } from '#core/memory-pagination'
@@ -31,14 +35,14 @@ export class StorageMemoryRepository extends StorageRepository {
     return Storage.restore(structuredClone(props))
   }
 
-  async detail(id: string): Promise<StoragesFileShowResponse | null> {
+  async detail(id: string): Promise<StorageFileRead | null> {
     const props = this.rows.get(id)
     if (!props || props.deletedAt) return null
 
     return this.toResponse(props)
   }
 
-  async detailsOf(ids: ReadonlyArray<string>): Promise<StoragesFileShowResponse[]> {
+  async detailsOf(ids: ReadonlyArray<string>): Promise<StorageFileRead[]> {
     return [...new Set(ids)].flatMap((id) => {
       const props = this.rows.get(id)
 
@@ -68,7 +72,7 @@ export class StorageMemoryRepository extends StorageRepository {
     this.rows.delete(storage.id)
   }
 
-  async paginate(criteria: StorageListCriteria): Promise<Paginated<StoragesFileShowResponse>> {
+  async paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>> {
     const search = criteria.search?.toLowerCase()
     const sign = SIGN[criteria.direction]
     const all = [...this.rows.values()]
@@ -98,7 +102,7 @@ export class StorageMemoryRepository extends StorageRepository {
     return a[sort].localeCompare(b[sort])
   }
 
-  private toResponse(props: StorageProps): StoragesFileShowResponse {
+  private toResponse(props: StorageProps): StorageFileRead {
     return {
       id: props.id,
       filename: props.filename,
@@ -112,7 +116,6 @@ export class StorageMemoryRepository extends StorageRepository {
       createdAt: props.createdAt?.toISOString() ?? null,
       updatedAt: props.updatedAt?.toISOString() ?? null,
       deletedAt: props.deletedAt?.toISOString() ?? null,
-      url: `memory://${props.path}`,
     }
   }
 }

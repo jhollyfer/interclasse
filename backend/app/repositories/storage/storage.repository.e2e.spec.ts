@@ -66,7 +66,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(updated?.snapshot().status, 'UPLOADED')
     })
 
-    test('detail traz o registro na forma da resposta, com a url', async ({ assert }) => {
+    test('detail traz o registro na forma da resposta, sem a url', async ({ assert }) => {
       const repository = await make()
       const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a93', 'capa.png')
       await repository.save(capa)
@@ -74,7 +74,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const detail = await repository.detail(capa.id)
 
       assert.deepInclude(detail, { id: capa.id, originalName: 'capa.png', status: 'UPLOADED' })
-      assert.isString(detail?.url)
+      assert.notProperty(detail, 'url')
       assert.isNull(await repository.detail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 

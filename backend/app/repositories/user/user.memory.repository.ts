@@ -1,13 +1,8 @@
 import hash from '@adonisjs/core/services/hash'
 import { TRASHED_MODE, left, right } from '@interclasse/shared'
-import type {
-  AdministratorUserShowResponse,
-  Either,
-  Paginated,
-  SortDirection,
-} from '@interclasse/shared'
+import type { Either, Paginated, SortDirection } from '@interclasse/shared'
 
-import { UserRepository, type UserListCriteria } from './user.repository.ts'
+import { UserRepository, type UserListCriteria, type UserRead } from './user.repository.ts'
 
 import { User, type UserProps } from '#domain/user/user.entity'
 import type { UserError } from '#domain/user/user.errors'
@@ -85,14 +80,14 @@ export class UserMemoryRepository extends UserRepository {
     this.rows.delete(user.id)
   }
 
-  async detail(id: string): Promise<AdministratorUserShowResponse | null> {
+  async detail(id: string): Promise<UserRead | null> {
     const props = this.rows.get(id)
     if (!props || props.deletedAt) return null
 
     return this.toResponse(props, await this.avatarOf(props))
   }
 
-  async paginate(criteria: UserListCriteria): Promise<Paginated<AdministratorUserShowResponse>> {
+  async paginate(criteria: UserListCriteria): Promise<Paginated<UserRead>> {
     const search = criteria.search?.toLowerCase()
     const sign = SIGN[criteria.direction]
     const all = [...this.rows.values()]
@@ -133,16 +128,13 @@ export class UserMemoryRepository extends UserRepository {
     return a[sort].localeCompare(b[sort])
   }
 
-  private async avatarOf(props: UserProps): Promise<AdministratorUserShowResponse['avatar']> {
+  private async avatarOf(props: UserProps): Promise<UserRead['avatar']> {
     const [avatar] = await this.storages.detailsOf([props.avatarId ?? []].flat())
 
     return avatar ?? null
   }
 
-  private toResponse(
-    props: UserProps,
-    avatar: AdministratorUserShowResponse['avatar'],
-  ): AdministratorUserShowResponse {
+  private toResponse(props: UserProps, avatar: UserRead['avatar']): UserRead {
     return {
       id: props.id,
       name: props.name,

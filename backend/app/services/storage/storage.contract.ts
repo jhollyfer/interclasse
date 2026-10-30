@@ -40,4 +40,15 @@ export abstract class StorageContract {
   abstract signedDownload(file: StorageDownload): Promise<string>
   /** O header `Content-Disposition` de um download, com o nome original. */
   abstract contentDisposition(originalName: string): string
+
+  /**
+   * O ponto único da assinatura de leitura: o registro do arquivo com a `url` ao lado
+   * do `path`. O repository devolve a leitura sem `url` (`_standards/architecture.md`
+   * §2: nenhum service dentro dele) e o use-case assina por aqui, a cada leitura.
+   */
+  async withUrl<TFile extends { readonly path: string }>(
+    file: TFile,
+  ): Promise<TFile & { readonly url: string }> {
+    return { ...file, url: await this.signedUrl(file.path) }
+  }
 }
