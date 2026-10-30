@@ -5,9 +5,8 @@ import AdvisorStudentCreateUseCase from './create.use-case.ts'
 
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
 import { StudentRepository } from '#repositories/student/student.repository'
-import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
@@ -16,7 +15,7 @@ const FOREIGN = '00000000-0000-4000-8000-000000000002'
 const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
   const own = Classroom.create(
     { id: CLASSROOM, name: '9º A', grade: 9, advisorId: ADVISOR, now: new Date() },
     { advisor: { exists: true, taken: false } },
@@ -25,7 +24,7 @@ async function setup() {
   if (own.isLeft() || foreign.isLeft()) throw new Error('arranjo inválido')
   await classrooms.save(own.value)
   await classrooms.save(foreign.value)
-  const students = new StudentMemoryRepository().withClassroom(CLASSROOM, ADVISOR)
+  const students = MemoryRepositories.students().withClassroom(CLASSROOM, ADVISOR)
   const useCase = await makeWithMemory(AdvisorStudentCreateUseCase, [
     [ClassroomRepository, classrooms],
     [StudentRepository, students],

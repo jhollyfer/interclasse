@@ -5,7 +5,7 @@ import AdvisorStudentPaginateUseCase from './paginate.use-case.ts'
 
 import { Student } from '#domain/student/student.entity'
 import { StudentRepository } from '#repositories/student/student.repository'
-import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
@@ -14,7 +14,7 @@ const FOREIGN = '00000000-0000-4000-8000-000000000002'
 const ACTOR = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
-  const students = new StudentMemoryRepository()
+  const students = MemoryRepositories.students()
     .withClassroom(OWN, ADVISOR)
     .withClassroom(FOREIGN, null)
   const names = [

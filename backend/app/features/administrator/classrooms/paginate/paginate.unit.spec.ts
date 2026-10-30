@@ -4,11 +4,11 @@ import AdministratorClassroomPaginateUseCase from './paginate.use-case.ts'
 
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
   const grades = [
     ['9º A', 9],
     ['4º A', 4],

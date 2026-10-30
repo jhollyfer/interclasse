@@ -3,12 +3,12 @@ import { CATEGORY } from '@interclasse/shared'
 
 import AdministratorBracketPreviewUseCase from './preview.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const useCase = await makeWithMemory(
     AdministratorBracketPreviewUseCase,
     BracketUnitFixtures.bindings(brackets),

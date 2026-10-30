@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import MatchCard from '#models/match-card'
+import { MatchCardFactory } from '#database/factories/match-card.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -17,17 +18,17 @@ test.group('cards > delete', (group) => {
   test('apaga o cartão e responde 204', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { match, homeTeam, homeStudent } = await matchWithTeams()
-    const card = await MatchCard.create({
+    const card = await MatchCardFactory.merge({
       matchId: match.id,
       teamId: homeTeam.id,
       studentId: homeStudent.id,
       color: 'YELLOW',
-    })
+    }).create()
 
     const response = await client.delete(`/administrator/cards/${card.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await MatchCard.find(card.id))
+    assert.isNull(await Stored.card(card.id))
   })
 
   test('cartão inexistente responde 404', async ({ client, assert }) => {

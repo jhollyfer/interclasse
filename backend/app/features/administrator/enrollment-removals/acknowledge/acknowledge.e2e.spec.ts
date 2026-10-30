@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import EnrollmentRemoval from '#models/enrollment-removal'
+import { EnrollmentRemovalFactory } from '#database/factories/enrollment-removal.factory'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import {
@@ -19,12 +19,12 @@ test.group('enrollment-removals > acknowledge', (group) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
-    const removal = await EnrollmentRemoval.create({
+    const removal = await EnrollmentRemovalFactory.merge({
       classroomId: classroom.id,
       sportId: sport.id,
       studentName: 'Ana',
       reason: 'Saiu da escola',
-    })
+    }).create()
 
     const first = await client
       .patch(`/administrator/enrollment-removals/${removal.id}/acknowledge`)

@@ -3,8 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { test } from '@japa/runner'
 import { MATCH_PHASE } from '@interclasse/shared'
 
-import Match from '#models/match'
-import Team from '#models/team'
+import { Stored } from '#tests/stored-fixtures'
 import { drawnBracket, scoreAll } from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,
@@ -45,8 +44,8 @@ test.group('brackets > delete', (group) => {
     response.assertStatus(204)
     const detalhe = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
     detalhe.assertStatus(404)
-    assert.lengthOf(await Team.query().where('bracketId', bracket.id), 0)
-    assert.lengthOf(await Match.query().where('bracketId', bracket.id), 0)
+    assert.lengthOf(await Stored.teamsOfBracket(bracket.id), 0)
+    assert.lengthOf(await Stored.matchesOfBracket(bracket.id), 0)
 
     // Sem a chave, a lista da turma continua aceitando mudança.
     const inscricao = await client.put('/advisor/enrollments').cookies(admin).json({

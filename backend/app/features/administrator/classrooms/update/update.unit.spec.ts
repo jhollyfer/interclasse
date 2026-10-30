@@ -5,7 +5,7 @@ import AdministratorClassroomUpdateUseCase from './update.use-case.ts'
 
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
@@ -28,7 +28,7 @@ function account(id: string, role: UserRole) {
 }
 
 async function born(
-  classrooms: ClassroomMemoryRepository,
+  classrooms: ClassroomRepository,
   id: string,
   name: string,
   grade: number,
@@ -45,7 +45,7 @@ async function born(
 }
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
     .withAccount(account(ADVISOR, USER_ROLE.ADVISOR))
     .withAccount(account(SECOND_ADVISOR, USER_ROLE.ADVISOR))
   await born(classrooms, ID, '7º A', 7, ADVISOR)

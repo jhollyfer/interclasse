@@ -4,13 +4,13 @@ import AdministratorSportUpdateUseCase from './update.use-case.ts'
 
 import { Sport } from '#domain/sport/sport.entity'
 import { SportRepository } from '#repositories/sport/sport.repository'
-import { SportMemoryRepository } from '#repositories/sport/sport.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
 
 async function setup() {
-  const sports = new SportMemoryRepository()
+  const sports = MemoryRepositories.sports()
   const futsal = Sport.create({
     id: ID,
     name: 'Futsal',

@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Sport from '#models/sport'
 import { SportFactory } from '#database/factories/sport.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { enrollRoster } from '#tests/sports-fixtures'
 import {
   authenticateAsAdministrator,
@@ -86,7 +86,7 @@ test.group('sports > update', (group) => {
     response.assertStatus(422)
     assert.equal(body(response).code, 'SPORT_INVALID_LIMITS')
     assert.property(body(response).errors, 'minAthletes')
-    const stored = await Sport.findOrFail(sport.id)
+    const stored = await Stored.sportOrFail(sport.id)
     assert.equal(stored.maxAthletes, 10)
   })
 
@@ -138,7 +138,7 @@ test.group('sports > update', (group) => {
 
       response.assertStatus(422)
     }
-    const stored = await Sport.findOrFail(sport.id)
+    const stored = await Stored.sportOrFail(sport.id)
     assert.equal(stored.name, sport.name)
     assert.equal(stored.maxAthletes, sport.maxAthletes)
   })

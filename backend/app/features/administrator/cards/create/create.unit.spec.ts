@@ -5,12 +5,12 @@ import { CARD_COLOR, MATCH_PHASE } from '@interclasse/shared'
 
 import AdministratorCardCreateUseCase from './create.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const drawn = await BracketUnitFixtures.drawn(brackets)
   const cards = BracketUnitFixtures.cards(brackets, drawn.students)
   const useCase = await makeWithMemory(

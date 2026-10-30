@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import MatchCard from '#models/match-card'
+import { MatchCardFactory } from '#database/factories/match-card.factory'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -15,10 +15,10 @@ test.group('cards > paginate', (group) => {
   test('lista os cartões e filtra pela turma', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } = await matchWithTeams()
-    await MatchCard.createMany([
+    await MatchCardFactory.merge([
       { matchId: match.id, teamId: homeTeam.id, studentId: homeStudent.id, color: 'YELLOW' },
       { matchId: match.id, teamId: awayTeam.id, studentId: awayStudent.id, color: 'RED' },
-    ])
+    ]).createMany(2)
 
     const all = await client.get('/administrator/cards').cookies(session)
     const filtered = await client

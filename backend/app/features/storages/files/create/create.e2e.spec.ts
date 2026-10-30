@@ -2,7 +2,6 @@ import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import { StoragesFileCreateValidator } from '#validators/storages/files.validator'
 import { UPLOAD_MAX_SIZE } from '#validators/storages/files.validator'
@@ -12,6 +11,7 @@ import {
   resetDatabase,
   type ResponseBody,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
 
 /**
@@ -146,7 +146,7 @@ test.group('storages > create', (group) => {
 
     assert.strictEqual(opened.storage.size, size)
 
-    const stored = await Storage.findOrFail(opened.storage.id)
+    const stored = await Stored.storageOrFail(opened.storage.id)
     assert.strictEqual(stored.size, size)
   })
 

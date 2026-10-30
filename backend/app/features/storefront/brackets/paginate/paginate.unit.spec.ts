@@ -2,13 +2,13 @@ import { test } from '@japa/runner'
 
 import StorefrontBracketPaginateUseCase from './paginate.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('storefront/brackets > paginate (unit)', () => {
   test('lista as chaves por nome de modalidade', async ({ assert }) => {
-    const brackets = new BracketMemoryRepository()
+    const brackets = MemoryRepositories.brackets()
     const useCase = await makeWithMemory(
       StorefrontBracketPaginateUseCase,
       BracketUnitFixtures.bindings(brackets),

@@ -1,10 +1,7 @@
-import { randomUUID } from 'node:crypto'
-
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
-import { UPLOAD_STATUS } from '@interclasse/shared'
 
-import Storage from '#models/storage'
+import { StorageFactory } from '#database/factories/storage.factory'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   authenticateAsAdministrator,
@@ -13,26 +10,12 @@ import {
   authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
-/** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
-function upload() {
-  const id = randomUUID()
-
-  return Storage.create({
-    filename: `${id}.png`,
-    originalName: 'foto.png',
-    mimetype: 'image/png',
-    size: 1024,
-    path: `${id}.png`,
-    status: UPLOAD_STATUS.UPLOADED,
-  })
-}
-
 test.group('administrador > users > leitura', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('a foto sai aninhada e a senha não sai', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const avatar = await upload()
+    const avatar = await StorageFactory.create()
 
     const user = await UserFactory.merge({ avatarId: avatar.id }).create()
 

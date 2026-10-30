@@ -6,10 +6,6 @@
  *
  * @type {import('dependency-cruiser').IConfiguration}
  */
-// A spec monta o use-case com o repository em memória e semeia pelo model
-// (DECISIONS.md #116); a proibição vale para o código de produção.
-const SPEC = '\\.(unit|e2e)\\.spec\\.ts$'
-
 module.exports = {
   forbidden: [
     {
@@ -48,7 +44,7 @@ module.exports = {
       name: 'models-so-em-repositories',
       comment: 'models/ só é importado por repositories/ (e por outro model).',
       severity: 'error',
-      from: { path: '^app/', pathNot: ['^app/(repositories|models)/', SPEC] },
+      from: { path: '^app/', pathNot: '^app/(repositories|models)/' },
       to: { path: '^app/models/' },
     },
     {
@@ -87,7 +83,7 @@ module.exports = {
       name: 'features-sem-implementacao',
       comment: 'features/ usa o contrato; nunca model nem implementação concreta.',
       severity: 'error',
-      from: { path: '^app/features/', pathNot: SPEC },
+      from: { path: '^app/features/' },
       to: {
         path: [
           '^app/models/',

@@ -3,13 +3,13 @@ import { test } from '@japa/runner'
 import AdministratorSportShowUseCase from './show.use-case.ts'
 
 import { SportRepository } from '#repositories/sport/sport.repository'
-import { SportMemoryRepository } from '#repositories/sport/sport.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { seedSport } from '#tests/sports-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
 async function setup() {
-  const sports = new SportMemoryRepository()
+  const sports = MemoryRepositories.sports()
   const useCase = await makeWithMemory(AdministratorSportShowUseCase, [[SportRepository, sports]])
 
   return { sports, useCase }

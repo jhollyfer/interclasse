@@ -3,7 +3,6 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
 import { StorageFactory } from '#database/factories/storage.factory'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import {
@@ -12,6 +11,7 @@ import {
   resetDatabase,
   type ResponseBody,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
@@ -92,7 +92,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(204)
 
-    assert.isNull(await Storage.find(storage.id))
+    assert.isNull(await Stored.storage(storage.id))
     assert.isFalse(await drive.use().exists(storage.path))
   })
 
@@ -111,7 +111,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(204)
 
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isNull(await Stored.storage(opened.storage.id))
     // O upload deixou de existir: pedir a retomada dele agora é 404.
     const resumed = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
     resumed.assertStatus(404)
@@ -130,7 +130,7 @@ test.group('storages > delete', (group) => {
     assert.equal(body(response).code, 'STORAGE_IN_USE')
 
     // O 409 não pode ser um "apagou e reclamou": registro e binário seguem lá.
-    assert.isNotNull(await Storage.find(storage.id))
+    assert.isNotNull(await Stored.storage(storage.id))
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
@@ -148,7 +148,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'STORAGE_IN_USE')
-    assert.isNotNull(await Storage.find(storage.id))
+    assert.isNotNull(await Stored.storage(storage.id))
   })
 
   test('recusa com 409 o arquivo em uso como regulamento do site', async ({ client, assert }) => {
@@ -165,7 +165,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'STORAGE_IN_USE')
-    assert.isNotNull(await Storage.find(pdf.id))
+    assert.isNotNull(await Stored.storage(pdf.id))
   })
 
   test('volta a aceitar depois de o anexo ser desvinculado', async ({ client, assert }) => {
@@ -178,7 +178,7 @@ test.group('storages > delete', (group) => {
     const response = await client.delete(`/storages/${storage.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Storage.find(storage.id))
+    assert.isNull(await Stored.storage(storage.id))
   })
 
   test('responde 404 para id inexistente', async ({ client, assert }) => {

@@ -3,7 +3,6 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import {
   authenticateAsAdministrator,
@@ -11,6 +10,7 @@ import {
   resetDatabase,
   type ResponseBody,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
@@ -143,7 +143,7 @@ test.group('storages > complete', (group) => {
 
     // Recusado é recusado: nem a linha nem o binário sobrevivem, e o registro
     // nunca chega a `UPLOADED`.
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isNull(await Stored.storage(opened.storage.id))
     assert.isFalse(await drive.use().exists(opened.storage.path))
   })
 

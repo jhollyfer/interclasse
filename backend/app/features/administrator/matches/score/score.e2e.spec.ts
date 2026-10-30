@@ -3,8 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { test } from '@japa/runner'
 import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
-import Bracket from '#models/bracket'
 import { MatchFactory } from '#database/factories/match.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawnBracket, scheduledMatch, scoreAll } from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,
@@ -159,7 +159,7 @@ test.group('matches > score', (group) => {
     assert.property(body(response).errors, 'awayScore')
     await match.refresh()
     assert.equal(match.status, MATCH_STATUS.SCHEDULED)
-    const bracket = await Bracket.findOrFail(match.bracketId)
+    const bracket = await Stored.bracketOrFail(match.bracketId)
     assert.equal(bracket.status, BRACKET_STATUS.KNOCKOUT)
   })
 
