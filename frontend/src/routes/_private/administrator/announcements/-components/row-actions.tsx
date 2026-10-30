@@ -17,6 +17,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 /** Editar e apagar. O aviso some do site na hora. */
 export function AnnouncementRowActions({
@@ -29,7 +30,7 @@ export function AnnouncementRowActions({
   const remove = useAnnouncementDelete({
     onError: (error) => notifyError(error, { id: 'announcement-delete' }),
     onSuccess: () => {
-      toast.success('Aviso removido.')
+      toast.success(m.admin_announcements_removed())
       return invalidate([
         queryKeys.administrator.announcements.all,
         ...DEPENDENTS.announcements,
@@ -46,15 +47,17 @@ export function AnnouncementRowActions({
             params={{ id: announcement.id }}
           >
             <PencilSimpleIcon />
-            Editar
+            {m.admin_common_edit()}
           </Link>
         }
       />
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(announcement.id)}>
-        <ConfirmDialogTitle>{`Remover o aviso "${announcement.title}"?`}</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.admin_announcements_remove_title({ title: announcement.title })}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          Ele some do site na hora. Não dá para desfazer.
+          {m.admin_announcements_remove_description()}
         </ConfirmDialogDescription>
       </RowActionsDelete>
     </RowActions>

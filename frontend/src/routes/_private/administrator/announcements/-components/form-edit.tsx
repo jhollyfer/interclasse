@@ -23,6 +23,7 @@ import { announcementQueryOptions } from '#/integrations/tanstack-query/queries/
 import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { AnnouncementFormType } from './form-fields'
 import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
@@ -51,7 +52,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
     invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
-    success: () => 'Aviso salvo.',
+    success: () => m.admin_announcements_saved(),
     retry: 'announcement-update-error',
     payload: (values) => ({ ...values, id }),
   })
@@ -60,7 +61,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar aviso</FormShellTitle>
+        <FormShellTitle>{m.admin_announcements_edit()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

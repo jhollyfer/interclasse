@@ -162,5 +162,140 @@
   "admin_matches_all_statuses": "All statuses",
   "admin_matches_empty_title": "No matches",
   "admin_matches_empty_description": "Matches come from each bracket's draw: draw a sport in a category and the matches show up here. The winner moves on to the next round on its own.",
-  "admin_matches_go_to_brackets": "Go to brackets"
+  "admin_matches_go_to_brackets": "Go to brackets",
+  "admin_common_edit": "Edit",
+  "admin_common_delete": "Delete",
+  "admin_common_name": "Name",
+  "admin_common_title": "Title",
+  "admin_common_advisor": "Advisor",
+  "admin_common_representative": "Representative",
+  "admin_common_all": "All",
+  "admin_common_retry": "Try again",
+  "admin_common_none": "None",
+  "admin_common_edit_named": "Edit {name}",
+  "admin_common_no_advisor": "No advisor",
+  "admin_common_no_representative": "No representative",
+  "admin_common_count_athletes": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} athletes",
+        "countExact=*, countPlural=one": "{count} athlete",
+        "countExact=*, countPlural=*": "{count} athletes"
+      }
+    }
+  ],
+  "admin_common_count_students": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} students",
+        "countExact=*, countPlural=one": "{count} student",
+        "countExact=*, countPlural=*": "{count} students"
+      }
+    }
+  ],
+  "admin_common_count_sports": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} sports",
+        "countExact=*, countPlural=one": "{count} sport",
+        "countExact=*, countPlural=*": "{count} sports"
+      }
+    }
+  ],
+  "admin_announcements_title": "Announcements",
+  "admin_announcements_pinned": "Pinned",
+  "admin_announcements_published_on": "Published on",
+  "admin_announcements_field_title_placeholder": "Schedule change",
+  "admin_announcements_field_body": "Text",
+  "admin_announcements_field_pinned": "Pin to the top of the site",
+  "admin_announcements_field_pinned_description": "A pinned announcement appears before the others.",
+  "admin_announcements_published": "Announcement published.",
+  "admin_announcements_saved": "Announcement saved.",
+  "admin_announcements_create": "Add announcement",
+  "admin_announcements_edit": "Edit announcement",
+  "admin_announcements_removed": "Announcement removed.",
+  "admin_announcements_remove_title": "Remove the announcement \"{title}\"?",
+  "admin_announcements_remove_description": "It disappears from the site right away. This cannot be undone.",
+  "admin_announcements_search": "Search announcements…",
+  "admin_announcements_empty_title": "No announcements yet",
+  "admin_announcements_empty_description": "Schedule, venue or rule changes: the announcement shows up on the site as soon as it is created.",
+  "admin_classrooms_title": "Classes",
+  "admin_classrooms_description": "The classes that compete in the games. Each one forms one team per sport; the category comes from the grade.",
+  "admin_classrooms_create": "Add class",
+  "admin_classrooms_load_error": "Could not load the classes right now.",
+  "admin_classrooms_empty": "No classes in this category yet.",
+  "admin_classrooms_created": "Class {name} created.",
+  "admin_classrooms_saved": "Class {name} saved.",
+  "admin_classrooms_removed": "Class removed.",
+  "admin_classrooms_remove_title": "Remove class {name}?",
+  "admin_classrooms_remove_description": "Its students and registrations are deleted with it. This cannot be undone.",
+  "admin_classrooms_edit": "Edit class",
+  "admin_classrooms_field_name_placeholder": "9th A",
+  "admin_classrooms_field_name_description": "This is the name shown on the scoreboard.",
+  "admin_classrooms_field_grade": "Grade",
+  "admin_classrooms_field_grade_description": "Grades 3 to 5 are Fundamental 1; grades 6 to 9 are Fundamental 2.",
+  "admin_classrooms_grade_option": "Grade {grade}",
+  "admin_classrooms_field_advisor": "Advisor teacher",
+  "admin_classrooms_field_representative": "Student representative",
+  "admin_classrooms_field_representative_description": "Accounts come from Users, with the representative role.",
+  "admin_sports_title": "Sports",
+  "admin_sports_athletes_per_team": "Athletes per team",
+  "admin_sports_range": "{min} to {max}",
+  "admin_sports_created": "Sport {name} created.",
+  "admin_sports_saved": "Sport {name} saved.",
+  "admin_sports_create": "Add sport",
+  "admin_sports_field_name_placeholder": "Futsal",
+  "admin_sports_field_name_description": "It becomes the sport's address on the site.",
+  "admin_sports_field_min": "Minimum athletes",
+  "admin_sports_field_min_description": "A class with fewer registered athletes is left out of the draw.",
+  "admin_sports_field_max": "Maximum athletes",
+  "admin_sports_removed": "Sport removed.",
+  "admin_sports_remove_title": "Remove the sport {name}?",
+  "admin_sports_remove_description": "Only possible while no class has registered athletes in it. This cannot be undone.",
+  "admin_sports_search": "Search sports…",
+  "admin_sports_empty_title": "No sports yet",
+  "admin_sports_empty_description": "Futsal, volleyball, dodgeball… each with a minimum and maximum number of athletes per team.",
+  "admin_photos_title": "Photos",
+  "admin_photos_description": "The photos in the site carousel. Advisors' photos only appear after they are approved here.",
+  "admin_photos_upload_description": "A photo from the organizers goes straight to the site.",
+  "admin_photos_upload_success": "Photo published on the site.",
+  "admin_photos_tab_pending": "Pending",
+  "admin_photos_tab_approved": "On the site",
+  "admin_photos_tab_rejected": "Rejected",
+  "admin_photos_empty": "No photos here.",
+  "admin_photos_approved": "Photo approved: it is already on the site.",
+  "admin_photos_rejected": "Photo rejected: it is off the site.",
+  "admin_photos_deleted": "Photo deleted.",
+  "admin_photos_approve": "Approve",
+  "admin_photos_reject": "Reject",
+  "admin_photos_delete_label": "Delete photo",
+  "admin_photos_delete_title": "Delete this photo?",
+  "admin_photos_delete_description": "It disappears from the site and from the sender's list. This cannot be undone."
 }
