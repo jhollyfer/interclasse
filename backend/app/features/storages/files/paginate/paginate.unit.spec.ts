@@ -37,7 +37,7 @@ test.group('storages/files > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 FILE_PAGINATE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 STORAGES_FILE_PAGINATE_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     storages.paginate = async () => {
       throw new Error('banco fora')

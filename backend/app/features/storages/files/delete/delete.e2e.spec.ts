@@ -4,6 +4,7 @@ import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
 import Storage from '#models/storage'
+import { StorageFactory } from '#database/factories/storage.factory'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import {
   authenticateAsAdministrator,
@@ -131,6 +132,40 @@ test.group('storages > delete', (group) => {
     // O 409 não pode ser um "apagou e reclamou": registro e binário seguem lá.
     assert.isNotNull(await Storage.find(storage.id))
     assert.isTrue(await drive.use().exists(storage.path))
+  })
+
+  test('recusa com 409 o arquivo em uso como foto da galeria', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const storage = await upload(client, session)
+
+    const photo = await client
+      .post('/administrator/photos')
+      .cookies(session)
+      .json({ storageId: storage.id })
+    photo.assertStatus(201)
+
+    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'STORAGE_IN_USE')
+    assert.isNotNull(await Storage.find(storage.id))
+  })
+
+  test('recusa com 409 o arquivo em uso como regulamento do site', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
+
+    const linked = await client
+      .put('/administrator/site')
+      .cookies(session)
+      .json({ regulationId: pdf.id })
+    linked.assertStatus(200)
+
+    const response = await client.delete(`/storages/${pdf.id}`).cookies(session)
+
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'STORAGE_IN_USE')
+    assert.isNotNull(await Storage.find(pdf.id))
   })
 
   test('volta a aceitar depois de o anexo ser desvinculado', async ({ client, assert }) => {

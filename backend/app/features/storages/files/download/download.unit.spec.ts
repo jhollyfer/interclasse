@@ -35,7 +35,7 @@ test.group('storages/files > download (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do bucket é 500 FILE_DOWNLOAD_ERROR', async ({ assert }) => {
+  test('falha do bucket é 500 STORAGES_FILE_DOWNLOAD_ERROR', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
     bucket.signedDownload = async () => {

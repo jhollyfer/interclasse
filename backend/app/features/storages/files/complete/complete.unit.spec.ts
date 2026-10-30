@@ -91,7 +91,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do bucket é 500 FILE_COMPLETE_ERROR', async ({ assert }) => {
+  test('falha do bucket é 500 STORAGES_FILE_COMPLETE_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(pendingFile())
 

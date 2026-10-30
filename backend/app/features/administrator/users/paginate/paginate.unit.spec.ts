@@ -77,7 +77,7 @@ test.group('administrator/users > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 USER_PAGINATE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_PAGINATE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.paginate = async () => {
       throw new Error('banco fora')

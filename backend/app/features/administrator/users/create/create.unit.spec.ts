@@ -100,7 +100,7 @@ test.group('administrator/users > create (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
   })
 
-  test('falha do repositório é 500 USER_CREATE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_CREATE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.save = async () => {
       throw new Error('banco fora')

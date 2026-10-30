@@ -7,8 +7,8 @@ import Storage from '#models/storage'
  * Registro de arquivo. A factory grava só a linha na tabela: nada vai para o
  * bucket.
  *
- * Isso basta para tudo o que o teste precisa - `cover_id`, `audio_id`,
- * `avatar_id` e os pivôs de galeria - porque a `url` da resposta é derivada
+ * Isso basta para tudo o que o teste precisa - `avatar_id`, `storage_id` de foto,
+ * `regulation_id` - porque a `url` da resposta é derivada
  * pelo hook de `app/models/storage.ts` a partir de `path`. A URL sai
  * preenchida no JSON; abrir a URL dá 404, e é o esperado.
  *
