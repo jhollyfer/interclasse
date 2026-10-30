@@ -16,12 +16,12 @@
 
 ## Parou em
 
-Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) e 5.7 (código e UI do frontend: ESLint completo incluindo `ui/`, dialogs por trigger/handle, Luxon, sem memo manual, tema por cookie, tokens, CSP, teste de toda peça de `components/common`, JSON-LD de trilha e `SportsEvent` na chave pública, grades arbitrárias viradas `@utility`) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
+Fase 5 (régua estrita) concluída na branch `refactor/interclasse-regua-estrita`: frentes 5.1 a 5.8 integradas e verificadas (E2E 14/14 duas vezes, backend 462 unit + 691/692 e2e, frontend 413 unit). Workflows e imagens Docker só rodam de verdade no primeiro PR.
 
 ## Próximos passos
 
 1. Medir o `size-adjust` das fontes de reserva (resto da 5.7).
-2. Rodar o E2E Playwright com o backend de pé antes do PR (URL do login e rotas `new`/`$id/edit` mudaram).
+2. Abrir o PR da fase 5 e conferir os workflows novos (Docker e E2E) na primeira execução real.
 3. Antes do deploy: definir `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build) na produção; sem a primeira o site sai `noindex`, sem a segunda o CSP bloqueia o upload.
 
 ## Contexto importante

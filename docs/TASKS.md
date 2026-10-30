@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** 23 tarefas · 20 feitas · 0 em andamento · 3 a fazer — atualizado 2026-10-29
+**Resumo:** fases 1 a 5 feitas; pendências e propostas ao upstream listadas abaixo — atualizado 2026-10-30
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -27,7 +27,7 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 1.8 | Frontend: tipos e validators do `shared/` (Zod + zodResolver) | Alta | Feita | VineJS saiu do frontend |
 | 1.9 | Frontend: todos os textos nos três idiomas | Alta | Feita | 600 chaves por idioma |
 | 1.11 | Suíte E2E (Playwright) dos fluxos críticos | Alta | Feita | 14 testes, `pnpm test:e2e` |
-| 1.12 | E2E no CI (API e banco em container no job) | Média | A fazer | hoje roda só local |
+| 1.12 | E2E no CI (API e banco em container no job) | Média | Feita | job Playwright em `main-check-frontend.yml` (5.1); roda de verdade no primeiro PR |
 | 1.10 | Docs do projeto preenchidos a partir do código | Média | Feita | |
 
 ## Fase 2 · Pedidos do Geison, 29/10 (9/9)
@@ -75,7 +75,7 @@ tudo o que os `CLAUDE.md` dos apps chamavam de exceção. Cada frente fecha os i
 | 5.5 | Backend testes: unit/e2e faltando, matriz de status, redes obrigatórias, specs no alvo | Média | Feita | T2, T3. Depcruise só com a violação do guard (proposta ao upstream abaixo): a URL de leitura é assinada no use-case (`StorageContract.withUrl`), a isenção de spec saiu, a spec lê o banco por `tests/stored-fixtures.ts` e pega o repositório em memória de `tests/memory-fixtures.ts`. Matriz de status completa nas ações de `storages/files/*` e nas de painel e conselheiro que faltavam 422/401/403 |
 | 5.6 | Frontend estrutura: `_authentication/`, `request` por schema, `local-store`, `lib/` na árvore, kit comum completo, molde de recurso, sufixo `Mutation`, assets e sitemap/robots | Alta | Feita | login em `/sign-in`; `request(path, schema)`; kit comum completo; `robots`/`sitemap` por rota de servidor |
 | 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | Parcial | B4, C3, T4, SEC-9, 4.3 feitos; teste de toda peça de `components/common`, `BreadcrumbList` e `SportsEvent` na chave pública, grades arbitrárias como `@utility` e o pedido de motivo da remoção por handle feitos; falta o `size-adjust` das fontes de reserva medido e o E2E (5.8) |
-| 5.8 | Verificação final: todos os portões, suíte e2e do backend e E2E Playwright | Alta | A fazer | |
+| 5.8 | Verificação final: todos os portões, suíte e2e do backend e E2E Playwright | Alta | Feita | E2E 14/14 duas vezes seguidas (2,3 min); backend 462 unit + 691/692 e2e (falha só do moto, que não expira URL); frontend 413 unit, build, ciclos; shared 21; depcruise só com o guard (proposta ao upstream) |
 
 ### Propostas ao upstream (`maiyu-pattern`) e pendências da 5.5
 
