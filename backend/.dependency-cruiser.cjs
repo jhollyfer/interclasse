@@ -42,10 +42,19 @@ module.exports = {
     },
     {
       name: 'models-so-em-repositories',
-      comment: 'models/ só é importado por repositories/ (e por outro model).',
+      comment:
+        'models/ só é importado por repositories/ (e por outro model; o guard tem regra própria).',
       severity: 'error',
-      from: { path: '^app/', pathNot: '^app/(repositories|models)/' },
+      from: { path: '^app/', pathNot: '^app/(repositories|models|guards)/' },
       to: { path: '^app/models/' },
+    },
+    {
+      name: 'guard-so-model-da-conta',
+      comment:
+        'O guard importa só o model da conta: o GuardContract<User> do @adonisjs/auth exige (architecture.md §2, DECISIONS.md #247).',
+      severity: 'error',
+      from: { path: '^app/guards/' },
+      to: { path: '^app/models/', pathNot: '^app/models/user\\.ts$' },
     },
     {
       name: 'models-so-core',
