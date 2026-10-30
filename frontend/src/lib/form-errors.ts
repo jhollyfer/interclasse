@@ -6,6 +6,7 @@ import {
   HTTPErrorCode,
   HTTPStatus,
 } from '#/integrations/tanstack-query/http'
+import { m } from '#/paraglide/messages'
 
 /**
  * Leva o erro da API para os campos do formulário.
@@ -116,13 +117,10 @@ export function applyMutationError<TValues extends FieldValues>({
  * já existe") e passa como veio. O de um 5xx é do servidor para o log: a tela
  * mostra o texto daqui, sem detalhe de implementação.
  */
-const HTTP_ERROR_MESSAGES: Record<string, string | undefined> = {
-  [HTTPErrorCode.NETWORK_ERROR]:
-    'Não foi possível conectar ao servidor. Tente novamente.',
-  [HTTPErrorCode.UNKNOWN_ERROR]: 'Erro inesperado. Tente novamente.',
+const HTTP_ERROR_MESSAGES: Record<string, (() => string) | undefined> = {
+  [HTTPErrorCode.NETWORK_ERROR]: () => m.common_error_network(),
+  [HTTPErrorCode.UNKNOWN_ERROR]: () => m.common_error_unknown(),
 }
-
-const SERVER_ERROR_MESSAGE = 'O servidor não conseguiu concluir. Tente de novo.'
 
 export function httpErrorMessage(error: Error): string {
   // Erro que não veio de `request` (o upload recusando o tipo do arquivo, por
@@ -130,8 +128,8 @@ export function httpErrorMessage(error: Error): string {
   if (!(error instanceof HTTPError)) return error.message
 
   const known = HTTP_ERROR_MESSAGES[error.code]
-  if (known) return known
-  if (error.isServerError) return SERVER_ERROR_MESSAGE
+  if (known) return known()
+  if (error.isServerError) return m.common_error_server()
 
   return error.message
 }
@@ -160,7 +158,7 @@ export function notifyError(
 ): void {
   let action: { label: string; onClick: () => void } | undefined
   if (retry && isRetrySafe(error))
-    action = { label: 'Tentar de novo', onClick: retry }
+    action = { label: m.common_retry(), onClick: retry }
 
   toast.error(httpErrorMessage(error), { id, action })
 }

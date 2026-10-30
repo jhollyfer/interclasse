@@ -8,6 +8,7 @@ import { missingParts, planParts } from '#/lib/chunking'
 import { putPart } from '#/lib/upload-transport'
 import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
 import { isStorageMimetype } from '#/lib/mimetype'
+import { m } from '#/paraglide/messages'
 
 /**
  * O upload de um arquivo, do começo ao fim, do lado do cliente.
@@ -56,7 +57,9 @@ export function useMultipartUpload({
 
     if (!isStorageMimetype(mimetype)) {
       throw new Error(
-        `Tipo de arquivo não aceito: ${mimetype || 'desconhecido'}`,
+        m.upload_error_type({
+          type: mimetype || m.upload_unknown_type(),
+        }),
       )
     }
 
@@ -189,7 +192,7 @@ async function send(
 
       // O servidor não deu URL nova nem parte nova: insistir seria laço eterno.
       if (batch.parts.length === 0 && etags.size < plan.length) {
-        throw new Error('O storage não devolveu URLs para as partes restantes.')
+        throw new Error(m.upload_error_missing_urls())
       }
 
       continue

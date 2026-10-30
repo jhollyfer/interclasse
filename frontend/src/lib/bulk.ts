@@ -1,3 +1,5 @@
+import { m } from '#/paraglide/messages'
+
 /** O resultado de uma ação em massa: quantos passaram e quantos não. */
 export type BulkOutcome = {
   done: number
@@ -39,14 +41,20 @@ export async function runBulk<TItem>(
 export function bulkMessage(outcome: BulkOutcome, verb: string): string {
   const total = outcome.done + outcome.failed
 
-  if (outcome.failed === 0) {
-    if (outcome.done === 1) return `1 ${verb.replace(/s$/, '')}.`
+  const singular = verb.replace(/s$/, '')
 
-    return `${outcome.done} ${verb}.`
+  if (outcome.failed === 0) {
+    if (outcome.done === 1) return m.common_bulk_done({ count: 1, verb: singular })
+
+    return m.common_bulk_done({ count: outcome.done, verb })
   }
 
-  if (outcome.done === 0)
-    return `Nenhum ${verb.replace(/s$/, '')}: ${total} falharam.`
+  if (outcome.done === 0) return m.common_bulk_none({ verb: singular, total })
 
-  return `${outcome.done} de ${total} ${verb}; ${outcome.failed} falharam.`
+  return m.common_bulk_partial({
+    done: outcome.done,
+    total,
+    verb,
+    failed: outcome.failed,
+  })
 }

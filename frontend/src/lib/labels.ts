@@ -13,13 +13,17 @@ import type {
 } from '@interclasse/shared'
 
 import type { badgeVariants } from '#/components/ui/badge'
+import { m } from '#/paraglide/messages'
+import { getLocale } from '#/paraglide/runtime'
 
 import { SCHOOL_TIME_ZONE } from './constant'
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 
 /**
- * Os rótulos em português e as cores de cada enum do domínio.
+ * Os rótulos (no idioma da tela, lidos a cada acesso) e as cores de cada enum do
+ * domínio. Cada rótulo é um `get` que chama `m.*()`: `LABELS[valor]` continua
+ * sendo a forma de uso e devolve o texto do idioma atual.
  *
  * Separado de `validator.ts` de propósito: lá é o contrato com a API, e o valor
  * do enum é identificador, não texto de interface. Aqui é apresentação.
@@ -34,8 +38,12 @@ type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
  * `LABELS[valor] ?? valor`, que mostra o identificador cru em vez de quebrar.
  */
 export const ACTIVE_STATUS_LABELS: Record<string, string | undefined> = {
-  ACTIVE: 'Ativa',
-  INACTIVE: 'Inativa',
+  get ACTIVE() {
+    return m.label_active_status_active()
+  },
+  get INACTIVE() {
+    return m.label_active_status_inactive()
+  },
 } satisfies Record<ActiveStatus, string>
 
 export const ACTIVE_STATUS_VARIANTS: Record<string, BadgeVariant> = {
@@ -49,8 +57,12 @@ export const ACTIVE_STATUS_VARIANTS: Record<string, BadgeVariant> = {
  * que o backend guarda o valor em inglês.
  */
 export const ACCOUNT_STATUS_LABELS: Record<string, string | undefined> = {
-  ACTIVE: 'Ativo',
-  INACTIVE: 'Inativo',
+  get ACTIVE() {
+    return m.label_account_status_active()
+  },
+  get INACTIVE() {
+    return m.label_account_status_inactive()
+  },
 } satisfies Record<ActiveStatus, string>
 
 /**
@@ -67,9 +79,15 @@ export const ACTIVE_STATUS_DOTS: Record<string, string | undefined> = {
 
 /** Um papel por responsabilidade nos jogos. */
 export const USER_ROLE_LABELS: Record<string, string | undefined> = {
-  ADMINISTRATOR: 'Administrador',
-  ADVISOR: 'Professor conselheiro',
-  REPRESENTATIVE: 'Representante de turma',
+  get ADMINISTRATOR() {
+    return m.label_role_administrator()
+  },
+  get ADVISOR() {
+    return m.label_role_advisor()
+  },
+  get REPRESENTATIVE() {
+    return m.label_role_representative()
+  },
 } satisfies Record<UserRole, string>
 
 export const USER_ROLE_VARIANTS: Record<string, BadgeVariant> = {
@@ -79,19 +97,31 @@ export const USER_ROLE_VARIANTS: Record<string, BadgeVariant> = {
 } satisfies Record<UserRole, BadgeVariant>
 
 export const CATEGORY_LABELS: Record<string, string | undefined> = {
-  F1: 'Fundamental 1',
-  F2: 'Fundamental 2',
+  get F1() {
+    return m.label_category_f1()
+  },
+  get F2() {
+    return m.label_category_f2()
+  },
 } satisfies Record<Category, string>
 
 /** A forma curta, para coluna de tabela e aba. */
 export const CATEGORY_SHORT_LABELS: Record<string, string | undefined> = {
-  F1: '3º ao 5º',
-  F2: '6º ao 9º',
+  get F1() {
+    return m.label_category_short_f1()
+  },
+  get F2() {
+    return m.label_category_short_f2()
+  },
 } satisfies Record<Category, string>
 
 export const BRACKET_STATUS_LABELS: Record<string, string | undefined> = {
-  KNOCKOUT: 'Em disputa',
-  FINISHED: 'Encerrada',
+  get KNOCKOUT() {
+    return m.label_bracket_status_knockout()
+  },
+  get FINISHED() {
+    return m.label_bracket_status_finished()
+  },
 } satisfies Record<BracketStatus, string>
 
 export const BRACKET_STATUS_VARIANTS: Record<string, BadgeVariant> = {
@@ -100,9 +130,15 @@ export const BRACKET_STATUS_VARIANTS: Record<string, BadgeVariant> = {
 } satisfies Record<BracketStatus, BadgeVariant>
 
 export const PHOTO_STATUS_LABELS: Record<string, string | undefined> = {
-  PENDING: 'Aguardando aprovação',
-  APPROVED: 'No site',
-  REJECTED: 'Recusada',
+  get PENDING() {
+    return m.label_photo_status_pending()
+  },
+  get APPROVED() {
+    return m.label_photo_status_approved()
+  },
+  get REJECTED() {
+    return m.label_photo_status_rejected()
+  },
 } satisfies Record<PhotoStatus, string>
 
 export const PHOTO_STATUS_VARIANTS: Record<string, BadgeVariant> = {
@@ -112,15 +148,27 @@ export const PHOTO_STATUS_VARIANTS: Record<string, BadgeVariant> = {
 } satisfies Record<PhotoStatus, BadgeVariant>
 
 export const MATCH_PHASE_LABELS: Record<string, string | undefined> = {
-  ROUND_OF_16: 'Oitavas',
-  QUARTER: 'Quartas',
-  SEMI: 'Semifinal',
-  FINAL: 'Final',
+  get ROUND_OF_16() {
+    return m.label_match_phase_round_of_16()
+  },
+  get QUARTER() {
+    return m.label_match_phase_quarter()
+  },
+  get SEMI() {
+    return m.label_match_phase_semi()
+  },
+  get FINAL() {
+    return m.label_match_phase_final()
+  },
 } satisfies Record<MatchPhase, string>
 
 export const MATCH_STATUS_LABELS: Record<string, string | undefined> = {
-  SCHEDULED: 'A jogar',
-  FINISHED: 'Encerrada',
+  get SCHEDULED() {
+    return m.label_match_status_scheduled()
+  },
+  get FINISHED() {
+    return m.label_match_status_finished()
+  },
 } satisfies Record<MatchStatus, string>
 
 export const MATCH_STATUS_VARIANTS: Record<string, BadgeVariant> = {
@@ -129,8 +177,12 @@ export const MATCH_STATUS_VARIANTS: Record<string, BadgeVariant> = {
 } satisfies Record<MatchStatus, BadgeVariant>
 
 export const CARD_COLOR_LABELS: Record<string, string | undefined> = {
-  YELLOW: 'Amarelo',
-  RED: 'Vermelho',
+  get YELLOW() {
+    return m.label_card_color_yellow()
+  },
+  get RED() {
+    return m.label_card_color_red()
+  },
 } satisfies Record<CardColor, string>
 
 /** A cor do próprio cartão, para o retângulo que o representa na tela. */
@@ -147,8 +199,12 @@ export const CARD_COLOR_CLASSES: Record<string, string | undefined> = {
  * tela promete um arquivo que o backend recusa.
  */
 export const UPLOAD_STATUS_LABELS: Record<string, string | undefined> = {
-  PENDING: 'Incompleto',
-  UPLOADED: 'Enviado',
+  get PENDING() {
+    return m.label_upload_status_pending()
+  },
+  get UPLOADED() {
+    return m.label_upload_status_uploaded()
+  },
 } satisfies Record<UploadStatus, string>
 
 export const UPLOAD_STATUS_VARIANTS: Record<string, BadgeVariant> = {
@@ -169,15 +225,33 @@ export const UPLOAD_STATUS_DOTS: Record<string, string | undefined> = {
  * continua sendo o que viaja na URL e no corpo.
  */
 export const STORAGE_MIMETYPE_LABELS: Record<string, string | undefined> = {
-  'image/jpeg': 'Imagem JPEG',
-  'image/png': 'Imagem PNG',
-  'image/webp': 'Imagem WebP',
-  'image/gif': 'Imagem GIF',
-  'application/pdf': 'PDF',
-  'audio/mpeg': 'Áudio MP3',
-  'audio/mp4': 'Áudio MP4',
-  'audio/ogg': 'Áudio OGG',
-  'audio/wav': 'Áudio WAV',
+  get 'image/jpeg'() {
+    return m.label_mimetype_jpeg()
+  },
+  get 'image/png'() {
+    return m.label_mimetype_png()
+  },
+  get 'image/webp'() {
+    return m.label_mimetype_webp()
+  },
+  get 'image/gif'() {
+    return m.label_mimetype_gif()
+  },
+  get 'application/pdf'() {
+    return m.label_mimetype_pdf()
+  },
+  get 'audio/mpeg'() {
+    return m.label_mimetype_mp3()
+  },
+  get 'audio/mp4'() {
+    return m.label_mimetype_mp4()
+  },
+  get 'audio/ogg'() {
+    return m.label_mimetype_ogg()
+  },
+  get 'audio/wav'() {
+    return m.label_mimetype_wav()
+  },
 } satisfies Record<StorageMimetype, string>
 
 /**
@@ -203,45 +277,47 @@ export function initials(name: string | undefined | null): string {
 }
 
 /**
+ * O formatador de data no idioma atual e no fuso da escola. Montado a cada uso
+ * porque o idioma muda com a URL; o `Intl` guarda o cache dos dados por dentro.
+ */
+function schoolFormat(
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(getLocale(), {
+    ...options,
+    timeZone: SCHOOL_TIME_ZONE,
+  })
+}
+
+/**
  * Data no fuso do servidor, e não com `toLocaleString()` do navegador: o painel
  * renderiza no SSR, e a mesma data formatada em dois fusos é divergência de
  * hidratação na primeira renderização.
  */
-const DATE_FORMAT = new Intl.DateTimeFormat('pt-BR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-  timeZone: SCHOOL_TIME_ZONE,
-})
-
 export function formatDate(value: string | null): string {
   if (!value) return '-'
 
-  return DATE_FORMAT.format(new Date(value))
+  return schoolFormat({ dateStyle: 'short', timeStyle: 'short' }).format(
+    new Date(value),
+  )
 }
-
-const TIME_FORMAT = new Intl.DateTimeFormat('pt-BR', {
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: SCHOOL_TIME_ZONE,
-})
 
 /** "08:30", ou o relógio vazio de quem ainda não tem horário. */
 export function formatTime(value: string | null): string {
   if (!value) return '--:--'
 
-  return TIME_FORMAT.format(new Date(value))
+  return schoolFormat({ hour: '2-digit', minute: '2-digit' }).format(
+    new Date(value),
+  )
 }
-
-const DAY_FORMAT = new Intl.DateTimeFormat('pt-BR', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  timeZone: SCHOOL_TIME_ZONE,
-})
 
 /** "sexta-feira, 16 de outubro": o título de um dia da agenda. */
 export function formatDay(value: string): string {
-  return DAY_FORMAT.format(new Date(value))
+  return schoolFormat({
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date(value))
 }
 
 /** `en-CA` porque escreve a data como `2026-10-16`, que serve de chave. */
@@ -254,20 +330,17 @@ export function formatDayKey(value: string): string {
   return DAY_KEY_FORMAT.format(new Date(value))
 }
 
-const WHEN_FORMAT = new Intl.DateTimeFormat('pt-BR', {
-  weekday: 'short',
-  day: '2-digit',
-  month: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: SCHOOL_TIME_ZONE,
-})
-
 /** "sex., 16/10, 08:30", ou o aviso de que o horário ainda não saiu. */
 export function formatWhen(value: string | null): string {
-  if (!value) return 'Horário a definir'
+  if (!value) return m.label_when_undefined()
 
-  return WHEN_FORMAT.format(new Date(value))
+  return schoolFormat({
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
 }
 
 const ZONE_PARTS = new Intl.DateTimeFormat('en-US', {
@@ -335,10 +408,14 @@ export function fromSchoolInput(value: string): string {
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
 
+  const oneDecimal = new Intl.NumberFormat(getLocale(), {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })
   const kb = bytes / 1024
-  if (kb < 1024) return `${kb.toFixed(1)} KB`
+  if (kb < 1024) return `${oneDecimal.format(kb)} KB`
 
-  return `${(kb / 1024).toFixed(1)} MB`
+  return `${oneDecimal.format(kb / 1024)} MB`
 }
 
 /**
@@ -349,9 +426,10 @@ export function formatBytes(bytes: number): string {
  * `eslint.config.js` a proíbe. Escrever `if` em cada uma delas seria a mesma
  * duplicação com mais linhas.
  *
- * Português tem plural irregular demais para derivar do singular, então as duas
- * formas entram: `plural(3, 'foto', 'fotos')`. Quem precisa só do substantivo,
- * sem o número na frente, passa `withCount: false`.
+ * Plural irregular não se deriva do singular, então as duas formas entram, já
+ * traduzidas pelo chamador: `plural(3, m.photo_one(), m.photo_other())`. Frase
+ * inteira com contagem é uma mensagem com variante de plural, não esta função.
+ * Quem precisa só do substantivo, sem o número na frente, passa `withCount: false`.
  */
 export function plural(
   count: number,
@@ -364,7 +442,7 @@ export function plural(
 
   if (!withCount) return word
 
-  return `${count} ${word}`
+  return `${new Intl.NumberFormat(getLocale()).format(count)} ${word}`
 }
 
 /** A turma campeã: quem venceu a final. Nula enquanto a final não acontece. */
