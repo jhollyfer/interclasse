@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
+import logo512 from '#/assets/logo-512.png'
 import {
   storefrontAnnouncementsQueryOptions,
   storefrontBracketsQueryOptions,
@@ -48,7 +49,7 @@ export function HomePage(): React.JSX.Element {
         <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
           <div className="flex flex-col gap-5">
             <img
-              src="/logo-512.png"
+              src={logo512}
               alt={m.public_logo_alt()}
               width={144}
               height={144}

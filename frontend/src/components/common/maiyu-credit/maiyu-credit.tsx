@@ -1,5 +1,6 @@
 import type * as React from 'react'
 
+import maiyuLogo from '#/assets/maiyu.png'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -21,7 +22,7 @@ export function MaiyuCredit({
       className={cn('flex items-center justify-center gap-2', className)}
     >
       <img
-        src="/maiyu.png"
+        src={maiyuLogo}
         alt=""
         width={20}
         height={20}

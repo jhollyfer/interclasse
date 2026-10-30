@@ -1,3 +1,4 @@
+import logo512 from '#/assets/logo-512.png'
 import { env } from '#/env'
 import { m } from '#/paraglide/messages'
 import { getLocale, locales, localizeUrl } from '#/paraglide/runtime'
@@ -11,7 +12,7 @@ const OG_LOCALES = {
 } satisfies Record<Locale, string>
 
 /** A imagem do cartão do link: a logo dos jogos. */
-const OG_IMAGE = `${env.VITE_SITE_URL}/logo-512.png`
+const OG_IMAGE = new URL(logo512, env.VITE_SITE_URL).href
 
 type PageHeadInput = Readonly<{
   /** O assunto da página; o sufixo do site é somado aqui. Ausente, vale só o nome do site. */
@@ -25,7 +26,7 @@ type PageHeadInput = Readonly<{
 }>
 
 /** A URL absoluta da página no idioma pedido (`localizeUrl` devolve `URL`). */
-function urlIn(pathname: string, locale: Locale): string {
+export function localizedUrl(pathname: string, locale: Locale): string {
   const url = localizeUrl(new URL(pathname, env.VITE_SITE_URL), { locale })
   // `/es/` e `/es` são o mesmo endereço, e o site responde na forma sem barra.
   if (url.pathname.length > 1 && url.pathname.endsWith('/'))
@@ -56,7 +57,7 @@ export function pageHead({
   if (title) fullTitle = `${title} | ${siteTitle}`
 
   const locale = getLocale()
-  const canonical = urlIn(pathname, locale)
+  const canonical = localizedUrl(pathname, locale)
 
   const meta = [
     { title: fullTitle },
@@ -74,9 +75,13 @@ export function pageHead({
     ...locales.map((item) => ({
       rel: 'alternate',
       hrefLang: item,
-      href: urlIn(pathname, item),
+      href: localizedUrl(pathname, item),
     })),
-    { rel: 'alternate', hrefLang: 'x-default', href: urlIn(pathname, 'pt-BR') },
+    {
+      rel: 'alternate',
+      hrefLang: 'x-default',
+      href: localizedUrl(pathname, 'pt-BR'),
+    },
   ]
 
   return { meta, links }

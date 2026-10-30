@@ -3,6 +3,7 @@ import type * as React from 'react'
 import { AuthenticationSessionSignInValidator } from '@interclasse/shared'
 import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
+import logo512 from '#/assets/logo-512.png'
 import { InputPassword } from '#/components/common/input-password'
 import { SubmitButton } from '#/components/common/submit-button'
 import { Field, FieldGroup } from '#/components/ui/field'
@@ -83,7 +84,7 @@ export function SignInForm(): React.JSX.Element {
               como a marca levava. */}
           <Link to="/" aria-label={m.auth_back_to_site()}>
             <img
-              src="/logo-512.png"
+              src={logo512}
               alt={m.auth_logo_alt()}
               width={256}
               height={256}

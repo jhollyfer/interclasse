@@ -15,6 +15,8 @@ import { Route as AuthenticationLayoutRouteImport } from './routes/_authenticati
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
 import { Route as HealthCheckRouteImport } from './routes/health-check'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivateAdministratorLayoutRouteImport } from './routes/_private/administrator/layout'
 import { Route as PrivateAdvisorLayoutRouteImport } from './routes/_private/advisor/layout'
 import { Route as PrivateRepresentativeLayoutRouteImport } from './routes/_private/representative/layout'
@@ -82,6 +84,16 @@ const PublicLayoutRoute = PublicLayoutRouteImport.update({
 const HealthCheckRoute = HealthCheckRouteImport.update({
   id: '/health-check',
   path: '/health-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivateAdministratorLayoutRoute =
@@ -448,6 +460,8 @@ const PrivateAdministratorUsersIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
@@ -493,6 +507,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$': typeof PublicSplatRoute
   '/sign-in': typeof AuthenticationSignInIndexRoute
   '/administrator': typeof PrivateAdministratorIndexRoute
@@ -538,6 +554,8 @@ export interface FileRoutesById {
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_private/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/_private/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/_private/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
@@ -586,6 +604,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/administrator'
     | '/advisor'
     | '/representative'
@@ -631,6 +651,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$'
     | '/sign-in'
     | '/administrator'
@@ -675,6 +697,8 @@ export interface FileRouteTypes {
     | '/_private'
     | '/_public'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/_private/administrator'
     | '/_private/advisor'
     | '/_private/representative'
@@ -724,6 +748,8 @@ export interface RootRouteChildren {
   PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
   HealthCheckRoute: typeof HealthCheckRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -754,6 +780,20 @@ declare module '@tanstack/react-router' {
       path: '/health-check'
       fullPath: '/health-check'
       preLoaderRoute: typeof HealthCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_private/administrator': {
@@ -1222,6 +1262,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
   HealthCheckRoute: HealthCheckRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

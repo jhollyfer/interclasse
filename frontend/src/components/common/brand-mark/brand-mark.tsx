@@ -1,5 +1,6 @@
 import type * as React from 'react'
 
+import logo128 from '#/assets/logo-128.png'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -24,7 +25,7 @@ export function BrandMark({
       {/* Na barra lateral recolhida sobra só a logo: o nome some da tela, e
           não do leitor de tela. Fora da barra o seletor não casa nada. */}
       <img
-        src="/logo-128.png"
+        src={logo128}
         alt=""
         width={40}
         height={40}

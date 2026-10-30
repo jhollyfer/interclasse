@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
 import type { StorefrontSiteShowResponse } from '@interclasse/shared'
 
+import logo512 from '#/assets/logo-512.png'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
@@ -37,7 +38,7 @@ export function AboutPage(): React.JSX.Element {
       </SectionHeader>
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
         <img
-          src="/logo-512.png"
+          src={logo512}
           alt={m.public_logo_alt()}
           width={192}
           height={192}
