@@ -6,6 +6,9 @@ on:
       COOLIFY_TOKEN:
         required: true
 
+permissions:
+  contents: read
+
 # Os valores que mudam de projeto para projeto, num lugar só.
 #
 # Os uuids são das APLICAÇÕES no Coolify, e não da instância nem do projeto:

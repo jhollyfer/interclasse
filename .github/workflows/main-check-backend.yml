@@ -1,25 +1,30 @@
 name: Check Backend
 
+# Reutilizável: o PR (`ci.yml`) e o push em `main` (`main.yml`) chamam este
+# mesmo arquivo, para o PR não passar por uma régua diferente da do deploy
+# (_standards/tooling.md §7, §8.1). O `shared/` roda antes do backend.
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   check:
-    name: Backend - Lint, Typecheck, OpenAPI & Test
+    name: Shared e Backend - check, testes e build
     runs-on: ubuntu-latest
 
     # A porta e o nome do banco vêm de `backend/.env.test`, que é versionado:
-    # 5434 no host e `interclasse_test`. Declarar `POSTGRES_DB` já com o
-    # nome de teste dispensa o `createdb` que o desenvolvimento local faz à mão.
+    # 5434 no host e `interclasse_test`.
     services:
       database:
-        image: postgres:16-alpine
+        image: postgres:18-alpine
         env:
           POSTGRES_USER: interclasse
           POSTGRES_PASSWORD: interclasse
           POSTGRES_DB: interclasse_test
         ports:
-          - "5434:5432"
+          - '5434:5432'
         options: >-
           --health-cmd "pg_isready -U interclasse -d interclasse_test"
           --health-interval 5s
@@ -27,133 +32,186 @@ jobs:
           --health-retries 10
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          version: 12.11.2
+          # O histórico inteiro: o passo de autor lê `origin/<base>..HEAD`.
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      # Autor único e sem marca de agente (tooling.md §6, camada 3). Pega o
+      # commit feito com `--no-verify` ou numa máquina sem o hook.
+      - name: Autor e trailer dos commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          commits=$(git log --format='%an <%ae>%n%B' "origin/${BASE_REF}..HEAD")
+          if printf '%s\n' "$commits" | grep -qiE '^(co-authored-by|claude-session):|generated with|noreply@anthropic\.com|anthropic\.com/claude'; then
+            echo "trailer ou marca de agente em commit do PR" >&2
+            exit 1
+          fi
+          if git log --format='%ae' "origin/${BASE_REF}..HEAD" | grep -qvx 'jhollyfer.fr@gmail.com'; then
+            echo "autor de commit diferente do dono do repositório" >&2
+            exit 1
+          fi
+
+      - name: Setup pnpm e Node
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: pnpm-lock.yaml
+          runtime: node@24
+          cache: true
+          install: false
 
-      # Da raiz: um lockfile só para o workspace (_standards/tooling.md §1). O
-      # filtro com `...` instala o backend e o que ele usa do workspace.
       - name: Install dependencies
-        run: pnpm --filter "{./backend}..." install --frozen-lockfile --fail-if-no-match
+        run: pnpm install --frozen-lockfile
 
       # O backend importa o `dist/` do `@interclasse/shared`.
       - name: Build shared
-        run: pnpm --filter ./shared run build
+        run: pnpm --filter ./shared --fail-if-no-match run build
 
       - name: Check shared
-        run: pnpm --filter ./shared run typecheck && pnpm --filter ./shared run test
+        run: pnpm --filter ./shared --fail-if-no-match check && pnpm --filter ./shared --fail-if-no-match test:unit
 
-      - name: Run linter
-        working-directory: ./backend
-        run: pnpm lint
+      - name: Lint
+        run: pnpm --filter ./backend --fail-if-no-match lint
 
       - name: Typecheck
-        working-directory: ./backend
-        run: pnpm typecheck
+        run: pnpm --filter ./backend --fail-if-no-match typecheck
 
-      # `openapi.json` é artefato commitado. Este passo reprova quem mexeu numa
-      # rota, num validator ou num bloco `docs` e não regerou o documento.
-      #
-      # O bloco `env` é do passo, e não do job: `openapi:generate` roda com
-      # `startApp`, ou seja, boota a aplicação, e o boot valida `start/env.ts`.
-      # Estes valores existem só para o schema passar — o comando lê rotas e
-      # schemas VineJS, não toca no banco nem no bucket. No job inteiro eles
-      # venceriam o `.env.test` do passo seguinte, porque variável de processo
-      # tem precedência sobre arquivo, e a suíte apontaria para um banco que
-      # não existe.
+      - name: Guard-rails do padrão
+        run: pnpm --filter ./backend --fail-if-no-match pattern:check && pnpm --filter ./backend --fail-if-no-match authz:check
+
+      # Direção das camadas e ciclo (domain.md §8).
+      - name: Camadas
+        run: pnpm --filter ./backend --fail-if-no-match depcruise
+
+      # `openapi.json` é artefato commitado. O `env` é do passo, e não do job:
+      # o comando boota a aplicação e o boot valida `start/env.ts`. Estes valores
+      # existem só para o schema passar; no job inteiro venceriam o `.env.test`
+      # dos passos seguintes, porque variável de processo tem precedência sobre
+      # arquivo.
       - name: Check OpenAPI document
         working-directory: ./backend
         env:
           NODE_ENV: development
-          PORT: "3333"
+          PORT: '3333'
           HOST: 0.0.0.0
           LOG_LEVEL: info
           APP_KEY: ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL: http://localhost:3333
           SESSION_DRIVER: cookie
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
-          UPLOAD_MAX_SIZE: "1073741824"
-          # Obrigatórias no schema; o gerador não fala com o bucket.
+          UPLOAD_MAX_SIZE: '1073741824'
           STORAGE_KEY: ci-placeholder
           STORAGE_SECRET: ci-placeholder
           STORAGE_BUCKET: ci-placeholder
           STORAGE_ENDPOINT: http://localhost:9004
-        run: node ace openapi:generate --check --strict
+        run: pnpm openapi:check
 
-      # Os guardas de forma do padrão. O `sync:check` (cópia da régua contra o
-      # upstream) fica de fora: é conferência local, não portão de deploy.
-      - name: Guard-rails do padrão
-        working-directory: ./backend
-        run: pnpm pattern:check && pnpm authz:check
-
-      # O MinIO não sobe como `services:` porque precisa de `command` — a chave
-      # existe no compose e não no bloco de serviço do Actions. `--network host`
-      # com `--address :9004` reproduz a porta publicada do compose, que
-      # é a que `.env.test` procura.
-      #
-      # O bootstrap é o mesmo do serviço `storage-bootstrap`: cria o bucket de
-      # teste e libera leitura anônima, porque a `url` de um anexo é pública.
-      - name: Start MinIO
-        run: |
-          docker run -d --name storage --network host \
-            -e MINIO_ROOT_USER=interclasse \
-            -e MINIO_ROOT_PASSWORD=interclasse-secret \
-            -e MINIO_API_CORS_ALLOW_ORIGIN='*' \
-            pgsty/minio:latest server /data --address ":9004" --console-address ":9003"
-
-          for _ in $(seq 1 30); do
-            curl -fsS http://localhost:9004/minio/health/live && break
-            sleep 2
-          done
-
-          docker run --rm --network host --entrypoint sh pgsty/mc:latest -c '
-            set -e
-            mc alias set target http://localhost:9004 interclasse interclasse-secret
-            mc mb --ignore-existing target/interclasse-test
-            mc anonymous set none target/interclasse-test
-          '
-
-      # A suíte é funcional e fala com o Postgres e com o MinIO de verdade
-      # (`multipart.spec.ts`, `storages.spec.ts`) — é o mesmo caminho de código
-      # que produção usa. Só entram aqui as variáveis que `.env.test` não traz:
-      # o resto sai do arquivo versionado, e sobrescrevê-lo daqui apontaria a
-      # suíte para outro banco e outro bucket.
-      - name: Test
+      - name: Test unit
         working-directory: ./backend
         env:
-          PORT: "3333"
+          PORT: '3333'
           HOST: 0.0.0.0
           LOG_LEVEL: info
           APP_KEY: ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL: http://localhost:3333
-        run: pnpm test
+        run: pnpm test:unit
+
+      # O MinIO não sobe como `services:` porque precisa de `command`. A imagem
+      # é compilada de `backend/infra/minio/Dockerfile` (a `minio/minio` saiu do
+      # Docker Hub), com cache da camada de build (tooling.md §8.4).
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build MinIO
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend/infra/minio
+          load: true
+          push: false
+          tags: interclasse-minio-test:2025-10-15
+          cache-from: type=gha,scope=minio
+          cache-to: type=gha,mode=max,scope=minio
+
+      - name: Start MinIO
+        env:
+          MINIO_ROOT_USER: ci-minio-root
+          MINIO_ROOT_PASSWORD: ci-minio-root-secret
+        run: |
+          docker run -d --name minio --network host \
+            -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+            -e MINIO_API_CORS_ALLOW_ORIGIN='http://localhost:5173,http://localhost:4173' \
+            interclasse-minio-test:2025-10-15 server /data --address ":9004" --console-address ":9003"
+
+      # A espera é pelo estado: o setup roda até o bucket de teste existir e
+      # responder, e não por `sleep` (tooling.md §7, passo 7).
+      - name: Setup MinIO e espera pelo bucket
+        env:
+          MINIO_ENDPOINT: http://localhost:9004
+          MINIO_ROOT_USER: ci-minio-root
+          MINIO_ROOT_PASSWORD: ci-minio-root-secret
+          STORAGE_KEY: interclasse
+          STORAGE_SECRET: interclasse-secret
+          STORAGE_BUCKET: interclasse
+        run: |
+          for _ in $(seq 1 30); do
+            if docker run --rm --network host \
+              -e MINIO_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+              -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
+              -v "$PWD/backend/infra/minio:/setup:ro" \
+              --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
+              -c '/setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}-test"'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "o bucket de teste não ficou disponível" >&2
+          exit 1
+
+      # A suíte fala com o Postgres e com o MinIO de verdade. Só entram aqui as
+      # variáveis que `.env.test` não traz.
+      - name: Test e2e
+        working-directory: ./backend
+        env:
+          PORT: '3333'
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_SERVER_URL: http://localhost:3333
+        run: pnpm test:e2e
 
       # Depois da suíte, no mesmo job: `di:check` boota a aplicação, e aqui o
-      # banco e o bucket já estão de pé. Constrói todo service e policy pelo
-      # container - a dependência que ele não sabe resolver aparece no boot, e
-      # não na primeira requisição que a usa.
-      #
-      # `NODE_ENV: test` é o que faz o Adonis carregar o `.env.test` (banco,
-      # bucket, sessão). O `pnpm test` o define sozinho; este passo não, e sem
-      # ele o boot reprovava por `DATABASE_URL` ausente.
+      # banco e o bucket já estão de pé. `NODE_ENV: test` faz o Adonis carregar
+      # o `.env.test`.
       - name: Injeção de dependência
         working-directory: ./backend
         env:
           NODE_ENV: test
-          PORT: "3333"
+          PORT: '3333'
           HOST: 0.0.0.0
           LOG_LEVEL: info
           APP_KEY: ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL: http://localhost:3333
         run: pnpm di:check
+
+      # Typecheck de dev e build de produção usam configs diferentes o bastante
+      # para um passar e o outro falhar (`node ace build`).
+      - name: Build
+        working-directory: ./backend
+        env:
+          NODE_ENV: development
+          PORT: '3333'
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_SERVER_URL: http://localhost:3333
+          SESSION_DRIVER: cookie
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          UPLOAD_MAX_SIZE: '1073741824'
+          STORAGE_KEY: ci-placeholder
+          STORAGE_SECRET: ci-placeholder
+          STORAGE_BUCKET: ci-placeholder
+          STORAGE_ENDPOINT: http://localhost:9004
+        run: pnpm run build
