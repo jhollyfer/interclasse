@@ -1,8 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import type {
-  AccountProfileUpdatePayload,
-  AccountProfileShowResponse,
-} from '@interclasse/shared'
+import { AccountProfileShowResponse } from '@interclasse/shared'
+import type { AccountProfileUpdatePayload } from '@interclasse/shared'
 
 import type { HTTPError } from '../http'
 import { request } from '../http'
@@ -34,7 +32,7 @@ export function useAccountUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AccountProfileShowResponse>('/account', {
+      return request('/account', AccountProfileShowResponse, {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

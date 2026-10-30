@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import type { RepresentativeEnrollmentShowResponse } from '@interclasse/shared'
+import { RepresentativeEnrollmentShowResponse } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 
@@ -10,8 +10,9 @@ export const representativeEnrollmentsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.representative.enrollments.board,
     queryFn: ({ signal }) =>
-      request<RepresentativeEnrollmentShowResponse>(
+      request(
         '/representative/enrollments',
+        RepresentativeEnrollmentShowResponse,
         { signal },
       ),
     retry: false,

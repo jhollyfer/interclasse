@@ -1,18 +1,27 @@
 import { useMutation } from '@tanstack/react-query'
+import {
+  AdministratorAnnouncementShowResponse,
+  AdministratorBracketCreateResponse,
+  AdministratorCardCreateResponse,
+  AdministratorClassroomShowResponse,
+  AdministratorEnrollmentRemovalShowResponse,
+  AdministratorMatchScoreResponse,
+  AdministratorMatchUnscoreResponse,
+  AdministratorMatchUpdateResponse,
+  AdministratorPhotoShowResponse,
+  AdministratorSiteShowResponse,
+  AdministratorSportShowResponse,
+  AdministratorUserShowResponse,
+} from '@interclasse/shared'
 import type {
   AdministratorAnnouncementCreatePayload,
   AdministratorAnnouncementUpdatePayload,
   AdministratorBracketCreatePayload,
-  AdministratorBracketCreateResponse,
   AdministratorCardCreatePayload,
-  AdministratorCardCreateResponse,
   AdministratorClassroomCreatePayload,
   AdministratorClassroomUpdatePayload,
   AdministratorMatchScorePayload,
-  AdministratorMatchScoreResponse,
-  AdministratorMatchUnscoreResponse,
   AdministratorMatchUpdatePayload,
-  AdministratorMatchUpdateResponse,
   AdministratorPhotoCreatePayload,
   AdministratorPhotoReviewPayload,
   AdministratorSiteUpdatePayload,
@@ -20,13 +29,6 @@ import type {
   AdministratorSportUpdatePayload,
   AdministratorUserCreatePayload,
   AdministratorUserUpdatePayload,
-  AdministratorAnnouncementShowResponse,
-  AdministratorClassroomShowResponse,
-  AdministratorEnrollmentRemovalShowResponse,
-  AdministratorPhotoShowResponse,
-  AdministratorSiteShowResponse,
-  AdministratorSportShowResponse,
-  AdministratorUserShowResponse,
   Merge,
 } from '@interclasse/shared'
 
@@ -50,7 +52,7 @@ export function useUserCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorUserShowResponse>('/administrator/users', {
+      return request('/administrator/users', AdministratorUserShowResponse, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -82,8 +84,9 @@ export function useUserUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorUserShowResponse>(
+      return request(
         '/administrator/users/'.concat(id),
+        AdministratorUserShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -150,8 +153,9 @@ export function useClassroomCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorClassroomShowResponse>(
+      return request(
         '/administrator/classrooms',
+        AdministratorClassroomShowResponse,
         {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -179,8 +183,9 @@ export function useClassroomUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorClassroomShowResponse>(
+      return request(
         '/administrator/classrooms/'.concat(id),
+        AdministratorClassroomShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -214,7 +219,7 @@ export function useSportCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorSportShowResponse>('/administrator/sports', {
+      return request('/administrator/sports', AdministratorSportShowResponse, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -237,8 +242,9 @@ export function useSportUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorSportShowResponse>(
+      return request(
         '/administrator/sports/'.concat(id),
+        AdministratorSportShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -272,8 +278,9 @@ export function useAnnouncementCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorAnnouncementShowResponse>(
+      return request(
         '/administrator/announcements',
+        AdministratorAnnouncementShowResponse,
         {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -301,8 +308,9 @@ export function useAnnouncementUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorAnnouncementShowResponse>(
+      return request(
         '/administrator/announcements/'.concat(id),
+        AdministratorAnnouncementShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -342,8 +350,9 @@ export function useBracketCreate(
     retry: shouldRetryQuery,
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorBracketCreateResponse>(
+      return request(
         '/administrator/brackets',
+        AdministratorBracketCreateResponse,
         {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -384,8 +393,9 @@ export function useMatchUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorMatchUpdateResponse>(
+      return request(
         '/administrator/matches/'.concat(id),
+        AdministratorMatchUpdateResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -411,8 +421,9 @@ export function useMatchScore(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorMatchScoreResponse>(
+      return request(
         '/administrator/matches/'.concat(id, '/score'),
+        AdministratorMatchScoreResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -429,8 +440,9 @@ export function useMatchUnscore(
   return useMutation<AdministratorMatchUnscoreResponse, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
-      return request<AdministratorMatchUnscoreResponse>(
+      return request(
         '/administrator/matches/'.concat(id, '/score'),
+        AdministratorMatchUnscoreResponse,
         {
           method: 'DELETE',
         },
@@ -453,7 +465,7 @@ export function useCardCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorCardCreateResponse>('/administrator/cards', {
+      return request('/administrator/cards', AdministratorCardCreateResponse, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -481,8 +493,9 @@ export function useEnrollmentRemovalAcknowledge(
   >({
     ...options,
     mutationFn: function (id) {
-      return request<AdministratorEnrollmentRemovalShowResponse>(
+      return request(
         '/administrator/enrollment-removals/'.concat(id, '/acknowledge'),
+        AdministratorEnrollmentRemovalShowResponse,
         { method: 'PATCH' },
       )
     },
@@ -503,7 +516,7 @@ export function useSiteUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorSiteShowResponse>('/administrator/site', {
+      return request('/administrator/site', AdministratorSiteShowResponse, {
         method: 'PUT',
         body: JSON.stringify(payload),
       })
@@ -529,8 +542,9 @@ export function usePhotoCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdministratorPhotoShowResponse>(
+      return request(
         '/'.concat(area, '/photos'),
+        AdministratorPhotoShowResponse,
         {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -556,8 +570,9 @@ export function usePhotoReview(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdministratorPhotoShowResponse>(
+      return request(
         '/administrator/photos/'.concat(id, '/review'),
+        AdministratorPhotoShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),

@@ -1,12 +1,13 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import type {
+import {
   AdvisorCardPaginateResponse,
   AdvisorClassroomShowResponse,
   AdvisorEnrollmentShowResponse,
   AdvisorPhotoShowResponse,
   AdvisorStudentShowResponse,
-  Paginated, Merge 
+  paginatedResponse,
 } from '@interclasse/shared'
+import type { Merge } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type { ListSearch, StudentListSearch } from '#/lib/list-search'
@@ -19,8 +20,9 @@ export const advisorClassroomsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisor.classrooms.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdvisorClassroomShowResponse>>(
+      request(
         '/advisor/classrooms'.concat(queryString(params)),
+        paginatedResponse(AdvisorClassroomShowResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -30,8 +32,9 @@ export const studentsQueryOptions = (params: StudentListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisor.students.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdvisorStudentShowResponse>>(
+      request(
         '/advisor/students'.concat(queryString(params)),
+        paginatedResponse(AdvisorStudentShowResponse),
         {
           signal,
         },
@@ -46,8 +49,9 @@ export const advisorCardsQueryOptions = (
   queryOptions({
     queryKey: queryKeys.advisor.cards.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdvisorCardPaginateResponse>>(
+      request(
         '/advisor/cards'.concat(queryString(params)),
+        paginatedResponse(AdvisorCardPaginateResponse),
         {
           signal,
         },
@@ -59,8 +63,9 @@ export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
   queryOptions({
     queryKey: queryKeys.advisor.enrollments.board(classroomId),
     queryFn: ({ signal }) =>
-      request<AdvisorEnrollmentShowResponse>(
+      request(
         '/advisor/enrollments'.concat(queryString({ classroomId })),
+        AdvisorEnrollmentShowResponse,
         { signal },
       ),
   })
@@ -70,8 +75,9 @@ export const advisorPhotosQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisor.photos.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdvisorPhotoShowResponse>>(
+      request(
         '/advisor/photos'.concat(queryString(params)),
+        paginatedResponse(AdvisorPhotoShowResponse),
         {
           signal,
         },

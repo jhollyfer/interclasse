@@ -1,10 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
+import {
+  AdvisorEnrollmentShowResponse,
+  AdvisorStudentShowResponse,
+} from '@interclasse/shared'
 import type {
   AdvisorEnrollmentUpdatePayload,
   AdvisorStudentCreatePayload,
   AdvisorStudentUpdatePayload,
-  AdvisorEnrollmentShowResponse,
-  AdvisorStudentShowResponse,
   Merge,
 } from '@interclasse/shared'
 
@@ -25,7 +27,7 @@ export function useStudentCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdvisorStudentShowResponse>('/advisor/students', {
+      return request('/advisor/students', AdvisorStudentShowResponse, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -48,8 +50,9 @@ export function useStudentUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdvisorStudentShowResponse>(
+      return request(
         '/advisor/students/'.concat(id),
+        AdvisorStudentShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -84,7 +87,7 @@ export function useAdvisorEnrollmentUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdvisorEnrollmentShowResponse>('/advisor/enrollments', {
+      return request('/advisor/enrollments', AdvisorEnrollmentShowResponse, {
         method: 'PUT',
         body: JSON.stringify(payload),
       })
