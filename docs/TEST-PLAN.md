@@ -17,7 +17,7 @@
 | Unitário do frontend | Vitest | `frontend/src/**/*.test.ts` e `frontend/scripts/**/*.test.ts` (só `.ts`: componente React não é testável hoje) | todo pull request e todo push em `main` |
 | Mensagens | `pnpm i18n:check` (inlang) | `frontend/messages/` | pull request |
 | Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm sync:check` (só local) | `backend/scripts/` | `pnpm check` e CI |
-| E2E do frontend | Não se aplica: o projeto não tem Playwright nem pasta `e2e/`; os fluxos são cobertos pelo E2E da API e pelo teste manual (§7) | | |
+| E2E do frontend | Playwright, `pnpm e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; fora do CI por enquanto |
 
 ## 2. Fluxos críticos
 
