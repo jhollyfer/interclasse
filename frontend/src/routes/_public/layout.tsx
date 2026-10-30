@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 import { Footer } from './-components/footer'
 import { Header } from './-components/header'
@@ -53,7 +54,7 @@ function RouteComponent(): React.JSX.Element {
         href={'#'.concat(MAIN_ID)}
         className="sr-only rounded-md bg-background px-4 py-2 font-medium text-foreground no-underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
       >
-        Pular para o conteúdo
+        {m.public_skip_to_content()}
       </a>
 
       <Header />

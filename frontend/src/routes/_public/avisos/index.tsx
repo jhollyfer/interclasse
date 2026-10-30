@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { storefrontAnnouncementsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import { SITE_TITLE } from '#/lib/constant'
+import { pageHead } from '#/lib/page-head'
+import { m } from '#/paraglide/messages'
 
 import { validateSearch } from './-search'
 
@@ -12,5 +13,10 @@ export const Route = createFileRoute('/_public/avisos/')({
     context.queryClient
       .query(storefrontAnnouncementsQueryOptions(deps))
       .catch(() => undefined),
-  head: () => ({ meta: [{ title: `Avisos | ${SITE_TITLE}` }] }),
+  head: () =>
+    pageHead({
+      title: m.public_nav_announcements(),
+      description: m.public_announcements_head_description(),
+      pathname: '/avisos',
+    }),
 })

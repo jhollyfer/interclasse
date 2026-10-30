@@ -33,7 +33,7 @@ export const Route = createFileRoute('/authentication')({
     // entre eles é o `403` do backend em `/administrator/users`.
     throw redirect({ to: '/painel' })
   },
-  head: () => ({ meta: [{ title: `Entrar | ${SITE_TITLE}` }] }),
+  head: () => ({ meta: [{ title: `Entrar | ${SITE_TITLE()}` }] }),
   component: RouteComponent,
 })
 

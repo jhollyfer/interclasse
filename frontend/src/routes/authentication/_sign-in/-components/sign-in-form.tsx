@@ -93,7 +93,7 @@ export function SignInForm(): React.JSX.Element {
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
               anuncia: a marca desenha a sigla, e é aqui que ela é dita
               inteira. */}
-          <AuthShellTagline>{SITE_DESCRIPTION}</AuthShellTagline>
+          <AuthShellTagline>{SITE_DESCRIPTION()}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
 

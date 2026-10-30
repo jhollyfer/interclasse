@@ -10,6 +10,7 @@ import {
 } from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
 import { Agenda } from '#/components/common/match-agenda'
+import { m } from '#/paraglide/messages'
 
 import {
   Empty,
@@ -36,17 +37,17 @@ export function GamesPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>Tabela de jogos</SectionTitle>
+        <SectionTitle render={<h1 />}>{m.public_games_title()}</SectionTitle>
       </SectionHeader>
       <div className="grid gap-2 sm:flex sm:flex-wrap">
         <OptionCombobox
-          aria-label="Modalidade"
+          aria-label={m.public_games_filter_sport()}
           className="w-full sm:w-48"
           clearable
           value={search.sportId ?? ''}
           onValueChange={(value) => filter('sportId', value)}
           options={[
-            { value: '', label: 'Toda modalidade' },
+            { value: '', label: m.public_games_all_sports() },
             ...(sports?.data ?? []).map((sport) => ({
               value: sport.id,
               label: sport.name,
@@ -54,30 +55,30 @@ export function GamesPage(): React.JSX.Element {
           ]}
         />
         <OptionCombobox
-          aria-label="Categoria"
+          aria-label={m.public_games_filter_category()}
           className="w-full sm:w-48"
           clearable
           value={search.category ?? ''}
           onValueChange={(value) => filter('category', value)}
           options={toOptions(['', ...CATEGORIES], {
             ...CATEGORY_LABELS,
-            '': 'Toda categoria',
+            '': m.public_games_all_categories(),
           })}
         />
         <OptionCombobox
-          aria-label="Situação"
+          aria-label={m.public_games_filter_status()}
           className="w-full sm:w-48"
           clearable
           value={search.status ?? ''}
           onValueChange={(value) => filter('status', value)}
           options={toOptions(['', ...MATCH_STATUSES], {
             ...MATCH_STATUS_LABELS,
-            '': 'Todos',
+            '': m.public_games_all_statuses(),
           })}
         />
       </div>
 
-      {data?.data.length === 0 && <Empty>Nenhum jogo neste recorte.</Empty>}
+      {data?.data.length === 0 && <Empty>{m.public_games_empty()}</Empty>}
 
       <Agenda matches={data?.data ?? []} />
 

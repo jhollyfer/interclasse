@@ -69,7 +69,7 @@ export const Route = createFileRoute('/_private')({
     const title = breadcrumbTitle(buildBreadcrumbs(matches))
 
     return {
-      meta: [{ title: [title, SITE_TITLE].filter(Boolean).join(' | ') }],
+      meta: [{ title: [title, SITE_TITLE()].filter(Boolean).join(' | ') }],
     }
   },
   component: RouteComponent,

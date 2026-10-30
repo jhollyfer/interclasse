@@ -8,6 +8,7 @@ import {
   storefrontMatchesQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
 import { Agenda } from '#/components/common/match-agenda'
+import { m } from '#/paraglide/messages'
 
 import {
   HOME_ANNOUNCEMENTS,
@@ -48,30 +49,29 @@ export function HomePage(): React.JSX.Element {
           <div className="flex flex-col gap-5">
             <img
               src="/logo-512.png"
-              alt="2º JIC - II Jogos Interclasse do Cosme, CMEI 2026"
+              alt={m.public_logo_alt()}
               width={144}
               height={144}
               className="size-28 md:size-36"
             />
             <p className="text-brand font-semibold">
-              CMEI Cosme Jean, 2ª edição
+              {m.public_home_edition()}
             </p>
             <h1 className="font-display pb-1 text-5xl leading-[1.05] font-extrabold uppercase italic md:text-6xl">
-              Jogos Estudantis 2026
+              {m.public_home_title()}
             </h1>
             <p className="max-w-md text-lg text-brand-ink-foreground/80">
-              Tabela, placar e classificação das turmas do 3º ao 9º ano,
-              atualizados durante os jogos.
+              {m.public_home_lead()}
             </p>
             <div className="flex flex-wrap gap-3">
               <Link to="/jogos" className="skew-button bg-brand text-brand-ink">
-                Ver jogos
+                {m.public_home_see_games()}
               </Link>
               <Link
                 to="/classificacao"
                 className="skew-button border border-brand-ink-foreground/30 text-brand-ink-foreground"
               >
-                Classificação
+                {m.public_nav_standings()}
               </Link>
               <RegulationLink className="skew-button border border-brand-ink-foreground/30 text-brand-ink-foreground" />
             </div>
@@ -85,18 +85,18 @@ export function HomePage(): React.JSX.Element {
 
       <Section>
         <SectionHeader>
-          <SectionTitle>Próximos jogos</SectionTitle>
-          <SectionMore to="/jogos">Tabela completa</SectionMore>
+          <SectionTitle>{m.public_home_upcoming_title()}</SectionTitle>
+          <SectionMore to="/jogos">{m.public_home_full_schedule()}</SectionMore>
         </SectionHeader>
         {upcoming.length === 0 && (
-          <Empty>Nenhum jogo marcado. A agenda sai depois do sorteio.</Empty>
+          <Empty>{m.public_home_upcoming_empty()}</Empty>
         )}
         <Agenda matches={upcoming} />
       </Section>
 
       <Section>
         <SectionHeader>
-          <SectionTitle>Classificação</SectionTitle>
+          <SectionTitle>{m.public_nav_standings()}</SectionTitle>
         </SectionHeader>
         <StandingsExplorer
           brackets={brackets.data?.data ?? []}
@@ -109,8 +109,10 @@ export function HomePage(): React.JSX.Element {
 
       <Section>
         <SectionHeader>
-          <SectionTitle>Avisos</SectionTitle>
-          <SectionMore to="/avisos">Todos os avisos</SectionMore>
+          <SectionTitle>{m.public_nav_announcements()}</SectionTitle>
+          <SectionMore to="/avisos">
+            {m.public_home_all_announcements()}
+          </SectionMore>
         </SectionHeader>
         <AnnouncementList announcements={announcements.data?.data ?? []} />
       </Section>

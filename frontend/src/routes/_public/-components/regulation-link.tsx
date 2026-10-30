@@ -4,6 +4,7 @@ import { FilePdfIcon } from '@phosphor-icons/react'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /**
  * O "Baixar regulamento", onde quer que apareça: no topo da home, no "Sobre" e
@@ -26,7 +27,7 @@ export function RegulationLink({
       className={cn('inline-flex items-center gap-2', className)}
     >
       <FilePdfIcon className="size-5" />
-      Baixar regulamento
+      {m.public_regulation_download()}
     </a>
   )
 }

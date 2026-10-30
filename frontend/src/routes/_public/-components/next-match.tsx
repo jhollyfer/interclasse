@@ -3,6 +3,7 @@ import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 
 import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import { phaseLabel, scoreOf } from '#/components/common/match-agenda'
+import { m } from '#/paraglide/messages'
 
 /**
  * O placar do herói: o próximo jogo, ou o último resultado quando não há jogo
@@ -22,24 +23,30 @@ export function NextMatch({
     return (
       <div className="rounded-lg border border-brand-ink-foreground/15 bg-brand-ink-shade/20 p-6 text-brand-ink-foreground/80">
         <p className="font-display text-2xl font-extrabold uppercase italic text-brand-ink-foreground">
-          Sorteio em breve
+          {m.public_next_match_soon_title()}
         </p>
-        <p className="mt-2">
-          Os jogos aparecem aqui assim que a organização sortear as chaves.
-        </p>
+        <p className="mt-2">{m.public_next_match_soon_body()}</p>
       </div>
     )
   }
 
-  let title = 'Próximo jogo'
-  if (!next) title = 'Último resultado'
+  let title = m.public_next_match_next()
+  if (!next) title = m.public_next_match_last()
+
+  let when = formatWhen(match.scheduledAt)
+  if (match.location)
+    when = m.common_match_when_location({ when, location: match.location })
 
   return (
     <div className="rounded-lg border border-brand-ink-foreground/15 bg-brand-ink-shade/25 p-6 text-brand-ink-foreground">
       <p className="text-brand font-semibold">{title}</p>
       <p className="mt-1 text-sm text-brand-ink-foreground/70">
-        {match.bracket.sport.name}, {CATEGORY_LABELS[match.bracket.category]},{' '}
-        {phaseLabel(match)}
+        {m.common_match_context({
+          sport: match.bracket.sport.name,
+          category:
+            CATEGORY_LABELS[match.bracket.category] ?? match.bracket.category,
+          phase: phaseLabel(match),
+        })}
       </p>
 
       <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -54,10 +61,7 @@ export function NextMatch({
         </span>
       </div>
 
-      <p className="mt-6 text-sm text-brand-ink-foreground/70">
-        {formatWhen(match.scheduledAt)}
-        {match.location && `, ${match.location}`}
-      </p>
+      <p className="mt-6 text-sm text-brand-ink-foreground/70">{when}</p>
     </div>
   )
 }
