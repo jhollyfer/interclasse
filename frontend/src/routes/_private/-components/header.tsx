@@ -87,9 +87,7 @@ function AccountMenu(): React.JSX.Element {
         `render`, e não aninhamento: o gatilho já é um `<button>`, e outro botão
         por dentro dele seria um botão dentro de outro - erro de hidratação.
       */}
-        <DropdownMenuTrigger
-          className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
-        >
+        <DropdownMenuTrigger className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted">
           <Avatar className="size-7">
             <AvatarImage src={account.avatar?.url} alt="" />
             <AvatarFallback
