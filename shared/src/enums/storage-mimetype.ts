@@ -32,3 +32,9 @@ export const STORAGE_MIMETYPES = [
   'audio/ogg',
   'audio/wav',
 ] as const satisfies ReadonlyArray<StorageMimetype>
+
+/**
+ * Quantos bytes do início do objeto bastam para conferir o tipo: a maior
+ * assinatura (WebP e WAV, `RIFF....WEBP`) acaba no byte 12.
+ */
+export const STORAGE_SIGNATURE_BYTES = 12

@@ -92,12 +92,16 @@ export default defineConfig({
     // lado do que cobre.
     suites: [
       {
-        files: ['app/**/*.unit.spec.{ts,js}', 'scripts/**/*.unit.spec.{ts,js}'],
+        files: [
+          'app/**/*.unit.spec.{ts,js}',
+          'commands/**/*.unit.spec.{ts,js}',
+          'scripts/**/*.unit.spec.{ts,js}',
+        ],
         name: 'unit',
         timeout: 5000,
       },
       {
-        files: ['app/**/*.e2e.spec.{ts,js}'],
+        files: ['app/**/*.e2e.spec.{ts,js}', 'commands/**/*.e2e.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },

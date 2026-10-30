@@ -1,7 +1,6 @@
 import { test } from '@japa/runner'
 import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
-import User from '#models/user'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
@@ -9,6 +8,7 @@ import {
   body,
   resetDatabase,
 } from '#tests/http-fixtures'
+import { findUserByEmail, userExists } from '#tests/users-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
 
@@ -22,7 +22,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
 
   test('arquivar a própria conta responde 403 e não escreve', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const eu = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const eu = await findUserByEmail(ADMINISTRATOR.email)
 
     const response = await client.patch(`/administrator/users/${eu.id}/archive`).cookies(session)
 
@@ -38,18 +38,18 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const eu = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const eu = await findUserByEmail(ADMINISTRATOR.email)
 
     const response = await client.delete(`/administrator/users/${eu.id}`).cookies(session)
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'SELF_DELETE_FORBIDDEN')
-    assert.isNotNull(await User.find(eu.id))
+    assert.isTrue(await userExists(eu.id))
   })
 
   test('rebaixar o próprio papel responde 403 e não escreve', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const eu = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const eu = await findUserByEmail(ADMINISTRATOR.email)
 
     const response = await client
       .put(`/administrator/users/${eu.id}`)
@@ -65,7 +65,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
 
   test('desativar a própria conta responde 403 e não escreve', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const eu = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const eu = await findUserByEmail(ADMINISTRATOR.email)
 
     const response = await client
       .put(`/administrator/users/${eu.id}`)
@@ -84,7 +84,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const eu = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const eu = await findUserByEmail(ADMINISTRATOR.email)
 
     const response = await client
       .put(`/administrator/users/${eu.id}`)

@@ -1,11 +1,9 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
-import { DateTime } from 'luxon'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
 import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
 import StoragesPrune from '#commands/storages-prune.command'
 import {
@@ -15,7 +13,7 @@ import {
   type ResponseBody,
 } from '#tests/http-fixtures'
 import type { Session } from '#tests/http-fixtures'
-import { pngBytes } from '#tests/storages-fixtures'
+import { ageStorage, pngBytes, storageExists } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -91,11 +89,7 @@ test.group('storages > prune', (group) => {
   group.each.setup(() => resetDatabase())
 
   /** Envelhece a linha no banco: é a idade que o comando usa para decidir. */
-  async function age(id: string, hours: number): Promise<void> {
-    await Storage.query()
-      .where('id', id)
-      .update({ created_at: DateTime.now().minus({ hours }).toSQL() })
-  }
+  const age = ageStorage
 
   async function prune(...args: Array<string>) {
     const ace = await app.container.make('ace')
@@ -125,7 +119,7 @@ test.group('storages > prune', (group) => {
 
     command.assertSucceeded()
 
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isFalse(await storageExists(opened.storage.id))
     // Listar as partes de um upload abortado é erro, e não lista vazia - é a
     // diferença entre "abortado" e "aberto e sem parte nenhuma".
     await assert.rejects(() => multipart.listParts(opened.storage.path, opened.uploadId))
@@ -144,7 +138,7 @@ test.group('storages > prune', (group) => {
 
     command.assertSucceeded()
 
-    assert.isNotNull(await Storage.find(opened.storage.id))
+    assert.isTrue(await storageExists(opened.storage.id))
   })
 
   test('não toca no UPLOADED, por mais velho que seja', async ({ client, assert }) => {
@@ -157,7 +151,7 @@ test.group('storages > prune', (group) => {
 
     command.assertSucceeded()
 
-    assert.isNotNull(await Storage.find(storage.id))
+    assert.isTrue(await storageExists(storage.id))
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
@@ -174,10 +168,10 @@ test.group('storages > prune', (group) => {
 
     // Sobrevive ao padrão de 24h e não sobrevive a um corte de uma hora.
     await prune()
-    assert.isNotNull(await Storage.find(opened.storage.id))
+    assert.isTrue(await storageExists(opened.storage.id))
 
     await prune('--hours=1')
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isFalse(await storageExists(opened.storage.id))
   })
 
   test('--dry-run lista sem apagar', async ({ client, assert }) => {
@@ -195,6 +189,6 @@ test.group('storages > prune', (group) => {
 
     command.assertSucceeded()
 
-    assert.isNotNull(await Storage.find(opened.storage.id))
+    assert.isTrue(await storageExists(opened.storage.id))
   })
 })

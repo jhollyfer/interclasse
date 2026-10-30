@@ -1,9 +1,12 @@
 import { randomUUID } from 'node:crypto'
 
 import drive from '@adonisjs/drive/services/main'
-import { STORAGE_EXTENSIONS, type StorageMimetype } from '@interclasse/shared'
+import {
+  STORAGE_EXTENSIONS,
+  STORAGE_SIGNATURE_BYTES,
+  type StorageMimetype,
+} from '@interclasse/shared'
 
-import { SIGNATURE_BYTES } from '#domain/storage/storage.entity'
 import {
   StorageContract,
   type StorageDownload,
@@ -61,13 +64,13 @@ export default class StorageService extends StorageContract {
         chunks.push(Buffer.from(chunk))
         read += chunk.length
 
-        if (read >= SIGNATURE_BYTES) break
+        if (read >= STORAGE_SIGNATURE_BYTES) break
       }
     } finally {
       stream.destroy()
     }
 
-    return Buffer.concat(chunks).subarray(0, SIGNATURE_BYTES)
+    return Buffer.concat(chunks).subarray(0, STORAGE_SIGNATURE_BYTES)
   }
 
   /**
