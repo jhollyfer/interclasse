@@ -11,3 +11,6 @@ node_modules/
 
 # Worktrees de agentes do Claude Code.
 .claude/worktrees/
+
+# Saída do `tsc` do `shared/`: gerada no build, nunca versionada.
+shared/dist/

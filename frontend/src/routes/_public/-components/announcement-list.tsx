@@ -1,18 +1,19 @@
 import type * as React from 'react'
 import { PushPinIcon } from '@phosphor-icons/react'
+import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
 
-import type { IAnnouncement } from '#/lib/interfaces'
 import { formatWhen } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { Empty } from './section'
 
 export function AnnouncementList({
   announcements,
 }: Readonly<{
-  announcements: ReadonlyArray<IAnnouncement>
+  announcements: ReadonlyArray<AdministratorAnnouncementShowResponse>
 }>): React.JSX.Element {
   if (announcements.length === 0)
-    return <Empty>Nenhum aviso por enquanto.</Empty>
+    return <Empty>{m.public_announcements_empty()}</Empty>
 
   return (
     <ul className="grid gap-3">
@@ -26,7 +27,7 @@ export function AnnouncementList({
               <PushPinIcon
                 className="text-primary"
                 weight="fill"
-                aria-label="Fixado"
+                aria-label={m.public_announcements_pinned()}
               />
             )}
             {announcement.title}

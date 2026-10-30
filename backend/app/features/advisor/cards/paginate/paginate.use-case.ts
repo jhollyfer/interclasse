@@ -1,34 +1,62 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  left,
+  right,
+  type Actor,
+  type AdvisorCardPaginateResponse,
+  type Either,
+  type Merge,
+  type Paginated,
+} from '@interclasse/shared'
 
-import CardService from '#services/card/card.service'
-import { left, right, type Either } from '#core/either'
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
+import { MatchCardRepository } from '#repositories/match-card/match-card.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
-import type { CardPaginatePayload } from '#features/advisor/cards/cards.validator'
+import type { AdvisorCardPaginatePayload } from '#validators/advisor/cards.validator'
 
-type Payload = CardPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = Merge<AdvisorCardPaginatePayload, { actor: Actor }>
+type Response = Either<HTTPException, Paginated<AdvisorCardPaginateResponse>>
 
+/**
+ * Os cartões que os atletas da turma levaram, do mais novo ao mais antigo. A
+ * turma alheia é 404 como a inexistente: a posse vai no critério da consulta
+ * (`_standards/domain.md` §5.1), não numa conferência depois.
+ */
 @inject()
 export default class AdvisorCardPaginateUseCase {
-  constructor(private readonly cards: CardService) {}
+  constructor(
+    private readonly cards: MatchCardRepository,
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const cards = await this.cards
-        .list({ classroomId: payload.classroomId })
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
+      const classroom = await this.classrooms.findOwned({
+        id: payload.classroomId,
+        actor: payload.actor,
+      })
+      if (!classroom)
+        return left(
+          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+        )
 
-      return right({ meta: cards.getMeta(), data: cards.all() })
+      return right(
+        await this.cards.paginate({
+          classroomId: payload.classroomId,
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[cards > paginate][error]')
+      logger.error({ err: error }, '[advisor/cards > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADVISOR_CARD_PAGINATE_ERROR',
         ),
       )

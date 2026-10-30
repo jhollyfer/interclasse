@@ -1,3 +1,4 @@
+import type { z } from '@interclasse/shared'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import { middlewareInfo } from '@adonisjs/core/http/helpers'
@@ -32,6 +33,7 @@ import {
   toSchema,
 } from '#core/openapi/vine-schema'
 import { isListResource, isModelResource, paginated } from '#core/openapi/types'
+import { ZodSchema } from '#core/openapi/zod-schema'
 import { modelSchema, typeIndex } from '#core/openapi/model-schema'
 import type { TypeIndex } from '#core/openapi/model-schema'
 import type {
@@ -446,7 +448,7 @@ async function buildContract(
   // que o ternário fazia é o mesmo que o `if` logo abaixo já fazia de novo.
   if (!intro?.directory) return contract
 
-  const schema = loadResponseSchema(intro.directory, app.makePath('.'))
+  const schema = loadResponseSchema(intro.directory, app.makePath('.'), intro.action)
 
   if (!schema) return contract
 
@@ -480,11 +482,13 @@ function isPaginated(body: ResponseBody): body is PaginatedResponse {
  * métricas, lookup e o plano de upload multipart.
  */
 function bodySchema(
-  body: DocumentedValidator | ModelResource | ListResource,
+  body: DocumentedValidator | ModelResource | ListResource | z.ZodType,
   types: TypeIndex,
   context: string,
   warnings: string[],
 ): SchemaObject {
+  // A fonte da régua: o schema `…Response` do `shared/` (`openapi.md`).
+  if (ZodSchema.is(body)) return ZodSchema.toOpenAPI(body)
   if (isModelResource(body)) return modelSchema(types, body)
   if (isListResource(body)) return { type: 'array', items: modelSchema(types, body.item) }
 

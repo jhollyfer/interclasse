@@ -104,6 +104,30 @@ const tags: TagRule[] = [
     plural: 'avisos',
   },
   {
+    prefix: '/administrator/reports',
+    name: 'Painel · Relatórios',
+    description: 'Quantas turmas, alunos e atletas participaram dos jogos, na tela ou em CSV.',
+    singular: 'relatório',
+    plural: 'relatórios',
+  },
+  {
+    prefix: '/administrator/photos',
+    name: 'Painel · Fotos',
+    description:
+      'As fotos do carrossel do site. As do conselheiro chegam pendentes e só vão ao ar ' +
+      'depois de aprovadas.',
+    singular: 'foto',
+    plural: 'fotos',
+  },
+  {
+    prefix: '/administrator/site',
+    name: 'Painel · Site',
+    description:
+      'O "Sobre" dos jogos e o regulamento em PDF que o site público mostra. Uma configuração só.',
+    singular: 'configuração',
+    plural: 'configurações',
+  },
+  {
     prefix: '/administrator/brackets',
     name: 'Painel · Chaves',
     description:

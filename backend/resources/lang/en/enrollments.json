@@ -1,0 +1,11 @@
+{
+  "sport_not_found": "Sport not found",
+  "limit_exceeded": "Too many athletes",
+  "limit_exceeded_field": "Enroll at most {max} athletes",
+  "student_not_in_classroom": "Student not found in the class",
+  "student_not_in_classroom_field": "Select only students from this class",
+  "removal_forbidden": "Only the advisor teacher removes athletes from the list",
+  "locked": "Enrollment in this sport is closed: the draw already happened",
+  "reason_required": "Enter the reason for the removal",
+  "reason_required_field": "Say why the athlete left the list"
+}

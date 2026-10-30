@@ -2,6 +2,14 @@ import { ShuffleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import * as React from 'react'
+import {
+  AdministratorBracketCreateValidator,
+  CATEGORIES,
+} from '@interclasse/shared'
+import type {
+  AdministratorBracketCreatePayload,
+  AdministratorBracketPaginateResponse,
+} from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -21,16 +29,13 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useBracketCreate } from '#/integrations/tanstack-query/mutations'
+import { useBracketCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import {
   bracketPreviewQueryOptions,
   sportsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
-import { CATEGORIES } from '#/lib/entity'
-import type { IBracket } from '#/lib/interfaces'
-import { CATEGORY_LABELS, plural } from '#/lib/labels'
-import { BracketCreateValidator } from '#/validators/administrator/brackets.validator'
-import type { BracketCreatePayload } from '#/validators/administrator/brackets.validator'
+} from '#/integrations/tanstack-query/queries/administrator'
+import { CATEGORY_LABELS } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 const FIELDS = ['sportId', 'category'] as const
 
@@ -44,16 +49,16 @@ export function DrawDialog(): React.JSX.Element {
   const { data: sports } = useQuery(sportsQueryOptions({ perPage: 100 }))
 
   const { form, mutation, onSubmit } = useMutationForm<
-    BracketCreatePayload,
-    IBracket,
-    BracketCreatePayload
+    AdministratorBracketCreatePayload,
+    AdministratorBracketPaginateResponse,
+    AdministratorBracketCreatePayload
   >({
-    validator: BracketCreateValidator,
+    validator: AdministratorBracketCreateValidator,
     defaults: { sportId: '' },
     fields: FIELDS,
     mutation: useBracketCreate,
     invalidate: [...GAME_KEYS, ...DEPENDENTS.games],
-    success: 'Chave sorteada.',
+    success: m.admin_brackets_drawn_ok(),
     payload: (values) => values,
     async onSuccess(bracket) {
       setOpen(false)
@@ -70,18 +75,16 @@ export function DrawDialog(): React.JSX.Element {
         render={
           <Button>
             <ShuffleIcon />
-            Sortear chave
+            {m.admin_brackets_draw()}
           </Button>
         }
       />
       <DialogContent>
         <form method="post" className="grid gap-4" onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>Sortear chave</DialogTitle>
+            <DialogTitle>{m.admin_brackets_draw()}</DialogTitle>
             <DialogDescription>
-              Entram as turmas da categoria com o mínimo de atletas inscritos.
-              Depois do sorteio, só o professor conselheiro troca atleta da
-              lista.
+              {m.admin_brackets_draw_description()}
             </DialogDescription>
           </DialogHeader>
 
@@ -89,13 +92,15 @@ export function DrawDialog(): React.JSX.Element {
             control={form.control}
             name="sportId"
             id="draw-sport"
-            label="Modalidade"
+            label={m.admin_common_sport()}
           >
             {({ field, control }) => (
               // `select` nativo: dentro do diálogo o popup do combobox abre
               // atrás do overlay.
               <NativeSelect {...field} {...control}>
-                <NativeSelectOption value="">Selecione</NativeSelectOption>
+                <NativeSelectOption value="">
+                  {m.admin_common_select()}
+                </NativeSelectOption>
                 {(sports?.data ?? []).map((sport) => (
                   <NativeSelectOption key={sport.id} value={sport.id}>
                     {sport.name}
@@ -108,7 +113,7 @@ export function DrawDialog(): React.JSX.Element {
             control={form.control}
             name="category"
             id="draw-category"
-            label="Categoria"
+            label={m.admin_common_category()}
           >
             {({ field, control }) => (
               <NativeSelect
@@ -123,7 +128,9 @@ export function DrawDialog(): React.JSX.Element {
                 }
                 onBlur={field.onBlur}
               >
-                <NativeSelectOption value="">Selecione</NativeSelectOption>
+                <NativeSelectOption value="">
+                  {m.admin_common_select()}
+                </NativeSelectOption>
                 {CATEGORIES.map((value) => (
                   <NativeSelectOption key={value} value={value}>
                     {CATEGORY_LABELS[value]}
@@ -142,7 +149,7 @@ export function DrawDialog(): React.JSX.Element {
 
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
-              Sortear
+              {m.admin_brackets_draw_confirm()}
             </Button>
           </DialogFooter>
         </form>
@@ -178,12 +185,14 @@ function DrawPreview({
     <div className="grid gap-2 rounded-lg border p-3 text-sm">
       {data.drawn && (
         <p className="text-destructive">
-          Esta modalidade já foi sorteada nesta categoria. Para refazer, apague
-          a chave atual.
+          {m.admin_brackets_preview_already_drawn()}
         </p>
       )}
       <p className="font-medium">
-        {`${plural(eligible.length, 'turma entra', 'turmas entram')} (mínimo de ${plural(data.minAthletes, 'atleta', 'atletas')})`}
+        {m.admin_brackets_preview_eligible({
+          eligible: eligible.length,
+          min: data.minAthletes,
+        })}
       </p>
       {eligible.length > 0 && (
         <p className="text-muted-foreground">
@@ -192,14 +201,15 @@ function DrawPreview({
       )}
       {out.length > 0 && (
         <p className="text-muted-foreground">
-          <span className="text-foreground">Ficam de fora: </span>
+          <span className="text-foreground">
+            {m.admin_brackets_preview_out()}{' '}
+          </span>
           {out.map((row) => `${row.name} (${row.athletes})`).join(', ')}
         </p>
       )}
       {eligible.length < 2 && !data.drawn && (
         <p className="text-destructive">
-          São necessárias ao menos 2 turmas com o mínimo de atletas. Peça aos
-          conselheiros e representantes que completem as listas.
+          {m.admin_brackets_preview_not_enough()}
         </p>
       )}
     </div>

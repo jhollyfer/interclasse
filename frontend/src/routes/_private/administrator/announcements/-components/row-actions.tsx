@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -15,21 +16,21 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations'
-import type { IAnnouncement } from '#/lib/interfaces'
+import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 /** Editar e apagar. O aviso some do site na hora. */
 export function AnnouncementRowActions({
   announcement,
 }: Readonly<{
-  announcement: IAnnouncement
+  announcement: AdministratorAnnouncementShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
   const remove = useAnnouncementDelete({
     onError: (error) => notifyError(error, { id: 'announcement-delete' }),
     onSuccess: () => {
-      toast.success('Aviso removido.')
+      toast.success(m.admin_announcements_removed())
       return invalidate([
         queryKeys.administrator.announcements.all,
         ...DEPENDENTS.announcements,
@@ -46,15 +47,17 @@ export function AnnouncementRowActions({
             params={{ id: announcement.id }}
           >
             <PencilSimpleIcon />
-            Editar
+            {m.admin_common_edit()}
           </Link>
         }
       />
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(announcement.id)}>
-        <ConfirmDialogTitle>{`Remover o aviso "${announcement.title}"?`}</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.admin_announcements_remove_title({ title: announcement.title })}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          Ele some do site na hora. Não dá para desfazer.
+          {m.admin_announcements_remove_description()}
         </ConfirmDialogDescription>
       </RowActionsDelete>
     </RowActions>

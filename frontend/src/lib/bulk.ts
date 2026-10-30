@@ -26,27 +26,3 @@ export async function runBulk<TItem>(
 
   return { done, failed: results.length - done }
 }
-
-/**
- * O texto do aviso, já flexionado e já dizendo o que falhou.
- *
- * O relato parcial é o ponto: "7 de 9 arquivados" é acionável, "erro ao
- * arquivar" depois de sete sucessos é mentira.
- *
- * `verb` vem no particípio e no masculino plural (`arquivados`, `excluídos`),
- * que é como as duas mensagens o usam.
- */
-export function bulkMessage(outcome: BulkOutcome, verb: string): string {
-  const total = outcome.done + outcome.failed
-
-  if (outcome.failed === 0) {
-    if (outcome.done === 1) return `1 ${verb.replace(/s$/, '')}.`
-
-    return `${outcome.done} ${verb}.`
-  }
-
-  if (outcome.done === 0)
-    return `Nenhum ${verb.replace(/s$/, '')}: ${total} falharam.`
-
-  return `${outcome.done} de ${total} ${verb}; ${outcome.failed} falharam.`
-}

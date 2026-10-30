@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 
 /**
  * A ficha da própria conta: nome, e-mail, avatar, papel, situação e desde

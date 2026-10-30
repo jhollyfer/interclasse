@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
@@ -7,8 +8,8 @@ import {
   ACTIVE_STATUS_DOTS,
   USER_ROLE_LABELS,
 } from '#/lib/labels'
-import { ACTIVE_STATUSES, USER_ROLES } from '#/lib/entity'
-import type { UserListSearch } from '#/integrations/tanstack-query/queries'
+import type { UserListSearch } from '#/lib/list-search'
+import { m } from '#/paraglide/messages'
 
 /**
  * Os dois recortes da tela, como o `UserPaginateValidator`
@@ -29,7 +30,7 @@ export function UserFilters({
   return (
     <>
       <OptionCombobox
-        aria-label="Papel"
+        aria-label={m.admin_common_role()}
         className="w-full sm:w-40"
         value={search.role ?? ''}
         clearable
@@ -44,12 +45,12 @@ export function UserFilters({
         // ser dito.
         options={toOptions(['', ...USER_ROLES], {
           ...USER_ROLE_LABELS,
-          '': 'Todo papel',
+          '': m.admin_users_all_roles(),
         })}
       />
 
       <OptionCombobox
-        aria-label="Situação"
+        aria-label={m.admin_common_status()}
         className="w-full sm:w-40"
         value={search.status ?? ''}
         clearable
@@ -61,7 +62,7 @@ export function UserFilters({
         }
         options={toOptions(
           ['', ...ACTIVE_STATUSES],
-          { ...ACCOUNT_STATUS_LABELS, '': 'Toda situação' },
+          { ...ACCOUNT_STATUS_LABELS, '': m.admin_users_all_statuses() },
           ACTIVE_STATUS_DOTS,
         )}
       />

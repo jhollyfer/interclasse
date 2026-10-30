@@ -1,4 +1,9 @@
 import type * as React from 'react'
+import { AdministratorUserCreateValidator } from '@interclasse/shared'
+import type {
+  AdministratorUserCreatePayload,
+  AdministratorUserShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -12,12 +17,10 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { UserCreateValidator } from '#/validators/administrator/users.validator'
-import type { IUser } from '#/lib/interfaces'
-import type { UserCreatePayload } from '#/validators/administrator/users.validator'
-import { useUserCreate } from '#/integrations/tanstack-query/mutations'
+import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { UserFormType } from './form-fields'
 import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
@@ -36,30 +39,32 @@ export function UserFormCreate(): React.JSX.Element {
   // profundo, e o compilador não tem como voltar dele ao tipo do formulário.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
-    IUser,
-    UserCreatePayload
+    AdministratorUserShowResponse,
+    AdministratorUserCreatePayload
   >({
     formId: FORM_ID,
-    validator: UserCreateValidator,
+    validator: AdministratorUserCreateValidator,
     defaults: USER_FORM_DEFAULTS,
     fields: USER_FIELDS,
     mutation: useUserCreate,
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users',
-    success: (user) => `Conta de ${user.name} criada.`,
+    success: (user) => m.admin_users_created_ok({ name: user.name }),
     // Com `retry`, ao contrário dos depoimentos: o `create.use-case.ts` recusa
     // e-mail de conta viva com `409 USER_ALREADY_EXISTS`, então reenviar depois
     // de um 5xx que possa ter gravado não cria uma segunda conta - esbarra no
     // 409 e diz isso.
     retry: 'user-create-error',
-    payload: (values) => values,
+    // O resolver já validou; o `parse` devolve o tipo de criação, em que o
+    // formulário (o da atualização, tudo opcional) não prova nome, e-mail e papel.
+    payload: (values) => AdministratorUserCreateValidator.parse(values),
   })
 
   return (
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar usuário</FormShellTitle>
+        <FormShellTitle>{m.admin_users_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />
@@ -70,12 +75,9 @@ export function UserFormCreate(): React.JSX.Element {
         <Card>
           <CardContent>
             <FieldSet>
-              <FieldLegend>Identidade e acesso</FieldLegend>
+              <FieldLegend>{m.admin_users_identity_legend()}</FieldLegend>
               <UserFormFields form={form} idPrefix="user" />
-              <FieldDescription>
-                O e-mail de uma conta arquivada reativa aquela linha com os
-                dados novos, em vez de criar outra.
-              </FieldDescription>
+              <FieldDescription>{m.admin_users_create_note()}</FieldDescription>
             </FieldSet>
           </CardContent>
         </Card>

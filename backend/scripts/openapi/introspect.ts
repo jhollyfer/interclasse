@@ -1,3 +1,4 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { basename, dirname, relative, resolve } from 'node:path'
@@ -235,7 +236,52 @@ async function loadValidator(
 // ---------------------------------------------------------------------------
 
 /**
- * Coleta `HTTPException.Fábrica('mensagem', 'CODE')` do use-case irmão.
+ * As mensagens de negócio em pt-BR, a língua do documento (`_standards/openapi.md`,
+ * "erros-do-use-case"): a chave é `<arquivo>.<caminho>`, como o `i18n.t()` do
+ * Adonis resolve (_doc-lib/adonisjs.md#guides/digging-deeper/i18n).
+ */
+const PT_BR_MESSAGES: ReadonlyMap<string, string> = (() => {
+  const messages = new Map<string, string>()
+  const root = resolve(dirname(new URL(import.meta.url).pathname), '../../resources/lang/pt-BR')
+
+  const flatten = function (prefix: string, value: unknown): void {
+    if (typeof value === 'string') {
+      messages.set(prefix, value)
+      return
+    }
+    if (typeof value !== 'object' || value === null) return
+    for (const [key, nested] of Object.entries(value)) flatten(`${prefix}.${key}`, nested)
+  }
+
+  if (!existsSync(root)) return messages
+
+  for (const file of readdirSync(root)) {
+    if (!file.endsWith('.json')) continue
+    flatten(file.replace('.json', ''), JSON.parse(readFileSync(resolve(root, file), 'utf8')))
+  }
+
+  return messages
+})()
+
+/**
+ * O texto da mensagem: literal, ou a chave de `t('chave')` / `this.i18n.t('chave')`
+ * resolvida em pt-BR. Chave montada em variável não é adivinhada.
+ */
+function messageText(node: ts.Expression): string | undefined {
+  if (ts.isStringLiteralLike(node)) return node.text
+  if (!ts.isCallExpression(node)) return undefined
+
+  const callee = calleeText(node)
+  if (callee !== 't' && !callee.endsWith('.t')) return undefined
+
+  const [keyNode] = node.arguments
+  if (!keyNode || !ts.isStringLiteralLike(keyNode)) return undefined
+
+  return PT_BR_MESSAGES.get(keyNode.text)
+}
+
+/**
+ * Coleta `HTTPException.Fábrica(mensagem, 'CODE')` do use-case irmão.
  *
  * Só argumentos literais são lidos. Code montado em variável não é adivinhado -
  * ficaria de fora e o `--strict` cobra, que é melhor que documentar um palpite.
@@ -266,7 +312,9 @@ async function readErrors(file: string): Promise<IntrospectedError[]> {
 
     const [messageNode, codeNode] = node.arguments
 
-    if (!messageNode || !ts.isStringLiteralLike(messageNode)) return
+    const message = messageNode && messageText(messageNode)
+
+    if (message === undefined) return
     if (!codeNode || !ts.isStringLiteralLike(codeNode)) return
 
     const key = `${status}:${codeNode.text}`
@@ -274,7 +322,7 @@ async function readErrors(file: string): Promise<IntrospectedError[]> {
     if (seen.has(key)) return
 
     seen.add(key)
-    errors.push({ status, code: codeNode.text, message: messageNode.text })
+    errors.push({ status, code: codeNode.text, message })
   })
 
   return errors
@@ -314,9 +362,18 @@ export function controllerPath(importExpression: string, appRoot: string): strin
 export function loadResponseSchema(
   directory: string,
   appRoot: string,
+  action?: string,
 ): FeatureResponse | undefined {
   const features = resolve(appRoot, 'app/features')
   const key = relative(features, directory)
+
+  // A entrada da ação ganha da do recurso: `administrator/sports/paginate`
+  // aponta o item da lista quando ele não é a forma do detalhe
+  // (`_standards/openapi.md`, "registro-de-resposta").
+  if (action) {
+    const specific = RESPONSES[`${key}/${action}`]
+    if (specific) return specific
+  }
 
   return RESPONSES[key]
 }

@@ -1,0 +1,7 @@
+{
+  "not_found": "Cartão não encontrado",
+  "match_not_found": "Partida não encontrada",
+  "teams_pending": "A partida ainda não tem os dois times definidos",
+  "student_not_in_match": "Atleta fora da partida",
+  "student_not_in_match_field": "Selecione um atleta de uma das duas turmas da partida"
+}

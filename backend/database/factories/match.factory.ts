@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
+import { MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import Match from '#models/match'
-import { MATCH_PHASE, MATCH_STATUS } from '#core/entity'
 import { BracketFactory } from '#database/factories/bracket.factory'
 
 /** Partida agendável, sem times nem placar: a forma que o sorteio cria. */

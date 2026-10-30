@@ -57,7 +57,10 @@ export default defineConfig({
     () => import('@adonisjs/drive/drive_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('#providers/storage.provider'),
+    () => import('#providers/repository.provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
+    () => import('@adonisjs/i18n/i18n_provider'),
+    () => import('#providers/i18n.provider'),
   ],
 
   /*
@@ -85,13 +88,18 @@ export default defineConfig({
   |
   */
   tests: {
-    // Suíte única: sem repositório injetável não há o que dublar num teste
-    // unitário. Testar por HTTP exercita rota, middleware, validator, use-case e
-    // serialização de uma vez. A spec mora ao lado do que cobre - a da ação na
-    // pasta da ação (_padroes/backend.md §7); `tests/` guarda só infraestrutura.
+    // Duas suítes (_standards/architecture.md §3.2 e §8): `unit` não abre banco
+    // nem HTTP e roda a regra rápido; `functional` sobe a aplicação de verdade
+    // e fala com Postgres e MinIO. O sufixo separa o runner, e a spec mora ao
+    // lado do que cobre.
     suites: [
       {
-        files: ['app/**/*.spec.{ts,js}'],
+        files: ['app/**/*.unit.spec.{ts,js}', 'scripts/**/*.unit.spec.{ts,js}'],
+        name: 'unit',
+        timeout: 5000,
+      },
+      {
+        files: ['app/**/*.e2e.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },
@@ -113,6 +121,10 @@ export default defineConfig({
     // `/openapi.json`. Sem esta entrada o build de produção não o copia, e a rota
     // responde 500 no servidor buildado - mas funciona em desenvolvimento.
     { pattern: 'openapi.json', reloadServer: false },
+    {
+      pattern: 'resources/lang/**/*.{json,yaml,yml}',
+      reloadServer: false,
+    },
   ],
 
   hooks: {
@@ -126,7 +138,7 @@ export default defineConfig({
         },
       }),
       generateRegistry(),
-      // Policies em kebab com sufixo de papel (_padroes/arquitetura.md §3).
+      // Policies em kebab com sufixo de papel (_standards/architecture.md §3).
       indexPolicies({ glob: ['**/*.policy.ts'] }),
     ],
   },

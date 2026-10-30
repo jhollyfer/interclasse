@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest'
+
+import { LOCALES } from '../enums/locale.js'
+import { IDENTITY_MESSAGES, useValidatorLocale } from '../validator.js'
+
+import { AccountProfileUpdateValidator } from './account/profile.validator.js'
+import { AdministratorUserCreateValidator } from './administrator/users.validator.js'
+
+const VALID = {
+  name: 'Ana',
+  email: 'ana@mail.com',
+  role: 'ADVISOR',
+  password: 'Senha@123',
+  passwordConfirmation: 'Senha@123',
+} as const
+
+describe('validators de identidade', () => {
+  it('aceita a conta válida', () => {
+    expect(AdministratorUserCreateValidator.safeParse(VALID).success).toBe(true)
+  })
+
+  it('senha fraca e confirmação diferente usam a mensagem do idioma em vigor', () => {
+    for (const locale of LOCALES) {
+      useValidatorLocale(locale)
+
+      const weak = AdministratorUserCreateValidator.safeParse({
+        ...VALID,
+        password: 'semsimbolo1A',
+        passwordConfirmation: 'semsimbolo1A',
+      })
+      const mismatch = AdministratorUserCreateValidator.safeParse({
+        ...VALID,
+        passwordConfirmation: 'Outra@1234',
+      })
+
+      expect(weak.error?.issues[0]?.message).toBe(IDENTITY_MESSAGES[locale].weakPassword)
+      expect(mismatch.error?.issues[0]?.message).toBe(IDENTITY_MESSAGES[locale].passwordMismatch)
+    }
+
+    useValidatorLocale('pt-BR')
+  })
+
+  it('trocar a senha do perfil exige a senha atual', () => {
+    const result = AccountProfileUpdateValidator.safeParse({
+      password: 'Senha@123',
+      passwordConfirmation: 'Senha@123',
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0]?.path).toEqual(['currentPassword'])
+  })
+})

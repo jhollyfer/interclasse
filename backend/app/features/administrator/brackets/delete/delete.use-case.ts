@@ -1,53 +1,49 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
-import Bracket from '#models/bracket'
-import Match from '#models/match'
-import { left, right, type Either } from '#core/either'
+import { BracketRefusal } from '../_shared.bracket-refusal.ts'
+
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
-import { MATCH_STATUS } from '#core/entity'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, Bracket>
+type Response = Either<HTTPException, null>
 
 /**
- * Times e partidas vão junto por `CASCADE`.
+ * Times e partidas vão junto.
  *
- * Só sai a chave sem resultado: com placar lançado, apagar levaria embora o
- * que aconteceu em quadra, sem volta. Para refazer uma chave já jogada,
- * desfazem-se os placares antes (`DELETE /administrator/matches/:id/score`).
+ * Só sai a chave sem resultado (regra da entidade): com placar lançado, apagar
+ * levaria embora o que aconteceu em quadra, sem volta. Para refazer uma chave já
+ * jogada, desfazem-se os placares antes (`DELETE /administrator/matches/:id/score`).
  */
 @inject()
 export default class AdministratorBracketDeleteUseCase {
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const bracket = await Bracket.find(id)
+      const bracket = await this.brackets.findById(id)
+      if (!bracket)
+        return left(HTTPException.NotFound(this.i18n.t('brackets.not_found'), 'BRACKET_NOT_FOUND'))
 
-      if (!bracket) return left(HTTPException.NotFound('Chave não encontrada', 'BRACKET_NOT_FOUND'))
+      const deletable = bracket.ensureDeletable()
+      if (deletable.isLeft()) return left(BracketRefusal.http(deletable.value, this.i18n))
 
-      const played = await Match.query()
-        .where('bracketId', bracket.id)
-        .where('status', MATCH_STATUS.FINISHED)
-        .first()
+      await this.brackets.delete(bracket)
 
-      if (played)
-        return left(
-          HTTPException.Conflict(
-            'A chave já tem placar lançado: desfaça os placares antes de apagá-la',
-            'BRACKET_HAS_RESULTS',
-          ),
-        )
-
-      await bracket.delete()
-
-      return right(bracket)
+      return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[brackets > delete][error]')
+      logger.error({ err: error }, '[administrator/brackets > delete][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_BRACKET_DELETE_ERROR',
         ),
       )

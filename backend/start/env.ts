@@ -12,7 +12,7 @@
 import { Env } from '@adonisjs/core/env'
 
 /**
- * O único leitor de ambiente (_padroes/backend.md §6), em blocos na ordem da
+ * O único leitor de ambiente (_standards/backend.md §6), em blocos na ordem da
  * casa. Toda chave declarada aqui é lida por algum `env.get()`, e vice-versa -
  * `pattern:check` cobra os dois sentidos; chave que perdeu o leitor sai.
  *

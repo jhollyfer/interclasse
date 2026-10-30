@@ -1,40 +1,47 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  left,
+  right,
+  type Either,
+  type Paginated,
+  type StorefrontBracketPaginateResponse,
+} from '@interclasse/shared'
 
-import Bracket from '#models/bracket'
-import Sport from '#models/sport'
-import { left, right, type Either } from '#core/either'
+import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
-import type { BracketPaginatePayload } from '#features/storefront/brackets/brackets.validator'
+import type { StorefrontBracketPaginatePayload } from '#validators/storefront/brackets.validator'
 
-type Payload = BracketPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = StorefrontBracketPaginatePayload
+type Response = Either<HTTPException, Paginated<StorefrontBracketPaginateResponse>>
 
 @inject()
 export default class StorefrontBracketPaginateUseCase {
+  constructor(
+    private readonly brackets: BracketRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = Bracket.query().preload('sport')
-
-      if (payload.sportId) query.where('sportId', payload.sportId)
-      if (payload.category) query.where('category', payload.category)
-
-      // Por modalidade e categoria: é como o site agrupa as abas.
-      const brackets = await query
-        .orderBy(Sport.query().whereColumn('sports.id', 'brackets.sport_id').select('name'), 'asc')
-        .orderBy('category', 'asc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: brackets.getMeta(), data: brackets.all() })
+      return right(
+        await this.brackets.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          sportId: payload.sportId,
+          category: payload.category,
+          // Por modalidade e categoria: é como o site agrupa as abas.
+          order: 'sport-name',
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[brackets > paginate][error]')
+      logger.error({ err: error }, '[storefront/brackets > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'STOREFRONT_BRACKET_PAGINATE_ERROR',
         ),
       )

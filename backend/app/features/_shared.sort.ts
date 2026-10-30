@@ -1,4 +1,4 @@
-import { SORT_DIRECTION, type SortDirection } from '#core/entity'
+import { SORT_DIRECTION, type SortDirection } from '@interclasse/shared'
 
 /**
  * A ordem que a consulta vai usar: o que o payload pediu, ou o padrão do

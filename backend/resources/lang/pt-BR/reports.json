@@ -1,0 +1,17 @@
+{
+  "csv": {
+    "classroom": "Turma",
+    "category": "Categoria",
+    "advisor": "Conselheiro",
+    "representative": "Representante",
+    "students": "Alunos",
+    "athletes": "Atletas",
+    "sports": "Modalidades",
+    "total": "Total",
+    "total_classrooms": "{count} turmas"
+  },
+  "category": {
+    "F1": "Fundamental 1",
+    "F2": "Fundamental 2"
+  }
+}

@@ -1,6 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import { BRACKET_STATUSES, CATEGORIES } from '#core/entity'
+import { BRACKET_STATUSES, CATEGORIES } from '@interclasse/shared'
 
 export default class extends BaseSchema {
   protected tableName = 'brackets'

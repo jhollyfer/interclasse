@@ -10,7 +10,8 @@ import {
   PageShellHeader,
 } from '#/components/common/page-shell'
 import { SubmitButton } from '#/components/common/submit-button'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 import { useFormShellContext } from './form-shell-context'
 
@@ -69,7 +70,7 @@ export function FormShellActions(
  * Sem children escreve "Descartar", que é o que todo formulário do painel diz.
  */
 export function FormShellDiscard({
-  children = 'Descartar',
+  children = m.common_discard(),
   ...rest
 }: React.ComponentProps<typeof Button>): React.JSX.Element {
   const { backTo, backParams } = useFormShellContext('FormShellDiscard')
@@ -106,7 +107,7 @@ type FormShellSubmitProps = Readonly<
  * decisão. Sem children escreve "Salvar".
  */
 export function FormShellSubmit({
-  children = 'Salvar',
+  children = m.common_save(),
   ...rest
 }: FormShellSubmitProps): React.JSX.Element {
   const { formId, isPending } = useFormShellContext('FormShellSubmit')

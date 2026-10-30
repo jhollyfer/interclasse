@@ -3,7 +3,7 @@ import string from '@adonisjs/core/helpers/string'
 
 import Classroom from '#models/classroom'
 import Sport from '#models/sport'
-import { categoryOf } from '#features/administrator/_shared.classroom'
+import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 
 /**
  * As modalidades e as turmas da escola, como estavam no site anterior.
@@ -42,7 +42,10 @@ export default class TournamentSeeder extends BaseSeeder {
     for (const { grade, letters } of grades) {
       for (const letter of letters) {
         const name = `${grade}º ${letter}`
-        await Classroom.updateOrCreate({ name }, { name, grade, category: categoryOf(grade) })
+        await Classroom.updateOrCreate(
+          { name },
+          { name, grade, category: ClassroomEntity.categoryOf(grade) },
+        )
       }
     }
   }

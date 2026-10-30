@@ -7,8 +7,8 @@ import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { MatchFactory } from '#database/factories/match.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { TeamFactory } from '#database/factories/team.factory'
-import { categoryOf } from '#features/administrator/_shared.classroom'
-import { signInWithFactory } from '#tests/helpers'
+import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
+import { signInWithFactory } from '#tests/http-fixtures'
 
 /**
  * Um professor conselheiro com sessão e a turma que ele aconselha. É o ponto de
@@ -49,7 +49,10 @@ export function drawSport(sport: Sport, classroom: Classroom) {
  * basta a turma ter um time.
  */
 export async function drawnClassroom(grade = 7) {
-  const classroom = await ClassroomFactory.merge({ grade, category: categoryOf(grade) }).create()
+  const classroom = await ClassroomFactory.merge({
+    grade,
+    category: ClassroomEntity.categoryOf(grade),
+  }).create()
   const bracket = await BracketFactory.with('sport').create()
 
   await TeamFactory.merge({ bracketId: bracket.id, classroomId: classroom.id }).create()
@@ -65,7 +68,7 @@ export async function matchWithTeams() {
   const bracket = await BracketFactory.with('sport').create()
   const [home, away] = await ClassroomFactory.merge({
     grade: 3,
-    category: categoryOf(3),
+    category: ClassroomEntity.categoryOf(3),
   }).createMany(2)
   if (!home || !away) throw new Error('factory criou menos turmas que o pedido')
   const homeTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: home.id }).create()

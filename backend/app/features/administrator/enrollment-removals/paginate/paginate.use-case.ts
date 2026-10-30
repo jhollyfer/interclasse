@@ -1,40 +1,46 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import type { ModelObject } from '@adonisjs/lucid/types/model'
+import {
+  PAGINATION,
+  left,
+  right,
+  type AdministratorEnrollmentRemovalShowResponse,
+  type Either,
+  type Paginated,
+} from '@interclasse/shared'
 
-import EnrollmentRemoval from '#models/enrollment-removal'
-import { left, right, type Either } from '#core/either'
+import { EnrollmentRemovalRepository } from '#repositories/enrollment-removal/enrollment-removal.repository'
 import HTTPException from '#exceptions/http.exception'
-import { PAGINATION } from '#core/entity'
-import { type Paginated } from '#core/response'
-import type { EnrollmentRemovalPaginatePayload } from '#features/administrator/enrollment-removals/enrollment-removals.validator'
+import type { AdministratorEnrollmentRemovalPaginatePayload } from '#validators/administrator/enrollment-removals.validator'
 
-type Payload = EnrollmentRemovalPaginatePayload
-type Response = Either<HTTPException, Paginated<ModelObject>>
+type Payload = AdministratorEnrollmentRemovalPaginatePayload
+type Response = Either<HTTPException, Paginated<AdministratorEnrollmentRemovalShowResponse>>
 
 /** Os avisos de remoção, do mais novo ao mais antigo, pendentes primeiro. */
 @inject()
 export default class AdministratorEnrollmentRemovalPaginateUseCase {
+  constructor(
+    private readonly removals: EnrollmentRemovalRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute(payload: Payload): Promise<Response> {
     try {
-      const query = EnrollmentRemoval.query().preload('classroom').preload('sport').preload('actor')
-
-      if (payload.pending === true) query.whereNull('acknowledgedAt')
-      if (payload.pending === false) query.whereNotNull('acknowledgedAt')
-      if (payload.classroomId) query.where('classroomId', payload.classroomId)
-
-      const removals = await query
-        .orderByRaw('acknowledged_at is null desc')
-        .orderBy('createdAt', 'desc')
-        .paginate(payload.page ?? PAGINATION.PAGE, payload.perPage ?? PAGINATION.PER_PAGE)
-
-      return right({ meta: removals.getMeta(), data: removals.all() })
+      return right(
+        await this.removals.paginate({
+          page: payload.page ?? PAGINATION.PAGE,
+          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+          pending: payload.pending,
+          classroomId: payload.classroomId,
+        }),
+      )
     } catch (error) {
-      logger.error({ err: error }, '[enrollment-removals > paginate][error]')
+      logger.error({ err: error }, '[administrator/enrollment-removals > paginate][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ENROLLMENT_REMOVAL_PAGINATE_ERROR',
         ),
       )

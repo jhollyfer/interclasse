@@ -13,7 +13,10 @@
  */
 
 import { AsyncLocalStorage } from 'node:async_hooks'
-import { getRequestHeader, getResponse } from '@tanstack/react-start/server'
+import {
+  appendResponseHeader,
+  getRequestHeader,
+} from '@tanstack/react-start/server'
 
 /**
  * O que precisa valer por requisição, e não por processo.
@@ -87,8 +90,9 @@ export function applySetCookie(
   if (!values.length) return cookie
 
   try {
-    const headers = getResponse().headers
-    for (const value of values) headers.append('set-cookie', value)
+    // A primitiva do Start para repassar `Set-Cookie` cru de outro servidor:
+    // acrescenta sem trocar o que já está na resposta.
+    appendResponseHeader('set-cookie', values)
   } catch {
     // idem `inboundCookie`: sem requisição em curso, não há onde escrever.
   }

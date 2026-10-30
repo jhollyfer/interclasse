@@ -526,7 +526,7 @@ const [erros, setErros] = React.useState({})
 ```
 
 ```tsx
-// caso real da stack: 422 de um applyHTTPErrorToForm central (_padroes/frontend.md §4)
+// caso real da stack: 422 de um applyHTTPErrorToForm central (_standards/frontend.md §4)
 // vira `errors` do Form quando o campo não existe no react-hook-form (erro de outro recurso)
 type CreateUserFormProps = { serverErrors: Record<string, string> }
 

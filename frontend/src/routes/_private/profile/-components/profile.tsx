@@ -25,7 +25,8 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
-import { accountQueryOptions } from '#/integrations/tanstack-query/queries'
+import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
+import { m } from '#/paraglide/messages'
 
 /**
  * A ficha da própria conta.
@@ -72,7 +73,9 @@ export function Profile(): React.JSX.Element {
                 {ACCOUNT_STATUS_LABELS[account.status] ?? account.status}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                No painel desde {formatDate(account.createdAt)}
+                {m.profile_member_since({
+                  date: formatDate(account.createdAt),
+                })}
               </span>
             </div>
           </div>
@@ -82,7 +85,7 @@ export function Profile(): React.JSX.Element {
           render={
             <Link to="/profile/edit">
               <PencilSimpleIcon />
-              Editar perfil
+              {m.profile_edit()}
             </Link>
           }
         />
@@ -93,25 +96,25 @@ export function Profile(): React.JSX.Element {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <IdentificationCardIcon />
-              Identidade e acesso
+              {m.profile_card_title()}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <Detail icon={<IdentificationCardIcon />} label="Nome">
+            <Detail icon={<IdentificationCardIcon />} label={m.common_name()}>
               {account.name}
             </Detail>
-            <Detail icon={<EnvelopeSimpleIcon />} label="E-mail">
+            <Detail icon={<EnvelopeSimpleIcon />} label={m.common_email()}>
               {account.email}
             </Detail>
             {/* A senha não se mostra, nem mascarada: um "••••••••" sugere que o
                 painel a conhece, e ele não conhece - o backend guarda o hash.
                 O que dá para dizer é onde trocá-la. */}
-            <Detail icon={<ShieldCheckIcon />} label="Senha">
+            <Detail icon={<ShieldCheckIcon />} label={m.common_password()}>
               <Link
                 to="/profile/edit"
                 className="text-primary underline-offset-4 hover:underline"
               >
-                Trocar senha
+                {m.profile_change_password()}
               </Link>
             </Detail>
           </CardContent>

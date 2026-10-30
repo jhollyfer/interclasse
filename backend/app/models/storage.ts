@@ -1,7 +1,7 @@
 import { column, computed, scope } from '@adonisjs/lucid/orm'
+import { type UploadStatus } from '@interclasse/shared'
 
 import { StorageSchema } from '#database/schema'
-import type { UploadStatus } from '#core/entity'
 
 /**
  * Registro neutro de arquivo: nome da chave, rótulo original, tipo, tamanho e

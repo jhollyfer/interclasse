@@ -13,8 +13,9 @@ import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
-import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations'
-import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries'
+import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/representative'
+import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
+import { m } from '#/paraglide/messages'
 
 /** A lista de atletas da turma do representante. A turma sai da sessão. */
 export function AthletesPage(): React.JSX.Element {
@@ -32,21 +33,21 @@ export function AthletesPage(): React.JSX.Element {
         queryKeys.representative.enrollments.board,
         updated,
       )
-      toast.success('Atletas salvos.')
+      toast.success(m.common_classroom_saved())
     },
     onError: (failure) => notifyError(failure, { id: 'enrollment-save' }),
   })
 
-  let title = 'Atletas da turma'
-  if (board) title = `Atletas do ${board.classroom.name}`
+  let title = m.representative_title()
+  if (board)
+    title = m.representative_title_named({ name: board.classroom.name })
 
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
         <PageHeaderTitle>{title}</PageHeaderTitle>
         <PageHeaderDescription>
-          Marque quem joga cada modalidade. Atleta salvo só sai da lista pelo
-          professor conselheiro, e depois do sorteio a modalidade trava.
+          {m.representative_description()}
         </PageHeaderDescription>
       </PageHeader>
 
@@ -55,17 +56,16 @@ export function AthletesPage(): React.JSX.Element {
       {/* Só o 404 quer dizer "sem turma"; o resto é falha de rede ou de servidor. */}
       {error?.status === HTTPStatus.NOT_FOUND && (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-          Nenhuma turma vinculada a você. Peça à organização para indicá-lo como
-          representante.
+          {m.representative_no_class()}
         </p>
       )}
       {error && error.status !== HTTPStatus.NOT_FOUND && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-6 text-center">
           <p className="text-muted-foreground">
-            Não foi possível carregar a lista agora.
+            {m.representative_load_error()}
           </p>
           <Button variant="outline" onClick={() => void refetch()}>
-            Tentar de novo
+            {m.common_retry()}
           </Button>
         </div>
       )}

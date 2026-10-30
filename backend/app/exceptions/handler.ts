@@ -81,7 +81,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     }
 
     /**
-     * Negação de policy pelo `ctx.bouncer` (_padroes/backend.md §4.6). A
+     * Negação de policy pelo `ctx.bouncer` (_standards/backend.md §4.6). A
      * policy diz status e mensagem pela `AuthorizationResponse`, e o
      * identificador de tradução é o `code` estável - o projeto não tem i18n, e
      * o identificador já é a chave que o cliente compara.

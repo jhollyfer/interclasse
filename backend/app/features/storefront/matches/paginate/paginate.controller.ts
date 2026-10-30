@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import StorefrontMatchPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { MatchPaginateValidator } from '#features/storefront/matches/matches.validator'
+import { StorefrontMatchPaginateValidator } from '#validators/storefront/matches.validator'
 
 @inject()
 export default class StorefrontMatchPaginateController {
@@ -17,7 +17,7 @@ export default class StorefrontMatchPaginateController {
   constructor(private readonly useCase: StorefrontMatchPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(MatchPaginateValidator, {
+    const payload = await context.request.validateUsing(StorefrontMatchPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

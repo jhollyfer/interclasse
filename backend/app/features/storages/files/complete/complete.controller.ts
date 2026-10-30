@@ -5,7 +5,7 @@ import StoragesFileCompleteUseCase from './complete.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import { IdentifierValidator } from '#core/validator'
-import { FileCompleteValidator } from '#features/storages/files/files.validator'
+import { StoragesFileCompleteValidator } from '#validators/storages/files.validator'
 
 @inject()
 export default class StoragesFileCompleteController {
@@ -22,6 +22,8 @@ export default class StoragesFileCompleteController {
       'O `mimetype` não é conferido porque não tem como divergir: ele entra na assinatura da ' +
       'URL, e o bucket recusa um `PUT` que não bata com ela.\n\n' +
       'Chamar duas vezes é seguro: a segunda devolve o mesmo registro.',
+    // Nasce na entidade e é traduzido em `_shared.file-refusal.ts`.
+    errors: { 422: 'STORAGE_SIZE_MISMATCH' },
   })
 
   constructor(private readonly useCase: StoragesFileCompleteUseCase) {}
@@ -30,7 +32,7 @@ export default class StoragesFileCompleteController {
     const { id } = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const payload = await context.request.validateUsing(FileCompleteValidator)
+    const payload = await context.request.validateUsing(StoragesFileCompleteValidator)
     const result = await this.useCase.execute({ ...payload, id })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

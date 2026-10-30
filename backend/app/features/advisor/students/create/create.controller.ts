@@ -3,10 +3,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import AdvisorStudentCreateUseCase from './create.use-case.ts'
 
-import Classroom from '#models/classroom'
-import ClassroomPolicy from '#policies/classroom.policy'
 import { defineDocs } from '#core/openapi/types'
-import { StudentCreateValidator } from '#features/advisor/students/students.validator'
+import { AdvisorStudentCreateValidator } from '#validators/advisor/students.validator'
 
 @inject()
 export default class AdvisorStudentCreateController {
@@ -17,10 +15,8 @@ export default class AdvisorStudentCreateController {
   constructor(private readonly useCase: AdvisorStudentCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(StudentCreateValidator)
-    const classroom = await Classroom.find(payload.classroomId)
-    await context.bouncer.with(ClassroomPolicy).authorize('manage', classroom)
-    const result = await this.useCase.execute(payload)
+    const payload = await context.request.validateUsing(AdvisorStudentCreateValidator)
+    const result = await this.useCase.execute({ ...payload, actor: context.auth.getUserOrFail() })
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)
   }

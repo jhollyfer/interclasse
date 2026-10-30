@@ -28,11 +28,21 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        run: pnpm --filter "{./frontend}..." install --frozen-lockfile --fail-if-no-match
+
+      # O frontend importa o `dist/` do `@interclasse/shared`.
+      - name: Build shared
+        run: pnpm --filter ./shared run build
+
+      # As mensagens do Paraglide compiladas antes de lint e typecheck: a saída
+      # (`src/paraglide/`) não é versionada (_standards/i18n.md §2), e o
+      # `inlang check` reprova tradução faltando nos três idiomas (§4).
+      - name: Compile and check messages
         working-directory: ./frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm i18n:compile && pnpm i18n:check
 
       - name: Run linter
         working-directory: ./frontend

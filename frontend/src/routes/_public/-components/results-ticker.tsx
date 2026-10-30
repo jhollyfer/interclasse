@@ -1,8 +1,8 @@
 import type * as React from 'react'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 
-import type { IMatch } from '#/lib/interfaces'
-
-import { phaseLabel } from './match-row'
+import { phaseLabel } from '#/components/common/match-agenda'
+import { m } from '#/paraglide/messages'
 
 /**
  * A faixa amarela de resultados, a marca do site anterior.
@@ -15,16 +15,16 @@ import { phaseLabel } from './match-row'
 export function ResultsTicker({
   matches,
 }: Readonly<{
-  matches: ReadonlyArray<IMatch>
+  matches: ReadonlyArray<AdministratorMatchPaginateResponse>
 }>): React.JSX.Element | null {
   if (matches.length === 0) return null
 
   const items = matches.map((match) => (
     <li key={match.id} className="flex shrink-0 items-center gap-2 px-6">
-      <span className="font-semibold">{match.bracket?.sport?.name}</span>
+      <span className="font-semibold">{match.bracket.sport.name}</span>
       <span className="font-display text-lg font-extrabold uppercase italic">
-        {match.homeTeam?.classroom.name} {match.homeScore} x {match.awayScore}{' '}
-        {match.awayTeam?.classroom.name}
+        {match.homeTeam.classroom.name} {match.homeScore} x {match.awayScore}{' '}
+        {match.awayTeam.classroom.name}
       </span>
       <span className="text-brand-ink/70 text-sm">{phaseLabel(match)}</span>
     </li>
@@ -33,7 +33,7 @@ export function ResultsTicker({
   return (
     <div
       className="ticker bg-brand text-brand-ink overflow-x-auto"
-      aria-label="Últimos resultados"
+      aria-label={m.public_ticker_label()}
     >
       <div className="ticker-track flex w-max py-2.5">
         <ul className="flex">{items}</ul>

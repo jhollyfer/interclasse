@@ -5,9 +5,9 @@ import AdministratorClassroomPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import {
-  ClassroomPaginateValidator,
+  AdministratorClassroomPaginateValidator,
   CLASSROOM_SORT_COLUMNS,
-} from '#features/administrator/classrooms/classrooms.validator'
+} from '#validators/administrator/classrooms.validator'
 
 @inject()
 export default class AdministratorClassroomPaginateController {
@@ -20,7 +20,7 @@ export default class AdministratorClassroomPaginateController {
   constructor(private readonly useCase: AdministratorClassroomPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(ClassroomPaginateValidator, {
+    const payload = await context.request.validateUsing(AdministratorClassroomPaginateValidator, {
       data: context.request.qs(),
     })
     const result = await this.useCase.execute(payload)

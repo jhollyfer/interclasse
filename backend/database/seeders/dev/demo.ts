@@ -1,6 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
+import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '@interclasse/shared'
 
 import env from '#start/env'
 import Announcement from '#models/announcement'
@@ -14,7 +15,6 @@ import User from '#models/user'
 import TournamentSeeder from '#database/seeders/tournament.seed'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
-import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '#core/entity'
 
 /**
  * Um campeonato de demonstração, no meio do caminho: contas dos três papéis,
@@ -26,7 +26,7 @@ import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '
  *   SEED_DEMO_PASSWORD=<senha> pnpm db:seed:demo
  *
  * Mora em `dev/`, sem o sufixo `.seed.ts`, por ser seed manual de demonstração
- * (_padroes/backend.md §3).
+ * (_standards/backend.md §3).
  *
  * Banco que já tem chave sorteada é deixado em paz: o seeder não sabe distinguir
  * demonstração de campeonato real, e apagar o segundo não tem volta.
@@ -54,7 +54,7 @@ export default class extends BaseSeeder {
       return
     }
 
-    // Pelo container, não por `new` (_padroes/backend.md §2.1): o construtor do
+    // Pelo container, não por `new` (_standards/backend.md §2.1): o construtor do
     // seeder ganha dependência e a chamada continua montando o objeto inteiro.
     const tournament = await app.container.make(TournamentSeeder, [this.client])
     await tournament.run()
@@ -64,10 +64,12 @@ export default class extends BaseSeeder {
 
     for (const [index, classroom] of classrooms.entries()) {
       const representative = await this.representative(classroom, password)
-      const advisor = advisors[index % advisors.length]
-      if (!advisor) throw new Error('[demo] nenhum conselheiro para distribuir as turmas')
+      // Um conselheiro por turma (índice único): as turmas além do número de
+      // professores ficam "Sem conselheiro", como fica a escola de verdade
+      // enquanto a organização não indica todos.
+      const advisor = advisors.at(index)
       classroom.merge({
-        advisorId: advisor.id,
+        advisorId: advisor?.id ?? null,
         representativeId: representative.id,
       })
       await classroom.save()
@@ -79,7 +81,7 @@ export default class extends BaseSeeder {
     await this.championship()
   }
 
-  /** Os professores conselheiros: cada um fica com quatro turmas, em média. */
+  /** Os professores conselheiros, um para cada uma das primeiras turmas. */
   private async advisors(password: string): Promise<User[]> {
     const people = [
       ['Raimunda Tananta', 'raimunda.tananta'],
@@ -277,9 +279,12 @@ export default class extends BaseSeeder {
       const target = await sport(item.slug)
       const created = await draw.execute({ sportId: target.id, category: item.category })
       if (created.isLeft()) throw created.value
+      // Chave que já existia (seed rodado de novo): o jogo dela já foi montado.
+      if (!created.value.created) continue
 
-      day = await this.schedule(created.value.id, day)
-      await this.play(created.value.id, item.stage, score)
+      const { bracket } = created.value
+      day = await this.schedule(bracket.id, day)
+      await this.play(bracket.id, item.stage, score)
     }
   }
 

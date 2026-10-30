@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArchiveIcon } from '@phosphor-icons/react'
+import { TRASHED_MODE } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
-import { TRASHED_MODE } from '#/lib/entity'
+import { m } from '#/paraglide/messages'
 
 import { InputSearch } from './table-search-input'
 import { useTableContext } from './table-context'
@@ -50,7 +51,7 @@ export function TableToolbar({
  */
 export function TableSearch({
   placeholder,
-  help = 'Digite e tecle Enter, ou clique na lupa',
+  help = m.table_search_help(),
 }: Readonly<{
   placeholder: string
   help?: string
@@ -102,7 +103,7 @@ export function TableTrashToggle(): React.JSX.Element {
       }
     >
       <ArchiveIcon />
-      Arquivados
+      {m.table_archived()}
     </Button>
   )
 }

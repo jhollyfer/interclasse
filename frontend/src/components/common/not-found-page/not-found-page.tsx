@@ -5,7 +5,8 @@ import { TrophyIcon } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 type NotFoundPageProps = Readonly<
   Merge<
@@ -48,12 +49,12 @@ export function NotFoundPage({
       <div className="flex flex-col justify-center bg-background px-8 py-12 md:px-16">
         {children ?? (
           <>
-            <NotFoundPageTitle>Página não encontrada</NotFoundPageTitle>
+            <NotFoundPageTitle>{m.common_not_found_title()}</NotFoundPageTitle>
             <NotFoundPageSubtitle>
-              O endereço não existe ou saiu do ar
+              {m.common_not_found_subtitle()}
             </NotFoundPageSubtitle>
             <NotFoundPageDescription>
-              Confira o endereço, ou volte ao início e siga daqui.
+              {m.common_not_found_description()}
             </NotFoundPageDescription>
             <NotFoundPageActions>
               <NotFoundPageHomeButton />
@@ -152,7 +153,7 @@ export function NotFoundPageActions({
  */
 export function NotFoundPageHomeButton({
   to = '/',
-  children = 'Voltar ao início',
+  children = m.common_back_home(),
 }: Readonly<{
   to?: string
   children?: React.ReactNode

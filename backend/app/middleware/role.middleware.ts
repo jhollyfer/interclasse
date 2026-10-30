@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import { type UserRole } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
-import type { UserRole } from '#core/entity'
 
 /**
  * Recusa quem chega a um módulo cujo papel não é o seu.

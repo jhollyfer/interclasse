@@ -1,3 +1,4 @@
+import * as shared from '@interclasse/shared'
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
@@ -10,16 +11,30 @@ import {
   NotFoundPageTitle,
 } from '#/components/common/not-found-page'
 import { HTTPError } from '#/integrations/tanstack-query/http'
+import { m } from '#/paraglide/messages'
 
 import { getContext } from './integrations/tanstack-query/query-context'
+import { deLocalizeUrl, getLocale, localizeUrl } from './paraglide/runtime'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
+  // As mensagens de validação do Zod saem no idioma da tela. Só o cliente
+  // valida formulário; no servidor a configuração global do Zod seria dividida
+  // entre requisições de idiomas diferentes. `shared.` e não o nome solto: a
+  // função não é um hook, e o prefixo `use` do contrato dispararia a regra.
+  if (typeof window !== 'undefined') shared.useValidatorLocale(getLocale())
+
   const context = getContext()
 
   const router = createTanStackRouter({
     routeTree,
     context,
+    // A árvore de rotas é uma só: `/es/jogos` entra como `/jogos` e sai com o
+    // prefixo do idioma atual (_doc-lib/tanstack-router.md#guide/url-rewrites).
+    rewrite: {
+      input: ({ url }) => deLocalizeUrl(url),
+      output: ({ url }) => localizeUrl(url),
+    },
     scrollRestoration: true,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
@@ -61,7 +76,7 @@ export function getRouter() {
           <NotFoundPage code={String(handled.status)}>
             <NotFoundPageTitle>{handled.message}</NotFoundPageTitle>
             <NotFoundPageDescription>
-              Se você chegou aqui por um link, ele pode ter mudado de lugar.
+              {m.common_error_link_moved()}
             </NotFoundPageDescription>
             <NotFoundPageActions>
               <NotFoundPageHomeButton />

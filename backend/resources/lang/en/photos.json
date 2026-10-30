@@ -1,0 +1,6 @@
+{
+  "not_found": "Photo not found",
+  "storage_not_found": "File not found",
+  "not_image": "The photo must be an image",
+  "not_image_field": "Send an image (JPG, PNG, WebP or GIF)"
+}

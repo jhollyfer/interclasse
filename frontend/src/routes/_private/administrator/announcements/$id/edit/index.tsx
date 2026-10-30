@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
-import { announcementQueryOptions } from '#/integrations/tanstack-query/queries'
+import { announcementQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export const Route = createFileRoute(
   '/_private/administrator/announcements/$id/edit/',

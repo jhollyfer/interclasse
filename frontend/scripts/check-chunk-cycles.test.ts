@@ -31,22 +31,27 @@ describe('eagerOnly', () => {
   })
 
   it('apaga corpo de função declarada', () => {
-    expect(eager('function f() {\n  return contar()\n}')).not.toContain('contar')
+    expect(eager('function f() {\n  return contar()\n}')).not.toContain(
+      'contar',
+    )
   })
 
   it('apaga corpo de função com parâmetro desestruturado', () => {
     // A chave de `{ className }` não é o corpo. Confundi-las deixava passar
     // todo componente do bundle.
-    const code = 'function Overlay({ className, ...props }) {\n  return cn(className)\n}'
+    const code =
+      'function Overlay({ className, ...props }) {\n  return cn(className)\n}'
 
     expect(eager(code)).not.toContain('cn(')
   })
 
   it('apaga corpo de arrow com bloco e de arrow de expressão', () => {
-    expect(eager('var f = () => {\n  return contar()\n}')).not.toContain('contar')
-    expect(eager('var rota = { loader: () => contar(), nome: "x" }')).not.toContain(
+    expect(eager('var f = () => {\n  return contar()\n}')).not.toContain(
       'contar',
     )
+    expect(
+      eager('var rota = { loader: () => contar(), nome: "x" }'),
+    ).not.toContain('contar')
   })
 
   it('a arrow de expressão acaba na vírgula, e o que vem depois volta a contar', () => {
@@ -67,6 +72,8 @@ describe('eagerOnly', () => {
   it('não confunde literal de expressão regular com divisão', () => {
     // Sem o corte, a barra abriria uma "string" que engoliria o resto do
     // arquivo - e o guarda passaria a não achar nada, em silêncio.
-    expect(eager('var re = /contar()/g\nvar total = somar(1)')).toContain('somar')
+    expect(eager('var re = /contar()/g\nvar total = somar(1)')).toContain(
+      'somar',
+    )
   })
 })

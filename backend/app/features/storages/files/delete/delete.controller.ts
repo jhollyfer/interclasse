@@ -20,6 +20,8 @@ export default class StoragesFileDeleteController {
       'faz as partes já enviadas sumirem do bucket.\n\n' +
       'É o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem ' +
       'esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.',
+    // Nasce na entidade e é traduzido em `_shared.file-refusal.ts`.
+    errors: { 409: 'STORAGE_IN_USE' },
   })
 
   constructor(private readonly useCase: StoragesFileDeleteUseCase) {}

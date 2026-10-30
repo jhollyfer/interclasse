@@ -1,48 +1,45 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Actor, type Either, type Merge } from '@interclasse/shared'
 
-import Bracket from '#models/bracket'
-import Enrollment from '#models/enrollment'
-import Student from '#models/student'
-import { left, right, type Either } from '#core/either'
+import { StudentRefusal } from '../_shared.student-refusal.ts'
+
+import { StudentRepository } from '#repositories/student/student.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = IdentifierPayload
-type Response = Either<HTTPException, Student>
+type Payload = Merge<IdentifierPayload, { actor: Actor }>
+type Response = Either<HTTPException, null>
 
+/**
+ * Tira o aluno da turma, com as inscrições dele. Inscrito numa modalidade já
+ * sorteada fica: o time sorteado perderia um atleta (regra da entidade).
+ */
 @inject()
 export default class AdvisorStudentDeleteUseCase {
-  async execute({ id }: Payload): Promise<Response> {
+  constructor(
+    private readonly students: StudentRepository,
+    private readonly i18n: I18n,
+  ) {}
+
+  async execute({ id, actor }: Payload): Promise<Response> {
     try {
-      const student = await Student.query().where('id', id).preload('classroom').first()
+      const student = await this.students.findOwned({ id, actor })
+      if (!student)
+        return left(HTTPException.NotFound(this.i18n.t('students.not_found'), 'STUDENT_NOT_FOUND'))
 
-      if (!student) return left(HTTPException.NotFound('Aluno não encontrado', 'STUDENT_NOT_FOUND'))
+      const removable = student.remove({ inDrawnSport: await this.students.isInDrawnSport(id) })
+      if (removable.isLeft()) return left(StudentRefusal.http(removable.value, this.i18n))
 
-      const locked = await Enrollment.query()
-        .where('studentId', student.id)
-        .whereIn(
-          'sportId',
-          Bracket.query().where('category', student.classroom.category).select('sportId'),
-        )
-        .first()
+      await this.students.delete(student)
 
-      if (locked)
-        return left(
-          HTTPException.Conflict(
-            'O aluno está inscrito numa modalidade já sorteada',
-            'STUDENT_IN_COMPETITION',
-          ),
-        )
-
-      await student.delete()
-
-      return right(student)
+      return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[students > delete][error]')
+      logger.error({ err: error }, '[advisor/students > delete][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'STUDENT_DELETE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_DELETE_ERROR'),
       )
     }
   }

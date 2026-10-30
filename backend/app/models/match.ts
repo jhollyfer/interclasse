@@ -1,10 +1,10 @@
 import { belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { type MatchPhase, type MatchStatus } from '@interclasse/shared'
 
 import { MatchSchema } from '#database/schema'
 import Bracket from '#models/bracket'
 import Team from '#models/team'
-import type { MatchPhase, MatchStatus } from '#core/entity'
 
 /** Uma partida: de grupo ou de mata-mata, marcada ou com placar. */
 export default class Match extends MatchSchema {

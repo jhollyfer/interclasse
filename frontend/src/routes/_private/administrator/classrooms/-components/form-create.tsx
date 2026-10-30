@@ -1,4 +1,9 @@
 import type * as React from 'react'
+import { AdministratorClassroomCreateValidator } from '@interclasse/shared'
+import type {
+  AdministratorClassroomCreatePayload,
+  AdministratorClassroomShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -11,12 +16,10 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
-import type { IClassroom } from '#/lib/interfaces'
-import type { ClassroomCreatePayload } from '#/validators/administrator/classrooms.validator'
-import { useClassroomCreate } from '#/integrations/tanstack-query/mutations'
+import { useClassroomCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { ClassroomFormType } from './form-fields'
 import {
@@ -28,18 +31,19 @@ import {
 export function ClassroomFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
-    IClassroom,
-    ClassroomCreatePayload
+    AdministratorClassroomShowResponse,
+    AdministratorClassroomCreatePayload
   >({
     formId: 'classroom-create',
-    validator: ClassroomCreateValidator,
+    validator: AdministratorClassroomCreateValidator,
     defaults: CLASSROOM_FORM_DEFAULTS,
     fields: CLASSROOM_FIELDS,
     mutation: useClassroomCreate,
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',
-    success: (classroom) => `Turma ${classroom.name} criada.`,
+    success: (classroom) =>
+      m.admin_classrooms_created({ name: classroom.name }),
     // Nome repetido é `409 CLASSROOM_ALREADY_EXISTS`: reenviar é seguro.
     retry: 'classroom-create-error',
     payload: (values) => values,
@@ -49,7 +53,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar turma</FormShellTitle>
+        <FormShellTitle>{m.admin_classrooms_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

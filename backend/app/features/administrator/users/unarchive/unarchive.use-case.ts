@@ -1,13 +1,15 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
-import User from '#models/user'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
+import { UserRepository } from '#repositories/user/user.repository'
+import { UserRefusal } from '#features/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, User>
+type Response = Either<HTTPException, null>
 
 /**
  * Tira a conta da lixeira. O espelho de `archive`: busca só o que está
@@ -21,24 +23,29 @@ type Response = Either<HTTPException, User>
  */
 @inject()
 export default class AdministratorUserUnarchiveUseCase {
+  constructor(
+    private readonly users: UserRepository,
+    private readonly i18n: I18n,
+  ) {}
+
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const user = await User.query()
-        .where('id', id)
-        .withScopes((scopes) => scopes.onlyDeleted())
-        .first()
+      const user = await this.users.findArchivedById(id)
 
-      if (!user) return left(HTTPException.NotFound('Usuário não encontrado', 'USER_NOT_FOUND'))
+      if (!user)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      user.deletedAt = null
-      await user.save()
+      const restored = user.unarchive(new Date())
+      if (restored.isLeft()) return left(UserRefusal.http(restored.value, this.i18n))
 
-      return right(user)
+      await this.users.save(user)
+
+      return right(null)
     } catch (error) {
       logger.error({ err: error }, '[users > unarchive][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'USER_UNARCHIVE_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_UNARCHIVE_ERROR'),
       )
     }
   }

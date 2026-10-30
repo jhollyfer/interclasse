@@ -1,0 +1,7 @@
+{
+  "not_found": "Chave não encontrada",
+  "sport_not_found": "Modalidade não encontrada",
+  "not_enough_teams": "São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos",
+  "too_many_teams": "A chave comporta até {maxTeams} turmas",
+  "has_results": "A chave já tem placar lançado: desfaça os placares antes de apagá-la"
+}

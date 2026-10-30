@@ -1,87 +1,78 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import {
+  left,
+  right,
+  type AdministratorClassroomShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
-import Team from '#models/team'
-import ClassroomService from '#services/classroom/classroom.service'
-import { left, right, type Either } from '#core/either'
+import { ClassroomRefusal } from '../_shared.classroom-refusal.ts'
+
+import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
 import { isUniqueViolation } from '#features/_shared.database'
-import { type Merge } from '#core/entity'
-import { categoryOf } from '#features/administrator/_shared.classroom'
-import type { ClassroomUpdatePayload } from '#features/administrator/classrooms/classrooms.validator'
 import type { IdentifierPayload } from '#core/validator'
+import type { AdministratorClassroomUpdatePayload } from '#validators/administrator/classrooms.validator'
 
-type Payload = Merge<ClassroomUpdatePayload, IdentifierPayload>
-type Response = Either<HTTPException, Classroom>
+type Payload = Merge<AdministratorClassroomUpdatePayload, IdentifierPayload>
+type Response = Either<HTTPException, AdministratorClassroomShowResponse>
 
+/**
+ * Renomeia, muda o ano e os vínculos. Campo ausente é "não mexer". A entidade
+ * confere só o vínculo que mudou e recusa a troca de categoria da turma sorteada.
+ */
 @inject()
 export default class AdministratorClassroomUpdateUseCase {
-  constructor(private readonly classrooms: ClassroomService) {}
+  constructor(
+    private readonly classrooms: ClassroomRepository,
+    private readonly i18n: I18n,
+  ) {}
 
-  async execute({ id, ...payload }: Payload): Promise<Response> {
+  async execute({ id, ...changes }: Payload): Promise<Response> {
     try {
-      const classroom = await Classroom.find(id)
+      const classroom = await this.classrooms.findById(id)
+      if (!classroom) return left(this.notFound())
 
-      if (!classroom)
-        return left(HTTPException.NotFound('Turma não encontrada', 'CLASSROOM_NOT_FOUND'))
+      if (
+        classroom.renamesTo(changes.name) &&
+        (await this.classrooms.existsByName(changes.name, id))
+      )
+        return left(ClassroomRefusal.alreadyExists(this.i18n))
 
-      if (payload.name && payload.name !== classroom.name) {
-        const existing = await Classroom.findBy('name', payload.name)
+      const facts = await this.classrooms.peopleFacts(classroom.changedLinks(changes), id)
+      // Só vale perguntar do sorteio quando o ano levaria a turma a outra categoria.
+      const inCompetition =
+        classroom.changesCategoryWith(changes.grade) && (await this.classrooms.isInCompetition(id))
 
-        if (existing)
-          return left(
-            HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
-              name: 'Já existe uma turma com este nome',
-            }),
-          )
-      }
+      const updated = classroom.update(changes, { facts, inCompetition, now: new Date() })
+      if (updated.isLeft()) return left(ClassroomRefusal.http(updated.value, this.i18n))
 
-      const people = await this.classrooms.assertPeople(payload, classroom)
-      if (people.isLeft()) return left(people.value)
+      await this.classrooms.save(classroom)
 
-      const category = categoryOf(payload.grade ?? classroom.grade)
+      const detail = await this.classrooms.findDetail(id)
+      if (!detail) return left(this.notFound())
 
-      // Mudar de categoria com a turma numa chave a deixaria jogando contra a
-      // categoria errada.
-      if (category !== classroom.category) {
-        const team = await Team.findBy('classroomId', classroom.id)
-
-        if (team)
-          return left(
-            HTTPException.Conflict(
-              'A turma já está numa chave sorteada',
-              'CLASSROOM_IN_COMPETITION',
-              { grade: 'Não é possível mudar a categoria de uma turma já sorteada' },
-            ),
-          )
-      }
-
-      classroom.merge({ ...payload, category })
-      await classroom.save()
-
-      await classroom.load('advisor')
-      await classroom.load('representative')
-
-      return right(classroom)
+      return right(detail)
     } catch (error) {
       // A checagem acima não fecha a corrida: o segundo de dois pedidos
       // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error))
-        return left(
-          HTTPException.Conflict('Turma já existe', 'CLASSROOM_ALREADY_EXISTS', {
-            name: 'Já existe uma turma com este nome',
-          }),
-        )
+      if (isUniqueViolation(error)) return left(ClassroomRefusal.race(error, this.i18n))
 
-      logger.error({ err: error }, '[classrooms > update][error]')
+      logger.error({ err: error }, '[administrator/classrooms > update][error]')
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'ADMINISTRATOR_CLASSROOM_UPDATE_ERROR',
         ),
       )
     }
+  }
+
+  private notFound(): HTTPException {
+    return HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND')
   }
 }

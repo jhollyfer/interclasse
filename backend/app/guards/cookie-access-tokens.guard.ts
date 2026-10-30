@@ -4,11 +4,11 @@ import { errors, symbols } from '@adonisjs/auth'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { AccessToken } from '@adonisjs/auth/access_tokens'
 import type { AuthClientResponse, GuardContract } from '@adonisjs/auth/types'
+import { ACTIVE_STATUS } from '@interclasse/shared'
 
 import User from '#models/user'
-import { ACTIVE_STATUS } from '#core/entity'
 import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
-import SessionService from '#services/session/session.service'
+import { SessionContract } from '#services/session/session.contract'
 
 /**
  * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.
@@ -109,8 +109,8 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
   async authenticateAsClient(user: User): Promise<AuthClientResponse> {
     // O guard nasce fora do container (factory de `config/auth.ts`); o service
     // é pedido a ele, nunca construído com `new`.
-    const session = await app.container.make(SessionService)
-    const tokens = await session.issue(user)
+    const session = await app.container.make(SessionContract)
+    const tokens = await session.issue(user.id)
 
     return {
       cookies: {

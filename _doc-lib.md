@@ -1,7 +1,7 @@
 # Índice de documentação
 
 Referência anotada de 1321 páginas de documentação, distribuídas em 24 bibliotecas. As regras da
-casa — o que fazer com elas — ficam em [`_padroes/`](_padroes/), e vencem o código existente.
+casa — o que fazer com elas — ficam em [`_standards/`](_standards/), e vencem o código existente.
 
 O Fastify é a única biblioteca com **dois** arquivos, e o motivo é que são duas perguntas: como o
 framework funciona, e que plugin resolve um problema. A segunda tem 298 respostas, e afogaria a
@@ -16,7 +16,7 @@ e o resto continua valendo. A opinião forte que os arquivos carregam ("não use
 apoia na **stack**, não em decisão de repositório: mesma stack, mesma conclusão.
 
 O gerador de contrato da API, que antes morava aqui como exceção, é padrão da casa e está em
-[`_padroes/openapi.md`](_padroes/openapi.md).
+[`_standards/openapi.md`](_standards/openapi.md).
 
 Cada biblioteca tem um arquivo próprio em `_doc-lib/`. Dentro dele, o cabeçalho responde **o que é**,
 **para que serve**, **como usar** e **quando adotar** a biblioteca, e cada link responde três coisas:
@@ -25,7 +25,7 @@ Cada biblioteca tem um arquivo próprio em `_doc-lib/`. Dentro dele, o cabeçalh
 - **Para que serve** o que ela ensina.
 - **Quando usar**, ou seja, o gatilho concreto que faz valer a pena abrir.
 
-O objetivo é escolher o link certo sem visitar os outros 1317.
+O objetivo é escolher o link certo sem visitar os outros 2421.
 
 ---
 
@@ -38,15 +38,20 @@ O objetivo é escolher o link certo sem visitar os outros 1317.
 | **Fastify (plugins)**  | [`_doc-lib/fastify-plugins.md`](_doc-lib/fastify-plugins.md)       | O ecossistema: 60 plugins oficiais anotados e 237 da comunidade em tabela         |  298  |
 | **fastify-decorators** | [`_doc-lib/fastify-decorators.md`](_doc-lib/fastify-decorators.md) | Controller, rota e injeção por decorator sobre o Fastify; bootstrap por diretório |   20  |
 | **Lucid ORM**          | [`_doc-lib/lucid.md`](_doc-lib/lucid.md)                           | ORM do AdonisJS: models, migrations, query builder, relacionamentos               |   35  |
-| **VineJS**             | [`_doc-lib/vinejs.md`](_doc-lib/vinejs.md)                         | Validação de payload com tipo inferido do schema. Também usado no frontend        |   26  |
+| **VineJS**             | [`_doc-lib/vinejs.md`](_doc-lib/vinejs.md)                         | Validação de payload com tipo inferido do schema, só no backend Adonis            |   26  |
+| **Zod**                | [`_doc-lib/zod.md`](_doc-lib/zod.md)                               | Schema e tipo inferido: shared/, env.ts, Fastify, formulário, JSON Schema         |   17  |
 | **FlyDrive**           | [`_doc-lib/flydrive.md`](_doc-lib/flydrive.md)                     | Arquivos com uma API só sobre disco local, S3, R2 e GCS                           |   13  |
 | **MongoDB (driver)**   | [`_doc-lib/mongodb.md`](_doc-lib/mongodb.md)                       | O driver oficial sem ODM: CRUD, agregação, índices, transações, tipagem           |   48  |
 | **BullMQ**             | [`_doc-lib/bullmq.md`](_doc-lib/bullmq.md)                         | Fila de trabalho em Redis: retry, agendamento, flows, encerramento limpo          |   45  |
 | **Socket.IO**          | [`_doc-lib/socket-io.md`](_doc-lib/socket-io.md)                   | Tempo real com fallback: namespaces, rooms, auth no handshake, escala             |   44  |
 | **isolated-vm**        | [`_doc-lib/isolated-vm.md`](_doc-lib/isolated-vm.md)               | Isolate V8 separado para rodar código não confiável — o que `node:vm` não faz     |   35  |
+| **Japa**             | [`_doc-lib/japa.md`](_doc-lib/japa.md)                             | Runner de teste do Adonis: suítes unit/functional, api-client, hooks, datasets, pin |   27  |
+| **Node.js 24**       | [`_doc-lib/nodejs.md`](_doc-lib/nodejs.md)                         | O runtime: erro, sinal, timeout, stream, contexto, crypto, processo filho, ESM, flags |   37  |
+| **OpenTimestamps**   | [`_doc-lib/opentimestamps.md`](_doc-lib/opentimestamps.md)         | Carimbo do tempo no Bitcoin; sem site de doc, a página descreve a API instalada        |    0  |
 
-AdonisJS e Fastify ocupam a **mesma camada** e não se somam: um projeto tem um ou o outro. Lucid,
-VineJS e FlyDrive não dependem dessa escolha, e o frontend inteiro menos ainda. O que muda é de
+AdonisJS e Fastify ocupam a **mesma camada** e não se somam: um projeto tem um ou o outro. Lucid e
+FlyDrive não dependem dessa escolha, e o frontend inteiro menos ainda; o schema depende (VineJS no
+Adonis, Zod no Fastify). O que muda é de
 onde vem o resto — no Adonis, do próprio framework; no Fastify, do ecossistema, e é isso que o
 segundo arquivo cataloga. O `fastify-decorators` só existe do lado Fastify: é o que devolve a ele
 o container e a convenção de controller que o Adonis traz de fábrica.
@@ -63,9 +68,16 @@ o container e a convenção de controller que o Adonis traz de fábrica.
 | **TanStack Router** | [`_doc-lib/tanstack-router.md`](_doc-lib/tanstack-router.md) | Roteamento com tipagem de ponta a ponta, incluindo search params                                 |  61   |
 | **TanStack Start**  | [`_doc-lib/tanstack-start.md`](_doc-lib/tanstack-start.md)   | Camada full-stack sobre o Router: SSR, server functions, deploy                                  |  45   |
 | **TanStack Table**  | [`_doc-lib/tanstack-table.md`](_doc-lib/tanstack-table.md)   | Motor de tabela headless (v9): features opt-in, ordenação, filtro, paginação, seleção            |  46   |
+| **dnd kit**         | [`_doc-lib/dnd-kit.md`](_doc-lib/dnd-kit.md)                 | Arrastar, soltar e reordenar em React (API nova e migração do `@dnd-kit/core`)                  |  21   |
+| **Luxon**           | [`_doc-lib/luxon.md`](_doc-lib/luxon.md)                     | Data e hora imutável: zona explícita, locale por Intl, ISO no transporte, `DateTime` do Lucid   |  69   |
+| **Motion**          | [`_doc-lib/motion.md`](_doc-lib/motion.md)                   | Animação React: layout, saída, gesto, arraste, scroll; Motion+ (pago) marcado                     |  44   |
+| **Paraglide JS**    | [`_doc-lib/paraglide.md`](_doc-lib/paraglide.md)             | i18n compilado do frontend: mensagens tipadas, estratégia de idioma, URL por locale, SSR        |  40   |
+| **Phosphor**        | [`_doc-lib/phosphor.md`](_doc-lib/phosphor.md)               | Ícones React: pesos, `IconContext`, acessibilidade, migração do lucide pelo shadcn             |  14   |
+| **Recharts**        | [`_doc-lib/recharts.md`](_doc-lib/recharts.md)               | Gráficos React em SVG por composição, a base do `chart` do shadcn                               |  111  |
+| **Tuyau**           | [`_doc-lib/tuyau.md`](_doc-lib/tuyau.md)                     | Cliente HTTP tipado do Adonis por nome de rota; transporte sob o `http.ts`, não o contrato     |   2   |
 | **TanStack Store**  | [`_doc-lib/tanstack-store.md`](_doc-lib/tanstack-store.md)   | Estado de cliente que não é do servidor nem cabe na URL                                          |   4   |
 | **Tailwind CSS**    | [`_doc-lib/tailwindcss.md`](_doc-lib/tailwindcss.md)         | Utilitário sobre CSS, v4 configurada em CSS: tema por token, variantes, modo escuro              |  42   |
-| **Tiptap**          | [`_doc-lib/tiptap.md`](_doc-lib/tiptap.md)                   | Editor de texto rico headless sobre ProseMirror: schema, extensão própria, round-trip de HTML    |  45   |
+| **Tiptap**          | [`_doc-lib/tiptap.md`](_doc-lib/tiptap.md)                   | Editor de texto rico headless sobre ProseMirror: schema, extensão própria, round-trip de HTML    |  538   |
 
 ## Build e ferramentas
 
@@ -74,6 +86,12 @@ o container e a convenção de controller que o Adonis traz de fábrica.
 | **Vite**   | [`_doc-lib/vitejs.md`](_doc-lib/vitejs.md) | Dev server, build, plugins, variável de ambiente, HMR                |  25   |
 | **Nitro**  | [`_doc-lib/nitro.md`](_doc-lib/nitro.md)   | Servidor de produção do build: preset, runtime, storage, cache, task |  30   |
 | **Vitest** | [`_doc-lib/vitest.md`](_doc-lib/vitest.md) | Suite de teste sobre o Vite: mock, cobertura, isolamento, projetos   |  50   |
+| **ESLint + typescript-eslint** | [`_doc-lib/eslint.md`](_doc-lib/eslint.md) | Config flat, lint com tipo e as regras que cobram ternário, any, as, !, interface e imports |  31   |
+| **commitlint + Husky** | [`_doc-lib/commitlint.md`](_doc-lib/commitlint.md) | Hook commit-msg na raiz e Conventional Commits no hook e no PR |  16   |
+| **pnpm** | [`_doc-lib/pnpm.md`](_doc-lib/pnpm.md) | Workspace, filter, deploy da imagem, allowBuilds, audit e lockfile no CI |  25   |
+| **dependency-cruiser** | [`_doc-lib/dependency-cruiser.md`](_doc-lib/dependency-cruiser.md) | Regra de camada e ciclo do backend no CI |   6   |
+| **Playwright** | [`_doc-lib/playwright.md`](_doc-lib/playwright.md) | E2E do frontend: config, localizador, fixture, auth, rede, a11y, trace e CI |  72   |
+| **TypeScript** | [`_doc-lib/typescript.md`](_doc-lib/typescript.md) | Linguagem e tsc 6.x: narrowing, tipos derivados, módulos, tsconfig estrito; o que muda no 7 |  75   |
 
 ---
 
@@ -135,12 +153,12 @@ variante são invenção do shadcn, e não existem no Base UI.
 | -------------------------------------------------- | ------------------------------ |
 | Rota, middleware, resposta                         | AdonisJS ou Fastify            |
 | Injeção de dependência, convenção de controller    | AdonisJS ou fastify-decorators |
-| Formato e regra do payload que entra               | VineJS                         |
+| Formato e regra do payload que entra               | VineJS (Adonis) ou Zod (Fastify) |
 | Schema, consulta, relacionamento, transação        | Lucid                          |
 | Gravar e ler arquivo, em qualquer destino          | FlyDrive                       |
 | Publicar o contrato da API para quem consome       | OpenAPI (do repositório)       |
 
-A última linha não acrescenta trabalho às outras: o gerador lê o que AdonisJS e VineJS já declararam.
+A última linha não acrescenta trabalho às outras: o gerador lê o que o framework e o schema já declararam.
 Rota nova em feature existente não exige documentação nenhuma.
 
 As duas primeiras linhas têm duas respostas porque a escolha do framework é do projeto, e a
@@ -152,45 +170,23 @@ não avisa. O `fastify-decorators` acrescenta uma segunda forma de silêncio, qu
 por constructor só existe se o tipo do parâmetro sobreviver à compilação, e o serviço que chega
 `undefined` não avisa no boot.
 
-**VineJS nos dois lados**
+**Zod em tudo, VineJS só no backend Adonis** (`_standards/DECISIONS.md` #241)
 
-Um módulo de validator de cada lado — no servidor e no cliente —, os dois em VineJS. **Sem uma
-segunda biblioteca de schema no frontend.** Onde cada módulo mora é convenção do projeto; o que não
-é convenção é existirem os dois, e serem um só arquivo por lado. Daqui em diante este texto os chama
-de `validator.ts` do servidor e `validator.ts` do cliente.
+Frontend, `shared/` e backend Fastify validam com Zod ([`zod.md`](_doc-lib/zod.md)); o backend
+Adonis valida com VineJS ([`vinejs.md`](_doc-lib/vinejs.md)), que é nativo do framework. Não entra
+uma terceira biblioteca de schema.
 
-O schema não atravessa a fronteira, e continua sendo duas declarações: o backend não publica os seus
-validators como pacote. O ganho de usar a mesma biblioteca dos dois lados é que as duas declarações
-passam a ser **a mesma expressão**, e não uma tradução. Uma regra `document()` do frontend é a
-`document()` do backend copiada linha a linha.
-
-Com dialetos diferentes a tradução envelhece sem avisar, e o sintoma é sempre o mesmo: o cliente
-recusa por meses um valor que o servidor já aceita, com um comentário explicando uma espera que já
-terminou.
-
-Regra nova entra nos dois arquivos, ou entra só no servidor. Validação de cliente é conveniência para
-quem digita; a do servidor é a que segura o dado, porque quem chama a API direto passa longe do
-frontend.
-
-Dois lugares onde o VineJS **não** serve, e onde a saída é função à mão em vez de uma segunda
-biblioteca: um módulo de env com `@t3-oss/env-core` e o `validateSearch` do TanStack Router. Os dois
-exigem schema **síncrono**, e o `validate` do VineJS devolve promessa.
-
-Duas configurações fazem o cliente se comportar como o servidor, e as duas moram no topo do
-validator do cliente:
-
-| Configuração                            | Por quê                                                                                                                                                                 |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vine.convertEmptyStringsToNull = true` | Espelha o `config/bodyparser.ts` do AdonisJS. O default do VineJS fora do AdonisJS é `false`, e sem isto o `''` de um `<input>` passa no cliente e é recusado pela API. |
-| `vine.messagesProvider`                 | O VineJS não aceita mensagem inline por campo. As mensagens traduzidas ficam num módulo à parte, com chave `campo.regra`.                                               |
-
-O provider existe **nos dois lados**, pelo mesmo motivo dos validators: um módulo de mensagens no
-servidor, outro no cliente. Sem o do servidor a resposta 422 sai bilíngue — envelope traduzido,
-`errors` no default em inglês do VineJS.
-
-As duas valem sobre um **singleton**, então o `validator.ts` reexporta o `vine` já configurado.
-Importar `@vinejs/vine` direto num componente compila o schema com a flag errada e mensagem em
-inglês, dependendo da ordem em que os módulos carregam.
+- **Fastify:** o mesmo schema do `shared/` vale nos dois lados. A rota recebe pelo
+  `fastify-type-provider-zod` ([`fastify-plugins.md`](_doc-lib/fastify-plugins.md)), e o
+  `start/env.ts` usa `safeParse`, que é síncrono: a validação manual do ENV deixa de existir.
+- **Adonis:** o validator VineJS do backend e o schema Zod do `shared/` têm par de caminho e nome,
+  e um spec de paridade confere os campos. Regra nova entra nos dois, ou só no servidor: a validação
+  do cliente é conveniência para quem digita; a do servidor é a que segura o dado.
+- **Síncrono quando precisa ser:** `validateSearch` do TanStack Router e o leitor de ENV usam
+  `safeParse` do Zod. Refinamento ou transformação `async` não entra nesses schemas, porque o
+  `safeParse` lança com eles (`zod.md#basics`).
+- **Mensagens:** pt-BR, es e en saem do `shared/` pelo locale do Zod (`zod.md#error-customization`);
+  no Adonis, o backend segue com o `messagesProvider` do VineJS.
 
 **Onde a máscara mora**
 
@@ -198,7 +194,7 @@ Máscara é camada de **input**, e só. Ela não valida, não guarda estado e n�
 "onde um dado mora" — o campo mascarado continua sendo um campo do React Hook Form, com a diferença
 de que o que entra no estado é a string formatada.
 
-É aí que ela toca o VineJS, e é a única decisão que o assunto exige: **quem tira a máscara antes da
+É aí que ela toca o schema (Zod no frontend), e é a única decisão que o assunto exige: **quem tira a máscara antes da
 regra**. Duas respostas, e escolher uma por campo:
 
 | Onde                                     | O que acontece                                                                                                                                 |
@@ -219,7 +215,7 @@ Para quem está começando na stack e não quer ler 1321 páginas:
 **Backend**: `adonisjs` (folder-structure, http-context, routing, dependency-injection),
 `vinejs` (schema_101, html_forms_and_surprises, types/object) e `lucid` (models, migrations,
 table-builder, model-query-builder, relationships). Antes de abrir a primeira pull request que
-mexa em rota, leia `_padroes/openapi.md` (fluxo-de-trabalho, rota-nova) — são dois minutos e evitam um
+mexa em rota, leia `_standards/openapi.md` (fluxo-de-trabalho, rota-nova) — são dois minutos e evitam um
 `--check` vermelho no CI.
 
 **Backend em Fastify**, no lugar do primeiro parágrafo e não além dele: `fastify`
@@ -302,7 +298,7 @@ inteira de pé. Confira o `#Id` na página-mãe antes de sair procurando substit
 
 A auditoria de link é `node scripts/doc-lib/audit.mjs` (status, redirect, hash do conteúdo,
 último push de repositório, páginas oficiais sem entrada). O resultado vai para
-`_doc-lib/_audit/RELATORIO.md`, e a rodada seguinte compara com `links.json` para mostrar só o
+`_doc-lib/_audit/REPORT.md`, e a rodada seguinte compara com `links.json` para mostrar só o
 que mudou. Rode antes de mexer em qualquer arquivo daqui.
 
 **Quando a biblioteca lançar versão nova**, o link continuar respondendo 200 não quer dizer nada: o

@@ -42,6 +42,18 @@ const routes = {
     tokens: [{"old":"/storefront/matches","type":0,"val":"storefront","end":""},{"old":"/storefront/matches","type":0,"val":"matches","end":""}],
     types: placeholder as Registry['storefront.matches']['types'],
   },
+  'storefront.site': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/site',
+    tokens: [{"old":"/storefront/site","type":0,"val":"storefront","end":""},{"old":"/storefront/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['storefront.site']['types'],
+  },
+  'storefront.photos': {
+    methods: ["GET","HEAD"],
+    pattern: '/storefront/photos',
+    tokens: [{"old":"/storefront/photos","type":0,"val":"storefront","end":""},{"old":"/storefront/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['storefront.photos']['types'],
+  },
   'storefront.brackets.paginate': {
     methods: ["GET","HEAD"],
     pattern: '/storefront/brackets',
@@ -185,6 +197,54 @@ const routes = {
     pattern: '/administrator/sports/:id',
     tokens: [{"old":"/administrator/sports/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/sports/:id","type":0,"val":"sports","end":""},{"old":"/administrator/sports/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['administrator.sports.delete']['types'],
+  },
+  'administrator.reports.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/reports',
+    tokens: [{"old":"/administrator/reports","type":0,"val":"administrator","end":""},{"old":"/administrator/reports","type":0,"val":"reports","end":""}],
+    types: placeholder as Registry['administrator.reports.show']['types'],
+  },
+  'administrator.reports.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/reports/csv',
+    tokens: [{"old":"/administrator/reports/csv","type":0,"val":"administrator","end":""},{"old":"/administrator/reports/csv","type":0,"val":"reports","end":""},{"old":"/administrator/reports/csv","type":0,"val":"csv","end":""}],
+    types: placeholder as Registry['administrator.reports.export']['types'],
+  },
+  'administrator.photos.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/photos',
+    tokens: [{"old":"/administrator/photos","type":0,"val":"administrator","end":""},{"old":"/administrator/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['administrator.photos.paginate']['types'],
+  },
+  'administrator.photos.create': {
+    methods: ["POST"],
+    pattern: '/administrator/photos',
+    tokens: [{"old":"/administrator/photos","type":0,"val":"administrator","end":""},{"old":"/administrator/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['administrator.photos.create']['types'],
+  },
+  'administrator.photos.review': {
+    methods: ["PUT"],
+    pattern: '/administrator/photos/:id/review',
+    tokens: [{"old":"/administrator/photos/:id/review","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id/review","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id/review","type":1,"val":"id","end":""},{"old":"/administrator/photos/:id/review","type":0,"val":"review","end":""}],
+    types: placeholder as Registry['administrator.photos.review']['types'],
+  },
+  'administrator.photos.delete': {
+    methods: ["DELETE"],
+    pattern: '/administrator/photos/:id',
+    tokens: [{"old":"/administrator/photos/:id","type":0,"val":"administrator","end":""},{"old":"/administrator/photos/:id","type":0,"val":"photos","end":""},{"old":"/administrator/photos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['administrator.photos.delete']['types'],
+  },
+  'administrator.site.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/administrator/site',
+    tokens: [{"old":"/administrator/site","type":0,"val":"administrator","end":""},{"old":"/administrator/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['administrator.site.show']['types'],
+  },
+  'administrator.site.update': {
+    methods: ["PUT"],
+    pattern: '/administrator/site',
+    tokens: [{"old":"/administrator/site","type":0,"val":"administrator","end":""},{"old":"/administrator/site","type":0,"val":"site","end":""}],
+    types: placeholder as Registry['administrator.site.update']['types'],
   },
   'administrator.announcements.paginate': {
     methods: ["GET","HEAD"],
@@ -383,6 +443,24 @@ const routes = {
     pattern: '/advisor/students/:id',
     tokens: [{"old":"/advisor/students/:id","type":0,"val":"advisor","end":""},{"old":"/advisor/students/:id","type":0,"val":"students","end":""},{"old":"/advisor/students/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['advisor.students.delete']['types'],
+  },
+  'advisor.photos.paginate': {
+    methods: ["GET","HEAD"],
+    pattern: '/advisor/photos',
+    tokens: [{"old":"/advisor/photos","type":0,"val":"advisor","end":""},{"old":"/advisor/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['advisor.photos.paginate']['types'],
+  },
+  'advisor.photos.create': {
+    methods: ["POST"],
+    pattern: '/advisor/photos',
+    tokens: [{"old":"/advisor/photos","type":0,"val":"advisor","end":""},{"old":"/advisor/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['advisor.photos.create']['types'],
+  },
+  'advisor.photos.delete': {
+    methods: ["DELETE"],
+    pattern: '/advisor/photos/:id',
+    tokens: [{"old":"/advisor/photos/:id","type":0,"val":"advisor","end":""},{"old":"/advisor/photos/:id","type":0,"val":"photos","end":""},{"old":"/advisor/photos/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['advisor.photos.delete']['types'],
   },
   'advisor.enrollments.show': {
     methods: ["GET","HEAD"],

@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
+import { BRACKET_STATUS, CATEGORY } from '@interclasse/shared'
 
 import Bracket from '#models/bracket'
-import { BRACKET_STATUS, CATEGORY } from '#core/entity'
 import { SportFactory } from '#database/factories/sport.factory'
 
 /**

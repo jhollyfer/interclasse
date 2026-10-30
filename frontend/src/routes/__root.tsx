@@ -13,10 +13,8 @@ import { TooltipProvider } from '#/components/ui/tooltip'
 import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'
-
-/** O idioma do documento: o site é só em português. */
-const LOCALE = 'pt-BR'
 
 /**
  * O que toda rota enxerga em `context`.
@@ -40,11 +38,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: SITE_TITLE,
+        title: SITE_TITLE(),
       },
       {
         name: 'description',
-        content: SITE_DESCRIPTION,
+        content: SITE_DESCRIPTION(),
       },
     ],
     links: [
@@ -76,7 +74,7 @@ function RootDocument({
     // escreve `class="dark"` no `<html>` por um script que roda antes da
     // hidratação - é o que evita o flash de tema claro -, então o servidor e o
     // cliente divergem neste elemento por construção.
-    <html lang={LOCALE} suppressHydrationWarning>
+    <html lang={getLocale()} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

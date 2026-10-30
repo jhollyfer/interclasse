@@ -3,7 +3,7 @@ import type * as React from 'react'
 import { Button } from '#/components/ui/button'
 import { Spinner } from '#/components/ui/spinner'
 import { useIsUploading } from '#/components/common/uploading-context'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 type SubmitButtonProps = Readonly<
   Merge<

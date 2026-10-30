@@ -1,10 +1,11 @@
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
+import { left, right, type Either } from '@interclasse/shared'
 
-import Storage from '#models/storage'
-import { left, right, type Either } from '#core/either'
 import HTTPException from '#exceptions/http.exception'
-import { StorageContract } from '#services/storage/storage-contract.service'
+import { StorageRepository } from '#repositories/storage/storage.repository'
+import { StorageContract } from '#services/storage/storage.contract'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -32,21 +33,27 @@ type Response = Either<HTTPException, string>
  */
 @inject()
 export default class StoragesFileDownloadUseCase {
-  constructor(private readonly storage: StorageContract) {}
+  constructor(
+    private readonly bucket: StorageContract,
+    private readonly storages: StorageRepository,
+    private readonly i18n: I18n,
+  ) {}
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const storage = await Storage.query().where('id', payload.id).first()
+      const storage = await this.storages.findById(payload.id)
 
       if (!storage)
-        return left(HTTPException.NotFound('Arquivo não encontrado', 'STORAGE_NOT_FOUND'))
+        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
 
-      return right(await this.storage.signedDownload(storage))
+      const { path, mimetype, originalName } = storage.snapshot()
+
+      return right(await this.bucket.signedDownload({ path, mimetype, originalName }))
     } catch (error) {
       logger.error({ err: error }, '[files > download][error]')
 
       return left(
-        HTTPException.InternalServerError('Erro interno do servidor', 'FILE_DOWNLOAD_ERROR'),
+        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_DOWNLOAD_ERROR'),
       )
     }
   }

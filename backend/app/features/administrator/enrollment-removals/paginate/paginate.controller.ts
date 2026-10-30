@@ -4,7 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AdministratorEnrollmentRemovalPaginateUseCase from './paginate.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { EnrollmentRemovalPaginateValidator } from '#features/administrator/enrollment-removals/enrollment-removals.validator'
+import { AdministratorEnrollmentRemovalPaginateValidator } from '#validators/administrator/enrollment-removals.validator'
 
 @inject()
 export default class AdministratorEnrollmentRemovalPaginateController {
@@ -18,9 +18,12 @@ export default class AdministratorEnrollmentRemovalPaginateController {
   constructor(private readonly useCase: AdministratorEnrollmentRemovalPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(EnrollmentRemovalPaginateValidator, {
-      data: context.request.qs(),
-    })
+    const payload = await context.request.validateUsing(
+      AdministratorEnrollmentRemovalPaginateValidator,
+      {
+        data: context.request.qs(),
+      },
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

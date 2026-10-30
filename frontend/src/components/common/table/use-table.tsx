@@ -20,6 +20,8 @@ import type {
   ColumnVisibilityState,
 } from '@tanstack/react-table'
 
+import { m } from '#/paraglide/messages'
+
 import { TableLayoutValidator } from './table-layout.validator'
 import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
@@ -99,7 +101,7 @@ const MAX_COLUMN_SIZE = 640
  * que já mordeu: âncora não fica invisível, e largura fica dentro de um
  * intervalo plausível.
  */
-async function readLayout(key: string | undefined): Promise<PersistedLayout> {
+function readLayout(key: string | undefined): PersistedLayout {
   if (!key) return {}
 
   try {
@@ -107,8 +109,10 @@ async function readLayout(key: string | undefined): Promise<PersistedLayout> {
     if (!raw) return {}
 
     const parsed: unknown = JSON.parse(raw)
-    const [error, saved] = await TableLayoutValidator.tryValidate(parsed)
-    if (error) return {}
+    const result = TableLayoutValidator.safeParse(parsed)
+    if (!result.success) return {}
+
+    const saved = result.data
 
     let columnVisibility = saved.columnVisibility
     if (columnVisibility) {
@@ -224,7 +228,7 @@ export function useTable<TRow extends RowData>({
         // vazio: para quem lê a tabela por leitor de tela, a última coluna não
         // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
         // um menu de 24px que já se explica pelo ícone.
-        header: () => <span className="sr-only">Ações</span>,
+        header: () => <span className="sr-only">{m.common_actions()}</span>,
         cell: ({ row }) => (
           // O menu não pode disparar o clique da linha atrás dele.
           <div onClick={(event) => event.stopPropagation()}>
@@ -266,27 +270,14 @@ export function useTable<TRow extends RowData>({
   const [hydrated, setHydrated] = React.useState(false)
 
   React.useEffect(() => {
-    // A validação é assíncrona; trocar de tabela no meio dela não pode aplicar
-    // o layout da anterior.
-    let current = true
+    const saved = readLayout(persistKey)
 
-    async function load(): Promise<void> {
-      const saved = await readLayout(persistKey)
-      if (!current) return
+    if (saved.columnVisibility) setColumnVisibility(saved.columnVisibility)
+    if (saved.columnOrder) setColumnOrder(saved.columnOrder)
+    if (saved.columnSizing) setColumnSizing(saved.columnSizing)
+    if (saved.columnPinning) setColumnPinning(saved.columnPinning)
 
-      if (saved.columnVisibility) setColumnVisibility(saved.columnVisibility)
-      if (saved.columnOrder) setColumnOrder(saved.columnOrder)
-      if (saved.columnSizing) setColumnSizing(saved.columnSizing)
-      if (saved.columnPinning) setColumnPinning(saved.columnPinning)
-
-      setHydrated(true)
-    }
-
-    void load()
-
-    return () => {
-      current = false
-    }
+    setHydrated(true)
   }, [persistKey])
 
   React.useEffect(() => {

@@ -1,36 +1,8 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
-import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
-import {
-  advisorEnrollmentsQueryOptions,
-  studentsQueryOptions,
-} from '#/integrations/tanstack-query/queries'
-
-/** A lista de alunos inteira: uma turma não passa de 40. */
-export function studentsOf(classroomId: string) {
-  return { classroomId, perPage: 100 }
-}
+import { loadClassroomDetail } from '#/components/common/classroom-detail'
 
 export const Route = createFileRoute('/_private/advisor/$classroomId/')({
-  loader: async ({ context, params }) => {
-    try {
-      await Promise.all([
-        context.queryClient.query({
-          ...advisorEnrollmentsQueryOptions(params.classroomId),
-          staleTime: 'static',
-        }),
-        context.queryClient.query({
-          ...studentsQueryOptions(studentsOf(params.classroomId)),
-          staleTime: 'static',
-        }),
-      ])
-    } catch (error) {
-      // Turma alheia também é 404: o servidor não confirma que ela existe.
-      if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {
-        throw notFound()
-      }
-
-      throw error
-    }
-  },
+  loader: ({ context, params }) =>
+    loadClassroomDetail(context.queryClient, params.classroomId),
 })

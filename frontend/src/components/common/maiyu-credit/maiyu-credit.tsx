@@ -1,6 +1,7 @@
 import type * as React from 'react'
 
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /**
  * O crédito de quem fez o sistema: a marca da Maiyu e o nome, com link.
@@ -27,7 +28,7 @@ export function MaiyuCredit({
         className="size-5 shrink-0"
       />
       <span>
-        Desenvolvido por{' '}
+        {m.common_maiyu_credit_by()}{' '}
         <a
           href="https://maiyu.com.br"
           target="_blank"
@@ -35,8 +36,8 @@ export function MaiyuCredit({
           className="font-semibold underline-offset-4 hover:underline"
         >
           Maiyu
-        </a>{' '}
-        - Consultoria e Desenvolvimento em Tecnologia
+        </a>
+        . {m.common_maiyu_credit_tagline()}.
       </span>
     </p>
   )

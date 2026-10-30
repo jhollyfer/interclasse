@@ -30,7 +30,7 @@ export default class DiCheck extends BaseCommand {
     const dirPath = join(this.app.appRoot.pathname, 'app', directory)
 
     // Recursivo: service mora em `services/<nome>/<nome>.service.ts`
-    // (_padroes/arquitetura.md §3); policy continua plana.
+    // (_standards/architecture.md §3); policy continua plana.
     const entries = await readdir(dirPath, { recursive: true }).catch(() => [])
 
     return entries.filter(function (name) {
