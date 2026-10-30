@@ -15,10 +15,14 @@ import StorageModel from '#models/storage'
 import UserModel from '#models/user'
 import { Photo } from '#domain/photo/photo.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { StorageContract } from '#services/storage/storage.contract'
 
 @inject()
 export class PhotoLucidRepository extends PhotoRepository {
-  constructor(private readonly transaction: TransactionContext) {
+  constructor(
+    private readonly transaction: TransactionContext,
+    private readonly bucket: StorageContract,
+  ) {
     super()
   }
 
@@ -93,7 +97,7 @@ export class PhotoLucidRepository extends PhotoRepository {
 
     return {
       meta: page.getMeta(),
-      data: page.all().map((row) => this.toResponse(row)),
+      data: await Promise.all(page.all().map((row) => this.toResponse(row))),
     }
   }
 
@@ -109,12 +113,14 @@ export class PhotoLucidRepository extends PhotoRepository {
 
     return {
       meta: page.getMeta(),
-      data: page.all().map((row) => ({
-        id: row.id,
-        caption: row.caption,
-        url: row.storage.url ?? '',
-        createdAt: this.iso(row.createdAt),
-      })),
+      data: await Promise.all(
+        page.all().map(async (row) => ({
+          id: row.id,
+          caption: row.caption,
+          url: await this.bucket.signedUrl(row.storage.path),
+          createdAt: this.iso(row.createdAt),
+        })),
+      ),
     }
   }
 
@@ -132,7 +138,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     })
   }
 
-  private toResponse(row: PhotoModel): AdministratorPhotoShowResponse {
+  private async toResponse(row: PhotoModel): Promise<AdministratorPhotoShowResponse> {
     const { storage, author } = row
 
     return {
@@ -151,7 +157,7 @@ export class PhotoLucidRepository extends PhotoRepository {
         size: storage.size,
         path: storage.path,
         status: storage.status,
-        url: storage.url ?? '',
+        url: await this.bucket.signedUrl(storage.path),
         createdAt: storage.createdAt?.toISO() ?? null,
         updatedAt: storage.updatedAt?.toISO() ?? null,
         deletedAt: storage.deletedAt?.toISO() ?? null,

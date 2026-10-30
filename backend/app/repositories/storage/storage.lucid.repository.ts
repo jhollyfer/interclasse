@@ -8,6 +8,7 @@ import { StorageRepository, type StorageListCriteria } from './storage.repositor
 import StorageModel from '#models/storage'
 import { Storage } from '#domain/storage/storage.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { StorageContract } from '#services/storage/storage.contract'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
@@ -22,7 +23,10 @@ const REFERENCES = [{ table: 'users', column: 'avatar_id', label: 'avatar de usu
 
 @inject()
 export class StorageLucidRepository extends StorageRepository {
-  constructor(private readonly transaction: TransactionContext) {
+  constructor(
+    private readonly transaction: TransactionContext,
+    private readonly bucket: StorageContract,
+  ) {
     super()
   }
 
@@ -53,7 +57,7 @@ export class StorageLucidRepository extends StorageRepository {
       .whereIn('id', [...new Set(ids)])
       .withScopes((scopes) => scopes.notDeleted())
 
-    return rows.map((row) => this.toResponse(row))
+    return Promise.all(rows.map((row) => this.toResponse(row)))
   }
 
   async areAttachable(ids: ReadonlyArray<string>): Promise<boolean> {
@@ -129,7 +133,10 @@ export class StorageLucidRepository extends StorageRepository {
       .orderBy(criteria.sort, criteria.direction)
       .paginate(criteria.page, criteria.perPage)
 
-    return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
+    return {
+      meta: page.getMeta(),
+      data: await Promise.all(page.all().map((row) => this.toResponse(row))),
+    }
   }
 
   private toEntity(row: StorageModel): Storage {
@@ -149,8 +156,8 @@ export class StorageLucidRepository extends StorageRepository {
     })
   }
 
-  /** A `url` é a assinada que o hook de `providers/storage.provider.ts` deixou na leitura. */
-  private toResponse(row: StorageModel): StoragesFileShowResponse {
+  /** A `url` é assinada aqui, pelo contrato do bucket, a cada leitura (_standards/backend.md §4.7). */
+  private async toResponse(row: StorageModel): Promise<StoragesFileShowResponse> {
     return {
       id: row.id,
       filename: row.filename,
@@ -164,7 +171,7 @@ export class StorageLucidRepository extends StorageRepository {
       createdAt: row.createdAt?.toISO() ?? null,
       updatedAt: row.updatedAt?.toISO() ?? null,
       deletedAt: row.deletedAt?.toISO() ?? null,
-      url: row.url ?? '',
+      url: await this.bucket.signedUrl(row.path),
     }
   }
 

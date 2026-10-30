@@ -1,4 +1,4 @@
-import { column, computed, scope } from '@adonisjs/lucid/orm'
+import { column, scope } from '@adonisjs/lucid/orm'
 import { type UploadStatus } from '@interclasse/shared'
 
 import { StorageSchema } from '#database/schema'
@@ -41,19 +41,4 @@ export default class Storage extends StorageSchema {
    */
   @column({ consume: (value: bigint | number | string) => Number(value) })
   declare size: number
-
-  /**
-   * A URL assinada, exposta no JSON. Quem a resolve a cada leitura é o hook
-   * registrado em `providers/storage.provider.ts`, que a deixa em `$extras`.
-   *
-   * `@computed` e não `@column` porque não existe coluna `url`: ela é derivada,
-   * e gravá-la seria congelar o endereço do bucket na linha. Ausente (registro
-   * recém-criado, nunca lido), a chave some do JSON.
-   */
-  @computed()
-  get url(): string | undefined {
-    const url: unknown = this.$extras.url
-    if (typeof url === 'string') return url
-    return undefined
-  }
 }
