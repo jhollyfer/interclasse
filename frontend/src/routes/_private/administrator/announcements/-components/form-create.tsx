@@ -43,7 +43,8 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
     success: () => m.admin_announcements_published(),
-    // Nome repetido é `409 ANNOUNCEMENT_ALREADY_EXISTS`: reenviar é seguro.
+    // Aviso repetido não é recusado pela API: sem `retry`, reenviar duplicaria
+    // o aviso, e por isso o formulário não oferece "Tentar de novo".
     payload: (values) => values,
   })
 

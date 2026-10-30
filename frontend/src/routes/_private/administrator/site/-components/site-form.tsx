@@ -204,7 +204,7 @@ export function SiteForm(): React.JSX.Element {
                   <Input
                     {...control}
                     maxLength={30}
-                    placeholder="cmei_cosmejean"
+                    placeholder={m.admin_site_field_school_instagram_placeholder()}
                     value={field.value ?? ''}
                     onChange={(event) =>
                       field.onChange(blankToNull(event.target.value))

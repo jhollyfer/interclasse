@@ -206,7 +206,17 @@ async function send(
 
       if (!url) return
 
-      const etag = await putPart(url, file.slice(part.start, part.end), {
+      // O backend assina o `Content-Length` da parte: o corpo precisa ter
+      // exatamente o tamanho planejado (`Blob.slice` de `[start, end)`). O
+      // navegador manda o cabeçalho sozinho a partir do `Blob`, e uma parte de
+      // outro tamanho voltaria `403` do bucket sem dizer por quê.
+      const blob = file.slice(part.start, part.end)
+
+      if (blob.size !== part.end - part.start) {
+        throw new Error(m.upload_error_part_size())
+      }
+
+      const etag = await putPart(url, blob, {
         signal,
         onProgress: (loaded) => {
           progress.set(part.partNumber, loaded)

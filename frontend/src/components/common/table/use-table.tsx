@@ -31,7 +31,7 @@ import { selectionColumn } from './table-selection'
  * **Ordenar e filtrar não estão aqui, e é de propósito.** Quem pagina é o
  * backend: ordenar as 20 linhas em mãos daria uma ordem que só vale para elas, e
  * a linha 21 apareceria fora de lugar na página seguinte. O cabeçalho escreve
- * `?sort` na URL e o loader refaz a consulta - ver `data-table-column-header`.
+ * `?sort` na URL e o loader refaz a consulta - ver `table-column-header.tsx`.
  *
  * `rowPaginationFeature` fica de fora pelo mesmo motivo: no modo manual a tabela
  * não deve fatiar nada, ela já recebe a página pronta.
