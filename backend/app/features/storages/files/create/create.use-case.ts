@@ -16,7 +16,7 @@ import {
   PART_SIZE,
   type PresignedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts } from '#features/storages/_shared.parts'
+import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
 import type { StoragesFileCreatePayload } from '#validators/storages/files.validator'
 
 type Payload = StoragesFileCreatePayload
@@ -60,12 +60,21 @@ export default class StoragesFileCreateUseCase {
 
     try {
       if (totalParts <= 1) {
-        parts = [{ partNumber: 1, url: await this.multipart.signSingle(key, payload.mimetype) }]
+        parts = [
+          {
+            partNumber: 1,
+            url: await this.multipart.signSingle(key, payload.mimetype, payload.size),
+          },
+        ]
       }
 
       if (totalParts > 1) {
         uploadId = await this.multipart.initiate(key, payload.mimetype)
-        parts = await this.multipart.signParts(key, uploadId, pendingParts(totalParts, []))
+        parts = await this.multipart.signParts(
+          key,
+          uploadId,
+          sizedParts(pendingParts(totalParts, []), payload.size, PART_SIZE),
+        )
       }
 
       const storage = Storage.open({

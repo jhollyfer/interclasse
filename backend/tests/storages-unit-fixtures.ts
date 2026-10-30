@@ -22,9 +22,12 @@ export function pendingFile(overrides: { id?: string; uploadId?: string | null }
 }
 
 /** Um arquivo já confirmado. */
+/** O início de um PNG: o conteúdo que o tipo `image/png` exige no `complete`. */
+export const PNG_HEAD = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
+
 export function uploadedFile(id = FILE_ID): Storage {
   const file = pendingFile({ id })
-  file.complete({ contentLength: 1024 }, new Date('2026-10-29T12:05:00Z'))
+  file.complete({ contentLength: 1024, head: PNG_HEAD }, new Date('2026-10-29T12:05:00Z'))
 
   return file
 }

@@ -13,6 +13,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { bucket } from '#config/drive'
 import {
   MultipartContract,
+  type PartToSign,
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
@@ -25,6 +26,15 @@ import {
  * para as partes que faltam.
  */
 const URL_EXPIRES_IN = 60 * 60
+
+/**
+ * Os headers que a assinatura prende. Sem isto o presigner do SDK não assina
+ * `content-type` nem `content-length`, e o bucket aceita qualquer tipo e
+ * qualquer tamanho na URL (_standards/backend.md §5.4; _doc-lib/adonisjs.md#guides/basics/file-uploads,
+ * https://docs.adonisjs.com/guides/basics/file-uploads). Com ele, `PUT` com tipo
+ * ou tamanho diferente do assinado recebe 403 do storage.
+ */
+const SIGNABLE_HEADERS = new Set(['content-type', 'content-length'])
 
 /**
  * O multipart do S3, que o FlyDrive não expõe.
@@ -76,17 +86,18 @@ export default class MultipartService extends MultipartContract {
    * As URLs para enviar as partes indicadas, uma por parte.
    *
    * Recebe **quais** partes assinar, e não quantas, porque a retomada precisa
-   * assinar só o que falta. Um upload novo pede `[1, 2, 3, ...]`; um retomado
-   * pede o buraco que sobrou.
+   * assinar só o que falta. Um upload novo pede as partes `1, 2, 3, ...`; um
+   * retomado pede o buraco que sobrou. Cada parte leva o próprio tamanho, preso
+   * em `Content-Length` na assinatura.
    */
   async signParts(
     key: string,
     uploadId: string,
-    partNumbers: Array<number>,
+    parts: ReadonlyArray<PartToSign>,
     expiresIn: number = URL_EXPIRES_IN,
   ): Promise<Array<PresignedPart>> {
     return Promise.all(
-      partNumbers.map(async (partNumber) => {
+      parts.map(async ({ partNumber, size }) => {
         const url = await getSignedUrl(
           this.client,
           new UploadPartCommand({
@@ -94,8 +105,9 @@ export default class MultipartService extends MultipartContract {
             Key: key,
             UploadId: uploadId,
             PartNumber: partNumber,
+            ContentLength: size,
           }),
-          { expiresIn },
+          { expiresIn, signableHeaders: SIGNABLE_HEADERS },
         )
 
         return { partNumber, url }
@@ -113,12 +125,18 @@ export default class MultipartService extends MultipartContract {
   async signSingle(
     key: string,
     contentType: string,
+    size: number,
     expiresIn: number = URL_EXPIRES_IN,
   ): Promise<string> {
     return getSignedUrl(
       this.client,
-      new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
-      { expiresIn },
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        ContentType: contentType,
+        ContentLength: size,
+      }),
+      { expiresIn, signableHeaders: SIGNABLE_HEADERS },
     )
   }
 

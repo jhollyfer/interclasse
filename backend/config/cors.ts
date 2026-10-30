@@ -11,18 +11,26 @@ import env from '#start/env'
  */
 
 /**
- * A allowlist vem de `CORS_ORIGIN`, separada por vírgula, lida uma vez aqui e
- * exportada: o middleware de origem e o cookie de sessão leem a mesma lista em
- * vez de cada um refazer o parse.
+ * A allowlist vem de `CORS_ORIGINS`, separada por vírgula, lida uma vez aqui e
+ * exportada: o middleware de origem lê a mesma lista em vez de refazer o parse.
  *
  * Ela precisa ser explícita: com `credentials: true` abaixo, o protocolo recusa
  * `*` - o navegador não envia cookie para uma origem curinga. Então ou a origem
  * do frontend está listada, ou não existe sessão entre os dois.
  */
-export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGIN') ?? '')
+export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGINS') ?? '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean)
+
+/**
+ * Em produção a lista é obrigatória: vazia, a barreira de origem recusa toda
+ * escrita e o frontend não entra. Subir assim é erro de configuração, e o boot
+ * para em vez de esperar o primeiro usuário (_standards/backend.md §4.10).
+ */
+if (app.inProduction && corsOrigins.length === 0) {
+  throw new Error('CORS_ORIGINS é obrigatória em produção: liste as origens do frontend')
+}
 
 /**
  * Em desenvolvimento libera qualquer origem, para não exigir configuração de

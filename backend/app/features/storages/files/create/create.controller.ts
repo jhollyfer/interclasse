@@ -31,8 +31,8 @@ export default class StoragesFileCreateController {
       '`parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que ' +
       'é o mesmo endpoint da retomada.\n\n' +
       'A linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo ' +
-      'nasce sem dono: quem anexa guarda a referência, informando o `id` em `avatarId`, ' +
-      '`coverId`, `audioId` ou `imageIds`.',
+      'nasce sem dono: quem anexa guarda a referência, informando o `id` no campo do ' +
+      'recurso (hoje, `avatarId` do usuário).',
   })
 
   constructor(private readonly useCase: StoragesFileCreateUseCase) {}

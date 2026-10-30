@@ -12,10 +12,11 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  type PartToSign,
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts } from '#features/storages/_shared.parts'
+import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -81,7 +82,7 @@ export default class StoragesFilePartsUseCase {
         totalParts,
         uploaded.map((part) => part.partNumber),
       )
-      const parts = await this.sign(storage, missing)
+      const parts = await this.sign(storage, sizedParts(missing, file.size, partSize))
 
       return right(
         FilePresenter.upload({
@@ -126,13 +127,16 @@ export default class StoragesFilePartsUseCase {
   }
 
   /** URL nova para cada parte que falta - as antigas podem ter expirado. */
-  private async sign(storage: Storage, missing: Array<number>): Promise<Array<PresignedPart>> {
+  private async sign(
+    storage: Storage,
+    missing: ReadonlyArray<PartToSign>,
+  ): Promise<Array<PresignedPart>> {
     if (missing.length === 0) return []
 
-    const { path, uploadId, mimetype } = storage.snapshot()
+    const { path, uploadId, mimetype, size } = storage.snapshot()
 
     if (uploadId) return this.multipart.signParts(path, uploadId, missing)
 
-    return [{ partNumber: 1, url: await this.multipart.signSingle(path, mimetype) }]
+    return [{ partNumber: 1, url: await this.multipart.signSingle(path, mimetype, size) }]
   }
 }

@@ -105,7 +105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -160,7 +160,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -382,7 +382,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -462,7 +462,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -550,7 +550,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -642,7 +642,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -748,7 +748,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -868,7 +868,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -958,7 +958,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1050,7 +1050,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1132,7 +1132,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1248,7 +1248,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1364,7 +1364,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1447,7 +1447,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1553,7 +1553,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1686,7 +1686,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1786,7 +1786,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1874,7 +1874,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1976,7 +1976,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2082,7 +2082,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2191,7 +2191,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2297,7 +2297,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2450,7 +2450,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2551,7 +2551,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2642,7 +2642,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2751,7 +2751,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2867,7 +2867,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2968,7 +2968,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3041,7 +3041,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3132,7 +3132,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3233,7 +3233,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3293,7 +3293,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3353,7 +3353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3411,7 +3411,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3506,7 +3506,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3626,7 +3626,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3716,7 +3716,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3804,7 +3804,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3906,7 +3906,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4022,7 +4022,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4179,7 +4179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4269,7 +4269,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4358,7 +4358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4460,7 +4460,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4554,7 +4554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4638,7 +4638,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4744,7 +4744,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4870,7 +4870,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4971,7 +4971,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5061,7 +5061,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5167,7 +5167,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5257,7 +5257,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5331,7 +5331,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5438,7 +5438,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5546,7 +5546,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5637,7 +5637,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5730,7 +5730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5915,7 +5915,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5962,7 +5962,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6030,7 +6030,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6145,7 +6145,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6283,7 +6283,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6309,7 +6309,7 @@
             }
           }
         },
-        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo.\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, audio/mpeg, audio/mp4, audio/ogg, audio/wav, até 1073741824 bytes, recusados **antes** de qualquer assinatura: arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência, informando o `id` em `avatarId`, `coverId`, `audioId` ou `imageIds`.",
+        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo.\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, audio/mpeg, audio/mp4, audio/ogg, audio/wav, até 1073741824 bytes, recusados **antes** de qualquer assinatura: arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência, informando o `id` no campo do recurso (hoje, `avatarId` do usuário).",
         "security": [
           {
             "cookieAuth": []
@@ -6350,7 +6350,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6419,7 +6419,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6465,7 +6465,7 @@
             }
           }
         },
-        "description": "**Irreversível**: apaga o binário no bucket e a linha em `storages`.\n\nSó apaga arquivo **órfão**. O arquivo é um registro neutro e compartilhado - ele não pertence ao formulário que o enviou -, então quem o referencia é quem manda: avatar de usuário, capa de notícia ou galeria de álbum em uso respondem `409`, com a origem na mensagem. Desvincule primeiro, apague depois.\n\nArquivo ainda `PENDING` é cancelamento de upload: o multipart é abortado, e é isso que faz as partes já enviadas sumirem do bucket.\n\nÉ o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.",
+        "description": "**Irreversível**: apaga o binário no bucket e a linha em `storages`.\n\nSó apaga arquivo **órfão**. O arquivo é um registro neutro e compartilhado - ele não pertence ao formulário que o enviou -, então quem o referencia é quem manda: arquivo em uso por outro registro (hoje, o avatar de um usuário) responde `409`, com a origem na mensagem. Desvincule primeiro, apague depois.\n\nArquivo ainda `PENDING` é cancelamento de upload: o multipart é abortado, e é isso que faz as partes já enviadas sumirem do bucket.\n\nÉ o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.",
         "security": [
           {
             "cookieAuth": []
@@ -6507,7 +6507,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6527,7 +6527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422StorageSizeMismatchValidationError"
+                  "$ref": "#/components/schemas/Error422StorageContentMismatchStorageSizeMismatchValidationError"
                 }
               }
             }
@@ -6588,7 +6588,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6666,7 +6666,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -18088,6 +18088,40 @@
         ],
         "additionalProperties": false
       },
+      "Error401AuthenticationRequired": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              401
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error401InvalidCredentials": {
         "type": "object",
         "properties": {
@@ -18141,40 +18175,6 @@
             "enum": [
               "REFRESH_TOKEN_INVALID",
               "REFRESH_TOKEN_MISSING"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error401Unauthorized": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              401
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "UNAUTHORIZED"
             ]
           },
           "errors": {
@@ -19592,7 +19592,7 @@
           "errors"
         ]
       },
-      "Error422StorageNotFoundValidationError": {
+      "Error422StorageContentMismatchStorageSizeMismatchValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19609,7 +19609,8 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_NOT_FOUND",
+              "STORAGE_CONTENT_MISMATCH",
+              "STORAGE_SIZE_MISMATCH",
               "VALIDATION_ERROR"
             ]
           },
@@ -19628,7 +19629,7 @@
           "errors"
         ]
       },
-      "Error422StorageSizeMismatchValidationError": {
+      "Error422StorageNotFoundValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19645,7 +19646,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_SIZE_MISMATCH",
+              "STORAGE_NOT_FOUND",
               "VALIDATION_ERROR"
             ]
           },

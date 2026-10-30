@@ -60,6 +60,20 @@ test.group('storages/files > complete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
+  test('.png com bytes de SVG apaga binário e linha: 422 STORAGE_CONTENT_MISMATCH', async ({
+    assert,
+  }) => {
+    const { storages, bucket, useCase } = await setup()
+    await storages.save(pendingFile())
+    bucket.put('capa.png', { contentLength: 1024 }, new TextEncoder().encode('<svg xmlns="http'))
+
+    const result = await useCase.execute({ id: FILE_ID })
+
+    assert.deepInclude(result.value, { status: 422, code: 'STORAGE_CONTENT_MISMATCH' })
+    assert.deepEqual(bucket.discarded, ['capa.png'])
+    assert.isNull(await storages.findById(FILE_ID))
+  })
+
   test('confirmar de novo devolve o mesmo registro sem consultar o bucket', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())

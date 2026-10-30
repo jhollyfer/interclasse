@@ -7,6 +7,7 @@ import { UserMemoryRepository } from './user.memory.repository.ts'
 import type { UserRepository } from './user.repository.ts'
 
 import { resetDatabase } from '#tests/http-fixtures'
+import { PNG_HEAD } from '#tests/storages-unit-fixtures'
 import { Storage } from '#domain/storage/storage.entity'
 import { User } from '#domain/user/user.entity'
 import { StorageLucidRepository } from '#repositories/storage/storage.lucid.repository'
@@ -128,7 +129,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         partSize: 1,
         now: NOW,
       })
-      foto.complete({ contentLength: 1 }, NOW)
+      foto.complete({ contentLength: 1, head: PNG_HEAD }, NOW)
       await storages.save(foto)
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.update({ avatarId: CAIO }, NOW)

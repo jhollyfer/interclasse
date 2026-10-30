@@ -21,8 +21,8 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `LOG_LEVEL` | sim | não | nível do logger | `info` |
 | `APP_KEY` | sim | **sim** | chave de cifra da aplicação | `<segredo>` |
 | `APP_SERVER_URL` | sim | não | endereço público da API | `http://${HOST}:${PORT}` |
-| `SESSION_DRIVER` | sim | não | `cookie`, `memory` ou `database` | `cookie` |
-| `CORS_ORIGIN` | em produção | não | origens do navegador autorizadas, separadas por vírgula; ausente fora de desenvolvimento recusa todo pedido cross-origin | `https://interclass.maiyu.com.br` |
+| `TRUSTED_PROXIES` | atrás de proxy | não | proxy reverso confiável para `request.ip()`: um IP, sub-rede ou apelido do `proxy-addr` (`loopback`, `uniquelocal`); ausente vale `loopback`. Nunca `true` | `172.16.0.0/12` |
+| `CORS_ORIGINS` | em produção | não | allowlist do CORS e da barreira de origem (CSRF), separada por vírgula; toda escrita de origem fora dela recebe 403; o boot para sem ela em produção | `https://interclass.maiyu.com.br` |
 | `COOKIE_DOMAIN` | em produção | não | `Domain` dos cookies de sessão: o menor domínio que cobre o site e a API | `.maiyu.com.br` |
 | `DATABASE_URL` | sim | **sim** | conexão com o Postgres | `postgres://<usuario>:<senha>@localhost:5434/<banco>` |
 | `DATABASE_SSL` | não | não | TLS na conexão; `true` para banco gerenciado que exige | `false` |
@@ -32,8 +32,8 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `STORAGE_BUCKET` | sim | não | nome do bucket (privado) | `interclasse` |
 | `STORAGE_ENDPOINT` | sim | não | endpoint S3-compatível | `http://localhost:9004` |
 | `STORAGE_FORCE_PATH_STYLE` | não | não | `true` no MinIO; ausente em R2, S3 e Spaces | `true` |
-| `SEED_OWNER_EMAIL` | só no seeder | não | e-mail do administrador criado por `node ace db:seed` | `administrator@mail.com` |
-| `SEED_OWNER_PASSWORD` | só no seeder | **sim** | senha desse administrador; sem ela o seeder para | `<segredo>` |
+| `SEED_ADMINISTRATOR_EMAIL` | só no seeder | não | e-mail do administrador criado por `node ace db:seed` | `administrator@mail.com` |
+| `SEED_ADMINISTRATOR_PASSWORD` | só no seeder | **sim** | senha desse administrador; sem ela o seeder para | `<segredo>` |
 | `SEED_DEMO_PASSWORD` | não | **sim** | senha das contas de demonstração (`pnpm db:seed:demo`); ausente, a demonstração é pulada | `<segredo>` |
 
 ### Site (`frontend/`)
@@ -48,7 +48,7 @@ Regras:
 - Segredo e credencial **não têm default**: o app não sobe sem eles.
 - `VITE_*` vai para o navegador: nunca segredo. O `frontend/.env.production` é versionado por isso.
 - `VITE_API_URL` é de build: trocar a variável do container não muda nada, só uma nova imagem.
-- Em produção, `CORS_ORIGIN` e `COOKIE_DOMAIN` são exigidas, embora o schema as declare opcionais (em desenvolvimento, vazias é o certo).
+- Em produção, `CORS_ORIGINS` e `COOKIE_DOMAIN` são exigidas (a primeira derruba o boot sem ela), embora o schema as declare opcionais (em desenvolvimento, vazias é o certo).
 - O `Dockerfile-production` da API traz valores de build só para satisfazer o schema durante `node ace build`; em runtime quem injeta é a plataforma.
 
 ## 2. Exemplo
@@ -66,12 +66,10 @@ NODE_ENV=development
 LOG_LEVEL=info
 APP_KEY=<segredo>
 APP_SERVER_URL=http://${HOST}:${PORT}
-
-# Session
-SESSION_DRIVER=cookie
+# TRUSTED_PROXIES=172.16.0.0/12
 
 # CORS (produção)
-# CORS_ORIGIN=https://interclass.maiyu.com.br
+CORS_ORIGINS=http://localhost:3001  # produção: https://interclass.maiyu.com.br
 # COOKIE_DOMAIN=.maiyu.com.br
 
 # Banco de dados
@@ -86,8 +84,8 @@ STORAGE_ENDPOINT=http://localhost:9004
 STORAGE_FORCE_PATH_STYLE=true
 
 # Semeadura
-SEED_OWNER_EMAIL=administrator@mail.com
-SEED_OWNER_PASSWORD=<segredo>
+SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
+SEED_ADMINISTRATOR_PASSWORD=<segredo>
 ```
 
 `frontend/.env.example`:
@@ -101,8 +99,8 @@ VITE_API_URL=http://localhost:3333
 `.gitignore` (raiz e apps): `.env` e `.env.local` ficam fora; `.env.example`, `.env.test` e
 `frontend/.env.production` são versionados.
 
-`backend/.env.test` tem só container local, senha de banco de teste, bucket `interclasse-test` e
-`SESSION_DRIVER=memory`. O banco `interclasse_test` é separado do de desenvolvimento porque a suíte
+`backend/.env.test` tem só container local, senha de banco de teste, bucket `interclasse-test` e a
+allowlist do CORS. O banco `interclasse_test` é separado do de desenvolvimento porque a suíte
 roda `truncate()` entre os testes.
 
 ## 4. Por ambiente
@@ -121,6 +119,6 @@ Secrets de CI no repositório: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COOLIFY
 - [ ] `cp backend/.env.example backend/.env` e preencher cada `<segredo>`.
 - [ ] Gerar `APP_KEY` com `node ace generate:key` (em `backend/`).
 - [ ] Subir os serviços locais: `cd backend && docker compose up -d`.
-- [ ] Rodar `node ace migration:run && node ace db:seed` (o seeder exige `SEED_OWNER_PASSWORD`).
+- [ ] Rodar `node ace migration:run && node ace db:seed` (o seeder exige `SEED_ADMINISTRATOR_PASSWORD`).
 - [ ] Rodar `pnpm dev` na raiz: o app valida as variáveis no boot e para se faltar alguma.
 - [ ] Reiniciar o app depois de mudar o `.env`.

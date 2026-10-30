@@ -6,6 +6,7 @@ import { StorageMemoryRepository } from './storage.memory.repository.ts'
 import type { StorageRepository } from './storage.repository.ts'
 
 import { resetDatabase } from '#tests/http-fixtures'
+import { PNG_HEAD } from '#tests/storages-unit-fixtures'
 import { Storage } from '#domain/storage/storage.entity'
 import { UserFactory } from '#database/factories/user.factory'
 import UserModel from '#models/user'
@@ -33,7 +34,7 @@ function file(id: string, originalName: string, confirmed = true): Storage {
     partSize: 10,
     now: NOW,
   })
-  if (confirmed) storage.complete({ contentLength: 1024 }, NOW)
+  if (confirmed) storage.complete({ contentLength: 1024, head: PNG_HEAD }, NOW)
 
   return storage
 }
@@ -58,7 +59,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a92', 'capa.png', false)
       await repository.save(capa)
 
-      capa.complete({ contentLength: 1024 }, NOW)
+      capa.complete({ contentLength: 1024, head: PNG_HEAD }, NOW)
       await repository.save(capa)
 
       const updated = await repository.findById(capa.id)

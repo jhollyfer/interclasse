@@ -27,6 +27,11 @@ export abstract class StorageContract {
   abstract key(mimetype: StorageMimetype): string
   /** O que o bucket sabe sobre o objeto: tamanho e `ETag`. */
   abstract metadata(path: string): Promise<StorageMetadata>
+  /**
+   * Os primeiros bytes do objeto (`SIGNATURE_BYTES`), para conferir o tipo pelo
+   * conteúdo e não pelo que o cliente declarou.
+   */
+  abstract head(path: string): Promise<Uint8Array>
   /** Apaga o binário do bucket. */
   abstract discard(path: string): Promise<void>
   /** A URL assinada de leitura, derivada de `path` a cada leitura do registro. */

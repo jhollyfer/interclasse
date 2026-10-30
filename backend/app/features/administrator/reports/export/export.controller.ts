@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import AdministratorReportExportUseCase from './export.use-case.ts'
 
+import { csvDownload } from '#features/_shared.csv'
 import { defineDocs } from '#core/openapi/types'
 
 @inject()
@@ -22,8 +23,7 @@ export default class AdministratorReportExportController {
   async handle(context: HttpContext) {
     const result = await this.useCase.execute()
     if (result.isLeft()) throw result.value
-    context.response.header('Content-Type', 'text/csv; charset=utf-8')
-    context.response.header('Content-Disposition', 'attachment; filename="relatorio-jogos.csv"')
-    return context.response.ok(result.value)
+
+    return csvDownload(context.response, 'relatorio-jogos.csv', result.value)
   }
 }

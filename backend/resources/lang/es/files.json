@@ -3,5 +3,6 @@
   "in_use": "Archivo en uso",
   "in_use_field": "Archivo en uso en: {places}. Desvincúlalo antes de borrarlo.",
   "incomplete": "Archivo incompleto",
-  "size_mismatch_field": "El archivo enviado tiene {received} bytes, y se declararon {declared}."
+  "size_mismatch_field": "El archivo enviado tiene {received} bytes, y se declararon {declared}.",
+  "content_mismatch_field": "El contenido del archivo no es del tipo declarado ({mimetype})."
 }

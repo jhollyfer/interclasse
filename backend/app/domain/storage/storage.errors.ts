@@ -8,4 +8,5 @@ export type StorageError =
       readonly declared: number
       readonly received: number
     }
+  | { readonly code: 'STORAGE_CONTENT_MISMATCH'; readonly mimetype: string }
   | { readonly code: 'STORAGE_IN_USE'; readonly usedBy: ReadonlyArray<string> }

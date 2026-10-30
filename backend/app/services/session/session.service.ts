@@ -3,7 +3,7 @@ import { Secret } from '@adonisjs/core/helpers'
 import logger from '@adonisjs/core/services/logger'
 
 import User from '#models/user'
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN } from '#config/cookie'
 import {
   SessionContract,
   type RefreshGrant,
@@ -17,7 +17,7 @@ const SESSION_TABLE = 'auth_access_tokens'
 /**
  * Os tokens da sessão no banco: emitir, ler o de refresh e revogar.
  *
- * Separado do `CookieService`, que escreve a resposta HTTP: emitir token toca o
+ * Separado do controller, que escreve a resposta HTTP: emitir token toca o
  * banco, escrever cookie toca o transporte, e são duas razões para mudar.
  */
 @inject()

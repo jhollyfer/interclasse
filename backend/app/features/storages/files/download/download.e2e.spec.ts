@@ -12,6 +12,7 @@ import {
   type ResponseBody,
 } from '#tests/http-fixtures'
 import type { Session } from '#tests/http-fixtures'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -19,7 +20,7 @@ import type { Session } from '#tests/http-fixtures'
  * (`PENDING` ou `UPLOADED`) e a referência viva.
  */
 
-const SMALL = new Uint8Array(1024).fill(66)
+const SMALL = pngBytes(1024)
 
 /** Abre um upload pelo endpoint real e devolve o envelope. */
 async function open(

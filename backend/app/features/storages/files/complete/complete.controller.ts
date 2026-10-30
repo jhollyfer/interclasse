@@ -23,7 +23,7 @@ export default class StoragesFileCompleteController {
       'URL, e o bucket recusa um `PUT` que não bata com ela.\n\n' +
       'Chamar duas vezes é seguro: a segunda devolve o mesmo registro.',
     // Nasce na entidade e é traduzido em `_shared.file-refusal.ts`.
-    errors: { 422: 'STORAGE_SIZE_MISMATCH' },
+    errors: { 422: ['STORAGE_SIZE_MISMATCH', 'STORAGE_CONTENT_MISMATCH'] },
   })
 
   constructor(private readonly useCase: StoragesFileCompleteUseCase) {}

@@ -12,7 +12,7 @@ export type RefreshGrant = {
 
 /**
  * O contrato dos tokens da sessão (_standards/solid.md §2): emitir, ler o de
- * refresh e revogar. Quem escreve a resposta HTTP é o `CookieService`; quem
+ * refresh e revogar. Quem escreve a resposta HTTP é o controller, com `config/cookie.ts`; quem
  * decide quando emitir ou revogar é o use-case.
  *
  * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo

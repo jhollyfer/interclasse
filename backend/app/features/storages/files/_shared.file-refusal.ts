@@ -23,6 +23,12 @@ export class FileRefusal {
             }),
           },
         )
+      case 'STORAGE_CONTENT_MISMATCH':
+        return HTTPException.UnprocessableEntity(
+          i18n.t('files.incomplete'),
+          'STORAGE_CONTENT_MISMATCH',
+          { mimetype: i18n.t('files.content_mismatch_field', { mimetype: error.mimetype }) },
+        )
       case 'STORAGE_IN_USE':
         return HTTPException.Conflict(i18n.t('files.in_use'), 'STORAGE_IN_USE', {
           id: i18n.t('files.in_use_field', { places: error.usedBy.join(', ') }),

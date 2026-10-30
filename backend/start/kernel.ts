@@ -25,6 +25,10 @@ server.errorHandler(() => import('#exceptions/handler'))
 server.use([
   () => import('#middleware/force-json-response.middleware'),
   () => import('#middleware/container-bindings.middleware'),
+  // Cabeçalhos de segurança antes de tudo que pode recusar: a resposta de CORS,
+  // de origem proibida e de 404 também sai com `X-Frame-Options` e HSTS
+  // (_standards/backend.md §4.10, "Ordem da cadeia").
+  () => import('@adonisjs/shield/shield_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
 ])
 
@@ -33,7 +37,7 @@ server.use([
  * requests with a registered route.
  */
 router.use([
-  // Primeiro: todo erro abaixo (CORS, origem, sessão, papel) já sai no idioma
+  // Primeiro: todo erro abaixo (origem, autenticação, papel) já sai no idioma
   // de quem pediu (_standards/i18n.md §3).
   () => import('#middleware/detect-user-locale.middleware'),
   /**
@@ -46,8 +50,6 @@ router.use([
    */
   () => import('#middleware/origin.middleware'),
   () => import('@adonisjs/core/bodyparser_middleware'),
-  () => import('@adonisjs/session/session_middleware'),
-  () => import('@adonisjs/shield/shield_middleware'),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
   () => import('#middleware/silent-auth.middleware'),
   () => import('#middleware/initialize-bouncer.middleware'),
