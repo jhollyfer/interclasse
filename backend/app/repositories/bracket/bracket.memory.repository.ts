@@ -1,3 +1,4 @@
+import { left, right } from '@interclasse/shared'
 import type {
   AdministratorBracketPaginateResponse,
   AdministratorBracketPreviewResponse,
@@ -7,6 +8,7 @@ import type {
   AdministratorMatchUpdateResponse,
   AdministratorSportShowResponse,
   Category,
+  Either,
   Paginated,
 } from '@interclasse/shared'
 
@@ -17,6 +19,7 @@ import {
 } from './bracket.repository.ts'
 
 import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
+import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
 import { MemoryPagination } from '#core/memory-pagination'
 
@@ -132,8 +135,20 @@ export class BracketMemoryRepository extends BracketRepository {
     return names
   }
 
-  async save(bracket: Bracket): Promise<void> {
-    this.rows.set(bracket.id, structuredClone(bracket.snapshot()))
+  async save(bracket: Bracket): Promise<Either<BracketError, void>> {
+    const snapshot = structuredClone(bracket.snapshot())
+    const taken = [...this.rows.values()].some(
+      (row) =>
+        row.id !== snapshot.id &&
+        row.sportId === snapshot.sportId &&
+        row.category === snapshot.category,
+    )
+    // O `unique` de modalidade e categoria, como o banco o garante.
+    if (taken) return left({ code: 'BRACKET_ALREADY_EXISTS' })
+
+    this.rows.set(snapshot.id, snapshot)
+
+    return right(undefined)
   }
 
   async delete(bracket: Bracket): Promise<void> {

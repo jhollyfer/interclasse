@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { left, right } from '@interclasse/shared'
 import type {
   AdministratorBracketPaginateResponse,
   AdministratorBracketPreviewResponse,
@@ -10,6 +11,7 @@ import type {
   AdministratorMatchUpdateResponse,
   AdministratorSportShowResponse,
   Category,
+  Either,
   Paginated,
 } from '@interclasse/shared'
 
@@ -26,7 +28,9 @@ import MatchModel from '#models/match'
 import SportModel from '#models/sport'
 import StudentModel from '#models/student'
 import TeamModel from '#models/team'
-import { Bracket, type MatchProps } from '#domain/bracket/bracket.entity'
+import { PostgresError } from '#core/postgres-error'
+import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
+import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
@@ -124,12 +128,27 @@ export class BracketLucidRepository extends BracketRepository {
     return new Map(rows.map((row) => [row.id, row.name]))
   }
 
-  async save(bracket: Bracket): Promise<void> {
+  async save(bracket: Bracket): Promise<Either<BracketError, void>> {
     const client = this.transaction.client()
     const snapshot = bracket.snapshot()
     const existing = await BracketModel.query({ client }).where('id', snapshot.id).first()
 
-    if (!existing) {
+    if (!existing) return this.insert(bracket)
+
+    await this.update(existing, snapshot)
+
+    return right(undefined)
+  }
+
+  /**
+   * A chave nova, com times e partidas. Dois sorteios ao mesmo tempo esbarram no
+   * `unique` de modalidade e categoria, e o segundo volta como fato.
+   */
+  private async insert(bracket: Bracket): Promise<Either<BracketError, void>> {
+    const client = this.transaction.client()
+    const snapshot = bracket.snapshot()
+
+    try {
       await BracketModel.create(
         {
           id: snapshot.id,
@@ -158,8 +177,17 @@ export class BracketLucidRepository extends BracketRepository {
         { client },
       )
 
-      return
+      return right(undefined)
+    } catch (error) {
+      if (PostgresError.isUniqueViolation(error)) return left({ code: 'BRACKET_ALREADY_EXISTS' })
+
+      throw error
     }
+  }
+
+  /** O que mudou numa chave já gravada: o status e as partidas. */
+  private async update(existing: BracketModel, snapshot: Readonly<BracketProps>): Promise<void> {
+    const client = this.transaction.client()
 
     if (existing.status !== snapshot.status)
       await BracketModel.updateOrCreate(

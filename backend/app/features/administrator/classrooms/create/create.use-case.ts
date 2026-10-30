@@ -15,7 +15,6 @@ import { ClassroomRefusal } from '../_shared.classroom-refusal.ts'
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import HTTPException from '#exceptions/http.exception'
-import { isUniqueViolation } from '#features/_shared.database'
 import type { AdministratorClassroomCreatePayload } from '#validators/administrator/classrooms.validator'
 
 type Payload = AdministratorClassroomCreatePayload
@@ -35,13 +34,14 @@ export default class AdministratorClassroomCreateUseCase {
   async execute(payload: Payload): Promise<Response> {
     try {
       if (await this.classrooms.existsByName(payload.name))
-        return left(ClassroomRefusal.alreadyExists(this.i18n))
+        return left(ClassroomRefusal.http({ code: 'CLASSROOM_ALREADY_EXISTS' }, this.i18n))
 
       const facts = await this.classrooms.peopleFacts(payload)
       const created = Classroom.create({ id: randomUUID(), ...payload, now: new Date() }, facts)
       if (created.isLeft()) return left(ClassroomRefusal.http(created.value, this.i18n))
 
-      await this.classrooms.save(created.value)
+      const saved = await this.classrooms.save(created.value)
+      if (saved.isLeft()) return left(ClassroomRefusal.http(saved.value, this.i18n))
 
       const detail = await this.classrooms.findDetail(created.value.id)
       if (!detail)
@@ -51,10 +51,6 @@ export default class AdministratorClassroomCreateUseCase {
 
       return right(detail)
     } catch (error) {
-      // A checagem acima não fecha a corrida: o segundo de dois pedidos
-      // simultâneos esbarra no `unique` do banco.
-      if (isUniqueViolation(error)) return left(ClassroomRefusal.race(error, this.i18n))
-
       logger.error({ err: error }, '[administrator/classrooms > create][error]')
 
       return left(

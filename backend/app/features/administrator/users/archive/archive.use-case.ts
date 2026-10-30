@@ -8,7 +8,7 @@ import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { UserRefusal } from '#features/_shared.user-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -53,14 +53,17 @@ export default class AdministratorUserArchiveUseCase {
 
       // Arquivar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
       // falha do segundo passo deixaria a conta arquivada com sessão viva.
-      await this.unitOfWork.run(async () => {
-        await this.users.save(user)
+      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
+        const saved = await this.users.save(user)
+        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
+
         await this.sessions.revokeAll(id)
         // Conta arquivada não aconselha nem representa turma nenhuma.
         await this.classrooms.detachAccount(id)
 
         return right(null)
       })
+      if (written.isLeft()) return left(written.value)
 
       return right(null)
     } catch (error) {

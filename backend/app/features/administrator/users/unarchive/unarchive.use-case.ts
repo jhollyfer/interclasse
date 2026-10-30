@@ -5,7 +5,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { UserRefusal } from '#features/_shared.user-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -38,7 +38,8 @@ export default class AdministratorUserUnarchiveUseCase {
       const restored = user.unarchive(new Date())
       if (restored.isLeft()) return left(UserRefusal.http(restored.value, this.i18n))
 
-      await this.users.save(user)
+      const saved = await this.users.save(user)
+      if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
       return right(null)
     } catch (error) {

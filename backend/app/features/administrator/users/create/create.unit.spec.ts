@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { left } from '@interclasse/shared'
 
 import AdministratorUserCreateUseCase from './create.use-case.ts'
 
@@ -88,11 +89,11 @@ test.group('administrator/users > create (unit)', () => {
     assert.deepInclude(created, { id: USER_ID, role: 'ADMINISTRATOR', deletedAt: null })
   })
 
-  test('a corrida no unique do banco também é 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('a corrida no unique do banco (fato do repository) também é 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
-    users.save = async () => {
-      throw Object.assign(new Error('duplicate key'), { code: '23505' })
-    }
+    users.save = async () => left({ code: 'USER_ALREADY_EXISTS' })
 
     const result = await useCase.execute(NEW_USER)
 

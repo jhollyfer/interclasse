@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { left } from '@interclasse/shared'
 
 import AccountProfileUpdateUseCase from './update.use-case.ts'
 
@@ -118,12 +119,12 @@ test.group('account/profile > update (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('a corrida no unique do banco é 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('a corrida no unique do banco (fato do repository) é 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
-    users.save = async () => {
-      throw Object.assign(new Error('duplicate key'), { code: '23505' })
-    }
+    users.save = async () => left({ code: 'USER_ALREADY_EXISTS' })
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 

@@ -1,12 +1,14 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import { TRASHED_MODE } from '@interclasse/shared'
-import type { AdministratorUserShowResponse, Paginated } from '@interclasse/shared'
+import { TRASHED_MODE, left, right } from '@interclasse/shared'
+import type { AdministratorUserShowResponse, Either, Paginated } from '@interclasse/shared'
 
 import { UserRepository, type UserListCriteria } from './user.repository.ts'
 
 import UserModel from '#models/user'
+import { PostgresError } from '#core/postgres-error'
 import { User } from '#domain/user/user.entity'
+import type { UserError } from '#domain/user/user.errors'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
@@ -64,21 +66,29 @@ export class UserLucidRepository extends UserRepository {
     return Boolean(await query.first())
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<Either<UserError, void>> {
     const { id, createdAt, updatedAt, deletedAt, ...columns } = user.snapshot()
 
-    // A senha vai como está: o hook do model cifra quando ela mudou, e o hash
-    // já gravado volta igual e não é cifrado de novo.
-    await UserModel.updateOrCreate(
-      { id },
-      {
-        ...columns,
-        createdAt: DateTime.fromJSDate(createdAt),
-        updatedAt: this.dateOrNull(updatedAt),
-        deletedAt: this.dateOrNull(deletedAt),
-      },
-      { client: this.transaction.client() },
-    )
+    try {
+      // A senha vai como está: o hook do model cifra quando ela mudou, e o hash
+      // já gravado volta igual e não é cifrado de novo.
+      await UserModel.updateOrCreate(
+        { id },
+        {
+          ...columns,
+          createdAt: DateTime.fromJSDate(createdAt),
+          updatedAt: this.dateOrNull(updatedAt),
+          deletedAt: this.dateOrNull(deletedAt),
+        },
+        { client: this.transaction.client() },
+      )
+
+      return right(undefined)
+    } catch (error) {
+      if (PostgresError.isUniqueViolation(error)) return left({ code: 'USER_ALREADY_EXISTS' })
+
+      throw error
+    }
   }
 
   async delete(user: User): Promise<void> {

@@ -9,8 +9,7 @@ import {
   type Either,
 } from '@interclasse/shared'
 
-import { EnrollmentRefusal } from './_shared.enrollment-refusal.ts'
-
+import { EnrollmentRefusal } from '#features/advisor/enrollments/_shared.enrollment-refusal'
 import { type EnrollmentWriter } from '#domain/enrollment/enrollment.entity'
 import { EnrollmentRemoval } from '#domain/enrollment-removal/enrollment-removal.entity'
 import { type EnrollmentRemovalRepository } from '#repositories/enrollment-removal/enrollment-removal.repository'

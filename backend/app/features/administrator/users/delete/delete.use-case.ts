@@ -5,7 +5,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { UserRefusal } from '#features/_shared.user-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload

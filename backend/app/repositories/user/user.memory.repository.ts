@@ -1,10 +1,16 @@
 import hash from '@adonisjs/core/services/hash'
-import { TRASHED_MODE } from '@interclasse/shared'
-import type { AdministratorUserShowResponse, Paginated, SortDirection } from '@interclasse/shared'
+import { TRASHED_MODE, left, right } from '@interclasse/shared'
+import type {
+  AdministratorUserShowResponse,
+  Either,
+  Paginated,
+  SortDirection,
+} from '@interclasse/shared'
 
 import { UserRepository, type UserListCriteria } from './user.repository.ts'
 
 import { User, type UserProps } from '#domain/user/user.entity'
+import type { UserError } from '#domain/user/user.errors'
 import type { StorageRepository } from '#repositories/storage/storage.repository'
 import { MemoryPagination } from '#core/memory-pagination'
 
@@ -59,14 +65,20 @@ export class UserMemoryRepository extends UserRepository {
     return [...this.rows.values()].some((row) => row.id !== exceptId && row.email === email)
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<Either<UserError, void>> {
     const snapshot = structuredClone(user.snapshot())
+    // O `unique` do e-mail, como o banco o garante.
+    if (await this.existsByEmail(snapshot.email, snapshot.id))
+      return left({ code: 'USER_ALREADY_EXISTS' })
+
     const stored = this.rows.get(snapshot.id)
     const changed = !stored || stored.password !== snapshot.password
     let password = snapshot.password
     if (changed) password = await hash.make(snapshot.password)
 
     this.rows.set(snapshot.id, { ...snapshot, password })
+
+    return right(undefined)
   }
 
   async delete(user: User): Promise<void> {

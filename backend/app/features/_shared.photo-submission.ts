@@ -4,8 +4,7 @@ import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import { left, right, type AdministratorPhotoShowResponse, type Either } from '@interclasse/shared'
 
-import { PhotoRefusal } from './_shared.photo-refusal.ts'
-
+import { PhotoRefusal } from '#features/administrator/photos/_shared.photo-refusal'
 import { Photo, type PhotoSender } from '#domain/photo/photo.entity'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'

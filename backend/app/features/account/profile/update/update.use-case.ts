@@ -16,9 +16,8 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
-import { UserRefusal } from '#features/_shared.user-refusal'
-import { isUniqueViolation } from '#features/_shared.database'
+import { FileRefusal } from '#features/storages/files/_shared.file-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { AccountProfileUpdatePayload } from '#validators/account/profile.validator'
 
 type Payload = Merge<AccountProfileUpdatePayload, { actor: Actor }>
@@ -55,14 +54,14 @@ export default class AccountProfileUpdateUseCase {
         changes.email !== user.snapshot().email &&
         (await this.users.existsByEmail(changes.email, actor.id))
       )
-        return left(UserRefusal.alreadyExists(this.i18n))
+        return left(UserRefusal.http({ code: 'USER_ALREADY_EXISTS' }, this.i18n))
 
       // Antes da edição: `avatar_id` é chave estrangeira, e sem esta checagem um
       // uuid inexistente estouraria a constraint e viraria 500. Também recusa o
       // que ainda está `PENDING` - o binário sobe direto para o bucket, e anexar
       // antes da confirmação publicaria uma foto pela metade.
       if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
-        return left(AttachmentRefusal.notFound('avatarId', this.i18n))
+        return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
       // A prova de identidade da troca de senha: a sessão prova posse do cookie,
       // e um cookie sequestrado trocaria a senha sem que o dono dissesse nada.
@@ -83,13 +82,17 @@ export default class AccountProfileUpdateUseCase {
 
       // Trocar e-mail ou senha derruba todas as sessões, inclusive a desta
       // requisição: gravar e revogar caem juntos.
-      await this.unitOfWork.run(async () => {
-        await this.users.save(user)
+      // A checagem de e-mail acima não fecha a corrida: o `save` devolve o
+      // mesmo fato quando o `unique` do banco a perde (_standards/backend.md §4.4).
+      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
+        const saved = await this.users.save(user)
+        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
         if (updated.value.revokesSessions) await this.sessions.revokeAll(actor.id)
 
         return right(null)
       })
+      if (written.isLeft()) return left(written.value)
 
       // Recarrega depois de gravar: quem acabou de trocar a foto tem de receber
       // a `url` nova na mesma resposta, sem uma leitura a mais.
@@ -98,10 +101,6 @@ export default class AccountProfileUpdateUseCase {
 
       return right(profile)
     } catch (error) {
-      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
-      // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
-      if (isUniqueViolation(error)) return left(UserRefusal.alreadyExists(this.i18n))
-
       logger.error({ err: error }, '[profile > update][error]')
 
       return left(

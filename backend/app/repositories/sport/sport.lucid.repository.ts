@@ -1,11 +1,14 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import type { AdministratorSportShowResponse, Paginated } from '@interclasse/shared'
+import { left, right } from '@interclasse/shared'
+import type { AdministratorSportShowResponse, Either, Paginated } from '@interclasse/shared'
 
 import { SportRepository, type SportListCriteria } from './sport.repository.ts'
 
 import SportModel from '#models/sport'
+import { PostgresError } from '#core/postgres-error'
 import { Sport } from '#domain/sport/sport.entity'
+import type { SportError } from '#domain/sport/sport.errors'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
 
 @inject()
@@ -56,18 +59,26 @@ export class SportLucidRepository extends SportRepository {
     return Boolean(enrollment || bracket)
   }
 
-  async save(sport: Sport): Promise<void> {
+  async save(sport: Sport): Promise<Either<SportError, void>> {
     const { id, createdAt, updatedAt, ...columns } = sport.snapshot()
 
-    await SportModel.updateOrCreate(
-      { id },
-      {
-        ...columns,
-        createdAt: DateTime.fromJSDate(createdAt),
-        updatedAt: this.dateOrNull(updatedAt),
-      },
-      { client: this.transaction.client() },
-    )
+    try {
+      await SportModel.updateOrCreate(
+        { id },
+        {
+          ...columns,
+          createdAt: DateTime.fromJSDate(createdAt),
+          updatedAt: this.dateOrNull(updatedAt),
+        },
+        { client: this.transaction.client() },
+      )
+
+      return right(undefined)
+    } catch (error) {
+      if (PostgresError.isUniqueViolation(error)) return left({ code: 'SPORT_ALREADY_EXISTS' })
+
+      throw error
+    }
   }
 
   async delete(sport: Sport): Promise<void> {

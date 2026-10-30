@@ -3641,16 +3641,6 @@
               }
             }
           },
-          "409": {
-            "description": "Modalidade já existe",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error409SportAlreadyExists"
-                }
-              }
-            }
-          },
           "422": {
             "description": "Dados inválidos",
             "content": {
@@ -3830,11 +3820,11 @@
             }
           },
           "409": {
-            "description": "Modalidade já existe",
+            "description": "Conflito com o estado atual",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409SportAlreadyExistsSportRosterAboveLimit"
+                  "$ref": "#/components/schemas/Error409SportRosterAboveLimit"
                 }
               }
             }
@@ -18981,75 +18971,6 @@
           "code"
         ]
       },
-      "Error409SportAlreadyExists": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "SPORT_ALREADY_EXISTS"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error409SportAlreadyExistsSportRosterAboveLimit": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "SPORT_ALREADY_EXISTS",
-              "SPORT_ROSTER_ABOVE_LIMIT"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
       "Error409SportInUse": {
         "type": "object",
         "properties": {
@@ -19068,6 +18989,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "SPORT_IN_USE"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409SportRosterAboveLimit": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SPORT_ROSTER_ABOVE_LIMIT"
             ]
           },
           "errors": {

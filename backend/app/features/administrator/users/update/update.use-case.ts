@@ -15,9 +15,8 @@ import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionContract } from '#services/session/session.contract'
-import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
-import { UserRefusal } from '#features/_shared.user-refusal'
-import { isUniqueViolation } from '#features/_shared.database'
+import { FileRefusal } from '#features/storages/files/_shared.file-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { AdministratorUserUpdatePayload } from '#validators/administrator/users.validator'
 import type { IdentifierPayload } from '#core/validator'
 
@@ -61,10 +60,10 @@ export default class AdministratorUserUpdateUseCase {
         changes.email !== user.snapshot().email &&
         (await this.users.existsByEmail(changes.email, id))
       )
-        return left(UserRefusal.alreadyExists(this.i18n))
+        return left(UserRefusal.http({ code: 'USER_ALREADY_EXISTS' }, this.i18n))
 
       if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
-        return left(AttachmentRefusal.notFound('avatarId', this.i18n))
+        return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
       // Trocar e-mail ou senha, mudar o papel e desativar a conta derrubam as
       // sessões do alvo, e mudar o papel solta as turmas: a entidade diz o que
@@ -73,14 +72,18 @@ export default class AdministratorUserUpdateUseCase {
 
       // Gravar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
       // falha de um deixaria a conta mudada com sessão ou turma do papel antigo.
-      await this.unitOfWork.run(async () => {
-        await this.users.save(user)
+      // A checagem de e-mail acima não fecha a corrida: o `save` devolve o
+      // mesmo fato quando o `unique` do banco a perde (_standards/backend.md §4.4).
+      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
+        const saved = await this.users.save(user)
+        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
         if (effects.revokesSessions) await this.sessions.revokeAll(id)
         if (effects.roleChanged) await this.classrooms.detachAccount(id)
 
         return right(null)
       })
+      if (written.isLeft()) return left(written.value)
 
       // Recarrega antes de responder: quem acabou de editar recebe a linha como
       // ela ficou no banco, com `updated_at` e a foto nova.
@@ -89,10 +92,6 @@ export default class AdministratorUserUpdateUseCase {
 
       return right(detail)
     } catch (error) {
-      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
-      // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
-      if (isUniqueViolation(error)) return left(UserRefusal.alreadyExists(this.i18n))
-
       logger.error({ err: error }, '[users > update][error]')
 
       return left(
