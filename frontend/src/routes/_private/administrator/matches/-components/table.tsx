@@ -48,6 +48,7 @@ import {
   MATCH_STATUS_VARIANTS,
   formatDate,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 const route = getRouteApi('/_private/administrator/matches/')
 
@@ -64,69 +65,74 @@ function phaseOf(match: AdministratorMatchPaginateResponse): string {
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
-const columns: TableColumns<AdministratorMatchPaginateResponse> = [
-  // O jogo primeiro: é o que se procura na lista, e é o que a tabela estreita
-  // não pode cortar.
-  {
-    id: 'game',
-    accessorFn: (row) => row.id,
-    meta: { label: 'Jogo' },
-    size: 240,
-    header: () => 'Jogo',
-    cell: ({ row }) => (
-      <span className="font-medium">
-        {row.original.homeTeam.classroom.name}{' '}
-        <span className="tabular-nums">
-          {row.original.homeScore ?? '-'} x {row.original.awayScore ?? '-'}
-        </span>{' '}
-        {row.original.awayTeam.classroom.name}
-      </span>
-    ),
-    enableHiding: false,
-  },
-  {
-    id: 'when',
-    accessorFn: (row) => row.scheduledAt ?? '',
-    meta: { label: 'Quando' },
-    size: 150,
-    header: () => 'Quando',
-    cell: ({ row }) => (
-      <span className="text-muted-foreground">
-        {formatDate(row.original.scheduledAt)}
-      </span>
-    ),
-  },
-  {
-    id: 'sport',
-    accessorFn: (row) => row.bracket.sport.name,
-    meta: { label: 'Modalidade' },
-    size: 170,
-    header: () => 'Modalidade',
-    cell: ({ row }) => {
-      const bracket = row.original.bracket
-      return `${bracket.sport.name} · ${CATEGORY_SHORT_LABELS[bracket.category] ?? ''}`
+function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
+  return [
+    // O jogo primeiro: é o que se procura na lista, e é o que a tabela estreita
+    // não pode cortar.
+    {
+      id: 'game',
+      accessorFn: (row) => row.id,
+      meta: { label: m.admin_common_match() },
+      size: 240,
+      header: () => m.admin_common_match(),
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {row.original.homeTeam.classroom.name}{' '}
+          <span className="tabular-nums">
+            {row.original.homeScore ?? '-'} x {row.original.awayScore ?? '-'}
+          </span>{' '}
+          {row.original.awayTeam.classroom.name}
+        </span>
+      ),
+      enableHiding: false,
     },
-  },
-  {
-    id: 'phase',
-    accessorFn: (row) => phaseOf(row),
-    meta: { label: 'Fase' },
-    size: 110,
-    header: () => 'Fase',
-    cell: ({ row }) => phaseOf(row.original),
-  },
-  {
-    accessorKey: 'status',
-    meta: { label: 'Situação' },
-    size: 120,
-    header: () => 'Situação',
-    cell: ({ row }) => (
-      <Badge variant={MATCH_STATUS_VARIANTS[row.original.status]}>
-        {MATCH_STATUS_LABELS[row.original.status]}
-      </Badge>
-    ),
-  },
-]
+    {
+      id: 'when',
+      accessorFn: (row) => row.scheduledAt ?? '',
+      meta: { label: m.admin_common_when() },
+      size: 150,
+      header: () => m.admin_common_when(),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">
+          {formatDate(row.original.scheduledAt)}
+        </span>
+      ),
+    },
+    {
+      id: 'sport',
+      accessorFn: (row) => row.bracket.sport.name,
+      meta: { label: m.admin_common_sport() },
+      size: 170,
+      header: () => m.admin_common_sport(),
+      cell: ({ row }) => {
+        const bracket = row.original.bracket
+        return m.admin_common_sport_category({
+          sport: bracket.sport.name,
+          category: CATEGORY_SHORT_LABELS[bracket.category] ?? '',
+        })
+      },
+    },
+    {
+      id: 'phase',
+      accessorFn: (row) => phaseOf(row),
+      meta: { label: m.admin_common_phase() },
+      size: 110,
+      header: () => m.admin_common_phase(),
+      cell: ({ row }) => phaseOf(row.original),
+    },
+    {
+      accessorKey: 'status',
+      meta: { label: m.admin_common_status() },
+      size: 120,
+      header: () => m.admin_common_status(),
+      cell: ({ row }) => (
+        <Badge variant={MATCH_STATUS_VARIANTS[row.original.status]}>
+          {MATCH_STATUS_LABELS[row.original.status]}
+        </Badge>
+      ),
+    },
+  ]
+}
 
 /**
  * A agenda de todas as chaves numa lista só: é por aqui que se marca horário e
@@ -143,6 +149,8 @@ export function MatchesTable(): React.JSX.Element {
   const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
   const [carding, setCarding] = React.useState<MatchRef | null>(null)
 
+  const columns = React.useMemo(() => matchColumns(), [])
+
   const table = useTable({
     rows: data?.data ?? [],
     columns,
@@ -154,21 +162,21 @@ export function MatchesTable(): React.JSX.Element {
       <RowActions>
         <DropdownMenuItem onClick={() => setScheduling(toRef(match))}>
           <CalendarBlankIcon />
-          Agendar
+          {m.admin_common_schedule()}
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={!match.homeTeamId || !match.awayTeamId}
           onClick={() => setScoring(toRef(match))}
         >
           <NumberSquareOneIcon />
-          Lançar placar
+          {m.admin_matches_score()}
         </DropdownMenuItem>
         <DropdownMenuItem
           disabled={!match.homeTeamId || !match.awayTeamId}
           onClick={() => setCarding(toRef(match))}
         >
           <CardsIcon />
-          Cartões
+          {m.admin_common_cards()}
         </DropdownMenuItem>
         {match.status === 'FINISHED' && (
           <DropdownMenuItem
@@ -176,7 +184,7 @@ export function MatchesTable(): React.JSX.Element {
             onClick={() => setUnscoring(toRef(match))}
           >
             <ArrowCounterClockwiseIcon />
-            Desfazer placar
+            {m.admin_common_undo_score()}
           </DropdownMenuItem>
         )}
       </RowActions>
@@ -199,7 +207,7 @@ export function MatchesTable(): React.JSX.Element {
       onRetry={() => void refetch()}
     >
       <TableHeader>
-        <TableTitle>Partidas</TableTitle>
+        <TableTitle>{m.admin_matches_title()}</TableTitle>
         <TableActions>
           {/* Jogo novo não se cria aqui: nasce do sorteio da chave, e as fases
               seguintes se preenchem sozinhas com os vencedores. */}
@@ -208,43 +216,41 @@ export function MatchesTable(): React.JSX.Element {
             className={buttonVariants({ variant: 'outline' })}
           >
             <TreeStructureIcon />
-            Lançar jogos (sortear chave)
+            {m.admin_matches_set_up()}
           </Link>
         </TableActions>
       </TableHeader>
 
       <TableToolbar>
         <OptionCombobox
-          aria-label="Categoria"
+          aria-label={m.admin_common_category()}
           className="w-full sm:w-44"
           clearable
           value={search.category ?? ''}
           onValueChange={(value) => filter('category', value)}
           options={toOptions(['', ...CATEGORIES], {
             ...CATEGORY_LABELS,
-            '': 'Toda categoria',
+            '': m.admin_matches_all_categories(),
           })}
         />
         <OptionCombobox
-          aria-label="Situação"
+          aria-label={m.admin_common_status()}
           className="w-full sm:w-40"
           clearable
           value={search.status ?? ''}
           onValueChange={(value) => filter('status', value)}
           options={toOptions(['', ...MATCH_STATUSES], {
             ...MATCH_STATUS_LABELS,
-            '': 'Toda situação',
+            '': m.admin_matches_all_statuses(),
           })}
         />
       </TableToolbar>
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>Nenhuma partida</TableEmptyTitle>
+          <TableEmptyTitle>{m.admin_matches_empty_title()}</TableEmptyTitle>
           <TableEmptyDescription>
-            As partidas nascem do sorteio de cada chave: sorteie a modalidade
-            numa categoria e os jogos aparecem aqui. Quem vence avança sozinho
-            para a fase seguinte.
+            {m.admin_matches_empty_description()}
           </TableEmptyDescription>
           <TableEmptyActions>
             <Link
@@ -252,7 +258,7 @@ export function MatchesTable(): React.JSX.Element {
               className={buttonVariants({ variant: 'default' })}
             >
               <TreeStructureIcon />
-              Ir para as chaves
+              {m.admin_matches_go_to_brackets()}
             </Link>
           </TableEmptyActions>
         </TableEmpty>

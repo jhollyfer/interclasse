@@ -3,5 +3,164 @@
   "locale_switch_label": "Language",
   "locale_pt_br": "Portuguese",
   "locale_es": "Spanish",
-  "locale_en": "English"
+  "locale_en": "English",
+  "admin_common_select": "Select",
+  "admin_common_category": "Category",
+  "admin_common_status": "Status",
+  "admin_common_sport": "Sport",
+  "admin_common_schedule": "Schedule",
+  "admin_common_cards": "Cards",
+  "admin_common_brackets": "Brackets",
+  "admin_common_phase": "Round",
+  "admin_common_when": "When",
+  "admin_common_match": "Match",
+  "admin_common_undo_score": "Undo score",
+  "admin_common_sport_category": "{sport} · {category}",
+  "admin_common_versus": "{home} vs {away}",
+  "admin_common_acknowledged": "Acknowledged",
+  "admin_dashboard_title": "Dashboard",
+  "admin_dashboard_description": "Enter the result of each match: the winner moves on to the next round and the loser is out.",
+  "admin_dashboard_removals_notice": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} athletes were removed from a sport by the advisors. See the reason.",
+        "countExact=*, countPlural=one": "{count} athlete was removed from a sport by the advisors. See the reason.",
+        "countExact=*, countPlural=*": "{count} athletes were removed from a sport by the advisors. See the reason."
+      }
+    }
+  ],
+  "admin_dashboard_removals_link": "View notices",
+  "admin_dashboard_matches_title": "Matches awaiting a result ({count})",
+  "admin_dashboard_matches_empty": "No matches waiting for a result. Draw a bracket to create the matches.",
+  "admin_dashboard_match_meta": "{sport} {category} · {phase} · {when}",
+  "admin_dashboard_result": "Result",
+  "admin_dashboard_brackets_empty": "No brackets drawn.",
+  "admin_dashboard_draw_new": "Draw a new bracket",
+  "admin_brackets_drawn_on": "Drawn on",
+  "admin_brackets_deleted": "Bracket deleted. Registrations are open again.",
+  "admin_brackets_delete_trigger": "Delete bracket",
+  "admin_brackets_has_results_title": "The bracket already has scores",
+  "admin_brackets_has_results_description": "Deleting it would erase results that happened on the court. To redo the draw, undo the scores first, from the final back to the first round.",
+  "admin_brackets_understood": "Got it",
+  "admin_brackets_delete_title": "Delete the bracket?",
+  "admin_brackets_delete_description": "Teams and matches disappear, and the sport's registrations open again. This is how you redo a draw.",
+  "admin_brackets_champion": "Champion: {name}",
+  "admin_brackets_help": "Matches are created by the draw. Enter the score and the winner moves up to the next round on its own; a tie asks who won on penalties.",
+  "admin_brackets_waiting_teams": "Waiting for both teams",
+  "admin_brackets_score": "Score",
+  "admin_brackets_undo": "Undo",
+  "admin_brackets_unscore_locked": "The next match already has a score: undo it first",
+  "admin_brackets_drawn_ok": "Bracket drawn.",
+  "admin_brackets_draw": "Draw bracket",
+  "admin_brackets_draw_confirm": "Draw",
+  "admin_brackets_draw_description": "Classes in the category with the minimum number of registered athletes take part. After the draw, only the advisor teacher can swap athletes on the list.",
+  "admin_brackets_preview_already_drawn": "This sport has already been drawn in this category. To redo it, delete the current bracket.",
+  "admin_brackets_preview_eligible": [
+    {
+      "declarations": [
+        "input eligible",
+        "local eligibleExact = eligible",
+        "local eligiblePlural = eligible: plural",
+        "input min",
+        "local minExact = min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "eligibleExact",
+        "eligiblePlural",
+        "minExact",
+        "minPlural"
+      ],
+      "match": {
+        "eligibleExact=0, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} classes take part (minimum of {min} athletes)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} classes take part (minimum of {min} athlete)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} classes take part (minimum of {min} athletes)",
+        "eligibleExact=*, eligiblePlural=one, minExact=0, minPlural=*": "{eligible} class takes part (minimum of {min} athletes)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=one": "{eligible} class takes part (minimum of {min} athlete)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=*": "{eligible} class takes part (minimum of {min} athletes)",
+        "eligibleExact=*, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} classes take part (minimum of {min} athletes)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} classes take part (minimum of {min} athlete)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} classes take part (minimum of {min} athletes)"
+      }
+    }
+  ],
+  "admin_brackets_preview_out": "Left out:",
+  "admin_brackets_preview_not_enough": "At least 2 classes with the minimum number of athletes are needed. Ask the advisors and representatives to complete the lists.",
+  "admin_brackets_open": "Open bracket",
+  "admin_brackets_row_delete_title": "Delete the {sport} · {category} bracket?",
+  "admin_brackets_row_delete_description": "The bracket's matches are deleted and registrations open again. A bracket with a score entered cannot be deleted.",
+  "admin_brackets_empty_title": "No brackets drawn",
+  "admin_brackets_empty_description": "Add classes and sports, let the classes register their athletes, and draw each sport's bracket by category.",
+  "admin_cards_title": "Cards",
+  "admin_cards_summary": [
+    {
+      "declarations": [
+        "input cards",
+        "local cardsExact = cards",
+        "local cardsPlural = cards: plural",
+        "input red",
+        "local redExact = red",
+        "local redPlural = red: plural"
+      ],
+      "selectors": [
+        "cardsExact",
+        "cardsPlural",
+        "redExact",
+        "redPlural"
+      ],
+      "match": {
+        "cardsExact=0, cardsPlural=*, redExact=0, redPlural=*": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=one": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=*": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=one, redExact=0, redPlural=*": "{cards} card, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=one": "{cards} card, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=*": "{cards} card, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=*, redExact=0, redPlural=*": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=one": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=*": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\"."
+      }
+    }
+  ],
+  "admin_cards_deleted": "Card deleted.",
+  "admin_cards_empty": "No cards entered yet.",
+  "admin_removals_title": "Athlete removals",
+  "admin_removals_description": [
+    {
+      "declarations": [
+        "input pending",
+        "local pendingExact = pending",
+        "local pendingPlural = pending: plural"
+      ],
+      "selectors": [
+        "pendingExact",
+        "pendingPlural"
+      ],
+      "match": {
+        "pendingExact=0, pendingPlural=*": "Who the advisors removed from sports, and why. {pending} pending notices.",
+        "pendingExact=*, pendingPlural=one": "Who the advisors removed from sports, and why. {pending} pending notice.",
+        "pendingExact=*, pendingPlural=*": "Who the advisors removed from sports, and why. {pending} pending notices."
+      }
+    }
+  ],
+  "admin_removals_empty": "No athlete has been removed from a sport.",
+  "admin_removals_item": "{student} left {sport}",
+  "admin_removals_by_actor": "By {actor} on {date}",
+  "admin_removals_by_deleted": "By a deleted account on {date}",
+  "admin_matches_title": "Matches",
+  "admin_matches_score": "Enter score",
+  "admin_matches_set_up": "Set up matches (draw a bracket)",
+  "admin_matches_all_categories": "All categories",
+  "admin_matches_all_statuses": "All statuses",
+  "admin_matches_empty_title": "No matches",
+  "admin_matches_empty_description": "Matches come from each bracket's draw: draw a sport in a category and the matches show up here. The winner moves on to the next round on its own.",
+  "admin_matches_go_to_brackets": "Go to brackets"
 }

@@ -3,5 +3,164 @@
   "locale_switch_label": "Idioma",
   "locale_pt_br": "Português",
   "locale_es": "Espanhol",
-  "locale_en": "Inglês"
+  "locale_en": "Inglês",
+  "admin_common_select": "Selecione",
+  "admin_common_category": "Categoria",
+  "admin_common_status": "Situação",
+  "admin_common_sport": "Modalidade",
+  "admin_common_schedule": "Agendar",
+  "admin_common_cards": "Cartões",
+  "admin_common_brackets": "Chaves",
+  "admin_common_phase": "Fase",
+  "admin_common_when": "Quando",
+  "admin_common_match": "Jogo",
+  "admin_common_undo_score": "Desfazer placar",
+  "admin_common_sport_category": "{sport} · {category}",
+  "admin_common_versus": "{home} x {away}",
+  "admin_common_acknowledged": "Ciente",
+  "admin_dashboard_title": "Painel",
+  "admin_dashboard_description": "Lance o resultado de cada jogo: o vencedor passa para a fase seguinte e o perdedor está fora.",
+  "admin_dashboard_removals_notice": [
+    {
+      "declarations": [
+        "input count",
+        "local countExact = count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countExact",
+        "countPlural"
+      ],
+      "match": {
+        "countExact=0, countPlural=*": "{count} atletas foram tirados de modalidade pelos conselheiros. Veja o motivo.",
+        "countExact=*, countPlural=one": "{count} atleta foi tirado de modalidade pelos conselheiros. Veja o motivo.",
+        "countExact=*, countPlural=*": "{count} atletas foram tirados de modalidade pelos conselheiros. Veja o motivo."
+      }
+    }
+  ],
+  "admin_dashboard_removals_link": "Ver avisos",
+  "admin_dashboard_matches_title": "Jogos para lançar resultado ({count})",
+  "admin_dashboard_matches_empty": "Nenhum jogo esperando resultado. Sorteie uma chave para criar os jogos.",
+  "admin_dashboard_match_meta": "{sport} {category} · {phase} · {when}",
+  "admin_dashboard_result": "Resultado",
+  "admin_dashboard_brackets_empty": "Nenhuma chave sorteada.",
+  "admin_dashboard_draw_new": "Sortear nova chave",
+  "admin_brackets_drawn_on": "Sorteada em",
+  "admin_brackets_deleted": "Chave apagada. As inscrições reabriram.",
+  "admin_brackets_delete_trigger": "Apagar chave",
+  "admin_brackets_has_results_title": "A chave já tem placar",
+  "admin_brackets_has_results_description": "Apagar levaria embora resultados que aconteceram em quadra. Para refazer o sorteio, desfaça os placares antes, da final para a primeira fase.",
+  "admin_brackets_understood": "Entendi",
+  "admin_brackets_delete_title": "Apagar a chave?",
+  "admin_brackets_delete_description": "Times e partidas somem, e as inscrições da modalidade reabrem. É assim que se refaz um sorteio.",
+  "admin_brackets_champion": "Campeã: {name}",
+  "admin_brackets_help": "As partidas nascem do sorteio. Lance o placar e o vencedor sobe sozinho para a fase seguinte; empate pede quem venceu nos pênaltis.",
+  "admin_brackets_waiting_teams": "Esperando os dois times",
+  "admin_brackets_score": "Placar",
+  "admin_brackets_undo": "Desfazer",
+  "admin_brackets_unscore_locked": "A partida seguinte já tem placar: desfaça-a antes",
+  "admin_brackets_drawn_ok": "Chave sorteada.",
+  "admin_brackets_draw": "Sortear chave",
+  "admin_brackets_draw_confirm": "Sortear",
+  "admin_brackets_draw_description": "Entram as turmas da categoria com o mínimo de atletas inscritos. Depois do sorteio, só o professor conselheiro troca atleta da lista.",
+  "admin_brackets_preview_already_drawn": "Esta modalidade já foi sorteada nesta categoria. Para refazer, apague a chave atual.",
+  "admin_brackets_preview_eligible": [
+    {
+      "declarations": [
+        "input eligible",
+        "local eligibleExact = eligible",
+        "local eligiblePlural = eligible: plural",
+        "input min",
+        "local minExact = min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "eligibleExact",
+        "eligiblePlural",
+        "minExact",
+        "minPlural"
+      ],
+      "match": {
+        "eligibleExact=0, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} turmas entram (mínimo de {min} atletas)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} turmas entram (mínimo de {min} atleta)",
+        "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} turmas entram (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=one, minExact=0, minPlural=*": "{eligible} turma entra (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=one": "{eligible} turma entra (mínimo de {min} atleta)",
+        "eligibleExact=*, eligiblePlural=one, minExact=*, minPlural=*": "{eligible} turma entra (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} turmas entram (mínimo de {min} atletas)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} turmas entram (mínimo de {min} atleta)",
+        "eligibleExact=*, eligiblePlural=*, minExact=*, minPlural=*": "{eligible} turmas entram (mínimo de {min} atletas)"
+      }
+    }
+  ],
+  "admin_brackets_preview_out": "Ficam de fora:",
+  "admin_brackets_preview_not_enough": "São necessárias ao menos 2 turmas com o mínimo de atletas. Peça aos conselheiros e representantes que completem as listas.",
+  "admin_brackets_open": "Abrir chave",
+  "admin_brackets_row_delete_title": "Apagar a chave de {sport} · {category}?",
+  "admin_brackets_row_delete_description": "As partidas da chave são apagadas e as inscrições reabrem. Chave com placar lançado não pode ser apagada.",
+  "admin_brackets_empty_title": "Nenhuma chave sorteada",
+  "admin_brackets_empty_description": "Cadastre turmas e modalidades, deixe as turmas inscreverem os atletas e sorteie a chave de cada modalidade por categoria.",
+  "admin_cards_title": "Cartões",
+  "admin_cards_summary": [
+    {
+      "declarations": [
+        "input cards",
+        "local cardsExact = cards",
+        "local cardsPlural = cards: plural",
+        "input red",
+        "local redExact = red",
+        "local redPlural = red: plural"
+      ],
+      "selectors": [
+        "cardsExact",
+        "cardsPlural",
+        "redExact",
+        "redPlural"
+      ],
+      "match": {
+        "cardsExact=0, cardsPlural=*, redExact=0, redPlural=*": "{cards} cartões, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=one": "{cards} cartões, {red} vermelho. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=0, cardsPlural=*, redExact=*, redPlural=*": "{cards} cartões, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=one, redExact=0, redPlural=*": "{cards} cartão, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=one": "{cards} cartão, {red} vermelho. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=one, redExact=*, redPlural=*": "{cards} cartão, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=*, redExact=0, redPlural=*": "{cards} cartões, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=one": "{cards} cartões, {red} vermelho. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
+        "cardsExact=*, cardsPlural=*, redExact=*, redPlural=*": "{cards} cartões, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\"."
+      }
+    }
+  ],
+  "admin_cards_deleted": "Cartão apagado.",
+  "admin_cards_empty": "Nenhum cartão lançado ainda.",
+  "admin_removals_title": "Remoções de atleta",
+  "admin_removals_description": [
+    {
+      "declarations": [
+        "input pending",
+        "local pendingExact = pending",
+        "local pendingPlural = pending: plural"
+      ],
+      "selectors": [
+        "pendingExact",
+        "pendingPlural"
+      ],
+      "match": {
+        "pendingExact=0, pendingPlural=*": "Quem os conselheiros tiraram das modalidades, e por quê. {pending} avisos pendentes.",
+        "pendingExact=*, pendingPlural=one": "Quem os conselheiros tiraram das modalidades, e por quê. {pending} aviso pendente.",
+        "pendingExact=*, pendingPlural=*": "Quem os conselheiros tiraram das modalidades, e por quê. {pending} avisos pendentes."
+      }
+    }
+  ],
+  "admin_removals_empty": "Nenhum atleta foi tirado de modalidade.",
+  "admin_removals_item": "{student} saiu do {sport}",
+  "admin_removals_by_actor": "Por {actor} em {date}",
+  "admin_removals_by_deleted": "Por conta removida em {date}",
+  "admin_matches_title": "Partidas",
+  "admin_matches_score": "Lançar placar",
+  "admin_matches_set_up": "Lançar jogos (sortear chave)",
+  "admin_matches_all_categories": "Toda categoria",
+  "admin_matches_all_statuses": "Toda situação",
+  "admin_matches_empty_title": "Nenhuma partida",
+  "admin_matches_empty_description": "As partidas nascem do sorteio de cada chave: sorteie a modalidade numa categoria e os jogos aparecem aqui. Quem vence avança sozinho para a fase seguinte.",
+  "admin_matches_go_to_brackets": "Ir para as chaves"
 }
