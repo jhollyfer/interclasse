@@ -66,10 +66,13 @@ export default class AdministratorUserCreateUseCase {
 
       return right(detail)
     } catch (error) {
-      logger.error({ err: error }, '[users > create][error]')
+      logger.error({ err: error }, '[administrator/users > create][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_CREATE_ERROR',
+        ),
       )
     }
   }

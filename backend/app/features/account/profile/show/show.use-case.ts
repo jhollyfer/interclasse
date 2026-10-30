@@ -38,10 +38,13 @@ export default class AccountProfileShowUseCase {
 
       return right(profile)
     } catch (error) {
-      logger.error({ err: error }, '[profile > show][error]')
+      logger.error({ err: error }, '[account/profile > show][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'PROFILE_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ACCOUNT_PROFILE_SHOW_ERROR',
+        ),
       )
     }
   }

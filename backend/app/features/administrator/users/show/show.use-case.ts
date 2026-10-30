@@ -29,10 +29,13 @@ export default class AdministratorUserShowUseCase {
 
       return right(user)
     } catch (error) {
-      logger.error({ err: error }, '[users > show][error]')
+      logger.error({ err: error }, '[administrator/users > show][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_SHOW_ERROR',
+        ),
       )
     }
   }

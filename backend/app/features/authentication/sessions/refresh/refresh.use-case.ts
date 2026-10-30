@@ -48,10 +48,13 @@ export default class AuthenticationSessionRefreshUseCase {
 
       return right(await this.sessions.issue(user.id))
     } catch (error) {
-      logger.error({ err: error }, '[sessions > refresh][error]')
+      logger.error({ err: error }, '[authentication/sessions > refresh][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_REFRESH_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'AUTHENTICATION_SESSION_REFRESH_ERROR',
+        ),
       )
     }
   }

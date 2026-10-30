@@ -83,6 +83,6 @@ test.group('storages/files > complete (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_COMPLETE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_COMPLETE_ERROR' })
   })
 })

@@ -41,7 +41,10 @@ export default class AdvisorStudentPaginateUseCase {
       logger.error({ err: error }, '[advisor/students > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_PAGINATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADVISOR_STUDENT_PAGINATE_ERROR',
+        ),
       )
     }
   }

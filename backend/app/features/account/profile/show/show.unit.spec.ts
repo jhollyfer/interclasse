@@ -37,6 +37,6 @@ test.group('account/profile > show (unit)', () => {
       actor: { id: USER_ID, role: 'ADVISOR', avatarId: null },
     })
 
-    assert.deepInclude(result.value, { status: 500, code: 'PROFILE_SHOW_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ACCOUNT_PROFILE_SHOW_ERROR' })
   })
 })

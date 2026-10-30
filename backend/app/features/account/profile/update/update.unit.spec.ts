@@ -140,6 +140,6 @@ test.group('account/profile > update (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'PROFILE_UPDATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ACCOUNT_PROFILE_UPDATE_ERROR' })
   })
 })

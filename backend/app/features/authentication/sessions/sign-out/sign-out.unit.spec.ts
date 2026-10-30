@@ -59,6 +59,6 @@ test.group('authentication/sessions > sign-out (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_SIGN_OUT_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_OUT_ERROR' })
   })
 })

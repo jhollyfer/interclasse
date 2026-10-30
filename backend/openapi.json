@@ -125,7 +125,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ProfileShowError"
+                  "$ref": "#/components/schemas/Error500AccountProfileShowError"
                 }
               }
             }
@@ -200,7 +200,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ProfileUpdateError"
+                  "$ref": "#/components/schemas/Error500AccountProfileUpdateError"
                 }
               }
             }
@@ -2112,7 +2112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentRemovalPaginateError"
+                  "$ref": "#/components/schemas/Error500AdministratorEnrollmentRemovalPaginateError"
                 }
               }
             }
@@ -2231,7 +2231,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentRemovalAcknowledgeError"
+                  "$ref": "#/components/schemas/Error500AdministratorEnrollmentRemovalAcknowledgeError"
                 }
               }
             }
@@ -4042,7 +4042,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserPaginateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserPaginateError"
                 }
               }
             }
@@ -4209,7 +4209,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserCreateError"
                 }
               }
             }
@@ -4299,7 +4299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserShowError"
                 }
               }
             }
@@ -4398,7 +4398,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserUpdateError"
                 }
               }
             }
@@ -4500,7 +4500,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserDeleteError"
                 }
               }
             }
@@ -4584,7 +4584,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserArchiveError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserArchiveError"
                 }
               }
             }
@@ -4668,7 +4668,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserUnarchiveError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserUnarchiveError"
                 }
               }
             }
@@ -5458,7 +5458,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentPaginateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentPaginateError"
                 }
               }
             }
@@ -5576,7 +5576,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentCreateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentCreateError"
                 }
               }
             }
@@ -5667,7 +5667,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentUpdateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentUpdateError"
                 }
               }
             }
@@ -5770,7 +5770,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentDeleteError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentDeleteError"
                 }
               }
             }
@@ -5825,7 +5825,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionRefreshError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionRefreshError"
                 }
               }
             }
@@ -5870,7 +5870,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionSignInError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionSignInError"
                 }
               }
             }
@@ -5915,7 +5915,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionSignOutError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionSignOutError"
                 }
               }
             }
@@ -6155,7 +6155,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FilePaginateError"
+                  "$ref": "#/components/schemas/Error500StoragesFilePaginateError"
                 }
               }
             }
@@ -6293,7 +6293,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileCreateError"
+                  "$ref": "#/components/schemas/Error500StoragesFileCreateError"
                 }
               }
             }
@@ -6370,7 +6370,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileShowError"
+                  "$ref": "#/components/schemas/Error500StoragesFileShowError"
                 }
               }
             }
@@ -6449,7 +6449,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileDeleteError"
+                  "$ref": "#/components/schemas/Error500StoragesFileDeleteError"
                 }
               }
             }
@@ -6527,7 +6527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileCompleteError"
+                  "$ref": "#/components/schemas/Error500StoragesFileCompleteError"
                 }
               }
             }
@@ -6608,7 +6608,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileDownloadError"
+                  "$ref": "#/components/schemas/Error500StoragesFileDownloadError"
                 }
               }
             }
@@ -6686,7 +6686,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FilePartsError"
+                  "$ref": "#/components/schemas/Error500StoragesFilePartsError"
                 }
               }
             }
@@ -19654,6 +19654,74 @@
           "errors"
         ]
       },
+      "Error500AccountProfileShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ACCOUNT_PROFILE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AccountProfileUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ACCOUNT_PROFILE_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AdministratorAnnouncementCreateError": {
         "type": "object",
         "properties": {
@@ -20250,6 +20318,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_CLASSROOM_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorEnrollmentRemovalAcknowledgeError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorEnrollmentRemovalPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_ENROLLMENT_REMOVAL_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -20878,6 +21014,244 @@
           "code"
         ]
       },
+      "Error500AdministratorUserArchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_ARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_CREATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserDeleteError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserUnarchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_UNARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AdvisorCardPaginateError": {
         "type": "object",
         "properties": {
@@ -21116,7 +21490,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentRemovalAcknowledgeError": {
+      "Error500AdvisorStudentCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21133,7 +21507,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR"
+              "ADVISOR_STUDENT_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -21150,7 +21524,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentRemovalPaginateError": {
+      "Error500AdvisorStudentDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21167,7 +21541,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_REMOVAL_PAGINATE_ERROR"
+              "ADVISOR_STUDENT_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -21184,7 +21558,7 @@
           "code"
         ]
       },
-      "Error500FileCompleteError": {
+      "Error500AdvisorStudentPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21201,7 +21575,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_COMPLETE_ERROR"
+              "ADVISOR_STUDENT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -21218,7 +21592,7 @@
           "code"
         ]
       },
-      "Error500FileCreateError": {
+      "Error500AdvisorStudentUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21235,7 +21609,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_CREATE_ERROR"
+              "ADVISOR_STUDENT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -21252,7 +21626,7 @@
           "code"
         ]
       },
-      "Error500FileDeleteError": {
+      "Error500AuthenticationSessionRefreshError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21269,7 +21643,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_DELETE_ERROR"
+              "AUTHENTICATION_SESSION_REFRESH_ERROR"
             ]
           },
           "errors": {
@@ -21286,7 +21660,7 @@
           "code"
         ]
       },
-      "Error500FileDownloadError": {
+      "Error500AuthenticationSessionSignInError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21303,7 +21677,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_DOWNLOAD_ERROR"
+              "AUTHENTICATION_SESSION_SIGN_IN_ERROR"
             ]
           },
           "errors": {
@@ -21320,7 +21694,7 @@
           "code"
         ]
       },
-      "Error500FilePaginateError": {
+      "Error500AuthenticationSessionSignOutError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21337,143 +21711,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500FilePartsError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "FILE_PARTS_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500FileShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "FILE_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500ProfileShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "PROFILE_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500ProfileUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "PROFILE_UPDATE_ERROR"
+              "AUTHENTICATION_SESSION_SIGN_OUT_ERROR"
             ]
           },
           "errors": {
@@ -21558,7 +21796,7 @@
           "code"
         ]
       },
-      "Error500SessionRefreshError": {
+      "Error500StoragesFileCompleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21575,7 +21813,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_REFRESH_ERROR"
+              "STORAGES_FILE_COMPLETE_ERROR"
             ]
           },
           "errors": {
@@ -21592,7 +21830,7 @@
           "code"
         ]
       },
-      "Error500SessionSignInError": {
+      "Error500StoragesFileCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21609,7 +21847,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_SIGN_IN_ERROR"
+              "STORAGES_FILE_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -21626,7 +21864,7 @@
           "code"
         ]
       },
-      "Error500SessionSignOutError": {
+      "Error500StoragesFileDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21643,7 +21881,143 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_SIGN_OUT_ERROR"
+              "STORAGES_FILE_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFileDownloadError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_DOWNLOAD_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFilePaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFilePartsError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_PARTS_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFileShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -21882,380 +22256,6 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "STOREFRONT_SPORT_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentCreateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_CREATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentDeleteError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_DELETE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentPaginateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_UPDATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserArchiveError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_ARCHIVE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserCreateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_CREATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserDeleteError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_DELETE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserPaginateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserUnarchiveError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_UNARCHIVE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_UPDATE_ERROR"
             ]
           },
           "errors": {

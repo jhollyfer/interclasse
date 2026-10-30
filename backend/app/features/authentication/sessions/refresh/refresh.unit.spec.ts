@@ -81,6 +81,6 @@ test.group('authentication/sessions > refresh (unit)', () => {
 
     const result = await useCase.execute({ refreshToken: 'refresh-ok' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_REFRESH_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_REFRESH_ERROR' })
   })
 })

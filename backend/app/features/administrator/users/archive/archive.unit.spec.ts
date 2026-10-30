@@ -64,6 +64,6 @@ test.group('administrator/users > archive (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_ARCHIVE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_ARCHIVE_ERROR' })
   })
 })

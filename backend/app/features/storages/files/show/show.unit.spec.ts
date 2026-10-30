@@ -40,6 +40,6 @@ test.group('storages/files > show (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_SHOW_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_SHOW_ERROR' })
   })
 })

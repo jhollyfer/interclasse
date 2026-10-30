@@ -50,10 +50,13 @@ export default class AuthenticationSessionSignInUseCase {
     } catch (error) {
       // Só credencial errada vira 401. Qualquer outra falha (banco fora, por
       // exemplo) continua sendo erro de servidor - não vale mentir 401.
-      logger.error({ err: error }, '[sessions > sign-in][error]')
+      logger.error({ err: error }, '[authentication/sessions > sign-in][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_SIGN_IN_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'AUTHENTICATION_SESSION_SIGN_IN_ERROR',
+        ),
       )
     }
   }

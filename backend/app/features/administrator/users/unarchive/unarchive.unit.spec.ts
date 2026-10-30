@@ -46,6 +46,6 @@ test.group('administrator/users > unarchive (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_UNARCHIVE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_UNARCHIVE_ERROR' })
   })
 })

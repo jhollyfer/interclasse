@@ -43,10 +43,13 @@ export default class AdministratorUserUnarchiveUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[users > unarchive][error]')
+      logger.error({ err: error }, '[administrator/users > unarchive][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_UNARCHIVE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_UNARCHIVE_ERROR',
+        ),
       )
     }
   }

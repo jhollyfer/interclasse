@@ -52,7 +52,10 @@ export default class AdvisorStudentCreateUseCase {
       logger.error({ err: error }, '[advisor/students > create][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'STUDENT_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADVISOR_STUDENT_CREATE_ERROR',
+        ),
       )
     }
   }

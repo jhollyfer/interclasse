@@ -51,10 +51,13 @@ export default class AdministratorUserDeleteUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[users > delete][error]')
+      logger.error({ err: error }, '[administrator/users > delete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_DELETE_ERROR',
+        ),
       )
     }
   }

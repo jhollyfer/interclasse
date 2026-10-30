@@ -67,10 +67,13 @@ export default class AdministratorUserArchiveUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[users > archive][error]')
+      logger.error({ err: error }, '[administrator/users > archive][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_ARCHIVE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_ARCHIVE_ERROR',
+        ),
       )
     }
   }

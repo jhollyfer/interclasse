@@ -44,6 +44,6 @@ test.group('storages/files > download (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_DOWNLOAD_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_DOWNLOAD_ERROR' })
   })
 })

@@ -56,7 +56,7 @@ export default class AdministratorEnrollmentRemovalAcknowledgeUseCase {
       return left(
         HTTPException.InternalServerError(
           this.i18n.t('errors.internal'),
-          'ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR',
+          'ADMINISTRATOR_ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR',
         ),
       )
     }

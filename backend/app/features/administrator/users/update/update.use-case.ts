@@ -92,10 +92,13 @@ export default class AdministratorUserUpdateUseCase {
 
       return right(detail)
     } catch (error) {
-      logger.error({ err: error }, '[users > update][error]')
+      logger.error({ err: error }, '[administrator/users > update][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_UPDATE_ERROR',
+        ),
       )
     }
   }

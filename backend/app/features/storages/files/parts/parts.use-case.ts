@@ -95,10 +95,13 @@ export default class StoragesFilePartsUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[files > parts][error]')
+      logger.error({ err: error }, '[storages/files > parts][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_PARTS_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_PARTS_ERROR',
+        ),
       )
     }
   }

@@ -37,10 +37,13 @@ export default class AuthenticationSessionSignOutUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[sessions > sign-out][error]')
+      logger.error({ err: error }, '[authentication/sessions > sign-out][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_SIGN_OUT_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'AUTHENTICATION_SESSION_SIGN_OUT_ERROR',
+        ),
       )
     }
   }

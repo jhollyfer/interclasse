@@ -28,10 +28,13 @@ export default class StoragesFileShowUseCase {
 
       return right(storage)
     } catch (error) {
-      logger.error({ err: error }, '[files > show][error]')
+      logger.error({ err: error }, '[storages/files > show][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_SHOW_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_SHOW_ERROR',
+        ),
       )
     }
   }

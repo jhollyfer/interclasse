@@ -85,6 +85,6 @@ test.group('administrator/users > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_PAGINATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_PAGINATE_ERROR' })
   })
 })

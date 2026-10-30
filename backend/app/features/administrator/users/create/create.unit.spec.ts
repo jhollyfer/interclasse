@@ -108,6 +108,6 @@ test.group('administrator/users > create (unit)', () => {
 
     const result = await useCase.execute(NEW_USER)
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_CREATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_CREATE_ERROR' })
   })
 })

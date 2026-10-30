@@ -67,6 +67,6 @@ test.group('authentication/sessions > sign-in (unit)', () => {
 
     const result = await useCase.execute({ email: 'ana@mail.com', password: PASSWORD })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_SIGN_IN_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_IN_ERROR' })
   })
 })

@@ -69,7 +69,7 @@ test.group('storages/files > create (unit)', () => {
       size: PART_SIZE * 2,
     })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_CREATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_CREATE_ERROR' })
     assert.lengthOf(multipart.aborted, 1)
   })
 })

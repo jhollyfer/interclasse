@@ -101,10 +101,13 @@ export default class AccountProfileUpdateUseCase {
 
       return right(profile)
     } catch (error) {
-      logger.error({ err: error }, '[profile > update][error]')
+      logger.error({ err: error }, '[account/profile > update][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'PROFILE_UPDATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ACCOUNT_PROFILE_UPDATE_ERROR',
+        ),
       )
     }
   }

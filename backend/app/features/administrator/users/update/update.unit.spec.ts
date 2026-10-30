@@ -146,6 +146,6 @@ test.group('administrator/users > update (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_UPDATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_UPDATE_ERROR' })
   })
 })
