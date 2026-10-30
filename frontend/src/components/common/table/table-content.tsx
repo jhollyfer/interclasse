@@ -11,6 +11,7 @@ import {
   EmptyTitle,
 } from '#/components/ui/empty'
 import { PageShellContent } from '#/components/common/page-shell'
+import { m } from '#/paraglide/messages'
 
 import { useTableContext } from './table-context'
 
@@ -42,9 +43,9 @@ export function TableContent({
             <EmptyMedia variant="icon">
               <WarningCircleIcon aria-hidden />
             </EmptyMedia>
-            <EmptyTitle>Não foi possível carregar a lista</EmptyTitle>
+            <EmptyTitle>{m.table_load_error_title()}</EmptyTitle>
             <EmptyDescription>
-              A consulta falhou. Verifique a conexão e tente de novo.
+              {m.table_load_error_description()}
             </EmptyDescription>
           </EmptyHeader>
 
@@ -54,7 +55,7 @@ export function TableContent({
             <EmptyContent>
               <Button variant="outline" onClick={onRetry}>
                 <ArrowClockwiseIcon aria-hidden />
-                Tentar de novo
+                {m.common_retry()}
               </Button>
             </EmptyContent>
           )}

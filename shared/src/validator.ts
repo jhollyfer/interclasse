@@ -20,27 +20,59 @@ const ZOD_LOCALES = {
   en: z.locales.en,
 } satisfies Record<Locale, () => { localeError: z.core.$ZodErrorMap }>
 
+/** As mensagens que a casa escreve por cima do locale, no formato de cada idioma. */
+type ValidationMessages = {
+  readonly required: string
+  readonly option: string
+  readonly number: string
+  readonly integer: string
+  readonly email: string
+  readonly minLength: (min: number) => string
+  readonly maxLength: (max: number) => string
+  readonly min: (min: number) => string
+  readonly max: (max: number) => string
+  readonly maxItems: (max: number) => string
+}
+
 /** As mensagens que a casa escreve por cima do locale, por idioma. */
 export const VALIDATION_MESSAGES = {
   'pt-BR': {
     required: 'Preencha este campo',
     option: 'Selecione uma opção válida',
     number: 'Informe um número válido',
+    integer: 'Informe um número inteiro',
+    email: 'Informe um e-mail válido',
+    minLength: (min) => `Informe ao menos ${min} caracteres`,
+    maxLength: (max) => `Informe no máximo ${max} caracteres`,
+    min: (min) => `Informe um valor maior ou igual a ${min}`,
+    max: (max) => `Informe um valor menor ou igual a ${max}`,
+    maxItems: (max) => `Informe no máximo ${max} itens`,
   },
   es: {
     required: 'Completa este campo',
     option: 'Selecciona una opción válida',
     number: 'Ingresa un número válido',
+    integer: 'Ingresa un número entero',
+    email: 'Ingresa un correo electrónico válido',
+    minLength: (min) => `Ingresa al menos ${min} caracteres`,
+    maxLength: (max) => `Ingresa como máximo ${max} caracteres`,
+    min: (min) => `Ingresa un valor mayor o igual a ${min}`,
+    max: (max) => `Ingresa un valor menor o igual a ${max}`,
+    maxItems: (max) => `Incluye como máximo ${max} elementos`,
   },
   en: {
     required: 'Fill in this field',
     option: 'Select a valid option',
     number: 'Enter a valid number',
+    integer: 'Enter a whole number',
+    email: 'Enter a valid email address',
+    minLength: (min) => `Enter at least ${min} characters`,
+    maxLength: (max) => `Enter at most ${max} characters`,
+    min: (min) => `Enter a value greater than or equal to ${min}`,
+    max: (max) => `Enter a value less than or equal to ${max}`,
+    maxItems: (max) => `Include at most ${max} items`,
   },
-} satisfies Record<
-  Locale,
-  { readonly required: string; readonly option: string; readonly number: string }
->
+} satisfies Record<Locale, ValidationMessages>
 
 /** O idioma em vigor, para as regras da casa que escrevem a própria mensagem. */
 let activeLocale: Locale = BASE_LOCALE
@@ -52,30 +84,44 @@ let activeLocale: Locale = BASE_LOCALE
 export function useValidatorLocale(locale: Locale): void {
   activeLocale = locale
   z.config(ZOD_LOCALES[locale]())
+  const messages = VALIDATION_MESSAGES[locale]
   z.config({
     customError: (issue) => {
       // Texto obrigatório vazio chega como `too_small` com mínimo 1: "Preencha
       // este campo" diz o que fazer, "Muito pequeno: esperado 1 caractere" não.
-      if (issue.code === 'too_small' && issue.origin === 'string' && issue.minimum === 1)
-        return VALIDATION_MESSAGES[locale].required
+      if (issue.code === 'too_small' && issue.origin === 'string') {
+        if (issue.minimum === 1) return messages.required
+        return messages.minLength(Number(issue.minimum))
+      }
+      if (issue.code === 'too_big' && issue.origin === 'string')
+        return messages.maxLength(Number(issue.maximum))
+
+      // Limites de número: só o inclusivo (`min`/`max`) tem a frase da casa.
+      if (issue.code === 'too_small' && issue.origin === 'number' && issue.inclusive)
+        return messages.min(Number(issue.minimum))
+      if (issue.code === 'too_big' && issue.origin === 'number' && issue.inclusive)
+        return messages.max(Number(issue.maximum))
+
+      if (issue.code === 'too_big' && issue.origin === 'array')
+        return messages.maxItems(Number(issue.maximum))
 
       // Campo sem valor (`undefined`) é "preencha", não "esperava texto,
       // recebeu undefined"; número apagado no input chega como `NaN`.
       if (issue.code === 'invalid_type') {
-        if (issue.input === undefined || issue.input === null)
-          return VALIDATION_MESSAGES[locale].required
-        if (typeof issue.input === 'number' && Number.isNaN(issue.input))
-          return VALIDATION_MESSAGES[locale].number
+        if (issue.input === undefined || issue.input === null) return messages.required
+        if (typeof issue.input === 'number' && Number.isNaN(issue.input)) return messages.number
+        if (issue.expected === 'int') return messages.integer
       }
 
       // Lista fechada (enum) e id: o que o usuário faz é escolher, não digitar.
-      if (issue.code === 'invalid_value') return VALIDATION_MESSAGES[locale].option
-      if (issue.code === 'invalid_format' && issue.format === 'uuid')
-        return VALIDATION_MESSAGES[locale].option
+      if (issue.code === 'invalid_value') return messages.option
 
-      // E-mail (ou outro formato) em branco é campo vazio, não formato errado.
-      if (issue.code === 'invalid_format' && issue.input === '')
-        return VALIDATION_MESSAGES[locale].required
+      if (issue.code === 'invalid_format') {
+        if (issue.format === 'uuid') return messages.option
+        // E-mail (ou outro formato) em branco é campo vazio, não formato errado.
+        if (issue.input === '') return messages.required
+        if (issue.format === 'email') return messages.email
+      }
 
       return undefined
     },

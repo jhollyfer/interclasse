@@ -1,3 +1,5 @@
+import { m } from '#/paraglide/messages'
+
 /**
  * O envio de uma parte para a URL assinada.
  *
@@ -68,7 +70,7 @@ function retriable(error: unknown): boolean {
 function wait(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {
-      reject(new DOMException('Upload cancelado', 'AbortError'))
+      reject(new DOMException(m.upload_error_cancelled(), 'AbortError'))
       return
     }
 
@@ -79,7 +81,7 @@ function wait(ms: number, signal?: AbortSignal): Promise<void> {
 
     function onAbort() {
       clearTimeout(timer)
-      reject(new DOMException('Upload cancelado', 'AbortError'))
+      reject(new DOMException(m.upload_error_cancelled(), 'AbortError'))
     }
 
     signal?.addEventListener('abort', onAbort, { once: true })
@@ -94,7 +96,7 @@ function attempt(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {
-      reject(new DOMException('Upload cancelado', 'AbortError'))
+      reject(new DOMException(m.upload_error_cancelled(), 'AbortError'))
       return
     }
 
@@ -134,7 +136,7 @@ function attempt(
       if (request.status < 200 || request.status >= 300) {
         reject(
           new UploadPartError(
-            `Envio recusado (${request.status})`,
+            m.upload_error_refused({ status: request.status }),
             request.status,
           ),
         )
@@ -145,10 +147,7 @@ function attempt(
 
       if (!etag) {
         reject(
-          new UploadPartError(
-            'O storage não expôs o ETag da parte - confira o CORS do bucket.',
-            request.status,
-          ),
+          new UploadPartError(m.upload_error_missing_etag(), request.status),
         )
         return
       }
@@ -158,7 +157,7 @@ function attempt(
 
     request.onerror = () => {
       clearStall()
-      reject(new UploadPartError('Falha de rede ao enviar a parte', 0))
+      reject(new UploadPartError(m.upload_error_network(), 0))
     }
 
     request.onabort = () => {
@@ -167,11 +166,11 @@ function attempt(
       // O `abort()` do relógio de silêncio chega aqui pelo mesmo caminho do
       // cancelamento do usuário. Só um dos dois merece nova tentativa.
       if (stalled) {
-        reject(new UploadPartError('A conexão parou de responder', 408))
+        reject(new UploadPartError(m.upload_error_stalled(), 408))
         return
       }
 
-      reject(new DOMException('Upload cancelado', 'AbortError'))
+      reject(new DOMException(m.upload_error_cancelled(), 'AbortError'))
     }
 
     signal?.addEventListener('abort', () => request.abort(), { once: true })

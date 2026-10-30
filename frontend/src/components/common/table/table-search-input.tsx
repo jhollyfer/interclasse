@@ -12,6 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '#/components/ui/tooltip'
+import { m } from '#/paraglide/messages'
 
 type InputSearchProps = Readonly<{
   /** O termo **aplicado**, que mora na URL. */
@@ -46,7 +47,7 @@ type InputSearchProps = Readonly<{
 export function InputSearch({
   value,
   onSearch,
-  placeholder = 'Pesquise aqui...',
+  placeholder = m.table_search_placeholder(),
   help,
 }: InputSearchProps): React.JSX.Element {
   const [term, setTerm] = React.useState(value ?? '')
@@ -93,7 +94,7 @@ export function InputSearch({
                 <InputGroupButton
                   variant="ghost"
                   size="icon-xs"
-                  aria-label="Ajuda"
+                  aria-label={m.table_help()}
                 >
                   <QuestionIcon />
                 </InputGroupButton>
@@ -107,7 +108,7 @@ export function InputSearch({
       <InputGroupInput
         data-test-id="search-input"
         // O placeholder some ao digitar e não nomeia o campo.
-        aria-label="Pesquisar na lista"
+        aria-label={m.table_search_label()}
         value={term}
         placeholder={placeholder}
         onChange={(event) => change(event.target.value)}
@@ -125,7 +126,7 @@ export function InputSearch({
             data-test-id="search-clear"
             variant="ghost"
             size="icon-xs"
-            aria-label="Limpar busca"
+            aria-label={m.table_search_clear()}
             onClick={clear}
           >
             <XIcon />
@@ -137,7 +138,7 @@ export function InputSearch({
             data-test-id="search-submit"
             variant="ghost"
             size="icon-xs"
-            aria-label="Buscar"
+            aria-label={m.table_search_submit()}
             onClick={apply}
           >
             <MagnifyingGlassIcon />

@@ -11,6 +11,7 @@ import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { env } from '#/env'
 import { getLocale } from '#/paraglide/runtime'
+import { m } from '#/paraglide/messages'
 
 import * as server from './http.server'
 
@@ -378,7 +379,7 @@ async function perform(
   } catch {
     // `fetch` só rejeita aqui: sem resposta, logo sem status real.
     throw new HTTPError({
-      message: 'Não foi possível conectar ao servidor. Tente novamente.',
+      message: m.common_error_network(),
       status: HTTPStatus.NETWORK,
       code: HTTPErrorCode.NETWORK_ERROR,
     })
@@ -416,7 +417,7 @@ async function perform(
     }
 
     throw new HTTPError({
-      message: body?.message ?? 'Erro inesperado. Tente novamente.',
+      message: body?.message ?? m.common_error_unknown(),
       status: body?.status ?? response.status,
       code: body?.code ?? HTTPErrorCode.UNKNOWN_ERROR,
       errors: body?.errors,
@@ -438,7 +439,7 @@ export async function request<T>(
   // estouraria com um `SyntaxError`, fora do contrato de sempre `HTTPError`.
   if (response.status === HTTPStatus.NO_CONTENT) {
     throw new HTTPError({
-      message: 'A API respondeu sem corpo onde se esperava um registro.',
+      message: m.common_error_empty_response(),
       status: response.status,
       code: HTTPErrorCode.UNKNOWN_ERROR,
     })

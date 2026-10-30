@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { SITE_TITLE } from '#/lib/constant'
+import { m } from '#/paraglide/messages'
 
 import { validateSearch } from './-search'
 
@@ -33,7 +34,9 @@ export const Route = createFileRoute('/authentication')({
     // entre eles é o `403` do backend em `/administrator/users`.
     throw redirect({ to: '/painel' })
   },
-  head: () => ({ meta: [{ title: `Entrar | ${SITE_TITLE()}` }] }),
+  head: () => ({
+    meta: [{ title: `${m.auth_page_title()} | ${SITE_TITLE()}` }],
+  }),
   component: RouteComponent,
 })
 

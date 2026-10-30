@@ -7,6 +7,7 @@ import {
 } from '#/components/ui/alert-dialog'
 import { Button } from '#/components/ui/button'
 import type { Merge } from '#/lib/merge'
+import { m } from '#/paraglide/messages'
 
 import { useConfirmDialogContext } from './confirm-dialog-context'
 
@@ -25,7 +26,7 @@ export function ConfirmDialogFooter({
       {children ?? (
         <React.Fragment>
           <ConfirmDialogCancel />
-          <ConfirmDialogConfirm>Confirmar</ConfirmDialogConfirm>
+          <ConfirmDialogConfirm>{m.common_confirm()}</ConfirmDialogConfirm>
         </React.Fragment>
       )}
     </AlertDialogFooter>
@@ -37,7 +38,7 @@ export function ConfirmDialogFooter({
  * painel diz.
  */
 export function ConfirmDialogCancel({
-  children = 'Cancelar',
+  children = m.common_cancel(),
   ...rest
 }: React.ComponentProps<typeof Button>): React.JSX.Element {
   return (

@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '#/components/ui/sidebar'
+import { m } from '#/paraglide/messages'
 
 import { PENDING_REMOVALS, menuFor } from './menu'
 import {
@@ -189,9 +190,9 @@ export function Sidebar(): React.JSX.Element {
             */}
             <SignOutConfirm
               trigger={
-                <SidebarMenuButton tooltip="Sair">
+                <SidebarMenuButton tooltip={m.panel_sign_out()}>
                   <SignOutIcon />
-                  <span>Sair</span>
+                  <span>{m.panel_sign_out()}</span>
                 </SidebarMenuButton>
               }
             >

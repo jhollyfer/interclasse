@@ -25,6 +25,7 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { usePhotoDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { advisorPhotosQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import { notifyError } from '#/lib/form-errors'
+import { m } from '#/paraglide/messages'
 
 import { MY_PHOTOS } from '../index'
 
@@ -35,22 +36,22 @@ export function MyPhotosPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Fotos dos jogos</PageHeaderTitle>
+        <PageHeaderTitle>{m.advisor_photos_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          Fotos dos atletas e dos jogos para o carrossel do site.
+          {m.advisor_photos_subtitle()}
         </PageHeaderDescription>
       </PageHeader>
 
       <PhotoUploadForm
         area="advisor"
-        description="A organização aprova a foto antes de ela aparecer no site."
-        success="Foto enviada. Ela aparece no site depois de aprovada."
+        description={m.advisor_photos_upload_description()}
+        success={m.advisor_photos_upload_success()}
       />
 
       <PhotoGrid
         photos={data?.data ?? []}
         isPending={isPending}
-        empty="Você ainda não enviou fotos."
+        empty={m.advisor_photos_empty()}
         actions={(photo) => <DeleteAction photo={photo} />}
       />
     </div>
@@ -63,7 +64,7 @@ function DeleteAction({
   const invalidate = useInvalidate()
   const remove = usePhotoDelete('advisor', {
     onSuccess: async () => {
-      toast.success('Foto apagada.')
+      toast.success(m.advisor_photo_deleted())
       await invalidate(DEPENDENTS.photos)
     },
     onError: (error) => notifyError(error, { id: 'photo-delete' }),
@@ -76,19 +77,21 @@ function DeleteAction({
       trigger={
         <Button size="sm" variant="ghost">
           <TrashIcon />
-          Apagar
+          {m.advisor_photo_delete()}
         </Button>
       }
     >
       <ConfirmDialogHeader>
-        <ConfirmDialogTitle>Apagar esta foto?</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.advisor_photo_delete_title()}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          Se ela já estiver no site, sai de lá também.
+          {m.advisor_photo_delete_description()}
         </ConfirmDialogDescription>
       </ConfirmDialogHeader>
       <ConfirmDialogFooter>
         <ConfirmDialogCancel />
-        <ConfirmDialogConfirm>Apagar</ConfirmDialogConfirm>
+        <ConfirmDialogConfirm>{m.advisor_photo_delete()}</ConfirmDialogConfirm>
       </ConfirmDialogFooter>
     </ConfirmDialog>
   )

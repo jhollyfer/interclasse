@@ -25,6 +25,7 @@ import { SidebarTrigger } from '#/components/ui/sidebar'
 import { LocaleSwitch } from '#/components/common/locale-switch'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { initials } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { ThemeToggle } from './theme-toggle'
 import {
@@ -84,7 +85,7 @@ function AccountMenu(): React.JSX.Element {
         por dentro dele seria um botão dentro de outro - erro de hidratação.
       */}
       <DropdownMenuTrigger
-        aria-label={`Conta de ${account.name}`}
+        aria-label={m.panel_account_of({ name: account.name })}
         className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
       >
         <Avatar className="size-7">
@@ -112,14 +113,18 @@ function AccountMenu(): React.JSX.Element {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link to="/profile">Meu perfil</Link>} />
+        <DropdownMenuItem
+          render={<Link to="/profile">{m.panel_my_profile()}</Link>}
+        />
         <DropdownMenuSeparator />
         {/* `closeOnClick={false}`: o item é o gatilho do alerta, e sem isso o
             menu fecha e leva o gatilho embora antes do alerta abrir. */}
         <SignOutConfirm
           nativeButton={false}
           trigger={
-            <DropdownMenuItem closeOnClick={false}>Sair</DropdownMenuItem>
+            <DropdownMenuItem closeOnClick={false}>
+              {m.panel_sign_out()}
+            </DropdownMenuItem>
           }
         >
           <SignOutConfirmHeader />
