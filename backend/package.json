@@ -27,6 +27,7 @@
     "sync:check": "node --import @poppinss/ts-exec scripts/sync-check.ts",
     "pattern:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts",
     "authz:check": "node --import @poppinss/ts-exec scripts/authz-check.ts",
+    "depcruise": "depcruise app",
     "di:check": "node ace di:check"
   },
   "imports": {
@@ -64,6 +65,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/luxon": "^3.7.6",
     "@types/node": "~26.6.5",
+    "dependency-cruiser": "^18.7.0",
     "eslint": "^10.12.0",
     "eslint-plugin-import-x": "^4.17.1",
     "hot-hook": "^1.0.0",

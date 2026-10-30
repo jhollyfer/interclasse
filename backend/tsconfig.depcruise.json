@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "#features/*": ["./app/features/*"],
+      "#validators/*": ["./app/validators/*"],
+      "#core/*": ["./app/core/*"],
+      "#domain/*": ["./app/domain/*"],
+      "#repositories/*": ["./app/repositories/*"],
+      "#exceptions/*": ["./app/exceptions/*"],
+      "#models/*": ["./app/models/*"],
+      "#policies/*": ["./app/policies/*"],
+      "#abilities/*": ["./app/abilities/*"],
+      "#services/*": ["./app/services/*"],
+      "#middleware/*": ["./app/middleware/*"],
+      "#guards/*": ["./app/guards/*"],
+      "#providers/*": ["./providers/*"],
+      "#database/*": ["./database/*"],
+      "#tests/*": ["./tests/*"],
+      "#start/*": ["./start/*"],
+      "#config/*": ["./config/*"],
+      "#commands/*": ["./commands/*"],
+      "#scripts/*": ["./scripts/*"]
+    },
+    "rootDir": "..",
+    "noEmit": true
+  },
+  "include": ["./app/**/*"]
+}
