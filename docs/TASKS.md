@@ -6,12 +6,12 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** 19 tarefas · 14 feitas · 2 em andamento · 3 a fazer — atualizado 2026-10-29
+**Resumo:** 21 tarefas · 18 feitas · 1 em andamento · 2 a fazer — atualizado 2026-10-29
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
 
-## Fase 1 · Régua (5/8)
+## Fase 1 · Régua (9/10)
 
 Trazer o projeto para o padrão Maiyu inteiro.
 
@@ -21,10 +21,12 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 1.2 | Workspace pnpm na raiz + `shared/` (Either, `z`, enums, envelope) | Alta | Feita | lockfile único, imagem da API pela raiz |
 | 1.3 | Fundação backend: specs unit/e2e, `app/validators/`, i18n por requisição, UnitOfWork | Alta | Feita | |
 | 1.4 | Módulo de referência `sports` (entidade, repositório, presenter, Zod no `shared/`) | Alta | Feita | |
-| 1.5 | Demais módulos do backend na forma da referência | Alta | Em andamento | 5 frentes em paralelo |
+| 1.5 | Demais módulos do backend na forma da referência | Alta | Feita | 911 testes |
 | 1.6 | Frontend: Paraglide pt-BR/es/en e troca de idioma | Alta | Feita | |
-| 1.7 | Frontend: queries/mutations por módulo, `-search.ts`, guard por área | Alta | Em andamento | |
-| 1.8 | Frontend: tipos e validators do `shared/` (Zod + zodResolver), textos nos três idiomas | Alta | A fazer | depende de 1.5 |
+| 1.7 | Frontend: queries/mutations por módulo, `-search.ts`, guard por área | Alta | Feita | |
+| 1.8 | Frontend: tipos e validators do `shared/` (Zod + zodResolver) | Alta | Feita | VineJS saiu do frontend |
+| 1.9 | Frontend: todos os textos nos três idiomas | Alta | Em andamento | site, painel do admin, partes comuns |
+| 1.10 | Docs do projeto preenchidos a partir do código | Média | Feita | |
 
 ## Fase 2 · Pedidos do Geison, 29/10 (9/9)
 
