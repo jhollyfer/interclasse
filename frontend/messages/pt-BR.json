@@ -819,5 +819,17 @@
   "common_ui_open_options": "Abrir opções",
   "common_ui_clear_selection": "Limpar seleção",
   "common_error_link_moved": "Se você chegou aqui por um link, ele pode ter mudado de lugar.",
-  "common_ui_sidebar_title": "Barra lateral"
+  "common_ui_sidebar_title": "Barra lateral",
+  "rich_editor_toolbar": "Formatação do texto",
+  "rich_editor_bold": "Negrito",
+  "rich_editor_italic": "Itálico",
+  "rich_editor_heading": "Título",
+  "rich_editor_bullet_list": "Lista com marcadores",
+  "rich_editor_ordered_list": "Lista numerada",
+  "multi_file_upload_add": "Adicionar arquivos",
+  "multi_file_upload_remove": "Remover {name}",
+  "multi_file_upload_progress": "{name}: {percent}%",
+  "multi_file_upload_failed": "Falha ao enviar {name}",
+  "multi_file_upload_cancel": "Cancelar envio de {name}",
+  "multi_file_upload_list": "Arquivos enviados"
 }

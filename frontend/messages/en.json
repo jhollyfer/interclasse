@@ -833,5 +833,17 @@
   "common_ui_open_options": "Open options",
   "common_ui_clear_selection": "Clear selection",
   "common_error_link_moved": "If you got here from a link, it may have moved.",
-  "common_ui_sidebar_title": "Sidebar"
+  "common_ui_sidebar_title": "Sidebar",
+  "rich_editor_toolbar": "Text formatting",
+  "rich_editor_bold": "Bold",
+  "rich_editor_italic": "Italic",
+  "rich_editor_heading": "Heading",
+  "rich_editor_bullet_list": "Bulleted list",
+  "rich_editor_ordered_list": "Numbered list",
+  "multi_file_upload_add": "Add files",
+  "multi_file_upload_remove": "Remove {name}",
+  "multi_file_upload_progress": "{name}: {percent}%",
+  "multi_file_upload_failed": "Failed to upload {name}",
+  "multi_file_upload_cancel": "Cancel upload of {name}",
+  "multi_file_upload_list": "Uploaded files"
 }
