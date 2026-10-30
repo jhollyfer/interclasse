@@ -53,6 +53,7 @@ import {
   advisorEnrollmentsQueryOptions,
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
+import { createDialogHandle } from '#/lib/dialog-handle'
 import { notifyError } from '#/lib/form-errors'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
@@ -91,7 +92,9 @@ export function ClassroomDetail({
     advisorEnrollmentsQueryOptions(classroomId),
   )
   const queryClient = useQueryClient()
-  const [pending, setPending] = React.useState<PendingRemoval | null>(null)
+  const [removalHandle] = React.useState(() =>
+    createDialogHandle<PendingRemoval>(),
+  )
 
   const store = (updated: AdvisorEnrollmentShowResponse) =>
     queryClient.setQueryData(
@@ -147,21 +150,22 @@ export function ClassroomDetail({
                   const sportName =
                     board.sports.find((sport) => sport.id === sportId)?.name ??
                     ''
-                  setPending({ sportId, sportName, studentIds, removed })
+                  removalHandle.openWithPayload({
+                    sportId,
+                    sportName,
+                    studentIds,
+                    removed,
+                  })
                   return
                 }
                 save.mutate({ classroomId, sportId, studentIds })
               }}
             />
-            {pending && (
-              <RemovalReasonDialog
-                key={pending.sportId}
-                classroomId={classroomId}
-                pending={pending}
-                onClose={() => setPending(null)}
-                onSaved={store}
-              />
-            )}
+            <RemovalReasonDialog
+              classroomId={classroomId}
+              handle={removalHandle}
+              onSaved={store}
+            />
           </TabsContent>
           <TabsContent value="students" className="pt-4">
             <Students classroomId={classroomId} />

@@ -44,10 +44,14 @@ vi.mock('@tanstack/react-router', () => ({
 
 const CLASSROOM_ID = '0b9c1f5e-4a6d-4c1e-9d3b-5f2a7e8c1d40'
 
+const SPORT_ID = '5c7d0a52-0f35-4a8e-8d0c-2b6f3f8f9a11'
+const ANA_ID = '7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d'
+const BIA_ID = '8b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e'
+
 const META = { total: 2, perPage: 100, currentPage: 1, lastPage: 1 }
 
 const FUTSAL = {
-  id: 'futsal',
+  id: SPORT_ID,
   name: 'Futsal',
   minAthletes: 1,
   maxAthletes: 5,
@@ -59,8 +63,8 @@ const BOARD = {
   classroom: { id: CLASSROOM_ID, name: '6º A', category: CATEGORY.F2 },
   sports: [FUTSAL],
   students: [
-    { id: 'ana', name: 'Ana', sportIds: ['futsal'] },
-    { id: 'bia', name: 'Bia', sportIds: [] },
+    { id: ANA_ID, name: 'Ana', sportIds: [SPORT_ID] },
+    { id: BIA_ID, name: 'Bia', sportIds: [] },
   ],
 }
 
@@ -166,8 +170,8 @@ describe('ClassroomDetail', () => {
       ),
     ).toEqual({
       classroomId: CLASSROOM_ID,
-      sportId: 'futsal',
-      studentIds: expect.arrayContaining(['ana', 'bia']),
+      sportId: SPORT_ID,
+      studentIds: expect.arrayContaining([ANA_ID, BIA_ID]),
     })
     await waitFor(() =>
       expect(toast.success).toHaveBeenCalledWith(m.common_classroom_saved()),
@@ -195,6 +199,37 @@ describe('ClassroomDetail', () => {
       screen.getByRole('button', { name: m.common_cancel() }),
     )
 
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('com o motivo informado grava a lista, avisa e fecha o pedido', async () => {
+    renderDetail()
+
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'Ana' }))
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: m.common_enrollment_save({ name: 'Futsal' }),
+      }),
+    )
+    await userEvent.type(
+      await screen.findByRole('textbox', { name: m.common_removal_reason() }),
+      'Mudou de escola',
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: m.common_removal_submit() }),
+    )
+
+    await waitFor(() =>
+      expect(requestsTo('/advisor/enrollments', 'PUT')).toHaveLength(1),
+    )
+    expect(
+      JSON.parse(
+        String(requestsTo('/advisor/enrollments', 'PUT')[0]?.[2]?.body),
+      ),
+    ).toMatchObject({ studentIds: [], reason: 'Mudou de escola' })
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith(m.common_removal_saved()),
+    )
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
@@ -242,7 +277,7 @@ describe('ClassroomDetail', () => {
     )
 
     await waitFor(() =>
-      expect(send).toHaveBeenCalledWith('/advisor/students/bia', {
+      expect(send).toHaveBeenCalledWith(`/advisor/students/${BIA_ID}`, {
         method: 'DELETE',
       }),
     )
