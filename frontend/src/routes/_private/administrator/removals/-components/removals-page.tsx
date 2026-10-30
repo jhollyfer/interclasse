@@ -1,7 +1,7 @@
+import type { AdministratorEnrollmentRemovalShowResponse } from '@interclasse/shared'
 import { CheckIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
-import type { AdministratorEnrollmentRemovalShowResponse } from '@interclasse/shared'
 
 import {
   PageHeader,
@@ -13,11 +13,11 @@ import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useEnrollmentRemovalAcknowledge } from '#/integrations/tanstack-query/mutations/administrator'
+import { useEnrollmentRemovalAcknowledgeMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { cn } from '#/lib/cn'
 import { notifyError } from '#/lib/form-errors'
 import { formatDate } from '#/lib/labels'
-import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
 
 import { ADMINISTRATOR_REMOVALS } from '../index'
@@ -64,7 +64,7 @@ function RemovalItem({
   removal: AdministratorEnrollmentRemovalShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
-  const acknowledge = useEnrollmentRemovalAcknowledge({
+  const acknowledge = useEnrollmentRemovalAcknowledgeMutation({
     onSuccess: async () => {
       await invalidate([queryKeys.administrator.enrollmentRemovals.all])
     },

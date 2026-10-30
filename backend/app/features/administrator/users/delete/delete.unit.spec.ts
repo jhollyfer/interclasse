@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import AdministratorUserDeleteUseCase from './delete.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
 async function setup() {
@@ -44,7 +44,7 @@ test.group('administrator/users > delete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 USER_DELETE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_DELETE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
     users.delete = async () => {
@@ -53,6 +53,6 @@ test.group('administrator/users > delete (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_DELETE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_DELETE_ERROR' })
   })
 })

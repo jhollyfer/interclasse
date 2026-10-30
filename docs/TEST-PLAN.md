@@ -16,8 +16,8 @@
 | `shared/` | Vitest | `shared/src/**/*.test.ts` | todo pull request e todo push em `main` |
 | Unitário do frontend | Vitest | `frontend/src/**/*.test.ts` e `frontend/scripts/**/*.test.ts` (só `.ts`: componente React não é testável hoje) | todo pull request e todo push em `main` |
 | Mensagens | `pnpm i18n:check` (inlang) | `frontend/messages/` | pull request |
-| Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm sync:check` (só local) | `backend/scripts/` | `pnpm check` e CI |
-| E2E do frontend | Playwright, `pnpm e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; fora do CI por enquanto |
+| Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm depcruise` | `backend/scripts/` | `pnpm check` e CI |
+| E2E do frontend | Playwright, `pnpm test:e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; job `e2e` do `main-check-frontend.yml` em todo PR |
 
 ## 2. Fluxos críticos
 
@@ -50,7 +50,7 @@ do requisito; a ligação é pelo arquivo e pelo título.
 | PRD 5 | lista inteira por turma e modalidade, dentro do máximo | unitário e E2E | `domain/enrollment/enrollment.entity.unit.spec.ts`, `advisor/enrollments/update`, `representative/enrollments/update` |
 | PRD 6 | aviso de remoção com motivo; a do administrador já nasce lida | E2E | `advisor/enrollments/update`, `administrator/enrollment-removals/*/*.e2e.spec.ts` |
 | PRD 7 | sorteio idempotente por modalidade e categoria; apagar só sem placar | E2E | `administrator/brackets/create`, `administrator/brackets/delete` |
-| PRD 7 | regras do mata-mata (potência de dois, folga, avanço) | unitário | `domain/bracket/knockout.unit.spec.ts`, `bracket.entity.unit.spec.ts` |
+| PRD 7 | regras do mata-mata (potência de dois, folga, avanço) | unitário | `domain/shared/knockout.value-object.unit.spec.ts`, `bracket.entity.unit.spec.ts` |
 | PRD 8 | placar, empate com pênaltis, desfazer, cartão só de atleta da partida | E2E e unitário | `administrator/matches/*`, `administrator/cards/*`, `domain/match-card/match-card.entity.unit.spec.ts` |
 | PRD 9 | avisos: criar, editar, apagar, fixar | E2E | `administrator/announcements/*/*.e2e.spec.ts` |
 | PRD 10 | leitura pública de jogos, chaves, avisos e modalidades | E2E | `storefront/{announcements,brackets,matches,sports}/*/*.e2e.spec.ts` |
@@ -70,7 +70,7 @@ Membros enumerados e o teste que prova cada um. Membro sem teste aparece como **
 | | `FINISHED` | `administrator/matches/score/score.e2e.spec.ts` ("do sorteio ao campeão") |
 | `MatchStatus` | `SCHEDULED` | `administrator/matches/unscore/unscore.e2e.spec.ts` |
 | | `FINISHED` | `administrator/matches/score/score.e2e.spec.ts` |
-| `MatchPhase` | `ROUND_OF_16`, `QUARTER`, `SEMI`, `FINAL` | `domain/bracket/knockout.unit.spec.ts` |
+| `MatchPhase` | `ROUND_OF_16`, `QUARTER`, `SEMI`, `FINAL` | `domain/shared/knockout.value-object.unit.spec.ts` |
 | `PhotoStatus` | `PENDING`, `APPROVED` | `administrator/photos/review/review.e2e.spec.ts` |
 | | `REJECTED` | `domain/photo/photo.entity.unit.spec.ts`, `administrator/photos/review/review.unit.spec.ts` |
 | `UserRole` | `ADMINISTRATOR` | `administrator/*` e `role.middleware.e2e.spec.ts` |
@@ -103,7 +103,7 @@ Rotas do `/storefront` são só leitura: cobrem sucesso, filtro e paginação, e
 
 ## 5. Dados de teste
 
-- Banco: `interclasse_test`, separado do de desenvolvimento, via `backend/.env.test`; a suíte roda `truncate()` entre os testes. Bucket `interclasse-test` no MinIO do `docker-compose.yml` (criado pelo serviço `storage-bootstrap`).
+- Banco: `interclasse_test`, separado do de desenvolvimento, via `backend/.env.test`; a suíte roda `truncate()` entre os testes. Bucket `interclasse-test` no MinIO do `docker-compose.yml` (criado pelo serviço `minio-setup`).
 - Factories em `backend/database/factories/`, com o papel mínimo que o teste precisa.
 - Repositórios em memória (`*.memory.repository.ts`) e fakes (`session.fake.ts`, `storage.fake.ts`) servem aos testes unitários.
 - No CI, o job do backend sobe o MinIO e roda a suíte inteira.
@@ -116,7 +116,7 @@ proibido) vale aqui sem cópia: `_standards/tooling.md` §10.1. Deste projeto:
 - Teste novo falha antes da correção e passa depois.
 - Mudança de regra de dado (índice, unique, enum) roda a suíte inteira do backend antes do commit.
 - Cobertura: o join do §3.1 sem lacuna nas rotas e enums que a mudança toca. Percentual mínimo: não exigido.
-- `pnpm check` e `pnpm test` no backend (o `pre-commit` roda os dois); `pnpm lint`, `pnpm typecheck`, `pnpm test` e `pnpm build` no frontend; `pnpm check-cycles` depois do build do frontend.
+- `pnpm check` e `pnpm test:e2e` no backend (o `pre-commit` roda `check`, que inclui o `test:unit`); `pnpm lint`, `pnpm typecheck`, `pnpm test:unit` e `pnpm build` no frontend; `pnpm check-cycles` depois do build do frontend.
 
 ## 7. Teste manual antes do release
 

@@ -11,7 +11,7 @@
  * Cada regra aponta a secao da regua que a origina, para que a mensagem de erro
  * leve a decisao junto e nao so ao sintoma. O que e deste projeto - isencoes
  * nomeadas, chaves de ambiente fora do leitor, arquivos de FORMA - mora em
- * `scripts/pattern-check.config.json`.
+ * `scripts/pattern-check.config.ts`.
  *
  * Uso:
  *   node --import @poppinss/ts-exec scripts/pattern-check.ts            # reprova
@@ -20,6 +20,8 @@
 
 import { access, readdir, readFile } from 'node:fs/promises'
 import { basename, dirname, join, relative, resolve } from 'node:path'
+
+import { CONFIG } from './pattern-check.config.ts'
 
 type Finding = {
   file: string
@@ -30,28 +32,6 @@ type Finding = {
 }
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
-
-/** Uma entrada de `newAllowlist` da config. */
-type NewEntry = {
-  /** O simbolo construido com `new`. */
-  symbol: string
-  /** Onde o uso vive. Aceita `**` e `*`. */
-  file: string
-  /** Por que aquele `new` e legitimo. */
-  reason: string
-}
-
-type Config = {
-  /** Chave que nunca passa por `env.get()`, com o motivo. Secao 6. */
-  envOutsideReader: Record<string, string>
-  newAllowlist: NewEntry[]
-  softDeleteExempt: string[]
-  shape: string[]
-}
-
-const CONFIG: Config = JSON.parse(
-  await readFile(join(ROOT, 'scripts/pattern-check.config.json'), 'utf8'),
-)
 
 /** Diretorios que a regua exige mesmo vazios. Secao 1.1. */
 const REQUIRED_DIRECTORIES = [
@@ -236,14 +216,38 @@ const RULES: Rule[] = [
     section: '4.3',
     scope: /\.use-case\.ts$/,
     pattern: /\bactor\s*:\s*string\b/,
-    message: '`actor` e o objeto `User`, nao o id — a policy recebe (actor, target)',
+    message:
+      '`actor` e o objeto `Actor` validado pelo schema, nao o id — a policy recebe (actor, target)',
   },
   {
-    name: 'throw-in-use-case',
+    name: 'throw-in-use-case-or-repository',
     section: '4.2',
-    scope: /\.use-case\.ts$/,
-    pattern: /^(?!.*\/\/).*?\bthrow\s+HTTPException\./m,
-    message: 'falha de negocio e `left(HTTPException...)`, nunca `throw`',
+    scope: /\.(?:use-case|lucid\.repository|memory\.repository)\.ts$/,
+    // `throw error` relanca o que o `catch` recebeu (o repository so reconhece a
+    // violacao de unique e relanca o resto); o que a regua proibe e criar a falha.
+    pattern: /\bthrow\s+(?!error\b)/,
+    message:
+      'falha de negocio e `left(...)`, nunca `throw`; o repository devolve `null` ou o fato, e o use-case decide',
+  },
+  {
+    name: 'or-fail-in-use-case-or-repository',
+    section: '4.2',
+    scope: /\.(?:use-case|lucid\.repository|memory\.repository)\.ts$/,
+    pattern: /\.\w*OrFail\s*\(/,
+    message:
+      '`*OrFail()` lanca e vira 500 onde deveria haver 404: use `.first()`/`.find()` e devolva `null`',
+  },
+  {
+    name: 'shared-with-io',
+    section: '4.9',
+    // `_shared.<tema>.ts` e so funcao pura; a base de template method
+    // (`_shared.<tema>.base.ts`) injeta o que precisa e fica de fora.
+    scope: /_shared\.[^/]*(?<!\.base)\.ts$/,
+    // `import type` fica de fora: tipo some na compilação e não faz I/O.
+    pattern:
+      /^(?!import type\b).*from\s+'(?:#models\/|#repositories\/|#services\/|@adonisjs\/lucid|@adonisjs\/drive|node:fs|@adonisjs\/core\/services\/db)/,
+    message:
+      '`_shared` e so funcao pura: sem model, repository, service, `db`, `drive` nem arquivo',
   },
   {
     name: 'core-imports-upper-layer',
@@ -427,6 +431,8 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
     const pair = `app/validators/${logical}`
     const backSource = sources.get(pair)
     const sharedSource = withoutComments(await readFile(file, 'utf8'))
+    // Schema que não é de request (o `ActorSchema`) não tem par VineJS.
+    if (!/export\s+const\s+\w+Validator\b/.test(sharedSource)) continue
     if (backSource === undefined) {
       findings.push({
         file: `../shared/src/validators/${logical}`,
@@ -521,7 +527,7 @@ async function checkEnv(files: string[]): Promise<Finding[]> {
       line: lineOf(cleanSchema, cleanSchema.indexOf(key)),
       rule: 'env-without-reader',
       section: '6',
-      message: `\`${key}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envForaDoLeitor\` com o motivo`,
+      message: `\`${key}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envOutsideReader\` com o motivo`,
     })
   }
 
@@ -591,7 +597,7 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
 
     if (used) continue
     findings.push({
-      file: 'scripts/pattern-check.config.json',
+      file: 'scripts/pattern-check.config.ts',
       line: 1,
       rule: 'unused-new-allowlist-entry',
       section: '2.1',
@@ -619,7 +625,7 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
 async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]> {
   const exempt = new Set(CONFIG.softDeleteExempt)
   const findings: Finding[] = []
-  const pattern = /whereNull\(\s*'(?:deletedAt|deleted_at)'\s*\)/
+  const pattern = /where(?:Not)?Null\(\s*'(?:\w+\.)?(?:deletedAt|deleted_at)'\s*\)/
 
   for (const [relativePath, source] of sources) {
     if (relativePath.startsWith('app/models/')) continue
@@ -670,7 +676,7 @@ async function checkShape(): Promise<Finding[]> {
     if (await exists(join(ROOT, filePath))) continue
 
     findings.push({
-      file: 'scripts/pattern-check.config.json',
+      file: 'scripts/pattern-check.config.ts',
       line: 1,
       rule: 'missing-shape',
       section: '5',
@@ -726,6 +732,141 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
       rule: 'use-case-without-response',
       section: '4.2',
       message: 'declare `type Response = Either<HTTPException, T>` no topo',
+    })
+  }
+
+  return findings
+}
+
+/** O singular de recurso que o codigo de 500 usa (`matches` -> `MATCH`). */
+function singularCode(resource: string): string {
+  return singular(resource).toUpperCase().replaceAll('-', '_')
+}
+
+/**
+ * A tag de log e o codigo de 500 do caso de uso derivam do caminho (secao 3):
+ * `[<modulo>/<recurso> > <acao>][error]` e `<MODULO>_<RECURSO>_<ACAO>_ERROR`,
+ * sempre com o modulo.
+ */
+function checkUseCaseNames(relativePath: string, source: string): Finding[] {
+  const match = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/\3\.use-case\.ts$/.exec(relativePath)
+  if (match === null) return []
+
+  const [, module = '', resource = '', action = ''] = match
+  const clean = withoutComments(source)
+  const tag = `[${module}/${resource} > ${action}]`
+  const code = `${module.toUpperCase()}_${singularCode(resource)}_${action.toUpperCase().replaceAll('-', '_')}_ERROR`
+  const findings: Finding[] = []
+
+  for (const found of clean.matchAll(/'(\[[^\]']*> [^\]']*\](?:\[[a-z]+\])*)'/g)) {
+    if ((found[1] ?? '').startsWith(tag)) continue
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, found.index),
+      rule: 'log-tag',
+      section: '3',
+      message: `a tag de log deriva do caminho: \`${tag}[error]\``,
+    })
+  }
+
+  for (const found of clean.matchAll(/'([A-Z][A-Z_]*_ERROR)'/g)) {
+    if (found[1] === code) continue
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, found.index),
+      rule: 'internal-error-code',
+      section: '3',
+      message: `o codigo de 500 deriva do caminho: \`${code}\``,
+    })
+  }
+
+  return findings
+}
+
+/**
+ * O `actor` no payload tem esse nome, e nenhum outro (secao 4.3): `user`,
+ * `userId`, `createdBy` e `ownerId` sao o mesmo dado escapando da policy
+ * `(actor, target)`.
+ */
+function checkActorName(relativePath: string, source: string): Finding[] {
+  if (!relativePath.endsWith('.use-case.ts')) return []
+
+  const clean = withoutComments(source)
+  const payload = /^type Payload\b[^\n]*(?:\n(?!\n)[^\n]*)*/m.exec(clean)
+  if (payload === null) return []
+
+  const wrong = /\b(?:user|userId|createdBy|ownerId)\??\s*:/.exec(payload[0])
+  if (wrong === null) return []
+
+  return [
+    {
+      file: relativePath,
+      line: lineOf(clean, payload.index),
+      rule: 'actor-name',
+      section: '4.3',
+      message: `o payload chama \`${wrong[0].replace(/\W/g, '')}\` o que e o \`actor\`; use \`actor: Actor\``,
+    },
+  ]
+}
+
+/**
+ * Rota com regra por registro (alem de posse) checa `ctx.bouncer` no controller:
+ * a lista `BOUNCER_REQUIRED` e dado do projeto (secao 4.6).
+ */
+function checkBouncerRequired(sources: Map<string, string>): Finding[] {
+  const findings: Finding[] = []
+
+  for (const file of CONFIG.BOUNCER_REQUIRED) {
+    const source = sources.get(file)
+    if (source === undefined) {
+      findings.push({
+        file: 'scripts/pattern-check.config.ts',
+        line: 1,
+        rule: 'bouncer-required-missing-file',
+        section: '4.6',
+        message: `\`BOUNCER_REQUIRED\` lista \`${file}\`, que nao existe`,
+      })
+      continue
+    }
+    if (/\bbouncer\s*\.with\(/.test(source)) continue
+    findings.push({
+      file,
+      line: 1,
+      rule: 'bouncer-required',
+      section: '4.6',
+      message:
+        'regra por registro: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
+    })
+  }
+
+  return findings
+}
+
+/**
+ * Uma acao nao importa outra por caminho relativo (secao 1.3): o que as duas
+ * usam sobe para `_shared.<tema>`, para o presenter do recurso ou para o dominio.
+ */
+function checkRelativeImportBetweenActions(relativePath: string, source: string): Finding[] {
+  const own = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(relativePath)
+  if (own === null) return []
+
+  const findings: Finding[] = []
+  const clean = withoutComments(source)
+  const fromDir = dirname(relativePath)
+
+  for (const found of clean.matchAll(/from\s+'(\.\.?\/[^']+)'/g)) {
+    const target = join(fromDir, found[1] ?? '')
+    const theirs = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/[^/]+$/.exec(target)
+    if (theirs === null) continue
+    if (theirs[1] === own[1] && theirs[2] === own[2] && theirs[3] === own[3]) continue
+    if ((theirs[3] ?? '').startsWith('_shared.')) continue
+
+    findings.push({
+      file: relativePath,
+      line: lineOf(clean, found.index),
+      rule: 'import-between-actions',
+      section: '1.3',
+      message: `importa \`${found[1]}\`, de outra acao; suba o compartilhado para \`_shared.<tema>\``,
     })
   }
 
@@ -823,12 +964,16 @@ async function main(): Promise<void> {
     findings.push(...checkValidatorName(relativePath, source))
     findings.push(...checkCrossFeatureImport(relativePath, source))
     findings.push(...checkUseCaseShape(relativePath, source))
+    findings.push(...checkUseCaseNames(relativePath, source))
+    findings.push(...checkActorName(relativePath, source))
+    findings.push(...checkRelativeImportBetweenActions(relativePath, source))
   }
 
   findings.push(...(await checkEnv(files)))
   findings.push(...(await checkNewAllowlist(sources)))
   findings.push(...(await checkSoftDelete(sources)))
   findings.push(...(await checkShape()))
+  findings.push(...checkBouncerRequired(sources))
   findings.push(...(await checkRoute(files)))
   findings.push(...(await checkValidatorParity(sources)))
   report(findings)

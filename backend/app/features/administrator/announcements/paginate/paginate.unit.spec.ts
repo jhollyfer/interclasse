@@ -4,11 +4,11 @@ import AdministratorAnnouncementPaginateUseCase from './paginate.use-case.ts'
 
 import { Announcement } from '#domain/announcement/announcement.entity'
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
-import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const announcements = new AnnouncementMemoryRepository()
+  const announcements = MemoryRepositories.announcements()
   await announcements.save(
     Announcement.create({
       id: '1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b6a',

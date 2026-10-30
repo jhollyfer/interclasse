@@ -1,4 +1,9 @@
-import { LIST_LIMITS, paginationFields, sortFields, z } from '../../validator.js'
+import {
+  LIST_LIMITS,
+  paginationFields,
+  sortFields,
+  z,
+} from '../../validator.js'
 
 /**
  * A modalidade, como o painel a cadastra. Par de caminho e nome do VineJS de
@@ -16,16 +21,21 @@ export const AdministratorSportCreateValidator = z.object({
   maxAthletes: athletes(),
 })
 
-export const AdministratorSportUpdateValidator = AdministratorSportCreateValidator.partial()
+export const AdministratorSportUpdateValidator =
+  AdministratorSportCreateValidator.partial()
 
 export const AdministratorSportPaginateValidator = z.object({
   ...paginationFields(),
   ...sortFields(SPORT_SORT_COLUMNS),
 })
 
-export type AdministratorSportCreatePayload = z.infer<typeof AdministratorSportCreateValidator>
+export type AdministratorSportCreatePayload = z.infer<
+  typeof AdministratorSportCreateValidator
+>
 
-export type AdministratorSportUpdatePayload = z.infer<typeof AdministratorSportUpdateValidator>
+export type AdministratorSportUpdatePayload = z.infer<
+  typeof AdministratorSportUpdateValidator
+>
 
 export type AdministratorSportPaginatePayload = z.infer<
   typeof AdministratorSportPaginateValidator

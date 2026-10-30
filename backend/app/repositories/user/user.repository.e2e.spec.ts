@@ -7,6 +7,7 @@ import { UserMemoryRepository } from './user.memory.repository.ts'
 import type { UserRepository } from './user.repository.ts'
 
 import { resetDatabase } from '#tests/http-fixtures'
+import { PNG_HEAD } from '#tests/storages-unit-fixtures'
 import { Storage } from '#domain/storage/storage.entity'
 import { User } from '#domain/user/user.entity'
 import { StorageLucidRepository } from '#repositories/storage/storage.lucid.repository'
@@ -61,6 +62,15 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.notEqual(found?.snapshot().password, 'Senha@123')
       assert.isTrue(await hash.verify(found?.snapshot().password ?? '', 'Senha@123'))
       assert.isNull(await users.findById(BIA))
+    })
+
+    test('save de e-mail que é de outra conta devolve USER_ALREADY_EXISTS', async ({ assert }) => {
+      const { users } = await make()
+      await users.save(account(ANA, 'Ana', 'ana@t.dev'))
+
+      const saved = await users.save(account(BIA, 'Bia', 'ana@t.dev'))
+
+      assert.deepEqual(saved.value, { code: 'USER_ALREADY_EXISTS' })
     })
 
     test('salvar de novo sem trocar a senha não a cifra outra vez', async ({ assert }) => {
@@ -128,7 +138,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         partSize: 1,
         now: NOW,
       })
-      foto.complete({ contentLength: 1 }, NOW)
+      foto.complete({ contentLength: 1, head: PNG_HEAD }, NOW)
       await storages.save(foto)
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.update({ avatarId: CAIO }, NOW)

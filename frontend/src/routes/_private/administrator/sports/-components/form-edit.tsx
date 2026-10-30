@@ -1,12 +1,12 @@
-import type * as React from 'react'
-import { getRouteApi } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministratorSportCreateValidator } from '@interclasse/shared'
 import type {
   AdministratorSportUpdatePayload,
   AdministratorSportShowResponse,
   Merge,
 } from '@interclasse/shared'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import {
   FormShell,
@@ -19,16 +19,16 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useSportUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { useSportUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
 import type { SportFormType } from './form-fields'
 import { SPORT_FIELDS, SportFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/sports/$id/edit/')
+const route = getRouteApi('/_private/administrator/sports/$id/edit')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
 export function SportFormEdit(): React.JSX.Element {
@@ -48,7 +48,7 @@ export function SportFormEdit(): React.JSX.Element {
       maxAthletes: sport.maxAthletes,
     },
     fields: SPORT_FIELDS,
-    mutation: useSportUpdate,
+    mutation: useSportUpdateMutation,
     invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',

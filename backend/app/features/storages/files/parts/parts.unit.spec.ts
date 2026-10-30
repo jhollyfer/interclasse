@@ -5,7 +5,7 @@ import StoragesFilePartsUseCase from './parts.use-case.ts'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { StorageContract } from '#services/storage/storage.contract'
 import { MultipartContract } from '#services/multipart/multipart.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import {
   FILE_ID,
   pendingFile,

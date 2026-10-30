@@ -1,18 +1,23 @@
+import { IconContext } from '@phosphor-icons/react'
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import type { QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { ThemeProvider } from 'next-themes'
-import type { QueryClient } from '@tanstack/react-query'
 
+import { ThemeProvider } from '#/components/common/theme-provider'
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
+import { env } from '#/env'
+import { noindexMeta, organizationJsonLd } from '#/lib/page-head'
+import { isIndexable } from '#/lib/site-environment'
+import { THEME_CLASS, readTheme } from '#/lib/theme'
+import { m } from '#/paraglide/messages'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'
 
@@ -27,8 +32,22 @@ type RouterContext = {
   queryClient: QueryClient
 }
 
+/** Ícone padrão da casa: decorativo, do tamanho do texto, traço regular (`frontend.md` §10.2). */
+const ICON_DEFAULTS = {
+  size: '1em',
+  weight: 'regular',
+  'aria-hidden': true,
+} as const
+
 export const Route = createRootRouteWithContext<RouterContext>()({
-  head: () => ({
+  // O tema vem do cookie, lido no servidor: o primeiro HTML já sai com a classe
+  // certa (`frontend.md` §6). `isIndexable` é a ENV de ambiente: fora de
+  // produção a página inteira responde `noindex` (`frontend.md` §9.7).
+  loader: async () => ({
+    theme: readTheme(),
+    indexable: await isIndexable(),
+  }),
+  head: ({ loaderData }) => ({
     meta: [
       {
         charSet: 'utf-8',
@@ -38,14 +57,27 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: SITE_TITLE(),
+        title: m.common_site_title(),
       },
       {
         name: 'description',
-        content: SITE_DESCRIPTION(),
+        content: m.common_site_description(),
+      },
+      ...noindexMeta(loaderData?.indexable),
+    ],
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: organizationJsonLd(),
       },
     ],
     links: [
+      // A conexão com a API abre junto do HTML (`frontend.md` §9.5).
+      {
+        rel: 'preconnect',
+        href: env.VITE_API_URL,
+        crossOrigin: 'use-credentials',
+      },
       {
         rel: 'icon',
         href: '/favicon.png',
@@ -69,34 +101,32 @@ function RootDocument({
 }: Readonly<{
   children: React.ReactNode
 }>): React.JSX.Element {
+  const { theme } = Route.useLoaderData()
+
   return (
-    // `suppressHydrationWarning` só aqui, e é obrigatório: o `next-themes`
-    // escreve `class="dark"` no `<html>` por um script que roda antes da
-    // hidratação - é o que evita o flash de tema claro -, então o servidor e o
-    // cliente divergem neste elemento por construção.
-    <html lang={getLocale()} suppressHydrationWarning>
+    // `suppressHydrationWarning` só aqui, e é obrigatório para `system`: sem
+    // cookie o servidor não sabe a preferência do sistema, e o script antes da
+    // hidratação escreve a classe no `<html>` - nó que diverge por natureza
+    // (`frontend.md` §3.2). Com `light` ou `dark` o servidor já manda a classe.
+    <html
+      lang={getLocale()}
+      className={THEME_CLASS[theme]}
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
       </head>
       <body>
         {/*
-          `attribute="class"` porque o Tailwind 4 deste projeto declara
-          `@custom-variant dark (&:is(.dark *))` em `styles.css`: quem liga o
-          tema escuro é a classe, não um `data-theme`.
+          Um provider só para toda a árvore: ele agrupa o atraso de abertura,
+          então passar o mouse de um botão a outro não recomeça a contagem.
         */}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/*
-            Um provider só para toda a árvore: ele agrupa o atraso de abertura,
-            então passar o mouse de um botão a outro não recomeça a contagem.
-          */}
-          <TooltipProvider delay={300}>{children}</TooltipProvider>
+        <ThemeProvider theme={theme}>
+          <IconContext.Provider value={ICON_DEFAULTS}>
+            <TooltipProvider delay={300}>{children}</TooltipProvider>
+          </IconContext.Provider>
+          <Toaster />
         </ThemeProvider>
-        <Toaster />
         {/*
           Só em desenvolvimento. Os dois painéis de dentro já se anulam sozinhos
           fora dele - `TanStackRouterDevtoolsPanel` e `ReactQueryDevtoolsPanel`
@@ -116,7 +146,10 @@ function RootDocument({
                 name: 'Tanstack Router',
                 render: <TanStackRouterDevtoolsPanel />,
               },
-              TanStackQueryDevtools,
+              {
+                name: 'Tanstack Query',
+                render: <ReactQueryDevtoolsPanel />,
+              },
             ]}
           />
         )}

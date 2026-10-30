@@ -1,18 +1,18 @@
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 
 import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
-import { BRACKETS_INDEX } from '../../index'
-import { StandingsExplorer } from '../../../-components/standings-explorer'
 import {
   Section,
   SectionHeader,
   SectionMore,
   SectionTitle,
 } from '../../../-components/section'
+import { StandingsExplorer } from '../../../-components/standings-explorer'
+import { BRACKETS_INDEX } from '../../index'
 
 const route = getRouteApi('/_public/classificacao/$id/')
 
@@ -29,7 +29,7 @@ export function BracketPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_nav_standings()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_nav_standings()}</SectionTitle>
         <SectionMore to="/">{m.common_back_home()}</SectionMore>
       </SectionHeader>
       <StandingsExplorer

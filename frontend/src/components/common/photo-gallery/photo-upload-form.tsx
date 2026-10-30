@@ -1,10 +1,10 @@
-import type * as React from 'react'
-import { ImageIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react'
 import { AdministratorPhotoCreateValidator } from '@interclasse/shared'
 import type {
   AdministratorPhotoCreatePayload,
   AdministratorPhotoShowResponse,
 } from '@interclasse/shared'
+import { ImageIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import {
   ImageField,
@@ -24,10 +24,19 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { usePhotoCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import {
+  useAdministratorPhotoCreateMutation,
+  useAdvisorPhotoCreateMutation,
+} from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 const PHOTO_FIELDS = ['storageId', 'caption'] as const
+
+/** O hook de cada área, escolhido por lookup: a área é fixa por tela. */
+const PHOTO_CREATE = {
+  administrator: useAdministratorPhotoCreateMutation,
+  advisor: useAdvisorPhotoCreateMutation,
+} as const
 
 const EMPTY: AdministratorPhotoCreatePayload = { storageId: '', caption: null }
 
@@ -56,7 +65,7 @@ export function PhotoUploadForm({
     validator: AdministratorPhotoCreateValidator,
     defaults: EMPTY,
     fields: PHOTO_FIELDS,
-    mutation: (options) => usePhotoCreate(area, options),
+    mutation: PHOTO_CREATE[area],
     invalidate: DEPENDENTS.photos,
     success,
     payload: (values) => values,

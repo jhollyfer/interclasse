@@ -1,3 +1,5 @@
+import { USER_ROLE } from '@interclasse/shared'
+import type { UserRole } from '@interclasse/shared'
 import {
   BasketballIcon,
   CalendarDotsIcon,
@@ -16,8 +18,6 @@ import {
   UsersIcon,
 } from '@phosphor-icons/react'
 import { linkOptions } from '@tanstack/react-router'
-import { USER_ROLE } from '@interclasse/shared'
-import type { UserRole } from '@interclasse/shared'
 
 import { m } from '#/paraglide/messages'
 

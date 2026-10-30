@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
-import User from '#models/user'
+import { Stored } from '#tests/stored-fixtures'
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import {
   authenticate,
@@ -29,7 +29,7 @@ test.group('users > unarchive', (group) => {
       .cookies(session)
 
     response.assertStatus(204)
-    const restored = await User.findOrFail(user.id)
+    const restored = await Stored.userOrFail(user.id)
     assert.isNull(restored.deletedAt)
 
     // Nenhum token nasce da restauração: quem volta entra pelo sign-in.
@@ -45,7 +45,7 @@ test.group('users > unarchive', (group) => {
     ver.assertStatus(200)
   })
 
-  test('restaurar usuário vivo responde 404', async ({ client, assert }) => {
+  test('restaurar usuário vivo responde 409 USER_NOT_ARCHIVED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -53,8 +53,8 @@ test.group('users > unarchive', (group) => {
       .patch(`/administrator/users/${user.id}/unarchive`)
       .cookies(session)
 
-    response.assertStatus(404)
-    assert.equal(body(response).code, 'USER_NOT_FOUND')
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'USER_NOT_ARCHIVED')
   })
 
   test('usuário inexistente responde 404', async ({ client, assert }) => {
@@ -81,7 +81,19 @@ test.group('users > unarchive', (group) => {
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')
-    const archived = await User.findOrFail(user.id)
+    const archived = await Stored.userOrFail(user.id)
     assert.isNotNull(archived.deletedAt)
+  })
+})
+
+test.group('administrator/users/unarchive > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.patch('/administrator/users/nao-e-uuid/unarchive').cookies(admin)
+
+    response.assertStatus(422)
   })
 })

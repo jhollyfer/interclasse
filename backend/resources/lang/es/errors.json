@@ -1,3 +1,9 @@
 {
-  "internal": "Error interno del servidor"
+  "internal": "Error interno del servidor",
+  "origin_not_allowed": "Origen no permitido",
+  "access_denied": "Acceso denegado",
+  "not_found": "No encontrado",
+  "unauthorized": "No autorizado",
+  "validation": "Datos inválidos",
+  "too_many_requests": "Demasiados intentos. Inténtalo de nuevo más tarde"
 }

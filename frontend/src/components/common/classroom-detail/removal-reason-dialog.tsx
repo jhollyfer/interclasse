@@ -1,13 +1,14 @@
-import type * as React from 'react'
 import { AdvisorEnrollmentUpdateValidator } from '@interclasse/shared'
 import type {
   AdvisorEnrollmentUpdatePayload,
   AdvisorEnrollmentShowResponse,
 } from '@interclasse/shared'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -21,7 +22,8 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/advisor'
+import { useAdvisorEnrollmentUpdateMutation } from '#/integrations/tanstack-query/mutations/advisor'
+import type { DialogHandle } from '#/lib/dialog-handle'
 import { m } from '#/paraglide/messages'
 
 /** A lista que espera o motivo para ser gravada. */
@@ -36,21 +38,55 @@ const FIELDS = ['reason', 'studentIds'] as const
 
 type RemovalReasonDialogProps = Readonly<{
   classroomId: string
-  pending: PendingRemoval
-  onClose: () => void
+  /** Um handle por diálogo; a tela abre com `handle.openWithPayload(pedido)`. */
+  handle: DialogHandle<PendingRemoval>
   onSaved: (board: AdvisorEnrollmentShowResponse) => void
 }>
 
 /**
  * Tirar atleta da lista pede o motivo. Ele vai para a organização como aviso,
  * junto com o nome de quem saiu - é assim que o administrador fica sabendo.
+ *
+ * Uncontrolled, aberto por `handle` com o pedido como payload (`frontend.md`
+ * §6.2): o formulário só monta aberto e nasce com a lista do clique.
+ * _doc-lib/base-ui.md#react/components/dialog.
  */
 export function RemovalReasonDialog({
   classroomId,
-  pending,
-  onClose,
+  handle,
   onSaved,
 }: RemovalReasonDialogProps): React.JSX.Element {
+  return (
+    <Dialog handle={handle}>
+      {({ payload }) => (
+        <React.Fragment>
+          {payload !== undefined && (
+            <DialogContent>
+              <RemovalReasonForm
+                classroomId={classroomId}
+                pending={payload}
+                handle={handle}
+                onSaved={onSaved}
+              />
+            </DialogContent>
+          )}
+        </React.Fragment>
+      )}
+    </Dialog>
+  )
+}
+
+function RemovalReasonForm({
+  classroomId,
+  pending,
+  handle,
+  onSaved,
+}: Readonly<{
+  classroomId: string
+  pending: PendingRemoval
+  handle: DialogHandle<PendingRemoval>
+  onSaved: (board: AdvisorEnrollmentShowResponse) => void
+}>): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
     AdvisorEnrollmentUpdatePayload,
     AdvisorEnrollmentShowResponse,
@@ -64,61 +100,57 @@ export function RemovalReasonDialog({
       reason: '',
     },
     fields: FIELDS,
-    mutation: useAdvisorEnrollmentUpdate,
+    mutation: useAdvisorEnrollmentUpdateMutation,
     invalidate: [queryKeys.administrator.enrollmentRemovals.all],
     success: m.common_removal_saved(),
     payload: (values) => values,
     onSuccess: (board) => {
       onSaved(board)
-      onClose()
+      handle.close()
     },
   })
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent>
-        <form method="post" className="grid gap-4" onSubmit={onSubmit}>
-          <DialogHeader>
-            <DialogTitle>
-              {m.common_removal_title({ sport: pending.sportName })}
-            </DialogTitle>
-            <DialogDescription>
-              {m.common_removal_description({
-                names: pending.removed.join(', '),
-              })}
-            </DialogDescription>
-          </DialogHeader>
+    <form method="post" className="grid gap-4" onSubmit={onSubmit}>
+      <DialogHeader>
+        <DialogTitle>
+          {m.common_removal_title({ sport: pending.sportName })}
+        </DialogTitle>
+        <DialogDescription>
+          {m.common_removal_description({
+            names: pending.removed.join(', '),
+          })}
+        </DialogDescription>
+      </DialogHeader>
 
-          <AppField
-            control={form.control}
-            name="reason"
-            id="removal-reason"
-            label={m.common_removal_reason()}
-          >
-            {({ field, control }) => (
-              <Textarea
-                {...field}
-                {...control}
-                value={field.value ?? ''}
-                rows={4}
-                maxLength={500}
-                placeholder={m.common_removal_placeholder()}
-              />
-            )}
-          </AppField>
+      <AppField
+        control={form.control}
+        name="reason"
+        id="removal-reason"
+        label={m.common_removal_reason()}
+      >
+        {({ field, control }) => (
+          <Textarea
+            {...field}
+            {...control}
+            value={field.value ?? ''}
+            rows={4}
+            maxLength={500}
+            placeholder={m.common_removal_placeholder()}
+          />
+        )}
+      </AppField>
 
-          <AppFormRootError form={form} />
+      <AppFormRootError form={form} />
 
-          <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose}>
-              {m.common_cancel()}
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {m.common_removal_submit()}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <DialogClose render={<Button type="button" variant="ghost" />}>
+          {m.common_cancel()}
+        </DialogClose>
+        <Button type="submit" disabled={mutation.isPending}>
+          {m.common_removal_submit()}
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }

@@ -5,8 +5,7 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import { USER_ROLE } from '@interclasse/shared'
 
-import Storage from '#models/storage'
-import User from '#models/user'
+import { Stored } from '#tests/stored-fixtures'
 import { StorageFactory } from '#database/factories/storage.factory'
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import {
@@ -42,7 +41,7 @@ test.group('users > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'USER_NOT_ARCHIVED')
-    assert.isNotNull(await User.find(user.id))
+    assert.isNotNull(await Stored.user(user.id))
   })
 
   test('apagar usuário arquivado responde 204 e leva os tokens junto', async ({
@@ -55,7 +54,7 @@ test.group('users > delete', (group) => {
 
     // Um token vivo antes de arquivar, para provar o `CASCADE` do purge.
     await authenticate(client, user.email, FACTORY_PASSWORD)
-    await User.accessTokens.create(user)
+    await Stored.issueToken(user)
 
     const arquivar = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
     arquivar.assertStatus(204)
@@ -63,7 +62,7 @@ test.group('users > delete', (group) => {
     const response = await client.delete(`/administrator/users/${user.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await User.find(user.id))
+    assert.isNull(await Stored.user(user.id))
 
     const [{ count }] = await db
       .from('auth_access_tokens')
@@ -71,7 +70,7 @@ test.group('users > delete', (group) => {
       .count('* as count')
     assert.equal(Number(count), 0)
     // O arquivo fica: a chave é `SET NULL` e o binário é neutro.
-    assert.isNotNull(await Storage.find(avatar.id))
+    assert.isNotNull(await Stored.storage(avatar.id))
   })
 
   test('usuário inexistente responde 404', async ({ client, assert }) => {
@@ -88,14 +87,14 @@ test.group('users > delete', (group) => {
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const self = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const self = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
 
     const response = await client.delete(`/administrator/users/${self.id}`).cookies(session)
 
     // 403 e não 409: a regra que protege é a da própria conta, não o estado do registro.
     response.assertStatus(403)
     assert.equal(body(response).code, 'SELF_DELETE_FORBIDDEN')
-    assert.isNotNull(await User.find(self.id))
+    assert.isNotNull(await Stored.user(self.id))
   })
 
   test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
@@ -109,7 +108,7 @@ test.group('users > delete', (group) => {
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')
-    assert.isNotNull(await User.find(user.id))
+    assert.isNotNull(await Stored.user(user.id))
   })
 
   test('o percurso completo fecha: criar, arquivar, restaurar, arquivar e apagar', async ({
@@ -147,6 +146,18 @@ test.group('users > delete', (group) => {
     const apagado = await client.delete(`/administrator/users/${id}`).cookies(session)
     apagado.assertStatus(204)
 
-    assert.isNull(await User.find(id))
+    assert.isNull(await Stored.user(id))
+  })
+})
+
+test.group('administrator/users/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/users/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
   })
 })

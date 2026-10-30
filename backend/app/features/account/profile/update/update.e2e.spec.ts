@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
+import { UPLOAD_STATUS } from '@interclasse/shared'
 
-import User from '#models/user'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
@@ -9,6 +9,8 @@ import {
   body,
   resetDatabase,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
+import { storageRow } from '#tests/storages-fixtures'
 
 /**
  * A atualização parcial, e as duas regras que a acompanham.
@@ -40,7 +42,7 @@ test.group('conta > atualização', (group) => {
     assert.equal(body(response).email, ADMINISTRATOR.email)
 
     // E a linha no banco também: nem `email` nem `role` foram tocados.
-    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
     assert.equal(user.name, 'Outro Nome')
     assert.equal(user.role, 'ADMINISTRATOR')
   })
@@ -149,7 +151,37 @@ test.group('conta > atualização', (group) => {
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'name')
-    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
     assert.notEqual(user.name.trim(), '')
+  })
+})
+
+/**
+ * Só o arquivo confirmado anexa. Desde que o binário sobe direto para o bucket,
+ * a linha nasce antes do arquivo, e anexar um `PENDING` publicaria um avatar
+ * que ainda está a meio caminho - a tela mostraria um 404.
+ */
+test.group('conta > atualização > avatar', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('recusa com 422 anexar um arquivo ainda PENDING', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const storage = await storageRow({ status: UPLOAD_STATUS.PENDING })
+
+    const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
+
+    response.assertStatus(422)
+    assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
+  })
+
+  /** O par do teste acima: sem ele, recusar tudo passaria por vacuidade. */
+  test('aceita o mesmo arquivo depois de ele estar UPLOADED', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const storage = await storageRow({ status: UPLOAD_STATUS.UPLOADED })
+
+    const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
+
+    response.assertStatus(200)
+    assert.equal(body(response).avatar.id, storage.id)
   })
 })

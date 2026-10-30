@@ -1,11 +1,10 @@
 import { test } from '@japa/runner'
 
-import Enrollment from '#models/enrollment'
-import EnrollmentRemoval from '#models/enrollment-removal'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -41,7 +40,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(200)
     assert.equal(body(response).classroom.id, classroom.id)
-    const enrolled = await Enrollment.query().where('sportId', sport.id)
+    const enrolled = await Stored.enrollmentsOfSport(sport.id)
     assert.deepEqual(
       enrolled.map((enrollment) => enrollment.studentId),
       [entrando.id],
@@ -61,7 +60,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 0)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 0)
   })
 
   test('depois do sorteio o conselheiro ainda troca a lista', async ({ client, assert }) => {
@@ -76,7 +75,7 @@ test.group('enrollments > update', (group) => {
       .json({ classroomId: classroom.id, sportId: sport.id, studentIds: [aluno.id] })
 
     response.assertStatus(200)
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 1)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 1)
   })
 
   test('tirar atleta sem motivo responde 422 e nada muda', async ({ client, assert }) => {
@@ -92,7 +91,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'ENROLLMENT_REASON_REQUIRED')
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 1)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 1)
   })
 
   test('tirar atleta com motivo vira aviso pendente para a organização', async ({
@@ -112,7 +111,7 @@ test.group('enrollments > update', (group) => {
     })
 
     response.assertStatus(200)
-    const removals = await EnrollmentRemoval.query().where('classroomId', classroom.id)
+    const removals = await Stored.removalsOfClassroom(classroom.id)
     assert.lengthOf(removals, 1)
     assert.equal(removals[0]?.studentName, aluno.name)
     assert.equal(removals[0]?.reason, 'Mau comportamento com os colegas')
@@ -135,7 +134,7 @@ test.group('enrollments > update', (group) => {
     })
 
     response.assertStatus(200)
-    const removal = await EnrollmentRemoval.findByOrFail('classroomId', classroom.id)
+    const removal = await Stored.removalOfClassroomOrFail(classroom.id)
     assert.isNotNull(removal.acknowledgedAt)
   })
 

@@ -27,7 +27,7 @@ export default class RoleMiddleware {
     const allowed: readonly string[] = roles
 
     if (!user || !allowed.includes(user.role)) {
-      throw HTTPException.Forbidden('Acesso negado', 'ACCESS_DENIED')
+      throw HTTPException.Forbidden(context.i18n.t('errors.access_denied'), 'ACCESS_DENIED')
     }
 
     return next()

@@ -83,7 +83,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await repository.save(ana)
       const found = await repository.findOwned({
         id: ana.id,
-        actor: { id: advisorId, role: USER_ROLE.ADVISOR },
+        actor: { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
       })
 
       assert.deepEqual(found?.snapshot(), ana.snapshot())
@@ -100,11 +100,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       const denied = await repository.findOwned({
         id: ana.id,
-        actor: { id: stranger.advisorId, role: USER_ROLE.ADVISOR },
+        actor: { id: stranger.advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
       })
       const administrator = await repository.findOwned({
         id: ana.id,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR },
+        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
       })
 
       assert.isNull(denied)
@@ -122,7 +122,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       const found = await repository.findOwned({
         id: ana.id,
-        actor: { id: advisorId, role: USER_ROLE.ADVISOR },
+        actor: { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
       })
       assert.equal(found?.snapshot().name, 'Ana Clara')
     })
@@ -148,7 +148,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       const found = await repository.findOwned({
         id: ana.id,
-        actor: { id: advisorId, role: USER_ROLE.ADVISOR },
+        actor: { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
       })
       assert.isNull(found)
     })
@@ -162,7 +162,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await repository.save(newStudent(own.classroomId, 'Bia'))
       await repository.save(newStudent(own.classroomId, 'Ana'))
       await repository.save(newStudent(stranger.classroomId, 'Caio'))
-      const actor = { id: own.advisorId, role: USER_ROLE.ADVISOR }
+      const actor = { id: own.advisorId, role: USER_ROLE.ADVISOR, avatarId: null }
 
       const mine = await repository.paginate({ page: 1, perPage: 10, actor })
       const searched = await repository.paginate({ page: 1, perPage: 10, search: 'bi', actor })
@@ -175,7 +175,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const all = await repository.paginate({
         page: 1,
         perPage: 10,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR },
+        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
       })
 
       assert.deepEqual(

@@ -1,13 +1,15 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
 
+import logo512 from '#/assets/logo-512.png'
+import { Agenda } from '#/components/common/match-agenda'
+import { Picture } from '#/components/common/picture'
 import {
   storefrontAnnouncementsQueryOptions,
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
-import { Agenda } from '#/components/common/match-agenda'
 import { m } from '#/paraglide/messages'
 
 import {
@@ -21,7 +23,6 @@ import { NextMatch } from './next-match'
 import { PhotoCarousel } from './photo-carousel'
 import { RegulationLink } from './regulation-link'
 import { ResultsTicker } from './results-ticker'
-import { StandingsExplorer } from './standings-explorer'
 import {
   Empty,
   Section,
@@ -29,6 +30,7 @@ import {
   SectionMore,
   SectionTitle,
 } from './section'
+import { StandingsExplorer } from './standings-explorer'
 
 export function HomePage(): React.JSX.Element {
   const next = useQuery(storefrontMatchesQueryOptions(HOME_NEXT))
@@ -45,19 +47,20 @@ export function HomePage(): React.JSX.Element {
   return (
     <>
       <section className="hero text-brand-ink-foreground">
-        <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
+        <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-hero md:py-20">
           <div className="flex flex-col gap-5">
-            <img
-              src="/logo-512.png"
+            <Picture
+              src={logo512}
               alt={m.public_logo_alt()}
               width={144}
               height={144}
               className="size-28 md:size-36"
+              placement="lcp"
             />
             <p className="text-brand font-semibold">
               {m.public_home_edition()}
             </p>
-            <h1 className="font-display pb-1 text-5xl leading-[1.05] font-extrabold uppercase italic md:text-6xl">
+            <h1 className="font-display pb-1 text-5xl leading-display font-extrabold uppercase italic md:text-6xl">
               {m.public_home_title()}
             </h1>
             <p className="max-w-md text-lg text-brand-ink-foreground/80">

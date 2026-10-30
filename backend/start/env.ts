@@ -42,16 +42,27 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_KEY: Env.schema.secret(),
   APP_SERVER_URL: Env.schema.string({ format: 'url', tld: false }),
 
-  // Session
-  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+  /**
+   * Quem o Adonis trata como proxy confiável, para `request.ip()` ler o
+   * `X-Forwarded-For` só de quem o proxy de fato escreveu. Um valor só, no
+   * formato do `proxy-addr`: IP, sub-rede (`10.0.0.0/8`) ou apelido
+   * (`loopback`, `linklocal`, `uniquelocal`).
+   *
+   * Opcional, e o default é seguro: ausente vale `loopback`, o do Adonis. Atrás
+   * do Traefik do Coolify (outro container) ela é **necessária**: sem ela
+   * `request.ip()` é o IP do proxy e todo limite por IP vira global. Nunca
+   * `true`: o cliente passa a forjar o `X-Forwarded-For`.
+   */
+  TRUSTED_PROXIES: Env.schema.string.optional(),
 
   /**
    * Origens que o navegador pode usar para chamar esta API, separadas por
-   * vírgula. Opcional porque em desenvolvimento o `config/cors.ts` libera tudo;
+   * vírgula. Obrigatória em produção (`config/cors.ts` derruba o boot sem ela) e
+   * opcional fora dela, onde o CORS libera qualquer origem;
    * fora dele, ausente significa lista vazia, e lista vazia recusa todo pedido
    * cross-origin - que é o default certo para um valor que ninguém configurou.
    */
-  CORS_ORIGIN: Env.schema.string.optional(),
+  CORS_ORIGINS: Env.schema.string.optional(),
 
   /**
    * O domínio do cookie de sessão, quando o app e a API ficam em hosts
@@ -130,7 +141,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | `SEED_DEMO_PASSWORD` é a senha das contas do catálogo de demonstração, onde
   | houver esse catálogo. Mesma regra: sem default, e o seeder para sem ela.
   */
-  SEED_OWNER_EMAIL: Env.schema.string.optional(),
-  SEED_OWNER_PASSWORD: Env.schema.string.optional(),
+  SEED_ADMINISTRATOR_EMAIL: Env.schema.string.optional(),
+  SEED_ADMINISTRATOR_PASSWORD: Env.schema.string.optional(),
   SEED_DEMO_PASSWORD: Env.schema.string.optional(),
 })

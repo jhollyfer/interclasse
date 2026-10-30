@@ -5,15 +5,15 @@ import AdministratorUserArchiveUseCase from './archive.use-case.ts'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 
 async function setup() {
   const doubles = identityDoubles()
   const useCase = await makeWithMemory(AdministratorUserArchiveUseCase, [
     [UserRepository, doubles.users],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
     [ClassroomRepository, doubles.classrooms],
     [UnitOfWork, doubles.unitOfWork],
   ])
@@ -35,14 +35,14 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [USER_ID])
   })
 
-  test('arquivar duas vezes responde 404 USER_NOT_FOUND na segunda', async ({ assert }) => {
+  test('arquivar duas vezes responde 409 USER_ALREADY_ARCHIVED na segunda', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     await useCase.execute({ id: USER_ID })
 
     const second = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(second.value, { status: 404, code: 'USER_NOT_FOUND' })
+    assert.deepInclude(second.value, { status: 409, code: 'USER_ALREADY_ARCHIVED' })
   })
 
   test('conta inexistente não revoga nem solta nada', async ({ assert }) => {
@@ -55,7 +55,7 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
-  test('falha do repositório é 500 USER_ARCHIVE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_ARCHIVE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {
@@ -64,6 +64,6 @@ test.group('administrator/users > archive (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'USER_ARCHIVE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_ARCHIVE_ERROR' })
   })
 })

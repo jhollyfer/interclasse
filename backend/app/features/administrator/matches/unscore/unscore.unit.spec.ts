@@ -3,12 +3,13 @@ import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import AdministratorMatchUnscoreUseCase from './unscore.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { type BracketRepository } from '#repositories/bracket/bracket.repository'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup(total = 4) {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const useCase = await makeWithMemory(
     AdministratorMatchUnscoreUseCase,
     BracketUnitFixtures.bindings(brackets),
@@ -20,7 +21,7 @@ async function setup(total = 4) {
 
 /** Lança o placar direto na entidade e grava: o arranjo do que o desfazer desfaz. */
 async function scored(
-  brackets: BracketMemoryRepository,
+  brackets: BracketRepository,
   bracketId: string,
   matchId: string,
 ): Promise<void> {

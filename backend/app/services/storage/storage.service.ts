@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto'
 
 import drive from '@adonisjs/drive/services/main'
-import { STORAGE_EXTENSIONS, type StorageMimetype } from '@interclasse/shared'
+import {
+  STORAGE_EXTENSIONS,
+  STORAGE_SIGNATURE_BYTES,
+  type StorageMimetype,
+} from '@interclasse/shared'
 
 import {
   StorageContract,
@@ -44,6 +48,29 @@ export default class StorageService extends StorageContract {
    */
   async metadata(path: string): Promise<StorageMetadata> {
     return drive.use().getMetaData(path)
+  }
+
+  /**
+   * Os primeiros bytes do objeto: lê o início do fluxo e o fecha, sem baixar o
+   * resto do arquivo.
+   */
+  async head(path: string): Promise<Uint8Array> {
+    const stream = await drive.use().getStream(path)
+    const chunks: Buffer[] = []
+    let read = 0
+
+    try {
+      for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk))
+        read += chunk.length
+
+        if (read >= STORAGE_SIGNATURE_BYTES) break
+      }
+    } finally {
+      stream.destroy()
+    }
+
+    return Buffer.concat(chunks).subarray(0, STORAGE_SIGNATURE_BYTES)
   }
 
   /**

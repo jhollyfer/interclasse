@@ -44,6 +44,10 @@ export type AdministratorMatchPaginatePayload = z.infer<
   typeof AdministratorMatchPaginateValidator
 >
 
-export type AdministratorMatchUpdatePayload = z.infer<typeof AdministratorMatchUpdateValidator>
+export type AdministratorMatchUpdatePayload = z.infer<
+  typeof AdministratorMatchUpdateValidator
+>
 
-export type AdministratorMatchScorePayload = z.infer<typeof AdministratorMatchScoreValidator>
+export type AdministratorMatchScorePayload = z.infer<
+  typeof AdministratorMatchScoreValidator
+>

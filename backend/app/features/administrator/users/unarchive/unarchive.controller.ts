@@ -12,7 +12,7 @@ export default class AdministratorUserUnarchiveController {
     summary: 'Restaurar usuário',
     description:
       'Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo ' +
-      'responde `404`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo ' +
+      'responde `409`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo ' +
       'sign-in.',
   })
 

@@ -1,63 +1,80 @@
 import { test } from '@japa/runner'
-import { UPLOAD_STATUS, type UploadStatus } from '@interclasse/shared'
+import app from '@adonisjs/core/services/app'
+import drive from '@adonisjs/drive/services/main'
 
-import Storage from '#models/storage'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
-
-/**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
- */
-
-/** Abre um upload pelo endpoint real e devolve o envelope. */
-
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
-
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
-
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
-function record(status: UploadStatus) {
-  return Storage.create({
-    filename: 'a3f1c0de-0000-4000-8000-000000000000.png',
-    originalName: 'capa.png',
-    mimetype: 'image/png',
-    size: 1024,
-    path: 'a3f1c0de-0000-4000-8000-000000000000.png',
-    status,
-  })
-}
+import { StorageContract } from '#services/storage/storage.contract'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * `StorageService.assertExist` é o que separa "a linha existe" de "o arquivo
- * está íntegro". Desde que o binário sobe direto para o bucket, a
- * linha nasce antes do arquivo, e anexar um `PENDING` publicaria uma foto que
- * ainda está a meio caminho - a tela mostraria um 404.
+ * O adaptador real do bucket contra o S3 local (`_standards/architecture.md` §8):
+ * a chave sai do tipo, e os bytes, o tamanho e a URL assinada vêm do objeto gravado.
  */
-test.group('storages > anexar', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group('services > storage > bucket real', (group) => {
+  let storage: StorageContract
+  const written: Array<string> = []
 
-  test('recusa com 422 anexar um arquivo ainda PENDING', async ({ client, assert }) => {
-    const session = await authenticateAsAdministrator(client)
-    const storage = await record(UPLOAD_STATUS.PENDING)
-
-    const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
-
-    response.assertStatus(422)
-    assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
+  group.setup(async () => {
+    storage = await app.container.make(StorageContract)
   })
 
-  /**
-   * O par do teste acima: sem ele, um `assertExist` que recusasse **tudo**
-   * passaria pela recusa por vacuidade.
-   */
-  test('aceita o mesmo arquivo depois de ele estar UPLOADED', async ({ client, assert }) => {
-    const session = await authenticateAsAdministrator(client)
-    const storage = await record(UPLOAD_STATUS.UPLOADED)
+  group.teardown(async () => {
+    await Promise.all(written.map((path) => drive.use().delete(path)))
+  })
 
-    const response = await client.put('/account').cookies(session).json({ avatarId: storage.id })
+  test('a chave leva a extensão do tipo e nunca repete', ({ assert }) => {
+    const first = storage.key('image/png')
 
-    response.assertStatus(200)
-    assert.equal(body(response).avatar.id, storage.id)
+    assert.match(first, /^[0-9a-f-]{36}\.png$/)
+    assert.notEqual(first, storage.key('image/png'))
+  })
+
+  test('metadata e head leem o objeto gravado', async ({ assert }) => {
+    const path = storage.key('image/png')
+    written.push(path)
+    await drive.use().put(path, pngBytes(2048), { contentType: 'image/png' })
+
+    const metadata = await storage.metadata(path)
+    const head = await storage.head(path)
+
+    assert.equal(metadata.contentLength, 2048)
+    assert.lengthOf(head, 12)
+  })
+
+  test('a URL assinada de leitura entrega o objeto', async ({ assert }) => {
+    const path = storage.key('image/png')
+    written.push(path)
+    await drive.use().put(path, pngBytes(512), { contentType: 'image/png' })
+
+    const response = await fetch(await storage.signedUrl(path))
+
+    assert.equal(response.status, 200)
+    const received = await response.arrayBuffer()
+
+    assert.equal(received.byteLength, 512)
+  })
+
+  test('o download assinado leva o nome original no Content-Disposition', async ({ assert }) => {
+    const path = storage.key('image/png')
+    written.push(path)
+    await drive.use().put(path, pngBytes(256), { contentType: 'image/png' })
+
+    const url = await storage.signedDownload({
+      path,
+      mimetype: 'image/png',
+      originalName: 'relatório.png',
+    })
+    const response = await fetch(url)
+
+    assert.equal(response.status, 200)
+    assert.include(response.headers.get('content-disposition') ?? '', "filename*=UTF-8''")
+  })
+
+  test('discard apaga o binário do bucket', async ({ assert }) => {
+    const path = storage.key('image/png')
+    await drive.use().put(path, pngBytes(128), { contentType: 'image/png' })
+
+    await storage.discard(path)
+
+    assert.isFalse(await drive.use().exists(path))
   })
 })

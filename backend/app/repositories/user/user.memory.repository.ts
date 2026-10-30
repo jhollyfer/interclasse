@@ -1,12 +1,13 @@
 import hash from '@adonisjs/core/services/hash'
-import { TRASHED_MODE } from '@interclasse/shared'
-import type { AdministratorUserShowResponse, Paginated, SortDirection } from '@interclasse/shared'
+import { TRASHED_MODE, left, right } from '@interclasse/shared'
+import type { Either, Paginated, SortDirection } from '@interclasse/shared'
 
-import { UserRepository, type UserListCriteria } from './user.repository.ts'
+import { UserRepository, type UserListCriteria, type UserRead } from './user.repository.ts'
 
 import { User, type UserProps } from '#domain/user/user.entity'
+import type { UserError } from '#domain/user/user.errors'
 import type { StorageRepository } from '#repositories/storage/storage.repository'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /** O sinal da comparação por sentido de ordenação. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
@@ -59,28 +60,34 @@ export class UserMemoryRepository extends UserRepository {
     return [...this.rows.values()].some((row) => row.id !== exceptId && row.email === email)
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<Either<UserError, void>> {
     const snapshot = structuredClone(user.snapshot())
+    // O `unique` do e-mail, como o banco o garante.
+    if (await this.existsByEmail(snapshot.email, snapshot.id))
+      return left({ code: 'USER_ALREADY_EXISTS' })
+
     const stored = this.rows.get(snapshot.id)
     const changed = !stored || stored.password !== snapshot.password
     let password = snapshot.password
     if (changed) password = await hash.make(snapshot.password)
 
     this.rows.set(snapshot.id, { ...snapshot, password })
+
+    return right(undefined)
   }
 
   async delete(user: User): Promise<void> {
     this.rows.delete(user.id)
   }
 
-  async detail(id: string): Promise<AdministratorUserShowResponse | null> {
+  async detail(id: string): Promise<UserRead | null> {
     const props = this.rows.get(id)
     if (!props || props.deletedAt) return null
 
     return this.toResponse(props, await this.avatarOf(props))
   }
 
-  async paginate(criteria: UserListCriteria): Promise<Paginated<AdministratorUserShowResponse>> {
+  async paginate(criteria: UserListCriteria): Promise<Paginated<UserRead>> {
     const search = criteria.search?.toLowerCase()
     const sign = SIGN[criteria.direction]
     const all = [...this.rows.values()]
@@ -121,16 +128,13 @@ export class UserMemoryRepository extends UserRepository {
     return a[sort].localeCompare(b[sort])
   }
 
-  private async avatarOf(props: UserProps): Promise<AdministratorUserShowResponse['avatar']> {
+  private async avatarOf(props: UserProps): Promise<UserRead['avatar']> {
     const [avatar] = await this.storages.detailsOf([props.avatarId ?? []].flat())
 
     return avatar ?? null
   }
 
-  private toResponse(
-    props: UserProps,
-    avatar: AdministratorUserShowResponse['avatar'],
-  ): AdministratorUserShowResponse {
+  private toResponse(props: UserProps, avatar: UserRead['avatar']): UserRead {
     return {
       id: props.id,
       name: props.name,

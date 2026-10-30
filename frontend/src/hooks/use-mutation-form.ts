@@ -1,10 +1,11 @@
-import type * as React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { z } from '@interclasse/shared'
 import type {
   QueryKey,
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
+import type * as React from 'react'
 import { useForm } from 'react-hook-form'
 import type {
   DefaultValues,
@@ -13,8 +14,8 @@ import type {
   UseFormReturn,
 } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { z } from '@interclasse/shared'
 
+import { useUnsavedChangesBlocker } from '#/hooks/use-unsaved-changes-blocker'
 import type { HTTPError } from '#/integrations/tanstack-query/http'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { applyMutationError } from '#/lib/form-errors'
@@ -145,6 +146,12 @@ export function useMutationForm<
       await onSuccess?.(record, sent)
     },
   })
+
+  // Alteração digitada e ainda não enviada: sair da tela pergunta antes. Depois
+  // de enviar, a navegação de sucesso passa livre.
+  useUnsavedChangesBlocker(
+    form.formState.isDirty && !mutation.isPending && !mutation.isSuccess,
+  )
 
   function onValid(submitted: TValues): void {
     // O `root` guarda o erro da tentativa anterior. Sem limpar, um 409 já

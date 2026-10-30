@@ -1,5 +1,4 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import * as React from 'react'
+import { TableLayout } from '@interclasse/shared'
 import {
   columnOrderingFeature,
   columnPinningFeature,
@@ -19,11 +18,11 @@ import type {
   RowSelectionState,
   ColumnVisibilityState,
 } from '@tanstack/react-table'
+import * as React from 'react'
 
+import { readLocal, writeLocal } from '#/lib/local-store'
 import { m } from '#/paraglide/messages'
 
-import { TableLayoutValidator } from './table-layout.validator'
-import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
 
 /**
@@ -32,7 +31,7 @@ import { selectionColumn } from './table-selection'
  * **Ordenar e filtrar não estão aqui, e é de propósito.** Quem pagina é o
  * backend: ordenar as 20 linhas em mãos daria uma ordem que só vale para elas, e
  * a linha 21 apareceria fora de lugar na página seguinte. O cabeçalho escreve
- * `?sort` na URL e o loader refaz a consulta - ver `data-table-column-header`.
+ * `?sort` na URL e o loader refaz a consulta - ver `table-column-header.tsx`.
  *
  * `rowPaginationFeature` fica de fora pelo mesmo motivo: no modo manual a tabela
  * não deve fatiar nada, ela já recebe a página pronta.
@@ -56,29 +55,20 @@ export type TableColumns<TRow extends RowData> = Array<
 >
 
 /** O que persiste entre sessões. Seleção não entra: ela morre com a página. */
-type PersistedLayout = TableLayoutPayload
+type PersistedLayout = TableLayout
 
 /**
- * O `localStorage`, que só existe no navegador. `createIsomorphicFn` e não
- * `typeof window` solto: o primeiro render acontece no servidor, e lá a
- * resposta é "não há onde ler".
- */
-const layoutStorage = createIsomorphicFn()
-  .client((): Storage | null => window.localStorage)
-  .server((): Storage | null => null)
-
-/**
- * `v2` porque o layout salvo é durável e o que já está gravado está errado.
+ * O tema do layout no `lib/local-store.ts`, que monta a chave
+ * `interclasse:data-table:<recurso>:v1`.
  *
- * Até aqui um `columnVisibility['_actions'] === false` gravado escondia o menu
- * de ações **para sempre**: o `table-core` consulta o estado salvo antes de
- * olhar a definição da coluna, então `enableHiding: false` não protegia nada
+ * A chave nova descarta de propósito o layout gravado antes (`data-table:v2:`):
+ * um `columnVisibility['_actions'] === false` salvo escondia o menu de ações
+ * **para sempre**, porque o `table-core` consulta o estado salvo antes de olhar
+ * a definição da coluna, e `enableHiding: false` não protegia nada
  * (`features/column-visibility/columnVisibilityFeature.utils.js`,
- * `column_getIsVisible`). Recarregar não resolvia, e trocar o código também
- * não - a chave é por navegador e por recurso, o que explica o menu sumido em
- * alguns recursos e não em outros. Subir a versão descarta o que está lá.
+ * `column_getIsVisible`). Quando o formato mudar de novo, sobe o `v1` de lá.
  */
-const STORAGE_PREFIX = 'data-table:v2:'
+const THEME_PREFIX = 'data-table:'
 
 /**
  * As colunas que esta casca monta sozinha. Não são conteúdo, são âncoras: sem a
@@ -104,48 +94,37 @@ const MAX_COLUMN_SIZE = 640
 function readLayout(key: string | undefined): PersistedLayout {
   if (!key) return {}
 
-  try {
-    const raw = layoutStorage()?.getItem(STORAGE_PREFIX.concat(key))
-    if (!raw) return {}
+  const saved = readLocal({
+    theme: THEME_PREFIX.concat(key),
+    schema: TableLayout,
+    fallback: {},
+  })
 
-    const parsed: unknown = JSON.parse(raw)
-    const result = TableLayoutValidator.safeParse(parsed)
-    if (!result.success) return {}
-
-    const saved = result.data
-
-    let columnVisibility = saved.columnVisibility
-    if (columnVisibility) {
-      columnVisibility = Object.fromEntries(
-        Object.entries(columnVisibility).filter(
-          ([id]) => !ANCHOR_COLUMNS.includes(id),
-        ),
-      )
-    }
-
-    let columnSizing = saved.columnSizing
-    if (columnSizing) {
-      columnSizing = Object.fromEntries(
-        Object.entries(columnSizing).filter(
-          ([, size]) => size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE,
-        ),
-      )
-    }
-
-    return { ...saved, columnVisibility, columnSizing }
-  } catch {
-    return {}
+  let columnVisibility = saved.columnVisibility
+  if (columnVisibility) {
+    columnVisibility = Object.fromEntries(
+      Object.entries(columnVisibility).filter(
+        ([id]) => !ANCHOR_COLUMNS.includes(id),
+      ),
+    )
   }
+
+  let columnSizing = saved.columnSizing
+  if (columnSizing) {
+    columnSizing = Object.fromEntries(
+      Object.entries(columnSizing).filter(
+        ([, size]) => size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE,
+      ),
+    )
+  }
+
+  return { ...saved, columnVisibility, columnSizing }
 }
 
 function writeLayout(key: string | undefined, layout: PersistedLayout): void {
   if (!key) return
 
-  try {
-    layoutStorage()?.setItem(STORAGE_PREFIX.concat(key), JSON.stringify(layout))
-  } catch {
-    // Cota estourada ou modo privativo: o layout não persiste e a tela segue.
-  }
+  writeLocal(THEME_PREFIX.concat(key), layout)
 }
 
 type UseTableOptions<TRow extends RowData> = {
@@ -191,69 +170,53 @@ export function useTable<TRow extends RowData>({
   actions,
   selectable = false,
 }: UseTableOptions<TRow>) {
-  // `actions` chega como arrow inline de cada tela (`actions: (notice) =>
-  // <NoticeRowActions .../>`), então é uma função nova a cada render e a lista
-  // de dependências abaixo nunca casaria: o array de colunas era reconstruído a
-  // cada tecla digitada na busca. A ref guarda a versão de agora sem entrar na
-  // dependência, e o que decide a **forma** da tabela - ter ou não ter a coluna
-  // - é um booleano, que é estável.
-  //
-  // `enableRowSelection` continua lendo `selectable` direto, e é de propósito:
-  // ele é chamado, não memoizado, e o predicado de `users` precisa enxergar a
-  // conta de agora.
-  const actionsRef = React.useRef(actions)
-  actionsRef.current = actions
-
   const hasActions = Boolean(actions)
   const hasSelection = Boolean(selectable)
 
   // Seleção e ações são colunas montadas aqui, e não pedidas a cada tela: a
   // primeira é sempre igual e esquecê-la deixaria a barra de ações em massa
   // inalcançável; a última era, antes, uma `<TableHead/>` solta fora do modelo
-  // de colunas - invisível para fixação, largura e ordem.
-  const allColumns = React.useMemo(() => {
-    const result: TableColumns<TRow> = []
+  // de colunas - invisível para fixação, largura e ordem. Sem `useMemo`: o
+  // React Compiler memoiza o array pelas dependências que ele lê
+  // (_doc-lib/tanstack-table.md#framework/react/guide/react-compiler).
+  const allColumns: TableColumns<TRow> = []
 
-    if (hasSelection) result.push(selectionColumn<TRow>())
+  if (hasSelection) allColumns.push(selectionColumn<TRow>())
 
-    result.push(...columns)
+  allColumns.push(...columns)
 
-    if (hasActions) {
-      result.push({
-        id: '_actions',
-        size: 56,
-        enableHiding: false,
-        enableResizing: false,
-        // A coluna existe e precisa se anunciar. Sem `header` o `<th>` saía
-        // vazio: para quem lê a tabela por leitor de tela, a última coluna não
-        // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
-        // um menu de 24px que já se explica pelo ícone.
-        header: () => <span className="sr-only">{m.common_actions()}</span>,
-        cell: ({ row }) => (
-          // O menu não pode disparar o clique da linha atrás dele.
-          <div onClick={(event) => event.stopPropagation()}>
-            {actionsRef.current?.(row.original)}
-          </div>
-        ),
-      })
-    }
-
-    return result
-  }, [columns, hasSelection, hasActions])
+  if (hasActions) {
+    allColumns.push({
+      id: '_actions',
+      size: 56,
+      enableHiding: false,
+      enableResizing: false,
+      // A coluna existe e precisa se anunciar. Sem `header` o `<th>` saía
+      // vazio: para quem lê a tabela por leitor de tela, a última coluna não
+      // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
+      // um menu de 24px que já se explica pelo ícone.
+      header: () => <span className="sr-only">{m.common_actions()}</span>,
+      cell: ({ row }) => (
+        // O menu não pode disparar o clique da linha atrás dele.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
+        <div onClick={(event) => event.stopPropagation()}>
+          {actions?.(row.original)}
+        </div>
+      ),
+    })
+  }
 
   // A caixa de seleção e o menu ficam visíveis ao rolar na horizontal: sem eles
   // ancorados, marcar a linha certa numa tabela larga vira adivinhação.
-  const initialPinning = React.useMemo(() => {
-    const start: Array<string> = []
-    const end: Array<string> = []
+  const pinStart: Array<string> = []
+  const pinEnd: Array<string> = []
 
-    if (hasSelection) start.push('_select')
-    if (hasActions) end.push('_actions')
+  if (hasSelection) pinStart.push('_select')
+  if (hasActions) pinEnd.push('_actions')
 
-    if (start.length === 0 && end.length === 0) return undefined
-
-    return { start, end }
-  }, [hasSelection, hasActions])
+  let initialPinning: ColumnPinningState | undefined = undefined
+  if (pinStart.length > 0 || pinEnd.length > 0)
+    initialPinning = { start: pinStart, end: pinEnd }
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({})
@@ -269,6 +232,7 @@ export function useTable<TRow extends RowData>({
 
   const [hydrated, setHydrated] = React.useState(false)
 
+  /* eslint-disable react-hooks/set-state-in-effect -- o servidor não tem o layout salvo: lê-lo no estado inicial diverge a hidratação (frontend.md §3.2) */
   React.useEffect(() => {
     const saved = readLayout(persistKey)
 
@@ -279,6 +243,7 @@ export function useTable<TRow extends RowData>({
 
     setHydrated(true)
   }, [persistKey])
+  /* eslint-enable react-hooks/set-state-in-effect -- fim do trecho que lê o layout salvo */
 
   React.useEffect(() => {
     // Antes de hidratar o estado ainda é o default, e gravá-lo apagaria o que

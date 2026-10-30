@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { MagnifyingGlassIcon, QuestionIcon, XIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
 import {
   InputGroup,

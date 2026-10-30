@@ -1,14 +1,14 @@
+import type { Merge } from '@interclasse/shared'
 import type * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { cn } from '#/lib/cn'
 
 import { useImageFieldContext } from './image-field-context'
 
 type ImageFieldPreviewProps = Readonly<
   Merge<
-    React.ComponentProps<typeof Avatar>,
+    Omit<React.ComponentProps<typeof Avatar>, 'alt' | 'children'>,
     {
       /** O texto alternativo da imagem. Acessibilidade, não markup - segue prop. */
       alt: string

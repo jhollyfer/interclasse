@@ -2,10 +2,9 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Classroom from '#models/classroom'
-import Student from '#models/student'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
-import { drawnClassroom } from '#tests/classrooms-fixtures'
+import { Stored } from '#tests/stored-fixtures'
+import { drawnClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -18,15 +17,15 @@ test.group('classrooms > delete', (group) => {
 
   test('apaga a turma e os alunos dela vão junto', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const classroom = await ClassroomFactory.with('students', 2).create()
+    const classroom = await classroomWithStudents(2)
 
     const response = await client
       .delete(`/administrator/classrooms/${classroom.id}`)
       .cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Classroom.find(classroom.id))
-    assert.lengthOf(await Student.query().where('classroomId', classroom.id), 0)
+    assert.isNull(await Stored.classroom(classroom.id))
+    assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
   test('turma inexistente responde 404', async ({ client, assert }) => {
@@ -50,7 +49,7 @@ test.group('classrooms > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'CLASSROOM_IN_COMPETITION')
-    assert.isNotNull(await Classroom.find(classroom.id))
+    assert.isNotNull(await Stored.classroom(classroom.id))
   })
 
   test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
@@ -65,6 +64,18 @@ test.group('classrooms > delete', (group) => {
       .cookies(advisor)
 
     response.assertStatus(403)
-    assert.isNotNull(await Classroom.find(classroom.id))
+    assert.isNotNull(await Stored.classroom(classroom.id))
+  })
+})
+
+test.group('administrator/classrooms/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/classrooms/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
   })
 })

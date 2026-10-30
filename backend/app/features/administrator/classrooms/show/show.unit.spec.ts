@@ -4,13 +4,13 @@ import AdministratorClassroomShowUseCase from './show.use-case.ts'
 
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
   const created = Classroom.create({ id: ID, name: '7º A', grade: 7, now: new Date() }, {})
   if (created.isLeft()) throw new Error('arranjo inválido')
   await classrooms.save(created.value)

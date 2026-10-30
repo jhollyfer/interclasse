@@ -1,8 +1,11 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { InstagramLogoIcon } from '@phosphor-icons/react'
 import type { StorefrontSiteShowResponse } from '@interclasse/shared'
+import { InstagramLogoIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
 
+import logo512 from '#/assets/logo-512.png'
+import { Picture } from '#/components/common/picture'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
@@ -14,9 +17,11 @@ import {
   SectionTitle,
 } from '../../-components/section'
 
+const route = getRouteApi('/_public/sobre/')
+
 /** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
-function sinceLabel(firstEditionYear: number): string {
-  const years = new Date().getFullYear() - firstEditionYear
+function sinceLabel(firstEditionYear: number, currentYear: number): string {
+  const years = currentYear - firstEditionYear
   if (years < 1) return m.public_about_since({ year: firstEditionYear })
 
   return m.public_about_since_years({ year: firstEditionYear, years })
@@ -33,15 +38,16 @@ export function AboutPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_about_title()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_about_title()}</SectionTitle>
       </SectionHeader>
-      <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
-        <img
-          src="/logo-512.png"
+      <div className="grid items-start gap-8 md:grid-cols-term-value">
+        <Picture
+          src={logo512}
           alt={m.public_logo_alt()}
           width={192}
           height={192}
           className="size-40 md:size-48"
+          placement="lcp"
         />
         <AboutContent site={site} />
       </div>
@@ -52,6 +58,8 @@ export function AboutPage(): React.JSX.Element {
 function AboutContent({
   site,
 }: Readonly<{ site?: StorefrontSiteShowResponse }>): React.JSX.Element {
+  const { currentYear } = route.useLoaderData()
+
   if (!site || (!site.about && !site.organizer && !site.edition))
     return <Empty>{m.public_about_empty()}</Empty>
 
@@ -66,7 +74,7 @@ function AboutContent({
           <span>{m.public_about_edition({ edition: site.edition })}</span>
         )}
         {site.firstEditionYear && (
-          <span>{sinceLabel(site.firstEditionYear)}</span>
+          <span>{sinceLabel(site.firstEditionYear, currentYear)}</span>
         )}
       </p>
       {paragraphs.map((paragraph) => (

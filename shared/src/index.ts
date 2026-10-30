@@ -20,8 +20,10 @@ export * from './enums/trashed-mode.js'
 export * from './enums/upload-status.js'
 export * from './enums/user-role.js'
 
-export * from './records/actor.js'
+export * from './validators/authentication/actor.validator.js'
 export * from './records/pagination.js'
+export * from './records/table-layout.js'
+export * from './records/upload-resume.js'
 export * from './records/utility.js'
 
 export * from './responses/envelope.js'
@@ -48,7 +50,6 @@ export * from './responses/administrator/photos.response.js'
 export * from './responses/administrator/reports.response.js'
 export * from './responses/advisor/photos.response.js'
 export * from './responses/storefront/photos.response.js'
-
 
 export * from './validators/administrator/classrooms.validator.js'
 export * from './validators/administrator/enrollment-removals.validator.js'

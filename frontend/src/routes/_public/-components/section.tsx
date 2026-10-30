@@ -1,10 +1,11 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
+import type { Merge } from '@interclasse/shared'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type * as React from 'react'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 /**
  * Uma seção do site. Compound sem contexto (`frontend.md` §6.1): as partes não
@@ -46,11 +47,14 @@ export function SectionHeader({
  * home o `h1` é o do herói.
  */
 export function SectionTitle({
+  level = 'h2',
   render,
   ...props
-}: Readonly<useRender.ComponentProps<'h2'>>): React.ReactElement {
+}: Readonly<
+  Merge<useRender.ComponentProps<'h2'>, { level?: 'h1' | 'h2' }>
+>): React.ReactElement {
   return useRender({
-    defaultTagName: 'h2',
+    defaultTagName: level,
     render,
     props: {
       ...mergeProps<'h2'>(

@@ -2,6 +2,47 @@ import { UPLOAD_STATUS, left, right, type Either, type UploadStatus } from '@int
 
 import type { StorageError } from './storage.errors.ts'
 
+/**
+ * As assinaturas (magic bytes) de cada tipo aceito: o `Content-Type` e a
+ * extensão são declaração do cliente, e o conteúdo é o que prova
+ * (_standards/backend.md §5.4). Cada alternativa é uma lista de sequências de
+ * bytes em uma posição, e todas da lista precisam conferir; o tipo confere
+ * quando alguma alternativa confere.
+ */
+type Signature = { readonly offset: number; readonly bytes: ReadonlyArray<number> }
+
+const TEXT = new TextEncoder()
+
+const SIGNATURES: Readonly<Record<string, ReadonlyArray<ReadonlyArray<Signature>>>> = {
+  'image/jpeg': [[{ offset: 0, bytes: [0xff, 0xd8, 0xff] }]],
+  'image/png': [[{ offset: 0, bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] }]],
+  'image/gif': [
+    [{ offset: 0, bytes: Array.from(TEXT.encode('GIF87a')) }],
+    [{ offset: 0, bytes: Array.from(TEXT.encode('GIF89a')) }],
+  ],
+  'image/webp': [
+    [
+      { offset: 0, bytes: Array.from(TEXT.encode('RIFF')) },
+      { offset: 8, bytes: Array.from(TEXT.encode('WEBP')) },
+    ],
+  ],
+  'application/pdf': [[{ offset: 0, bytes: Array.from(TEXT.encode('%PDF-')) }]],
+  'audio/mpeg': [
+    [{ offset: 0, bytes: Array.from(TEXT.encode('ID3')) }],
+    [{ offset: 0, bytes: [0xff, 0xfb] }],
+    [{ offset: 0, bytes: [0xff, 0xf3] }],
+    [{ offset: 0, bytes: [0xff, 0xf2] }],
+  ],
+  'audio/mp4': [[{ offset: 4, bytes: Array.from(TEXT.encode('ftyp')) }]],
+  'audio/ogg': [[{ offset: 0, bytes: Array.from(TEXT.encode('OggS')) }]],
+  'audio/wav': [
+    [
+      { offset: 0, bytes: Array.from(TEXT.encode('RIFF')) },
+      { offset: 8, bytes: Array.from(TEXT.encode('WAVE')) },
+    ],
+  ],
+}
+
 export type StorageProps = {
   readonly id: string
   readonly filename: string
@@ -66,7 +107,10 @@ export class Storage {
    * num arquivo já confirmado devolve o mesmo arquivo: o cliente que perdeu a
    * resposta reenvia a confirmação.
    */
-  complete(received: { readonly contentLength: number }, now: Date): Either<StorageError, Storage> {
+  complete(
+    received: { readonly contentLength: number; readonly head: Uint8Array },
+    now: Date,
+  ): Either<StorageError, Storage> {
     if (this.isUploaded()) return right(this)
 
     if (received.contentLength !== this.props.size)
@@ -75,6 +119,9 @@ export class Storage {
         declared: this.props.size,
         received: received.contentLength,
       })
+
+    if (!this.matchesSignature(received.head))
+      return left({ code: 'STORAGE_CONTENT_MISMATCH', mimetype: this.props.mimetype })
 
     this.props.status = UPLOAD_STATUS.UPLOADED
     // O upload acabou: guardar o identificador só manteria vivo um ponteiro
@@ -95,6 +142,18 @@ export class Storage {
     if (usedBy.length > 0) return left({ code: 'STORAGE_IN_USE', usedBy })
 
     return right(this)
+  }
+
+  /**
+   * O início do objeto bate com a assinatura do tipo declarado. Tipo sem
+   * assinatura conhecida não confirma: a allowlist e a tabela andam juntas.
+   */
+  private matchesSignature(head: Uint8Array): boolean {
+    const alternatives = SIGNATURES[this.props.mimetype] ?? []
+
+    return alternatives.some((rules) =>
+      rules.every((rule) => rule.bytes.every((byte, index) => head[rule.offset + index] === byte)),
+    )
   }
 
   isPending(): boolean {

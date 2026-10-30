@@ -1,12 +1,11 @@
-import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { ArrowLeftIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { ButtonGroup } from '#/components/ui/button-group'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -26,7 +25,10 @@ import { m } from '#/paraglide/messages'
  * a ordem no JSX é a ordem na tela.
  */
 type PageShellProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 export function PageShell({
@@ -60,7 +62,10 @@ export function PageShell({
 // A linha divisória é sempre desenhada: quem não a quer passa `border-b-0`
 // em `className`, e o `cn` resolve o conflito - estrutura não vira prop.
 type PageShellHeaderProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { readonly children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { readonly children: React.ReactNode }
+  >
 >
 
 export function PageShellHeader({
@@ -120,7 +125,10 @@ export function PageShellContent({
 }
 
 type PageShellFooterProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { children?: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { children?: React.ReactNode }
+  >
 >
 
 export function PageShellFooter({
@@ -150,7 +158,7 @@ export function PageShellFooter({
  * a ficha de uma notícia mostra dois badges que a de um depoimento não tem. Com
  * prop, cada variação dessas vira mais uma prop opcional aqui dentro.
  *
- * A grade tem três colunas fixas - `[auto_1fr_auto]` - e cada parte declara
+ * A grade tem três colunas fixas - `grid-cols-page-header` - e cada parte declara
  * onde entra. Assim a ordem no JSX não decide o layout, e a coluna de uma parte
  * ausente colapsa para largura zero sozinha, sem `has-data-[...]`.
  */
@@ -164,7 +172,7 @@ export function PageHeader({
       className={cn(
         // Sem o "voltar", a coluna 1 fica vazia e o `gap-x` ainda a separava do
         // título: 12px de recuo que nenhum outro bloco da tela tinha.
-        'grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
+        'grid w-full grid-cols-page-header items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
         className,
       )}
       {...props}
@@ -212,6 +220,7 @@ export function PageHeaderBack({
 
 export function PageHeaderTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -222,7 +231,9 @@ export function PageHeaderTitle({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 
@@ -280,13 +291,10 @@ export function PageHeaderDescription({
  * As ações da direita: criar, editar, arquivar, exportar - uma, três ou
  * nenhuma. `flex-wrap` porque três botões não cabem lado a lado no telefone.
  *
- * Cada ação entra num `ButtonGroup` próprio, e não solta no grupo de fora: o
- * `ButtonGroup` **cola** os filhos diretos - tira o arredondamento da direita e
- * a borda da esquerda - e é assim que se desenha um controle segmentado. Estas
- * ações não são um controle só; são botões independentes que às vezes quebram
- * linha. Um filho sozinho no grupo aninhado recebe o arredondamento de volta
- * pela regra `:not(:has(~[data-slot]))`, então desenha igual a um `Button` solto,
- * e o grupo de fora reconhece os aninhados e devolve o `gap-2`.
+ * Um `div` com `gap`, e não `ButtonGroup`: o grupo **cola** os filhos diretos -
+ * tira o arredondamento da direita e a borda da esquerda - e é assim que se
+ * desenha um controle segmentado. Estas ações não são um controle só; são
+ * botões independentes que às vezes quebram linha.
  */
 export function PageHeaderActions({
   className,
@@ -296,21 +304,17 @@ export function PageHeaderActions({
   if (!children) return null
 
   return (
-    <ButtonGroup
+    <div
       data-slot="page-header-actions"
       className={cn(
         // No celular as ações descem para a linha de baixo: na mesma linha do
         // título elas o espremiam em três linhas.
-        'col-span-full row-start-3 flex-wrap items-center justify-start max-sm:mt-2 sm:col-span-1 sm:ml-3 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:justify-end sm:self-center',
+        'col-span-full row-start-3 flex flex-wrap items-center gap-2 justify-start max-sm:mt-2 sm:col-span-1 sm:ml-3 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:justify-end sm:self-center',
         className,
       )}
       {...props}
     >
-      {React.Children.map(children, (action) => {
-        if (!action) return null
-
-        return <ButtonGroup>{action}</ButtonGroup>
-      })}
-    </ButtonGroup>
+      {children}
+    </div>
   )
 }

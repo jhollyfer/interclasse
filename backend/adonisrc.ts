@@ -28,7 +28,6 @@ export default defineConfig({
   commands: [
     () => import('@adonisjs/core/commands'),
     () => import('@adonisjs/lucid/commands'),
-    () => import('@adonisjs/session/commands'),
     () => import('@adonisjs/bouncer/commands'),
   ],
 
@@ -49,7 +48,6 @@ export default defineConfig({
       environment: ['repl', 'test'],
     },
     () => import('@adonisjs/core/providers/vinejs_provider'),
-    () => import('@adonisjs/session/session_provider'),
     () => import('@adonisjs/shield/shield_provider'),
     () => import('@adonisjs/lucid/database_provider'),
     () => import('@adonisjs/cors/cors_provider'),
@@ -94,12 +92,19 @@ export default defineConfig({
     // lado do que cobre.
     suites: [
       {
-        files: ['app/**/*.unit.spec.{ts,js}', 'scripts/**/*.unit.spec.{ts,js}'],
+        files: [
+          'app/**/*.unit.spec.{ts,js}',
+          'commands/**/*.unit.spec.{ts,js}',
+          'scripts/**/*.unit.spec.{ts,js}',
+          'tests/**/*.unit.spec.{ts,js}',
+          'resources/**/*.unit.spec.{ts,js}',
+          'start/**/*.unit.spec.{ts,js}',
+        ],
         name: 'unit',
         timeout: 5000,
       },
       {
-        files: ['app/**/*.e2e.spec.{ts,js}'],
+        files: ['app/**/*.e2e.spec.{ts,js}', 'commands/**/*.e2e.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },

@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN } from '#config/cookie'
 import { ADMINISTRATOR, body, resetDatabase } from '#tests/http-fixtures'
 
 /**
@@ -48,5 +48,26 @@ test.group('autenticação > sign-in', (group) => {
 
     // E nenhum cookie é escrito na recusa.
     assert.isUndefined(existente.cookie(COOKIE_TOKEN.ACCESS))
+  })
+
+  test('429 na sexta tentativa do mesmo IP no minuto, mesmo com a senha certa', async ({
+    client,
+    assert,
+  }) => {
+    const wrong = { email: ADMINISTRATOR.email, password: 'Errada123!' }
+
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      const refused = await client.post('/authentication/sign-in').json(wrong)
+
+      refused.assertStatus(401)
+    }
+
+    const blocked = await client
+      .post('/authentication/sign-in')
+      .json({ email: ADMINISTRATOR.email, password: ADMINISTRATOR.password })
+
+    blocked.assertStatus(429)
+    assert.equal(body(blocked).code, 'TOO_MANY_REQUESTS')
+    assert.isUndefined(blocked.cookie(COOKIE_TOKEN.ACCESS))
   })
 })

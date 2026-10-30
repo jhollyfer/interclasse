@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router'
 import type { AdministratorBracketPaginateResponse } from '@interclasse/shared'
+import { Link } from '@tanstack/react-router'
 
-import { Badge } from '#/components/ui/badge'
 import type { TableColumns } from '#/components/common/table'
+import { Badge } from '#/components/ui/badge'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,

@@ -1,9 +1,9 @@
 import type { AdministratorUserShowResponse } from '@interclasse/shared'
 
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { Badge } from '#/components/ui/badge'
 import { TableColumnHeader } from '#/components/common/table'
 import type { TableColumns } from '#/components/common/table'
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import { Badge } from '#/components/ui/badge'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_VARIANTS,

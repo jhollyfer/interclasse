@@ -81,3 +81,13 @@ test.group('site > update', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/site/update > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.put('/administrator/site')
+
+    response.assertStatus(401)
+  })
+})

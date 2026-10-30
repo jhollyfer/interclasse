@@ -2,9 +2,9 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Sport from '#models/sport'
 import { BracketFactory } from '#database/factories/bracket.factory'
 import { SportFactory } from '#database/factories/sport.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { enrollRoster } from '#tests/sports-fixtures'
 import {
   authenticateAsAdministrator,
@@ -23,7 +23,7 @@ test.group('sports > delete', (group) => {
     const response = await client.delete(`/administrator/sports/${sport.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Sport.find(sport.id))
+    assert.isNull(await Stored.sport(sport.id))
   })
 
   test('modalidade inexistente responde 404', async ({ client, assert }) => {
@@ -44,7 +44,7 @@ test.group('sports > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'SPORT_IN_USE')
-    assert.isNotNull(await Sport.find(sport.id))
+    assert.isNotNull(await Stored.sport(sport.id))
   })
 
   test('modalidade com chave sorteada responde 409', async ({ client, assert }) => {
@@ -56,7 +56,7 @@ test.group('sports > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'SPORT_IN_USE')
-    assert.isNotNull(await Sport.find(sport.id))
+    assert.isNotNull(await Stored.sport(sport.id))
   })
 
   test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
@@ -69,6 +69,18 @@ test.group('sports > delete', (group) => {
     anonymous.assertStatus(401)
     forbidden.assertStatus(403)
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
-    assert.isNotNull(await Sport.find(sport.id))
+    assert.isNotNull(await Stored.sport(sport.id))
+  })
+})
+
+test.group('administrator/sports/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/sports/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
   })
 })

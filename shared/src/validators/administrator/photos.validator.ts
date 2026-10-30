@@ -1,4 +1,7 @@
-import { PHOTO_REVIEW_STATUSES, PHOTO_STATUSES } from '../../enums/photo-status.js'
+import {
+  PHOTO_REVIEW_STATUSES,
+  PHOTO_STATUSES,
+} from '../../enums/photo-status.js'
 import { pageFields, z } from '../../validator.js'
 
 /**
@@ -20,8 +23,14 @@ export const AdministratorPhotoReviewValidator = z.object({
   status: z.enum(PHOTO_REVIEW_STATUSES),
 })
 
-export type AdministratorPhotoCreatePayload = z.infer<typeof AdministratorPhotoCreateValidator>
+export type AdministratorPhotoCreatePayload = z.infer<
+  typeof AdministratorPhotoCreateValidator
+>
 
-export type AdministratorPhotoPaginatePayload = z.infer<typeof AdministratorPhotoPaginateValidator>
+export type AdministratorPhotoPaginatePayload = z.infer<
+  typeof AdministratorPhotoPaginateValidator
+>
 
-export type AdministratorPhotoReviewPayload = z.infer<typeof AdministratorPhotoReviewValidator>
+export type AdministratorPhotoReviewPayload = z.infer<
+  typeof AdministratorPhotoReviewValidator
+>

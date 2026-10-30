@@ -12,6 +12,7 @@ import {
   type ResponseBody,
 } from '#tests/http-fixtures'
 import type { Session } from '#tests/http-fixtures'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -19,7 +20,7 @@ import type { Session } from '#tests/http-fixtures'
  * (`PENDING` ou `UPLOADED`) e a referência viva.
  */
 
-const SMALL = new Uint8Array(1024).fill(66)
+const SMALL = pngBytes(1024)
 
 /** Abre um upload pelo endpoint real e devolve o envelope. */
 async function open(
@@ -169,5 +170,18 @@ test.group('storages > contentDisposition', () => {
     const header = service.contentDisposition('nota "final".pdf')
 
     assert.include(header, 'filename="nota _final_.pdf"')
+  })
+})
+
+test.group('storages > download > identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/storages/x/download').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

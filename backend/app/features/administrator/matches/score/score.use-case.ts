@@ -11,6 +11,7 @@ import {
 
 import { MatchRefusal } from '../_shared.match-refusal.ts'
 
+import { BracketRefusal } from '#features/administrator/brackets/_shared.bracket-refusal'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import HTTPException from '#exceptions/http.exception'
@@ -43,7 +44,8 @@ export default class AdministratorMatchScoreUseCase {
         const result = bracket.score(id, { homeScore, awayScore, winnerTeamId }, new Date())
         if (result.isLeft()) return left(MatchRefusal.http(result.value, this.i18n))
 
-        await this.brackets.save(bracket)
+        const saved = await this.brackets.save(bracket)
+        if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
 
         return right(null)
       })

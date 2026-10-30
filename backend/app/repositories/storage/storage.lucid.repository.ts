@@ -1,9 +1,13 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { UPLOAD_STATUS } from '@interclasse/shared'
-import type { Paginated, StoragesFileShowResponse } from '@interclasse/shared'
+import type { Paginated } from '@interclasse/shared'
 
-import { StorageRepository, type StorageListCriteria } from './storage.repository.ts'
+import {
+  StorageRepository,
+  type StorageFileRead,
+  type StorageListCriteria,
+} from './storage.repository.ts'
 
 import StorageModel from '#models/storage'
 import { Storage } from '#domain/storage/storage.entity'
@@ -18,7 +22,11 @@ import { TransactionContext } from '#repositories/unit-of-work/transaction-conte
  * referência a `storages` é `SET NULL` ou `CASCADE`, então o banco não impediria
  * nada: uma coluna que faltar aqui é um arquivo em uso que some sem aviso.
  */
-const REFERENCES = [{ table: 'users', column: 'avatar_id', label: 'avatar de usuário' }] as const
+const REFERENCES = [
+  { table: 'users', column: 'avatar_id', label: 'avatar de usuário' },
+  { table: 'photos', column: 'storage_id', label: 'foto da galeria' },
+  { table: 'site_settings', column: 'regulation_id', label: 'regulamento do site' },
+] as const
 
 @inject()
 export class StorageLucidRepository extends StorageRepository {
@@ -36,7 +44,7 @@ export class StorageLucidRepository extends StorageRepository {
     return this.toEntity(row)
   }
 
-  async detail(id: string): Promise<StoragesFileShowResponse | null> {
+  async detail(id: string): Promise<StorageFileRead | null> {
     const row = await StorageModel.query({ client: this.transaction.client() })
       .where('id', id)
       .withScopes((scopes) => scopes.notDeleted())
@@ -46,7 +54,7 @@ export class StorageLucidRepository extends StorageRepository {
     return this.toResponse(row)
   }
 
-  async detailsOf(ids: ReadonlyArray<string>): Promise<StoragesFileShowResponse[]> {
+  async detailsOf(ids: ReadonlyArray<string>): Promise<StorageFileRead[]> {
     if (ids.length === 0) return []
 
     const rows = await StorageModel.query({ client: this.transaction.client() })
@@ -104,7 +112,7 @@ export class StorageLucidRepository extends StorageRepository {
     await StorageModel.query({ client: this.transaction.client() }).where('id', storage.id).delete()
   }
 
-  async paginate(criteria: StorageListCriteria): Promise<Paginated<StoragesFileShowResponse>> {
+  async paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>> {
     const query = StorageModel.query({ client: this.transaction.client() }).withScopes((scopes) =>
       scopes.notDeleted(),
     )
@@ -129,7 +137,10 @@ export class StorageLucidRepository extends StorageRepository {
       .orderBy(criteria.sort, criteria.direction)
       .paginate(criteria.page, criteria.perPage)
 
-    return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
+    return {
+      meta: page.getMeta(),
+      data: page.all().map((row) => this.toResponse(row)),
+    }
   }
 
   private toEntity(row: StorageModel): Storage {
@@ -149,8 +160,8 @@ export class StorageLucidRepository extends StorageRepository {
     })
   }
 
-  /** A `url` é a assinada que o hook de `providers/storage.provider.ts` deixou na leitura. */
-  private toResponse(row: StorageModel): StoragesFileShowResponse {
+  /** A `url` não sai daqui: o use-case a assina, pelo contrato do bucket, a cada leitura. */
+  private toResponse(row: StorageModel): StorageFileRead {
     return {
       id: row.id,
       filename: row.filename,
@@ -164,7 +175,6 @@ export class StorageLucidRepository extends StorageRepository {
       createdAt: row.createdAt?.toISO() ?? null,
       updatedAt: row.updatedAt?.toISO() ?? null,
       deletedAt: row.deletedAt?.toISO() ?? null,
-      url: row.url ?? '',
     }
   }
 

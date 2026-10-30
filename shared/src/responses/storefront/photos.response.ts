@@ -11,4 +11,6 @@ export const StorefrontPhotoShowResponse = z.object({
   createdAt: z.iso.datetime({ offset: true }),
 })
 
-export type StorefrontPhotoShowResponse = z.infer<typeof StorefrontPhotoShowResponse>
+export type StorefrontPhotoShowResponse = z.infer<
+  typeof StorefrontPhotoShowResponse
+>

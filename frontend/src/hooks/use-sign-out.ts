@@ -1,7 +1,7 @@
-import { useRouter } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
 
-import { useAuthenticationSignOut } from '#/integrations/tanstack-query/mutations/authentication'
+import { useAuthenticationSignOutMutation } from '#/integrations/tanstack-query/mutations/authentication'
 
 /**
  * Sair do painel: encerra a sessão, esvazia o cache e volta para a entrada.
@@ -18,7 +18,7 @@ export function useSignOut() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  return useAuthenticationSignOut({
+  return useAuthenticationSignOutMutation({
     // `onSettled` e não `onSuccess`: se o token de acesso já expirou, o endpoint
     // responde 401 e a sessão morre do mesmo jeito - o que sobrar vence
     // sozinho. Limpar o cache só no sucesso deixaria o nome do usuário anterior
@@ -31,7 +31,7 @@ export function useSignOut() {
       // Depois de limpar, e não antes: navegar primeiro remonta o guard de
       // `_private` sobre um cache que ainda tem a sessão velha, e ele deixaria
       // passar.
-      await router.navigate({ to: '/authentication' })
+      await router.navigate({ to: '/sign-in' })
     },
   })
 }

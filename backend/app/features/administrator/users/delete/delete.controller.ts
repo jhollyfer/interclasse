@@ -5,6 +5,7 @@ import AdministratorUserDeleteUseCase from './delete.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import UserPolicy from '#policies/user.policy'
+import { UserRepository } from '#repositories/user/user.repository'
 import { IdentifierValidator } from '#core/validator'
 
 @inject()
@@ -22,13 +23,17 @@ export default class AdministratorUserDeleteController {
     errors: { 403: 'SELF_DELETE_FORBIDDEN', 409: 'USER_NOT_ARCHIVED' },
   })
 
-  constructor(private readonly useCase: AdministratorUserDeleteUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorUserDeleteUseCase,
+    private readonly users: UserRepository,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    await context.bouncer.with(UserPolicy).authorize('delete', payload.id)
+    const user = await this.users.findAnyById(payload.id)
+    await context.bouncer.with(UserPolicy).authorize('delete', user)
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.noContent()

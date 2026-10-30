@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import StoragesFilePaginateUseCase from './paginate.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { pendingFile, rightOf, storageDoubles, uploadedFile } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -37,7 +37,7 @@ test.group('storages/files > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 FILE_PAGINATE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 STORAGES_FILE_PAGINATE_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     storages.paginate = async () => {
       throw new Error('banco fora')
@@ -45,6 +45,6 @@ test.group('storages/files > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_PAGINATE_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_PAGINATE_ERROR' })
   })
 })

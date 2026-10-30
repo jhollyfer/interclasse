@@ -1,12 +1,12 @@
-import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministratorUserUpdateValidator } from '@interclasse/shared'
 import type {
   AdministratorUserUpdatePayload,
   AdministratorUserShowResponse,
   Merge,
 } from '@interclasse/shared'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import {
   FormShell,
@@ -20,16 +20,16 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useUserUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { useUserUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
 import type { UserFormType } from './form-fields'
 import { USER_FIELDS, UserFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/users/$id/edit/')
+const route = getRouteApi('/_private/administrator/users/$id/edit')
 
 const FORM_ID = 'user-update'
 
@@ -41,7 +41,7 @@ export function UserFormEdit(): React.JSX.Element {
   const { data: user } = useSuspenseQuery(userQueryOptions(id))
 
   // Os três parâmetros explícitos, como na criação. O payload é o da
-  // **atualização** com o `id` no caminho, que é a forma que `useUserUpdate`
+  // **atualização** com o `id` no caminho, que é a forma que `useUserUpdateMutation`
   // recebe.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
@@ -75,7 +75,7 @@ export function UserFormEdit(): React.JSX.Element {
       avatarId: user.avatarId,
     },
     fields: USER_FIELDS,
-    mutation: useUserUpdate,
+    mutation: useUserUpdateMutation,
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users/$id',
     backParams: { id },

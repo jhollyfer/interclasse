@@ -30,7 +30,7 @@ pacote `shared/` (`_standards/architecture.md` §9).
 | Monorepo | pnpm workspace: `backend/`, `frontend/`, `shared/`, um `pnpm-lock.yaml` | pnpm 12 | `_standards/architecture.md` §9 |
 | Web | TanStack Start + Router + Query + Table, React, Tailwind, shadcn sobre Base UI, ícones Phosphor | Start 1.168, React 19, Tailwind 4 | `_doc-lib/tanstack-start.md` |
 | API | AdonisJS (Lucid, Auth, Bouncer, Limiter, Drive, i18n) | 7.6 | `_doc-lib/adonisjs.md` |
-| Validação | Zod no `shared/` (contrato e resposta); VineJS no backend e, por enquanto, no frontend (TASKS 1.8) | Zod 4, Vine 4 | `_doc-lib/vinejs.md` |
+| Validação | Zod no `shared/` (contrato e resposta) e no frontend; VineJS só no backend Adonis, onde é nativo | Zod 4, Vine 4 | `_doc-lib/vinejs.md` |
 | Idiomas | Paraglide no front (`frontend/messages/`, hoje só o seletor de idioma; telas em pt-BR, TASKS 1.8); `@adonisjs/i18n` no back (`backend/resources/lang/`, mensagens nos três) | pt-BR, es, en | `_standards/i18n.md` |
 | Banco | PostgreSQL + Lucid | `pg` 8 | `_doc-lib/adonisjs.md` |
 | Fila | Não se aplica: nenhuma tarefa assíncrona | | |
@@ -40,10 +40,8 @@ pacote `shared/` (`_standards/architecture.md` §9).
 
 ## 3. Estrutura de pastas
 
-Segue `_standards/architecture.md` §3 (backend), §4 (frontend) e §9 (raiz e `shared/`). Nenhum
-desvio de árvore aceito. Os desvios de configuração e tooling do projeto (TypeScript 7 com o 6 ao
-lado, `moduleResolution`, `authentication/` com path, `vitest.config.ts` próprio) estão em
-`backend/CLAUDE.md` e `frontend/CLAUDE.md`.
+Segue `_standards/architecture.md` §3 (backend), §4 (frontend) e §9 (raiz e `shared/`), sem
+desvio: o que diverge da régua se corrige (`AGENTS.md`).
 
 ## 4. Módulos (features)
 
@@ -109,7 +107,7 @@ Migrations em `backend/database/migrations/`. Chaves primárias em `uuid`.
 | Entidade | Campos principais | Relações | Observação |
 |---|---|---|---|
 | `users` | `name`, `email` (único), `password`, `role`, `status`, `avatar_id`, `deleted_at` | `avatar_id` → `storages` | papel `ADMINISTRATOR`, `ADVISOR` ou `REPRESENTATIVE`; soft delete |
-| `auth_access_tokens` | tokens de acesso e de refresh | `users` | revogação por apagar a linha (`backend/CLAUDE.md`) |
+| `auth_access_tokens` | tokens de acesso e de refresh | `users` | revogação por apagar a linha |
 | `classrooms` | `name` (único, até 20), `grade` (3 a 9), `category`, `advisor_id` (único), `representative_id` | `users` | índice único em `advisor_id` (um conselheiro, uma turma) |
 | `students` | `name`, `classroom_id` | `classrooms` | |
 | `sports` | `name` (único), `slug` (único), `min_athletes`, `max_athletes` | | |
@@ -125,7 +123,7 @@ Migrations em `backend/database/migrations/`. Chaves primárias em `uuid`.
 | `storages` | `filename`, `original_name`, `mimetype`, `size`, `path`, `status` (`PENDING`, `UPLOADED`), `upload_id`, `deleted_at` | | o binário está no bucket |
 | `rate_limits` | contador do `@adonisjs/limiter` | | store `database`, compartilhado entre réplicas |
 
-`database/schema.ts` é gerado e commitado (`backend/CLAUDE.md`).
+`database/schema.ts` é gerado e commitado (`backend/AGENTS.md`).
 
 ## 6. Fluxo de dados
 
@@ -139,7 +137,7 @@ cai (`DECISIONS.md` #2).
 
 Modo de renderização do frontend (`ssr`): o site público renderiza no servidor; o grupo `_private`
 usa `ssr: 'data-only'` (dados no servidor, tela no cliente) em `routes/_private/layout.tsx`;
-`authentication/` é rota com path próprio.
+`_authentication/` é grupo pathless: o login mora em `/sign-in`.
 
 ## 7. Integrações externas
 
@@ -190,17 +188,18 @@ Health check: `GET /health-check` na API e no site.
 | O quê | Onde se configura | Por quê |
 |---|---|---|
 | `node ace migration:run --force` como comando de pré-deploy da API | Coolify, aplicação da API | o `Dockerfile-production` não tem `ENTRYPOINT`; subir uma réplica não deve alterar o schema |
-| `COOKIE_DOMAIN=.maiyu.com.br` e `CORS_ORIGIN=https://interclass.maiyu.com.br` na API | Coolify, variáveis da API | sem `COOKIE_DOMAIN` o cookie nasce host-only da API e o SSR perde a sessão a cada F5 |
+| `COOKIE_DOMAIN=.maiyu.com.br` e `CORS_ORIGINS=https://interclass.maiyu.com.br` na API | Coolify, variáveis da API | sem `COOKIE_DOMAIN` o cookie nasce host-only da API e o SSR perde a sessão a cada F5 |
 | `SERVER_API_URL` (nome do serviço da API na rede) no site | Coolify, variáveis do site | o SSR chama a API pela rede interna; ausente, usa a URL pública |
+| `SITE_ENV=production` no site | Coolify, variáveis do site | sem ela o site responde `noindex` e o `robots.txt` bloqueia tudo (staging seguro por padrão) |
 | Healthcheck do painel em `/health-check` | Coolify | o painel sobrepõe o `HEALTHCHECK` do Dockerfile |
 | CORS do bucket com PUT liberado para a origem do site e `ETag` exposto | provedor do storage | sem o `ETag` o upload multipart não fecha |
 | `uuid` das duas aplicações e o `COOLIFY_TOKEN` | `main-deploy-coolify.yml` e secrets do repositório | uuid de outro projeto redeploya o projeto errado |
 | `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` | secrets do repositório | publicar as imagens |
-| Semente do administrador (`node ace db:seed`) com `SEED_OWNER_PASSWORD` | à mão, uma vez por ambiente | o seeder para sem a senha |
+| Semente do administrador (`node ace db:seed`) com `SEED_ADMINISTRATOR_PASSWORD` | à mão, uma vez por ambiente | o seeder para sem a senha |
 
 ## 10. Escala e limites conhecidos
 
 - A maior chave é de oitavas de final: até 16 vagas, e a escola tem até 13 turmas por categoria (`TOO_MANY_TEAMS` acima disso).
-- Paginação em memória nos presenters que juntam várias tabelas (`backend/app/repositories/memory-pagination.ts`); serve ao volume de uma escola, não a um volume grande.
+- Paginação em memória nos presenters que juntam várias tabelas (`backend/app/core/memory-pagination.ts`); serve ao volume de uma escola, não a um volume grande.
 - Uma instância da API e uma do site; o limite de requisições usa o banco como store, então mais réplicas compartilham a contagem.
 - Atrás do proxy do Coolify, `request.ip()` é o IP do proxy até o `trustProxy` ser configurado (`SECURITY.md` §10, SEC-1).

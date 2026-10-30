@@ -4,7 +4,12 @@ import { test } from '@japa/runner'
 
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 test.group('matches > athletes', (group) => {
   group.each.setup(() => resetDatabase())
@@ -38,5 +43,43 @@ test.group('matches > athletes', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
+  })
+})
+
+test.group('administrator/matches/athletes > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get(
+      '/administrator/matches/00000000-0000-4000-8000-000000000000/athletes',
+    )
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client
+      .get('/administrator/matches/00000000-0000-4000-8000-000000000000/athletes')
+      .cookies(advisor)
+
+    response.assertStatus(403)
+  })
+})
+
+test.group('administrator/matches/athletes > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id de partida malformado responde 422 em vez de 500 do Postgres', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/administrator/matches/x/athletes').cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

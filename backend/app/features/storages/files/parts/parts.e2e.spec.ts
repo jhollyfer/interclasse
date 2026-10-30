@@ -10,6 +10,7 @@ import {
   type ResponseBody,
 } from '#tests/http-fixtures'
 import type { Session } from '#tests/http-fixtures'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -21,9 +22,9 @@ import type { Session } from '#tests/http-fixtures'
  * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
  * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
  */
-const FULL_PART = new Uint8Array(PART_SIZE).fill(65)
+const FULL_PART = pngBytes(PART_SIZE, 65)
 
-const SMALL = new Uint8Array(1024).fill(66)
+const SMALL = pngBytes(1024)
 
 /** Abre um upload pelo endpoint real e devolve o envelope. */
 async function open(
@@ -140,5 +141,35 @@ test.group('storages > parts', (group) => {
     assert.isEmpty(body(response).parts)
     assert.isEmpty(body(response).uploaded)
     assert.equal(body(response).storage.status, 'UPLOADED')
+  })
+})
+
+test.group('storages > parts > acesso e identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('sem sessão responde 401', async ({ client }) => {
+    const response = await client.get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
+
+    response.assertStatus(401)
+  })
+
+  test('id inexistente responde 404', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
+      .cookies(session)
+
+    response.assertStatus(404)
+    assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
+  })
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/storages/x/parts').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

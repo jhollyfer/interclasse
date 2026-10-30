@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import { MATCH_STATUS } from '@interclasse/shared'
 
-import Match from '#models/match'
+import { Stored } from '#tests/stored-fixtures'
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
 import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
 
@@ -56,9 +56,7 @@ test.group('storefront matches > paginate', (group) => {
     await recente.match.save()
     // Pela query, e não pelo model: o `save()` regravaria `updatedAt` com agora,
     // e duas gravações no mesmo milissegundo deixariam a ordem ao acaso.
-    await Match.query()
-      .where('id', antigo.match.id)
-      .update({ updatedAt: DateTime.now().minus({ hours: 1 }).toSQL() })
+    await Stored.touchMatch(antigo.match.id, DateTime.now().minus({ hours: 1 }))
 
     const response = await client.get('/storefront/matches').qs({ status: MATCH_STATUS.FINISHED })
 

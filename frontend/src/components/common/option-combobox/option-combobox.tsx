@@ -1,5 +1,6 @@
 import type * as React from 'react'
 
+import { Button } from '#/components/ui/button'
 import {
   Combobox,
   ComboboxContent,
@@ -9,7 +10,7 @@ import {
   ComboboxList,
 } from '#/components/ui/combobox'
 import { InputGroupAddon } from '#/components/ui/input-group'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 export type OptionComboboxItem = {
@@ -36,6 +37,14 @@ type OptionComboboxProps = Readonly<{
   'aria-invalid'?: boolean
   'aria-label'?: string
   className?: string
+  /**
+   * Liga a busca no servidor: o que se digita sobe por aqui e a lista de
+   * `options` já vem filtrada, então o filtro do cliente é desligado.
+   */
+  onSearch?: (term: string) => void
+  /** Há mais páginas no servidor: mostra "Carregar mais" no fim da lista. */
+  hasMore?: boolean
+  onLoadMore?: () => void
 }>
 
 /**
@@ -73,11 +82,17 @@ export function OptionCombobox({
   'aria-invalid': invalid,
   'aria-label': ariaLabel,
   className,
+  onSearch,
+  hasMore = false,
+  onLoadMore,
 }: OptionComboboxProps): React.JSX.Element {
   // Sem `useMemo`: o React Compiler está ligado (`vite.config.ts`), e um
   // `find` sobre a lista de opções de um enum não é o tipo de custo que
   // justifica escrever a dependência à mão.
   const selected = options.find((option) => option.value === value) ?? null
+
+  let filter: null | undefined = undefined
+  if (onSearch) filter = null
 
   return (
     <Combobox
@@ -87,6 +102,14 @@ export function OptionCombobox({
         onValueChange(option?.value ?? '')
       }
       itemToStringLabel={(option: OptionComboboxItem) => option.label}
+      // Busca no servidor: a lista já chega filtrada, e filtrar de novo no
+      // cliente esconderia o que o servidor achou por outro campo.
+      filter={filter}
+      onInputValueChange={(term, details) => {
+        // Só o que a pessoa digita: escolher um item reescreve o campo com o
+        // rótulo dele, e isso não é uma busca nova.
+        if (onSearch && details.reason === 'input-change') onSearch(term)
+      }}
       isItemEqualToValue={(
         option: OptionComboboxItem,
         current: OptionComboboxItem,
@@ -131,6 +154,17 @@ export function OptionCombobox({
             </ComboboxItem>
           )}
         </ComboboxList>
+        {hasMore && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="w-full"
+            onClick={onLoadMore}
+          >
+            {m.common_load_more()}
+          </Button>
+        )}
       </ComboboxContent>
     </Combobox>
   )

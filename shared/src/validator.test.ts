@@ -38,7 +38,9 @@ describe('validator', () => {
       useValidatorLocale(locale)
       const result = schema.safeParse({ name: '' })
       expect(result.success).toBe(false)
-      expect(result.error?.issues[0]?.message).toBe(VALIDATION_MESSAGES[locale].required)
+      expect(result.error?.issues[0]?.message).toBe(
+        VALIDATION_MESSAGES[locale].required,
+      )
     }
 
     useValidatorLocale('pt-BR')
@@ -50,7 +52,8 @@ describe('validator', () => {
     useValidatorLocale('en')
     const english = z.string().max(2).safeParse('abc').error?.issues[0]?.message
     useValidatorLocale('pt-BR')
-    const portuguese = z.string().max(2).safeParse('abc').error?.issues[0]?.message
+    const portuguese = z.string().max(2).safeParse('abc').error
+      ?.issues[0]?.message
 
     expect(english).not.toBe(portuguese)
   })
@@ -63,9 +66,15 @@ describe('validator', () => {
       kind: z.enum(['A', 'B']),
       email: z.email(),
     })
-    const issues = schema.safeParse({ amount: Number.NaN, id: '', kind: 'C', email: '' }).error
-      ?.issues
-    const messages = Object.fromEntries((issues ?? []).map((i) => [i.path.join('.'), i.message]))
+    const issues = schema.safeParse({
+      amount: Number.NaN,
+      id: '',
+      kind: 'C',
+      email: '',
+    }).error?.issues
+    const messages = Object.fromEntries(
+      (issues ?? []).map((i) => [i.path.join('.'), i.message]),
+    )
     const texts = VALIDATION_MESSAGES['pt-BR']
 
     expect(messages).toEqual({
@@ -101,7 +110,9 @@ describe('validator', () => {
       useValidatorLocale(locale)
       const texts = VALIDATION_MESSAGES[locale]
       const issues = schema.safeParse(input).error?.issues ?? []
-      const messages = Object.fromEntries(issues.map((i) => [i.path.join('.'), i.message]))
+      const messages = Object.fromEntries(
+        issues.map((i) => [i.path.join('.'), i.message]),
+      )
 
       expect(messages).toEqual({
         short: texts.minLength(3),

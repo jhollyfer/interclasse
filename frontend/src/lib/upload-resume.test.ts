@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { localStoreKey } from './local-store'
 import {
   clearResume,
   readResume,
-  resumeKey,
+  resumeTheme,
   writeResume,
 } from './upload-resume'
 
@@ -34,30 +35,35 @@ function fileOf(name: string, size: number, lastModified: number): File {
 
 const FILE = fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)
 
+/** A chave completa no storage: `interclasse:upload:<nome>:<tamanho>:<data>:v1`. */
+function keyOf(file: File): string {
+  return localStoreKey(resumeTheme(file))
+}
+
 const ENTRY = { storageId: 'abc', uploadId: 'upload-1', partSize: 1024 }
 
 beforeEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('resumeKey', () => {
+describe('resumeTheme', () => {
   it('é estável para o mesmo arquivo', () => {
-    expect(resumeKey(FILE)).toBe(
-      resumeKey(fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)),
+    expect(resumeTheme(FILE)).toBe(
+      resumeTheme(fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)),
     )
   })
 
   it('muda quando qualquer um dos três campos muda', () => {
-    const base = resumeKey(FILE)
+    const base = resumeTheme(FILE)
 
-    expect(resumeKey(fileOf('outro.pdf', 5_000, 1_700_000_000_000))).not.toBe(
+    expect(resumeTheme(fileOf('outro.pdf', 5_000, 1_700_000_000_000))).not.toBe(
       base,
     )
     expect(
-      resumeKey(fileOf('catalogo.pdf', 5_001, 1_700_000_000_000)),
+      resumeTheme(fileOf('catalogo.pdf', 5_001, 1_700_000_000_000)),
     ).not.toBe(base)
     expect(
-      resumeKey(fileOf('catalogo.pdf', 5_000, 1_700_000_000_001)),
+      resumeTheme(fileOf('catalogo.pdf', 5_000, 1_700_000_000_001)),
     ).not.toBe(base)
   })
 })
@@ -86,14 +92,14 @@ describe('readResume', () => {
 
   it('é nulo para lixo, e não estoura', () => {
     const data = withStorage()
-    data.set(resumeKey(FILE), 'isto não é json')
+    data.set(keyOf(FILE), 'isto não é json')
 
     expect(readResume(FILE)).toBeNull()
   })
 
   it('é nulo para json com a forma errada', () => {
     const data = withStorage()
-    data.set(resumeKey(FILE), JSON.stringify({ storageId: 42 }))
+    data.set(keyOf(FILE), JSON.stringify({ storageId: 42 }))
 
     expect(readResume(FILE)).toBeNull()
   })
@@ -146,19 +152,19 @@ describe('validade', () => {
     // escrita de outro arquivo, ele fica no disco para sempre.
     writeResume(FILE, ENTRY)
 
-    expect(data.has(resumeKey(velho))).toBe(false)
-    expect(data.has(resumeKey(FILE))).toBe(true)
+    expect(data.has(keyOf(velho))).toBe(false)
+    expect(data.has(keyOf(FILE))).toBe(true)
 
     vi.useRealTimers()
   })
 
   it('a varredura leva junto o que não dá para ler', () => {
     const data = withStorage()
-    data.set('upload:lixo.pdf:1:1', 'isto não é json')
+    data.set('interclasse:upload:lixo.pdf:1:1:v1', 'isto não é json')
 
     writeResume(FILE, ENTRY)
 
-    expect(data.has('upload:lixo.pdf:1:1')).toBe(false)
+    expect(data.has('interclasse:upload:lixo.pdf:1:1:v1')).toBe(false)
   })
 
   it('a varredura não toca no que não é retomada', () => {

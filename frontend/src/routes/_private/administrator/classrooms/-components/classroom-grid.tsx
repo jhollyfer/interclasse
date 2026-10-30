@@ -1,9 +1,9 @@
-import type * as React from 'react'
-import { getRouteApi, Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { PlusIcon } from '@phosphor-icons/react'
 import type { AdministratorClassroomPaginateResponse } from '@interclasse/shared'
 import { CATEGORIES } from '@interclasse/shared'
+import { PlusIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { getRouteApi, Link } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import {
   PageHeader,
@@ -138,12 +138,12 @@ function ClassroomCard({
           {CATEGORY_LABELS[classroom.category]} ·{' '}
           {CATEGORY_SHORT_LABELS[classroom.category]}
         </CardDescription>
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute top-3 right-3 z-dropdown">
           <ClassroomRowActions classroom={classroom} />
         </div>
       </CardHeader>
       <CardContent>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+        <dl className="grid grid-cols-term-value gap-x-3 gap-y-1 text-sm">
           <dt className="text-muted-foreground">{m.admin_common_advisor()}</dt>
           <dd className="truncate">
             {classroom.advisor?.name ?? m.admin_common_no_advisor()}

@@ -1,8 +1,14 @@
 import { test } from '@japa/runner'
 import { CATEGORY, MATCH_PHASE } from '@interclasse/shared'
 
+import { Stored } from '#tests/stored-fixtures'
 import { createSport, draw, enrolledClassrooms } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 /**
  * O sorteio, por HTTP: turmas, alunos e inscrições pela rota, porque é delas
@@ -93,5 +99,44 @@ test.group('brackets > create', (group) => {
 
     const list = await client.get('/administrator/brackets').cookies(admin)
     assert.lengthOf(body(list).data, 1)
+  })
+})
+
+test.group('administrator/brackets/create > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.post('/administrator/brackets')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.post('/administrator/brackets').cookies(advisor)
+
+    response.assertStatus(403)
+  })
+})
+
+test.group('administrator/brackets/create > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('modalidade malformada e categoria fora da lista respondem 422, e nada é sorteado', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .post('/administrator/brackets')
+      .cookies(admin)
+      .json({ sportId: 'x', category: 'F9' })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'sportId')
+    assert.property(body(response).errors, 'category')
+    assert.lengthOf(await Stored.brackets(), 0)
   })
 })

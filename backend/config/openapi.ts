@@ -22,7 +22,7 @@ export const SECURITY_SCHEME = 'cookieAuth'
 
 /**
  * Cookie que carrega o token de acesso. Espelha `COOKIE_TOKEN.ACCESS` de
- * `app/services/cookie/cookie.service.ts`.
+ * `config/cookie.ts`.
  */
 export const SECURITY_COOKIE = 'access-token'
 
@@ -43,7 +43,7 @@ export type TagRule = {
   description: string
   /**
    * O substantivo do recurso, usado para montar o resumo de cada operação:
-   * `create` + `notícia` -> "Criar notícia". Escrever o par uma vez por grupo
+   * `create` + `modalidade` -> "Criar modalidade". Escrever o par uma vez por grupo
    * cobre as sete operações dele, em vez de um resumo por controller.
    */
   singular?: string

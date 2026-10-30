@@ -1,7 +1,7 @@
+import type { AdministratorAnnouncementCreatePayload } from '@interclasse/shared'
 import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
-import type { AdministratorAnnouncementCreatePayload } from '@interclasse/shared'
 
 import { Checkbox } from '#/components/ui/checkbox'
 import {

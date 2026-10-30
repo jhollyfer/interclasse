@@ -2,11 +2,10 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Enrollment from '#models/enrollment'
-import Student from '#models/student'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
 import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 
@@ -21,8 +20,8 @@ test.group('students > delete', (group) => {
     const response = await client.delete(`/advisor/students/${student.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Student.find(student.id))
-    assert.lengthOf(await Enrollment.query().where('studentId', student.id), 0)
+    assert.isNull(await Stored.student(student.id))
+    assert.lengthOf(await Stored.enrollmentsOfStudent(student.id), 0)
   })
 
   test('aluno numa modalidade já sorteada responde 409 e fica', async ({ client, assert }) => {
@@ -36,7 +35,7 @@ test.group('students > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'STUDENT_IN_COMPETITION')
-    assert.isNotNull(await Student.find(student.id))
+    assert.isNotNull(await Stored.student(student.id))
   })
 
   test('aluno de outro conselheiro responde 404 e fica', async ({ client, assert }) => {
@@ -48,7 +47,7 @@ test.group('students > delete', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
-    assert.isNotNull(await Student.find(student.id))
+    assert.isNotNull(await Stored.student(student.id))
   })
 
   test('aluno inexistente responde o mesmo 404', async ({ client, assert }) => {
@@ -72,6 +71,19 @@ test.group('students > delete', (group) => {
     anonimo.assertStatus(401)
     negado.assertStatus(403)
     assert.equal(body(negado).code, 'ACCESS_DENIED')
-    assert.isNotNull(await Student.find(student.id))
+    assert.isNotNull(await Stored.student(student.id))
+  })
+})
+
+test.group('advisor/students/delete > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const { session } = await signInWithFactory(client)
+
+    const response = await client.delete('/advisor/students/x').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

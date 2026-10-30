@@ -18,9 +18,11 @@ async function firstBracketId(request: APIRequestContext): Promise<string> {
 test.describe('classificação pública', () => {
   test('a home troca de categoria e de modalidade sem mudar de página', async ({
     page,
+    expectAccessible,
   }) => {
     await page.goto('/')
     await waitForHydration(page)
+    await expectAccessible(page)
 
     const standings = page.getByRole('heading', {
       name: 'Classificação',

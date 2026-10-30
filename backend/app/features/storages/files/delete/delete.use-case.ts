@@ -31,8 +31,8 @@ type Response = Either<HTTPException, null>
  *
  * **Só apaga o que ninguém usa.** `storages` é registro neutro e compartilhado
  * - o arquivo não pertence ao formulário que o enviou -, então a posse não
- * serve de autorização: quem conhecesse um uuid furaria a capa de uma notícia
- * alheia. Referenciado é `409`, e a mensagem diz onde.
+ * serve de autorização: quem conhecesse um uuid furaria o avatar de outro
+ * usuário. Referenciado é `409`, e a mensagem diz onde.
  */
 @inject()
 export default class StoragesFileDeleteUseCase {
@@ -61,10 +61,13 @@ export default class StoragesFileDeleteUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[files > delete][error]')
+      logger.error({ err: error }, '[storages/files > delete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_DELETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_DELETE_ERROR',
+        ),
       )
     }
   }

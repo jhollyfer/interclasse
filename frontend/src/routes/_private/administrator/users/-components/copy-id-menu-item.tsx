@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { CopySimpleIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'

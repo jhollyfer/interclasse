@@ -20,7 +20,10 @@ const fileShape = {
 }
 
 /** O arquivo como a API devolve: com a URL assinada de leitura. */
-export const StoragesFileShowResponse = z.object({ ...fileShape, url: z.string() })
+export const StoragesFileShowResponse = z.object({
+  ...fileShape,
+  url: z.string(),
+})
 
 /**
  * O plano de upload de `POST /storages` e `GET /storages/:id/parts`: por onde
@@ -32,9 +35,13 @@ export const StoragesFileUploadResponse = z.object({
   partSize: z.number(),
   totalParts: z.number(),
   parts: z.array(z.object({ partNumber: z.number(), url: z.string() })),
-  uploaded: z.array(z.object({ partNumber: z.number(), size: z.number(), etag: z.string() })),
+  uploaded: z.array(
+    z.object({ partNumber: z.number(), size: z.number(), etag: z.string() }),
+  ),
 })
 
 export type StoragesFileShowResponse = z.infer<typeof StoragesFileShowResponse>
 
-export type StoragesFileUploadResponse = z.infer<typeof StoragesFileUploadResponse>
+export type StoragesFileUploadResponse = z.infer<
+  typeof StoragesFileUploadResponse
+>

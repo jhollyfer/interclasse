@@ -1,5 +1,5 @@
-import type * as React from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { SORT_DIRECTION } from '@interclasse/shared'
+import type { SortDirection } from '@interclasse/shared'
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -7,9 +7,9 @@ import {
   PushPinIcon,
   PushPinSlashIcon,
 } from '@phosphor-icons/react'
+import { useNavigate } from '@tanstack/react-router'
 import type { Column, RowData } from '@tanstack/react-table'
-import { SORT_DIRECTION } from '@interclasse/shared'
-import type { SortDirection } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'
@@ -22,8 +22,8 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { m } from '#/paraglide/messages'
 
-import type { TableFeatures } from './use-table'
 import { useTableContext } from './table-context'
+import type { TableFeatures } from './use-table'
 
 type TableColumnHeaderProps<TRow extends RowData> = Readonly<{
   /** O rótulo da coluna. */

@@ -1,23 +1,23 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrophyIcon } from '@phosphor-icons/react'
 import type {
   AdministratorBracketPaginateResponse,
   Category,
 } from '@interclasse/shared'
 import { CATEGORIES } from '@interclasse/shared'
+import { TrophyIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import { BracketTree } from '#/components/common/bracket-tree'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { cn } from '#/lib/cn'
 import {
   BRACKET_STATUS_LABELS,
   CATEGORY_LABELS,
   CATEGORY_SHORT_LABELS,
   championName,
 } from '#/lib/labels'
-import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
 
 import { Empty } from './section'
@@ -90,12 +90,12 @@ export function StandingsExplorer({
             aria-pressed={bracket.id === current.id}
             onClick={() => onSelect(bracket.id)}
             className={cn(
-              'hover:border-primary hover:text-primary flex flex-col items-start rounded-md border px-4 py-2 text-left transition-colors active:scale-[0.98] motion-reduce:transition-none',
+              'hover:border-primary hover:text-primary flex flex-col items-start rounded-md border px-4 py-2 text-left transition-colors active:scale-press motion-reduce:transition-none',
               'aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground',
             )}
           >
             <span className="font-semibold">{bracket.sport.name}</span>
-            <span className="text-xs opacity-80">
+            <span className="text-xs">
               {BRACKET_STATUS_LABELS[bracket.status]}
             </span>
           </button>

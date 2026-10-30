@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Student from '#models/student'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -27,7 +27,7 @@ test.group('students > create', (group) => {
     assert.equal(body(response).name, 'Maria')
     assert.equal(body(response).classroomId, classroom.id)
     assert.isString(body(response).id)
-    assert.isNotNull(await Student.find(body(response).id))
+    assert.isNotNull(await Stored.student(body(response).id))
   })
 
   test('turma de outro conselheiro responde 404, como se não existisse', async ({
@@ -44,7 +44,7 @@ test.group('students > create', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
-    assert.lengthOf(await Student.query().where('classroomId', classroom.id), 0)
+    assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
   test('turma inexistente responde o mesmo 404', async ({ client, assert }) => {

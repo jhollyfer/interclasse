@@ -1,9 +1,8 @@
-import type * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
-import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -13,8 +12,9 @@ import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
-import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/representative'
+import { useRepresentativeEnrollmentUpdateMutation } from '#/integrations/tanstack-query/mutations/representative'
 import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
+import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /** A lista de atletas da turma do representante. A turma sai da sessão. */
@@ -27,7 +27,7 @@ export function AthletesPage(): React.JSX.Element {
   } = useQuery(representativeEnrollmentsQueryOptions())
   const queryClient = useQueryClient()
 
-  const save = useRepresentativeEnrollmentUpdate({
+  const save = useRepresentativeEnrollmentUpdateMutation({
     onSuccess: (updated) => {
       queryClient.setQueryData(
         queryKeys.representative.enrollments.board,

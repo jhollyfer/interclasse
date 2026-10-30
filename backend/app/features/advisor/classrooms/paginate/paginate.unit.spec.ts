@@ -5,14 +5,14 @@ import AdvisorClassroomPaginateUseCase from './paginate.use-case.ts'
 
 import { Classroom } from '#domain/classroom/classroom.entity'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
 const FREE = { advisor: { exists: true, taken: false } }
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
   const own = Classroom.create(
     {
       id: '00000000-0000-4000-8000-000000000001',
@@ -41,14 +41,16 @@ test.group('advisor/classrooms > paginate (unit)', () => {
   test('o conselheiro vê só a turma que aconselha', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ actor: { id: ADVISOR, role: USER_ROLE.ADVISOR } })
+    const result = await useCase.execute({
+      actor: { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null },
+    })
 
     assert.deepEqual(result.isRight() && result.value.data.map((item) => item.name), ['9º A'])
   })
 
   test('o administrador vê todas, por nome, e a busca recorta', async ({ assert }) => {
     const { useCase } = await setup()
-    const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR }
+    const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 
     const all = await useCase.execute({ actor })
     const searched = await useCase.execute({ actor, search: '8º' })
@@ -61,7 +63,11 @@ test.group('advisor/classrooms > paginate (unit)', () => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
-      actor: { id: '99999999-9999-4999-8999-999999999999', role: USER_ROLE.REPRESENTATIVE },
+      actor: {
+        id: '99999999-9999-4999-8999-999999999999',
+        role: USER_ROLE.REPRESENTATIVE,
+        avatarId: null,
+      },
     })
 
     assert.equal(result.isRight() && result.value.meta.total, 0)

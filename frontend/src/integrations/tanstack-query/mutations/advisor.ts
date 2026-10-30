@@ -1,18 +1,21 @@
-import { useMutation } from '@tanstack/react-query'
+import {
+  AdvisorEnrollmentShowResponse,
+  AdvisorStudentShowResponse,
+} from '@interclasse/shared'
 import type {
   AdvisorEnrollmentUpdatePayload,
   AdvisorStudentCreatePayload,
   AdvisorStudentUpdatePayload,
-  AdvisorEnrollmentShowResponse,
-  AdvisorStudentShowResponse,
   Merge,
 } from '@interclasse/shared'
+import { useMutation } from '@tanstack/react-query'
+
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 
 import type { HTTPError } from '../http'
 import { request, send } from '../http'
-import type { MutationProps } from '../mutation-props'
 
-export function useStudentCreate(
+export function useStudentCreateMutation(
   options?: MutationProps<
     AdvisorStudentShowResponse,
     AdvisorStudentCreatePayload
@@ -25,7 +28,7 @@ export function useStudentCreate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdvisorStudentShowResponse>('/advisor/students', {
+      return request('/advisor/students', AdvisorStudentShowResponse, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -38,7 +41,7 @@ export type StudentUpdateVariables = Merge<
   { readonly id: string }
 >
 
-export function useStudentUpdate(
+export function useStudentUpdateMutation(
   options?: MutationProps<AdvisorStudentShowResponse, StudentUpdateVariables>,
 ) {
   return useMutation<
@@ -48,8 +51,9 @@ export function useStudentUpdate(
   >({
     ...options,
     mutationFn: function ({ id, ...body }) {
-      return request<AdvisorStudentShowResponse>(
+      return request(
         '/advisor/students/'.concat(id),
+        AdvisorStudentShowResponse,
         {
           method: 'PUT',
           body: JSON.stringify(body),
@@ -59,7 +63,9 @@ export function useStudentUpdate(
   })
 }
 
-export function useStudentDelete(options?: MutationProps<void, string>) {
+export function useStudentDeleteMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -71,7 +77,7 @@ export function useStudentDelete(options?: MutationProps<void, string>) {
 }
 
 /** Troca a lista de atletas da turma numa modalidade, inteira. */
-export function useAdvisorEnrollmentUpdate(
+export function useAdvisorEnrollmentUpdateMutation(
   options?: MutationProps<
     AdvisorEnrollmentShowResponse,
     AdvisorEnrollmentUpdatePayload
@@ -84,7 +90,7 @@ export function useAdvisorEnrollmentUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AdvisorEnrollmentShowResponse>('/advisor/enrollments', {
+      return request('/advisor/enrollments', AdvisorEnrollmentShowResponse, {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

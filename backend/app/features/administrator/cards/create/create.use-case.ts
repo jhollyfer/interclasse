@@ -61,7 +61,8 @@ export default class AdministratorCardCreateUseCase {
       await this.cards.save(launched.value)
 
       const response = await this.cards.findResponse(launched.value.id)
-      if (!response) throw new Error('cartão gravado e não encontrado')
+      if (!response)
+        return left(HTTPException.NotFound(this.i18n.t('cards.not_found'), 'CARD_NOT_FOUND'))
 
       return right(response)
     } catch (error) {

@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
@@ -8,8 +5,13 @@ import {
   TrashIcon,
   TrophyIcon,
 } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 import { toast } from 'sonner'
 
+import { BracketTree } from '#/components/common/bracket-tree'
+import type { BracketMatch } from '#/components/common/bracket-tree'
 import {
   ConfirmDialog,
   ConfirmDialogDescription,
@@ -19,8 +21,6 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { BracketTree } from '#/components/common/bracket-tree'
-import type { BracketMatch } from '#/components/common/bracket-tree'
 import {
   MatchCardsDialog,
   MatchScheduleDialog,
@@ -28,8 +28,6 @@ import {
   MatchScoreDialog,
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderActions,
@@ -41,8 +39,11 @@ import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent } from '#/components/ui/card'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
-import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import { useBracketDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { createConfirmHandle, createDialogHandle } from '#/lib/dialog-handle'
+import { notifyError } from '#/lib/form-errors'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
@@ -85,14 +86,14 @@ export function BracketDetailView(): React.JSX.Element {
   const { data: bracket } = useSuspenseQuery(bracketQueryOptions(id))
   const invalidateKeys = useInvalidate()
   const navigate = useNavigate()
-  const [scoring, setScoring] = React.useState<MatchRef | null>(null)
-  const [scheduling, setScheduling] = React.useState<MatchRef | null>(null)
-  const [unscoring, setUnscoring] = React.useState<MatchRef | null>(null)
-  const [carding, setCarding] = React.useState<MatchRef | null>(null)
+  const [scoreHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [scheduleHandle] = React.useState(() => createDialogHandle<MatchRef>())
+  const [unscoreHandle] = React.useState(() => createConfirmHandle<MatchRef>())
+  const [cardsHandle] = React.useState(() => createDialogHandle<MatchRef>())
 
   const invalidate = () => invalidateKeys([...GAME_KEYS, ...DEPENDENTS.games])
 
-  const remove = useBracketDelete({
+  const remove = useBracketDeleteMutation({
     onSuccess: async () => {
       toast.success(m.admin_brackets_deleted())
       await invalidate()
@@ -127,7 +128,7 @@ export function BracketDetailView(): React.JSX.Element {
           <ConfirmDialog
             destructive
             onConfirm={() => remove.mutate(bracket.id)}
-            trigger={
+            render={
               <Button variant="destructive">
                 <TrashIcon />
                 {m.admin_brackets_delete_trigger()}
@@ -200,14 +201,14 @@ export function BracketDetailView(): React.JSX.Element {
                 title={
                   (!ready && m.admin_brackets_waiting_teams()) || undefined
                 }
-                onClick={() => setScoring(match)}
+                onClick={() => scoreHandle.openWithPayload(match)}
               >
                 {m.admin_brackets_score()}
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => setScheduling(match)}
+                onClick={() => scheduleHandle.openWithPayload(match)}
               >
                 <CalendarBlankIcon />
                 {m.admin_common_schedule()}
@@ -216,7 +217,7 @@ export function BracketDetailView(): React.JSX.Element {
                 size="sm"
                 variant="ghost"
                 disabled={!ready}
-                onClick={() => setCarding(match)}
+                onClick={() => cardsHandle.openWithPayload(match)}
               >
                 <CardsIcon />
                 {m.admin_common_cards()}
@@ -227,7 +228,7 @@ export function BracketDetailView(): React.JSX.Element {
                   variant="ghost"
                   disabled={locked}
                   title={UNSCORE_TITLE[String(locked)]?.()}
-                  onClick={() => setUnscoring(match)}
+                  onClick={() => unscoreHandle.openWithPayload(match)}
                 >
                   <ArrowCounterClockwiseIcon />
                   {m.admin_brackets_undo()}
@@ -238,38 +239,10 @@ export function BracketDetailView(): React.JSX.Element {
         }}
       />
 
-      {scoring && (
-        <MatchScoreDialog
-          key={scoring.id}
-          match={scoring}
-          open
-          onOpenChange={() => setScoring(null)}
-        />
-      )}
-      {unscoring && (
-        <MatchUnscoreDialog
-          key={unscoring.id}
-          match={unscoring}
-          open
-          onOpenChange={() => setUnscoring(null)}
-        />
-      )}
-      {carding && (
-        <MatchCardsDialog
-          key={carding.id}
-          match={carding}
-          open
-          onOpenChange={() => setCarding(null)}
-        />
-      )}
-      {scheduling && (
-        <MatchScheduleDialog
-          key={scheduling.id}
-          match={scheduling}
-          open
-          onOpenChange={() => setScheduling(null)}
-        />
-      )}
+      <MatchScoreDialog handle={scoreHandle} />
+      <MatchUnscoreDialog handle={unscoreHandle} />
+      <MatchCardsDialog handle={cardsHandle} />
+      <MatchScheduleDialog handle={scheduleHandle} />
     </div>
   )
 }

@@ -5,10 +5,15 @@ import {
   UPLOAD_STATUS,
   type AdministratorPhotoShowResponse,
   type Paginated,
-  type StorefrontPhotoShowResponse,
 } from '@interclasse/shared'
 
-import { PhotoRepository, type PhotoListCriteria, type PhotoStorage } from './photo.repository.ts'
+import {
+  PhotoRepository,
+  type ApprovedPhotoRead,
+  type PhotoListCriteria,
+  type PhotoRead,
+  type PhotoStorage,
+} from './photo.repository.ts'
 
 import PhotoModel from '#models/photo'
 import StorageModel from '#models/storage'
@@ -71,7 +76,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     await PhotoModel.query({ client: this.transaction.client() }).where('id', photo.id).delete()
   }
 
-  async show(id: string): Promise<AdministratorPhotoShowResponse | null> {
+  async show(id: string): Promise<PhotoRead | null> {
     const row = await PhotoModel.query({ client: this.transaction.client() })
       .where('id', id)
       .preload('storage')
@@ -82,7 +87,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     return this.toResponse(row)
   }
 
-  async paginate(criteria: PhotoListCriteria): Promise<Paginated<AdministratorPhotoShowResponse>> {
+  async paginate(criteria: PhotoListCriteria): Promise<Paginated<PhotoRead>> {
     const query = PhotoModel.query({ client: this.transaction.client() })
       .preload('storage')
       .preload('author')
@@ -100,7 +105,7 @@ export class PhotoLucidRepository extends PhotoRepository {
   async paginateApproved(criteria: {
     readonly page: number
     readonly perPage: number
-  }): Promise<Paginated<StorefrontPhotoShowResponse>> {
+  }): Promise<Paginated<ApprovedPhotoRead>> {
     const page = await PhotoModel.query({ client: this.transaction.client() })
       .where('status', PHOTO_STATUS.APPROVED)
       .preload('storage')
@@ -112,7 +117,7 @@ export class PhotoLucidRepository extends PhotoRepository {
       data: page.all().map((row) => ({
         id: row.id,
         caption: row.caption,
-        url: row.storage.url ?? '',
+        path: row.storage.path,
         createdAt: this.iso(row.createdAt),
       })),
     }
@@ -132,7 +137,7 @@ export class PhotoLucidRepository extends PhotoRepository {
     })
   }
 
-  private toResponse(row: PhotoModel): AdministratorPhotoShowResponse {
+  private toResponse(row: PhotoModel): PhotoRead {
     const { storage, author } = row
 
     return {
@@ -151,7 +156,6 @@ export class PhotoLucidRepository extends PhotoRepository {
         size: storage.size,
         path: storage.path,
         status: storage.status,
-        url: storage.url ?? '',
         createdAt: storage.createdAt?.toISO() ?? null,
         updatedAt: storage.updatedAt?.toISO() ?? null,
         deletedAt: storage.deletedAt?.toISO() ?? null,

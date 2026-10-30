@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 /**
  * O cabeçalho fixo da listagem: título e descrição à esquerda, ações à direita.
@@ -27,7 +27,7 @@ function TableHeader({
     <div
       data-slot="table-header"
       className={cn(
-        'grid shrink-0 auto-rows-min items-start gap-1 border-b pb-3 has-data-[slot=table-actions]:grid-cols-[1fr_auto]',
+        'grid shrink-0 auto-rows-min items-start gap-1 border-b pb-3 has-data-[slot=table-actions]:grid-cols-title-actions',
         className,
       )}
       {...props}
@@ -37,6 +37,7 @@ function TableHeader({
 
 function TableTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -44,7 +45,9 @@ function TableTitle({
       data-slot="table-title"
       className={cn('text-2xl font-bold', className)}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 

@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { PushPinIcon } from '@phosphor-icons/react'
 import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
+import { PushPinIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import { formatWhen } from '#/lib/labels'
 import { m } from '#/paraglide/messages'

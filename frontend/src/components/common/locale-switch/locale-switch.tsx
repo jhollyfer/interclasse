@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { TranslateIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import {
   DropdownMenu,
@@ -10,10 +10,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 import { getLocale, isLocale, locales, setLocale } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
-import { cn } from '#/lib/utils'
 
 /** O nome de cada idioma, no idioma da tela. */
 const LOCALE_NAMES = {
@@ -33,13 +33,14 @@ export function LocaleSwitch({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={m.locale_switch_label()}
         className={cn(
           'flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold uppercase transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50',
           className,
         )}
       >
-        <TranslateIcon className="size-4" />
+        {/* Nome acessível pelo conteúdo, com o texto visível dentro: WCAG 2.5.3. */}
+        <span className="sr-only">{m.locale_switch_label()}</span>
+        <TranslateIcon aria-hidden="true" className="size-4" />
         {getLocale()}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">

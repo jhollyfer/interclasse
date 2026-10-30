@@ -1,5 +1,6 @@
-import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
 import { DotsThreeIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -10,8 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
+
+type RowActionsProps = Readonly<
+  Merge<
+    React.ComponentProps<typeof DropdownMenuContent>,
+    {
+      /**
+       * Os alertas que os itens abrem (`RowActionsConfirm`). Ficam **irmãos**
+       * do menu, e não dentro do `DropdownMenuContent`: o conteúdo desmonta
+       * quando o menu fecha e levaria o alerta junto (`frontend.md` §6.2).
+       */
+      dialogs?: React.ReactNode
+    }
+  >
+>
 
 /**
  * O menu de uma linha da tabela.
@@ -21,55 +36,43 @@ import { m } from '#/paraglide/messages'
  * largura varia, e por isso ela é a única coisa que continua chegando de
  * fora.
  *
- * Não há contexto: os itens não leem estado nenhum do casco, cada um se basta
- * com o `onConfirm` que a tela lhe dá.
+ * Não há contexto: os itens não leem estado nenhum do casco. O item que pede
+ * confirmação chama `handle.open(null)` no clique, o menu fecha sozinho e o
+ * alerta, irmão do menu, abre pelo mesmo handle.
  */
-/**
- * Fecha o menu. Os itens que abrem alerta chamam ao abrir: sem isso o menu
- * ficava aceso atrás do overlay. O menu fica montado (`keepMounted`) porque o
- * alerta mora dentro dele - desmontar o menu levaria o alerta junto.
- */
-const RowActionsMenuContext = React.createContext<() => void>(() => {})
-
-export function useCloseRowActions(): () => void {
-  return React.useContext(RowActionsMenuContext)
-}
-
 export function RowActions({
   className,
   children,
+  dialogs,
   ...rest
-}: React.ComponentProps<typeof DropdownMenuContent>): React.JSX.Element {
-  const [open, setOpen] = React.useState(false)
-  const close = React.useCallback(() => setOpen(false), [])
-
+}: RowActionsProps): React.JSX.Element {
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={m.common_open_actions()}
-          >
-            <DotsThreeIcon weight="bold" />
-          </Button>
-        }
-      />
-      <DropdownMenuContent
-        data-slot="row-actions"
-        className={cn('w-48', className)}
-        keepMounted
-        {...rest}
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>{m.common_actions()}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <RowActionsMenuContext.Provider value={close}>
+    <React.Fragment>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={m.common_open_actions()}
+            >
+              <DotsThreeIcon weight="bold" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent
+          data-slot="row-actions"
+          className={cn('w-48', className)}
+          {...rest}
+        >
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{m.common_actions()}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             {children}
-          </RowActionsMenuContext.Provider>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {dialogs}
+    </React.Fragment>
   )
 }

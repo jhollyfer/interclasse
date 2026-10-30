@@ -1,8 +1,8 @@
+import { AdministratorBracketPaginateResponse } from './brackets.response.js'
 import { CATEGORIES } from '../../enums/category.js'
 import { MATCH_PHASES } from '../../enums/match-phase.js'
 import { MATCH_STATUSES } from '../../enums/match-status.js'
 import { z } from '../../validator.js'
-import { AdministratorBracketPaginateResponse } from './brackets.response.js'
 
 /**
  * A partida como a API devolve (`_standards/architecture.md` §10). A tabela de
@@ -80,7 +80,8 @@ export const AdministratorMatchUpdateResponse = z.object({
 
 export const AdministratorMatchScoreResponse = AdministratorMatchUpdateResponse
 
-export const AdministratorMatchUnscoreResponse = AdministratorMatchUpdateResponse
+export const AdministratorMatchUnscoreResponse =
+  AdministratorMatchUpdateResponse
 
 /**
  * Os atletas que podem levar cartão numa partida: os alunos das duas turmas,
@@ -92,19 +93,33 @@ export const AdministratorMatchAthletesResponse = z.object({
       teamId: z.uuid(),
       classroomId: z.uuid(),
       name: z.string(),
-      students: z.array(z.object({ id: z.uuid(), name: z.string(), enrolled: z.boolean() })),
+      students: z.array(
+        z.object({ id: z.uuid(), name: z.string(), enrolled: z.boolean() }),
+      ),
     }),
   ),
 })
 
-export type AdministratorMatchTeamResponse = z.infer<typeof AdministratorMatchTeamResponse>
+export type AdministratorMatchTeamResponse = z.infer<
+  typeof AdministratorMatchTeamResponse
+>
 
-export type AdministratorMatchPaginateResponse = z.infer<typeof AdministratorMatchPaginateResponse>
+export type AdministratorMatchPaginateResponse = z.infer<
+  typeof AdministratorMatchPaginateResponse
+>
 
-export type AdministratorMatchUpdateResponse = z.infer<typeof AdministratorMatchUpdateResponse>
+export type AdministratorMatchUpdateResponse = z.infer<
+  typeof AdministratorMatchUpdateResponse
+>
 
-export type AdministratorMatchScoreResponse = z.infer<typeof AdministratorMatchScoreResponse>
+export type AdministratorMatchScoreResponse = z.infer<
+  typeof AdministratorMatchScoreResponse
+>
 
-export type AdministratorMatchUnscoreResponse = z.infer<typeof AdministratorMatchUnscoreResponse>
+export type AdministratorMatchUnscoreResponse = z.infer<
+  typeof AdministratorMatchUnscoreResponse
+>
 
-export type AdministratorMatchAthletesResponse = z.infer<typeof AdministratorMatchAthletesResponse>
+export type AdministratorMatchAthletesResponse = z.infer<
+  typeof AdministratorMatchAthletesResponse
+>

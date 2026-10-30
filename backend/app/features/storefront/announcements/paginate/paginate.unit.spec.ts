@@ -4,12 +4,12 @@ import StorefrontAnnouncementPaginateUseCase from './paginate.use-case.ts'
 
 import { Announcement } from '#domain/announcement/announcement.entity'
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
-import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('storefront/announcements > paginate (unit)', () => {
   test('fixados primeiro e depois do mais novo ao mais antigo', async ({ assert }) => {
-    const announcements = new AnnouncementMemoryRepository()
+    const announcements = MemoryRepositories.announcements()
     const aviso = (id: string, title: string, day: number, pinned: boolean) =>
       announcements.save(
         Announcement.create({

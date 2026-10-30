@@ -1,11 +1,11 @@
-import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { AUTHENTICATION, NAVIGATION } from './menu'
@@ -122,7 +122,7 @@ export function Header(): React.JSX.Element {
   return (
     <header
       data-slot="public-header"
-      className="fixed top-0 left-0 z-50 w-full border-b border-brand-ink-foreground/5 bg-brand-ink/95 backdrop-blur-md"
+      className="fixed top-0 left-0 z-sticky w-full border-b border-brand-ink-foreground/5 bg-brand-ink/95 backdrop-blur-md"
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
@@ -144,7 +144,7 @@ export function Header(): React.JSX.Element {
             to={AUTHENTICATION.to}
             className={cn(
               navigationLinkVariants({ variant: 'bar' }),
-              'ml-2 bg-brand font-semibold text-brand-ink active:scale-[0.97]',
+              'ml-2 bg-brand font-semibold text-brand-ink active:scale-press',
             )}
           >
             {AUTHENTICATION.label()}
@@ -164,16 +164,16 @@ export function Header(): React.JSX.Element {
           aria-expanded={open}
           aria-label={menuLabel}
           onClick={() => setOpen((previous) => !previous)}
-          className="group flex size-8 flex-col items-center justify-center gap-[5px] text-brand-ink-foreground md:hidden"
+          className="group flex size-8 flex-col items-center justify-center gap-menu-bar text-brand-ink-foreground md:hidden"
         >
-          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:translate-y-[7px] group-data-open:rotate-45 motion-reduce:transition-none" />
+          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:translate-y-menu-bar-shift group-data-open:rotate-45 motion-reduce:transition-none" />
           <span className="block h-px w-5 origin-center bg-current transition-transform duration-200 group-data-open:scale-x-0 motion-reduce:transition-none" />
-          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:-translate-y-[7px] group-data-open:-rotate-45 motion-reduce:transition-none" />
+          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:-translate-y-menu-bar-shift group-data-open:-rotate-45 motion-reduce:transition-none" />
         </button>
       </div>
 
       {/*
-        O painel móvel. `grid-rows-[0fr]` para `[1fr]` anima a altura sem que
+        O painel móvel. `grid-rows-collapsed` para `grid-rows-expanded` anima a altura sem que
         ninguém precise medi-la - é o truque de CSS que substitui o
         `height: auto` que a transição não sabe animar. `invisible` no fechado
         porque altura zero com `overflow-hidden` ainda deixa o link focável.
@@ -181,7 +181,7 @@ export function Header(): React.JSX.Element {
       <div
         data-slot="public-header-mobile"
         data-open={open || undefined}
-        className="grid grid-rows-[0fr] overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-[grid-template-rows,opacity] duration-300 data-open:grid-rows-[1fr] data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
+        className="grid grid-rows-collapsed overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-reveal duration-300 data-open:grid-rows-expanded data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
         aria-hidden={!open}
       >
         <nav
@@ -204,7 +204,7 @@ export function Header(): React.JSX.Element {
             onClick={close}
             className={cn(
               navigationLinkVariants({ variant: 'panel' }),
-              'mt-3 rounded-full bg-brand text-center font-semibold text-brand-ink active:scale-[0.97]',
+              'mt-3 rounded-full bg-brand text-center font-semibold text-brand-ink active:scale-press',
             )}
           >
             {AUTHENTICATION.label()}

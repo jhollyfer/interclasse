@@ -9,13 +9,20 @@
 # variante arm64. Compilando por estágio, cada arquitetura instala o binário
 # dela.
 
-FROM node:24-alpine AS builder
+# Imagem fixada por digest, atualizada pelo Dependabot (tooling.md §8.2, §9): tag
+# móvel muda o que foi auditado sem commit.
+FROM node:24-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85 AS builder
 
 WORKDIR /repo
 
-# Sem Corepack (_doc-lib/pnpm.md#installation). O pnpm troca sozinho para a
-# versão de `devEngines.packageManager` no primeiro uso.
-RUN npm install --global pnpm@12
+# Sem Corepack (_doc-lib/pnpm.md#installation): `npx get-pnpm` instala o binário
+# nativo em PNPM_HOME e o pnpm troca sozinho para a versão de
+# `devEngines.packageManager` no primeiro uso. Roda fora do projeto porque o npm
+# recusa o `devEngines` do repositório (EBADDEVENGINES).
+ENV PNPM_HOME=/pnpm \
+    PNPM_NO_MODIFY_PATH=1
+ENV PATH="$PNPM_HOME/bin:$PATH"
+RUN cd /tmp && npx --yes get-pnpm
 
 # Os manifestos antes do código: a camada de install só refaz quando muda
 # dependência. O `pnpm-workspace.yaml` carrega o `allowBuilds`; sem ele o install
@@ -46,11 +53,11 @@ ENV NODE_ENV=development \
     STORAGE_BUCKET=build \
     STORAGE_ENDPOINT=http://localhost:9000
 
-# O `shared/` compila primeiro (ordem topológica do filtro). APP_KEY fica na
-# linha do comando, e não em ENV: em ENV ela viraria metadado da imagem.
-RUN pnpm --filter ./shared run build \
-    && cd backend \
-    && APP_KEY=build-time-placeholder-nao-usada-em-runtime node ace build
+# O `shared/` compila antes do app (ordem topológica do filtro, `build` do
+# backend é `node ace build`). APP_KEY fica na linha do comando, e não em ENV:
+# em ENV ela viraria metadado da imagem.
+RUN APP_KEY=build-time-placeholder-nao-usada-em-runtime \
+    pnpm --filter "{./backend}..." run build
 
 # Só o app e o `dist/` do `shared/`, sem dev tool (_doc-lib/pnpm.md#cli/deploy).
 # `files: ["build"]` no package.json do backend faz o deploy levar só a saída
@@ -58,7 +65,7 @@ RUN pnpm --filter ./shared run build \
 RUN pnpm --filter ./backend --prod deploy /out
 
 
-FROM node:24-alpine
+FROM node:24-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85
 
 WORKDIR /app
 

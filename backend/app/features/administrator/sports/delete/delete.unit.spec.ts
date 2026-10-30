@@ -4,13 +4,13 @@ import AdministratorSportDeleteUseCase from './delete.use-case.ts'
 
 import { Sport } from '#domain/sport/sport.entity'
 import { SportRepository } from '#repositories/sport/sport.repository'
-import { SportMemoryRepository } from '#repositories/sport/sport.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 
 async function setup() {
-  const sports = new SportMemoryRepository()
+  const sports = MemoryRepositories.sports()
   const queimada = Sport.create({
     id: ID,
     name: 'Queimada',

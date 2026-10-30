@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import { body } from '#tests/http-fixtures'
 
 /**
- * A allowlist de `config/cors.ts`, que vem de `CORS_ORIGIN`.
+ * A allowlist de `config/cors.ts`, que vem de `CORS_ORIGINS`.
  *
  * O teste roda fora de desenvolvimento - `NODE_ENV=test` -, que é a única
  * condição em que a lista vale: em dev a configuração libera qualquer origem e
@@ -33,7 +33,9 @@ test.group('cors > allowlist', () => {
 })
 
 /**
- * A barreira de CSRF dos content-types que não disparam preflight.
+ * A barreira de CSRF: toda escrita confere a origem, qualquer que seja o `Content-Type`.
+ * O caso sem `Origin` e sem `Sec-Fetch-Site` é do `origin.middleware.unit.spec.ts`:
+ * o cliente de teste sempre manda a origem da allowlist (`tests/bootstrap.ts`).
  *
  * `config/shield.ts` tem `csrf.enabled: false`, e o bodyparser aceita
  * `multipart/form-data` e `application/x-www-form-urlencoded` — content-types
@@ -44,7 +46,7 @@ test.group('cors > allowlist', () => {
  * de sumir sem ninguém notar: ela não tem efeito visível em requisição
  * legítima, então nada mais reprovaria a sua remoção.
  */
-test.group('cors > escrita cross-origin em content type simples', () => {
+test.group('cors > escrita cross-origin', () => {
   test('origem fora da allowlist é recusada com 403', async ({ client, assert }) => {
     const response = await client
       .post('/authentication/sign-in')
@@ -70,27 +72,25 @@ test.group('cors > escrita cross-origin em content type simples', () => {
     assert.notEqual(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('sem header de origem passa: não é navegador', async ({ client, assert }) => {
-    // Postman, mobile e servidor não mandam `Origin`. A mesma decisão que o
-    // `origin` do CORS já toma.
-    const response = await client
-      .post('/authentication/sign-in')
-      .header('content-type', 'application/x-www-form-urlencoded')
-      .field('email', 'quem@exemplo.com')
-      .field('password', 'nao-importa')
-
-    assert.notEqual(body(response).code, 'ORIGIN_NOT_ALLOWED')
-  })
-
-  test('JSON não passa pela barreira: o preflight já o cobre', async ({ client, assert }) => {
-    // `application/json` deixa a requisição de ser simples, o navegador é
-    // obrigado ao preflight, e o preflight bate na allowlist do CORS. Barrar
-    // aqui também seria cobrar duas vezes o mesmo pedágio.
+  test('JSON de origem fora da allowlist também é recusado', async ({ client, assert }) => {
+    // A barreira não olha `Content-Type`: `text/plain` e POST vazio também cruzam
+    // sites sem preflight (_standards/backend.md §4.10).
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://intruso.example')
       .json({ email: 'quem@exemplo.com', password: 'nao-importa' })
 
-    assert.notEqual(body(response).code, 'ORIGIN_NOT_ALLOWED')
+    response.assertStatus(403)
+    assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
+  })
+
+  test('text/plain de origem fora da allowlist é recusado', async ({ client, assert }) => {
+    const response = await client
+      .post('/authentication/sign-out')
+      .header('origin', 'http://intruso.example')
+      .header('content-type', 'text/plain')
+
+    response.assertStatus(403)
+    assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 })

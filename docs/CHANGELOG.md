@@ -6,7 +6,28 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ## [Não lançado]
 
-Nada além do que está em 0.1.0.
+### Segurança
+
+- A API passa a ler o IP do cliente atrás do proxy (`TRUSTED_PROXIES`), então o limite de tentativas de login conta cada pessoa e não o servidor todo.
+- Toda escrita confere a origem (`CORS_ORIGINS`), qualquer que seja o tipo de conteúdo; `CORS_ORIGIN` foi renomeada.
+- O cookie de sessão fica sempre `SameSite=Lax`.
+- Excesso de tentativas responde 429 com código estável; erro interno nunca mais devolve a mensagem crua do banco.
+- Upload prende o tamanho de cada parte na URL assinada e confere o conteúdo do arquivo antes de confirmar.
+- Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
+- `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` viram `SEED_ADMINISTRATOR_EMAIL` e `SEED_ADMINISTRATOR_PASSWORD`; `SESSION_DRIVER` deixa de existir.
+
+### Alterado
+
+- A página pública de uma chave passa a declarar a trilha de navegação (início, classificação, chave) e o evento esportivo para os buscadores.
+- O tema claro/escuro vem de um cookie lido no servidor: a página já abre no tema escolhido, sem piscar.
+- Fora de produção o site responde `noindex` e o `robots.txt` bloqueia tudo; produção precisa de `SITE_ENV=production` (`ENV.md`). Painel e telas de entrada ficam sempre fora dos buscadores.
+- O site manda cabeçalhos de segurança (CSP com `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, HSTS); o CSP precisa de `VITE_STORAGE_URL` para o upload de fotos.
+- Formulário com alteração não salva pergunta antes de sair da tela.
+- Listas do sorteio e das turmas buscam contas e modalidades no servidor, 20 por vez, com "Carregar mais".
+- Listas mostram um esqueleto enquanto carregam e telas de detalhe têm página própria de "não encontrado".
+- A tela de entrada do painel passa de `/authentication` para `/sign-in`.
+- `robots.txt` e `sitemap.xml` passam a ser gerados pelo servidor: o mapa do site lista as páginas públicas e as chaves, uma entrada por idioma, e fora de produção o `robots.txt` proíbe a indexação.
+- O layout salvo das tabelas (colunas escondidas, ordem, largura) volta ao padrão uma vez, porque a chave de armazenamento mudou.
 
 ## [0.1.0] - 2026-10-29
 

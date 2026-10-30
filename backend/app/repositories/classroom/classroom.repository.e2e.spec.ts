@@ -119,8 +119,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const advisorId = await account(USER_ROLE.ADVISOR)
       const own = await born(repository, '7º A', 7, { advisorId })
       const foreign = await born(repository, '8º A', 8)
-      const advisor = { id: advisorId, role: USER_ROLE.ADVISOR }
-      const administrator = { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR }
+      const advisor = { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null }
+      const administrator = { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 
       assert.isNotNull(await repository.findOwned({ id: own.id, actor: advisor }))
       assert.isNull(await repository.findOwned({ id: foreign.id, actor: advisor }))
@@ -242,12 +242,12 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const own = await repository.paginateOwned({
         page: 1,
         perPage: 10,
-        actor: { id: advisorId, role: USER_ROLE.ADVISOR },
+        actor: { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
       })
       const all = await repository.paginateOwned({
         page: 1,
         perPage: 10,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR },
+        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
       })
 
       assert.deepEqual(

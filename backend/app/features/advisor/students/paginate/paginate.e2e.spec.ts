@@ -1,8 +1,7 @@
 import { test } from '@japa/runner'
 
-import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { StudentFactory } from '#database/factories/student.factory'
-import { signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
+import { signInAsAdvisorOfClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   body,
@@ -37,7 +36,7 @@ test.group('students > paginate', (group) => {
 
   test('?classroomId de outro conselheiro responde lista vazia', async ({ client, assert }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
-    const alheia = await ClassroomFactory.with('students', 2).create()
+    const alheia = await classroomWithStudents(2)
 
     const response = await client
       .get('/advisor/students')
@@ -64,7 +63,7 @@ test.group('students > paginate', (group) => {
 
   test('o administrador enxerga os alunos de todas as turmas', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
-    await ClassroomFactory.with('students', 2).createMany(2)
+    await Promise.all([classroomWithStudents(2), classroomWithStudents(2)])
 
     const response = await client.get('/advisor/students').cookies(admin)
 
@@ -81,5 +80,18 @@ test.group('students > paginate', (group) => {
     anonimo.assertStatus(401)
     negado.assertStatus(403)
     assert.equal(body(negado).code, 'ACCESS_DENIED')
+  })
+})
+
+test.group('advisor/students/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+    const { session } = await signInWithFactory(client)
+
+    const response = await client.get('/advisor/students').qs({ classroomId: 'x' }).cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'classroomId')
   })
 })

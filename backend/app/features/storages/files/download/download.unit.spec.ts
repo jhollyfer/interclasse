@@ -4,7 +4,7 @@ import StoragesFileDownloadUseCase from './download.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { StorageContract } from '#services/storage/storage.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { FILE_ID, rightOf, storageDoubles, uploadedFile } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -35,7 +35,7 @@ test.group('storages/files > download (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do bucket é 500 FILE_DOWNLOAD_ERROR', async ({ assert }) => {
+  test('falha do bucket é 500 STORAGES_FILE_DOWNLOAD_ERROR', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
     bucket.signedDownload = async () => {
@@ -44,6 +44,6 @@ test.group('storages/files > download (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'FILE_DOWNLOAD_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_DOWNLOAD_ERROR' })
   })
 })

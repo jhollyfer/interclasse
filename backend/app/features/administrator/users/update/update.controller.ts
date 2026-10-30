@@ -5,6 +5,7 @@ import AdministratorUserUpdateUseCase from './update.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
 import UserPolicy from '#policies/user.policy'
+import { UserRepository } from '#repositories/user/user.repository'
 import { AdministratorUserUpdateValidator } from '#validators/administrator/users.validator'
 import { IdentifierValidator } from '#core/validator'
 
@@ -34,7 +35,10 @@ export default class AdministratorUserUpdateController {
     },
   })
 
-  constructor(private readonly useCase: AdministratorUserUpdateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorUserUpdateUseCase,
+    private readonly users: UserRepository,
+  ) {}
 
   async handle(context: HttpContext) {
     // Corpo e params validados separadamente e fundidos: o `:id` vem da URL e
@@ -44,7 +48,8 @@ export default class AdministratorUserUpdateController {
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    await context.bouncer.with(UserPolicy).authorize('update', params.id, body)
+    const user = await this.users.findById(params.id)
+    await context.bouncer.with(UserPolicy).authorize('update', user, body)
     const result = await this.useCase.execute({ ...body, ...params })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

@@ -19,7 +19,7 @@ export default class AccountProfileShowController {
   constructor(private readonly useCase: AccountProfileShowUseCase) {}
 
   async handle(context: HttpContext) {
-    const result = await this.useCase.execute({ actor: context.auth.getUserOrFail() })
+    const result = await this.useCase.execute({ actor: context.actor })
 
     if (result.isLeft()) throw result.value
 

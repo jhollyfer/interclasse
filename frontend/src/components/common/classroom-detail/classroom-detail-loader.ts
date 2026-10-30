@@ -1,12 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { notFound } from '@tanstack/react-router'
 
-import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import {
   advisorClassroomsQueryOptions,
   advisorEnrollmentsQueryOptions,
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
+import { loadOrNotFound } from '#/lib/load-or-not-found'
 
 /** A lista de alunos inteira: uma turma não passa de 40. */
 export function studentsOf(classroomId: string) {
@@ -28,8 +27,8 @@ export async function loadClassroomDetail(
   queryClient: QueryClient,
   classroomId: string,
 ): Promise<void> {
-  try {
-    await Promise.all([
+  await loadOrNotFound(() =>
+    Promise.all([
       queryClient.query({
         ...advisorEnrollmentsQueryOptions(classroomId),
         staleTime: 'static',
@@ -39,12 +38,6 @@ export async function loadClassroomDetail(
         staleTime: 'static',
       }),
       queryClient.query(advisorClassroomsQueryOptions(VISIBLE_CLASSROOMS)),
-    ])
-  } catch (error) {
-    if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {
-      throw notFound()
-    }
-
-    throw error
-  }
+    ]),
+  )
 }

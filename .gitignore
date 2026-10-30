@@ -1,16 +1,57 @@
-# Segredos: `.env.example` é o que fica versionado, com valores de exemplo.
-.env
-.env.local
+# Dependências instaladas: o `pnpm-lock.yaml` é quem as fixa.
+node_modules/
 
-# Configuração de IDE, que é de cada pessoa e não do projeto. Já vazou para um
-# commit uma vez por estar fora daqui.
+# Segredos: `.env.example` e `.env.test` (só endereço de container local e senha
+# de banco de teste) são o que fica versionado (_standards/backend.md §6).
+.env
+.env.*
+!.env.example
+!.env.test
+!.env.e2e.example
+
+# Credenciais do E2E do frontend: o versionado é `.env.e2e.example`.
+.env.e2e
+**/e2e/.auth/
+
+# Saída de build. `shared/dist/` é gerada pelo `tsc`; `backend/build/` pelo
+# `node ace build`; `frontend/.output/` pelo Nitro. Nunca versionadas
+# (_standards/tooling.md §9).
+dist/
+dist-ssr/
+build/
+.output/
+.nitro/
+.tanstack/
+.wrangler/
+.vinxi/
+*.local
+
+# Saída do compilador do Paraglide: gerada no dev e no build, não versionada
+# (_standards/i18n.md §2).
+src/paraglide/
+
+# Resultado de teste e relatório do Playwright.
+coverage/
+test-results/
+playwright-report/
+
+# Relatório de varredura do `claude-security`: traz cenário de exploração e não
+# vai para o histórico (_standards/tooling.md §10.4).
+CLAUDE-SECURITY-*/
+
+# Arquivos temporários e logs.
+tmp/*
+!tmp/.gitkeep
+npm-debug.log
+yarn-error.log
+__unconfig*
+todos.json
+
+# Configuração de IDE e de sistema, que é de cada pessoa e não do projeto.
 .idea/
 .vscode/
-
-node_modules/
+.fleet
+.DS_Store
 
 # Worktrees de agentes do Claude Code.
 .claude/worktrees/
-
-# Saída do `tsc` do `shared/`: gerada no build, nunca versionada.
-shared/dist/

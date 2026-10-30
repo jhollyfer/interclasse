@@ -64,3 +64,13 @@ test.group('reports > show', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/reports/show > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get('/administrator/reports')
+
+    response.assertStatus(401)
+  })
+})

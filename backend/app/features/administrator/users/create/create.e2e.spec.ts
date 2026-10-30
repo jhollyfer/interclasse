@@ -5,13 +5,14 @@ import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
-import User from '#models/user'
+import { Stored } from '#tests/stored-fixtures'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
   authenticateAsAdministrator,
   body,
   resetDatabase,
+  authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
 /** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
@@ -52,7 +53,7 @@ test.group('administrador > users > criação', (group) => {
 
     // O mixin `withAuthFinder` cifra no save: gravar o texto puro deixaria a
     // senha legível no banco, e um hash de hash não deixaria ninguém entrar.
-    const user = await User.findOrFail(body(criado).id)
+    const user = await Stored.userOrFail(body(criado).id)
     assert.notEqual(user.password, payload.password)
 
     const entrada = await client
@@ -140,5 +141,23 @@ test.group('administrador > users > criação', (group) => {
 
     const [{ count }] = await db.from('users').where('email', payload.email).count('* as count')
     assert.equal(Number(count), 0)
+  })
+})
+
+test.group('administrator/users/create > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.post('/administrator/users')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.post('/administrator/users').cookies(advisor)
+
+    response.assertStatus(403)
   })
 })

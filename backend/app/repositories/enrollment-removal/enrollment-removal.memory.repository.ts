@@ -13,7 +13,7 @@ import {
   EnrollmentRemoval,
   type EnrollmentRemovalProps,
 } from '#domain/enrollment-removal/enrollment-removal.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 type Classroom = AdministratorEnrollmentRemovalShowResponse['classroom']
 type Sport = AdministratorEnrollmentRemovalShowResponse['sport']

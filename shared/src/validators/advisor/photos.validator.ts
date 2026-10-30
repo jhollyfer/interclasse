@@ -14,6 +14,10 @@ export const AdvisorPhotoPaginateValidator = z.object({
   ...pageFields(),
 })
 
-export type AdvisorPhotoCreatePayload = z.infer<typeof AdvisorPhotoCreateValidator>
+export type AdvisorPhotoCreatePayload = z.infer<
+  typeof AdvisorPhotoCreateValidator
+>
 
-export type AdvisorPhotoPaginatePayload = z.infer<typeof AdvisorPhotoPaginateValidator>
+export type AdvisorPhotoPaginatePayload = z.infer<
+  typeof AdvisorPhotoPaginateValidator
+>

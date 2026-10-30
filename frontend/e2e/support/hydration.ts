@@ -6,13 +6,12 @@ import type { Page } from '@playwright/test'
  * controlado volta a vazio), e um clique cai no envio nativo do formulário.
  *
  * O React 19 grava `__reactProps$...` no elemento que hidratou; é o sinal que o
- * DOM expõe, sem `waitForTimeout` e sem `networkidle` (que o lint reprova).
+ * DOM expõe. Olha a página toda, e não só o `main`: página de texto (Sobre) não
+ * tem link nem botão ali, mas o cabeçalho hidrata junto. Sem `waitForTimeout` e sem `networkidle` (que o lint reprova).
  */
 export async function waitForHydration(page: Page): Promise<void> {
   await page.waitForFunction(() =>
-    Array.from(
-      document.querySelectorAll('main a, main button, main input'),
-    ).some((element) =>
+    Array.from(document.querySelectorAll('a, button, input')).some((element) =>
       Object.keys(element).some((key) => key.startsWith('__reactProps')),
     ),
   )

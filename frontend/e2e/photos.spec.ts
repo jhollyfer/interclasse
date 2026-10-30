@@ -1,7 +1,7 @@
-import { deflateSync, crc32 } from 'node:zlib'
 import type { APIRequestContext } from '@playwright/test'
+import { deflateSync, crc32 } from 'node:zlib'
 
-import { apiUrl } from './support/credentials'
+import { apiUrl, writeHeaders } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
@@ -46,7 +46,9 @@ async function purge(
   if (!list.ok()) return
   const body: { data: ReadonlyArray<PhotoRow> } = await list.json()
   for (const photo of body.data.filter((item) => item.caption === caption)) {
-    await request.delete(`${apiUrl()}/administrator/photos/${photo.id}`)
+    await request.delete(`${apiUrl()}/administrator/photos/${photo.id}`, {
+      headers: writeHeaders(),
+    })
   }
 }
 

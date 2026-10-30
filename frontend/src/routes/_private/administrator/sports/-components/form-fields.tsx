@@ -1,6 +1,6 @@
+import type { AdministratorSportCreatePayload } from '@interclasse/shared'
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
-import type { AdministratorSportCreatePayload } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'

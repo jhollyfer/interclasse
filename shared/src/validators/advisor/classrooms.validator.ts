@@ -8,4 +8,6 @@ export const AdvisorClassroomPaginateValidator = z.object({
   ...paginationFields(),
 })
 
-export type AdvisorClassroomPaginatePayload = z.infer<typeof AdvisorClassroomPaginateValidator>
+export type AdvisorClassroomPaginatePayload = z.infer<
+  typeof AdvisorClassroomPaginateValidator
+>

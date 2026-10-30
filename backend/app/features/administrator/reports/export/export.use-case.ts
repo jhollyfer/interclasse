@@ -3,7 +3,7 @@ import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
 import { left, right, type Either } from '@interclasse/shared'
 
-import { ReportCsv } from '../reports.csv.ts'
+import { ReportPresenter } from '../reports.presenter.ts'
 
 import { ReportRepository } from '#repositories/report/report.repository'
 import HTTPException from '#exceptions/http.exception'
@@ -26,7 +26,7 @@ export default class AdministratorReportExportUseCase {
       const report = await this.reports.summarize()
 
       return right(
-        ReportCsv.build(report, {
+        ReportPresenter.csv(report, {
           header: [
             this.i18n.t('reports.csv.classroom'),
             this.i18n.t('reports.csv.category'),

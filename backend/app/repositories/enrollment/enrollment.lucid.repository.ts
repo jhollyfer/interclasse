@@ -95,12 +95,13 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
 
     const [sports, students, drawn] = await Promise.all([
       SportModel.query({ client }).orderBy('name', 'asc'),
-      StudentModel.query({ client })
-        .where('classroomId', classroom.id)
-        .preload('enrollments')
-        .orderBy('name', 'asc'),
+      StudentModel.query({ client }).where('classroomId', classroom.id).orderBy('name', 'asc'),
       BracketModel.query({ client }).where('category', classroom.category).select('sportId'),
     ])
+    const enrollments = await EnrollmentModel.query({ client }).whereIn(
+      'studentId',
+      students.map((student) => student.id),
+    )
 
     const locked = new Set(drawn.map((bracket) => bracket.sportId))
 
@@ -117,7 +118,9 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
       students: students.map((student) => ({
         id: student.id,
         name: student.name,
-        sportIds: student.enrollments.map((enrollment) => enrollment.sportId),
+        sportIds: enrollments
+          .filter((enrollment) => enrollment.studentId === student.id)
+          .map((enrollment) => enrollment.sportId),
       })),
     }
   }

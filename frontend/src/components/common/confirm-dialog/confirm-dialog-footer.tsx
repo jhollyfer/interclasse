@@ -1,3 +1,4 @@
+import type { Merge } from '@interclasse/shared'
 import * as React from 'react'
 
 import {
@@ -6,7 +7,6 @@ import {
   AlertDialogFooter,
 } from '#/components/ui/alert-dialog'
 import { Button } from '#/components/ui/button'
-import type { Merge } from '#/lib/merge'
 import { m } from '#/paraglide/messages'
 
 import { useConfirmDialogContext } from './confirm-dialog-context'
@@ -54,7 +54,10 @@ export function ConfirmDialogCancel({
 }
 
 type ConfirmDialogConfirmProps = Readonly<
-  Merge<React.ComponentProps<typeof Button>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<typeof Button>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 /**

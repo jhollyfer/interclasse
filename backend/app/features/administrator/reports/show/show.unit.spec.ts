@@ -4,11 +4,11 @@ import { CATEGORY, MATCH_STATUS } from '@interclasse/shared'
 import AdministratorReportShowUseCase from './show.use-case.ts'
 
 import { ReportRepository } from '#repositories/report/report.repository'
-import { ReportMemoryRepository } from '#repositories/report/report.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const reports = new ReportMemoryRepository()
+  const reports = MemoryRepositories.reports()
     .withClassroom({ id: 'c1', name: '7º A', grade: 7, category: CATEGORY.F2 })
     .withClassroom({ id: 'c2', name: '3º Z', grade: 3, category: CATEGORY.F1 })
     .withStudent('s1', 'c1')

@@ -1,7 +1,7 @@
 # Dependências na última versão publicada (_standards/tooling.md §0): o Dependabot
 # abre o PR de atualização, e o upgrade é revisado antes do merge - changelog e
 # `.d.ts` novos em major. Um workspace pnpm com lockfile único na raiz
-# (`tooling.md` §1): os três pacotes saem de `directories`.
+# (`tooling.md` §1): os três pacotes e a raiz saem de `directories` (§9).
 version: 2
 updates:
   - package-ecosystem: npm
@@ -12,19 +12,24 @@ updates:
       - /shared
     schedule:
       interval: weekly
+    open-pull-requests-limit: 5
     groups:
-      minor-e-patch:
-        update-types: [minor, patch]
+      patches:
+        update-types: [patch]
+    ignore:
+      # Fica na última 6.x (tooling.md §0, DECISIONS.md #121).
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
 
-  # A imagem base do `Dockerfile-production` de cada app.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # A imagem base do `Dockerfile-production` de cada app, fixada por digest.
   - package-ecosystem: docker
     directories:
       - /backend
       - /frontend
-    schedule:
-      interval: weekly
-
-  - package-ecosystem: github-actions
-    directory: /
     schedule:
       interval: weekly

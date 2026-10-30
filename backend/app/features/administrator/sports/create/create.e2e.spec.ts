@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import Sport from '#models/sport'
+import { Stored } from '#tests/stored-fixtures'
 import { SportFactory } from '#database/factories/sport.factory'
 import {
   authenticateAsAdministrator,
@@ -25,7 +25,7 @@ test.group('sports > create', (group) => {
     assert.equal(body(response).slug, 'volei-de-praia')
     assert.equal(body(response).minAthletes, 2)
     assert.equal(body(response).maxAthletes, 4)
-    assert.isNotNull(await Sport.find(body(response).id))
+    assert.isNotNull(await Stored.sport(body(response).id))
   })
 
   test('nome repetido responde 409 apontando o campo', async ({ client, assert }) => {
@@ -65,7 +65,7 @@ test.group('sports > create', (group) => {
     response.assertStatus(422)
     assert.equal(body(response).code, 'SPORT_INVALID_LIMITS')
     assert.property(body(response).errors, 'minAthletes')
-    assert.isNull(await Sport.findBy('name', payload.name))
+    assert.isNull(await Stored.sportByName(payload.name))
   })
 
   test('payload sem os campos obrigatórios responde 422', async ({ client, assert }) => {

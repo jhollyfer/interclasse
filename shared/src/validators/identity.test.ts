@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { LOCALES } from '../enums/locale.js'
 import { IDENTITY_MESSAGES, useValidatorLocale } from '../validator.js'
-
 import { AccountProfileUpdateValidator } from './account/profile.validator.js'
 import { AdministratorUserCreateValidator } from './administrator/users.validator.js'
 
@@ -33,8 +32,12 @@ describe('validators de identidade', () => {
         passwordConfirmation: 'Outra@1234',
       })
 
-      expect(weak.error?.issues[0]?.message).toBe(IDENTITY_MESSAGES[locale].weakPassword)
-      expect(mismatch.error?.issues[0]?.message).toBe(IDENTITY_MESSAGES[locale].passwordMismatch)
+      expect(weak.error?.issues[0]?.message).toBe(
+        IDENTITY_MESSAGES[locale].weakPassword,
+      )
+      expect(mismatch.error?.issues[0]?.message).toBe(
+        IDENTITY_MESSAGES[locale].passwordMismatch,
+      )
     }
 
     useValidatorLocale('pt-BR')

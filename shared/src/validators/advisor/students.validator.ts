@@ -21,8 +21,14 @@ export const AdvisorStudentUpdateValidator = z.object({
   name: studentName(),
 })
 
-export type AdvisorStudentPaginatePayload = z.infer<typeof AdvisorStudentPaginateValidator>
+export type AdvisorStudentPaginatePayload = z.infer<
+  typeof AdvisorStudentPaginateValidator
+>
 
-export type AdvisorStudentCreatePayload = z.infer<typeof AdvisorStudentCreateValidator>
+export type AdvisorStudentCreatePayload = z.infer<
+  typeof AdvisorStudentCreateValidator
+>
 
-export type AdvisorStudentUpdatePayload = z.infer<typeof AdvisorStudentUpdateValidator>
+export type AdvisorStudentUpdatePayload = z.infer<
+  typeof AdvisorStudentUpdateValidator
+>

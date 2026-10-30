@@ -1,5 +1,3 @@
-import type * as React from 'react'
-import { toast } from 'sonner'
 import {
   AdministratorMatchScoreValidator,
   AdministratorMatchUpdateValidator,
@@ -10,37 +8,9 @@ import type {
   AdministratorMatchScoreResponse,
   AdministratorMatchUpdateResponse,
 } from '@interclasse/shared'
+import * as React from 'react'
+import { toast } from 'sonner'
 
-import { Button } from '#/components/ui/button'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '#/components/ui/dialog'
-import { Input } from '#/components/ui/input'
-import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
-import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
-import { blankToNull } from '#/lib/form-values'
-import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
-import { useMutationForm } from '#/hooks/use-mutation-form'
-import {
-  AppField,
-  AppFormRootError,
-} from '#/integrations/react-hook-form/app-field'
-import {
-  useMatchScore,
-  useMatchUnscore,
-  useMatchUpdate,
-} from '#/integrations/tanstack-query/mutations/administrator'
-import type {
-  MatchScoreVariables,
-  MatchUpdateVariables,
-} from '#/integrations/tanstack-query/mutations/administrator'
 import {
   ConfirmDialog,
   ConfirmDialogCancel,
@@ -50,27 +20,49 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
+import { OptionCombobox } from '#/components/common/option-combobox'
+import { Button } from '#/components/ui/button'
+import {
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '#/components/ui/dialog'
+import { Input } from '#/components/ui/input'
+import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
+import { useMutationForm } from '#/hooks/use-mutation-form'
+import {
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import {
+  useMatchScoreMutation,
+  useMatchUnscoreMutation,
+  useMatchUpdateMutation,
+} from '#/integrations/tanstack-query/mutations/administrator'
+import type {
+  MatchScoreVariables,
+  MatchUpdateVariables,
+} from '#/integrations/tanstack-query/mutations/administrator'
+import type { ConfirmHandle, DialogHandle } from '#/lib/dialog-handle'
+import { notifyError } from '#/lib/form-errors'
+import { blankToNull } from '#/lib/form-values'
+import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-/** O mínimo de uma partida que os dois diálogos precisam. */
-export type MatchRef = Readonly<{
-  id: string
-  phase: string
-  homeTeamId: string | null
-  awayTeamId: string | null
-  homeName: string | null
-  awayName: string | null
-  homeScore: number | null
-  awayScore: number | null
-  winnerTeamId: string | null
-  scheduledAt: string | null
-  location: string | null
-}>
+import { MatchDialogShell } from './match-dialog-shell'
+import type { MatchRef } from './match-dialog-shell'
+
+export type { MatchRef } from './match-dialog-shell'
 
 type DialogProps = Readonly<{
+  handle: DialogHandle<MatchRef>
+}>
+
+type FormProps = Readonly<{
   match: MatchRef
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  handle: DialogHandle<MatchRef>
 }>
 
 const SCORE_FIELDS = ['homeScore', 'awayScore', 'winnerTeamId'] as const
@@ -88,11 +80,15 @@ function isTied(home: number | undefined, away: number | undefined): boolean {
  * O placar. Empatado, aparece a escolha de quem venceu nos pênaltis - o
  * servidor recusa o empate sem ela.
  */
-export function MatchScoreDialog({
-  match,
-  open,
-  onOpenChange,
-}: DialogProps): React.JSX.Element {
+export function MatchScoreDialog({ handle }: DialogProps): React.JSX.Element {
+  return (
+    <MatchDialogShell handle={handle}>
+      {(match) => <MatchScoreForm match={match} handle={handle} />}
+    </MatchDialogShell>
+  )
+}
+
+function MatchScoreForm({ match, handle }: FormProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorMatchScorePayload,
     AdministratorMatchScoreResponse,
@@ -105,7 +101,7 @@ export function MatchScoreDialog({
       winnerTeamId: match.winnerTeamId ?? undefined,
     },
     fields: SCORE_FIELDS,
-    mutation: useMatchScore,
+    mutation: useMatchScoreMutation,
     success: m.common_match_score_saved(),
     // Placar é escrita idempotente: reenviar grava o mesmo resultado.
     retry: 'match-score',
@@ -117,98 +113,88 @@ export function MatchScoreDialog({
       return { ...values, id: match.id, winnerTeamId }
     },
     invalidate: GAME_CHANGE,
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => handle.close(),
   })
 
   const tied = isTied(form.watch('homeScore'), form.watch('awayScore'))
+  const winnerOptions = [
+    { value: match.homeTeamId ?? '', label: match.homeName ?? '' },
+    { value: match.awayTeamId ?? '', label: match.awayName ?? '' },
+  ]
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <form method="post" onSubmit={onSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle>{m.common_match_score_title()}</DialogTitle>
-            <DialogDescription>
-              {m.common_match_versus({
-                home: match.homeName ?? m.common_to_be_defined(),
-                away: match.awayName ?? m.common_to_be_defined(),
-              })}
-            </DialogDescription>
-          </DialogHeader>
+    <form method="post" onSubmit={onSubmit} className="grid gap-4">
+      <DialogHeader>
+        <DialogTitle>{m.common_match_score_title()}</DialogTitle>
+        <DialogDescription>
+          {m.common_match_versus({
+            home: match.homeName ?? m.common_to_be_defined(),
+            away: match.awayName ?? m.common_to_be_defined(),
+          })}
+        </DialogDescription>
+      </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-4">
-            <AppField
-              control={form.control}
-              name="homeScore"
-              id="score-home"
-              label={match.homeName}
-            >
-              {({ field, control }) => (
-                <ScoreInput
-                  {...control}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  onBlur={field.onBlur}
-                />
-              )}
-            </AppField>
-            <AppField
-              control={form.control}
-              name="awayScore"
-              id="score-away"
-              label={match.awayName}
-            >
-              {({ field, control }) => (
-                <ScoreInput
-                  {...control}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  onBlur={field.onBlur}
-                />
-              )}
-            </AppField>
-          </div>
-
-          {tied && (
-            <AppField
-              control={form.control}
-              name="winnerTeamId"
-              id="score-winner"
-              label={m.common_match_penalty_winner()}
-            >
-              {({ field, control }) => (
-                <NativeSelect
-                  {...control}
-                  value={field.value ?? ''}
-                  onChange={(event) =>
-                    field.onChange(event.target.value || undefined)
-                  }
-                  onBlur={field.onBlur}
-                >
-                  <NativeSelectOption value="">
-                    {m.common_select_placeholder()}
-                  </NativeSelectOption>
-                  <NativeSelectOption value={match.homeTeamId ?? ''}>
-                    {match.homeName}
-                  </NativeSelectOption>
-                  <NativeSelectOption value={match.awayTeamId ?? ''}>
-                    {match.awayName}
-                  </NativeSelectOption>
-                </NativeSelect>
-              )}
-            </AppField>
+      <div className="grid grid-cols-2 gap-4">
+        <AppField
+          control={form.control}
+          name="homeScore"
+          id="score-home"
+          label={match.homeName}
+        >
+          {({ field, control }) => (
+            <ScoreInput
+              {...control}
+              value={field.value}
+              onValueChange={field.onChange}
+              onBlur={field.onBlur}
+            />
           )}
+        </AppField>
+        <AppField
+          control={form.control}
+          name="awayScore"
+          id="score-away"
+          label={match.awayName}
+        >
+          {({ field, control }) => (
+            <ScoreInput
+              {...control}
+              value={field.value}
+              onValueChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        </AppField>
+      </div>
 
-          <AppFormRootError form={form} />
+      {tied && (
+        <AppField
+          control={form.control}
+          name="winnerTeamId"
+          id="score-winner"
+          label={m.common_match_penalty_winner()}
+        >
+          {({ field, control }) => (
+            <OptionCombobox
+              id={control.id}
+              aria-invalid={control['aria-invalid']}
+              value={field.value}
+              onValueChange={(value) => field.onChange(value || undefined)}
+              onBlur={field.onBlur}
+              options={winnerOptions}
+            />
+          )}
+        </AppField>
+      )}
 
-          <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {m.common_match_score_submit()}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <AppFormRootError form={form} />
+
+      <DialogFooter>
+        <Button type="submit" disabled={mutation.isPending}>
+          {m.common_match_score_submit()}
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }
 
@@ -243,10 +229,16 @@ function ScoreInput({
 
 /** Data, hora e local da partida. */
 export function MatchScheduleDialog({
-  match,
-  open,
-  onOpenChange,
+  handle,
 }: DialogProps): React.JSX.Element {
+  return (
+    <MatchDialogShell handle={handle}>
+      {(match) => <MatchScheduleForm match={match} handle={handle} />}
+    </MatchDialogShell>
+  )
+}
+
+function MatchScheduleForm({ match, handle }: FormProps): React.JSX.Element {
   const { form, mutation, onSubmit } = useMutationForm<
     AdministratorMatchUpdatePayload,
     AdministratorMatchUpdateResponse,
@@ -257,7 +249,7 @@ export function MatchScheduleDialog({
     // `null`. O relógio da escola é só o que o campo mostra.
     defaults: { scheduledAt: match.scheduledAt, location: match.location },
     fields: SCHEDULE_FIELDS,
-    mutation: useMatchUpdate,
+    mutation: useMatchUpdateMutation,
     success: m.common_match_schedule_saved(),
     retry: 'match-update',
     payload: (values) => ({
@@ -266,73 +258,69 @@ export function MatchScheduleDialog({
       location: values.location ?? null,
     }),
     invalidate: GAME_CHANGE,
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => handle.close(),
   })
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <form method="post" onSubmit={onSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle>{m.common_match_schedule_title()}</DialogTitle>
-            <DialogDescription>
-              {m.common_match_versus({
-                home: match.homeName ?? m.common_to_be_defined(),
-                away: match.awayName ?? m.common_to_be_defined(),
-              })}
-            </DialogDescription>
-          </DialogHeader>
+    <form method="post" onSubmit={onSubmit} className="grid gap-4">
+      <DialogHeader>
+        <DialogTitle>{m.common_match_schedule_title()}</DialogTitle>
+        <DialogDescription>
+          {m.common_match_versus({
+            home: match.homeName ?? m.common_to_be_defined(),
+            away: match.awayName ?? m.common_to_be_defined(),
+          })}
+        </DialogDescription>
+      </DialogHeader>
 
-          <AppField
-            control={form.control}
-            name="scheduledAt"
-            id="schedule-when"
-            label={m.common_match_when()}
-          >
-            {({ field, control }) => (
-              <Input
-                {...control}
-                type="datetime-local"
-                value={toSchoolInput(field.value ?? null)}
-                onChange={(event) => {
-                  const typed = event.target.value
-                  if (typed) field.onChange(fromSchoolInput(typed))
-                  else field.onChange(null)
-                }}
-                onBlur={field.onBlur}
-              />
-            )}
-          </AppField>
-          <AppField
-            control={form.control}
-            name="location"
-            id="schedule-location"
-            label={m.common_match_location()}
-          >
-            {({ field, control }) => (
-              <Input
-                {...control}
-                maxLength={120}
-                placeholder={m.common_match_location_placeholder()}
-                value={field.value ?? ''}
-                onChange={(event) =>
-                  field.onChange(blankToNull(event.target.value))
-                }
-                onBlur={field.onBlur}
-              />
-            )}
-          </AppField>
+      <AppField
+        control={form.control}
+        name="scheduledAt"
+        id="schedule-when"
+        label={m.common_match_when()}
+      >
+        {({ field, control }) => (
+          <Input
+            {...control}
+            type="datetime-local"
+            value={toSchoolInput(field.value ?? null)}
+            onChange={(event) => {
+              const typed = event.target.value
+              if (typed) field.onChange(fromSchoolInput(typed))
+              else field.onChange(null)
+            }}
+            onBlur={field.onBlur}
+          />
+        )}
+      </AppField>
+      <AppField
+        control={form.control}
+        name="location"
+        id="schedule-location"
+        label={m.common_match_location()}
+      >
+        {({ field, control }) => (
+          <Input
+            {...control}
+            maxLength={120}
+            placeholder={m.common_match_location_placeholder()}
+            value={field.value ?? ''}
+            onChange={(event) =>
+              field.onChange(blankToNull(event.target.value))
+            }
+            onBlur={field.onBlur}
+          />
+        )}
+      </AppField>
 
-          <AppFormRootError form={form} />
+      <AppFormRootError form={form} />
 
-          <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {m.common_match_schedule_submit()}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <Button type="submit" disabled={mutation.isPending}>
+          {m.common_match_schedule_submit()}
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }
 
@@ -341,12 +329,12 @@ export function MatchScheduleDialog({
  * seguinte já tem placar, e o motivo chega por toast.
  */
 export function MatchUnscoreDialog({
-  match,
-  open,
-  onOpenChange,
-}: DialogProps): React.JSX.Element {
+  handle,
+}: Readonly<{
+  handle: ConfirmHandle<MatchRef>
+}>): React.JSX.Element {
   const invalidate = useInvalidate()
-  const unscore = useMatchUnscore({
+  const unscore = useMatchUnscoreMutation({
     onSuccess: async () => {
       toast.success(m.common_match_unscored())
       await invalidate(GAME_CHANGE)
@@ -357,29 +345,34 @@ export function MatchUnscoreDialog({
   return (
     <ConfirmDialog
       destructive
-      open={open}
-      onOpenChange={onOpenChange}
-      onConfirm={() => unscore.mutate(match.id)}
+      handle={handle}
+      onConfirm={(match) => {
+        if (match) unscore.mutate(match.id)
+      }}
     >
-      <ConfirmDialogHeader>
-        <ConfirmDialogTitle>
-          {m.common_match_unscore_title()}
-        </ConfirmDialogTitle>
-        <ConfirmDialogDescription>
-          {m.common_match_unscore_description({
-            home: match.homeName ?? m.common_to_be_defined(),
-            homeScore: match.homeScore ?? '-',
-            awayScore: match.awayScore ?? '-',
-            away: match.awayName ?? m.common_to_be_defined(),
-          })}
-        </ConfirmDialogDescription>
-      </ConfirmDialogHeader>
-      <ConfirmDialogFooter>
-        <ConfirmDialogCancel />
-        <ConfirmDialogConfirm>
-          {m.common_match_unscore_submit()}
-        </ConfirmDialogConfirm>
-      </ConfirmDialogFooter>
+      {(match) => (
+        <React.Fragment>
+          <ConfirmDialogHeader>
+            <ConfirmDialogTitle>
+              {m.common_match_unscore_title()}
+            </ConfirmDialogTitle>
+            <ConfirmDialogDescription>
+              {m.common_match_unscore_description({
+                home: match.homeName ?? m.common_to_be_defined(),
+                homeScore: match.homeScore ?? '-',
+                awayScore: match.awayScore ?? '-',
+                away: match.awayName ?? m.common_to_be_defined(),
+              })}
+            </ConfirmDialogDescription>
+          </ConfirmDialogHeader>
+          <ConfirmDialogFooter>
+            <ConfirmDialogCancel />
+            <ConfirmDialogConfirm>
+              {m.common_match_unscore_submit()}
+            </ConfirmDialogConfirm>
+          </ConfirmDialogFooter>
+        </React.Fragment>
+      )}
     </ConfirmDialog>
   )
 }

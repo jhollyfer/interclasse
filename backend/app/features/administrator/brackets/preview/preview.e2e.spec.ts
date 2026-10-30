@@ -5,7 +5,12 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 test.group('brackets > preview', (group) => {
   group.each.setup(() => resetDatabase())
@@ -41,5 +46,40 @@ test.group('brackets > preview', (group) => {
       [cheia.id]: { athletes: 2, eligible: true },
       [vazia.id]: { athletes: 0, eligible: false },
     })
+  })
+})
+
+test.group('administrator/brackets/preview > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.get('/administrator/brackets/preview')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.get('/administrator/brackets/preview').cookies(advisor)
+
+    response.assertStatus(403)
+  })
+})
+
+test.group('administrator/brackets/preview > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('modalidade malformada e categoria ausente respondem 422 apontando os campos', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/administrator/brackets/preview?sportId=x').cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'sportId')
+    assert.property(body(response).errors, 'category')
   })
 })

@@ -3,10 +3,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { type ErrorEnvelope } from '@interclasse/shared'
 
 /**
- * O corpo JSON que toda falha da API devolve. Segue a convenção do AdonisJS:
- * `status` é o número HTTP e `code` é o código de máquina.
+ * O corpo JSON que toda falha da API devolve, definido uma vez em
+ * `core/response.ts`: `status` é o número HTTP e `code` é o código de máquina.
  */
-/** O envelope de erro da API, definido uma vez em `core/response.ts`. */
 export type HTTPExceptionPayload = ErrorEnvelope
 
 /**

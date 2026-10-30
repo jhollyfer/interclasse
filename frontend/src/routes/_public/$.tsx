@@ -35,5 +35,5 @@ export const Route = createFileRoute('/_public/$')({
   // `min-h` menor que o padrão: dentro da casca a tela divide a altura com o
   // cabeçalho e o rodapé, e `min-h-dvh` empurraria o rodapé para fora da
   // primeira dobra.
-  component: () => <NotFoundPage className="min-h-[60dvh]" />,
+  component: () => <NotFoundPage className="min-h-stage-sm" />,
 })

@@ -11,6 +11,8 @@ import {
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
+import { PhotoReadBase } from '#features/_shared.photo-read.base'
+import { StorageContract } from '#services/storage/storage.contract'
 import type { IdentifierPayload } from '#core/validator'
 import type { AdministratorPhotoReviewPayload } from '#validators/administrator/photos.validator'
 
@@ -25,11 +27,10 @@ type Response = Either<HTTPException, AdministratorPhotoShowResponse>
  * por engano é aprovada de novo, e a aprovada pode sair do ar sem ser apagada.
  */
 @inject()
-export default class AdministratorPhotoReviewUseCase {
-  constructor(
-    private readonly photos: PhotoRepository,
-    private readonly i18n: I18n,
-  ) {}
+export default class AdministratorPhotoReviewUseCase extends PhotoReadBase {
+  constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {
+    super(photos, bucket, i18n)
+  }
 
   async execute({ id, status, actor }: Payload): Promise<Response> {
     try {
@@ -44,7 +45,7 @@ export default class AdministratorPhotoReviewUseCase {
       if (!shown)
         return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
 
-      return right(shown)
+      return right(await this.signed(shown))
     } catch (error) {
       logger.error({ err: error }, '[administrator/photos > review][error]')
 

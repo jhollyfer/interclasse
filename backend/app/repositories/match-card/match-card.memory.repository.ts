@@ -7,7 +7,7 @@ import {
 } from './match-card.repository.ts'
 
 import { MatchCard, type MatchCardProps } from '#domain/match-card/match-card.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 import type { BracketRepository } from '#repositories/bracket/bracket.repository'
 
 /**

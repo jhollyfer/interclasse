@@ -1,0 +1,56 @@
+import {
+  SessionRepository,
+  type RefreshGrant,
+  type SessionTokens,
+} from '#repositories/session/session.repository'
+
+/**
+ * Os tokens da sessão em memória, para o teste unitário. Honra o contrato do
+ * `SessionLucidRepository`: o token emitido é lido de volta, a revogação o
+ * tira, e o teste lê o que foi emitido e revogado.
+ */
+export class SessionMemoryRepository extends SessionRepository {
+  readonly issued: string[] = []
+  readonly revokedAll: string[] = []
+  private readonly refresh = new Map<string, RefreshGrant>()
+  private sequence = 0
+
+  /** Arranjo do teste: um token de refresh válido para a conta. */
+  withRefresh(value: string, grant: RefreshGrant): this {
+    this.refresh.set(value, grant)
+    return this
+  }
+
+  async issue(userId: string): Promise<SessionTokens | null> {
+    this.issued.push(userId)
+    this.sequence += 1
+    const refreshToken = `refresh-${userId}-${this.sequence}`
+    this.refresh.set(refreshToken, { userId, identifier: String(this.sequence) })
+
+    return { accessToken: `access-${userId}-${this.sequence}`, refreshToken }
+  }
+
+  async revokeAll(userId: string): Promise<void> {
+    this.revokedAll.push(userId)
+
+    for (const [value, grant] of this.refresh) {
+      if (grant.userId === userId) this.refresh.delete(value)
+    }
+  }
+
+  async revoke(userId: string, identifier: string): Promise<boolean> {
+    for (const [value, grant] of this.refresh) {
+      if (grant.userId !== userId || grant.identifier !== identifier) continue
+
+      this.refresh.delete(value)
+
+      return true
+    }
+
+    return false
+  }
+
+  async readRefresh(value: string): Promise<RefreshGrant | null> {
+    return this.refresh.get(value) ?? null
+  }
+}

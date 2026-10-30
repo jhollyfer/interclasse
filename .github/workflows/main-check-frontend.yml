@@ -1,0 +1,241 @@
+name: Check Frontend
+
+# Reutilizável: o PR (`ci.yml`) e o push em `main` (`main-build-frontend.yml`)
+# chamam este mesmo arquivo (_standards/tooling.md §7, §8.1).
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Frontend - check, testes e build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm e Node
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # O frontend importa o `dist/` do `@interclasse/shared`.
+      - name: Build shared
+        run: pnpm --filter ./shared --fail-if-no-match run build
+
+      # As mensagens do Paraglide compiladas antes de tudo que lê tipo: a saída
+      # (`src/paraglide/`) não é versionada (_standards/i18n.md §2). O compilador
+      # baixa os plugins do jsDelivr (`project.inlang/settings.json`).
+      - name: Compile messages
+        run: pnpm --filter ./frontend --fail-if-no-match i18n:compile
+
+      # Tradução, variável e plural faltando; mensagem sem uso (i18n.md §4).
+      - name: Check messages
+        run: pnpm --filter ./frontend --fail-if-no-match i18n:check
+
+      - name: Lint
+        run: pnpm --filter ./frontend --fail-if-no-match lint
+
+      # `vite build` apaga tipo sem checar nada; o `tsc --noEmit` inclui `e2e/`.
+      - name: Typecheck
+        run: pnpm --filter ./frontend --fail-if-no-match typecheck
+
+      - name: Prettier
+        run: pnpm --filter ./frontend --fail-if-no-match format:check
+
+      - name: Test unit
+        run: pnpm --filter ./frontend --fail-if-no-match test:unit
+
+      - name: Build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: pnpm --filter ./frontend --fail-if-no-match run build
+
+      # `routeTree.gen.ts` é artefato commitado: o build o regenera, e diferença
+      # é arquivo desatualizado (tooling.md §9).
+      - name: routeTree.gen.ts em dia
+        run: git diff --exit-code -- frontend/src/routeTree.gen.ts
+
+      - name: Ciclos de chunk
+        run: pnpm --filter ./frontend --fail-if-no-match check-cycles
+
+  # Playwright num job próprio, depois do build, com o backend em container: a
+  # imagem do próprio commit, o banco e o MinIO como no job do backend
+  # (tooling.md §7, passo 8).
+  e2e:
+    name: Frontend - E2E (Playwright)
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      database:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: interclasse
+          POSTGRES_PASSWORD: interclasse
+          POSTGRES_DB: interclasse
+        ports:
+          - '5434:5432'
+        options: >-
+          --health-cmd "pg_isready -U interclasse -d interclasse"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm e Node
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared
+        run: pnpm --filter ./shared --fail-if-no-match run build
+
+      - name: Compile messages
+        run: pnpm --filter ./frontend --fail-if-no-match i18n:compile
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build MinIO
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend/infra/minio
+          load: true
+          push: false
+          tags: interclasse-minio-test:2025-10-15
+          cache-from: type=gha,scope=minio
+          cache-to: type=gha,mode=max,scope=minio
+
+      # A API da própria revisão, a mesma imagem que vai para produção.
+      - name: Build API
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: backend/Dockerfile-production
+          load: true
+          push: false
+          tags: interclasse-api:e2e
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+      - name: Start MinIO
+        env:
+          MINIO_ROOT_USER: ci-minio-root
+          MINIO_ROOT_PASSWORD: ci-minio-root-secret
+        run: |
+          docker run -d --name minio --network host \
+            -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+            -e MINIO_API_CORS_ALLOW_ORIGIN='http://localhost:3010' \
+            interclasse-minio-test:2025-10-15 server /data --address ":9004" --console-address ":9003"
+
+      - name: Setup MinIO e espera pelo bucket
+        env:
+          MINIO_ENDPOINT: http://localhost:9004
+          MINIO_ROOT_USER: ci-minio-root
+          MINIO_ROOT_PASSWORD: ci-minio-root-secret
+          STORAGE_KEY: interclasse
+          STORAGE_SECRET: interclasse-secret
+          STORAGE_BUCKET: interclasse
+        run: |
+          for _ in $(seq 1 30); do
+            if docker run --rm --network host \
+              -e MINIO_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+              -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
+              -v "$PWD/backend/infra/minio:/setup:ro" \
+              --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
+              -c '/setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}"'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "o bucket não ficou disponível" >&2
+          exit 1
+
+      # Migrations, seed do administrador e demonstração (conselheiras do E2E),
+      # depois a API de pé. Valores só de teste; nenhum serve fora deste job.
+      - name: Sobe a API
+        env:
+          SEED_ADMINISTRATOR_PASSWORD: Ci-Owner-1!
+          SEED_DEMO_PASSWORD: Ci-Demo-1!
+        run: |
+          cat > "$RUNNER_TEMP/api.env" <<ENV
+          NODE_ENV=development
+          PORT=3333
+          HOST=0.0.0.0
+          LOG_LEVEL=info
+          APP_KEY=ci-placeholder-sem-uso-fora-deste-job
+          APP_SERVER_URL=http://localhost:3333
+          SESSION_DRIVER=cookie
+          CORS_ORIGINS=http://localhost:3010
+          DATABASE_URL=postgres://interclasse:interclasse@localhost:5434/interclasse
+          UPLOAD_MAX_SIZE=1073741824
+          STORAGE_KEY=interclasse
+          STORAGE_SECRET=interclasse-secret
+          STORAGE_BUCKET=interclasse
+          STORAGE_ENDPOINT=http://localhost:9004
+          STORAGE_FORCE_PATH_STYLE=true
+          SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
+          SEED_ADMINISTRATOR_PASSWORD=${SEED_ADMINISTRATOR_PASSWORD}
+          SEED_DEMO_PASSWORD=${SEED_DEMO_PASSWORD}
+          ENV
+          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace migration:run --force
+          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace db:seed
+          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace db:seed --files database/seeders/dev/demo.js
+          docker run -d --name api --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3333/health-check; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs api >&2
+          echo "a API não respondeu em /health-check" >&2
+          exit 1
+
+      # Sem cache de navegador: a doc do Playwright não o recomenda.
+      - name: Install Playwright
+        run: pnpm --filter ./frontend --fail-if-no-match exec playwright install --with-deps chromium
+
+      # Credenciais só de teste, as mesmas do seed acima; nenhuma tem default no
+      # código (tooling.md §7). As contas de conselheira vêm da demonstração.
+      - name: Test e2e
+        env:
+          E2E_ADMIN_EMAIL: administrator@mail.com
+          E2E_ADMIN_PASSWORD: Ci-Owner-1!
+          E2E_ADVISOR_EMAIL: raimunda.tananta@escola.demo
+          E2E_ADVISOR_PASSWORD: Ci-Demo-1!
+          E2E_SECOND_ADVISOR_EMAIL: joelson.cruz@escola.demo
+          E2E_SECOND_ADVISOR_PASSWORD: Ci-Demo-1!
+          E2E_API_URL: http://localhost:3333
+        run: pnpm --filter ./frontend --fail-if-no-match run test:e2e --workers=1 --add-reporter=github
+
+      - name: Relatório do Playwright
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

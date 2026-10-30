@@ -1,11 +1,11 @@
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { FilePdfIcon } from '@phosphor-icons/react'
 import { AdministratorSiteUpdateValidator } from '@interclasse/shared'
 import type {
   AdministratorSiteUpdatePayload,
   AdministratorSiteShowResponse,
 } from '@interclasse/shared'
+import { FilePdfIcon } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import {
   ImageField,
@@ -31,7 +31,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useSiteUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { blankToNull, nanToNull } from '#/lib/form-values'
 import { m } from '#/paraglide/messages'
@@ -79,7 +79,7 @@ export function SiteForm(): React.JSX.Element {
     validator: AdministratorSiteUpdateValidator,
     values: valuesOf(site),
     fields: SITE_FIELDS,
-    mutation: useSiteUpdate,
+    mutation: useSiteUpdateMutation,
     invalidate: [queryKeys.administrator.site, ...DEPENDENTS.site],
     success: m.admin_site_updated(),
     retry: 'site-update',
@@ -204,7 +204,7 @@ export function SiteForm(): React.JSX.Element {
                   <Input
                     {...control}
                     maxLength={30}
-                    placeholder="cmei_cosmejean"
+                    placeholder={m.admin_site_field_school_instagram_placeholder()}
                     value={field.value ?? ''}
                     onChange={(event) =>
                       field.onChange(blankToNull(event.target.value))

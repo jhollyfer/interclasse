@@ -23,7 +23,7 @@ export default class AdvisorStudentUpdateController {
     const result = await this.useCase.execute({
       ...body,
       ...params,
-      actor: context.auth.getUserOrFail(),
+      actor: context.actor,
     })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

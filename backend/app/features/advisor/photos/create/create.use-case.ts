@@ -3,9 +3,11 @@ import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
 import { left, type AdvisorPhotoShowResponse, type Either, type Merge } from '@interclasse/shared'
 
-import { PhotoSubmission } from '#features/_shared.photo-submission'
+import { PhotoSubmissionBase } from '#features/_shared.photo-submission.base'
+import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { PHOTO_SENDER } from '#domain/photo/photo.entity'
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import type { AdvisorPhotoCreatePayload } from '#validators/advisor/photos.validator'
 
 type Payload = Merge<AdvisorPhotoCreatePayload, { actor: { readonly id: string } }>
@@ -16,15 +18,14 @@ type Response = Either<HTTPException, AdvisorPhotoShowResponse>
  * decide se vai ao ar é a organização.
  */
 @inject()
-export default class AdvisorPhotoCreateUseCase {
-  constructor(
-    private readonly submission: PhotoSubmission,
-    private readonly i18n: I18n,
-  ) {}
+export default class AdvisorPhotoCreateUseCase extends PhotoSubmissionBase {
+  constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {
+    super(photos, bucket, i18n)
+  }
 
   async execute({ actor, ...upload }: Payload): Promise<Response> {
     try {
-      return await this.submission.submit({
+      return await this.submit({
         ...upload,
         author: actor,
         sender: PHOTO_SENDER.ADVISOR,

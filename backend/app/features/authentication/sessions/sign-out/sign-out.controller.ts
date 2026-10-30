@@ -4,7 +4,7 @@ import { inject } from '@adonisjs/core'
 import AuthenticationSessionSignOutUseCase from './sign-out.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import CookieService, { COOKIE_TOKEN } from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 
 @inject()
 export default class AuthenticationSessionSignOutController {
@@ -19,24 +19,25 @@ export default class AuthenticationSessionSignOutController {
       'senha em `PUT /account`, não desta rota.',
   })
 
-  constructor(
-    private readonly cookie: CookieService,
-    private readonly useCase: AuthenticationSessionSignOutUseCase,
-  ) {}
+  constructor(private readonly useCase: AuthenticationSessionSignOutUseCase) {}
 
   async handle(context: HttpContext) {
-    const actor = context.auth.getUserOrFail()
+    const { actor } = context
     const refreshToken = context.request.cookie(COOKIE_TOKEN.REFRESH)
 
     const result = await this.useCase.execute({
       actor,
-      accessTokenId: actor.currentAccessToken?.identifier.toString(),
+      accessTokenId: context.auth.user?.currentAccessToken?.identifier.toString(),
       refreshToken,
     })
 
     if (result.isLeft()) throw result.value
 
-    this.cookie.clear(context)
+    // Os MESMOS atributos da emissão, e não `clearCookie` pelado: sem eles o
+    // navegador cria um segundo cookie host-only vazio e o de domínio sobrevive.
+    context.response
+      .clearCookie(COOKIE_TOKEN.ACCESS, cookieOptions.clear)
+      .clearCookie(COOKIE_TOKEN.REFRESH, cookieOptions.clear)
 
     return context.response.noContent()
   }

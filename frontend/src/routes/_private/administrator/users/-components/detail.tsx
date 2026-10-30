@@ -1,17 +1,24 @@
-import { getRouteApi, Link, useRouter } from '@tanstack/react-router'
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { USER_ROLE } from '@interclasse/shared'
 import {
   ArchiveIcon,
   ArrowCounterClockwiseIcon,
   PencilSimpleIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi, Link, useRouter } from '@tanstack/react-router'
+import type * as React from 'react'
 import { toast } from 'sonner'
-import { USER_ROLE } from '@interclasse/shared'
 
-import { Button } from '#/components/ui/button'
-import { notifyError } from '#/lib/form-errors'
+import {
+  ConfirmDialog,
+  ConfirmDialogCancel,
+  ConfirmDialogConfirm,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+} from '#/components/common/confirm-dialog'
 import {
   PageHeader,
   PageHeaderActions,
@@ -25,23 +32,16 @@ import {
 } from '#/components/common/page-shell'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import {
-  ConfirmDialog,
-  ConfirmDialogCancel,
-  ConfirmDialogConfirm,
-  ConfirmDialogDescription,
-  ConfirmDialogFooter,
-  ConfirmDialogHeader,
-  ConfirmDialogTitle,
-} from '#/components/common/confirm-dialog'
-import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import {
-  useUserArchive,
-  useUserDelete,
-  useUserUnarchive,
-} from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import {
+  useUserArchiveMutation,
+  useUserDeleteMutation,
+  useUserUnarchiveMutation,
+} from '#/integrations/tanstack-query/mutations/administrator'
+import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { notifyError } from '#/lib/form-errors'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_VARIANTS,
@@ -75,7 +75,7 @@ export function UserDetail(): React.JSX.Element {
     })
   }
 
-  const archive = useUserArchive({
+  const archive = useUserArchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     async onSuccess() {
       toast.success(m.admin_users_archived_ok({ name: user.name }))
@@ -85,11 +85,11 @@ export function UserDetail(): React.JSX.Element {
       await router.navigate({ to: '/administrator/users' })
     },
   })
-  const unarchive = useUserUnarchive({
+  const unarchive = useUserUnarchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: invalidate,
   })
-  const remove = useUserDelete({
+  const remove = useUserDeleteMutation({
     onError: (error) => notifyError(error, { id: 'user-delete' }),
     async onSuccess() {
       await invalidate()
@@ -136,7 +136,7 @@ export function UserDetail(): React.JSX.Element {
             {!user.deletedAt && !isSelf && (
               <ConfirmDialog
                 onConfirm={() => archive.mutate(id)}
-                trigger={
+                render={
                   <Button variant="outline">
                     <ArchiveIcon />
                     {m.admin_common_archive()}
@@ -163,7 +163,7 @@ export function UserDetail(): React.JSX.Element {
             {user.deletedAt && (
               <ConfirmDialog
                 onConfirm={() => unarchive.mutate(id)}
-                trigger={
+                render={
                   <Button variant="outline">
                     <ArrowCounterClockwiseIcon />
                     {m.admin_common_restore()}
@@ -193,7 +193,7 @@ export function UserDetail(): React.JSX.Element {
               <ConfirmDialog
                 destructive
                 onConfirm={() => remove.mutate(id)}
-                trigger={
+                render={
                   <Button variant="destructive">
                     <TrashIcon />
                     {m.admin_common_remove()}

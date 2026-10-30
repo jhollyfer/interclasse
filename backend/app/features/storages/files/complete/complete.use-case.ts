@@ -61,7 +61,11 @@ export default class StoragesFileCompleteUseCase {
         if (uploadId) await this.multipart.complete(path, uploadId, payload.parts ?? [])
 
         const metadata = await this.bucket.metadata(path)
-        const completed = storage.complete(metadata, new Date())
+        const head = await this.bucket.head(path)
+        const completed = storage.complete(
+          { contentLength: metadata.contentLength, head },
+          new Date(),
+        )
 
         if (completed.isLeft()) {
           await this.discard(storage)
@@ -76,12 +80,15 @@ export default class StoragesFileCompleteUseCase {
 
       if (!detail) return left(this.notFound())
 
-      return right(detail)
+      return right(await this.bucket.withUrl(detail))
     } catch (error) {
-      logger.error({ err: error }, '[files > complete][error]')
+      logger.error({ err: error }, '[storages/files > complete][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_COMPLETE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_COMPLETE_ERROR',
+        ),
       )
     }
   }
@@ -98,7 +105,7 @@ export default class StoragesFileCompleteUseCase {
       await this.bucket.discard(storage.snapshot().path)
       await this.storages.delete(storage)
     } catch (error) {
-      logger.error({ err: error }, '[files > complete][discard][error]')
+      logger.error({ err: error }, '[storages/files > complete][discard][error]')
     }
   }
 

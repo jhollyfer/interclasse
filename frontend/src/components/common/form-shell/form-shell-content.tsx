@@ -1,14 +1,17 @@
+import type { Merge } from '@interclasse/shared'
 import type * as React from 'react'
 
-import { Card, CardContent } from '#/components/ui/card'
 import { PageShellContent } from '#/components/common/page-shell'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { Card, CardContent } from '#/components/ui/card'
+import { cn } from '#/lib/cn'
 
 import { useFormShellContext } from './form-shell-context'
 
 type FormShellContentProps = Readonly<
-  Merge<React.ComponentProps<'form'>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'form'>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 /**
@@ -47,7 +50,10 @@ export function FormShellContent({
 }
 
 type FormShellCardProps = Readonly<
-  Merge<React.ComponentProps<typeof CardContent>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<typeof CardContent>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 /**

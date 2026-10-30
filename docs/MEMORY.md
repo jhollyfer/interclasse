@@ -5,9 +5,9 @@
 > O agente lê **no início** de toda sessão e atualiza **no fim**. Curto: é um ponto de
 > retomada, não um diário. Histórico vai para `CHANGELOG.md` e `DECISIONS.md`.
 
-| Atualizado | Fase atual | Progresso | Status |
-|---|---|---|---|
-| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90% | Em revisão, branch `claude/modest-planck-jx0izx` |
+| Atualizado | Fase atual                                   | Progresso | Status                                           |
+| ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
+| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90%       | Em revisão, branch `claude/modest-planck-jx0izx` |
 
 ## Já feito
 
@@ -16,13 +16,13 @@
 
 ## Parou em
 
-Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
+Fase 5 (régua estrita) concluída na branch `refactor/interclasse-regua-estrita`: frentes 5.1 a 5.8 integradas e verificadas (E2E 14/14 duas vezes, backend 462 unit + 691/692 e2e, frontend 413 unit). Workflows e imagens Docker só rodam de verdade no primeiro PR.
 
 ## Próximos passos
 
-1. Dono revisa e decide o PR para `main`.
-2. Primeiro deploy: a imagem da API agora sai da raiz (`docker build -f backend/Dockerfile-production .`); o pré-deploy `node ace migration:run --force` não muda. A migration de conselheiro único solta turmas de quem tinha mais de uma.
-3. Pendências da Fase 4 de `TASKS.md` e E2E no CI.
+1. Medir o `size-adjust` das fontes de reserva (resto da 5.7).
+2. Abrir o PR da fase 5 e conferir os workflows novos (Docker e E2E) na primeira execução real.
+3. Antes do deploy: definir `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build) na produção; sem a primeira o site sai `noindex`, sem a segunda o CSP bloqueia o upload.
 
 ## Contexto importante
 
@@ -37,17 +37,18 @@ Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só 
 > Uma linha por correção do dono (`AGENTS.md`, "Modo de trabalho" item 3). Lida no início de toda
 > sessão. Lição que vale para todo projeto sobe para a régua e sai daqui.
 
-| Data | Erro | Regra que evita | Vale para |
-|---|---|---|---|
-| 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature | backend, migration e regra de domínio |
-| 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`) | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI |
+| Data       | Erro                                                                                                                                                                     | Regra que evita                                                                                                       | Vale para                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature        | backend, migration e regra de domínio |
+| 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`)          | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI    |
 
 ## Problemas conhecidos
 
 | Problema | Onde | Contorno |
 |---|---|---|
-| <…> | <arquivo/tela> | <…> |
+| `pnpm depcruise` acusa 18 violações de camada e ciclo (policies, guard e session service importando model; controllers de sessão importando o `CookieService`; ciclos entre models) | `backend/app` | corrigir na tarefa 5.4; o passo do CI falha até lá |
+| Dockerfiles, job E2E do frontend e workflows novos escritos sem acesso a Docker daemon nem a GitHub Actions | `.github/workflows/`, `*/Dockerfile-production` | validar no primeiro PR e na tarefa 5.8 |
 
 ## Links úteis
 
-- Repositório: <url> · Produção: <url> · Design: <url>
+- Repositório: https://github.com/jhollyfer/interclasse · Produção: https://interclass.maiyu.com.br · Design: `docs/DESIGN.md`

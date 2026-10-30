@@ -1,4 +1,5 @@
-import { test as base } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { expect, test as base } from '@playwright/test'
 import type { Browser, BrowserContext, Page } from '@playwright/test'
 
 import type { Role } from './credentials'
@@ -13,6 +14,12 @@ type Fixtures = Readonly<{
   advisor: RoleSession
   /** Outra conselheira, de outra turma da mesma categoria (sorteio precisa de duas). */
   secondAdvisor: RoleSession
+  /**
+   * Varre a aba com o axe e reprova violação séria ou crítica
+   * (_doc-lib/playwright.md#docs/accessibility-testing). Só pega o detectável
+   * por máquina; o resto fica na revisão manual.
+   */
+  expectAccessible: (page: Page) => Promise<void>
 }>
 
 async function openSession(
@@ -34,21 +41,31 @@ async function openSession(
  * o `storageState` guardado: nenhum login a mais na API.
  */
 export const test = base.extend<Fixtures>({
-  administrator: async ({ browser, baseURL }, use) => {
+  expectAccessible: async ({}, provide) => {
+    await provide(async (page) => {
+      const results = await new AxeBuilder({ page }).analyze()
+      const blocking = results.violations.filter(
+        (violation) =>
+          violation.impact === 'serious' || violation.impact === 'critical',
+      )
+      expect(blocking).toEqual([])
+    })
+  },
+  administrator: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'administrator')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
-  advisor: async ({ browser, baseURL }, use) => {
+  advisor: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'advisor')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
-  secondAdvisor: async ({ browser, baseURL }, use) => {
+  secondAdvisor: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'secondAdvisor')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
 })
 
-export { expect } from '@playwright/test'
+export { expect }

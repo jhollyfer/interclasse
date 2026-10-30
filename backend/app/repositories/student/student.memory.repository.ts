@@ -8,7 +8,7 @@ import {
 import { StudentRepository, type StudentListCriteria } from './student.repository.ts'
 
 import { Student, type StudentProps } from '#domain/student/student.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case

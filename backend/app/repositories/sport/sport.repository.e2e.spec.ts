@@ -41,6 +41,17 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(found?.snapshot(), futsal.snapshot())
     })
 
+    test('save de nome que é de outra modalidade devolve SPORT_ALREADY_EXISTS', async ({
+      assert,
+    }) => {
+      const repository = await make()
+      await repository.save(sport('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91', 'Futsal'))
+
+      const saved = await repository.save(sport('5c7a3d2f-4a3b-4d9f-8b2c-1a7e3f8d9ba2', 'Futsal'))
+
+      assert.deepEqual(saved.value, { code: 'SPORT_ALREADY_EXISTS' })
+    })
+
     test('findById de id inexistente é null', async ({ assert }) => {
       const repository = await make()
 

@@ -1,22 +1,22 @@
-import type * as React from 'react'
-import { useId } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import type { PaginationMeta } from '@interclasse/shared'
 import {
   CaretDoubleLeftIcon,
   CaretDoubleRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
 } from '@phosphor-icons/react'
-import type { PaginationMeta } from '@interclasse/shared'
+import { Link, useNavigate } from '@tanstack/react-router'
+import type * as React from 'react'
+import { useId } from 'react'
 
+import { OptionCombobox } from '#/components/common/option-combobox'
 import { Button } from '#/components/ui/button'
+import { Field, FieldDescription, FieldLabel } from '#/components/ui/field'
 import {
   PaginationContent,
   PaginationItem,
   Pagination as PaginationRoot,
 } from '#/components/ui/pagination'
-import { Field, FieldDescription, FieldLabel } from '#/components/ui/field'
-import { OptionCombobox } from '#/components/common/option-combobox'
 import type { ListSearch } from '#/lib/list-search'
 import { m } from '#/paraglide/messages'
 

@@ -1,6 +1,7 @@
-import type * as React from 'react'
 import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
+import type * as React from 'react'
 
+import { Picture } from '#/components/common/picture'
 import { Badge } from '#/components/ui/badge'
 import { Card, CardContent } from '#/components/ui/card'
 import { Skeleton } from '#/components/ui/skeleton'
@@ -43,11 +44,13 @@ export function PhotoGrid({
       {photos.map((photo) => (
         <li key={photo.id}>
           <Card className="h-full overflow-hidden pt-0">
-            <img
+            <Picture
               src={photo.storage.url}
               alt={photo.caption ?? m.common_photo_alt_default()}
-              loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
+              className="aspect-photo w-full object-cover"
+              width={800}
+              height={600}
+              placement="fold"
             />
             <CardContent className="flex flex-col gap-2">
               <Badge

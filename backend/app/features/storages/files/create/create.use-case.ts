@@ -14,9 +14,10 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  PRESIGNED_BATCH,
   type PresignedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts } from '#features/storages/_shared.parts'
+import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
 import type { StoragesFileCreatePayload } from '#validators/storages/files.validator'
 
 type Payload = StoragesFileCreatePayload
@@ -60,12 +61,25 @@ export default class StoragesFileCreateUseCase {
 
     try {
       if (totalParts <= 1) {
-        parts = [{ partNumber: 1, url: await this.multipart.signSingle(key, payload.mimetype) }]
+        parts = [
+          {
+            partNumber: 1,
+            url: await this.multipart.signSingle(key, payload.mimetype, payload.size),
+          },
+        ]
       }
 
       if (totalParts > 1) {
         uploadId = await this.multipart.initiate(key, payload.mimetype)
-        parts = await this.multipart.signParts(key, uploadId, pendingParts(totalParts, []))
+        parts = await this.multipart.signParts(
+          key,
+          uploadId,
+          sizedParts(
+            pendingParts({ totalParts, uploaded: [], batch: PRESIGNED_BATCH }),
+            payload.size,
+            PART_SIZE,
+          ),
+        )
       }
 
       const storage = Storage.open({
@@ -92,7 +106,7 @@ export default class StoragesFileCreateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[files > create][error]')
+      logger.error({ err: error }, '[storages/files > create][error]')
 
       // O multipart pode ter sido aberto antes de a linha falhar. Sem este
       // aborto ele fica pendurado no bucket para sempre: partes órfãs não
@@ -100,7 +114,10 @@ export default class StoragesFileCreateUseCase {
       if (uploadId) await this.abortQuietly(key, uploadId)
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_CREATE_ERROR',
+        ),
       )
     }
   }
@@ -113,7 +130,7 @@ export default class StoragesFileCreateUseCase {
     try {
       await this.multipart.abort(key, uploadId)
     } catch (error) {
-      logger.error({ err: error }, '[files > create][abort][error]')
+      logger.error({ err: error }, '[storages/files > create][abort][error]')
     }
   }
 }

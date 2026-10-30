@@ -1,9 +1,9 @@
+import { AdministratorSportShowResponse } from './sports.response.js'
 import { BRACKET_STATUSES } from '../../enums/bracket-status.js'
 import { CATEGORIES } from '../../enums/category.js'
 import { MATCH_PHASES } from '../../enums/match-phase.js'
 import { MATCH_STATUSES } from '../../enums/match-status.js'
 import { z } from '../../validator.js'
-import { AdministratorSportShowResponse } from './sports.response.js'
 
 /**
  * A chave como a API devolve (`_standards/architecture.md` §10). Datas em
@@ -22,7 +22,8 @@ export const AdministratorBracketPaginateResponse = z.object({
 })
 
 /** O sorteio devolve a chave da lista; repetido, a mesma que já existia. */
-export const AdministratorBracketCreateResponse = AdministratorBracketPaginateResponse
+export const AdministratorBracketCreateResponse =
+  AdministratorBracketPaginateResponse
 
 /**
  * A competição inteira, numa resposta: todas as partidas, de cada fase, com os
@@ -79,9 +80,13 @@ export type AdministratorBracketPaginateResponse = z.infer<
   typeof AdministratorBracketPaginateResponse
 >
 
-export type AdministratorBracketCreateResponse = z.infer<typeof AdministratorBracketCreateResponse>
+export type AdministratorBracketCreateResponse = z.infer<
+  typeof AdministratorBracketCreateResponse
+>
 
-export type AdministratorBracketShowResponse = z.infer<typeof AdministratorBracketShowResponse>
+export type AdministratorBracketShowResponse = z.infer<
+  typeof AdministratorBracketShowResponse
+>
 
 export type AdministratorBracketPreviewResponse = z.infer<
   typeof AdministratorBracketPreviewResponse

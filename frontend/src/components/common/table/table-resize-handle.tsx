@@ -1,7 +1,7 @@
-import type * as React from 'react'
 import type { Header, RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 import type { TableFeatures } from './use-table'
 
@@ -23,6 +23,7 @@ export function TableResizeHandle<TRow extends RowData>({
   const isResizing = header.column.getIsResizing()
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- redimensionar é ajuste de mouse e toque; a largura tem padrão por coluna
     <div
       data-slot="table-resize-handle"
       data-test-id={`resize-${header.column.id}`}

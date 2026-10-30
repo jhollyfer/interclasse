@@ -44,4 +44,6 @@ export const AdministratorPhotoShowResponse = z.object({
   updatedAt: datetime().nullable(),
 })
 
-export type AdministratorPhotoShowResponse = z.infer<typeof AdministratorPhotoShowResponse>
+export type AdministratorPhotoShowResponse = z.infer<
+  typeof AdministratorPhotoShowResponse
+>

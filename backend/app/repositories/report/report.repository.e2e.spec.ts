@@ -11,6 +11,7 @@ import type { ReportRepository } from './report.repository.ts'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
+import { StudentFactory } from '#database/factories/student.factory'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /**
@@ -27,11 +28,10 @@ const IMPLEMENTATIONS = {
       name: '7º A',
       grade: 7,
       category: CATEGORY.F2,
-    })
-      .with('students', 2)
-      .create()
+    }).create()
+    const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(2)
     const sport = await SportFactory.merge({ name: 'Futsal' }).create()
-    const [athlete] = classroom.students
+    const [athlete] = students
     if (!athlete) throw new Error('arranjo sem aluno')
     await EnrollmentFactory.merge({ studentId: athlete.id, sportId: sport.id }).create()
 

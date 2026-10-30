@@ -3,15 +3,20 @@ import {
   UPLOAD_STATUS,
   type AdministratorPhotoShowResponse,
   type Paginated,
-  type StorefrontPhotoShowResponse,
 } from '@interclasse/shared'
 
-import { PhotoRepository, type PhotoListCriteria, type PhotoStorage } from './photo.repository.ts'
+import {
+  PhotoRepository,
+  type ApprovedPhotoRead,
+  type PhotoListCriteria,
+  type PhotoRead,
+  type PhotoStorage,
+} from './photo.repository.ts'
 
 import { Photo, type PhotoProps } from '#domain/photo/photo.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import { MemoryPagination } from '#core/memory-pagination'
 
-type StorageRow = AdministratorPhotoShowResponse['storage']
+type StorageRow = PhotoRead['storage']
 type AuthorRow = NonNullable<AdministratorPhotoShowResponse['author']>
 
 /**
@@ -66,14 +71,14 @@ export class PhotoMemoryRepository extends PhotoRepository {
     this.rows.delete(photo.id)
   }
 
-  async show(id: string): Promise<AdministratorPhotoShowResponse | null> {
+  async show(id: string): Promise<PhotoRead | null> {
     const props = this.rows.get(id)
     if (!props) return null
 
     return this.toResponse(props)
   }
 
-  async paginate(criteria: PhotoListCriteria): Promise<Paginated<AdministratorPhotoShowResponse>> {
+  async paginate(criteria: PhotoListCriteria): Promise<Paginated<PhotoRead>> {
     const matching = this.newestFirst().filter(
       (row) =>
         (!criteria.status || row.status === criteria.status) &&
@@ -81,13 +86,13 @@ export class PhotoMemoryRepository extends PhotoRepository {
     )
     const page = MemoryPagination.slice(matching, criteria.page, criteria.perPage)
 
-    return { meta: page.meta, data: page.data.map((row) => this.toResponse(row)) }
+    return { meta: page.meta, data: page.data.flatMap((row) => this.toResponse(row) ?? []) }
   }
 
   async paginateApproved(criteria: {
     readonly page: number
     readonly perPage: number
-  }): Promise<Paginated<StorefrontPhotoShowResponse>> {
+  }): Promise<Paginated<ApprovedPhotoRead>> {
     const approved = this.newestFirst().filter((row) => row.status === PHOTO_STATUS.APPROVED)
     const page = MemoryPagination.slice(approved, criteria.page, criteria.perPage)
 
@@ -96,7 +101,7 @@ export class PhotoMemoryRepository extends PhotoRepository {
       data: page.data.map((row) => ({
         id: row.id,
         caption: row.caption,
-        url: this.storages.get(row.storageId)?.url ?? '',
+        path: this.storages.get(row.storageId)?.path ?? '',
         createdAt: row.createdAt.toISOString(),
       })),
     }
@@ -106,9 +111,10 @@ export class PhotoMemoryRepository extends PhotoRepository {
     return [...this.rows.values()].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
-  private toResponse(row: PhotoProps): AdministratorPhotoShowResponse {
+  /** Foto sem o arquivo gravado não tem leitura: o mesmo que o `join` do Lucid faz. */
+  private toResponse(row: PhotoProps): PhotoRead | null {
     const storage = this.storages.get(row.storageId)
-    if (!storage) throw new Error('foto sem o arquivo no arranjo do teste')
+    if (!storage) return null
 
     return {
       id: row.id,

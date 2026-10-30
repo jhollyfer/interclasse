@@ -16,6 +16,10 @@ export const AdministratorCardCreateValidator = z.object({
   note: z.string().trim().max(200).nullable().optional(),
 })
 
-export type AdministratorCardPaginatePayload = z.infer<typeof AdministratorCardPaginateValidator>
+export type AdministratorCardPaginatePayload = z.infer<
+  typeof AdministratorCardPaginateValidator
+>
 
-export type AdministratorCardCreatePayload = z.infer<typeof AdministratorCardCreateValidator>
+export type AdministratorCardCreatePayload = z.infer<
+  typeof AdministratorCardCreateValidator
+>

@@ -1,6 +1,4 @@
-import type { SortDirection, TrashedMode } from '@interclasse/shared'
-
-import type { Merge } from './merge'
+import type { Merge, SortDirection, TrashedMode } from '@interclasse/shared'
 
 /**
  * Os filtros de qualquer listagem do painel, na URL.
@@ -43,6 +41,13 @@ const TRASHED_MODES: Record<string, TrashedMode | undefined> = {
   only: 'only',
   with: 'with',
 }
+
+/**
+ * O que a URL não precisa carregar: a página 1 é a página sem `?page`.
+ * `stripSearchParams` tira o parâmetro igual ao padrão da URL gerada.
+ * _doc-lib/tanstack-router.md#how-to/validate-search-params.
+ */
+export const LIST_SEARCH_DEFAULTS = { page: 1 }
 
 export type ListSearch = {
   page?: number

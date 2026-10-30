@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { LockSimpleIcon } from '@phosphor-icons/react'
 import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
+import { LockSimpleIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
-import { Checkbox } from '#/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { Checkbox } from '#/components/ui/checkbox'
 import { m } from '#/paraglide/messages'
 
 type EnrollmentBoardProps = Readonly<{
@@ -100,10 +100,7 @@ function SportCard({
   // quando a lista DESTA modalidade mudou, e não a cada refetch - que
   // apagaria o que foi marcado e ainda não salvo nos outros cartões.
   const savedKey = [...enrolled].sort().join(',')
-  const initial = React.useMemo(
-    () => new Set(savedKey.split(',').filter(Boolean)),
-    [savedKey],
-  )
+  const initial = new Set(savedKey.split(',').filter(Boolean))
   const [selected, setSelected] = React.useState(initial)
   // Reset no render, e não `useEffect` espelhando a prop (`frontend.md` §2): a
   // lista gravada mudou, o rascunho volta a ela antes de desenhar.

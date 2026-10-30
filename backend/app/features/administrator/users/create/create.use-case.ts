@@ -7,11 +7,11 @@ import { left, right, type AdministratorUserShowResponse, type Either } from '@i
 
 import { User } from '#domain/user/user.entity'
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserRepository } from '#repositories/user/user.repository'
-import { AttachmentRefusal } from '#features/_shared.attachment-refusal'
-import { UserRefusal } from '#features/_shared.user-refusal'
-import { isUniqueViolation } from '#features/_shared.database'
+import { FileRefusal } from '#features/storages/files/_shared.file-refusal'
+import { UserRefusal } from '#features/administrator/users/_shared.user-refusal'
 import type { AdministratorUserCreatePayload } from '#validators/administrator/users.validator'
 
 type Payload = AdministratorUserCreatePayload
@@ -30,6 +30,7 @@ export default class AdministratorUserCreateUseCase {
   constructor(
     private readonly users: UserRepository,
     private readonly storages: StorageRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -39,7 +40,7 @@ export default class AdministratorUserCreateUseCase {
       // estrangeira, e sem isto um uuid inexistente estouraria a constraint e
       // viraria `500` em vez de `422` apontando o campo.
       if (payload.avatarId && !(await this.storages.areAttachable([payload.avatarId])))
-        return left(AttachmentRefusal.notFound('avatarId', this.i18n))
+        return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
       // Busca **sem** filtrar arquivados: o `unique` de `email` vale para a
       // tabela inteira, então conta arquivada continua ocupando o e-mail e é
@@ -57,23 +58,27 @@ export default class AdministratorUserCreateUseCase {
         user = revived.value
       }
 
-      await this.users.save(user)
+      const saved = await this.users.save(user)
+      if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
       // Recarrega antes de responder: `status` vem de `DEFAULT` no banco quando
       // não foi informado, e a foto vem com a URL.
       const detail = await this.users.detail(user.id)
-      if (!detail) throw new Error('a conta gravada não foi encontrada')
+      if (!detail)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right(detail)
+      return right({
+        ...detail,
+        avatar: await this.bucket.withOptionalUrl(detail.avatar),
+      })
     } catch (error) {
-      // A checagem de e-mail acima não fecha a corrida: o segundo de dois
-      // pedidos simultâneos esbarra no `unique` do banco (_standards/backend.md §4.4).
-      if (isUniqueViolation(error)) return left(UserRefusal.alreadyExists(this.i18n))
-
-      logger.error({ err: error }, '[users > create][error]')
+      logger.error({ err: error }, '[administrator/users > create][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_CREATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_CREATE_ERROR',
+        ),
       )
     }
   }

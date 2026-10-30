@@ -9,7 +9,7 @@
 
 | Fluxo | Quem | Tela inicial | Resultado |
 |---|---|---|---|
-| [Entrar no painel](#entrar-no-painel) | os três papéis | `/authentication` | painel aberto na primeira tela do papel |
+| [Entrar no painel](#entrar-no-painel) | os três papéis | `/sign-in` | painel aberto na primeira tela do papel |
 | [Cadastrar uma turma](#cadastrar-uma-turma) | organização | `/administrator/classrooms` | turma no cartão da categoria certa |
 | [Cadastrar uma modalidade](#cadastrar-uma-modalidade) | organização | `/administrator/sports` | modalidade na lista |
 | [Gerir contas](#gerir-contas) | organização | `/administrator/users` | conta criada, arquivada ou excluída |
@@ -33,7 +33,7 @@
 
 | # | Usuário faz | Sistema responde | Tela |
 |---|---|---|---|
-| 1 | abre "Entrar" | mostra o formulário | `/authentication` |
+| 1 | abre "Entrar" | mostra o formulário | `/sign-in` |
 | 2 | preenche e-mail e senha e envia | cria a sessão em cookie e abre o painel | `/painel` |
 | 3 | nada | redireciona cada papel à primeira tela: organização em `/administrator`, conselheiro em `/advisor`, representante em `/representative` | área do papel |
 

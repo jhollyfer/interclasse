@@ -1,6 +1,6 @@
-import type { APIRequestContext, Page } from '@playwright/test'
+import type { APIRequestContext, Locator, Page } from '@playwright/test'
 
-import { apiUrl } from './support/credentials'
+import { apiUrl, writeHeaders } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
@@ -41,6 +41,7 @@ async function enroll(
   }>,
 ): Promise<void> {
   const response = await request.put(`${apiUrl()}/advisor/enrollments`, {
+    headers: writeHeaders(),
     data: { ...input, reason: 'limpeza do teste E2E' },
   })
   expect(response.ok(), 'PUT /advisor/enrollments').toBe(true)
@@ -64,8 +65,26 @@ async function sportNamed(
 async function openDraw(page: Page, sport: string): Promise<void> {
   await page.getByRole('button', { name: 'Sortear chave' }).click()
   const dialog = page.getByRole('dialog', { name: 'Sortear chave' })
-  await dialog.getByLabel('Modalidade').selectOption({ label: sport })
-  await dialog.getByLabel('Categoria').selectOption({ label: 'Fundamental 1' })
+  await choose(
+    page,
+    dialog.getByRole('combobox', { name: 'Modalidade' }),
+    sport,
+  )
+  await choose(
+    page,
+    dialog.getByRole('combobox', { name: 'Categoria' }),
+    'Fundamental 1',
+  )
+}
+
+/** Abre o combobox e escolhe a opção pelo nome (a lista sai num popup fora do diálogo). */
+async function choose(
+  page: Page,
+  combobox: Locator,
+  option: string,
+): Promise<void> {
+  await combobox.click()
+  await page.getByRole('option', { name: option, exact: true }).click()
 }
 
 // docs/USER-FLOWS.md, "Cadastrar uma modalidade" e "Sortear uma chave".
@@ -169,7 +188,9 @@ async function cleanUp(
     '/administrator/brackets?perPage=50',
   )
   for (const bracket of brackets.filter((item) => item.sport.id === sport.id)) {
-    await admin.delete(`${apiUrl()}/administrator/brackets/${bracket.id}`)
+    await admin.delete(`${apiUrl()}/administrator/brackets/${bracket.id}`, {
+      headers: writeHeaders(),
+    })
   }
 
   for (const request of teams) {
@@ -177,5 +198,7 @@ async function cleanUp(
     await enroll(request, { classroomId, sportId: sport.id, studentIds: [] })
   }
 
-  await admin.delete(`${apiUrl()}/administrator/sports/${sport.id}`)
+  await admin.delete(`${apiUrl()}/administrator/sports/${sport.id}`, {
+    headers: writeHeaders(),
+  })
 }

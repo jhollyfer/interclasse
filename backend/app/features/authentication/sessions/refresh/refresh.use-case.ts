@@ -5,7 +5,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract, type SessionTokens } from '#services/session/session.contract'
+import { SessionRepository, type SessionTokens } from '#repositories/session/session.repository'
 
 type Payload = {
   readonly refreshToken?: string
@@ -17,7 +17,7 @@ type Response = Either<HTTPException, SessionTokens>
 export default class AuthenticationSessionRefreshUseCase {
   constructor(
     private readonly users: UserRepository,
-    private readonly sessions: SessionContract,
+    private readonly sessions: SessionRepository,
     private readonly i18n: I18n,
   ) {}
 
@@ -46,12 +46,24 @@ export default class AuthenticationSessionRefreshUseCase {
       // partir do mesmo token - rotação que não rotaciona.
       if (!(await this.sessions.revoke(user.id, grant.identifier))) return left(this.invalid())
 
-      return right(await this.sessions.issue(user.id))
+      const tokens = await this.sessions.issue(user.id)
+      if (!tokens)
+        return left(
+          HTTPException.InternalServerError(
+            this.i18n.t('errors.internal'),
+            'AUTHENTICATION_SESSION_REFRESH_ERROR',
+          ),
+        )
+
+      return right(tokens)
     } catch (error) {
-      logger.error({ err: error }, '[sessions > refresh][error]')
+      logger.error({ err: error }, '[authentication/sessions > refresh][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'SESSION_REFRESH_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'AUTHENTICATION_SESSION_REFRESH_ERROR',
+        ),
       )
     }
   }

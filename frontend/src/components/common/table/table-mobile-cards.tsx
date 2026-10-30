@@ -1,8 +1,8 @@
-import type * as React from 'react'
 import { FlexRender } from '@tanstack/react-table'
 import type { RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 import type { TableInstance } from './use-table'
 
@@ -52,6 +52,7 @@ export function TableMobileCards<TRow extends RowData>({
         if (row.getIsSelected()) state = 'selected'
 
         return (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- atalho de mouse: o menu da linha dá a mesma ação ao teclado
           <div
             key={row.id}
             data-test-id={`table-card-${index}`}
@@ -73,6 +74,7 @@ export function TableMobileCards<TRow extends RowData>({
                 </div>
               )}
               {controls.length > 0 && (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
                 <div
                   className="flex shrink-0 flex-wrap items-center justify-end gap-2"
                   // Clicar na caixa de seleção ou no menu não deve também abrir
@@ -94,7 +96,7 @@ export function TableMobileCards<TRow extends RowData>({
                   key={cell.id}
                   className="flex items-start justify-between gap-3"
                 >
-                  <dt className="max-w-[45%] shrink-0 truncate text-xs font-medium text-muted-foreground">
+                  <dt className="max-w-label shrink-0 truncate text-xs font-medium text-muted-foreground">
                     {labels.get(cell.column.id) ?? cell.column.id}
                   </dt>
                   <dd className="min-w-0 text-right text-sm break-words">

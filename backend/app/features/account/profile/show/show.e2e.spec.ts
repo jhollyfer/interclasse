@@ -1,13 +1,13 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
-import User from '#models/user'
 import {
   ADMINISTRATOR,
   authenticateAsAdministrator,
   body,
   resetDatabase,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 
 /**
  * A leitura da própria conta, e o que acontece com quem foi arquivado enquanto
@@ -35,7 +35,7 @@ test.group('conta > leitura', (group) => {
 
   test('usuário arquivado com token ainda válido responde 401', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
-    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
 
     await user.merge({ deletedAt: DateTime.now() }).save()
 

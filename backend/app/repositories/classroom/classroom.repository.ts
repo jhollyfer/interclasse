@@ -3,6 +3,7 @@ import type {
   AdministratorClassroomPaginateResponse,
   AdministratorClassroomShowResponse,
   Category,
+  Either,
   Paginated,
   SortDirection,
 } from '@interclasse/shared'
@@ -12,6 +13,7 @@ import type {
   ClassroomLinks,
   ClassroomPeopleFacts,
 } from '#domain/classroom/classroom.entity'
+import type { ClassroomError } from '#domain/classroom/classroom.errors'
 
 export type ClassroomListCriteria = {
   readonly page: number
@@ -58,7 +60,11 @@ export abstract class ClassroomRepository {
   ): Promise<ClassroomPeopleFacts>
   /** A turma já tem time numa chave sorteada. */
   abstract isInCompetition(id: string): Promise<boolean>
-  abstract save(classroom: Classroom): Promise<void>
+  /**
+   * Grava a turma; a corrida no `unique` volta como o fato do campo que colidiu: o nome,
+   * o conselheiro ou o representante.
+   */
+  abstract save(classroom: Classroom): Promise<Either<ClassroomError, void>>
   abstract delete(classroom: Classroom): Promise<void>
   /**
    * Desfaz os vínculos de turma de uma conta que deixou de ser o que era (papel

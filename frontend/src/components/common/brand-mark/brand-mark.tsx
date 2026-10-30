@@ -1,6 +1,8 @@
 import type * as React from 'react'
 
-import { cn } from '#/lib/utils'
+import logo128 from '#/assets/logo-128.png'
+import { Picture } from '#/components/common/picture'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -23,12 +25,13 @@ export function BrandMark({
     >
       {/* Na barra lateral recolhida sobra só a logo: o nome some da tela, e
           não do leitor de tela. Fora da barra o seletor não casa nada. */}
-      <img
-        src="/logo-128.png"
+      <Picture
+        src={logo128}
         alt=""
         width={40}
         height={40}
         className="size-10 shrink-0 group-data-[collapsible=icon]:size-7"
+        placement="lcp"
       />
       <span className="font-display text-xl font-extrabold uppercase italic group-data-[collapsible=icon]:sr-only">
         {m.common_brand_name()}

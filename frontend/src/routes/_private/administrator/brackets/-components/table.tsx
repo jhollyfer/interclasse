@@ -1,21 +1,25 @@
+import { ShuffleIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 
+import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
 import {
   Table,
   TableActions,
   TableContent,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
   TableTitle,
   useTable,
 } from '#/components/common/table'
+import { Button } from '#/components/ui/button'
 import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
@@ -31,7 +35,7 @@ export function BracketsTable(): React.JSX.Element {
     bracketsQueryOptions(search),
   )
 
-  const columns = React.useMemo(() => bracketColumns(), [])
+  const columns = bracketColumns()
 
   const table = useTable({
     rows: data?.data ?? [],
@@ -52,19 +56,33 @@ export function BracketsTable(): React.JSX.Element {
       <TableHeader>
         <TableTitle>{m.admin_common_brackets()}</TableTitle>
         <TableActions>
-          <DrawDialog />
+          <DrawDialog
+            render={
+              <Button>
+                <ShuffleIcon />
+                {m.admin_brackets_draw()}
+              </Button>
+            }
+          />
         </TableActions>
       </TableHeader>
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>{m.admin_brackets_empty_title()}</TableEmptyTitle>
-          <TableEmptyDescription>
+          <EmptyStateTitle>{m.admin_brackets_empty_title()}</EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_brackets_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
-            <DrawDialog />
-          </TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
+            <DrawDialog
+              render={
+                <Button>
+                  <ShuffleIcon />
+                  {m.admin_brackets_draw()}
+                </Button>
+              }
+            />
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

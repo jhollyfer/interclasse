@@ -4,11 +4,11 @@ import { CATEGORY } from '@interclasse/shared'
 import AdministratorReportExportUseCase from './export.use-case.ts'
 
 import { ReportRepository } from '#repositories/report/report.repository'
-import { ReportMemoryRepository } from '#repositories/report/report.memory.repository'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { MemoryRepositories } from '#tests/memory-fixtures'
+import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup(names: string[]) {
-  const reports = new ReportMemoryRepository()
+  const reports = MemoryRepositories.reports()
   names.forEach((name, index) =>
     reports.withClassroom({
       id: `c${index}`,

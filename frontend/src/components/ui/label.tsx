@@ -2,10 +2,11 @@
 
 import * as React from 'react'
 
-import { cn } from '#/lib/utils.ts'
+import { cn } from '#/lib/cn'
 
 function Label({ className, ...props }: React.ComponentProps<'label'>) {
   return (
+    // eslint-disable-next-line jsx-a11y/label-has-associated-control -- wrapper genérico: quem usa passa `htmlFor` ou o controle como filho
     <label
       data-slot="label"
       className={cn(

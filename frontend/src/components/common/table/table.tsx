@@ -1,14 +1,17 @@
+import type { Merge } from '@interclasse/shared'
 import * as React from 'react'
 
 import { PageShell } from '#/components/common/page-shell'
 import type { ListSearch } from '#/lib/list-search'
-import type { Merge } from '#/lib/merge'
 
 import { TableProvider } from './table-context'
 
 type TableProps = Readonly<
   Merge<
-    React.ComponentProps<typeof PageShell>,
+    Omit<
+      React.ComponentProps<typeof PageShell>,
+      'to' | 'search' | 'isPlaceholderData' | 'isError' | 'onRetry'
+    >,
     {
       /** A rota desta listagem, para busca, ordenação e paginação. */
       to: string
@@ -43,12 +46,8 @@ export function Table({
   children,
   ...rest
 }: TableProps): React.JSX.Element {
-  // Sem `useMemo` o objeto é novo a cada render da rota e todo subcomponente
-  // re-renderiza junto, mesmo com a rota e os filtros iguais.
-  const value = React.useMemo(
-    () => ({ to, search, isPlaceholderData, isError, onRetry }),
-    [to, search, isPlaceholderData, isError, onRetry],
-  )
+  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  const value = { to, search, isPlaceholderData, isError, onRetry }
 
   return (
     <TableProvider value={value}>

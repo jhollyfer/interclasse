@@ -8,12 +8,14 @@ import type {
   AdministratorSportShowResponse,
   BracketStatus,
   Category,
+  Either,
   MatchPhase,
   MatchStatus,
   Paginated,
 } from '@interclasse/shared'
 
 import type { Bracket } from '#domain/bracket/bracket.entity'
+import type { BracketError } from '#domain/bracket/bracket.errors'
 
 /** A ordem da lista de chaves: a mais nova primeiro (painel) ou por modalidade (abas do site). */
 export type BracketListOrder = 'newest' | 'sport-name'
@@ -79,7 +81,8 @@ export abstract class BracketRepository {
   /** O nome de cada turma, pelo id. */
   abstract classroomNames(classroomIds: ReadonlyArray<string>): Promise<Map<string, string>>
   /** Grava a chave inteira: nova, em lote; existente, só o que mudou. */
-  abstract save(bracket: Bracket): Promise<void>
+  /** Grava a chave; a modalidade e categoria já sorteadas (a corrida no `unique`) voltam como `BRACKET_ALREADY_EXISTS`. */
+  abstract save(bracket: Bracket): Promise<Either<BracketError, void>>
   /** Times e partidas vão junto. */
   abstract delete(bracket: Bracket): Promise<void>
 

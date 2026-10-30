@@ -1,4 +1,13 @@
-# Conventional Commits em pt-BR (_standards/tooling.md §6), contra o
-# `.commitlintrc.json` da raiz. É o mesmo commitlint do workflow
-# `commitlint.yml`: o hook e o CI reprovam pelo mesmo motivo.
-pnpm exec commitlint --edit "$1"
+# Conventional Commits em pt-BR e autor único (_standards/tooling.md §6,
+# camada 2). O mesmo commitlint do workflow `commitlint.yml`: o hook e o CI
+# reprovam pelo mesmo motivo.
+pnpm exec commitlint --edit "$1" || exit 1
+if grep -qiE '^(co-authored-by|claude-session):|generated with|noreply@anthropic\.com|anthropic\.com/claude' "$1"; then
+  echo "commit-msg: trailer ou marca de agente na mensagem; o autor é só o dono do repositório" >&2
+  exit 1
+fi
+author=$(git var GIT_AUTHOR_IDENT)
+case "$author" in
+  *"<jhollyfer.fr@gmail.com>"*) ;;
+  *) echo "commit-msg: autor fora do permitido: $author" >&2; exit 1 ;;
+esac

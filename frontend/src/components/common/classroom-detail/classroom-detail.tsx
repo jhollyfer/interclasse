@@ -1,8 +1,3 @@
-import * as React from 'react'
-import type { LinkProps } from '@tanstack/react-router'
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import {
   AdvisorStudentCreateValidator,
   AdvisorStudentUpdateValidator,
@@ -13,6 +8,11 @@ import type {
   AdvisorEnrollmentShowResponse,
   AdvisorStudentShowResponse,
 } from '@interclasse/shared'
+import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import type { LinkProps } from '@tanstack/react-router'
+import * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialog,
@@ -24,14 +24,6 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
-import { useMutationForm } from '#/hooks/use-mutation-form'
-import {
-  AppField,
-  AppFormRootError,
-} from '#/integrations/react-hook-form/app-field'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations/advisor'
-import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderActions,
@@ -44,16 +36,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Input } from '#/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
+import { useMutationForm } from '#/hooks/use-mutation-form'
 import {
-  useAdvisorEnrollmentUpdate,
-  useStudentCreate,
-  useStudentDelete,
-  useStudentUpdate,
+  AppField,
+  AppFormRootError,
+} from '#/integrations/react-hook-form/app-field'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
+import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations/advisor'
+import {
+  useAdvisorEnrollmentUpdateMutation,
+  useStudentCreateMutation,
+  useStudentDeleteMutation,
+  useStudentUpdateMutation,
 } from '#/integrations/tanstack-query/mutations/advisor'
 import {
   advisorEnrollmentsQueryOptions,
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
+import { createDialogHandle } from '#/lib/dialog-handle'
+import { notifyError } from '#/lib/form-errors'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
@@ -91,7 +92,9 @@ export function ClassroomDetail({
     advisorEnrollmentsQueryOptions(classroomId),
   )
   const queryClient = useQueryClient()
-  const [pending, setPending] = React.useState<PendingRemoval | null>(null)
+  const [removalHandle] = React.useState(() =>
+    createDialogHandle<PendingRemoval>(),
+  )
 
   const store = (updated: AdvisorEnrollmentShowResponse) =>
     queryClient.setQueryData(
@@ -99,7 +102,7 @@ export function ClassroomDetail({
       updated,
     )
 
-  const save = useAdvisorEnrollmentUpdate({
+  const save = useAdvisorEnrollmentUpdateMutation({
     onSuccess: (updated) => {
       store(updated)
       toast.success(m.common_classroom_saved())
@@ -118,7 +121,7 @@ export function ClassroomDetail({
         {actions && <PageHeaderActions>{actions}</PageHeaderActions>}
       </PageHeader>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[1fr_18rem]">
+      <div className="grid items-start gap-4 lg:grid-cols-main-aside">
         <ClassroomSummary board={board} className="lg:order-last" />
         <Tabs defaultValue="athletes" className="min-w-0">
           <TabsList>
@@ -147,21 +150,22 @@ export function ClassroomDetail({
                   const sportName =
                     board.sports.find((sport) => sport.id === sportId)?.name ??
                     ''
-                  setPending({ sportId, sportName, studentIds, removed })
+                  removalHandle.openWithPayload({
+                    sportId,
+                    sportName,
+                    studentIds,
+                    removed,
+                  })
                   return
                 }
                 save.mutate({ classroomId, sportId, studentIds })
               }}
             />
-            {pending && (
-              <RemovalReasonDialog
-                key={pending.sportId}
-                classroomId={classroomId}
-                pending={pending}
-                onClose={() => setPending(null)}
-                onSaved={store}
-              />
-            )}
+            <RemovalReasonDialog
+              classroomId={classroomId}
+              handle={removalHandle}
+              onSaved={store}
+            />
           </TabsContent>
           <TabsContent value="students" className="pt-4">
             <Students classroomId={classroomId} />
@@ -206,7 +210,7 @@ function Students({
     validator: AdvisorStudentCreateValidator,
     defaults: { classroomId, name: '' },
     fields: STUDENT_FIELDS,
-    mutation: useStudentCreate,
+    mutation: useStudentCreateMutation,
     invalidate: STUDENT_CHANGE,
     payload: (values) => values,
     onSuccess: (): void => form.reset({ classroomId, name: '' }),
@@ -277,14 +281,14 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
     validator: AdvisorStudentUpdateValidator,
     values: { name: student.name },
     fields: STUDENT_FIELDS,
-    mutation: useStudentUpdate,
+    mutation: useStudentUpdateMutation,
     invalidate: STUDENT_CHANGE,
     // Renomear é escrita idempotente: reenviar grava o mesmo nome.
     retry: 'student-update',
     payload: (values) => ({ ...values, id: student.id }),
     onSuccess: () => setEditing(false),
   })
-  const remove = useStudentDelete({
+  const remove = useStudentDeleteMutation({
     onSuccess: onChange,
     // Aluno inscrito numa modalidade já sorteada: `409 STUDENT_IN_COMPETITION`.
     onError: (error) => notifyError(error, { id: 'student-delete' }),
@@ -305,6 +309,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
             label={NAME_LABEL}
           >
             {({ field, control }) => (
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- o campo nasce de um clique em Editar: o foco vai para onde a pessoa acabou de pedir
               <Input {...field} {...control} autoFocus maxLength={120} />
             )}
           </AppField>
@@ -339,7 +344,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
       <ConfirmDialog
         destructive
         onConfirm={() => remove.mutate(student.id)}
-        trigger={
+        render={
           <Button
             size="icon-sm"
             variant="ghost"

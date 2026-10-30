@@ -105,7 +105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -125,7 +125,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ProfileShowError"
+                  "$ref": "#/components/schemas/Error500AccountProfileShowError"
                 }
               }
             }
@@ -160,7 +160,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -200,7 +200,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500ProfileUpdateError"
+                  "$ref": "#/components/schemas/Error500AccountProfileUpdateError"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -382,7 +382,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -462,7 +462,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -550,7 +550,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -642,7 +642,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -748,7 +748,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -868,7 +868,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -958,7 +958,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1050,7 +1050,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1132,7 +1132,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1248,7 +1248,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1364,7 +1364,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1375,6 +1375,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cartão não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404CardNotFound"
                 }
               }
             }
@@ -1447,7 +1457,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1553,7 +1563,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1686,7 +1696,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1786,7 +1796,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1874,7 +1884,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -1976,7 +1986,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2082,7 +2092,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2112,7 +2122,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentRemovalPaginateError"
+                  "$ref": "#/components/schemas/Error500AdministratorEnrollmentRemovalPaginateError"
                 }
               }
             }
@@ -2191,7 +2201,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2231,7 +2241,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500EnrollmentRemovalAcknowledgeError"
+                  "$ref": "#/components/schemas/Error500AdministratorEnrollmentRemovalAcknowledgeError"
                 }
               }
             }
@@ -2297,7 +2307,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2450,7 +2460,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2551,7 +2561,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2642,7 +2652,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2751,7 +2761,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2867,7 +2877,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -2968,7 +2978,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3041,7 +3051,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3132,7 +3142,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3233,7 +3243,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3293,7 +3303,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3353,7 +3363,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3411,7 +3421,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3427,11 +3437,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos · Arquivo não encontrado · O regulamento precisa ser PDF",
+            "description": "Dados inválidos",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422RegulationNotPdfStorageNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422ValidationError"
                 }
               }
             }
@@ -3506,7 +3516,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3626,7 +3636,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3637,16 +3647,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error403AccessDenied"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Modalidade já existe",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error409SportAlreadyExists"
                 }
               }
             }
@@ -3716,7 +3716,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3804,7 +3804,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -3830,11 +3830,11 @@
             }
           },
           "409": {
-            "description": "Modalidade já existe",
+            "description": "Conflito com o estado atual",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409SportAlreadyExistsSportRosterAboveLimit"
+                  "$ref": "#/components/schemas/Error409SportRosterAboveLimit"
                 }
               }
             }
@@ -3906,7 +3906,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4022,7 +4022,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4052,7 +4052,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserPaginateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserPaginateError"
                 }
               }
             }
@@ -4179,7 +4179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4190,6 +4190,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
                 }
               }
             }
@@ -4219,7 +4229,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserCreateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserCreateError"
                 }
               }
             }
@@ -4269,7 +4279,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4309,7 +4319,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserShowError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserShowError"
                 }
               }
             }
@@ -4358,7 +4368,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4408,7 +4418,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserUpdateError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserUpdateError"
                 }
               }
             }
@@ -4460,7 +4470,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4510,7 +4520,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserDeleteError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserDeleteError"
                 }
               }
             }
@@ -4554,7 +4564,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4594,13 +4604,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserArchiveError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserArchiveError"
                 }
               }
             }
           }
         },
-        "description": "Envia para a lixeira: grava `deletedAt` e **revoga todas as sessões da conta**. O guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do painel até o token vencer.\n\nA conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por `PATCH /:id/unarchive`. Usuário já arquivado responde `404`.\n\nA **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava administrando, e o conserto seria rodar o seeder.",
+        "description": "Envia para a lixeira: grava `deletedAt` e **revoga todas as sessões da conta**. O guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do painel até o token vencer.\n\nA conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por `PATCH /:id/unarchive`. Usuário já arquivado responde `409`.\n\nA **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava administrando, e o conserto seria rodar o seeder.",
         "security": [
           {
             "cookieAuth": []
@@ -4638,7 +4648,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4678,13 +4688,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500UserUnarchiveError"
+                  "$ref": "#/components/schemas/Error500AdministratorUserUnarchiveError"
                 }
               }
             }
           }
         },
-        "description": "Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo responde `404`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo sign-in.",
+        "description": "Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo responde `409`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo sign-in.",
         "security": [
           {
             "cookieAuth": []
@@ -4744,7 +4754,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4870,7 +4880,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -4971,7 +4981,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5061,7 +5071,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5167,7 +5177,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5257,7 +5267,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5331,7 +5341,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5438,7 +5448,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5468,7 +5478,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentPaginateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentPaginateError"
                 }
               }
             }
@@ -5546,7 +5556,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5586,7 +5596,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentCreateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentCreateError"
                 }
               }
             }
@@ -5637,7 +5647,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5677,7 +5687,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentUpdateError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentUpdateError"
                 }
               }
             }
@@ -5730,7 +5740,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5780,7 +5790,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500StudentDeleteError"
+                  "$ref": "#/components/schemas/Error500AdvisorStudentDeleteError"
                 }
               }
             }
@@ -5835,7 +5845,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionRefreshError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionRefreshError"
                 }
               }
             }
@@ -5880,7 +5890,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionSignInError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionSignInError"
                 }
               }
             }
@@ -5915,7 +5925,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -5925,7 +5935,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500SessionSignOutError"
+                  "$ref": "#/components/schemas/Error500AuthenticationSessionSignOutError"
                 }
               }
             }
@@ -5962,7 +5972,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6030,7 +6040,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6145,7 +6155,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6165,7 +6175,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FilePaginateError"
+                  "$ref": "#/components/schemas/Error500StoragesFilePaginateError"
                 }
               }
             }
@@ -6283,7 +6293,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6303,13 +6313,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileCreateError"
+                  "$ref": "#/components/schemas/Error500StoragesFileCreateError"
                 }
               }
             }
           }
         },
-        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo.\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, audio/mpeg, audio/mp4, audio/ogg, audio/wav, até 1073741824 bytes, recusados **antes** de qualquer assinatura: arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência, informando o `id` em `avatarId`, `coverId`, `audioId` ou `imageIds`.",
+        "description": "Abre um upload e devolve por onde subi-lo. **Não recebe bytes** - só os metadados do arquivo.\n\nO binário vai do navegador direto ao bucket, por URL assinada, e nunca atravessa esta aplicação: um arquivo grande num corpo HTTP esbarra no limite do proxy, ocupa a aplicação pelo tempo do upload, e não tem como ser retomado quando a conexão cai.\n\nAceita image/jpeg, image/png, image/webp, image/gif, application/pdf, audio/mpeg, audio/mp4, audio/ogg, audio/wav, até 1073741824 bytes, recusados **antes** de qualquer assinatura: arquivo proibido não ganha URL, então não chega ao bucket. Que o tamanho declarado seja verdade é o que `POST /storages/:id/complete` confere, contra o objeto real.\n\nO arquivo é fatiado em partes de 10485760 bytes. Quando cabe numa parte só, `uploadId` vem nulo e a única URL aceita um `PUT` com o arquivo inteiro. Quando não cabe, cada URL aceita a sua parte, o cliente guarda o `ETag` que cada `PUT` devolve, e `parts` pode trazer só o primeiro lote - o resto sai em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.\n\nA linha nasce `PENDING` e não pode ser anexada a nada até ser confirmada. O arquivo nasce sem dono: quem anexa guarda a referência, informando o `id` no campo do recurso (hoje, `avatarId` do usuário).",
         "security": [
           {
             "cookieAuth": []
@@ -6350,7 +6360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6380,7 +6390,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileShowError"
+                  "$ref": "#/components/schemas/Error500StoragesFileShowError"
                 }
               }
             }
@@ -6419,7 +6429,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6459,13 +6469,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileDeleteError"
+                  "$ref": "#/components/schemas/Error500StoragesFileDeleteError"
                 }
               }
             }
           }
         },
-        "description": "**Irreversível**: apaga o binário no bucket e a linha em `storages`.\n\nSó apaga arquivo **órfão**. O arquivo é um registro neutro e compartilhado - ele não pertence ao formulário que o enviou -, então quem o referencia é quem manda: avatar de usuário, capa de notícia ou galeria de álbum em uso respondem `409`, com a origem na mensagem. Desvincule primeiro, apague depois.\n\nArquivo ainda `PENDING` é cancelamento de upload: o multipart é abortado, e é isso que faz as partes já enviadas sumirem do bucket.\n\nÉ o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.",
+        "description": "**Irreversível**: apaga o binário no bucket e a linha em `storages`.\n\nSó apaga arquivo **órfão**. O arquivo é um registro neutro e compartilhado - ele não pertence ao formulário que o enviou -, então quem o referencia é quem manda: arquivo em uso por outro registro (hoje, o avatar de um usuário) responde `409`, com a origem na mensagem. Desvincule primeiro, apague depois.\n\nArquivo ainda `PENDING` é cancelamento de upload: o multipart é abortado, e é isso que faz as partes já enviadas sumirem do bucket.\n\nÉ o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.",
         "security": [
           {
             "cookieAuth": []
@@ -6507,7 +6517,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6527,7 +6537,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422StorageSizeMismatchValidationError"
+                  "$ref": "#/components/schemas/Error422StorageContentMismatchStorageSizeMismatchValidationError"
                 }
               }
             }
@@ -6537,7 +6547,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileCompleteError"
+                  "$ref": "#/components/schemas/Error500StoragesFileCompleteError"
                 }
               }
             }
@@ -6588,7 +6598,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6618,7 +6628,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FileDownloadError"
+                  "$ref": "#/components/schemas/Error500StoragesFileDownloadError"
                 }
               }
             }
@@ -6666,7 +6676,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error401Unauthorized"
+                  "$ref": "#/components/schemas/Error401AuthenticationRequired"
                 }
               }
             }
@@ -6696,7 +6706,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error500FilePartsError"
+                  "$ref": "#/components/schemas/Error500StoragesFilePartsError"
                 }
               }
             }
@@ -18088,6 +18098,40 @@
         ],
         "additionalProperties": false
       },
+      "Error401AuthenticationRequired": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              401
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error401InvalidCredentials": {
         "type": "object",
         "properties": {
@@ -18141,40 +18185,6 @@
             "enum": [
               "REFRESH_TOKEN_INVALID",
               "REFRESH_TOKEN_MISSING"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error401Unauthorized": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              401
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "UNAUTHORIZED"
             ]
           },
           "errors": {
@@ -18981,75 +18991,6 @@
           "code"
         ]
       },
-      "Error409SportAlreadyExists": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "SPORT_ALREADY_EXISTS"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error409SportAlreadyExistsSportRosterAboveLimit": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "SPORT_ALREADY_EXISTS",
-              "SPORT_ROSTER_ABOVE_LIMIT"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
       "Error409SportInUse": {
         "type": "object",
         "properties": {
@@ -19068,6 +19009,40 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "SPORT_IN_USE"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409SportRosterAboveLimit": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "SPORT_ROSTER_ABOVE_LIMIT"
             ]
           },
           "errors": {
@@ -19483,43 +19458,6 @@
           "errors"
         ]
       },
-      "Error422RegulationNotPdfStorageNotFoundValidationError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              422
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "REGULATION_NOT_PDF",
-              "STORAGE_NOT_FOUND",
-              "VALIDATION_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code",
-          "errors"
-        ]
-      },
       "Error422SportInvalidLimitsValidationError": {
         "type": "object",
         "properties": {
@@ -19592,7 +19530,7 @@
           "errors"
         ]
       },
-      "Error422StorageNotFoundValidationError": {
+      "Error422StorageContentMismatchStorageSizeMismatchValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19609,7 +19547,8 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_NOT_FOUND",
+              "STORAGE_CONTENT_MISMATCH",
+              "STORAGE_SIZE_MISMATCH",
               "VALIDATION_ERROR"
             ]
           },
@@ -19628,7 +19567,7 @@
           "errors"
         ]
       },
-      "Error422StorageSizeMismatchValidationError": {
+      "Error422StorageNotFoundValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19645,7 +19584,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_SIZE_MISMATCH",
+              "STORAGE_NOT_FOUND",
               "VALIDATION_ERROR"
             ]
           },
@@ -19697,6 +19636,74 @@
           "status",
           "code",
           "errors"
+        ]
+      },
+      "Error500AccountProfileShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ACCOUNT_PROFILE_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AccountProfileUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ACCOUNT_PROFILE_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
         ]
       },
       "Error500AdministratorAnnouncementCreateError": {
@@ -20295,6 +20302,74 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADMINISTRATOR_CLASSROOM_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorEnrollmentRemovalAcknowledgeError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorEnrollmentRemovalPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_ENROLLMENT_REMOVAL_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -20923,6 +20998,244 @@
           "code"
         ]
       },
+      "Error500AdministratorUserArchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_ARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserCreateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_CREATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserDeleteError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserPaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_SHOW_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserUnarchiveError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_UNARCHIVE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500AdministratorUserUpdateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "ADMINISTRATOR_USER_UPDATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
       "Error500AdvisorCardPaginateError": {
         "type": "object",
         "properties": {
@@ -21161,7 +21474,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentRemovalAcknowledgeError": {
+      "Error500AdvisorStudentCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21178,7 +21491,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_REMOVAL_ACKNOWLEDGE_ERROR"
+              "ADVISOR_STUDENT_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -21195,7 +21508,7 @@
           "code"
         ]
       },
-      "Error500EnrollmentRemovalPaginateError": {
+      "Error500AdvisorStudentDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21212,7 +21525,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "ENROLLMENT_REMOVAL_PAGINATE_ERROR"
+              "ADVISOR_STUDENT_DELETE_ERROR"
             ]
           },
           "errors": {
@@ -21229,7 +21542,7 @@
           "code"
         ]
       },
-      "Error500FileCompleteError": {
+      "Error500AdvisorStudentPaginateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21246,7 +21559,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_COMPLETE_ERROR"
+              "ADVISOR_STUDENT_PAGINATE_ERROR"
             ]
           },
           "errors": {
@@ -21263,7 +21576,7 @@
           "code"
         ]
       },
-      "Error500FileCreateError": {
+      "Error500AdvisorStudentUpdateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21280,7 +21593,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_CREATE_ERROR"
+              "ADVISOR_STUDENT_UPDATE_ERROR"
             ]
           },
           "errors": {
@@ -21297,7 +21610,7 @@
           "code"
         ]
       },
-      "Error500FileDeleteError": {
+      "Error500AuthenticationSessionRefreshError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21314,7 +21627,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_DELETE_ERROR"
+              "AUTHENTICATION_SESSION_REFRESH_ERROR"
             ]
           },
           "errors": {
@@ -21331,7 +21644,7 @@
           "code"
         ]
       },
-      "Error500FileDownloadError": {
+      "Error500AuthenticationSessionSignInError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21348,7 +21661,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_DOWNLOAD_ERROR"
+              "AUTHENTICATION_SESSION_SIGN_IN_ERROR"
             ]
           },
           "errors": {
@@ -21365,7 +21678,7 @@
           "code"
         ]
       },
-      "Error500FilePaginateError": {
+      "Error500AuthenticationSessionSignOutError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21382,143 +21695,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "FILE_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500FilePartsError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "FILE_PARTS_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500FileShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "FILE_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500ProfileShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "PROFILE_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500ProfileUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "PROFILE_UPDATE_ERROR"
+              "AUTHENTICATION_SESSION_SIGN_OUT_ERROR"
             ]
           },
           "errors": {
@@ -21603,7 +21780,7 @@
           "code"
         ]
       },
-      "Error500SessionRefreshError": {
+      "Error500StoragesFileCompleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21620,7 +21797,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_REFRESH_ERROR"
+              "STORAGES_FILE_COMPLETE_ERROR"
             ]
           },
           "errors": {
@@ -21637,7 +21814,7 @@
           "code"
         ]
       },
-      "Error500SessionSignInError": {
+      "Error500StoragesFileCreateError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21654,7 +21831,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_SIGN_IN_ERROR"
+              "STORAGES_FILE_CREATE_ERROR"
             ]
           },
           "errors": {
@@ -21671,7 +21848,7 @@
           "code"
         ]
       },
-      "Error500SessionSignOutError": {
+      "Error500StoragesFileDeleteError": {
         "type": "object",
         "properties": {
           "message": {
@@ -21688,7 +21865,143 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "SESSION_SIGN_OUT_ERROR"
+              "STORAGES_FILE_DELETE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFileDownloadError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_DOWNLOAD_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFilePaginateError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_PAGINATE_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFilePartsError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_PARTS_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error500StoragesFileShowError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              500
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "STORAGES_FILE_SHOW_ERROR"
             ]
           },
           "errors": {
@@ -21927,380 +22240,6 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "STOREFRONT_SPORT_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentCreateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_CREATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentDeleteError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_DELETE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentPaginateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500StudentUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "STUDENT_UPDATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserArchiveError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_ARCHIVE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserCreateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_CREATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserDeleteError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_DELETE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserPaginateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_PAGINATE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserShowError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_SHOW_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserUnarchiveError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_UNARCHIVE_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error500UserUpdateError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              500
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "USER_UPDATE_ERROR"
             ]
           },
           "errors": {

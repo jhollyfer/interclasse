@@ -1,8 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
-import { Toaster as Sonner } from 'sonner'
-import type { ToasterProps } from 'sonner'
 import {
   CheckCircleIcon,
   InfoIcon,
@@ -10,13 +7,25 @@ import {
   XCircleIcon,
   SpinnerIcon,
 } from '@phosphor-icons/react'
+import { Toaster as Sonner } from 'sonner'
+import type { ToasterProps } from 'sonner'
+
+import { useTheme } from '#/components/common/theme-provider'
+import type { CssVars } from '#/lib/css-vars'
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
+  // casa: tema do cookie da casa no lugar do `next-themes`
+  const { theme } = useTheme('Toaster')
+  const style: CssVars = {
+    '--normal-bg': 'var(--popover)',
+    '--normal-text': 'var(--popover-foreground)',
+    '--normal-border': 'var(--border)',
+    '--border-radius': 'var(--radius)',
+  }
 
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
+      theme={theme}
       className="toaster group"
       icons={{
         success: <CheckCircleIcon className="size-4" />,
@@ -25,14 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         error: <XCircleIcon className="size-4" />,
         loading: <SpinnerIcon className="size-4 animate-spin" />,
       }}
-      style={
-        {
-          '--normal-bg': 'var(--popover)',
-          '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
-          '--border-radius': 'var(--radius)',
-        } as React.CSSProperties
-      }
+      style={style}
       toastOptions={{
         classNames: {
           toast: 'cn-toast',

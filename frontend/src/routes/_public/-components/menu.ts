@@ -26,7 +26,7 @@ const ANNOUNCEMENTS = linkOptions({
 const ABOUT = linkOptions({ to: '/sobre', label: m.public_nav_about })
 
 const SIGN_IN = linkOptions({
-  to: '/authentication',
+  to: '/sign-in',
   label: m.public_nav_sign_in,
 })
 

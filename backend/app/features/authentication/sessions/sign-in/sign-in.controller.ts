@@ -5,7 +5,7 @@ import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 
 import { AuthenticationSessionSignInValidator } from '#validators/authentication/sessions.validator'
 import { defineDocs } from '#core/openapi/types'
-import CookieService from '#services/cookie/cookie.service'
+import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 
 @inject()
 export default class AuthenticationSessionSignInController {
@@ -19,10 +19,7 @@ export default class AuthenticationSessionSignInController {
       'devolvem o mesmo `401`. É o que impede descobrir, pela resposta, quais e-mails existem.',
   })
 
-  constructor(
-    private readonly cookie: CookieService,
-    private readonly useCase: AuthenticationSessionSignInUseCase,
-  ) {}
+  constructor(private readonly useCase: AuthenticationSessionSignInUseCase) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(AuthenticationSessionSignInValidator)
@@ -30,7 +27,9 @@ export default class AuthenticationSessionSignInController {
 
     if (result.isLeft()) throw result.value
 
-    this.cookie.set(context, result.value)
+    context.response
+      .cookie(COOKIE_TOKEN.ACCESS, result.value.accessToken, cookieOptions.access)
+      .cookie(COOKIE_TOKEN.REFRESH, result.value.refreshToken, cookieOptions.refresh)
 
     return context.response.noContent()
   }

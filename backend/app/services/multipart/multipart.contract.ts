@@ -12,6 +12,12 @@ export type PresignedPart = {
   readonly url: string
 }
 
+/** Uma parte a assinar: o número e o tamanho exato, que a assinatura prende. */
+export type PartToSign = {
+  readonly partNumber: number
+  readonly size: number
+}
+
 /** Uma parte que o bucket já recebeu. O `etag` é o que o `complete` exige. */
 export type UploadedPart = {
   readonly partNumber: number
@@ -44,10 +50,15 @@ export abstract class MultipartContract {
   abstract signParts(
     key: string,
     uploadId: string,
-    partNumbers: ReadonlyArray<number>,
+    parts: ReadonlyArray<PartToSign>,
     expiresIn?: number,
   ): Promise<Array<PresignedPart>>
-  abstract signSingle(key: string, contentType: string, expiresIn?: number): Promise<string>
+  abstract signSingle(
+    key: string,
+    contentType: string,
+    size: number,
+    expiresIn?: number,
+  ): Promise<string>
   abstract listParts(key: string, uploadId: string): Promise<Array<UploadedPart>>
   abstract complete(
     key: string,

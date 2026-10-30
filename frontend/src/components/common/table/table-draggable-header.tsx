@@ -1,12 +1,12 @@
-import type * as React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DotsSixVerticalIcon } from '@phosphor-icons/react'
 import type { Header, RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import type { TableFeatures } from './use-table'

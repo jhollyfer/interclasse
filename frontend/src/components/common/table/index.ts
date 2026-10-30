@@ -2,12 +2,7 @@ export { Table } from './table'
 export { TableColumnHeader } from './table-column-header'
 export { TableColumnToggle } from './table-column-toggle'
 export { TableContent } from './table-content'
-export {
-  TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
-} from './table-empty'
+export { TableEmpty } from './table-empty'
 export { TableGrid } from './table-grid'
 export {
   TableActions,

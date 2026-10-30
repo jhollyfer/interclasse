@@ -1,5 +1,5 @@
 import { assert } from '@japa/assert'
-import { apiClient } from '@japa/api-client'
+import { ApiClient, apiClient } from '@japa/api-client'
 import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
 import { spec } from '@japa/runner/reporters'
@@ -7,9 +7,11 @@ import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
-import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 
 import type { Registry } from '../.adonisjs/client/registry/schema.d.ts'
+
+import env from '#start/env'
+import { DatabaseGuard } from '#tests/database-guard'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -23,6 +25,19 @@ declare module '@japa/api-client/types' {
  */
 
 /**
+ * O cliente de teste não é um navegador e não manda `Origin`; a barreira de
+ * origem (`origin.middleware.ts`) recusaria toda escrita. Todo pedido sai como
+ * se viesse do frontend da allowlist de `.env.test`; o teste que mede a recusa
+ * põe a própria `Origin`.
+ */
+ApiClient.setup((request) => {
+  // O hook roda no envio, depois do `.header()` do teste: só preenche quando falta.
+  if (request.request.get('origin')) return
+
+  request.header('origin', 'http://localhost:5173')
+})
+
+/**
  * Configure Japa plugins in the plugins array.
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
@@ -31,7 +46,6 @@ export const plugins: Config['plugins'] = [
   pluginAdonisJS(app),
   dbAssertions(app),
   apiClient(),
-  sessionApiClient(app),
   authApiClient(app),
 ]
 
@@ -104,7 +118,8 @@ export const reporters: Config['reporters'] = REPORTERS[reporterMode]
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  // Antes de qualquer suíte e da primeira migration: banco sem `_test` derruba o runner.
+  setup: [() => DatabaseGuard.assertTestDatabase(env.get('DATABASE_URL'))],
   teardown: [],
 }
 

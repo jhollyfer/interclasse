@@ -3,7 +3,7 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
+import { StorageFactory } from '#database/factories/storage.factory'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import {
   authenticateAsAdministrator,
@@ -11,7 +11,9 @@ import {
   resetDatabase,
   type ResponseBody,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -23,9 +25,9 @@ import type { Session } from '#tests/http-fixtures'
  * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
  * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
  */
-const FULL_PART = new Uint8Array(PART_SIZE).fill(65)
+const FULL_PART = pngBytes(PART_SIZE, 65)
 
-const SMALL = new Uint8Array(1024).fill(66)
+const SMALL = pngBytes(1024)
 
 /** Abre um upload pelo endpoint real e devolve o envelope. */
 async function open(
@@ -90,7 +92,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(204)
 
-    assert.isNull(await Storage.find(storage.id))
+    assert.isNull(await Stored.storage(storage.id))
     assert.isFalse(await drive.use().exists(storage.path))
   })
 
@@ -109,7 +111,7 @@ test.group('storages > delete', (group) => {
 
     response.assertStatus(204)
 
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isNull(await Stored.storage(opened.storage.id))
     // O upload deixou de existir: pedir a retomada dele agora é 404.
     const resumed = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
     resumed.assertStatus(404)
@@ -128,8 +130,42 @@ test.group('storages > delete', (group) => {
     assert.equal(body(response).code, 'STORAGE_IN_USE')
 
     // O 409 não pode ser um "apagou e reclamou": registro e binário seguem lá.
-    assert.isNotNull(await Storage.find(storage.id))
+    assert.isNotNull(await Stored.storage(storage.id))
     assert.isTrue(await drive.use().exists(storage.path))
+  })
+
+  test('recusa com 409 o arquivo em uso como foto da galeria', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const storage = await upload(client, session)
+
+    const photo = await client
+      .post('/administrator/photos')
+      .cookies(session)
+      .json({ storageId: storage.id })
+    photo.assertStatus(201)
+
+    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'STORAGE_IN_USE')
+    assert.isNotNull(await Stored.storage(storage.id))
+  })
+
+  test('recusa com 409 o arquivo em uso como regulamento do site', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+    const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
+
+    const linked = await client
+      .put('/administrator/site')
+      .cookies(session)
+      .json({ regulationId: pdf.id })
+    linked.assertStatus(200)
+
+    const response = await client.delete(`/storages/${pdf.id}`).cookies(session)
+
+    response.assertStatus(409)
+    assert.equal(body(response).code, 'STORAGE_IN_USE')
+    assert.isNotNull(await Stored.storage(pdf.id))
   })
 
   test('volta a aceitar depois de o anexo ser desvinculado', async ({ client, assert }) => {
@@ -142,7 +178,7 @@ test.group('storages > delete', (group) => {
     const response = await client.delete(`/storages/${storage.id}`).cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Storage.find(storage.id))
+    assert.isNull(await Stored.storage(storage.id))
   })
 
   test('responde 404 para id inexistente', async ({ client, assert }) => {
@@ -160,5 +196,18 @@ test.group('storages > delete', (group) => {
     const response = await client.delete('/storages/00000000-0000-4000-8000-000000000000')
 
     response.assertStatus(401)
+  })
+})
+
+test.group('storages > delete > identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/storages/x').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

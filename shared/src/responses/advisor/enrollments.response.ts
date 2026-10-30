@@ -33,4 +33,6 @@ export const AdvisorEnrollmentShowResponse = z.object({
   ),
 })
 
-export type AdvisorEnrollmentShowResponse = z.infer<typeof AdvisorEnrollmentShowResponse>
+export type AdvisorEnrollmentShowResponse = z.infer<
+  typeof AdvisorEnrollmentShowResponse
+>

@@ -1,13 +1,13 @@
+import type { Merge } from '@interclasse/shared'
 import type * as React from 'react'
 
+import { useIsUploading } from '#/components/common/uploading-context'
 import { Button } from '#/components/ui/button'
 import { Spinner } from '#/components/ui/spinner'
-import { useIsUploading } from '#/components/common/uploading-context'
-import type { Merge } from '#/lib/merge'
 
 type SubmitButtonProps = Readonly<
   Merge<
-    React.ComponentProps<typeof Button>,
+    Omit<React.ComponentProps<typeof Button>, 'isPending' | 'children'>,
     {
       /** A mutation está em voo? Mostra o spinner e trava o botão. */
       isPending?: boolean

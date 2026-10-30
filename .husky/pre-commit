@@ -1,24 +1,19 @@
-# O gate de commit do repositório inteiro (_standards/tooling.md §6): cada app
-# só roda o que é dele, e só quando o commit toca nele.
-#
-# O backend roda `pnpm check && pnpm test`, o mesmo alvo do CI: o hook e o
-# pipeline reprovando por motivos diferentes é como um dos dois deixa de ser
-# lido. O frontend roda lint, typecheck e testes. Mudança no `shared/` vale
-# para os dois, porque os dois o importam.
+# O gate de commit (_standards/tooling.md §6): cada pacote roda o `check` e a
+# suíte unitária, só quando o commit o toca. Mexer em `shared/` testa os dois
+# consumidores, porque é o contrato deles. A suíte E2E fica no CI: precisa de
+# banco e serviços em container.
 staged=$(git diff --cached --name-only)
 
-if echo "$staged" | grep -qE '^(shared|backend)/'; then
-  pnpm --filter ./shared run build || exit 1
-fi
+touches() {
+  printf '%s\n' "$staged" | grep -q "^$1/"
+}
 
-if echo "$staged" | grep -q '^shared/'; then
-  pnpm --filter ./shared run typecheck && pnpm --filter ./shared run test || exit 1
+if touches shared; then
+  pnpm --filter ./shared check && pnpm --filter ./shared test:unit || exit 1
 fi
-
-if echo "$staged" | grep -qE '^(shared|backend)/'; then
-  (cd backend && pnpm check && pnpm test) || exit 1
+if touches backend || touches shared; then
+  pnpm --filter ./backend check && pnpm --filter ./backend test:unit || exit 1
 fi
-
-if echo "$staged" | grep -qE '^(shared|frontend)/'; then
-  (cd frontend && pnpm i18n:compile && pnpm i18n:check && pnpm lint && pnpm typecheck && pnpm test) || exit 1
+if touches frontend || touches shared; then
+  pnpm --filter ./frontend check && pnpm --filter ./frontend test:unit || exit 1
 fi

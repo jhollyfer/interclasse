@@ -11,6 +11,7 @@ import {
 } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { UserRepository } from '#repositories/user/user.repository'
 import { sortOrder } from '#features/_shared.sort'
 import type { AdministratorUserPaginatePayload } from '#validators/administrator/users.validator'
@@ -29,6 +30,7 @@ type Response = Either<HTTPException, Paginated<AdministratorUserShowResponse>>
 export default class AdministratorUserPaginateUseCase {
   constructor(
     private readonly users: UserRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -36,23 +38,34 @@ export default class AdministratorUserPaginateUseCase {
     try {
       const [sort, direction] = sortOrder(payload, 'name')
 
-      return right(
-        await this.users.paginate({
-          page: payload.page ?? PAGINATION.PAGE,
-          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
-          search: payload.search,
-          role: payload.role,
-          status: payload.status,
-          trashed: payload.trashed,
-          sort,
-          direction,
-        }),
-      )
+      const page = await this.users.paginate({
+        page: payload.page ?? PAGINATION.PAGE,
+        perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+        search: payload.search,
+        role: payload.role,
+        status: payload.status,
+        trashed: payload.trashed,
+        sort,
+        direction,
+      })
+
+      return right({
+        meta: page.meta,
+        data: await Promise.all(
+          page.data.map(async (user) => ({
+            ...user,
+            avatar: await this.bucket.withOptionalUrl(user.avatar),
+          })),
+        ),
+      })
     } catch (error) {
-      logger.error({ err: error }, '[users > paginate][error]')
+      logger.error({ err: error }, '[administrator/users > paginate][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'USER_PAGINATE_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'ADMINISTRATOR_USER_PAGINATE_ERROR',
+        ),
       )
     }
   }

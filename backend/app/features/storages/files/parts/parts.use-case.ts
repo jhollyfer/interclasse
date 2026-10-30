@@ -12,10 +12,12 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  PRESIGNED_BATCH,
+  type PartToSign,
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts } from '#features/storages/_shared.parts'
+import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -77,11 +79,12 @@ export default class StoragesFilePartsUseCase {
       }
 
       const uploaded = await this.uploaded(storage)
-      const missing = pendingParts(
+      const missing = pendingParts({
         totalParts,
-        uploaded.map((part) => part.partNumber),
-      )
-      const parts = await this.sign(storage, missing)
+        uploaded: uploaded.map((part) => part.partNumber),
+        batch: PRESIGNED_BATCH,
+      })
+      const parts = await this.sign(storage, sizedParts(missing, file.size, partSize))
 
       return right(
         FilePresenter.upload({
@@ -95,10 +98,13 @@ export default class StoragesFilePartsUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[files > parts][error]')
+      logger.error({ err: error }, '[storages/files > parts][error]')
 
       return left(
-        HTTPException.InternalServerError(this.i18n.t('errors.internal'), 'FILE_PARTS_ERROR'),
+        HTTPException.InternalServerError(
+          this.i18n.t('errors.internal'),
+          'STORAGES_FILE_PARTS_ERROR',
+        ),
       )
     }
   }
@@ -126,13 +132,16 @@ export default class StoragesFilePartsUseCase {
   }
 
   /** URL nova para cada parte que falta - as antigas podem ter expirado. */
-  private async sign(storage: Storage, missing: Array<number>): Promise<Array<PresignedPart>> {
+  private async sign(
+    storage: Storage,
+    missing: ReadonlyArray<PartToSign>,
+  ): Promise<Array<PresignedPart>> {
     if (missing.length === 0) return []
 
-    const { path, uploadId, mimetype } = storage.snapshot()
+    const { path, uploadId, mimetype, size } = storage.snapshot()
 
     if (uploadId) return this.multipart.signParts(path, uploadId, missing)
 
-    return [{ partNumber: 1, url: await this.multipart.signSingle(path, mimetype) }]
+    return [{ partNumber: 1, url: await this.multipart.signSingle(path, mimetype, size) }]
   }
 }

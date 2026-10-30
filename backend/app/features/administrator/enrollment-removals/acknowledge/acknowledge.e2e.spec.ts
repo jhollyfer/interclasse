@@ -2,10 +2,15 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import EnrollmentRemoval from '#models/enrollment-removal'
+import { EnrollmentRemovalFactory } from '#database/factories/enrollment-removal.factory'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { SportFactory } from '#database/factories/sport.factory'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+  authenticateAsAdvisor,
+} from '#tests/http-fixtures'
 
 test.group('enrollment-removals > acknowledge', (group) => {
   group.each.setup(() => resetDatabase())
@@ -14,12 +19,12 @@ test.group('enrollment-removals > acknowledge', (group) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
-    const removal = await EnrollmentRemoval.create({
+    const removal = await EnrollmentRemovalFactory.merge({
       classroomId: classroom.id,
       sportId: sport.id,
       studentName: 'Ana',
       reason: 'Saiu da escola',
-    })
+    }).create()
 
     const first = await client
       .patch(`/administrator/enrollment-removals/${removal.id}/acknowledge`)
@@ -43,5 +48,37 @@ test.group('enrollment-removals > acknowledge', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'ENROLLMENT_REMOVAL_NOT_FOUND')
+  })
+})
+
+test.group('administrator/enrollment-removals/acknowledge > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.patch(
+      '/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge',
+    )
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client
+      .patch('/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge')
+      .cookies(advisor)
+
+    response.assertStatus(403)
+  })
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .patch('/administrator/enrollment-removals/nao-e-uuid/acknowledge')
+      .cookies(admin)
+
+    response.assertStatus(422)
   })
 })

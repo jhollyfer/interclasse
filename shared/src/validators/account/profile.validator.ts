@@ -29,8 +29,11 @@ export const AccountProfileUpdateValidator = z
     passwordMismatchIssue(),
   )
   .refine(
-    (value) => value.password === undefined || value.currentPassword !== undefined,
+    (value) =>
+      value.password === undefined || value.currentPassword !== undefined,
     requiredIssue(['currentPassword']),
   )
 
-export type AccountProfileUpdatePayload = z.infer<typeof AccountProfileUpdateValidator>
+export type AccountProfileUpdatePayload = z.infer<
+  typeof AccountProfileUpdateValidator
+>

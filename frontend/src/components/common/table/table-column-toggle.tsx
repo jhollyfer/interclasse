@@ -1,6 +1,6 @@
-import type * as React from 'react'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import type { RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import {

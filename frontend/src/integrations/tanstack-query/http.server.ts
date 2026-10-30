@@ -12,11 +12,11 @@
  * cliente tanto a chamada quanto este import.
  */
 
-import { AsyncLocalStorage } from 'node:async_hooks'
 import {
   appendResponseHeader,
   getRequestHeader,
 } from '@tanstack/react-start/server'
+import { AsyncLocalStorage } from 'node:async_hooks'
 
 /**
  * O que precisa valer por requisição, e não por processo.

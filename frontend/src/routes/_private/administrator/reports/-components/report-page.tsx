@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { DownloadSimpleIcon } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import {
   PageHeader,

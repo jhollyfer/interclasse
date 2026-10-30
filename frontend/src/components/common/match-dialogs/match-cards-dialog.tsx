@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import type * as React from 'react'
 import {
   AdministratorCardCreateValidator,
   CARD_COLORS,
@@ -8,22 +6,18 @@ import type {
   AdministratorCardCreatePayload,
   AdministratorCardPaginateResponse,
 } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import * as React from 'react'
 
 import { CardList } from '#/components/common/card-list'
+import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import { Button } from '#/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog'
 import { Input } from '#/components/ui/input'
-import {
-  NativeSelect,
-  NativeSelectOptGroup,
-  NativeSelectOption,
-} from '#/components/ui/native-select'
 import { GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useMutationForm } from '#/hooks/use-mutation-form'
 import {
@@ -32,18 +26,20 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
-  useCardCreate,
-  useCardDelete,
+  useCardCreateMutation,
+  useCardDeleteMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import {
   cardsQueryOptions,
   matchAthletesQueryOptions,
 } from '#/integrations/tanstack-query/queries/administrator'
+import type { DialogHandle } from '#/lib/dialog-handle'
 import { notifyError } from '#/lib/form-errors'
 import { CARD_COLOR_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-import type { MatchRef } from './match-dialogs'
+import { MatchDialogShell } from './match-dialog-shell'
+import type { MatchRef } from './match-dialog-shell'
 
 const FIELDS = ['studentId', 'color', 'note'] as const
 
@@ -55,9 +51,7 @@ function athleteLabel(student: { name: string; enrolled: boolean }): string {
 }
 
 type MatchCardsDialogProps = Readonly<{
-  match: MatchRef
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  handle: DialogHandle<MatchRef>
 }>
 
 /**
@@ -65,10 +59,18 @@ type MatchCardsDialogProps = Readonly<{
  * O atleta sai das duas turmas da partida, os inscritos na modalidade primeiro.
  */
 export function MatchCardsDialog({
-  match,
-  open,
-  onOpenChange,
+  handle,
 }: MatchCardsDialogProps): React.JSX.Element {
+  return (
+    <MatchDialogShell handle={handle} className="sm:max-w-lg">
+      {(match) => <MatchCardsContent match={match} />}
+    </MatchDialogShell>
+  )
+}
+
+function MatchCardsContent({
+  match,
+}: Readonly<{ match: MatchRef }>): React.JSX.Element {
   const invalidate = useInvalidate()
   const { data: cards, isPending } = useQuery(
     cardsQueryOptions({ matchId: match.id, perPage: 100 }),
@@ -83,7 +85,7 @@ export function MatchCardsDialog({
     validator: AdministratorCardCreateValidator,
     defaults: { matchId: match.id, studentId: '', note: '' },
     fields: FIELDS,
-    mutation: useCardCreate,
+    mutation: useCardCreateMutation,
     invalidate: GAME_KEYS,
     success: (card) =>
       m.common_match_card_given({
@@ -95,7 +97,16 @@ export function MatchCardsDialog({
       form.reset({ matchId: match.id, studentId: '', note: '' }),
   })
 
-  const remove = useCardDelete({
+  // Uma lista só, com a turma no rótulo: o combobox busca por texto, e quem
+  // não está inscrito na modalidade segue avisado em `athleteLabel`.
+  const athleteOptions = (athletes?.teams ?? []).flatMap((team) =>
+    team.students.map((student) => ({
+      value: student.id,
+      label: `${team.name} - ${athleteLabel(student)}`,
+    })),
+  )
+
+  const remove = useCardDeleteMutation({
     onSuccess: async () => {
       await invalidate(GAME_KEYS)
     },
@@ -103,114 +114,95 @@ export function MatchCardsDialog({
   })
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{m.common_match_cards_title()}</DialogTitle>
-          <DialogDescription>
-            {m.common_match_versus({
-              home: match.homeName ?? m.common_to_be_defined(),
-              away: match.awayName ?? m.common_to_be_defined(),
-            })}
-          </DialogDescription>
-        </DialogHeader>
+    <React.Fragment>
+      <DialogHeader>
+        <DialogTitle>{m.common_match_cards_title()}</DialogTitle>
+        <DialogDescription>
+          {m.common_match_versus({
+            home: match.homeName ?? m.common_to_be_defined(),
+            away: match.awayName ?? m.common_to_be_defined(),
+          })}
+        </DialogDescription>
+      </DialogHeader>
 
-        <CardList
-          cards={cards?.data ?? []}
-          isPending={isPending}
-          empty={m.common_match_cards_empty()}
-          showMatch={false}
-          onDelete={(card) => remove.mutate(card.id)}
-        />
+      <CardList
+        cards={cards?.data ?? []}
+        isPending={isPending}
+        empty={m.common_match_cards_empty()}
+        showMatch={false}
+        onDelete={(card) => remove.mutate(card.id)}
+      />
 
-        <form
-          method="post"
-          className="grid gap-3 border-t pt-4"
-          onSubmit={onSubmit}
-        >
-          <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
-            <AppField
-              control={form.control}
-              name="studentId"
-              id="card-student"
-              label={m.common_match_card_athlete()}
-            >
-              {({ field, control }) => (
-                // `select` nativo: dentro do diálogo o popup do combobox abre
-                // atrás do overlay.
-                <NativeSelect {...field} {...control}>
-                  <NativeSelectOption value="">
-                    {m.common_select_placeholder()}
-                  </NativeSelectOption>
-                  {(athletes?.teams ?? []).map((team) => (
-                    <NativeSelectOptGroup key={team.teamId} label={team.name}>
-                      {team.students.map((student) => (
-                        <NativeSelectOption key={student.id} value={student.id}>
-                          {athleteLabel(student)}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelectOptGroup>
-                  ))}
-                </NativeSelect>
-              )}
-            </AppField>
-            <AppField
-              control={form.control}
-              name="color"
-              id="card-color"
-              label={m.common_match_card_color()}
-            >
-              {({ field, control }) => (
-                <NativeSelect
-                  {...control}
-                  value={String(field.value)}
-                  onChange={(event) =>
-                    field.onChange(
-                      CARD_COLORS.find((value) => value === event.target.value),
-                    )
-                  }
-                  onBlur={field.onBlur}
-                >
-                  <NativeSelectOption value="">
-                    {m.common_select_placeholder()}
-                  </NativeSelectOption>
-                  {CARD_COLORS.map((value) => (
-                    <NativeSelectOption key={value} value={value}>
-                      {CARD_COLOR_LABELS[value]}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              )}
-            </AppField>
-          </div>
+      <form
+        method="post"
+        className="grid gap-3 border-t pt-4"
+        onSubmit={onSubmit}
+      >
+        <div className="grid gap-3 sm:grid-cols-field-narrow">
           <AppField
             control={form.control}
-            name="note"
-            id="card-note"
-            label={m.common_match_card_note()}
+            name="studentId"
+            id="card-student"
+            label={m.common_match_card_athlete()}
           >
             {({ field, control }) => (
-              <Input
-                {...field}
-                {...control}
-                value={field.value ?? ''}
-                maxLength={200}
-                placeholder={m.common_match_card_note_placeholder()}
+              <OptionCombobox
+                id={control.id}
+                aria-invalid={control['aria-invalid']}
+                value={field.value}
+                onValueChange={field.onChange}
+                onBlur={field.onBlur}
+                options={athleteOptions}
               />
             )}
           </AppField>
-
-          <AppFormRootError form={form} />
-
-          <Button
-            type="submit"
-            className="justify-self-end"
-            disabled={mutation.isPending}
+          <AppField
+            control={form.control}
+            name="color"
+            id="card-color"
+            label={m.common_match_card_color()}
           >
-            {m.common_match_card_submit()}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+            {({ field, control }) => (
+              <OptionCombobox
+                id={control.id}
+                aria-invalid={control['aria-invalid']}
+                value={field.value}
+                onValueChange={(value) =>
+                  field.onChange(CARD_COLORS.find((color) => color === value))
+                }
+                onBlur={field.onBlur}
+                options={toOptions(CARD_COLORS, CARD_COLOR_LABELS)}
+              />
+            )}
+          </AppField>
+        </div>
+        <AppField
+          control={form.control}
+          name="note"
+          id="card-note"
+          label={m.common_match_card_note()}
+        >
+          {({ field, control }) => (
+            <Input
+              {...field}
+              {...control}
+              value={field.value ?? ''}
+              maxLength={200}
+              placeholder={m.common_match_card_note_placeholder()}
+            />
+          )}
+        </AppField>
+
+        <AppFormRootError form={form} />
+
+        <Button
+          type="submit"
+          className="justify-self-end"
+          disabled={mutation.isPending}
+        >
+          {m.common_match_card_submit()}
+        </Button>
+      </form>
+    </React.Fragment>
   )
 }

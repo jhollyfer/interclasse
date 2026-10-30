@@ -1,13 +1,13 @@
-import type {
+import {
   StoragesFileShowResponse,
   StoragesFileUploadResponse,
 } from '@interclasse/shared'
 
 import { request, HTTPError } from '#/integrations/tanstack-query/http'
 import { missingParts, planParts } from '#/lib/chunking'
-import { putPart } from '#/lib/upload-transport'
-import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
 import { isStorageMimetype } from '#/lib/mimetype'
+import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
+import { putPart } from '#/lib/upload-transport'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -72,8 +72,9 @@ export function useMultipartUpload({
 
       // O plano traz o arquivo sem a `url` derivada; o registro com ela vem do
       // `GET /storages/:id`.
-      return request<StoragesFileShowResponse>(
+      return request(
         '/storages/'.concat(plan.storage.id),
+        StoragesFileShowResponse,
         { signal },
       )
     }
@@ -111,8 +112,9 @@ async function open(
 
   if (saved) {
     try {
-      return await request<StoragesFileUploadResponse>(
+      return await request(
         `/storages/${saved.storageId}/parts`,
+        StoragesFileUploadResponse,
       )
     } catch (error) {
       if (!(error instanceof HTTPError) || error.status !== 404) throw error
@@ -121,7 +123,7 @@ async function open(
     }
   }
 
-  return request<StoragesFileUploadResponse>('/storages', {
+  return request('/storages', StoragesFileUploadResponse, {
     method: 'POST',
     body: JSON.stringify({
       fileName: file.name,
@@ -181,8 +183,9 @@ async function send(
     // O lote acabou e ainda falta parte: peça o próximo, que vem com URLs
     // recém-assinadas - as antigas podem já ter expirado.
     if (ready.length === 0) {
-      batch = await request<StoragesFileUploadResponse>(
+      batch = await request(
         `/storages/${initial.storage.id}/parts`,
+        StoragesFileUploadResponse,
       )
 
       for (const part of batch.uploaded) {
@@ -203,7 +206,17 @@ async function send(
 
       if (!url) return
 
-      const etag = await putPart(url, file.slice(part.start, part.end), {
+      // O backend assina o `Content-Length` da parte: o corpo precisa ter
+      // exatamente o tamanho planejado (`Blob.slice` de `[start, end)`). O
+      // navegador manda o cabeçalho sozinho a partir do `Blob`, e uma parte de
+      // outro tamanho voltaria `403` do bucket sem dizer por quê.
+      const blob = file.slice(part.start, part.end)
+
+      if (blob.size !== part.end - part.start) {
+        throw new Error(m.upload_error_part_size())
+      }
+
+      const etag = await putPart(url, blob, {
         signal,
         onProgress: (loaded) => {
           progress.set(part.partNumber, loaded)
@@ -237,7 +250,7 @@ async function complete(
 
   if (uploadId) body.parts = parts
 
-  return request<StoragesFileShowResponse>(`/storages/${storageId}/complete`, {
+  return request(`/storages/${storageId}/complete`, StoragesFileShowResponse, {
     method: 'POST',
     body: JSON.stringify(body),
   })

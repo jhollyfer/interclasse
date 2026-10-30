@@ -1,9 +1,16 @@
-import type { AdministratorSportShowResponse, Paginated, SortDirection } from '@interclasse/shared'
+import { left, right } from '@interclasse/shared'
+import type {
+  AdministratorSportShowResponse,
+  Either,
+  Paginated,
+  SortDirection,
+} from '@interclasse/shared'
 
 import { SportRepository, type SportListCriteria } from './sport.repository.ts'
 
 import { Sport, type SportProps } from '#domain/sport/sport.entity'
-import { MemoryPagination } from '#repositories/memory-pagination'
+import type { SportError } from '#domain/sport/sport.errors'
+import { MemoryPagination } from '#core/memory-pagination'
 
 /**
  * A segunda implementação de verdade, para o teste unitário do use-case
@@ -52,8 +59,17 @@ export class SportMemoryRepository extends SportRepository {
     return this.used.has(sportId)
   }
 
-  async save(sport: Sport): Promise<void> {
-    this.rows.set(sport.id, structuredClone(sport.snapshot()))
+  async save(sport: Sport): Promise<Either<SportError, void>> {
+    const snapshot = structuredClone(sport.snapshot())
+    const taken = [...this.rows.values()].some(
+      (row) => row.id !== snapshot.id && (row.name === snapshot.name || row.slug === snapshot.slug),
+    )
+    // Os `unique` de nome e slug, como o banco os garante.
+    if (taken) return left({ code: 'SPORT_ALREADY_EXISTS' })
+
+    this.rows.set(snapshot.id, snapshot)
+
+    return right(undefined)
   }
 
   async delete(sport: Sport): Promise<void> {

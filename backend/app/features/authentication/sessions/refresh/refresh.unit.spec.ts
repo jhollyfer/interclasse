@@ -3,8 +3,8 @@ import { test } from '@japa/runner'
 import AuthenticationSessionRefreshUseCase from './refresh.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionContract } from '#services/session/session.contract'
-import { makeWithMemory } from '#tests/unit-fixtures'
+import { SessionRepository } from '#repositories/session/session.repository'
+import { makeWithMemory } from '#tests/container-fixtures'
 import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
@@ -15,7 +15,7 @@ async function setup() {
   doubles.sessions.withRefresh('refresh-ok', GRANT)
   const useCase = await makeWithMemory(AuthenticationSessionRefreshUseCase, [
     [UserRepository, doubles.users],
-    [SessionContract, doubles.sessions],
+    [SessionRepository, doubles.sessions],
   ])
 
   return { ...doubles, useCase }
@@ -73,7 +73,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepEqual(sessions.issued, [])
   })
 
-  test('falha do repositório é 500 SESSION_REFRESH_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 AUTHENTICATION_SESSION_REFRESH_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.findById = async () => {
       throw new Error('banco fora')
@@ -81,6 +81,6 @@ test.group('authentication/sessions > refresh (unit)', () => {
 
     const result = await useCase.execute({ refreshToken: 'refresh-ok' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'SESSION_REFRESH_ERROR' })
+    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_REFRESH_ERROR' })
   })
 })

@@ -21,6 +21,15 @@ export const http = defineConfig({
   generateRequestId: true,
 
   /**
+   * Os proxies cuja palavra sobre o IP do cliente vale (`TRUSTED_PROXIES`).
+   * Ausente cai no `loopback` do Adonis. Sem o proxy da produção aqui,
+   * `request.ip()` é o IP dele e o limite por IP vira global
+   * (_standards/backend.md §4.10; _doc-lib/adonisjs.md#guides/basics/request,
+   * https://docs.adonisjs.com/guides/basics/request).
+   */
+  trustProxy: env.get('TRUSTED_PROXIES'),
+
+  /**
    * Allow HTTP method spoofing via the "_method" form/query parameter.
    * This lets HTML forms target PUT/PATCH/DELETE routes while still
    * submitting with POST.

@@ -9,7 +9,12 @@ import { paginationFields, sortFields, z } from '../../validator.js'
  * campo de entrada; que a conta indicada exista e tenha o papel do vínculo é
  * regra do domínio, não do formulário.
  */
-export const CLASSROOM_SORT_COLUMNS = ['name', 'grade', 'category', 'createdAt'] as const
+export const CLASSROOM_SORT_COLUMNS = [
+  'name',
+  'grade',
+  'category',
+  'createdAt',
+] as const
 
 export const AdministratorClassroomCreateValidator = z.object({
   name: z.string().trim().min(1).max(20),
@@ -19,7 +24,8 @@ export const AdministratorClassroomCreateValidator = z.object({
 })
 
 /** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
-export const AdministratorClassroomUpdateValidator = AdministratorClassroomCreateValidator.partial()
+export const AdministratorClassroomUpdateValidator =
+  AdministratorClassroomCreateValidator.partial()
 
 export const AdministratorClassroomPaginateValidator = z.object({
   ...paginationFields(),

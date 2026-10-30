@@ -10,4 +10,6 @@ export const StorefrontMatchPaginateValidator = z.object({
   ...matchFilterFields(),
 })
 
-export type StorefrontMatchPaginatePayload = z.infer<typeof StorefrontMatchPaginateValidator>
+export type StorefrontMatchPaginatePayload = z.infer<
+  typeof StorefrontMatchPaginateValidator
+>

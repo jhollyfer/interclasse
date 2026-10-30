@@ -1,3 +1,9 @@
 {
-  "internal": "Internal server error"
+  "internal": "Internal server error",
+  "origin_not_allowed": "Origin not allowed",
+  "access_denied": "Access denied",
+  "not_found": "Not found",
+  "unauthorized": "Unauthorized",
+  "validation": "Invalid data",
+  "too_many_requests": "Too many attempts. Try again later"
 }

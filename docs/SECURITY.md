@@ -76,7 +76,7 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 | leitura pública | `GET /storefront/*` | internet → `/storefront` | `backend/app/features/storefront/` |
 | upload | `POST /storages`, `:id/complete`, PUT na URL assinada | navegador → bucket | `backend/app/features/storages/files/` |
 | lista de atletas | `PUT /advisor/enrollments`, `PUT /representative/enrollments` | papel → rota | `backend/app/features/advisor/enrollments/`, `representative/enrollments/` |
-| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.csv.ts` |
+| exportação | `GET /administrator/reports/csv` | papel → rota | `backend/app/features/administrator/reports/reports.presenter.ts` |
 | documentação da API | `/openapi.json`, `/documentation` | internet → API | `backend/app/middleware/documentation.middleware.ts` |
 | deploy | push em `main` | CI → produção | `.github/workflows/main.yml` |
 
@@ -108,13 +108,13 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 - Rota nova no grupo `/storefront`: conferir que a resposta não carrega nome de aluno ou atleta.
 - Rota nova com id no caminho: conferir o escopo pela sessão na consulta.
 - Texto de usuário que chega ao CSV ou ao HTML: conferir a neutralização.
-- Mudança em `COOKIE_DOMAIN`, `CORS_ORIGIN` ou no proxy do Coolify: conferir o cookie e o `sameSite` em produção.
+- Mudança em `COOKIE_DOMAIN`, `CORS_ORIGINS` ou no proxy do Coolify: conferir o cookie e o `sameSite` em produção; `TRUSTED_PROXIES` define quem é o proxy do `request.ip()`.
 
 ## 3. Autenticação e sessão
 
 - Sessão por cookie `httpOnly`, `secure` em produção e `sameSite=lax`; cai para `none` só quando o site e a API não compartilham domínio-pai (`backend/app/services/cookie/cookie.service.ts`).
 - Par de tokens: acesso de 1 dia e refresh de 7 dias, guardados em `auth_access_tokens`.
-- Arquivar a conta, trocar a senha e mudar o papel revogam as sessões no servidor (`SessionService#revokeAll`).
+- Arquivar a conta, trocar a senha e mudar o papel revogam as sessões no servidor (`SessionLucidRepository#revokeAll`).
 - Limite de tentativas no login: 5 por minuto por IP e 20 por hora por e-mail, bloqueio de 10 minutos, com contagem no banco (`backend/start/limiter.ts`). Os achados SEC-1, SEC-7 e SEC-8 (§10) estão abertos.
 - O login responde igual para senha errada, conta arquivada e conta inativa.
 - Não há cadastro público nem recuperação de senha: a organização cria as contas.
@@ -171,14 +171,14 @@ código em 2026-10-29. Status: **aberto** (confirmado no código), **a confirmar
 
 | # | Severidade | Onde | O que acontece | Correção | Status |
 |---|---|---|---|---|---|
-| SEC-1 | alta | `backend/config/app.ts`, `backend/start/limiter.ts` | sem `trustProxy`, atrás do Traefik do Coolify `request.ip()` é o IP do proxy; o teto de login por IP (5 por minuto, bloqueio de 10 minutos) e o de upload viram globais, e cinco senhas erradas de qualquer pessoa trancam o login de todos | `trustProxy` pela topologia real, com `TRUSTED_PROXIES` no ENV (`_standards/backend.md` §4.10) | aberto: nenhuma ocorrência de `trustProxy` no backend |
-| SEC-2 | média | `backend/config/bodyparser.ts` | nenhuma rota recebe multipart, mas o bodyparser processa `multipart/form-data` em toda rota, com `autoProcess: true` e `limit: '20mb'`; `POST /authentication/refresh` é anônima e sem limite | `autoProcess: false` ou `multipart.limit` mínimo; teto de corpo por grupo | aberto |
-| SEC-3 | média | `backend/app/middleware/origin.middleware.ts`, `backend/app/services/cookie/cookie.service.ts` | a barreira de origem confere só `multipart/form-data` e `application/x-www-form-urlencoded`, sem `text/plain`; o `sameSite` cai para `none` com `CORS_ORIGIN` vazio ou sem domínio-pai em comum | barreira em todo método diferente de GET e HEAD; `sameSite: 'lax'` fixo; `CORS_ORIGIN` obrigatório em produção | aberto |
-| SEC-4 | média | `backend/app/exceptions/handler.ts` | o handler não trata a exceção do limiter: o 429 sai no formato da biblioteca, sem `code` estável e sem log do bloqueio | ramo no handler com `HTTPException.TooManyRequests` e `logger.warn` com tag e chave, sem e-mail em claro | aberto |
-| SEC-5 | média | `backend/app/exceptions/handler.ts` | erro desconhecido fora de use-case cai em `super.handle`; em produção a mensagem crua (do `pg`, com tabela e constraint) sai fora do envelope | ramo final: status 500 ou mais sem `HTTPException` vira `InternalServerError` genérico, com o erro só no log | aberto |
-| SEC-6 | baixa | `backend/start/limiter.ts`, `backend/start/routes.ts` | `uploadThrottle` conta por IP e vale para o grupo `storages` inteiro, leituras incluídas: a biblioteca de arquivos gasta a cota de upload, e usuários atrás do mesmo NAT (a escola) a dividem | `usingKey` pelo id do usuário e limite só em `POST /` e `:id/parts` | aberto |
-| SEC-7 | baixa | `backend/start/limiter.ts` | a chave por conta usa `request.input('email')` sem `trim()` nem minúsculas | normalizar o e-mail na chave | aberto |
-| SEC-8 | baixa | `backend/start/routes.ts` | `POST /authentication/refresh` escreve sem sessão e sem limite; sem força bruta prática (token opaco), fica o custo da consulta | limite leve por IP | aberto |
+| SEC-1 | alta | `backend/config/app.ts`, `backend/start/limiter.ts` | sem `trustProxy`, atrás do Traefik do Coolify `request.ip()` é o IP do proxy; o teto de login por IP (5 por minuto, bloqueio de 10 minutos) e o de upload viram globais, e cinco senhas erradas de qualquer pessoa trancam o login de todos | `trustProxy` pela topologia real, com `TRUSTED_PROXIES` no ENV (`_standards/backend.md` §4.10) | corrigido: `trustProxy` por `TRUSTED_PROXIES`; falta definir o valor no Coolify |
+| SEC-2 | média | `backend/config/bodyparser.ts` | nenhuma rota recebe multipart, mas o bodyparser processa `multipart/form-data` em toda rota, com `autoProcess: true` e `limit: '20mb'`; `POST /authentication/refresh` é anônima e sem limite | `autoProcess: false` ou `multipart.limit` mínimo; teto de corpo por grupo | corrigido: `multipart.autoProcess: false` e teto de 1 MB em JSON e formulário |
+| SEC-3 | média | `backend/app/middleware/origin.middleware.ts`, `backend/app/services/cookie/cookie.service.ts` | a barreira de origem confere só `multipart/form-data` e `application/x-www-form-urlencoded`, sem `text/plain`; o `sameSite` cai para `none` com `CORS_ORIGINS` vazio ou sem domínio-pai em comum | barreira em todo método diferente de GET e HEAD; `sameSite: 'lax'` fixo; `CORS_ORIGINS` obrigatório em produção | corrigido: barreira em todo método fora de GET/HEAD/OPTIONS, `sameSite: lax` fixo em `config/cookie.ts`; renomear `CORS_ORIGIN` para `CORS_ORIGINS` no Coolify |
+| SEC-4 | média | `backend/app/exceptions/handler.ts` | o handler não trata a exceção do limiter: o 429 sai no formato da biblioteca, sem `code` estável e sem log do bloqueio | ramo no handler com `HTTPException.TooManyRequests` e `logger.warn` com tag e chave, sem e-mail em claro | corrigido: 429 `TOO_MANY_REQUESTS` e `logger.warn` com a tag `[security > rate_limited]` |
+| SEC-5 | média | `backend/app/exceptions/handler.ts` | erro desconhecido fora de use-case cai em `super.handle`; em produção a mensagem crua (do `pg`, com tabela e constraint) sai fora do envelope | ramo final: status 500 ou mais sem `HTTPException` vira `InternalServerError` genérico, com o erro só no log | corrigido: status 500 ou mais sem `HTTPException` vira `SERVER_ERROR` genérico |
+| SEC-6 | baixa | `backend/start/limiter.ts`, `backend/start/routes.ts` | `uploadThrottle` conta por IP e vale para o grupo `storages` inteiro, leituras incluídas: a biblioteca de arquivos gasta a cota de upload, e usuários atrás do mesmo NAT (a escola) a dividem | `usingKey` pelo id do usuário e limite só em `POST /` e `:id/parts` | corrigido: limite por usuário só em `POST /storages`, `:id/complete` e `:id/parts` |
+| SEC-7 | baixa | `backend/start/limiter.ts` | a chave por conta usa `request.input('email')` sem `trim()` nem minúsculas | normalizar o e-mail na chave | corrigido: e-mail com `trim` e minúsculas em `LimiterKey.account` |
+| SEC-8 | baixa | `backend/start/routes.ts` | `POST /authentication/refresh` escreve sem sessão e sem limite; sem força bruta prática (token opaco), fica o custo da consulta | limite leve por IP | corrigido: `refreshThrottle` (30 por minuto, por IP) |
 | SEC-9 | baixa | `frontend/vite.config.ts` | o site SSR (painel incluso) sai sem cabeçalho anti-framing nem CSP: clickjacking no painel | cabeçalhos por `routeRules` do Nitro; registrar a regra no upstream (`_standards/frontend.md`), que hoje não cobre | aberto: regra não coberta pela régua |
 
 Outros itens abertos de segurança e privacidade, sem achado no arquivo de origem:

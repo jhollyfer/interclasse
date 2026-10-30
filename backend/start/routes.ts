@@ -8,8 +8,16 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { USER_ROLE } from '@interclasse/shared'
 
-import { signInAccountThrottle, signInThrottle, uploadThrottle } from '#start/limiter'
+import {
+  accountUpdateThrottle,
+  refreshThrottle,
+  reportExportThrottle,
+  signInAccountThrottle,
+  signInThrottle,
+  uploadThrottle,
+} from '#start/limiter'
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 
@@ -88,7 +96,9 @@ router
       .use(middleware.auth())
     // Fora do `auth()` porque é o token de acesso vencido que traz alguém até
     // aqui. Quem autoriza é o cookie de refresh, e nada mais.
-    router.post('refresh', [controllers.authentication.sessions.refresh.Refresh])
+    router
+      .post('refresh', [controllers.authentication.sessions.refresh.Refresh])
+      .use(refreshThrottle)
   })
   .prefix('authentication')
   .as('authentication')
@@ -103,7 +113,7 @@ router
 router
   .group(() => {
     router.get('/', [controllers.account.profile.show.Show])
-    router.put('/', [controllers.account.profile.update.Update])
+    router.put('/', [controllers.account.profile.update.Update]).use(accountUpdateThrottle)
   })
   .prefix('account')
   .as('profile')
@@ -130,9 +140,15 @@ router
 router
   .group(() => {
     router.get('/', [controllers.storages.files.paginate.Paginate])
-    router.post('/', [controllers.storages.files.create.Create])
-    router.post(':id/complete', [controllers.storages.files.complete.Complete]).as('complete')
-    router.get(':id/parts', [controllers.storages.files.parts.Parts]).as('parts')
+    router.post('/', [controllers.storages.files.create.Create]).use(uploadThrottle)
+    router
+      .post(':id/complete', [controllers.storages.files.complete.Complete])
+      .as('complete')
+      .use(uploadThrottle)
+    router
+      .get(':id/parts', [controllers.storages.files.parts.Parts])
+      .as('parts')
+      .use(uploadThrottle)
     // Depois de `:id/parts`: o caminho de duas partes é o mais específico, e
     // registrado antes ele não pode ser engolido pelo genérico.
     router.get(':id', [controllers.storages.files.show.Show])
@@ -151,7 +167,6 @@ router
   .prefix('storages')
   .as('storages')
   .use(middleware.auth())
-  .use(uploadThrottle)
 
 /**
  * Painel administrativo: a organização dos jogos.
@@ -187,7 +202,10 @@ router
     router
       .group(() => {
         router.get('/', [controllers.administrator.reports.show.Show])
-        router.get('csv', [controllers.administrator.reports.export.Export]).as('export')
+        router
+          .get('csv', [controllers.administrator.reports.export.Export])
+          .as('export')
+          .use(reportExportThrottle)
       })
       .prefix('reports')
       .as('reports')
@@ -318,7 +336,7 @@ router
   .prefix('administrator')
   .as('administrator')
   .use(middleware.auth())
-  .use(middleware.role(['ADMINISTRATOR']))
+  .use(middleware.role([USER_ROLE.ADMINISTRATOR]))
 
 /**
  * O professor conselheiro: alunos e inscrições das turmas que aconselha.
@@ -361,7 +379,7 @@ router
   .prefix('advisor')
   .as('advisor')
   .use(middleware.auth())
-  .use(middleware.role(['ADMINISTRATOR', 'ADVISOR']))
+  .use(middleware.role([USER_ROLE.ADMINISTRATOR, USER_ROLE.ADVISOR]))
 
 /**
  * O aluno representante: a lista de atletas da própria turma, e nada além.
@@ -375,4 +393,4 @@ router
   .prefix('representative/enrollments')
   .as('representative.enrollments')
   .use(middleware.auth())
-  .use(middleware.role(['REPRESENTATIVE']))
+  .use(middleware.role([USER_ROLE.REPRESENTATIVE]))
