@@ -10,6 +10,7 @@ import {
 } from '#/components/ui/input-group'
 import type { Input } from '#/components/ui/input'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 type PasswordInputProps = Readonly<
   Omit<React.ComponentProps<typeof Input>, 'type'>
@@ -32,8 +33,8 @@ export function InputPassword({
   let type: 'text' | 'password' = 'password'
   if (visible) type = 'text'
 
-  let label = 'Mostrar a senha'
-  if (visible) label = 'Ocultar a senha'
+  let label = m.common_show_password()
+  if (visible) label = m.common_hide_password()
 
   return (
     <InputGroup className={cn('bg-primary/5', className)}>

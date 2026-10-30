@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import { m } from '#/paraglide/messages'
 
 import type { TableFeatures } from './use-table'
 import { useTableContext } from './table-context'
@@ -93,7 +94,10 @@ export function TableColumnHeader<TRow extends RowData>({
               className="size-6"
               // O rótulo em texto puro sai de `meta.label` - o que o slot recebe
               // é markup, e `String(elemento)` daria `[object Object]`.
-              aria-label={`Opções de ${column?.columnDef.meta?.label ?? 'coluna'}`}
+              aria-label={m.table_column_options({
+                column:
+                  column?.columnDef.meta?.label ?? m.table_column_fallback(),
+              })}
             >
               {direction === SORT_DIRECTION.ASC && <ArrowUpIcon />}
               {direction === SORT_DIRECTION.DESC && <ArrowDownIcon />}
@@ -109,14 +113,14 @@ export function TableColumnHeader<TRow extends RowData>({
                 onClick={() => sort(SORT_DIRECTION.ASC)}
               >
                 <ArrowUpIcon />
-                Crescente
+                {m.table_sort_asc()}
               </DropdownMenuItem>
               <DropdownMenuItem
                 data-test-id="sort-desc"
                 onClick={() => sort(SORT_DIRECTION.DESC)}
               >
                 <ArrowDownIcon />
-                Decrescente
+                {m.table_sort_desc()}
               </DropdownMenuItem>
             </>
           )}
@@ -130,19 +134,19 @@ export function TableColumnHeader<TRow extends RowData>({
           {canPin && pinned !== 'start' && (
             <DropdownMenuItem onClick={() => column?.pin('start')}>
               <PushPinIcon />
-              Fixar no início
+              {m.table_pin_start()}
             </DropdownMenuItem>
           )}
           {canPin && pinned !== 'end' && (
             <DropdownMenuItem onClick={() => column?.pin('end')}>
               <PushPinIcon className="rotate-90" />
-              Fixar no fim
+              {m.table_pin_end()}
             </DropdownMenuItem>
           )}
           {canPin && pinned && (
             <DropdownMenuItem onClick={() => column?.pin(false)}>
               <PushPinSlashIcon />
-              Desafixar
+              {m.table_unpin()}
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>

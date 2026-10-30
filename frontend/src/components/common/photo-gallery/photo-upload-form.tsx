@@ -25,6 +25,7 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { usePhotoCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 const PHOTO_FIELDS = ['storageId', 'caption'] as const
 
@@ -65,7 +66,7 @@ export function PhotoUploadForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Enviar foto</CardTitle>
+        <CardTitle>{m.common_photo_upload_title()}</CardTitle>
         <p className="text-muted-foreground text-sm">{description}</p>
       </CardHeader>
       <CardContent>
@@ -75,7 +76,7 @@ export function PhotoUploadForm({
             control={form.control}
             name="storageId"
             id={`${area}-photo-file`}
-            label="Foto"
+            label={m.common_photo_field()}
           >
             {({ field, control }) => (
               <ImageField
@@ -83,12 +84,14 @@ export function PhotoUploadForm({
                 value={field.value || null}
                 onValueChange={(id) => field.onChange(id ?? '')}
               >
-                <ImageFieldPreview alt="Foto escolhida">
+                <ImageFieldPreview alt={m.common_photo_preview_alt()}>
                   <ImageIcon />
                 </ImageFieldPreview>
                 <ImageFieldContent>
                   <ImageFieldActions>
-                    <ImageFieldUpload>Escolher foto</ImageFieldUpload>
+                    <ImageFieldUpload>
+                      {m.common_photo_choose()}
+                    </ImageFieldUpload>
                     <ImageFieldRemove />
                   </ImageFieldActions>
                   <ImageFieldDescription />
@@ -100,13 +103,13 @@ export function PhotoUploadForm({
             control={form.control}
             name="caption"
             id={`${area}-photo-caption`}
-            label="Legenda (opcional)"
+            label={m.common_photo_caption()}
           >
             {({ field, control }) => (
               <Input
                 {...control}
                 maxLength={200}
-                placeholder="Final do futsal, 9º A x 8º B"
+                placeholder={m.common_photo_caption_placeholder()}
                 value={field.value ?? ''}
                 onChange={(event) => field.onChange(event.target.value || null)}
                 onBlur={field.onBlur}
@@ -116,7 +119,7 @@ export function PhotoUploadForm({
           <div className="flex justify-end">
             <Button type="submit" disabled={mutation.isPending}>
               <PaperPlaneTiltIcon />
-              Enviar
+              {m.common_photo_send()}
             </Button>
           </div>
         </form>

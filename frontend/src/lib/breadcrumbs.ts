@@ -10,6 +10,8 @@
  * trate o arquivo de teste como uma rota - mesmo motivo de `list-search.ts`.
  */
 
+import { m } from '#/paraglide/messages'
+
 export type Crumb = {
   label: string
   /** Ausente quando o prefixo não é uma rota, ou quando é a página atual. */
@@ -25,23 +27,57 @@ export type Crumb = {
  * evita que a tela de chaves nasça com "brackets" na trilha.
  */
 const SEGMENT_LABELS: Record<string, string | undefined> = {
-  administrator: 'Painel',
-  profile: 'Perfil',
-  brackets: 'Chaves',
-  matches: 'Partidas',
-  cards: 'Cartões',
-  removals: 'Remoções de atleta',
-  classrooms: 'Turmas',
-  sports: 'Modalidades',
-  announcements: 'Avisos',
-  photos: 'Fotos',
-  site: 'Site',
-  reports: 'Relatórios',
-  users: 'Usuários',
-  advisor: 'Minha turma',
-  representative: 'Atletas da turma',
-  new: 'Novo',
-  edit: 'Editar',
+  get administrator() {
+    return m.label_breadcrumb_panel()
+  },
+  get profile() {
+    return m.label_breadcrumb_profile()
+  },
+  get brackets() {
+    return m.label_breadcrumb_brackets()
+  },
+  get matches() {
+    return m.label_breadcrumb_matches()
+  },
+  get cards() {
+    return m.label_breadcrumb_cards()
+  },
+  get removals() {
+    return m.label_breadcrumb_removals()
+  },
+  get classrooms() {
+    return m.label_breadcrumb_classrooms()
+  },
+  get sports() {
+    return m.label_breadcrumb_sports()
+  },
+  get announcements() {
+    return m.label_breadcrumb_announcements()
+  },
+  get photos() {
+    return m.label_breadcrumb_photos()
+  },
+  get site() {
+    return m.label_breadcrumb_site()
+  },
+  get reports() {
+    return m.label_breadcrumb_reports()
+  },
+  get users() {
+    return m.label_breadcrumb_users()
+  },
+  get advisor() {
+    return m.label_breadcrumb_advisor()
+  },
+  get representative() {
+    return m.label_breadcrumb_representative()
+  },
+  get new() {
+    return m.label_breadcrumb_new()
+  },
+  get edit() {
+    return m.label_breadcrumb_edit()
+  },
 }
 
 function segments(path: string): Array<string> {
@@ -83,7 +119,7 @@ export function buildBreadcrumbs(
     let label = SEGMENT_LABELS[token] ?? value
 
     // Parâmetro de identificador: o uuid não diz nada a quem lê.
-    if (token.startsWith('$')) label = 'Detalhe'
+    if (token.startsWith('$')) label = m.label_breadcrumb_detail()
 
     const crumb: Crumb = { label }
 
@@ -109,11 +145,12 @@ export function breadcrumbTitle(crumbs: ReadonlyArray<Crumb>): string {
   // O "Painel" da raiz sai; a raiz de outro papel ("Minhas turmas") fica, ou
   // a aba do conselheiro diria só "Detalhe".
   let start = 0
-  if (labels[0] === 'Painel') start = 1
+  if (labels[0] === m.label_breadcrumb_panel()) start = 1
   const specific = labels
     .slice(start)
     .filter(
-      (label, index, all) => label !== 'Detalhe' || index === all.length - 1,
+      (label, index, all) =>
+        label !== m.label_breadcrumb_detail() || index === all.length - 1,
     )
 
   if (specific.length === 0) return labels.join('')

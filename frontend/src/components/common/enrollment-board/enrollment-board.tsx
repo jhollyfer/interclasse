@@ -6,7 +6,7 @@ import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { plural } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 type EnrollmentBoardProps = Readonly<{
   board: AdvisorEnrollmentShowResponse
@@ -45,8 +45,7 @@ export function EnrollmentBoard({
   if (board.students.length === 0) {
     return (
       <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        A turma ainda não tem alunos. A lista de alunos vem antes das
-        inscrições.
+        {m.common_enrollment_no_students()}
       </p>
     )
   }
@@ -54,7 +53,7 @@ export function EnrollmentBoard({
   if (board.sports.length === 0) {
     return (
       <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        Nenhuma modalidade cadastrada ainda.
+        {m.common_enrollment_no_sports()}
       </p>
     )
   }
@@ -134,15 +133,20 @@ function SportCard({
         {sport.locked && (
           <Badge variant="neutral">
             <LockSimpleIcon />
-            Sorteada
+            {m.common_enrollment_drawn()}
           </Badge>
         )}
         {/* Sorteada e ainda editável: só o conselheiro chega aqui, e o time
             sorteado é a turma, não a lista. */}
-        {sport.drawn && !sport.locked && <Badge variant="info">Sorteada</Badge>}
+        {sport.drawn && !sport.locked && (
+          <Badge variant="info">{m.common_enrollment_drawn()}</Badge>
+        )}
         <Badge variant={COUNT_VARIANT[String(over || under)]}>
-          {plural(selected.size, 'atleta', 'atletas')} · {sport.minAthletes} a{' '}
-          {sport.maxAthletes}
+          {m.common_enrollment_count({
+            count: selected.size,
+            min: sport.minAthletes,
+            max: sport.maxAthletes,
+          })}
         </Badge>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -168,12 +172,14 @@ function SportCard({
         </ul>
         {over && !sport.locked && (
           <p className="text-destructive text-xs">
-            {`Passou do máximo: desmarque ${selected.size - sport.maxAthletes} para salvar.`}
+            {m.common_enrollment_over({
+              count: selected.size - sport.maxAthletes,
+            })}
           </p>
         )}
         {under && !sport.locked && (
           <p className="text-muted-foreground text-xs">
-            Abaixo do mínimo, a turma fica fora do sorteio desta modalidade.
+            {m.common_enrollment_under()}
           </p>
         )}
         {!sport.locked && (
@@ -194,7 +200,7 @@ function SportCard({
               )
             }
           >
-            Salvar {sport.name}
+            {m.common_enrollment_save({ name: sport.name })}
           </Button>
         )}
       </CardContent>

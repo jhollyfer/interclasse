@@ -55,6 +55,7 @@ import {
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
 import { CATEGORY_LABELS } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { ClassroomCards } from './classroom-cards'
 import { studentsOf } from './classroom-detail-loader'
@@ -101,7 +102,7 @@ export function ClassroomDetail({
   const save = useAdvisorEnrollmentUpdate({
     onSuccess: (updated) => {
       store(updated)
-      toast.success('Atletas salvos.')
+      toast.success(m.common_classroom_saved())
     },
     onError: (error) => notifyError(error, { id: 'enrollment-save' }),
   })
@@ -121,10 +122,18 @@ export function ClassroomDetail({
         <ClassroomSummary board={board} className="lg:order-last" />
         <Tabs defaultValue="athletes" className="min-w-0">
           <TabsList>
-            <TabsTrigger value="athletes">Atletas por modalidade</TabsTrigger>
-            <TabsTrigger value="students">Alunos</TabsTrigger>
-            <TabsTrigger value="cards">Cartões</TabsTrigger>
-            <TabsTrigger value="matches">Jogos</TabsTrigger>
+            <TabsTrigger value="athletes">
+              {m.common_classroom_tab_athletes()}
+            </TabsTrigger>
+            <TabsTrigger value="students">
+              {m.common_classroom_tab_students()}
+            </TabsTrigger>
+            <TabsTrigger value="cards">
+              {m.common_classroom_tab_cards()}
+            </TabsTrigger>
+            <TabsTrigger value="matches">
+              {m.common_classroom_tab_matches()}
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="athletes" className="pt-4">
             <EnrollmentBoard
@@ -178,7 +187,7 @@ const STUDENT_CHANGE = [
 const STUDENT_FIELDS = ['name'] as const
 
 /** O rótulo do campo de nome: só para leitor de tela, a linha já diz o que é. */
-const NAME_LABEL = <span className="sr-only">Nome do aluno</span>
+const NAME_LABEL = <span className="sr-only">{m.common_student_name()}</span>
 
 /** O cadastro de alunos: um campo para adicionar, e editar e tirar por linha. */
 function Students({
@@ -206,7 +215,9 @@ function Students({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{data.meta.total} alunos</CardTitle>
+        <CardTitle>
+          {m.common_students_count({ count: data.meta.total })}
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <form
@@ -224,14 +235,14 @@ function Students({
               <Input
                 {...field}
                 {...control}
-                placeholder="Nome do aluno"
+                placeholder={m.common_student_name()}
                 maxLength={120}
               />
             )}
           </AppField>
           <Button type="submit" disabled={mutation.isPending}>
             <PlusIcon />
-            Adicionar
+            {m.common_student_add()}
           </Button>
         </form>
         <AppFormRootError form={form} />
@@ -298,7 +309,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
             )}
           </AppField>
           <Button type="submit" size="sm" disabled={mutation.isPending}>
-            Salvar
+            {m.common_save()}
           </Button>
           <Button
             type="button"
@@ -306,7 +317,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
             variant="ghost"
             onClick={() => setEditing(false)}
           >
-            Cancelar
+            {m.common_cancel()}
           </Button>
         </form>
         <AppFormRootError form={form} />
@@ -320,7 +331,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label={`Editar ${student.name}`}
+        aria-label={m.common_student_edit_aria({ name: student.name })}
         onClick={() => setEditing(true)}
       >
         <PencilSimpleIcon />
@@ -332,21 +343,23 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
           <Button
             size="icon-sm"
             variant="ghost"
-            aria-label={`Tirar ${student.name}`}
+            aria-label={m.common_student_remove_aria({ name: student.name })}
           >
             <TrashIcon />
           </Button>
         }
       >
         <ConfirmDialogHeader>
-          <ConfirmDialogTitle>{`Tirar ${student.name} da turma?`}</ConfirmDialogTitle>
+          <ConfirmDialogTitle>
+            {m.common_student_remove_title({ name: student.name })}
+          </ConfirmDialogTitle>
           <ConfirmDialogDescription>
-            As inscrições dele saem junto.
+            {m.common_student_remove_description()}
           </ConfirmDialogDescription>
         </ConfirmDialogHeader>
         <ConfirmDialogFooter>
           <ConfirmDialogCancel />
-          <ConfirmDialogConfirm>Remover</ConfirmDialogConfirm>
+          <ConfirmDialogConfirm>{m.common_remove()}</ConfirmDialogConfirm>
         </ConfirmDialogFooter>
       </ConfirmDialog>
     </li>

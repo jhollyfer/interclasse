@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import { m } from '#/paraglide/messages'
 
 import type { TableInstance } from './use-table'
 
@@ -38,7 +39,7 @@ export function TableColumnToggle<TRow extends RowData>({
             className="ml-auto"
           >
             <ColumnsIcon />
-            Colunas
+            {m.table_columns()}
           </Button>
         }
       />
@@ -48,7 +49,7 @@ export function TableColumnToggle<TRow extends RowData>({
             `Menu.Group` acima. Sem grupo, `useMenuGroupRootContext()` lança
             "MenuGroupContext is missing" ao abrir o menu. */}
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Colunas visíveis</DropdownMenuLabel>
+          <DropdownMenuLabel>{m.table_columns_visible()}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {table
             .getAllColumns()

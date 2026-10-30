@@ -9,6 +9,7 @@ import {
   PHOTO_STATUS_VARIANTS,
   formatDate,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 type PhotoGridProps = Readonly<{
   photos: ReadonlyArray<AdministratorPhotoShowResponse>
@@ -44,7 +45,7 @@ export function PhotoGrid({
           <Card className="h-full overflow-hidden pt-0">
             <img
               src={photo.storage.url}
-              alt={photo.caption ?? 'Foto dos jogos'}
+              alt={photo.caption ?? m.common_photo_alt_default()}
               loading="lazy"
               className="aspect-[4/3] w-full object-cover"
             />

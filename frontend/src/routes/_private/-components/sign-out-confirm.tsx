@@ -12,6 +12,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { useSignOut } from '#/hooks/use-sign-out'
+import { m } from '#/paraglide/messages'
 
 type SignOutConfirmProps = Readonly<{
   /**
@@ -73,9 +74,9 @@ export function SignOutConfirmHeader(): React.JSX.Element {
       <ConfirmDialogMedia>
         <SignOutIcon />
       </ConfirmDialogMedia>
-      <ConfirmDialogTitle>Sair da conta?</ConfirmDialogTitle>
+      <ConfirmDialogTitle>{m.panel_sign_out_title()}</ConfirmDialogTitle>
       <ConfirmDialogDescription>
-        Você será desconectado e voltará para a tela de login.
+        {m.panel_sign_out_description()}
       </ConfirmDialogDescription>
     </ConfirmDialogHeader>
   )
@@ -86,7 +87,7 @@ export function SignOutConfirmFooter(): React.JSX.Element {
   return (
     <ConfirmDialogFooter>
       <ConfirmDialogCancel />
-      <ConfirmDialogConfirm>Sair</ConfirmDialogConfirm>
+      <ConfirmDialogConfirm>{m.panel_sign_out()}</ConfirmDialogConfirm>
     </ConfirmDialogFooter>
   )
 }

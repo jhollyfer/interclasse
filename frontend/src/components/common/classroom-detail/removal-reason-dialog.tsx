@@ -22,6 +22,7 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/advisor'
+import { m } from '#/paraglide/messages'
 
 /** A lista que espera o motivo para ser gravada. */
 export type PendingRemoval = Readonly<{
@@ -65,7 +66,7 @@ export function RemovalReasonDialog({
     fields: FIELDS,
     mutation: useAdvisorEnrollmentUpdate,
     invalidate: [queryKeys.administrator.enrollmentRemovals.all],
-    success: 'Atletas salvos. A organização foi avisada.',
+    success: m.common_removal_saved(),
     payload: (values) => values,
     onSuccess: (board) => {
       onSaved(board)
@@ -78,9 +79,13 @@ export function RemovalReasonDialog({
       <DialogContent>
         <form method="post" className="grid gap-4" onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>{`Tirar do ${pending.sportName}`}</DialogTitle>
+            <DialogTitle>
+              {m.common_removal_title({ sport: pending.sportName })}
+            </DialogTitle>
             <DialogDescription>
-              {`Saem da lista: ${pending.removed.join(', ')}. Diga o motivo - a organização recebe o aviso.`}
+              {m.common_removal_description({
+                names: pending.removed.join(', '),
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -88,7 +93,7 @@ export function RemovalReasonDialog({
             control={form.control}
             name="reason"
             id="removal-reason"
-            label="Motivo"
+            label={m.common_removal_reason()}
           >
             {({ field, control }) => (
               <Textarea
@@ -97,7 +102,7 @@ export function RemovalReasonDialog({
                 value={field.value ?? ''}
                 rows={4}
                 maxLength={500}
-                placeholder="Ex.: retirado do vôlei por mau comportamento com os colegas."
+                placeholder={m.common_removal_placeholder()}
               />
             )}
           </AppField>
@@ -106,10 +111,10 @@ export function RemovalReasonDialog({
 
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancelar
+              {m.common_cancel()}
             </Button>
             <Button type="submit" disabled={mutation.isPending}>
-              Salvar e avisar
+              {m.common_removal_submit()}
             </Button>
           </DialogFooter>
         </form>

@@ -1,4 +1,4 @@
-import { describe, expect, it, test } from 'vitest'
+import { afterEach, describe, expect, it, test } from 'vitest'
 import {
   ACTIVE_STATUSES,
   BRACKET_STATUSES,
@@ -9,6 +9,8 @@ import {
   UPLOAD_STATUSES,
   USER_ROLES,
 } from '@interclasse/shared'
+
+import { overwriteGetLocale } from '#/paraglide/runtime'
 
 import {
   formatDayKey,
@@ -168,19 +170,19 @@ describe('formatBytes', () => {
   })
 
   it('vira KB no limite, e não uma casa antes', () => {
-    expect(formatBytes(1024)).toBe('1.0 KB')
-    expect(formatBytes(1024 * 1024 - 1)).toBe('1024.0 KB')
+    expect(formatBytes(1024)).toBe('1,0 KB')
+    expect(formatBytes(1024 * 1024 - 1)).toBe('1.024,0 KB')
   })
 
   it('vira MB no limite', () => {
-    expect(formatBytes(1024 * 1024)).toBe('1.0 MB')
-    expect(formatBytes(3.5 * 1024 * 1024)).toBe('3.5 MB')
+    expect(formatBytes(1024 * 1024)).toBe('1,0 MB')
+    expect(formatBytes(3.5 * 1024 * 1024)).toBe('3,5 MB')
   })
 
   // Sem ramo de GB de propósito: um arquivo desse tamanho não passa pelo
   // `UPLOAD_MAX_SIZE`, e a unidade que nunca aparece é um ramo nunca exercido.
   it('continua em MB para arquivo grande', () => {
-    expect(formatBytes(2 * 1024 * 1024 * 1024)).toBe('2048.0 MB')
+    expect(formatBytes(2 * 1024 * 1024 * 1024)).toBe('2.048,0 MB')
   })
 })
 
@@ -210,5 +212,33 @@ describe('datas da agenda, no fuso da escola', () => {
   it('formatWhen avisa quando o horário ainda não saiu', () => {
     expect(formatWhen(null)).toBe('Horário a definir')
     expect(formatWhen(INSTANT)).toContain('08:30')
+  })
+})
+
+/**
+ * Os rótulos seguem o idioma atual a cada leitura (`_standards/i18n.md` §2):
+ * o mapa é o mesmo objeto, e o texto sai do `getLocale()` de cada acesso.
+ */
+describe('idioma dos rótulos', () => {
+  afterEach(() => {
+    overwriteGetLocale(() => 'pt-BR')
+  })
+
+  it.each([
+    ['pt-BR', 'Professor conselheiro', 'Encerrada'],
+    ['es', 'Profesor consejero', 'Finalizada'],
+    ['en', 'Advisor teacher', 'Finished'],
+  ] as const)('%s', (locale, role, status) => {
+    overwriteGetLocale(() => locale)
+
+    expect(USER_ROLE_LABELS.ADVISOR).toBe(role)
+    expect(MATCH_STATUS_LABELS.FINISHED).toBe(status)
+  })
+
+  it('data e número saem no formato do idioma', () => {
+    overwriteGetLocale(() => 'en')
+
+    expect(formatBytes(1024)).toBe('1.0 KB')
+    expect(formatDate('2026-03-14T13:05:00.000Z')).toContain('3/14/26')
   })
 })
