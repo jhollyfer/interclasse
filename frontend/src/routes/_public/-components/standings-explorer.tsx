@@ -90,7 +90,7 @@ export function StandingsExplorer({
             aria-pressed={bracket.id === current.id}
             onClick={() => onSelect(bracket.id)}
             className={cn(
-              'hover:border-primary hover:text-primary flex flex-col items-start rounded-md border px-4 py-2 text-left transition-colors active:scale-[0.98] motion-reduce:transition-none',
+              'hover:border-primary hover:text-primary flex flex-col items-start rounded-md border px-4 py-2 text-left transition-colors active:scale-press motion-reduce:transition-none',
               'aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground',
             )}
           >

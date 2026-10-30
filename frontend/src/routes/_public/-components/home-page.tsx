@@ -47,7 +47,7 @@ export function HomePage(): React.JSX.Element {
   return (
     <>
       <section className="hero text-brand-ink-foreground">
-        <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
+        <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-hero md:py-20">
           <div className="flex flex-col gap-5">
             <Picture
               src={logo512}

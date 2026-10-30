@@ -90,7 +90,7 @@ export function DashboardPage(): React.JSX.Element {
         </Link>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-4 lg:grid-cols-dashboard">
         <Card>
           <CardHeader>
             <CardTitle>

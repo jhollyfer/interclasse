@@ -138,7 +138,7 @@ function MatchCardsContent({
         className="grid gap-3 border-t pt-4"
         onSubmit={onSubmit}
       >
-        <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
+        <div className="grid gap-3 sm:grid-cols-field-narrow">
           <AppField
             control={form.control}
             name="studentId"

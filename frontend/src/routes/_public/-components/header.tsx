@@ -173,7 +173,7 @@ export function Header(): React.JSX.Element {
       </div>
 
       {/*
-        O painel móvel. `grid-rows-[0fr]` para `[1fr]` anima a altura sem que
+        O painel móvel. `grid-rows-collapsed` para `grid-rows-expanded` anima a altura sem que
         ninguém precise medi-la - é o truque de CSS que substitui o
         `height: auto` que a transição não sabe animar. `invisible` no fechado
         porque altura zero com `overflow-hidden` ainda deixa o link focável.
@@ -181,7 +181,7 @@ export function Header(): React.JSX.Element {
       <div
         data-slot="public-header-mobile"
         data-open={open || undefined}
-        className="grid grid-rows-[0fr] overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-[grid-template-rows,opacity] duration-300 data-open:grid-rows-[1fr] data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
+        className="grid grid-rows-collapsed overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-reveal duration-300 data-open:grid-rows-expanded data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
         aria-hidden={!open}
       >
         <nav

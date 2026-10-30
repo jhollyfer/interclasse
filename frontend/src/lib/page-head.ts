@@ -1,5 +1,6 @@
 import logo512 from '#/assets/logo-512.png'
 import { env } from '#/env'
+import { schoolDateTime } from '#/lib/i18n'
 import { m } from '#/paraglide/messages'
 import { getLocale, locales, localizeUrl } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
@@ -23,6 +24,21 @@ type PageHeadInput = Readonly<{
   pathname: string
   /** Página fora do índice dos buscadores (404). */
   noindex?: boolean
+  /** Blocos JSON-LD já serializados por `jsonLd()` (`BreadcrumbList`, tipo do domínio). */
+  structuredData?: ReadonlyArray<string>
+}>
+
+/** Um degrau da trilha estruturada: o nome traduzido e o caminho sem idioma. */
+export type BreadcrumbItem = Readonly<{ name: string; pathname: string }>
+
+/** O evento esportivo de uma chave, a partir do que a rota já carregou. */
+export type SportsEventInput = Readonly<{
+  name: string
+  description: string
+  sport: string
+  pathname: string
+  /** O horário de cada jogo, ISO 8601; o mais cedo vira `startDate`, e sem nenhum o campo não sai. */
+  scheduledAt: ReadonlyArray<string | null>
 }>
 
 /** A URL absoluta da página no idioma pedido (`localizeUrl` devolve `URL`). */
@@ -51,6 +67,7 @@ export function pageHead({
   description = m.common_site_description(),
   pathname,
   noindex = false,
+  structuredData = [],
 }: PageHeadInput) {
   const siteTitle = m.common_site_title()
   let fullTitle: string = siteTitle
@@ -84,7 +101,12 @@ export function pageHead({
     },
   ]
 
-  return { meta, links }
+  const scripts = structuredData.map((children) => ({
+    type: 'application/ld+json',
+    children,
+  }))
+
+  return { meta, links, scripts }
 }
 
 /** O meta `robots` de página fora do índice. `indexable` ausente ou `true` não gera nada. */
@@ -110,4 +132,49 @@ export function organizationJsonLd(): string {
     url: env.VITE_SITE_URL,
     logo: OG_IMAGE,
   })
+}
+
+/** A `BreadcrumbList` do detalhe (`frontend.md` §9.7): URLs absolutas no idioma atual. */
+export function breadcrumbJsonLd(items: ReadonlyArray<BreadcrumbItem>): string {
+  const locale = getLocale()
+
+  return jsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: localizedUrl(item.pathname, locale),
+    })),
+  })
+}
+
+/** O `SportsEvent` de uma chave (`frontend.md` §9.7, tipo do domínio). */
+export function sportsEventJsonLd({
+  name,
+  description,
+  sport,
+  pathname,
+  scheduledAt,
+}: SportsEventInput): string {
+  const event: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    name,
+    description,
+    sport,
+    url: localizedUrl(pathname, getLocale()),
+    organizer: { '@type': 'Organization', name: m.common_site_title() },
+  }
+  const [first] = scheduledAt
+    .flatMap((value) => {
+      if (value === null) return []
+
+      return [schoolDateTime(value)]
+    })
+    .sort((a, b) => a.toMillis() - b.toMillis())
+  if (first) event.startDate = first.toISO()
+
+  return jsonLd(event)
 }

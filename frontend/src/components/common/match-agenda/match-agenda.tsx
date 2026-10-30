@@ -73,12 +73,12 @@ export function MatchRow({
   const time = formatTime(match.scheduledAt)
 
   return (
-    <li className="grid grid-cols-[3.5rem_1fr] items-center gap-x-4 gap-y-1 py-3 sm:grid-cols-[4rem_1fr_14rem]">
+    <li className="grid grid-cols-agenda items-center gap-x-4 gap-y-1 py-3 sm:grid-cols-agenda-wide">
       <span className="font-display text-muted-foreground row-span-2 text-xl font-bold italic tabular-nums sm:row-span-1">
         {time}
       </span>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid grid-cols-versus items-center gap-3">
         <span className="font-display truncate text-right text-lg font-extrabold uppercase italic">
           {match.homeTeam.classroom.name}
         </span>

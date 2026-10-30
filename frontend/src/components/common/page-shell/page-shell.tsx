@@ -158,7 +158,7 @@ export function PageShellFooter({
  * a ficha de uma notícia mostra dois badges que a de um depoimento não tem. Com
  * prop, cada variação dessas vira mais uma prop opcional aqui dentro.
  *
- * A grade tem três colunas fixas - `[auto_1fr_auto]` - e cada parte declara
+ * A grade tem três colunas fixas - `grid-cols-page-header` - e cada parte declara
  * onde entra. Assim a ordem no JSX não decide o layout, e a coluna de uma parte
  * ausente colapsa para largura zero sozinha, sem `has-data-[...]`.
  */
@@ -172,7 +172,7 @@ export function PageHeader({
       className={cn(
         // Sem o "voltar", a coluna 1 fica vazia e o `gap-x` ainda a separava do
         // título: 12px de recuo que nenhum outro bloco da tela tinha.
-        'grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
+        'grid w-full grid-cols-page-header items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
         className,
       )}
       {...props}

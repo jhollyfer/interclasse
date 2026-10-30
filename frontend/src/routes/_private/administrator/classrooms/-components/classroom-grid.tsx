@@ -143,7 +143,7 @@ function ClassroomCard({
         </div>
       </CardHeader>
       <CardContent>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+        <dl className="grid grid-cols-term-value gap-x-3 gap-y-1 text-sm">
           <dt className="text-muted-foreground">{m.admin_common_advisor()}</dt>
           <dd className="truncate">
             {classroom.advisor?.name ?? m.admin_common_no_advisor()}

@@ -39,7 +39,7 @@ export function ClassroomSummary({
         <CardTitle>{m.common_summary_title()}</CardTitle>
       </CardHeader>
       <CardContent>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm">
+        <dl className="grid grid-cols-term-value gap-x-3 gap-y-2 text-sm">
           <dt className="text-muted-foreground">
             {m.common_summary_category()}
           </dt>

@@ -383,6 +383,63 @@
   scale: 0.97;
 }
 
+/* Colunas e linhas de grade por papel, no lugar do `grid-cols-[...]` solto.
+   O nome diz o que a grade organiza; a medida mora aqui, num lugar só. */
+@utility grid-cols-term-value {
+  grid-template-columns: auto 1fr;
+}
+
+@utility grid-cols-versus {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+@utility grid-cols-page-header {
+  grid-template-columns: auto 1fr auto;
+}
+
+@utility grid-cols-title-actions {
+  grid-template-columns: 1fr auto;
+}
+
+@utility grid-cols-main-aside {
+  grid-template-columns: 1fr 18rem;
+}
+
+@utility grid-cols-agenda {
+  grid-template-columns: 3.5rem 1fr;
+}
+
+@utility grid-cols-agenda-wide {
+  grid-template-columns: 4rem 1fr 14rem;
+}
+
+@utility grid-cols-field-narrow {
+  grid-template-columns: 1fr 8rem;
+}
+
+@utility grid-cols-dashboard {
+  grid-template-columns: 2fr 1fr;
+}
+
+@utility grid-cols-hero {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+/* Abrir e fechar um painel animando a altura sem medi-la: `0fr` para `1fr`. */
+@utility grid-rows-collapsed {
+  grid-template-rows: 0fr;
+}
+
+@utility grid-rows-expanded {
+  grid-template-rows: 1fr;
+}
+
+@utility transition-reveal {
+  transition-property: grid-template-rows, opacity;
+  transition-timing-function: var(--default-transition-timing-function);
+  transition-duration: var(--default-transition-duration);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
