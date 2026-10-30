@@ -23,6 +23,7 @@ import { sportQueryOptions } from '#/integrations/tanstack-query/queries/adminis
 import { useSportUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { SportFormType } from './form-fields'
 import { SPORT_FIELDS, SportFormFields } from './form-fields'
@@ -51,7 +52,7 @@ export function SportFormEdit(): React.JSX.Element {
     invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',
-    success: (updated) => `Modalidade ${updated.name} salva.`,
+    success: (updated) => m.admin_sports_saved({ name: updated.name }),
     retry: 'sport-update-error',
     payload: (values) => ({ ...values, id }),
   })
@@ -60,7 +61,9 @@ export function SportFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar {sport.name}</FormShellTitle>
+        <FormShellTitle>
+          {m.admin_common_edit_named({ name: sport.name })}
+        </FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

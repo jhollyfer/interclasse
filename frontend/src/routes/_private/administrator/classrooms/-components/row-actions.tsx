@@ -17,6 +17,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useClassroomDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { m } from '#/paraglide/messages'
 
 /**
  * Editar e apagar. Turma já sorteada numa chave é recusada pelo servidor com
@@ -32,7 +33,7 @@ export function ClassroomRowActions({
   const remove = useClassroomDelete({
     onError: (error) => notifyError(error, { id: 'classroom-delete' }),
     onSuccess: () => {
-      toast.success('Turma removida.')
+      toast.success(m.admin_classrooms_removed())
       return invalidate([
         queryKeys.administrator.classrooms.all,
         ...DEPENDENTS.classrooms,
@@ -49,16 +50,17 @@ export function ClassroomRowActions({
             params={{ id: classroom.id }}
           >
             <PencilSimpleIcon />
-            Editar
+            {m.admin_common_edit()}
           </Link>
         }
       />
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(classroom.id)}>
-        <ConfirmDialogTitle>{`Remover a turma ${classroom.name}?`}</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.admin_classrooms_remove_title({ name: classroom.name })}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          Os alunos e as inscrições dela são apagados junto. Não dá para
-          desfazer.
+          {m.admin_classrooms_remove_description()}
         </ConfirmDialogDescription>
       </RowActionsDelete>
     </RowActions>

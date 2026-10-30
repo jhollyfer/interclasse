@@ -19,6 +19,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { useSportCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { SportFormType } from './form-fields'
 import {
@@ -41,7 +42,7 @@ export function SportFormCreate(): React.JSX.Element {
     invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',
-    success: (sport) => `Modalidade ${sport.name} criada.`,
+    success: (sport) => m.admin_sports_created({ name: sport.name }),
     // Nome repetido é `409 SPORT_ALREADY_EXISTS`: reenviar é seguro.
     retry: 'sport-create-error',
     payload: (values) => values,
@@ -51,7 +52,7 @@ export function SportFormCreate(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar modalidade</FormShellTitle>
+        <FormShellTitle>{m.admin_sports_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

@@ -3,6 +3,7 @@ import { PencilSimpleIcon } from '@phosphor-icons/react'
 
 import { ClassroomDetail } from '#/components/common/classroom-detail'
 import { Button } from '#/components/ui/button'
+import { m } from '#/paraglide/messages'
 
 export const Route = createLazyFileRoute(
   '/_private/administrator/classrooms/$id/',
@@ -23,7 +24,7 @@ function AdministratorClassroom(): React.JSX.Element {
           render={
             <Link to="/administrator/classrooms/$id/edit" params={{ id }}>
               <PencilSimpleIcon />
-              Editar turma
+              {m.admin_classrooms_edit()}
             </Link>
           }
         />

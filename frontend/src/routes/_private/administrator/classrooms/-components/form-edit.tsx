@@ -23,6 +23,7 @@ import { classroomQueryOptions } from '#/integrations/tanstack-query/queries/adm
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { ClassroomFormType } from './form-fields'
 import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
@@ -52,7 +53,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',
-    success: (updated) => `Turma ${updated.name} salva.`,
+    success: (updated) => m.admin_classrooms_saved({ name: updated.name }),
     retry: 'classroom-update-error',
     payload: (values) => ({ ...values, id }),
   })
@@ -61,7 +62,9 @@ export function ClassroomFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar {classroom.name}</FormShellTitle>
+        <FormShellTitle>
+          {m.admin_common_edit_named({ name: classroom.name })}
+        </FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

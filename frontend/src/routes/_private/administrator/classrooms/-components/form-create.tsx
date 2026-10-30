@@ -19,6 +19,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { useClassroomCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { ClassroomFormType } from './form-fields'
 import {
@@ -41,7 +42,8 @@ export function ClassroomFormCreate(): React.JSX.Element {
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',
-    success: (classroom) => `Turma ${classroom.name} criada.`,
+    success: (classroom) =>
+      m.admin_classrooms_created({ name: classroom.name }),
     // Nome repetido é `409 CLASSROOM_ALREADY_EXISTS`: reenviar é seguro.
     retry: 'classroom-create-error',
     payload: (values) => values,
@@ -51,7 +53,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar turma</FormShellTitle>
+        <FormShellTitle>{m.admin_classrooms_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />
