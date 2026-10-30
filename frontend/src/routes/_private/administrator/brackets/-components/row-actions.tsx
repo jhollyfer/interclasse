@@ -18,6 +18,7 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { notifyError } from '#/lib/form-errors'
 import { CATEGORY_LABELS } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 /**
  * Abrir e apagar a chave pela lista. Chave com placar lançado é recusada pelo
@@ -33,7 +34,7 @@ export function BracketRowActions({
   const remove = useBracketDelete({
     onError: (error) => notifyError(error, { id: 'bracket-delete' }),
     onSuccess: () => {
-      toast.success('Chave apagada. As inscrições reabriram.')
+      toast.success(m.admin_brackets_deleted())
       return invalidate([...GAME_KEYS, ...DEPENDENTS.games])
     },
   })
@@ -44,18 +45,20 @@ export function BracketRowActions({
         render={
           <Link to="/administrator/brackets/$id" params={{ id: bracket.id }}>
             <TreeStructureIcon />
-            Abrir chave
+            {m.admin_brackets_open()}
           </Link>
         }
       />
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(bracket.id)}>
         <ConfirmDialogTitle>
-          {`Apagar a chave de ${bracket.sport.name} · ${CATEGORY_LABELS[bracket.category]}?`}
+          {m.admin_brackets_row_delete_title({
+            sport: bracket.sport.name,
+            category: CATEGORY_LABELS[bracket.category] ?? bracket.category,
+          })}
         </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          As partidas da chave são apagadas e as inscrições reabrem. Chave com
-          placar lançado não pode ser apagada.
+          {m.admin_brackets_row_delete_description()}
         </ConfirmDialogDescription>
       </RowActionsDelete>
     </RowActions>

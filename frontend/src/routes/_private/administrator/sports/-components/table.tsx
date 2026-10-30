@@ -1,5 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -21,6 +21,7 @@ import {
   useTable,
 } from '#/components/common/table'
 import { sportsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { m } from '#/paraglide/messages'
 
 import { sportColumns } from './columns'
 import { SportRowActions } from './row-actions'
@@ -33,9 +34,11 @@ export function SportsTable(): React.JSX.Element {
     sportsQueryOptions(search),
   )
 
+  const columns = React.useMemo(() => sportColumns(), [])
+
   const table = useTable({
     rows: data?.data ?? [],
-    columns: sportColumns,
+    columns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:sports',
     actions: (sport) => <SportRowActions sport={sport} />,
@@ -50,29 +53,28 @@ export function SportsTable(): React.JSX.Element {
       onRetry={() => void refetch()}
     >
       <TableHeader>
-        <TableTitle>Modalidades</TableTitle>
+        <TableTitle>{m.admin_sports_title()}</TableTitle>
         <TableActions>
           <TableCreateButton to="/administrator/sports/new">
-            Adicionar modalidade
+            {m.admin_sports_create()}
           </TableCreateButton>
         </TableActions>
       </TableHeader>
 
       <TableToolbar>
-        <TableSearch placeholder="Buscar modalidades..." />
+        <TableSearch placeholder={m.admin_sports_search()} />
         <TableColumnToggle table={table} />
       </TableToolbar>
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>Nenhuma modalidade ainda</TableEmptyTitle>
+          <TableEmptyTitle>{m.admin_sports_empty_title()}</TableEmptyTitle>
           <TableEmptyDescription>
-            Futsal, vôlei, queimada... cada uma com o mínimo e o máximo de
-            atletas por time.
+            {m.admin_sports_empty_description()}
           </TableEmptyDescription>
           <TableEmptyActions>
             <TableCreateButton to="/administrator/sports/new">
-              Adicionar modalidade
+              {m.admin_sports_create()}
             </TableCreateButton>
           </TableEmptyActions>
         </TableEmpty>

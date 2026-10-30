@@ -15,6 +15,7 @@ import {
 import { Input } from '#/components/ui/input'
 import { OptionCombobox } from '#/components/common/option-combobox'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { m } from '#/paraglide/messages'
 
 export type ClassroomFormType = AdministratorClassroomCreatePayload
 
@@ -31,10 +32,7 @@ export const CLASSROOM_FIELDS = [
   'representativeId',
 ] as const
 
-const GRADE_OPTIONS = [3, 4, 5, 6, 7, 8, 9].map((grade) => ({
-  value: String(grade),
-  label: `${grade}º ano`,
-}))
+const GRADES = [3, 4, 5, 6, 7, 8, 9]
 
 /** As contas de um papel, como opções. 100 cobre a escola inteira. */
 function usePeople(role: UserRole) {
@@ -43,7 +41,7 @@ function usePeople(role: UserRole) {
   )
 
   return [
-    { value: '', label: 'Nenhum' },
+    { value: '', label: m.admin_common_none() },
     ...(data?.data ?? []).map((user) => ({ value: user.id, label: user.name })),
   ]
 }
@@ -59,6 +57,10 @@ export function ClassroomFormFields({
 }: ClassroomFormFieldsProps): React.JSX.Element {
   const advisors = usePeople(USER_ROLE.ADVISOR)
   const representatives = usePeople(USER_ROLE.REPRESENTATIVE)
+  const gradeOptions = GRADES.map((grade) => ({
+    value: String(grade),
+    label: m.admin_classrooms_grade_option({ grade }),
+  }))
 
   return (
     <FieldGroup>
@@ -68,12 +70,18 @@ export function ClassroomFormFields({
         control={form.control}
         name="name"
         id={`${idPrefix}-name`}
-        label="Nome"
+        label={m.admin_common_name()}
       >
         {({ field, control }) => (
           <>
-            <Input {...field} {...control} placeholder="9º A" />
-            <FieldDescription>É o nome que aparece no placar.</FieldDescription>
+            <Input
+              {...field}
+              {...control}
+              placeholder={m.admin_classrooms_field_name_placeholder()}
+            />
+            <FieldDescription>
+              {m.admin_classrooms_field_name_description()}
+            </FieldDescription>
           </>
         )}
       </AppField>
@@ -82,7 +90,7 @@ export function ClassroomFormFields({
         control={form.control}
         name="grade"
         id={`${idPrefix}-grade`}
-        label="Ano"
+        label={m.admin_classrooms_field_grade()}
       >
         {({ field, control }) => (
           <>
@@ -93,10 +101,10 @@ export function ClassroomFormFields({
               value={String(field.value)}
               onValueChange={(value) => field.onChange(Number(value))}
               onBlur={field.onBlur}
-              options={GRADE_OPTIONS}
+              options={gradeOptions}
             />
             <FieldDescription>
-              Do 3º ao 5º é Fundamental 1; do 6º ao 9º, Fundamental 2.
+              {m.admin_classrooms_field_grade_description()}
             </FieldDescription>
           </>
         )}
@@ -106,7 +114,7 @@ export function ClassroomFormFields({
         control={form.control}
         name="advisorId"
         id={`${idPrefix}-advisor`}
-        label="Professor conselheiro"
+        label={m.admin_classrooms_field_advisor()}
       >
         {({ field, control }) => (
           <OptionCombobox
@@ -123,7 +131,7 @@ export function ClassroomFormFields({
         control={form.control}
         name="representativeId"
         id={`${idPrefix}-representative`}
-        label="Aluno representante"
+        label={m.admin_classrooms_field_representative()}
       >
         {({ field, control }) => (
           <>
@@ -135,7 +143,7 @@ export function ClassroomFormFields({
               options={representatives}
             />
             <FieldDescription>
-              As contas saem de Usuários, com o papel de representante.
+              {m.admin_classrooms_field_representative_description()}
             </FieldDescription>
           </>
         )}

@@ -19,6 +19,7 @@ import { Card, CardContent } from '#/components/ui/card'
 import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { AnnouncementFormType } from './form-fields'
 import {
@@ -41,7 +42,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
-    success: () => 'Aviso publicado.',
+    success: () => m.admin_announcements_published(),
     // Nome repetido é `409 ANNOUNCEMENT_ALREADY_EXISTS`: reenviar é seguro.
     payload: (values) => values,
   })
@@ -50,7 +51,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar aviso</FormShellTitle>
+        <FormShellTitle>{m.admin_announcements_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />

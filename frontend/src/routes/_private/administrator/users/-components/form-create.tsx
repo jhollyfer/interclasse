@@ -20,6 +20,7 @@ import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { m } from '#/paraglide/messages'
 
 import type { UserFormType } from './form-fields'
 import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
@@ -48,7 +49,7 @@ export function UserFormCreate(): React.JSX.Element {
     mutation: useUserCreate,
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users',
-    success: (user) => `Conta de ${user.name} criada.`,
+    success: (user) => m.admin_users_created_ok({ name: user.name }),
     // Com `retry`, ao contrário dos depoimentos: o `create.use-case.ts` recusa
     // e-mail de conta viva com `409 USER_ALREADY_EXISTS`, então reenviar depois
     // de um 5xx que possa ter gravado não cria uma segunda conta - esbarra no
@@ -63,7 +64,7 @@ export function UserFormCreate(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Adicionar usuário</FormShellTitle>
+        <FormShellTitle>{m.admin_users_create()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />
@@ -74,12 +75,9 @@ export function UserFormCreate(): React.JSX.Element {
         <Card>
           <CardContent>
             <FieldSet>
-              <FieldLegend>Identidade e acesso</FieldLegend>
+              <FieldLegend>{m.admin_users_identity_legend()}</FieldLegend>
               <UserFormFields form={form} idPrefix="user" />
-              <FieldDescription>
-                O e-mail de uma conta arquivada reativa aquela linha com os
-                dados novos, em vez de criar outra.
-              </FieldDescription>
+              <FieldDescription>{m.admin_users_create_note()}</FieldDescription>
             </FieldSet>
           </CardContent>
         </Card>

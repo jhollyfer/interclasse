@@ -22,7 +22,8 @@ import {
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS, plural } from '#/lib/labels'
+import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { CLASSROOM_GRID } from '../index'
 import { ClassroomRowActions } from './row-actions'
@@ -47,17 +48,16 @@ export function ClassroomGrid(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Turmas</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_classrooms_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          As turmas que disputam os jogos. Cada uma forma um time por
-          modalidade; a categoria sai do ano.
+          {m.admin_classrooms_description()}
         </PageHeaderDescription>
         <PageHeaderActions>
           <Button
             render={
               <Link to="/administrator/classrooms/new">
                 <PlusIcon />
-                Adicionar turma
+                {m.admin_classrooms_create()}
               </Link>
             }
           />
@@ -73,9 +73,9 @@ export function ClassroomGrid(): React.JSX.Element {
           })
         }
       >
-        <TabsList aria-label="Categoria">
+        <TabsList aria-label={m.admin_common_category()}>
           <TabsTrigger value={ALL} className="px-4">
-            Todas
+            {m.admin_common_all()}
           </TabsTrigger>
           {CATEGORIES.map((category) => (
             <TabsTrigger key={category} value={category} className="px-4">
@@ -92,16 +92,16 @@ export function ClassroomGrid(): React.JSX.Element {
 
       {isError && (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-          Não foi possível carregar as turmas agora.{' '}
+          {m.admin_classrooms_load_error()}{' '}
           <Button variant="link" onClick={() => void refetch()}>
-            Tentar de novo
+            {m.admin_common_retry()}
           </Button>
         </p>
       )}
 
       {data?.data.length === 0 && (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-          Nenhuma turma nesta categoria ainda.
+          {m.admin_classrooms_empty()}
         </p>
       )}
 
@@ -144,19 +144,22 @@ function ClassroomCard({
       </CardHeader>
       <CardContent>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-          <dt className="text-muted-foreground">Conselheiro</dt>
+          <dt className="text-muted-foreground">{m.admin_common_advisor()}</dt>
           <dd className="truncate">
-            {classroom.advisor?.name ?? 'Sem conselheiro'}
+            {classroom.advisor?.name ?? m.admin_common_no_advisor()}
           </dd>
-          <dt className="text-muted-foreground">Representante</dt>
+          <dt className="text-muted-foreground">
+            {m.admin_common_representative()}
+          </dt>
           <dd className="truncate">
-            {classroom.representative?.name ?? 'Sem representante'}
+            {classroom.representative?.name ??
+              m.admin_common_no_representative()}
           </dd>
         </dl>
         <p className="text-muted-foreground mt-3 text-sm">
-          {plural(classroom.studentsCount, 'aluno', 'alunos')} ·{' '}
-          {plural(classroom.athletesCount, 'atleta', 'atletas')} ·{' '}
-          {plural(classroom.sportsCount, 'modalidade', 'modalidades')}
+          {m.admin_common_count_students({ count: classroom.studentsCount })} ·{' '}
+          {m.admin_common_count_athletes({ count: classroom.athletesCount })} ·{' '}
+          {m.admin_common_count_sports({ count: classroom.sportsCount })}
         </p>
       </CardContent>
     </Card>

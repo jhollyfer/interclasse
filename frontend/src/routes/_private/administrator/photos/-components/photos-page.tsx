@@ -31,6 +31,7 @@ import {
 } from '#/integrations/tanstack-query/mutations/administrator'
 import { photosQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
+import { m } from '#/paraglide/messages'
 
 import { PHOTO_PAGE } from '../index'
 
@@ -40,10 +41,10 @@ const route = getRouteApi('/_private/administrator/photos/')
 const ALL = 'ALL'
 
 const TABS = [
-  { value: PHOTO_STATUS.PENDING, label: 'Aguardando' },
-  { value: PHOTO_STATUS.APPROVED, label: 'No site' },
-  { value: PHOTO_STATUS.REJECTED, label: 'Recusadas' },
-  { value: ALL, label: 'Todas' },
+  { value: PHOTO_STATUS.PENDING, label: () => m.admin_photos_tab_pending() },
+  { value: PHOTO_STATUS.APPROVED, label: () => m.admin_photos_tab_approved() },
+  { value: PHOTO_STATUS.REJECTED, label: () => m.admin_photos_tab_rejected() },
+  { value: ALL, label: () => m.admin_common_all() },
 ] as const
 
 /**
@@ -60,17 +61,16 @@ export function PhotosPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Fotos</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_photos_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          As fotos do carrossel do site. As dos conselheiros só aparecem depois
-          de aprovadas aqui.
+          {m.admin_photos_description()}
         </PageHeaderDescription>
       </PageHeader>
 
       <PhotoUploadForm
         area="administrator"
-        description="A foto da organização vai direto para o site."
-        success="Foto publicada no site."
+        description={m.admin_photos_upload_description()}
+        success={m.admin_photos_upload_success()}
       />
 
       <Tabs
@@ -82,10 +82,10 @@ export function PhotosPage(): React.JSX.Element {
           })
         }
       >
-        <TabsList aria-label="Situação">
+        <TabsList aria-label={m.admin_common_status()}>
           {TABS.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value} className="px-4">
-              {tab.label}
+              {tab.label()}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -94,7 +94,7 @@ export function PhotosPage(): React.JSX.Element {
       <PhotoGrid
         photos={data?.data ?? []}
         isPending={isPending}
-        empty="Nenhuma foto aqui."
+        empty={m.admin_photos_empty()}
         showAuthor
         actions={(photo) => <ReviewActions photo={photo} />}
       />
@@ -115,13 +115,13 @@ function ReviewActions({
   const review = usePhotoReview({
     onSuccess: async (updated) => {
       if (updated.status === PHOTO_STATUS.APPROVED)
-        return done('Foto aprovada: já está no site.')()
-      return done('Foto recusada: saiu do site.')()
+        return done(m.admin_photos_approved())()
+      return done(m.admin_photos_rejected())()
     },
     onError: (error) => notifyError(error, { id: 'photo-review' }),
   })
   const remove = usePhotoDelete('administrator', {
-    onSuccess: done('Foto apagada.'),
+    onSuccess: done(m.admin_photos_deleted()),
     onError: (error) => notifyError(error, { id: 'photo-delete' }),
   })
 
@@ -136,7 +136,7 @@ function ReviewActions({
           }
         >
           <CheckIcon />
-          Aprovar
+          {m.admin_photos_approve()}
         </Button>
       )}
       {photo.status !== PHOTO_STATUS.REJECTED && (
@@ -149,27 +149,33 @@ function ReviewActions({
           }
         >
           <XIcon />
-          Recusar
+          {m.admin_photos_reject()}
         </Button>
       )}
       <ConfirmDialog
         destructive
         onConfirm={() => remove.mutate(photo.id)}
         trigger={
-          <Button size="sm" variant="ghost" aria-label="Apagar foto">
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label={m.admin_photos_delete_label()}
+          >
             <TrashIcon />
           </Button>
         }
       >
         <ConfirmDialogHeader>
-          <ConfirmDialogTitle>Apagar esta foto?</ConfirmDialogTitle>
+          <ConfirmDialogTitle>
+            {m.admin_photos_delete_title()}
+          </ConfirmDialogTitle>
           <ConfirmDialogDescription>
-            Ela some do site e da lista de quem enviou. Não dá para desfazer.
+            {m.admin_photos_delete_description()}
           </ConfirmDialogDescription>
         </ConfirmDialogHeader>
         <ConfirmDialogFooter>
           <ConfirmDialogCancel />
-          <ConfirmDialogConfirm>Apagar</ConfirmDialogConfirm>
+          <ConfirmDialogConfirm>{m.admin_common_delete()}</ConfirmDialogConfirm>
         </ConfirmDialogFooter>
       </ConfirmDialog>
     </>

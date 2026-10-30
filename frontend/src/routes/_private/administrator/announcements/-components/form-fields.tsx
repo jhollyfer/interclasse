@@ -16,6 +16,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
+import { m } from '#/paraglide/messages'
 
 export type AnnouncementFormType = AdministratorAnnouncementCreatePayload
 
@@ -44,10 +45,14 @@ export function AnnouncementFormFields({
         control={form.control}
         name="title"
         id={`${idPrefix}-title`}
-        label="Título"
+        label={m.admin_common_title()}
       >
         {({ field, control }) => (
-          <Input {...field} {...control} placeholder="Troca de horário" />
+          <Input
+            {...field}
+            {...control}
+            placeholder={m.admin_announcements_field_title_placeholder()}
+          />
         )}
       </AppField>
 
@@ -55,7 +60,7 @@ export function AnnouncementFormFields({
         control={form.control}
         name="body"
         id={`${idPrefix}-body`}
-        label="Texto"
+        label={m.admin_announcements_field_body()}
       >
         {({ field, control }) => <Textarea {...field} {...control} rows={5} />}
       </AppField>
@@ -73,10 +78,10 @@ export function AnnouncementFormFields({
               onCheckedChange={(checked) => field.onChange(checked === true)}
             />
             <FieldLabel htmlFor={`${idPrefix}-pinned`}>
-              Fixar no topo do site
+              {m.admin_announcements_field_pinned()}
             </FieldLabel>
             <FieldDescription className="sr-only">
-              Aviso fixado aparece antes dos demais.
+              {m.admin_announcements_field_pinned_description()}
             </FieldDescription>
           </Field>
         )}

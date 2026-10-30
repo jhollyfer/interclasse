@@ -34,8 +34,8 @@ import {
   CATEGORY_SHORT_LABELS,
   MATCH_PHASE_LABELS,
   formatWhen,
-  plural,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import {
   DASHBOARD_BRACKETS,
@@ -68,10 +68,9 @@ export function DashboardPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Painel</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_dashboard_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          Lance o resultado de cada jogo: o vencedor passa para a fase seguinte
-          e o perdedor está fora.
+          {m.admin_dashboard_description()}
         </PageHeaderDescription>
       </PageHeader>
 
@@ -82,22 +81,25 @@ export function DashboardPage(): React.JSX.Element {
         >
           <WarningCircleIcon className="text-primary size-6" weight="fill" />
           <span className="flex-1">
-            {`${plural(pendingRemovals, 'atleta foi tirado', 'atletas foram tirados')} de modalidade pelos conselheiros. Veja o motivo.`}
+            {m.admin_dashboard_removals_notice({ count: pendingRemovals })}
           </span>
-          <span className="font-medium underline">Ver avisos</span>
+          <span className="font-medium underline">
+            {m.admin_dashboard_removals_link()}
+          </span>
         </Link>
       )}
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
-            <CardTitle>{`Jogos para lançar resultado (${toPlay.length})`}</CardTitle>
+            <CardTitle>
+              {m.admin_dashboard_matches_title({ count: toPlay.length })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {toPlay.length === 0 && (
               <p className="text-muted-foreground text-sm">
-                Nenhum jogo esperando resultado. Sorteie uma chave para criar os
-                jogos.
+                {m.admin_dashboard_matches_empty()}
               </p>
             )}
             <ul className="divide-y">
@@ -108,15 +110,24 @@ export function DashboardPage(): React.JSX.Element {
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="font-medium">
-                      {`${match.homeTeam.classroom.name} x ${match.awayTeam.classroom.name}`}
+                      {m.admin_common_versus({
+                        home: match.homeTeam.classroom.name,
+                        away: match.awayTeam.classroom.name,
+                      })}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {`${match.bracket.sport.name} ${CATEGORY_SHORT_LABELS[match.bracket.category] ?? ''} · ${MATCH_PHASE_LABELS[match.phase] ?? match.phase} · ${formatWhen(match.scheduledAt)}`}
+                      {m.admin_dashboard_match_meta({
+                        sport: match.bracket.sport.name,
+                        category:
+                          CATEGORY_SHORT_LABELS[match.bracket.category] ?? '',
+                        phase: MATCH_PHASE_LABELS[match.phase] ?? match.phase,
+                        when: formatWhen(match.scheduledAt),
+                      })}
                     </span>
                   </div>
                   <Button size="sm" onClick={() => setScoring(toRef(match))}>
                     <TrophyIcon />
-                    Resultado
+                    {m.admin_dashboard_result()}
                   </Button>
                   <Button
                     size="sm"
@@ -124,7 +135,7 @@ export function DashboardPage(): React.JSX.Element {
                     onClick={() => setScheduling(toRef(match))}
                   >
                     <CalendarBlankIcon />
-                    Agendar
+                    {m.admin_common_schedule()}
                   </Button>
                   <Button
                     size="sm"
@@ -132,7 +143,7 @@ export function DashboardPage(): React.JSX.Element {
                     onClick={() => setCarding(toRef(match))}
                   >
                     <CardsIcon />
-                    Cartões
+                    {m.admin_common_cards()}
                   </Button>
                 </li>
               ))}
@@ -142,12 +153,12 @@ export function DashboardPage(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Chaves</CardTitle>
+            <CardTitle>{m.admin_common_brackets()}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {(brackets?.data ?? []).length === 0 && (
               <p className="text-muted-foreground text-sm">
-                Nenhuma chave sorteada.
+                {m.admin_dashboard_brackets_empty()}
               </p>
             )}
             {(brackets?.data ?? []).map((bracket) => (
@@ -158,7 +169,10 @@ export function DashboardPage(): React.JSX.Element {
                 className="hover:bg-muted flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
               >
                 <span className="flex-1">
-                  {`${bracket.sport.name} · ${CATEGORY_SHORT_LABELS[bracket.category] ?? ''}`}
+                  {m.admin_common_sport_category({
+                    sport: bracket.sport.name,
+                    category: CATEGORY_SHORT_LABELS[bracket.category] ?? '',
+                  })}
                 </span>
                 <Badge variant={BRACKET_STATUS_VARIANTS[bracket.status]}>
                   {BRACKET_STATUS_LABELS[bracket.status]}
@@ -172,7 +186,7 @@ export function DashboardPage(): React.JSX.Element {
                 className: 'mt-2',
               })}
             >
-              Sortear nova chave
+              {m.admin_dashboard_draw_new()}
             </Link>
           </CardContent>
         </Card>
