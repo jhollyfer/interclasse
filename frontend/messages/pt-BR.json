@@ -100,9 +100,7 @@
         "input years",
         "local yearsPlural = years: plural"
       ],
-      "selectors": [
-        "yearsPlural"
-      ],
+      "selectors": ["yearsPlural"],
       "match": {
         "yearsPlural=one": "Desde {year} · há {years} ano",
         "yearsPlural=*": "Desde {year} · há {years} anos"
@@ -211,13 +209,8 @@
   "table_per_page": "Itens por página",
   "table_records": [
     {
-      "declarations": [
-        "input total",
-        "local totalPlural = total: plural"
-      ],
-      "selectors": [
-        "totalPlural"
-      ],
+      "declarations": ["input total", "local totalPlural = total: plural"],
+      "selectors": ["totalPlural"],
       "match": {
         "totalPlural=one": "{total} registro",
         "totalPlural=*": "{total} registros"
@@ -258,13 +251,8 @@
   "common_enrollment_drawn": "Sorteada",
   "common_enrollment_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} atleta · {min} a {max}",
         "countPlural=*": "{count} atletas · {min} a {max}"
@@ -282,13 +270,8 @@
   "common_student_name": "Nome do aluno",
   "common_students_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} aluno",
         "countPlural=*": "{count} alunos"
@@ -311,13 +294,8 @@
   "common_summary_no_representative": "Sem representante",
   "common_summary_sports_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} modalidade",
         "countPlural=*": "{count} modalidades"
@@ -448,10 +426,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} atletas foram tirados de modalidade pelos conselheiros. Veja o motivo.",
         "countExact=*, countPlural=one": "{count} atleta foi tirado de modalidade pelos conselheiros. Veja o motivo.",
@@ -495,12 +470,7 @@
         "local minExact = min",
         "local minPlural = min: plural"
       ],
-      "selectors": [
-        "eligibleExact",
-        "eligiblePlural",
-        "minExact",
-        "minPlural"
-      ],
+      "selectors": ["eligibleExact", "eligiblePlural", "minExact", "minPlural"],
       "match": {
         "eligibleExact=0, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} turmas entram (mínimo de {min} atletas)",
         "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} turmas entram (mínimo de {min} atleta)",
@@ -532,12 +502,7 @@
         "local redExact = red",
         "local redPlural = red: plural"
       ],
-      "selectors": [
-        "cardsExact",
-        "cardsPlural",
-        "redExact",
-        "redPlural"
-      ],
+      "selectors": ["cardsExact", "cardsPlural", "redExact", "redPlural"],
       "match": {
         "cardsExact=0, cardsPlural=*, redExact=0, redPlural=*": "{cards} cartões, {red} vermelhos. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
         "cardsExact=0, cardsPlural=*, redExact=*, redPlural=one": "{cards} cartões, {red} vermelho. Para lançar, abra a partida na chave ou em Partidas e use \"Cartões\".",
@@ -561,10 +526,7 @@
         "local pendingExact = pending",
         "local pendingPlural = pending: plural"
       ],
-      "selectors": [
-        "pendingExact",
-        "pendingPlural"
-      ],
+      "selectors": ["pendingExact", "pendingPlural"],
       "match": {
         "pendingExact=0, pendingPlural=*": "Quem os conselheiros tiraram das modalidades, e por quê. {pending} avisos pendentes.",
         "pendingExact=*, pendingPlural=one": "Quem os conselheiros tiraram das modalidades, e por quê. {pending} aviso pendente.",
@@ -603,10 +565,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} atletas",
         "countExact=*, countPlural=one": "{count} atleta",
@@ -621,10 +580,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} alunos",
         "countExact=*, countPlural=one": "{count} aluno",
@@ -639,10 +595,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} modalidades",
         "countExact=*, countPlural=one": "{count} modalidade",
@@ -773,10 +726,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} contas deixam de entrar no painel e saem da listagem. Podem ser restauradas depois.",
         "countExact=*, countPlural=one": "{count} conta deixa de entrar no painel e sai da listagem. Pode ser restaurada depois.",
@@ -791,10 +741,7 @@
         "local doneExact = done",
         "local donePlural = done: plural"
       ],
-      "selectors": [
-        "doneExact",
-        "donePlural"
-      ],
+      "selectors": ["doneExact", "donePlural"],
       "match": {
         "doneExact=0, donePlural=*": "{done} arquivados.",
         "doneExact=*, donePlural=one": "{done} arquivado.",
@@ -809,10 +756,7 @@
         "local totalExact = total",
         "local totalPlural = total: plural"
       ],
-      "selectors": [
-        "totalExact",
-        "totalPlural"
-      ],
+      "selectors": ["totalExact", "totalPlural"],
       "match": {
         "totalExact=0, totalPlural=*": "Nenhum arquivado: {total} falharam.",
         "totalExact=*, totalPlural=one": "Nenhum arquivado: {total} falhou.",
@@ -827,10 +771,7 @@
         "local failedExact = failed",
         "local failedPlural = failed: plural"
       ],
-      "selectors": [
-        "failedExact",
-        "failedPlural"
-      ],
+      "selectors": ["failedExact", "failedPlural"],
       "match": {
         "failedExact=0, failedPlural=*": "{done} de {total} arquivados; {failed} falharam.",
         "failedExact=*, failedPlural=one": "{done} de {total} arquivados; {failed} falhou.",

@@ -26,7 +26,6 @@ import { TableLayoutValidator } from './table-layout.validator'
 import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
 
-
 /**
  * As features registradas nas tabelas do painel.
  *

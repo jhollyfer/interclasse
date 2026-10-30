@@ -73,11 +73,19 @@ function edges(file, source) {
 function importedFrom(source, file, target) {
   const names = new Set()
 
-  for (const match of source.matchAll(/\bimport\s*\{([^}]*)\}\s*from\s*["']([^"']+)["']/g)) {
+  for (const match of source.matchAll(
+    /\bimport\s*\{([^}]*)\}\s*from\s*["']([^"']+)["']/g,
+  )) {
     if (normalize(join(dirname(file), match[2])) !== target) continue
 
     for (const piece of match[1].split(','))
-      if (piece.trim()) names.add(piece.trim().split(/\s+as\s+/).pop())
+      if (piece.trim())
+        names.add(
+          piece
+            .trim()
+            .split(/\s+as\s+/)
+            .pop(),
+        )
   }
 
   return names
@@ -164,8 +172,8 @@ function eagerOnly(source) {
         let inClass = false
         while (i < source.length) {
           if (source[i] === '\\') i += 2
-          else if (source[i] === '[') (inClass = true), i++
-          else if (source[i] === ']') (inClass = false), i++
+          else if (source[i] === '[') ((inClass = true), i++)
+          else if (source[i] === ']') ((inClass = false), i++)
           else if (source[i] === '/' && !inClass) break
           else i++
         }
@@ -192,8 +200,9 @@ function eagerOnly(source) {
       let end = i
       while (end < source.length && /[\w$]/.test(source[end])) end++
       const word = source.slice(i, end)
-      if (word === 'function' || word === 'class') pendingAtDepth = brackets.length
-      while (i < end) keep(), i++
+      if (word === 'function' || word === 'class')
+        pendingAtDepth = brackets.length
+      while (i < end) (keep(), i++)
       continue
     }
 
@@ -246,98 +255,107 @@ export { eagerOnly }
 if (import.meta.main) main()
 
 function main() {
-const files = collect(root)
-const sources = new Map(files.map((file) => [file, readFileSync(file, 'utf8')]))
-const graph = new Map(files.map((file) => [file, edges(file, sources.get(file))]))
+  const files = collect(root)
+  const sources = new Map(
+    files.map((file) => [file, readFileSync(file, 'utf8')]),
+  )
+  const graph = new Map(
+    files.map((file) => [file, edges(file, sources.get(file))]),
+  )
 
-// DFS com três cores: sem marca, na pilha, fechado. Aresta para quem está na
-// pilha é o ciclo, e o caminho dele é o pedaço da pilha a partir do alvo.
-const state = new Map()
-const stack = []
-const cycles = []
+  // DFS com três cores: sem marca, na pilha, fechado. Aresta para quem está na
+  // pilha é o ciclo, e o caminho dele é o pedaço da pilha a partir do alvo.
+  const state = new Map()
+  const stack = []
+  const cycles = []
 
-function walk(file) {
-  state.set(file, 'open')
-  stack.push(file)
+  function walk(file) {
+    state.set(file, 'open')
+    stack.push(file)
 
-  for (const next of graph.get(file) ?? []) {
-    if (!graph.has(next)) continue
+    for (const next of graph.get(file) ?? []) {
+      if (!graph.has(next)) continue
 
-    if (state.get(next) === 'open')
-      cycles.push([...stack.slice(stack.indexOf(next)), next])
-    else if (!state.has(next)) walk(next)
+      if (state.get(next) === 'open')
+        cycles.push([...stack.slice(stack.indexOf(next)), next])
+      else if (!state.has(next)) walk(next)
+    }
+
+    stack.pop()
+    state.set(file, 'closed')
   }
 
-  stack.pop()
-  state.set(file, 'closed')
-}
+  for (const file of files) if (!state.has(file)) walk(file)
 
-for (const file of files) if (!state.has(file)) walk(file)
+  const show = (file) => relative(root, file)
+  const hazards = []
 
-const show = (file) => relative(root, file)
-const hazards = []
+  for (const cycle of cycles) {
+    const members = new Set(cycle)
 
-for (const cycle of cycles) {
-  const members = new Set(cycle)
+    for (const file of members) {
+      const source = sources.get(file)
+      const names = new Set()
 
-  for (const file of members) {
-    const source = sources.get(file)
-    const names = new Set()
+      for (const other of members)
+        if (other !== file)
+          for (const name of importedFrom(source, file, other)) names.add(name)
 
-    for (const other of members)
-      if (other !== file)
-        for (const name of importedFrom(source, file, other)) names.add(name)
+      if (names.size === 0) continue
 
-    if (names.size === 0) continue
+      const eager = eagerOnly(source).split('\n')
+      const pattern = new RegExp(
+        `\\b(${[...names].map((n) => n.replace(/\$/g, '\\$')).join('|')})\\b`,
+      )
 
-    const eager = eagerOnly(source).split('\n')
-    const pattern = new RegExp(
-      `\\b(${[...names].map((n) => n.replace(/\$/g, '\\$')).join('|')})\\b`,
+      const original = source.split('\n')
+
+      eager.forEach((line, index) => {
+        // A própria declaração de import, e o `export { ... }` que o Rolldown junta
+        // no fim do arquivo, citam todo nome sem ler nenhum: reexportar um binding
+        // não o avalia.
+        if (/^\s*(import\b|export\s*\{)/.test(original[index])) return
+
+        const match = line.match(pattern)
+        if (!match) return
+
+        hazards.push({
+          file,
+          line: index + 1,
+          name: match[1],
+          code: original[index].trim().slice(0, 100),
+        })
+      })
+    }
+  }
+
+  if (cycles.length > 0) {
+    console.log(`${root}: ${cycles.length} ciclo(s) de chunk (informativo).\n`)
+    for (const cycle of cycles)
+      console.log(`  ${cycle.map(show).join('\n  -> ')}\n`)
+  }
+
+  if (hazards.length === 0) {
+    console.log(
+      `${root}: ${files.length} chunks, nenhuma leitura antecipada em ciclo.`,
+    )
+    process.exit(0)
+  }
+
+  console.error(
+    `${root}: ${hazards.length} leitura(s) de binding em ciclo, durante a avaliação do módulo.\n`,
+  )
+
+  for (const hazard of hazards)
+    console.error(
+      `  ${show(hazard.file)}:${hazard.line}  [${hazard.name}]\n     ${hazard.code}\n`,
     )
 
-    const original = source.split('\n')
+  console.error(
+    'O chunk que exporta esses nomes ainda não terminou de avaliar quando estas\n' +
+      'linhas rodam, e o binding vale `undefined`. Adie a leitura: `import type` se\n' +
+      'o import só existe pelo tipo, chamada dentro da função se é valor.',
+  )
 
-    eager.forEach((line, index) => {
-      // A própria declaração de import, e o `export { ... }` que o Rolldown junta
-      // no fim do arquivo, citam todo nome sem ler nenhum: reexportar um binding
-      // não o avalia.
-      if (/^\s*(import\b|export\s*\{)/.test(original[index])) return
-
-      const match = line.match(pattern)
-      if (!match) return
-
-      hazards.push({
-        file,
-        line: index + 1,
-        name: match[1],
-        code: original[index].trim().slice(0, 100),
-      })
-    })
-  }
-}
-
-if (cycles.length > 0) {
-  console.log(`${root}: ${cycles.length} ciclo(s) de chunk (informativo).\n`)
-  for (const cycle of cycles) console.log(`  ${cycle.map(show).join('\n  -> ')}\n`)
-}
-
-if (hazards.length === 0) {
-  console.log(`${root}: ${files.length} chunks, nenhuma leitura antecipada em ciclo.`)
-  process.exit(0)
-}
-
-console.error(
-  `${root}: ${hazards.length} leitura(s) de binding em ciclo, durante a avaliação do módulo.\n`,
-)
-
-for (const hazard of hazards)
-  console.error(`  ${show(hazard.file)}:${hazard.line}  [${hazard.name}]\n     ${hazard.code}\n`)
-
-console.error(
-  'O chunk que exporta esses nomes ainda não terminou de avaliar quando estas\n' +
-    'linhas rodam, e o binding vale `undefined`. Adie a leitura: `import type` se\n' +
-    'o import só existe pelo tipo, chamada dentro da função se é valor.',
-)
-
-process.exit(1)
+  process.exit(1)
 }
