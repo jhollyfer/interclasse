@@ -49,6 +49,7 @@ import {
   CATEGORY_LABELS,
   championName,
 } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 const route = getRouteApi('/_private/administrator/brackets/$id/')
 
@@ -58,9 +59,9 @@ const SCORE_BUTTON: Record<string, 'default' | 'outline'> = {
   FINISHED: 'outline',
 }
 
-const UNSCORE_TITLE: Record<string, string> = {
-  true: 'A partida seguinte já tem placar: desfaça-a antes',
-  false: 'Desfazer placar',
+const UNSCORE_TITLE: Record<string, (() => string) | undefined> = {
+  true: () => m.admin_brackets_unscore_locked(),
+  false: () => m.admin_common_undo_score(),
 }
 
 /**
@@ -93,7 +94,7 @@ export function BracketDetailView(): React.JSX.Element {
 
   const remove = useBracketDelete({
     onSuccess: async () => {
-      toast.success('Chave apagada. As inscrições reabriram.')
+      toast.success(m.admin_brackets_deleted())
       await invalidate()
       await navigate({ to: '/administrator/brackets' })
     },
@@ -112,7 +113,10 @@ export function BracketDetailView(): React.JSX.Element {
       <PageHeader>
         <PageHeaderBack to="/administrator/brackets" />
         <PageHeaderTitle>
-          {bracket.sport.name} · {CATEGORY_LABELS[bracket.category]}
+          {m.admin_common_sport_category({
+            sport: bracket.sport.name,
+            category: CATEGORY_LABELS[bracket.category] ?? bracket.category,
+          })}
         </PageHeaderTitle>
         <PageHeaderBadges>
           <Badge variant={BRACKET_STATUS_VARIANTS[bracket.status]}>
@@ -126,37 +130,42 @@ export function BracketDetailView(): React.JSX.Element {
             trigger={
               <Button variant="destructive">
                 <TrashIcon />
-                Apagar chave
+                {m.admin_brackets_delete_trigger()}
               </Button>
             }
           >
             {hasResults && (
               <React.Fragment>
                 <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>A chave já tem placar</ConfirmDialogTitle>
+                  <ConfirmDialogTitle>
+                    {m.admin_brackets_has_results_title()}
+                  </ConfirmDialogTitle>
                   <ConfirmDialogDescription>
-                    Apagar levaria embora resultados que aconteceram em quadra.
-                    Para refazer o sorteio, desfaça os placares antes, da final
-                    para a primeira fase.
+                    {m.admin_brackets_has_results_description()}
                   </ConfirmDialogDescription>
                 </ConfirmDialogHeader>
                 <ConfirmDialogFooter>
-                  <ConfirmDialogCancel>Entendi</ConfirmDialogCancel>
+                  <ConfirmDialogCancel>
+                    {m.admin_brackets_understood()}
+                  </ConfirmDialogCancel>
                 </ConfirmDialogFooter>
               </React.Fragment>
             )}
             {!hasResults && (
               <React.Fragment>
                 <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>Apagar a chave?</ConfirmDialogTitle>
+                  <ConfirmDialogTitle>
+                    {m.admin_brackets_delete_title()}
+                  </ConfirmDialogTitle>
                   <ConfirmDialogDescription>
-                    Times e partidas somem, e as inscrições da modalidade
-                    reabrem. É assim que se refaz um sorteio.
+                    {m.admin_brackets_delete_description()}
                   </ConfirmDialogDescription>
                 </ConfirmDialogHeader>
                 <ConfirmDialogFooter>
                   <ConfirmDialogCancel />
-                  <ConfirmDialogConfirm>Apagar chave</ConfirmDialogConfirm>
+                  <ConfirmDialogConfirm>
+                    {m.admin_brackets_delete_trigger()}
+                  </ConfirmDialogConfirm>
                 </ConfirmDialogFooter>
               </React.Fragment>
             )}
@@ -168,15 +177,12 @@ export function BracketDetailView(): React.JSX.Element {
         <Card className="border-primary">
           <CardContent className="flex items-center gap-3 font-semibold">
             <TrophyIcon className="text-primary size-6" weight="fill" />
-            Campeã: {champion}
+            {m.admin_brackets_champion({ name: champion })}
           </CardContent>
         </Card>
       )}
 
-      <p className="text-muted-foreground text-sm">
-        As partidas nascem do sorteio. Lance o placar e o vencedor sobe sozinho
-        para a fase seguinte; empate pede quem venceu nos pênaltis.
-      </p>
+      <p className="text-muted-foreground text-sm">{m.admin_brackets_help()}</p>
 
       <BracketTree
         bracket={bracket}
@@ -191,10 +197,12 @@ export function BracketDetailView(): React.JSX.Element {
                 size="sm"
                 variant={SCORE_BUTTON[match.status]}
                 disabled={!ready}
-                title={(!ready && 'Esperando os dois times') || undefined}
+                title={
+                  (!ready && m.admin_brackets_waiting_teams()) || undefined
+                }
                 onClick={() => setScoring(match)}
               >
-                Placar
+                {m.admin_brackets_score()}
               </Button>
               <Button
                 size="sm"
@@ -202,7 +210,7 @@ export function BracketDetailView(): React.JSX.Element {
                 onClick={() => setScheduling(match)}
               >
                 <CalendarBlankIcon />
-                Agendar
+                {m.admin_common_schedule()}
               </Button>
               <Button
                 size="sm"
@@ -211,18 +219,18 @@ export function BracketDetailView(): React.JSX.Element {
                 onClick={() => setCarding(match)}
               >
                 <CardsIcon />
-                Cartões
+                {m.admin_common_cards()}
               </Button>
               {match.status === 'FINISHED' && (
                 <Button
                   size="sm"
                   variant="ghost"
                   disabled={locked}
-                  title={UNSCORE_TITLE[String(locked)]}
+                  title={UNSCORE_TITLE[String(locked)]?.()}
                   onClick={() => setUnscoring(match)}
                 >
                   <ArrowCounterClockwiseIcon />
-                  Desfazer
+                  {m.admin_brackets_undo()}
                 </Button>
               )}
             </div>

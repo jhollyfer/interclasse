@@ -16,8 +16,9 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useEnrollmentRemovalAcknowledge } from '#/integrations/tanstack-query/mutations/administrator'
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
-import { formatDate, plural } from '#/lib/labels'
+import { formatDate } from '#/lib/labels'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 import { ADMINISTRATOR_REMOVALS } from '../index'
 
@@ -35,16 +36,16 @@ export function RemovalsPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Remoções de atleta</PageHeaderTitle>
+        <PageHeaderTitle>{m.admin_removals_title()}</PageHeaderTitle>
         <PageHeaderDescription>
-          {`Quem os conselheiros tiraram das modalidades, e por quê. ${plural(pending, 'aviso pendente', 'avisos pendentes')}.`}
+          {m.admin_removals_description({ pending })}
         </PageHeaderDescription>
       </PageHeader>
 
       {isPending && <Skeleton className="h-24 w-full" />}
       {!isPending && removals.length === 0 && (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          Nenhum atleta foi tirado de modalidade.
+          {m.admin_removals_empty()}
         </p>
       )}
 
@@ -80,14 +81,25 @@ function RemovalItem({
     >
       <div className="flex flex-1 flex-col gap-1 text-sm">
         <span className="font-medium">
-          {`${removal.studentName} saiu do ${removal.sport.name}`}
+          {m.admin_removals_item({
+            student: removal.studentName,
+            sport: removal.sport.name,
+          })}
           <span className="text-muted-foreground font-normal">
             {` · ${removal.classroom.name}`}
           </span>
         </span>
         <p className="bg-muted rounded-md px-3 py-2">{removal.reason}</p>
         <span className="text-muted-foreground text-xs">
-          {`Por ${removal.actor?.name ?? 'conta removida'} em ${formatDate(removal.createdAt)}`}
+          {removal.actor &&
+            m.admin_removals_by_actor({
+              actor: removal.actor.name,
+              date: formatDate(removal.createdAt),
+            })}
+          {!removal.actor &&
+            m.admin_removals_by_deleted({
+              date: formatDate(removal.createdAt),
+            })}
         </span>
       </div>
       {open && (
@@ -98,10 +110,12 @@ function RemovalItem({
           onClick={() => acknowledge.mutate(removal.id)}
         >
           <CheckIcon />
-          Ciente
+          {m.admin_common_acknowledged()}
         </Button>
       )}
-      {!open && <Badge variant="neutral">Ciente</Badge>}
+      {!open && (
+        <Badge variant="neutral">{m.admin_common_acknowledged()}</Badge>
+      )}
     </li>
   )
 }

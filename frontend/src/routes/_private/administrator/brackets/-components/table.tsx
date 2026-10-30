@@ -1,5 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
-import type * as React from 'react'
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -17,6 +17,7 @@ import {
   useTable,
 } from '#/components/common/table'
 import { bracketsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { m } from '#/paraglide/messages'
 
 import { bracketColumns } from './columns'
 import { DrawDialog } from './draw-dialog'
@@ -30,9 +31,11 @@ export function BracketsTable(): React.JSX.Element {
     bracketsQueryOptions(search),
   )
 
+  const columns = React.useMemo(() => bracketColumns(), [])
+
   const table = useTable({
     rows: data?.data ?? [],
-    columns: bracketColumns,
+    columns,
     getRowId: (row) => row.id,
     actions: (bracket) => <BracketRowActions bracket={bracket} />,
     persistKey: 'administrator:brackets',
@@ -47,7 +50,7 @@ export function BracketsTable(): React.JSX.Element {
       onRetry={() => void refetch()}
     >
       <TableHeader>
-        <TableTitle>Chaves</TableTitle>
+        <TableTitle>{m.admin_common_brackets()}</TableTitle>
         <TableActions>
           <DrawDialog />
         </TableActions>
@@ -55,10 +58,9 @@ export function BracketsTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>Nenhuma chave sorteada</TableEmptyTitle>
+          <TableEmptyTitle>{m.admin_brackets_empty_title()}</TableEmptyTitle>
           <TableEmptyDescription>
-            Cadastre turmas e modalidades, deixe as turmas inscreverem os
-            atletas e sorteie a chave de cada modalidade por categoria.
+            {m.admin_brackets_empty_description()}
           </TableEmptyDescription>
           <TableEmptyActions>
             <DrawDialog />
