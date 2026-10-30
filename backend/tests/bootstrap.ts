@@ -28,6 +28,9 @@ declare module '@japa/api-client/types' {
  * põe a própria `Origin`.
  */
 ApiClient.setup((request) => {
+  // O hook roda no envio, depois do `.header()` do teste: só preenche quando falta.
+  if (request.request.get('origin')) return
+
   request.header('origin', 'http://localhost:5173')
 })
 
