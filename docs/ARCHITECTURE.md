@@ -190,7 +190,7 @@ Health check: `GET /health-check` na API e no site.
 | O quê | Onde se configura | Por quê |
 |---|---|---|
 | `node ace migration:run --force` como comando de pré-deploy da API | Coolify, aplicação da API | o `Dockerfile-production` não tem `ENTRYPOINT`; subir uma réplica não deve alterar o schema |
-| `COOKIE_DOMAIN=.maiyu.com.br` e `CORS_ORIGIN=https://interclass.maiyu.com.br` na API | Coolify, variáveis da API | sem `COOKIE_DOMAIN` o cookie nasce host-only da API e o SSR perde a sessão a cada F5 |
+| `COOKIE_DOMAIN=.maiyu.com.br` e `CORS_ORIGINS=https://interclass.maiyu.com.br` na API | Coolify, variáveis da API | sem `COOKIE_DOMAIN` o cookie nasce host-only da API e o SSR perde a sessão a cada F5 |
 | `SERVER_API_URL` (nome do serviço da API na rede) no site | Coolify, variáveis do site | o SSR chama a API pela rede interna; ausente, usa a URL pública |
 | Healthcheck do painel em `/health-check` | Coolify | o painel sobrepõe o `HEALTHCHECK` do Dockerfile |
 | CORS do bucket com PUT liberado para a origem do site e `ETag` exposto | provedor do storage | sem o `ETag` o upload multipart não fecha |

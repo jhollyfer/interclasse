@@ -57,11 +57,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   /**
    * Origens que o navegador pode usar para chamar esta API, separadas por
-   * vírgula. Opcional porque em desenvolvimento o `config/cors.ts` libera tudo;
+   * vírgula. Obrigatória em produção (`config/cors.ts` derruba o boot sem ela) e
+   * opcional fora dela, onde o CORS libera qualquer origem;
    * fora dele, ausente significa lista vazia, e lista vazia recusa todo pedido
    * cross-origin - que é o default certo para um valor que ninguém configurou.
    */
-  CORS_ORIGIN: Env.schema.string.optional(),
+  CORS_ORIGINS: Env.schema.string.optional(),
 
   /**
    * O domínio do cookie de sessão, quando o app e a API ficam em hosts

@@ -108,7 +108,7 @@ C = confidencialidade, I = integridade, D = disponibilidade.
 - Rota nova no grupo `/storefront`: conferir que a resposta não carrega nome de aluno ou atleta.
 - Rota nova com id no caminho: conferir o escopo pela sessão na consulta.
 - Texto de usuário que chega ao CSV ou ao HTML: conferir a neutralização.
-- Mudança em `COOKIE_DOMAIN`, `CORS_ORIGIN` ou no proxy do Coolify: conferir o cookie e o `sameSite` em produção.
+- Mudança em `COOKIE_DOMAIN`, `CORS_ORIGINS` ou no proxy do Coolify: conferir o cookie e o `sameSite` em produção.
 
 ## 3. Autenticação e sessão
 
@@ -173,7 +173,7 @@ código em 2026-10-29. Status: **aberto** (confirmado no código), **a confirmar
 |---|---|---|---|---|---|
 | SEC-1 | alta | `backend/config/app.ts`, `backend/start/limiter.ts` | sem `trustProxy`, atrás do Traefik do Coolify `request.ip()` é o IP do proxy; o teto de login por IP (5 por minuto, bloqueio de 10 minutos) e o de upload viram globais, e cinco senhas erradas de qualquer pessoa trancam o login de todos | `trustProxy` pela topologia real, com `TRUSTED_PROXIES` no ENV (`_standards/backend.md` §4.10) | aberto: nenhuma ocorrência de `trustProxy` no backend |
 | SEC-2 | média | `backend/config/bodyparser.ts` | nenhuma rota recebe multipart, mas o bodyparser processa `multipart/form-data` em toda rota, com `autoProcess: true` e `limit: '20mb'`; `POST /authentication/refresh` é anônima e sem limite | `autoProcess: false` ou `multipart.limit` mínimo; teto de corpo por grupo | aberto |
-| SEC-3 | média | `backend/app/middleware/origin.middleware.ts`, `backend/app/services/cookie/cookie.service.ts` | a barreira de origem confere só `multipart/form-data` e `application/x-www-form-urlencoded`, sem `text/plain`; o `sameSite` cai para `none` com `CORS_ORIGIN` vazio ou sem domínio-pai em comum | barreira em todo método diferente de GET e HEAD; `sameSite: 'lax'` fixo; `CORS_ORIGIN` obrigatório em produção | aberto |
+| SEC-3 | média | `backend/app/middleware/origin.middleware.ts`, `backend/app/services/cookie/cookie.service.ts` | a barreira de origem confere só `multipart/form-data` e `application/x-www-form-urlencoded`, sem `text/plain`; o `sameSite` cai para `none` com `CORS_ORIGINS` vazio ou sem domínio-pai em comum | barreira em todo método diferente de GET e HEAD; `sameSite: 'lax'` fixo; `CORS_ORIGINS` obrigatório em produção | aberto |
 | SEC-4 | média | `backend/app/exceptions/handler.ts` | o handler não trata a exceção do limiter: o 429 sai no formato da biblioteca, sem `code` estável e sem log do bloqueio | ramo no handler com `HTTPException.TooManyRequests` e `logger.warn` com tag e chave, sem e-mail em claro | aberto |
 | SEC-5 | média | `backend/app/exceptions/handler.ts` | erro desconhecido fora de use-case cai em `super.handle`; em produção a mensagem crua (do `pg`, com tabela e constraint) sai fora do envelope | ramo final: status 500 ou mais sem `HTTPException` vira `InternalServerError` genérico, com o erro só no log | aberto |
 | SEC-6 | baixa | `backend/start/limiter.ts`, `backend/start/routes.ts` | `uploadThrottle` conta por IP e vale para o grupo `storages` inteiro, leituras incluídas: a biblioteca de arquivos gasta a cota de upload, e usuários atrás do mesmo NAT (a escola) a dividem | `usingKey` pelo id do usuário e limite só em `POST /` e `:id/parts` | aberto |

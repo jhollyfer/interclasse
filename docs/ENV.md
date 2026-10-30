@@ -22,7 +22,7 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `APP_KEY` | sim | **sim** | chave de cifra da aplicação | `<segredo>` |
 | `APP_SERVER_URL` | sim | não | endereço público da API | `http://${HOST}:${PORT}` |
 | `TRUSTED_PROXIES` | atrás de proxy | não | proxy reverso confiável para `request.ip()`: um IP, sub-rede ou apelido do `proxy-addr` (`loopback`, `uniquelocal`); ausente vale `loopback`. Nunca `true` | `172.16.0.0/12` |
-| `CORS_ORIGIN` | em produção | não | origens do navegador autorizadas, separadas por vírgula; ausente fora de desenvolvimento recusa todo pedido cross-origin | `https://interclass.maiyu.com.br` |
+| `CORS_ORIGINS` | em produção | não | allowlist do CORS e da barreira de origem (CSRF), separada por vírgula; toda escrita de origem fora dela recebe 403; o boot para sem ela em produção | `https://interclass.maiyu.com.br` |
 | `COOKIE_DOMAIN` | em produção | não | `Domain` dos cookies de sessão: o menor domínio que cobre o site e a API | `.maiyu.com.br` |
 | `DATABASE_URL` | sim | **sim** | conexão com o Postgres | `postgres://<usuario>:<senha>@localhost:5434/<banco>` |
 | `DATABASE_SSL` | não | não | TLS na conexão; `true` para banco gerenciado que exige | `false` |
@@ -48,7 +48,7 @@ Regras:
 - Segredo e credencial **não têm default**: o app não sobe sem eles.
 - `VITE_*` vai para o navegador: nunca segredo. O `frontend/.env.production` é versionado por isso.
 - `VITE_API_URL` é de build: trocar a variável do container não muda nada, só uma nova imagem.
-- Em produção, `CORS_ORIGIN` e `COOKIE_DOMAIN` são exigidas, embora o schema as declare opcionais (em desenvolvimento, vazias é o certo).
+- Em produção, `CORS_ORIGINS` e `COOKIE_DOMAIN` são exigidas (a primeira derruba o boot sem ela), embora o schema as declare opcionais (em desenvolvimento, vazias é o certo).
 - O `Dockerfile-production` da API traz valores de build só para satisfazer o schema durante `node ace build`; em runtime quem injeta é a plataforma.
 
 ## 2. Exemplo
@@ -69,7 +69,7 @@ APP_SERVER_URL=http://${HOST}:${PORT}
 # TRUSTED_PROXIES=172.16.0.0/12
 
 # CORS (produção)
-# CORS_ORIGIN=https://interclass.maiyu.com.br
+CORS_ORIGINS=http://localhost:3001  # produção: https://interclass.maiyu.com.br
 # COOKIE_DOMAIN=.maiyu.com.br
 
 # Banco de dados
