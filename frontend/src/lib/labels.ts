@@ -14,9 +14,13 @@ import type { VariantProps } from 'class-variance-authority'
 
 import type { badgeVariants } from '#/components/ui/badge'
 import { m } from '#/paraglide/messages'
-import { getLocale } from '#/paraglide/runtime'
 
-import { SCHOOL_TIME_ZONE, formatNumber } from './i18n'
+import {
+  formatNumber,
+  formatSchoolDate,
+  schoolDateTime,
+  schoolInputToIso,
+} from './i18n'
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 
@@ -277,98 +281,49 @@ export function initials(name: string | undefined | null): string {
 }
 
 /**
- * O formatador de data no idioma atual e no fuso da escola. Montado a cada uso
- * porque o idioma muda com a URL; o `Intl` guarda o cache dos dados por dentro.
- */
-function schoolFormat(
-  options: Intl.DateTimeFormatOptions,
-): Intl.DateTimeFormat {
-  return new Intl.DateTimeFormat(getLocale(), {
-    ...options,
-    timeZone: SCHOOL_TIME_ZONE,
-  })
-}
-
-/**
- * Data no fuso do servidor, e não com `toLocaleString()` do navegador: o painel
+ * Data no fuso da escola, e não com `toLocaleString()` do navegador: o painel
  * renderiza no SSR, e a mesma data formatada em dois fusos é divergência de
- * hidratação na primeira renderização.
+ * hidratação na primeira renderização. Luxon com `setZone`/`setLocale` em
+ * `lib/i18n.ts`.
  */
 export function formatDate(value: string | null): string {
   if (!value) return '-'
 
-  return schoolFormat({ dateStyle: 'short', timeStyle: 'short' }).format(
-    new Date(value),
-  )
+  return formatSchoolDate(value, { dateStyle: 'short', timeStyle: 'short' })
 }
 
 /** "08:30", ou o relógio vazio de quem ainda não tem horário. */
 export function formatTime(value: string | null): string {
   if (!value) return '--:--'
 
-  return schoolFormat({ hour: '2-digit', minute: '2-digit' }).format(
-    new Date(value),
-  )
+  return formatSchoolDate(value, { hour: '2-digit', minute: '2-digit' })
 }
 
 /** "sexta-feira, 16 de outubro": o título de um dia da agenda. */
 export function formatDay(value: string): string {
-  return schoolFormat({
+  return formatSchoolDate(value, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-  }).format(new Date(value))
+  })
 }
-
-/** `en-CA` porque escreve a data como `2026-10-16`, que serve de chave. */
-const DAY_KEY_FORMAT = new Intl.DateTimeFormat('en-CA', {
-  timeZone: SCHOOL_TIME_ZONE,
-})
 
 /** O dia no relógio da escola, `AAAA-MM-DD`: agrupa jogos do mesmo dia. */
 export function formatDayKey(value: string): string {
-  return DAY_KEY_FORMAT.format(new Date(value))
+  return schoolDateTime(value).toFormat('yyyy-MM-dd')
 }
 
 /** "sex., 16/10, 08:30", ou o aviso de que o horário ainda não saiu. */
 export function formatWhen(value: string | null): string {
   if (!value) return m.label_when_undefined()
 
-  return schoolFormat({
+  return formatSchoolDate(value, {
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(value))
-}
-
-const ZONE_PARTS = new Intl.DateTimeFormat('en-US', {
-  timeZone: SCHOOL_TIME_ZONE,
-  hourCycle: 'h23',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-})
-
-/** Quanto o relógio da escola está à frente do UTC naquele instante, em ms. */
-function schoolOffset(instant: number): number {
-  const part = (type: string) =>
-    Number(
-      ZONE_PARTS.formatToParts(instant).find((item) => item.type === type)
-        ?.value,
-    )
-  const wall = Date.UTC(
-    part('year'),
-    part('month') - 1,
-    part('day'),
-    part('hour'),
-    part('minute'),
-  )
-
-  return wall - Math.floor(instant / 60_000) * 60_000
+  })
 }
 
 /**
@@ -381,16 +336,12 @@ function schoolOffset(instant: number): number {
 export function toSchoolInput(value: string | null): string {
   if (!value) return ''
 
-  const instant = new Date(value).getTime()
-
-  return new Date(instant + schoolOffset(instant)).toISOString().slice(0, 16)
+  return schoolDateTime(value).toFormat("yyyy-MM-dd'T'HH:mm")
 }
 
 /** O inverso: `2026-12-14T08:30` no relógio da escola para ISO. */
 export function fromSchoolInput(value: string): string {
-  const wall = Date.parse(value.concat(':00Z'))
-
-  return new Date(wall - schoolOffset(wall)).toISOString()
+  return schoolInputToIso(value)
 }
 
 /**

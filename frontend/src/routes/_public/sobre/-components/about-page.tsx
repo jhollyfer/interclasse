@@ -1,6 +1,7 @@
 import type { StorefrontSiteShowResponse } from '@interclasse/shared'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 
 import logo512 from '#/assets/logo-512.png'
@@ -16,9 +17,11 @@ import {
   SectionTitle,
 } from '../../-components/section'
 
+const route = getRouteApi('/_public/sobre/')
+
 /** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
-function sinceLabel(firstEditionYear: number): string {
-  const years = new Date().getFullYear() - firstEditionYear
+function sinceLabel(firstEditionYear: number, currentYear: number): string {
+  const years = currentYear - firstEditionYear
   if (years < 1) return m.public_about_since({ year: firstEditionYear })
 
   return m.public_about_since_years({ year: firstEditionYear, years })
@@ -55,6 +58,8 @@ export function AboutPage(): React.JSX.Element {
 function AboutContent({
   site,
 }: Readonly<{ site?: StorefrontSiteShowResponse }>): React.JSX.Element {
+  const { currentYear } = route.useLoaderData()
+
   if (!site || (!site.about && !site.organizer && !site.edition))
     return <Empty>{m.public_about_empty()}</Empty>
 
@@ -69,7 +74,7 @@ function AboutContent({
           <span>{m.public_about_edition({ edition: site.edition })}</span>
         )}
         {site.firstEditionYear && (
-          <span>{sinceLabel(site.firstEditionYear)}</span>
+          <span>{sinceLabel(site.firstEditionYear, currentYear)}</span>
         )}
       </p>
       {paragraphs.map((paragraph) => (

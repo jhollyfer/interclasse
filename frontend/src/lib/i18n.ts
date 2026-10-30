@@ -1,4 +1,5 @@
 import type { LocalizedText } from '@interclasse/shared'
+import { DateTime } from 'luxon'
 
 import { getLocale } from '#/paraglide/runtime'
 
@@ -37,4 +38,39 @@ export function formatNumber(
 /** Valor em reais no idioma atual. */
 export function formatCurrency(value: number): string {
   return formatNumber(value, { style: 'currency', currency: CURRENCY })
+}
+
+/**
+ * O instante da API no relógio da escola e no idioma atual (`frontend.md` §3.5):
+ * `setZone` explícito e `setLocale` do idioma da URL. O fuso do navegador faria
+ * SSR e hidratação renderizarem strings diferentes.
+ */
+export function schoolDateTime(value: string): DateTime {
+  return DateTime.fromISO(value)
+    .setZone(SCHOOL_TIME_ZONE)
+    .setLocale(getLocale())
+}
+
+/**
+ * O ano corrente no relógio da escola. Lido no `loader` da rota, e não no
+ * render: `new Date()` no render diverge entre SSR e hidratação na virada do
+ * ano (`frontend.md` §3.2).
+ */
+export function currentSchoolYear(): number {
+  return DateTime.now().setZone(SCHOOL_TIME_ZONE).year
+}
+
+/** A data da API formatada no relógio da escola e no idioma atual. */
+export function formatSchoolDate(
+  value: string,
+  options: Intl.DateTimeFormatOptions,
+): string {
+  return schoolDateTime(value).toLocaleString(options)
+}
+
+/** `2026-12-14T08:30` no relógio da escola para ISO em UTC. */
+export function schoolInputToIso(value: string): string {
+  return (
+    DateTime.fromISO(value, { zone: SCHOOL_TIME_ZONE }).toUTC().toISO() ?? ''
+  )
 }
