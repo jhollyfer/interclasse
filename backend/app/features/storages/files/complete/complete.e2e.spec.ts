@@ -3,7 +3,6 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import Storage from '#models/storage'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 import {
   authenticateAsAdministrator,
@@ -11,6 +10,7 @@ import {
   resetDatabase,
   type ResponseBody,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
@@ -143,7 +143,7 @@ test.group('storages > complete', (group) => {
 
     // Recusado é recusado: nem a linha nem o binário sobrevivem, e o registro
     // nunca chega a `UPLOADED`.
-    assert.isNull(await Storage.find(opened.storage.id))
+    assert.isNull(await Stored.storage(opened.storage.id))
     assert.isFalse(await drive.use().exists(opened.storage.path))
   })
 
@@ -156,5 +156,38 @@ test.group('storages > complete', (group) => {
     again.assertStatus(200)
     assert.equal(body(again).id, storage.id)
     assert.equal(body(again).status, 'UPLOADED')
+  })
+})
+
+test.group('storages > complete > acesso e identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('sem sessão responde 401', async ({ client }) => {
+    const response = await client
+      .post(`/storages/00000000-0000-4000-8000-000000000000/complete`)
+      .json({})
+
+    response.assertStatus(401)
+  })
+
+  test('id inexistente responde 404', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .post(`/storages/00000000-0000-4000-8000-000000000000/complete`)
+      .cookies(session)
+      .json({})
+
+    response.assertStatus(404)
+    assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
+  })
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.post('/storages/x/complete').cookies(session).json({})
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
   })
 })

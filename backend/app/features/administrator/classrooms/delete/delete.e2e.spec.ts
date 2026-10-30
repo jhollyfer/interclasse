@@ -2,9 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Classroom from '#models/classroom'
-import Student from '#models/student'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawnClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -25,8 +24,8 @@ test.group('classrooms > delete', (group) => {
       .cookies(session)
 
     response.assertStatus(204)
-    assert.isNull(await Classroom.find(classroom.id))
-    assert.lengthOf(await Student.query().where('classroomId', classroom.id), 0)
+    assert.isNull(await Stored.classroom(classroom.id))
+    assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
   test('turma inexistente responde 404', async ({ client, assert }) => {
@@ -50,7 +49,7 @@ test.group('classrooms > delete', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'CLASSROOM_IN_COMPETITION')
-    assert.isNotNull(await Classroom.find(classroom.id))
+    assert.isNotNull(await Stored.classroom(classroom.id))
   })
 
   test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
@@ -65,7 +64,7 @@ test.group('classrooms > delete', (group) => {
       .cookies(advisor)
 
     response.assertStatus(403)
-    assert.isNotNull(await Classroom.find(classroom.id))
+    assert.isNotNull(await Stored.classroom(classroom.id))
   })
 })
 

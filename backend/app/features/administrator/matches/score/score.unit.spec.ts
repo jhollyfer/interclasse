@@ -3,12 +3,12 @@ import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import AdministratorMatchScoreUseCase from './score.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup(total = 4) {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const useCase = await makeWithMemory(
     AdministratorMatchScoreUseCase,
     BracketUnitFixtures.bindings(brackets),
@@ -41,7 +41,7 @@ test.group('administrator/matches > score (unit)', () => {
   })
 
   test('a final encerra a chave', async ({ assert }) => {
-    const brackets = new BracketMemoryRepository()
+    const brackets = MemoryRepositories.brackets()
     const useCase = await makeWithMemory(
       AdministratorMatchScoreUseCase,
       BracketUnitFixtures.bindings(brackets),

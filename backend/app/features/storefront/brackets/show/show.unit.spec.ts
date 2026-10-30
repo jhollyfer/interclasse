@@ -2,12 +2,12 @@ import { test } from '@japa/runner'
 
 import StorefrontBracketShowUseCase from './show.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const useCase = await makeWithMemory(
     StorefrontBracketShowUseCase,
     BracketUnitFixtures.bindings(brackets),

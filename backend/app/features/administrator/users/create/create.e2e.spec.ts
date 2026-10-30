@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 
-import User from '#models/user'
+import { Stored } from '#tests/stored-fixtures'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
@@ -53,7 +53,7 @@ test.group('administrador > users > criação', (group) => {
 
     // O mixin `withAuthFinder` cifra no save: gravar o texto puro deixaria a
     // senha legível no banco, e um hash de hash não deixaria ninguém entrar.
-    const user = await User.findOrFail(body(criado).id)
+    const user = await Stored.userOrFail(body(criado).id)
     assert.notEqual(user.password, payload.password)
 
     const entrada = await client

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Announcement from '#models/announcement'
+import { Stored } from '#tests/stored-fixtures'
 import { AnnouncementFactory } from '#database/factories/announcement.factory'
 import {
   authenticateAsAdministrator,
@@ -73,7 +73,7 @@ test.group('announcements > update', (group) => {
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'title')
-    const stored = await Announcement.findOrFail(announcement.id)
+    const stored = await Stored.announcementOrFail(announcement.id)
     assert.equal(stored.title, announcement.title)
   })
 
@@ -96,7 +96,7 @@ test.group('announcements > update', (group) => {
       response.assertStatus(422)
       assert.property(body(response).errors, 'title')
     }
-    const stored = await Announcement.findOrFail(announcement.id)
+    const stored = await Stored.announcementOrFail(announcement.id)
     assert.equal(stored.title, announcement.title)
   })
 

@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
-import EnrollmentRemoval from '#models/enrollment-removal'
+import { EnrollmentRemovalFactory } from '#database/factories/enrollment-removal.factory'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import {
@@ -18,7 +18,7 @@ test.group('enrollment-removals > paginate', (group) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
-    await EnrollmentRemoval.createMany([
+    await EnrollmentRemovalFactory.merge([
       {
         classroomId: classroom.id,
         sportId: sport.id,
@@ -32,7 +32,7 @@ test.group('enrollment-removals > paginate', (group) => {
         reason: 'Machucou o pé',
         acknowledgedAt: DateTime.now(),
       },
-    ])
+    ]).createMany(2)
 
     const all = await client.get('/administrator/enrollment-removals').cookies(session)
     const pending = await client
@@ -64,5 +64,21 @@ test.group('administrator/enrollment-removals/paginate > acesso e validação', 
     const response = await client.get('/administrator/enrollment-removals')
 
     response.assertStatus(401)
+  })
+})
+
+test.group('administrator/enrollment-removals/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .get('/administrator/enrollment-removals')
+      .qs({ classroomId: 'x' })
+      .cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'classroomId')
   })
 })

@@ -2,27 +2,22 @@ import { randomUUID } from 'node:crypto'
 
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import {
-  UPLOAD_STATUS,
-  type AdministratorSiteRegulationResponse,
-  type AdministratorSiteShowResponse,
-  type StorefrontSiteShowResponse,
-} from '@interclasse/shared'
+import { UPLOAD_STATUS } from '@interclasse/shared'
 
-import { SiteSettingRepository } from './site-setting.repository.ts'
+import {
+  SiteSettingRepository,
+  type PublicSiteSettingRead,
+  type SiteSettingRead,
+} from './site-setting.repository.ts'
 
 import SiteSettingModel from '#models/site-setting'
 import StorageModel from '#models/storage'
 import { SiteSetting, type RegulationFile } from '#domain/site-setting/site-setting.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
-import { StorageContract } from '#services/storage/storage.contract'
 
 @inject()
 export class SiteSettingLucidRepository extends SiteSettingRepository {
-  constructor(
-    private readonly transaction: TransactionContext,
-    private readonly bucket: StorageContract,
-  ) {
+  constructor(private readonly transaction: TransactionContext) {
     super()
   }
 
@@ -72,7 +67,7 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
     )
   }
 
-  async show(): Promise<AdministratorSiteShowResponse> {
+  async show(): Promise<SiteSettingRead> {
     const current = await this.current()
     const setting = current.snapshot()
     const regulation = await this.regulationOf(setting.regulationId)
@@ -86,13 +81,13 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
       schoolInstagram: setting.schoolInstagram,
       developerInstagram: setting.developerInstagram,
       regulationId: setting.regulationId,
-      regulation: await this.toRegulationResponse(regulation),
+      regulation: this.toRegulationResponse(regulation),
       createdAt: setting.createdAt.toISOString(),
       updatedAt: setting.updatedAt?.toISOString() ?? null,
     }
   }
 
-  async showPublic(): Promise<StorefrontSiteShowResponse> {
+  async showPublic(): Promise<PublicSiteSettingRead> {
     const current = await this.current()
     const setting = current.snapshot()
     const regulation = await this.regulationOf(setting.regulationId)
@@ -105,7 +100,7 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
       schoolInstagram: setting.schoolInstagram,
       developerInstagram: setting.developerInstagram,
       regulation: regulation && {
-        url: await this.bucket.signedUrl(regulation.path),
+        path: regulation.path,
         originalName: regulation.originalName,
         size: regulation.size,
       },
@@ -134,9 +129,7 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
     })
   }
 
-  private async toRegulationResponse(
-    file: StorageModel | null,
-  ): Promise<AdministratorSiteRegulationResponse | null> {
+  private toRegulationResponse(file: StorageModel | null): SiteSettingRead['regulation'] {
     if (!file) return null
 
     return {
@@ -149,7 +142,6 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
       status: file.status,
       partSize: file.partSize,
       uploadId: file.uploadId,
-      url: await this.bucket.signedUrl(file.path),
       createdAt: file.createdAt?.toISO() ?? null,
       updatedAt: file.updatedAt?.toISO() ?? null,
       deletedAt: file.deletedAt?.toISO() ?? null,

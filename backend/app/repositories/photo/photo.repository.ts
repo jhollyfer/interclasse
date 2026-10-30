@@ -7,6 +7,19 @@ import type {
 
 import type { Photo } from '#domain/photo/photo.entity'
 
+/**
+ * A foto na forma da resposta do painel, com o arquivo sem a `url`: assinar é do
+ * use-case, pelo contrato do bucket (`_standards/architecture.md` §2).
+ */
+export type PhotoRead = Omit<AdministratorPhotoShowResponse, 'storage'> & {
+  readonly storage: Omit<AdministratorPhotoShowResponse['storage'], 'url'>
+}
+
+/** A foto aprovada do site: a resposta sem a `url`, com o `path` para o use-case assinar. */
+export type ApprovedPhotoRead = Omit<StorefrontPhotoShowResponse, 'url'> & {
+  readonly path: string
+}
+
 export type PhotoListCriteria = {
   readonly page: number
   readonly perPage: number
@@ -34,11 +47,11 @@ export abstract class PhotoRepository {
   abstract save(photo: Photo): Promise<void>
   abstract delete(photo: Photo): Promise<void>
   /** Leitura leve: a foto com o arquivo e quem enviou, direto da query. */
-  abstract show(id: string): Promise<AdministratorPhotoShowResponse | null>
-  abstract paginate(criteria: PhotoListCriteria): Promise<Paginated<AdministratorPhotoShowResponse>>
+  abstract show(id: string): Promise<PhotoRead | null>
+  abstract paginate(criteria: PhotoListCriteria): Promise<Paginated<PhotoRead>>
   /** O carrossel do site: só as aprovadas, sem autor. */
   abstract paginateApproved(criteria: {
     readonly page: number
     readonly perPage: number
-  }): Promise<Paginated<StorefrontPhotoShowResponse>>
+  }): Promise<Paginated<ApprovedPhotoRead>>
 }

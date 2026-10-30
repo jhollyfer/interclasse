@@ -3,9 +3,9 @@ import { randomUUID } from 'node:crypto'
 import { test } from '@japa/runner'
 import { CATEGORY } from '@interclasse/shared'
 
-import Classroom from '#models/classroom'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { UserFactory } from '#database/factories/user.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawnClassroom } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -192,7 +192,7 @@ test.group('classrooms > update', (group) => {
       .json({ name: 'Invasão' })
 
     response.assertStatus(403)
-    const intacta = await Classroom.findOrFail(classroom.id)
+    const intacta = await Stored.classroomOrFail(classroom.id)
     assert.equal(intacta.name, classroom.name)
   })
 
@@ -207,7 +207,7 @@ test.group('classrooms > update', (group) => {
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'name')
-    const stored = await Classroom.findOrFail(classroom.id)
+    const stored = await Stored.classroomOrFail(classroom.id)
     assert.equal(stored.name, classroom.name)
   })
 })

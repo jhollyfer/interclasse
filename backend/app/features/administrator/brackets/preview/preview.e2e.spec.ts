@@ -66,3 +66,20 @@ test.group('administrator/brackets/preview > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/brackets/preview > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('modalidade malformada e categoria ausente respondem 422 apontando os campos', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/administrator/brackets/preview?sportId=x').cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'sportId')
+    assert.property(body(response).errors, 'category')
+  })
+})

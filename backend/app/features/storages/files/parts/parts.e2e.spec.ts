@@ -143,3 +143,33 @@ test.group('storages > parts', (group) => {
     assert.equal(body(response).storage.status, 'UPLOADED')
   })
 })
+
+test.group('storages > parts > acesso e identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('sem sessão responde 401', async ({ client }) => {
+    const response = await client.get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
+
+    response.assertStatus(401)
+  })
+
+  test('id inexistente responde 404', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
+      .cookies(session)
+
+    response.assertStatus(404)
+    assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
+  })
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/storages/x/parts').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
+  })
+})

@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import MatchCard from '#models/match-card'
 import { StudentFactory } from '#database/factories/student.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -28,7 +28,7 @@ test.group('cards > create', (group) => {
     assert.equal(body(response).teamId, awayTeam.id)
     assert.equal(body(response).student.name, awayStudent.name)
     assert.equal(body(response).match.id, match.id)
-    assert.lengthOf(await MatchCard.all(), 1)
+    assert.lengthOf(await Stored.cards(), 1)
   })
 
   test('atleta de turma que não joga a partida responde 422', async ({ client, assert }) => {
@@ -43,7 +43,7 @@ test.group('cards > create', (group) => {
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'STUDENT_NOT_IN_MATCH')
-    assert.lengthOf(await MatchCard.all(), 0)
+    assert.lengthOf(await Stored.cards(), 0)
   })
 
   test('partida inexistente responde 422', async ({ client, assert }) => {

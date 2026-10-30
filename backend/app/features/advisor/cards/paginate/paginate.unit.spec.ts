@@ -7,19 +7,18 @@ import AdvisorCardPaginateUseCase from './paginate.use-case.ts'
 
 import { MatchCard } from '#domain/match-card/match-card.entity'
 import { Classroom } from '#domain/classroom/classroom.entity'
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = { id: randomUUID(), role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const drawn = await BracketUnitFixtures.drawn(brackets)
   const cards = BracketUnitFixtures.cards(brackets, drawn.students)
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
   const useCase = await makeWithMemory(AdvisorCardPaginateUseCase, [
     ...BracketUnitFixtures.cardBindings(brackets, cards),
     [ClassroomRepository, classrooms],

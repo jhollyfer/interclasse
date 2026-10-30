@@ -1,14 +1,17 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { UPLOAD_STATUS } from '@interclasse/shared'
-import type { Paginated, StoragesFileShowResponse } from '@interclasse/shared'
+import type { Paginated } from '@interclasse/shared'
 
-import { StorageRepository, type StorageListCriteria } from './storage.repository.ts'
+import {
+  StorageRepository,
+  type StorageFileRead,
+  type StorageListCriteria,
+} from './storage.repository.ts'
 
 import StorageModel from '#models/storage'
 import { Storage } from '#domain/storage/storage.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
-import { StorageContract } from '#services/storage/storage.contract'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
@@ -27,10 +30,7 @@ const REFERENCES = [
 
 @inject()
 export class StorageLucidRepository extends StorageRepository {
-  constructor(
-    private readonly transaction: TransactionContext,
-    private readonly bucket: StorageContract,
-  ) {
+  constructor(private readonly transaction: TransactionContext) {
     super()
   }
 
@@ -44,7 +44,7 @@ export class StorageLucidRepository extends StorageRepository {
     return this.toEntity(row)
   }
 
-  async detail(id: string): Promise<StoragesFileShowResponse | null> {
+  async detail(id: string): Promise<StorageFileRead | null> {
     const row = await StorageModel.query({ client: this.transaction.client() })
       .where('id', id)
       .withScopes((scopes) => scopes.notDeleted())
@@ -54,14 +54,14 @@ export class StorageLucidRepository extends StorageRepository {
     return this.toResponse(row)
   }
 
-  async detailsOf(ids: ReadonlyArray<string>): Promise<StoragesFileShowResponse[]> {
+  async detailsOf(ids: ReadonlyArray<string>): Promise<StorageFileRead[]> {
     if (ids.length === 0) return []
 
     const rows = await StorageModel.query({ client: this.transaction.client() })
       .whereIn('id', [...new Set(ids)])
       .withScopes((scopes) => scopes.notDeleted())
 
-    return Promise.all(rows.map((row) => this.toResponse(row)))
+    return rows.map((row) => this.toResponse(row))
   }
 
   async areAttachable(ids: ReadonlyArray<string>): Promise<boolean> {
@@ -112,7 +112,7 @@ export class StorageLucidRepository extends StorageRepository {
     await StorageModel.query({ client: this.transaction.client() }).where('id', storage.id).delete()
   }
 
-  async paginate(criteria: StorageListCriteria): Promise<Paginated<StoragesFileShowResponse>> {
+  async paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>> {
     const query = StorageModel.query({ client: this.transaction.client() }).withScopes((scopes) =>
       scopes.notDeleted(),
     )
@@ -139,7 +139,7 @@ export class StorageLucidRepository extends StorageRepository {
 
     return {
       meta: page.getMeta(),
-      data: await Promise.all(page.all().map((row) => this.toResponse(row))),
+      data: page.all().map((row) => this.toResponse(row)),
     }
   }
 
@@ -160,8 +160,8 @@ export class StorageLucidRepository extends StorageRepository {
     })
   }
 
-  /** A `url` é assinada aqui, pelo contrato do bucket, a cada leitura (_standards/backend.md §4.7). */
-  private async toResponse(row: StorageModel): Promise<StoragesFileShowResponse> {
+  /** A `url` não sai daqui: o use-case a assina, pelo contrato do bucket, a cada leitura. */
+  private toResponse(row: StorageModel): StorageFileRead {
     return {
       id: row.id,
       filename: row.filename,
@@ -175,7 +175,6 @@ export class StorageLucidRepository extends StorageRepository {
       createdAt: row.createdAt?.toISO() ?? null,
       updatedAt: row.updatedAt?.toISO() ?? null,
       deletedAt: row.deletedAt?.toISO() ?? null,
-      url: await this.bucket.signedUrl(row.path),
     }
   }
 

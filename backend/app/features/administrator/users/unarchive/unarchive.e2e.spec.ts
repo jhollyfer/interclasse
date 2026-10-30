@@ -4,7 +4,7 @@ import { test } from '@japa/runner'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
-import User from '#models/user'
+import { Stored } from '#tests/stored-fixtures'
 import { FACTORY_PASSWORD, UserFactory } from '#database/factories/user.factory'
 import {
   authenticate,
@@ -29,7 +29,7 @@ test.group('users > unarchive', (group) => {
       .cookies(session)
 
     response.assertStatus(204)
-    const restored = await User.findOrFail(user.id)
+    const restored = await Stored.userOrFail(user.id)
     assert.isNull(restored.deletedAt)
 
     // Nenhum token nasce da restauração: quem volta entra pelo sign-in.
@@ -81,7 +81,7 @@ test.group('users > unarchive', (group) => {
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')
-    const archived = await User.findOrFail(user.id)
+    const archived = await Stored.userOrFail(user.id)
     assert.isNotNull(archived.deletedAt)
   })
 })

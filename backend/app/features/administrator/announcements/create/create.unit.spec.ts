@@ -3,11 +3,11 @@ import { test } from '@japa/runner'
 import AdministratorAnnouncementCreateUseCase from './create.use-case.ts'
 
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
-import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const announcements = new AnnouncementMemoryRepository()
+  const announcements = MemoryRepositories.announcements()
   const useCase = await makeWithMemory(AdministratorAnnouncementCreateUseCase, [
     [AnnouncementRepository, announcements],
   ])

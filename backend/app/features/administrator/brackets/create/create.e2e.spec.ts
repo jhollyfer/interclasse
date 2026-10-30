@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import { CATEGORY, MATCH_PHASE } from '@interclasse/shared'
 
+import { Stored } from '#tests/stored-fixtures'
 import { createSport, draw, enrolledClassrooms } from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,
@@ -116,5 +117,26 @@ test.group('administrator/brackets/create > acesso e validação', (group) => {
     const response = await client.post('/administrator/brackets').cookies(advisor)
 
     response.assertStatus(403)
+  })
+})
+
+test.group('administrator/brackets/create > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('modalidade malformada e categoria fora da lista respondem 422, e nada é sorteado', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .post('/administrator/brackets')
+      .cookies(admin)
+      .json({ sportId: 'x', category: 'F9' })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'sportId')
+    assert.property(body(response).errors, 'category')
+    assert.lengthOf(await Stored.brackets(), 0)
   })
 })

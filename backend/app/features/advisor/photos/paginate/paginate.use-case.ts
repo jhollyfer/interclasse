@@ -13,6 +13,8 @@ import {
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
+import { PhotoReadBase } from '#features/_shared.photo-read.base'
+import { StorageContract } from '#services/storage/storage.contract'
 import type { AdvisorPhotoPaginatePayload } from '#validators/advisor/photos.validator'
 
 type Payload = Merge<AdvisorPhotoPaginatePayload, { actor: { readonly id: string } }>
@@ -20,20 +22,21 @@ type Response = Either<HTTPException, Paginated<AdvisorPhotoShowResponse>>
 
 /** As fotos que o conselheiro enviou, com a decisão da organização em cada uma. */
 @inject()
-export default class AdvisorPhotoPaginateUseCase {
-  constructor(
-    private readonly photos: PhotoRepository,
-    private readonly i18n: I18n,
-  ) {}
+export default class AdvisorPhotoPaginateUseCase extends PhotoReadBase {
+  constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {
+    super(photos, bucket, i18n)
+  }
 
   async execute(payload: Payload): Promise<Response> {
     try {
       return right(
-        await this.photos.paginate({
-          page: payload.page ?? PAGINATION.PAGE,
-          perPage: payload.perPage ?? PAGINATION.PER_PAGE,
-          authorId: payload.actor.id,
-        }),
+        await this.signedPage(
+          await this.photos.paginate({
+            page: payload.page ?? PAGINATION.PAGE,
+            perPage: payload.perPage ?? PAGINATION.PER_PAGE,
+            authorId: payload.actor.id,
+          }),
+        ),
       )
     } catch (error) {
       logger.error({ err: error }, '[advisor/photos > paginate][error]')

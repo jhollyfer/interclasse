@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Announcement from '#models/announcement'
+import { Stored } from '#tests/stored-fixtures'
 import { AnnouncementFactory } from '#database/factories/announcement.factory'
 import {
   authenticateAsAdministrator,
@@ -24,7 +24,7 @@ test.group('announcements > delete', (group) => {
 
     response.assertStatus(204)
     assert.isEmpty(response.text())
-    assert.isNull(await Announcement.find(announcement.id))
+    assert.isNull(await Stored.announcement(announcement.id))
   })
 
   test('aviso inexistente responde 404', async ({ client, assert }) => {
@@ -50,7 +50,7 @@ test.group('announcements > delete', (group) => {
     anonymous.assertStatus(401)
     forbidden.assertStatus(403)
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
-    assert.isNotNull(await Announcement.find(announcement.id))
+    assert.isNotNull(await Stored.announcement(announcement.id))
   })
 })
 

@@ -7,6 +7,7 @@ import { left, right, type AdministratorUserShowResponse, type Either } from '@i
 
 import { User } from '#domain/user/user.entity'
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserRepository } from '#repositories/user/user.repository'
 import { FileRefusal } from '#features/storages/files/_shared.file-refusal'
@@ -29,6 +30,7 @@ export default class AdministratorUserCreateUseCase {
   constructor(
     private readonly users: UserRepository,
     private readonly storages: StorageRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -65,7 +67,10 @@ export default class AdministratorUserCreateUseCase {
       if (!detail)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right(detail)
+      return right({
+        ...detail,
+        avatar: detail.avatar && (await this.bucket.withUrl(detail.avatar)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[administrator/users > create][error]')
 

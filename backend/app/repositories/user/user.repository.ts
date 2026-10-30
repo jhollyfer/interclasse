@@ -9,7 +9,16 @@ import type {
 import type { Either } from '@interclasse/shared'
 
 import type { User } from '#domain/user/user.entity'
+import type { StorageFileRead } from '#repositories/storage/storage.repository'
 import type { UserError } from '#domain/user/user.errors'
+
+/**
+ * A conta na forma da resposta, com o avatar sem a `url`: assinar é do use-case, pelo
+ * contrato do bucket (`_standards/architecture.md` §2, `StorageContract.withUrl`).
+ */
+export type UserRead = Omit<AdministratorUserShowResponse, 'avatar'> & {
+  readonly avatar: StorageFileRead | null
+}
 
 export type UserListCriteria = {
   readonly page: number
@@ -45,7 +54,7 @@ export abstract class UserRepository {
   /** Grava a conta; o e-mail de outra conta (a corrida no `unique`) volta como `USER_ALREADY_EXISTS`. */
   abstract save(user: User): Promise<Either<UserError, void>>
   abstract delete(user: User): Promise<void>
-  /** Leitura leve da conta viva, com o avatar: a forma da resposta, sem a senha. */
-  abstract detail(id: string): Promise<AdministratorUserShowResponse | null>
-  abstract paginate(criteria: UserListCriteria): Promise<Paginated<AdministratorUserShowResponse>>
+  /** Leitura leve da conta viva, com o avatar (sem a `url`): a forma da resposta, sem a senha. */
+  abstract detail(id: string): Promise<UserRead | null>
+  abstract paginate(criteria: UserListCriteria): Promise<Paginated<UserRead>>
 }

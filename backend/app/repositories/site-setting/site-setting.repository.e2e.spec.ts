@@ -48,7 +48,6 @@ const IMPLEMENTATIONS = {
           status: UPLOAD_STATUS.UPLOADED,
           partSize: null,
           uploadId: null,
-          url: 'https://bucket.test/arquivo',
           createdAt: null,
           updatedAt: null,
           deletedAt: null,
@@ -138,8 +137,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(shown.regulation?.id, id)
       assert.equal(shown.edition, 4)
       assert.equal(publicView.edition, 4)
-      assert.isString(publicView.regulation?.url)
-      assert.notProperty(publicView.regulation, 'path')
+      assert.equal(publicView.regulation?.path, shown.regulation?.path)
     })
   })
 }

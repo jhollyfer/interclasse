@@ -67,3 +67,19 @@ test.group('administrator/matches/athletes > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/matches/athletes > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id de partida malformado responde 422 em vez de 500 do Postgres', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/administrator/matches/x/athletes').cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
+  })
+})

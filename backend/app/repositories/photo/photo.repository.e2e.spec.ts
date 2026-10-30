@@ -50,7 +50,6 @@ const IMPLEMENTATIONS = {
         size: 1,
         path: 'a.png',
         status: UPLOAD_STATUS.UPLOADED,
-        url: 'http://bucket/a.png',
         createdAt: null,
         updatedAt: null,
         deletedAt: null,
@@ -170,7 +169,8 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
         [approved.id],
       )
       assert.notProperty(page.data[0] ?? {}, 'authorId')
-      assert.isString(page.data[0]?.url)
+      const shown = await arranged.repository.show(approved.id)
+      assert.equal(page.data[0]?.path, shown?.storage.path)
     })
 
     test('delete tira a foto', async ({ assert }) => {

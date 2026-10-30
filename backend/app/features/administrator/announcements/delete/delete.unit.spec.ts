@@ -4,13 +4,13 @@ import AdministratorAnnouncementDeleteUseCase from './delete.use-case.ts'
 
 import { Announcement } from '#domain/announcement/announcement.entity'
 import { AnnouncementRepository } from '#repositories/announcement/announcement.repository'
-import { AnnouncementMemoryRepository } from '#repositories/announcement/announcement.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 
 async function setup() {
-  const announcements = new AnnouncementMemoryRepository()
+  const announcements = MemoryRepositories.announcements()
   await announcements.save(
     Announcement.create({ id: ID, title: 'Vencido', body: 'Já passou', now: new Date() }),
   )

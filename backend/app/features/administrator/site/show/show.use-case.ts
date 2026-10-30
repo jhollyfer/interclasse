@@ -5,6 +5,7 @@ import { left, right, type AdministratorSiteShowResponse, type Either } from '@i
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 
 type Response = Either<HTTPException, AdministratorSiteShowResponse>
 
@@ -12,12 +13,18 @@ type Response = Either<HTTPException, AdministratorSiteShowResponse>
 export default class AdministratorSiteShowUseCase {
   constructor(
     private readonly settings: SiteSettingRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
   async execute(): Promise<Response> {
     try {
-      return right(await this.settings.show())
+      const setting = await this.settings.show()
+
+      return right({
+        ...setting,
+        regulation: setting.regulation && (await this.bucket.withUrl(setting.regulation)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[administrator/site > show][error]')
 

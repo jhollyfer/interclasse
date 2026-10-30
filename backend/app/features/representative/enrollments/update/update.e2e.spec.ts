@@ -2,10 +2,10 @@ import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
 
-import Enrollment from '#models/enrollment'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
+import { Stored } from '#tests/stored-fixtures'
 import { drawSport, signInAsRepresentativeOfClassroom } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
@@ -46,7 +46,7 @@ test.group('enrollments > update', (group) => {
     )
     acima.assertStatus(422)
     assert.equal(body(acima).code, 'ENROLLMENT_LIMIT_EXCEEDED')
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 3)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 3)
   })
 
   test('tirar atleta já inscrito é do conselheiro: 403', async ({ client, assert }) => {
@@ -63,7 +63,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ENROLLMENT_REMOVAL_FORBIDDEN')
-    const enrolled = await Enrollment.query().where('sportId', sport.id)
+    const enrolled = await Stored.enrollmentsOfSport(sport.id)
     assert.deepEqual(
       enrolled.map((enrollment) => enrollment.studentId),
       [inscrito.id],
@@ -82,7 +82,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 0)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 0)
   })
 
   test('modalidade inexistente responde 422', async ({ client, assert }) => {
@@ -110,7 +110,7 @@ test.group('enrollments > update', (group) => {
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'ENROLLMENT_LOCKED')
-    assert.lengthOf(await Enrollment.query().where('sportId', sport.id), 0)
+    assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 0)
   })
 
   test('representante sem turma vinculada responde 404', async ({ client, assert }) => {

@@ -1,7 +1,6 @@
 import { test } from '@japa/runner'
 import { UPLOAD_STATUS } from '@interclasse/shared'
 
-import User from '#models/user'
 import { UserFactory } from '#database/factories/user.factory'
 import {
   ADMINISTRATOR,
@@ -10,6 +9,7 @@ import {
   body,
   resetDatabase,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 import { storageRow } from '#tests/storages-fixtures'
 
 /**
@@ -42,7 +42,7 @@ test.group('conta > atualização', (group) => {
     assert.equal(body(response).email, ADMINISTRATOR.email)
 
     // E a linha no banco também: nem `email` nem `role` foram tocados.
-    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
     assert.equal(user.name, 'Outro Nome')
     assert.equal(user.role, 'ADMINISTRATOR')
   })
@@ -151,7 +151,7 @@ test.group('conta > atualização', (group) => {
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'name')
-    const user = await User.findByOrFail('email', ADMINISTRATOR.email)
+    const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
     assert.notEqual(user.name.trim(), '')
   })
 })

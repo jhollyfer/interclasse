@@ -3,12 +3,12 @@ import { MATCH_PHASE } from '@interclasse/shared'
 
 import AdministratorMatchPaginateUseCase from './paginate.use-case.ts'
 
-import { BracketMemoryRepository } from '#repositories/bracket/bracket.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 async function setup() {
-  const brackets = new BracketMemoryRepository()
+  const brackets = MemoryRepositories.brackets()
   const useCase = await makeWithMemory(
     AdministratorMatchPaginateUseCase,
     BracketUnitFixtures.bindings(brackets),

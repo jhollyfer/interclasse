@@ -4,7 +4,7 @@ import { USER_ROLE, type UserRole } from '@interclasse/shared'
 import AdministratorClassroomCreateUseCase from './create.use-case.ts'
 
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
-import { ClassroomMemoryRepository } from '#repositories/classroom/classroom.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const ADVISOR = '11111111-1111-4111-8111-111111111111'
@@ -25,7 +25,7 @@ function account(id: string, role: UserRole) {
 }
 
 async function setup() {
-  const classrooms = new ClassroomMemoryRepository()
+  const classrooms = MemoryRepositories.classrooms()
     .withAccount(account(ADVISOR, USER_ROLE.ADVISOR))
     .withAccount(account(REPRESENTATIVE, USER_ROLE.REPRESENTATIVE))
   const useCase = await makeWithMemory(AdministratorClassroomCreateUseCase, [

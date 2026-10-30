@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import { CATEGORY } from '@interclasse/shared'
 
+import { Stored } from '#tests/stored-fixtures'
 import {
   authenticateAsAdministrator,
   body,
@@ -74,5 +75,26 @@ test.group('administrator/classrooms/create > acesso e validação', (group) => 
     const response = await client.post('/administrator/classrooms').cookies(advisor)
 
     response.assertStatus(403)
+  })
+})
+
+test.group('administrator/classrooms/create > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('nome vazio e ano fora do 3º ao 9º respondem 422 apontando os campos, e nada é gravado', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .post('/administrator/classrooms')
+      .cookies(admin)
+      .json({ name: '   ', grade: 1 })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'name')
+    assert.property(body(response).errors, 'grade')
+    assert.lengthOf(await Stored.classrooms(), 0)
   })
 })

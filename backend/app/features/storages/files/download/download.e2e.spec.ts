@@ -172,3 +172,16 @@ test.group('storages > contentDisposition', () => {
     assert.include(header, 'filename="nota _final_.pdf"')
   })
 })
+
+test.group('storages > download > identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.get('/storages/x/download').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
+  })
+})

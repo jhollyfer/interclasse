@@ -7,6 +7,7 @@ import { SiteRefusal } from '../_shared.site-refusal.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import type { RegulationFile } from '#domain/site-setting/site-setting.entity'
 import type { AdministratorSiteUpdatePayload } from '#validators/administrator/site.validator'
 
@@ -21,6 +22,7 @@ type Response = Either<HTTPException, AdministratorSiteShowResponse>
 export default class AdministratorSiteUpdateUseCase {
   constructor(
     private readonly settings: SiteSettingRepository,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -36,7 +38,12 @@ export default class AdministratorSiteUpdateUseCase {
 
       await this.settings.save(setting)
 
-      return right(await this.settings.show())
+      const shown = await this.settings.show()
+
+      return right({
+        ...shown,
+        regulation: shown.regulation && (await this.bucket.withUrl(shown.regulation)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[administrator/site > update][error]')
 

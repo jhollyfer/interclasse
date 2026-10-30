@@ -4,7 +4,7 @@ import { UPLOAD_STATUS } from '@interclasse/shared'
 import AdministratorSiteUpdateUseCase from './update.use-case.ts'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
-import { SiteSettingMemoryRepository } from '#repositories/site-setting/site-setting.memory.repository'
+import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
@@ -29,7 +29,7 @@ function file(id: string, mimetype: string) {
 }
 
 async function setup() {
-  const settings = new SiteSettingMemoryRepository()
+  const settings = MemoryRepositories.siteSettings()
     .withFile(file(PDF_ID, 'application/pdf'))
     .withFile(file(PNG_ID, 'image/png'))
   const useCase = await makeWithMemory(AdministratorSiteUpdateUseCase, [

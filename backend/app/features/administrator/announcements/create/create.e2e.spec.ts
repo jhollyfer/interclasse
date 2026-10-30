@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
 
-import Announcement from '#models/announcement'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
   body,
   resetDatabase,
 } from '#tests/http-fixtures'
+import { Stored } from '#tests/stored-fixtures'
 
 const payload = { title: 'Troca de horário', body: 'O futsal passa para as 14h.' }
 
@@ -28,7 +28,7 @@ test.group('announcements > create', (group) => {
     // O `DEFAULT` do banco, relido depois do insert.
     assert.isFalse(body(response).pinned)
     assert.isString(body(response).createdAt)
-    assert.isNotNull(await Announcement.find(body(response).id))
+    assert.isNotNull(await Stored.announcement(body(response).id))
   })
 
   test('`pinned: true` publica o aviso fixado', async ({ client, assert }) => {
@@ -67,6 +67,6 @@ test.group('announcements > create', (group) => {
     anonymous.assertStatus(401)
     forbidden.assertStatus(403)
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
-    assert.isNull(await Announcement.findBy('title', payload.title))
+    assert.isNull(await Stored.announcementByTitle(payload.title))
   })
 })

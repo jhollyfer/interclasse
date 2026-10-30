@@ -12,6 +12,7 @@ import {
 } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
+import { StorageContract } from '#services/storage/storage.contract'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UserRepository } from '#repositories/user/user.repository'
@@ -34,6 +35,7 @@ export default class AccountProfileUpdateUseCase {
     private readonly storages: StorageRepository,
     private readonly sessions: SessionRepository,
     private readonly unitOfWork: UnitOfWork,
+    private readonly bucket: StorageContract,
     private readonly i18n: I18n,
   ) {}
 
@@ -100,7 +102,10 @@ export default class AccountProfileUpdateUseCase {
       if (!profile)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      return right(profile)
+      return right({
+        ...profile,
+        avatar: profile.avatar && (await this.bucket.withUrl(profile.avatar)),
+      })
     } catch (error) {
       logger.error({ err: error }, '[account/profile > update][error]')
 
