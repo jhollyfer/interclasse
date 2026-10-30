@@ -71,6 +71,8 @@ export const Route = createFileRoute('/_private')({
     return {
       meta: [
         { title: [title, m.common_site_title()].filter(Boolean).join(' | ') },
+        // Área restrita fora do índice (`frontend.md` §9.7).
+        { name: 'robots', content: 'noindex, nofollow' },
       ],
     }
   },
