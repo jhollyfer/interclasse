@@ -40,6 +40,12 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+function saved(previewUrl: string | null | undefined): string | null {
+  if (previewUrl) return 'saved'
+
+  return null
+}
+
 function Harness({
   onValueChange,
   previewUrl,
@@ -47,12 +53,10 @@ function Harness({
   onValueChange: (id: string | null) => void
   previewUrl?: string | null
 }>) {
-  const [value, setValue] = React.useState<string | null>(
-    previewUrl ? 'saved' : null,
+  const [value, setValue] = React.useState<string | null>(saved(previewUrl))
+  const [queryClient] = React.useState(
+    () => new QueryClient({ defaultOptions: { mutations: { retry: false } } }),
   )
-  const queryClient = new QueryClient({
-    defaultOptions: { mutations: { retry: false } },
-  })
 
   return (
     <QueryClientProvider client={queryClient}>

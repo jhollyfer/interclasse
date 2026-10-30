@@ -124,7 +124,7 @@ describe('ClassroomDetail', () => {
       await screen.findByRole('heading', { level: 1, name: '6º A' }),
     ).toBeTruthy()
     expect(
-      screen.getAllByText(CATEGORY_LABELS[CATEGORY.F2]).length,
+      screen.getAllByText(String(CATEGORY_LABELS[CATEGORY.F2])).length,
     ).toBeGreaterThan(0)
     expect(await screen.findByText('Marta')).toBeTruthy()
     expect(await screen.findByText('Caio')).toBeTruthy()
