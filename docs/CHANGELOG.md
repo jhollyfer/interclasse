@@ -6,7 +6,11 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ## [Não lançado]
 
-Nada além do que está em 0.1.0.
+### Alterado
+
+- A tela de entrada do painel passa de `/authentication` para `/sign-in`.
+- `robots.txt` e `sitemap.xml` passam a ser gerados pelo servidor: o mapa do site lista as páginas públicas e as chaves, uma entrada por idioma, e fora de produção o `robots.txt` proíbe a indexação.
+- O layout salvo das tabelas (colunas escondidas, ordem, largura) volta ao padrão uma vez, porque a chave de armazenamento mudou.
 
 ## [0.1.0] - 2026-10-29
 

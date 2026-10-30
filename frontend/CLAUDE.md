@@ -21,17 +21,9 @@ Aqui fica só o que este projeto faz diferente dela, e os comandos.
   a ser um pacote só quando o `typescript-eslint` aceitar o 7.
 - **`vitest.config.ts` próprio.** Os plugins do Start e do Nitro carregavam o
   React CJS no runner do Vitest. O glob inclui `scripts/**/*.test.ts`.
-- **`authentication/` continua com path**, e não `_authentication/` pathless:
-  sem o segmento, o login cairia em `/`, a home pública.
-- **`request<T>` tem um `as` de fronteira** (`integrations/tanstack-query/http.ts`):
-  o corpo de sucesso não tem schema no cliente. O corpo de erro é estreitado.
-- **`lib/upload-resume.ts` estreita o `localStorage` com type guard**, e não
-  com schema: é uma forma pequena, lida em caminho síncrono.
 - **ESLint**: o `no-restricted-syntax` de `new *Controller` ignora o
   `AbortController` (API da plataforma); `import-x/order` não roda em
   `components/ui/**` (saída do shadcn).
-- **Kit comum sem `rich-editor/` e `multi-file-upload/`**: nenhuma tela do
-  domínio tem texto rico nem envio de vários arquivos.
 - **Tabela sem contexto para a instância**: o `React.Context` perde o genérico
   do TanStack Table e cobraria um `as`, então ela vai por prop
   (`components/common/table/table-context.ts`).
