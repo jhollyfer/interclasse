@@ -3,7 +3,7 @@ import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import { middlewareInfo } from '@adonisjs/core/http/helpers'
 
-import { FIELD_PATCHES } from '#core/openapi/field-patches'
+import { FIELD_PATCHES } from '#scripts/openapi/field-patches'
 import openapi, {
   ACTION_OVERRIDES,
   SECURITY_COOKIE,
@@ -23,19 +23,8 @@ import {
   errorSchema,
   forbiddenDescription,
 } from '#scripts/openapi/errors'
-import {
-  PAGINATION_META_REF,
-  PAGINATION_META_SCHEMA,
-  applyFieldPatches,
-  mergeSchema,
-  paginatedSchema,
-  toParameters,
-  toSchema,
-} from '#core/openapi/vine-schema'
-import { isListResource, isModelResource, paginated } from '#core/openapi/types'
-import { ZodSchema } from '#core/openapi/zod-schema'
-import { modelSchema, typeIndex } from '#core/openapi/model-schema'
-import type { TypeIndex } from '#core/openapi/model-schema'
+import { VineSchema } from '#scripts/openapi/vine-schema'
+import { ZodSchema } from '#scripts/openapi/zod-schema'
 import type {
   DocumentedController,
   DocumentedValidator,
@@ -43,8 +32,6 @@ import type {
   OpenAPIOperation,
   OpenAPIParameter,
   OpenAPIResponse,
-  ListResource,
-  ModelResource,
   OperationDocs,
   PaginatedResponse,
   ResponseBody,
@@ -452,9 +439,8 @@ async function buildContract(
 
   if (!schema) return contract
 
-  // Uma lista crua não ganha envelope: quem a devolve não pagina.
-  if (intro?.action === 'paginate' && !isListResource(schema)) {
-    contract.responses = { [status]: paginated(schema) }
+  if (intro?.action === 'paginate') {
+    contract.responses = { [status]: { kind: 'paginated', item: schema } }
 
     return contract
   }
@@ -477,29 +463,25 @@ function isPaginated(body: ResponseBody): body is PaginatedResponse {
 /**
  * O corpo de uma resposta como JSON Schema, seja ele qual for.
  *
- * Três origens: o recurso derivado do model (`#core/response`), a lista crua
- * de um recurso, e o schema VineJS de quem não deriva de model - vitrine,
- * métricas, lookup e o plano de upload multipart.
+ * Duas origens: o schema `…Response` do `shared/` (Zod), que é a fonte da régua,
+ * e o schema VineJS de quem não tem resposta no `shared/` - o plano de upload
+ * multipart.
  */
 function bodySchema(
-  body: DocumentedValidator | ModelResource | ListResource | z.ZodType,
-  types: TypeIndex,
+  body: DocumentedValidator | z.ZodType,
   context: string,
   warnings: string[],
 ): SchemaObject {
   // A fonte da régua: o schema `…Response` do `shared/` (`openapi.md`).
   if (ZodSchema.is(body)) return ZodSchema.toOpenAPI(body)
-  if (isModelResource(body)) return modelSchema(types, body)
-  if (isListResource(body)) return { type: 'array', items: modelSchema(types, body.item) }
 
-  return toSchema(body, context, warnings)
+  return VineSchema.toSchema(body, context, warnings)
 }
 
 function buildSuccessResponses(
   contract: Contract,
   operationId: string,
   components: Components,
-  types: TypeIndex,
   warnings: string[],
 ): Record<string, OpenAPIResponse> {
   const responses: Record<string, OpenAPIResponse> = {}
@@ -518,12 +500,12 @@ function buildSuccessResponses(
 
     if (isPaginated(body)) {
       const itemName = `${prefix}Item`
-      components[itemName] = bodySchema(body.item, types, context, warnings)
+      components[itemName] = bodySchema(body.item, context, warnings)
       responses[rawStatus] = {
         description,
         content: {
           'application/json': {
-            schema: paginatedSchema({ $ref: `#/components/schemas/${itemName}` }),
+            schema: VineSchema.paginatedSchema({ $ref: `#/components/schemas/${itemName}` }),
           },
         },
       }
@@ -531,8 +513,8 @@ function buildSuccessResponses(
     }
 
     const name = `${prefix}Response${status}`
-    const derived = bodySchema(body, types, context, warnings)
-    components[name] = mergeSchema(derived, contract.overrides?.responses?.[status])
+    const derived = bodySchema(body, context, warnings)
+    components[name] = VineSchema.mergeSchema(derived, contract.overrides?.responses?.[status])
     responses[rawStatus] = {
       description,
       content: { 'application/json': { schema: { $ref: `#/components/schemas/${name}` } } },
@@ -612,9 +594,9 @@ function buildParameters(
   const declared = new Map<string, OpenAPIParameter>()
 
   if (contract.params) {
-    const schema = toSchema(contract.params, `${operationId} (parâmetros)`, warnings)
+    const schema = VineSchema.toSchema(contract.params, `${operationId} (parâmetros)`, warnings)
 
-    for (const parameter of toParameters(schema, 'path')) {
+    for (const parameter of VineSchema.toParameters(schema, 'path')) {
       declared.set(parameter.name, parameter)
     }
   }
@@ -631,8 +613,8 @@ function buildParameters(
   }
 
   if (contract.query) {
-    const schema = toSchema(contract.query, `${operationId} (query)`, warnings)
-    parameters.push(...toParameters(schema, 'query'))
+    const schema = VineSchema.toSchema(contract.query, `${operationId} (query)`, warnings)
+    parameters.push(...VineSchema.toParameters(schema, 'query'))
   }
 
   return parameters
@@ -648,7 +630,6 @@ function buildOperation(
     protection: Protection
   },
   components: Components,
-  types: TypeIndex,
   warnings: string[],
 ): OpenAPIOperation {
   const { method, operationId, path, pathParams, protection } = input
@@ -682,9 +663,9 @@ function buildOperation(
 
   if (contract.body) {
     const name = `${pascalize(operationId)}Body`
-    const derived = toSchema(contract.body, `${operationId} (payload)`, warnings)
-    const patched = applyFieldPatches(derived, FIELD_PATCHES)
-    const schema = mergeSchema(patched, contract.overrides?.body)
+    const derived = VineSchema.toSchema(contract.body, `${operationId} (payload)`, warnings)
+    const patched = VineSchema.applyFieldPatches(derived, FIELD_PATCHES)
+    const schema = VineSchema.mergeSchema(patched, contract.overrides?.body)
     components[name] = schema
     operation.requestBody = {
       required: true,
@@ -694,7 +675,7 @@ function buildOperation(
     }
   }
 
-  operation.responses = buildSuccessResponses(contract, operationId, components, types, warnings)
+  operation.responses = buildSuccessResponses(contract, operationId, components, warnings)
 
   if (Object.keys(operation.responses).length === 0) {
     const status = impliedSuccess(method)
@@ -721,11 +702,8 @@ function buildOperation(
 export async function buildDocument(): Promise<BuildResult> {
   router.commit()
 
-  const components: Components = { PaginationMeta: PAGINATION_META_SCHEMA }
+  const components: Components = { PaginationMeta: VineSchema.PAGINATION_META_SCHEMA }
 
-  // O índice de tipos é lido uma vez: são 31 classes geradas mais 25 models, e
-  // o corpo de toda resposta sai dele.
-  const types = await typeIndex(app.makePath('.'))
   const paths: Record<string, Record<string, OpenAPIOperation>> = {}
   const warnings: string[] = []
   const usedTags = new Set<string>()
@@ -780,7 +758,6 @@ export async function buildDocument(): Promise<BuildResult> {
         contract,
         { method: verb, operationId, path, pathParams: params, protection },
         components,
-        types,
         warnings,
       )
 
@@ -858,5 +835,3 @@ function sortKeys(components: Components): Components {
 
   return sorted
 }
-
-export { PAGINATION_META_REF }

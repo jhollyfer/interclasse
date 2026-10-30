@@ -20,7 +20,7 @@
   "softDeleteExempt": [],
   "shape": [
     "app/core/validator.ts",
-    "app/core/openapi/field-patches.ts",
+    "scripts/openapi/field-patches.ts",
     "app/services/storage/storage.service.ts",
     "app/middleware/documentation.middleware.ts",
     "config/openapi.ts",

@@ -1,4 +1,4 @@
-import type { SchemaObject } from './types.ts'
+import type { SchemaObject } from '#core/openapi/types'
 
 /**
  * Correções de documentação para as regras compartilhadas de `#core/validator`.

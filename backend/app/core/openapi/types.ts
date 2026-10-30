@@ -1,11 +1,10 @@
 import type { z } from '@interclasse/shared'
 import type { JSONSchema7 } from 'json-schema'
-import type { LucidModel } from '@adonisjs/lucid/types/model'
 
 /**
  * Vocabulário do gerador de documentação.
  *
- * Nasceu antes do gerador porque `defineDocs` e `ModelResource` são consumidos
+ * Nasceu antes do gerador porque `defineDocs` é consumido
  * por todo controller e por `#core/response` desde a primeira feature -
  * declarar o contrato só quando o gerador existisse obrigaria a voltar em cada
  * controller para acrescentá-lo.
@@ -36,72 +35,20 @@ export type DocumentedValidator = {
 }
 
 /**
- * Um recurso derivado de um model do Lucid.
- *
- * A resposta de um endpoint é o model serializado com as relações que o
- * use-case precarregou. Declarar o model e as relações é declarar o contrato
- * inteiro - nome, visibilidade e tipo de cada campo saem do próprio Lucid e do
- * TypeScript, em `model-schema.ts`.
- *
- * Relação **não** declarada em `relations` não entra: listar toda relação do
- * model prometeria dado que nenhum `preload` traz.
- */
-export type ModelResource = {
-  model: LucidModel
-  relations?: RelationMap
-  /**
-   * O `enum` de uma coluna. `database/schema.ts` é gerado das colunas e tipa
-   * todo enum de banco como `string`; sem isto o documento diria texto onde o
-   * endpoint aceita dois valores.
-   */
-  enums?: Record<string, readonly string[]>
-  /** O que nem o AST nem o Lucid contam. Sobrescreve o derivado. */
-  fields?: Record<string, SchemaObject>
-}
-
-/** As relações aninhadas de um recurso. `[recurso]` é lista; sem colchete, um. */
-export type RelationMap = Record<string, ModelResource | [ModelResource]>
-
-/** Uma resposta que é uma lista crua, sem envelope de paginação. */
-export type ListResource = { kind: 'list'; item: ModelResource }
-
-export function list(item: ModelResource): ListResource {
-  return { kind: 'list', item }
-}
-
-export function isModelResource(value: unknown): value is ModelResource {
-  return typeof value === 'object' && value !== null && 'model' in value
-}
-
-export function isListResource(value: unknown): value is ListResource {
-  return typeof value === 'object' && value !== null && 'kind' in value && value.kind === 'list'
-}
-
-/**
  * Resposta paginada. Marcador em vez de schema pronto porque `Paginated<T>` tem
- * forma fixa (`app/core/entity.ts`): o gerador monta o envelope e referencia
+ * forma fixa (`shared/src/records/pagination.ts`): o gerador monta o envelope e referencia
  * `PaginationMeta` uma vez só, em vez de repeti-lo em cada listagem.
  */
 export type PaginatedResponse = {
   kind: 'paginated'
-  item: DocumentedValidator | ModelResource | z.ZodType
-}
-
-export function paginated(
-  item: DocumentedValidator | ModelResource | z.ZodType,
-): PaginatedResponse {
-  return { kind: 'paginated', item }
+  item: DocumentedValidator | z.ZodType
 }
 
 /**
- * O que uma feature devolve, em `#core/response`.
- *
- * `DocumentedValidator` entra para a vitrine: a resposta pública **não** é o
- * model serializado inteiro, e sim o recorte de `StorefrontShapeService`. Um
- * `ModelResource` ali documentaria as colunas que o `pick` deixa de fora - o
- * documento prometeria `deletedAt` e `path` de bucket que nenhuma rota devolve.
+ * O que o registro de resposta guarda por ação: o schema `…Response` do `shared/`
+ * (Zod, a fonte da régua) ou, para o que ainda não tem resposta lá, o validator.
  */
-export type FeatureResponse = ModelResource | ListResource | DocumentedValidator | z.ZodType
+export type FeatureResponse = DocumentedValidator | z.ZodType
 
 /**
  * O que uma operação pode devolver num dado status.
@@ -111,8 +58,7 @@ export type FeatureResponse = ModelResource | ListResource | DocumentedValidator
  * download não tem corpo nenhum. Sem isto, as duas sairiam documentadas como o
  * model de `Storage`, que não é o que elas respondem.
  */
-export type ResponseBody =
-  DocumentedValidator | PaginatedResponse | ModelResource | ListResource | z.ZodType | 'no-content'
+export type ResponseBody = DocumentedValidator | PaginatedResponse | z.ZodType | 'no-content'
 
 /**
  * O contrato público de uma operação, declarado como `static docs` no
