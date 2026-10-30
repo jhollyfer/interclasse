@@ -24,7 +24,7 @@ describe('LocaleSwitch', () => {
     render(<LocaleSwitch />)
 
     const trigger = screen.getByRole('button', {
-      name: m.locale_switch_label(),
+      name: new RegExp(`^${m.locale_switch_label()}`),
     })
 
     expect(trigger.textContent).toContain('pt-BR')
@@ -34,7 +34,9 @@ describe('LocaleSwitch', () => {
     render(<LocaleSwitch />)
 
     await userEvent.click(
-      screen.getByRole('button', { name: m.locale_switch_label() }),
+      screen.getByRole('button', {
+        name: new RegExp(`^${m.locale_switch_label()}`),
+      }),
     )
 
     expect(await screen.findAllByRole('menuitemradio')).toHaveLength(3)
@@ -49,7 +51,9 @@ describe('LocaleSwitch', () => {
     render(<LocaleSwitch />)
 
     await userEvent.click(
-      screen.getByRole('button', { name: m.locale_switch_label() }),
+      screen.getByRole('button', {
+        name: new RegExp(`^${m.locale_switch_label()}`),
+      }),
     )
     await userEvent.click(
       await screen.findByRole('menuitemradio', { name: m.locale_en() }),

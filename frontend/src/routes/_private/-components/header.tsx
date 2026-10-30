@@ -88,16 +88,20 @@ function AccountMenu(): React.JSX.Element {
         por dentro dele seria um botão dentro de outro - erro de hidratação.
       */}
         <DropdownMenuTrigger
-          aria-label={m.panel_account_of({ name: account.name })}
           className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
         >
           <Avatar className="size-7">
             <AvatarImage src={account.avatar?.url} alt="" />
-            <AvatarFallback className="bg-brand text-xs font-semibold text-brand-ink">
+            <AvatarFallback
+              aria-hidden="true"
+              className="bg-brand text-xs font-semibold text-brand-ink"
+            >
               {initials(account.name)}
             </AvatarFallback>
           </Avatar>
-          <span className="hidden text-xs leading-none font-semibold lg:inline">
+          {/* Nome acessível pelo conteúdo, com o nome visível dentro: WCAG 2.5.3. */}
+          <span className="sr-only">{m.panel_account_label()}</span>
+          <span className="sr-only text-xs leading-none font-semibold lg:not-sr-only">
             {account.name}
           </span>
           <CaretDownIcon className="size-3 text-muted-foreground" />

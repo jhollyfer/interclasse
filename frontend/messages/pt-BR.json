@@ -361,7 +361,6 @@
   "panel_sign_out": "Sair",
   "panel_sign_out_title": "Sair da conta?",
   "panel_sign_out_description": "Você será desconectado e voltará para a tela de login.",
-  "panel_account_of": "Conta de {name}",
   "panel_my_profile": "Meu perfil",
   "panel_toggle_theme": "Alternar tema",
   "common_name": "Nome",
@@ -835,5 +834,6 @@
   "multi_file_upload_progress": "{name}: {percent}%",
   "multi_file_upload_failed": "Falha ao enviar {name}",
   "multi_file_upload_cancel": "Cancelar envio de {name}",
-  "multi_file_upload_list": "Arquivos enviados"
+  "multi_file_upload_list": "Arquivos enviados",
+  "panel_account_label": "Conta:"
 }

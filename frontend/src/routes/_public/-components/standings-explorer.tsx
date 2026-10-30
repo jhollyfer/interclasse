@@ -95,7 +95,7 @@ export function StandingsExplorer({
             )}
           >
             <span className="font-semibold">{bracket.sport.name}</span>
-            <span className="text-xs opacity-80">
+            <span className="text-xs">
               {BRACKET_STATUS_LABELS[bracket.status]}
             </span>
           </button>

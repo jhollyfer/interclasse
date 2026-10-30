@@ -31,7 +31,12 @@ export function ResultsTicker({
   ))
 
   return (
+    // Região rolável: precisa de região nomeada e foco de teclado para quem
+    // não usa o mouse (WCAG 2.1.1).
     <div
+      role="region"
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco de teclado (axe scrollable-region-focusable, WCAG 2.1.1)
+      tabIndex={0}
       className="ticker bg-brand text-brand-ink overflow-x-auto"
       aria-label={m.public_ticker_label()}
     >

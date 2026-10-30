@@ -375,7 +375,6 @@
   "panel_sign_out": "Sign out",
   "panel_sign_out_title": "Sign out of your account?",
   "panel_sign_out_description": "You will be signed out and returned to the sign-in screen.",
-  "panel_account_of": "{name} account",
   "panel_my_profile": "My profile",
   "panel_toggle_theme": "Toggle theme",
   "common_name": "Name",
@@ -849,5 +848,6 @@
   "multi_file_upload_progress": "{name}: {percent}%",
   "multi_file_upload_failed": "Failed to upload {name}",
   "multi_file_upload_cancel": "Cancel upload of {name}",
-  "multi_file_upload_list": "Uploaded files"
+  "multi_file_upload_list": "Uploaded files",
+  "panel_account_label": "Account:"
 }
