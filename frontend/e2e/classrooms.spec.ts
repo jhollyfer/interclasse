@@ -4,9 +4,11 @@ import { expect, test } from './support/test'
 // docs/USER-FLOWS.md, "Cadastrar uma turma", passos 1 e 4.
 test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre uma turma', async ({
   administrator: { page },
+  expectAccessible,
 }) => {
   await page.goto('/administrator/classrooms')
   await waitForHydration(page)
+  await expectAccessible(page)
 
   // O título de cada cartão é o link para a turma ("3º A").
   const cards = page

@@ -1,4 +1,5 @@
-import { test as base } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { expect, test as base } from '@playwright/test'
 import type { Browser, BrowserContext, Page } from '@playwright/test'
 
 import type { Role } from './credentials'
@@ -13,6 +14,12 @@ type Fixtures = Readonly<{
   advisor: RoleSession
   /** Outra conselheira, de outra turma da mesma categoria (sorteio precisa de duas). */
   secondAdvisor: RoleSession
+  /**
+   * Varre a aba com o axe e reprova violação séria ou crítica
+   * (_doc-lib/playwright.md#docs/accessibility-testing). Só pega o detectável
+   * por máquina; o resto fica na revisão manual.
+   */
+  expectAccessible: (page: Page) => Promise<void>
 }>
 
 async function openSession(
@@ -34,6 +41,16 @@ async function openSession(
  * o `storageState` guardado: nenhum login a mais na API.
  */
 export const test = base.extend<Fixtures>({
+  expectAccessible: async ({}, use) => {
+    await use(async (page) => {
+      const results = await new AxeBuilder({ page }).analyze()
+      const blocking = results.violations.filter(
+        (violation) =>
+          violation.impact === 'serious' || violation.impact === 'critical',
+      )
+      expect(blocking).toEqual([])
+    })
+  },
   administrator: async ({ browser, baseURL }, use) => {
     const session = await openSession(browser, baseURL, 'administrator')
     await use(session)
@@ -51,4 +68,4 @@ export const test = base.extend<Fixtures>({
   },
 })
 
-export { expect } from '@playwright/test'
+export { expect }
