@@ -28,7 +28,7 @@ import { m } from '#/paraglide/messages'
 import type { AnnouncementFormType } from './form-fields'
 import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/announcements/$id/edit/')
+const route = getRouteApi('/_private/administrator/announcements/$id/edit')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
 export function AnnouncementFormEdit(): React.JSX.Element {

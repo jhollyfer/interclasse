@@ -29,7 +29,7 @@ import { m } from '#/paraglide/messages'
 import type { UserFormType } from './form-fields'
 import { USER_FIELDS, UserFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/users/$id/edit/')
+const route = getRouteApi('/_private/administrator/users/$id/edit')
 
 const FORM_ID = 'user-update'
 

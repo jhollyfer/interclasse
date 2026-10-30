@@ -4,7 +4,7 @@ import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export const Route = createFileRoute(
-  '/_private/administrator/classrooms/$id/edit/',
+  '/_private/administrator/classrooms/$id/edit',
 )({
   loader: async ({ context, params }) => {
     try {

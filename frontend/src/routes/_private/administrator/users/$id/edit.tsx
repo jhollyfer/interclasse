@@ -7,7 +7,7 @@ import { userQueryOptions } from '#/integrations/tanstack-query/queries/administ
  * A mesma `queryOptions` do detalhe, com a mesma chave: quem abre a edição a
  * partir do detalhe não dispara requisição nova, o cache já está cheio.
  */
-export const Route = createFileRoute('/_private/administrator/users/$id/edit/')(
+export const Route = createFileRoute('/_private/administrator/users/$id/edit')(
   {
     loader: async ({ context, params }) => {
       try {

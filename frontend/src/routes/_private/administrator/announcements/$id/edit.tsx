@@ -4,7 +4,7 @@ import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import { announcementQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 export const Route = createFileRoute(
-  '/_private/administrator/announcements/$id/edit/',
+  '/_private/administrator/announcements/$id/edit',
 )({
   loader: async ({ context, params }) => {
     try {
