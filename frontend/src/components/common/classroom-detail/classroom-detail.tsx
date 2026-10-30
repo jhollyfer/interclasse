@@ -305,6 +305,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
             label={NAME_LABEL}
           >
             {({ field, control }) => (
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- o campo nasce de um clique em Editar: o foco vai para onde a pessoa acabou de pedir
               <Input {...field} {...control} autoFocus maxLength={120} />
             )}
           </AppField>

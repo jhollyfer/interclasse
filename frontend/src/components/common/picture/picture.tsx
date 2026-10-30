@@ -38,11 +38,13 @@ type PictureProps = Readonly<
  */
 export function Picture({
   placement,
+  alt,
   ...props
 }: PictureProps): React.JSX.Element {
   return (
     <img
       data-slot="picture"
+      alt={alt}
       decoding="async"
       {...IMAGE_LOADING[placement]}
       {...props}

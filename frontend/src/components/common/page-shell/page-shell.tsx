@@ -221,6 +221,7 @@ export function PageHeaderBack({
 
 export function PageHeaderTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -231,7 +232,9 @@ export function PageHeaderTitle({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 

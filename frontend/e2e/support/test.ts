@@ -41,8 +41,8 @@ async function openSession(
  * o `storageState` guardado: nenhum login a mais na API.
  */
 export const test = base.extend<Fixtures>({
-  expectAccessible: async ({}, use) => {
-    await use(async (page) => {
+  expectAccessible: async ({}, provide) => {
+    await provide(async (page) => {
       const results = await new AxeBuilder({ page }).analyze()
       const blocking = results.violations.filter(
         (violation) =>
@@ -51,19 +51,19 @@ export const test = base.extend<Fixtures>({
       expect(blocking).toEqual([])
     })
   },
-  administrator: async ({ browser, baseURL }, use) => {
+  administrator: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'administrator')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
-  advisor: async ({ browser, baseURL }, use) => {
+  advisor: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'advisor')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
-  secondAdvisor: async ({ browser, baseURL }, use) => {
+  secondAdvisor: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'secondAdvisor')
-    await use(session)
+    await provide(session)
     await session.context.close()
   },
 })

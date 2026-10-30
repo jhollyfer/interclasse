@@ -37,7 +37,7 @@ export function GamesPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_games_title()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_games_title()}</SectionTitle>
       </SectionHeader>
       <div className="grid gap-2 sm:flex sm:flex-wrap">
         <OptionCombobox

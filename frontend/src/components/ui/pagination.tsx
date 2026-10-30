@@ -49,14 +49,21 @@ function PaginationLink({
   size = 'icon',
   ...props
 }: PaginationLinkProps) {
+  let variant: 'outline' | 'ghost' = 'ghost'
+  if (isActive) variant = 'outline'
+
+  let current: 'page' | undefined = undefined
+  if (isActive) current = 'page'
+
   return (
     <Button
-      variant={isActive ? 'outline' : 'ghost'}
+      variant={variant}
       size={size}
       className={cn(className)}
       render={
+        // eslint-disable-next-line jsx-a11y/anchor-has-content -- o Button injeta o conteúdo pelo `render`
         <a
-          aria-current={isActive ? 'page' : undefined}
+          aria-current={current}
           data-slot="pagination-link"
           data-active={isActive}
           {...props}

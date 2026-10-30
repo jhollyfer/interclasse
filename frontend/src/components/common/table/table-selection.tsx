@@ -46,6 +46,7 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
     },
     cell: ({ row }) => (
       // O clique na caixa não pode também abrir o registro.
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
       <div onClick={(event) => event.stopPropagation()}>
         <Checkbox
           checked={row.getIsSelected()}

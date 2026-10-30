@@ -50,13 +50,15 @@ function InputGroupAddon({
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- atalho de mouse: o teclado já alcança o input pelo Tab
     <div
       role="group"
       data-slot="input-group-addon"
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
       onClick={(e) => {
-        if ((e.target as HTMLElement).closest('button')) {
+        // casa: `instanceof` no lugar de `as HTMLElement`
+        if (e.target instanceof Element && e.target.closest('button')) {
           return
         }
         e.currentTarget.parentElement?.querySelector('input')?.focus()

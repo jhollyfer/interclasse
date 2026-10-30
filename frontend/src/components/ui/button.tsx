@@ -52,6 +52,10 @@ function Button({
   render,
   ...props
 }: useRender.ComponentProps<'button'> & VariantProps<typeof buttonVariants>) {
+  const defaults: { type?: 'button' } = {}
+  // casa: sem `render`, o elemento nativo precisa de `type="button"`
+  if (!render) defaults.type = 'button'
+
   return useRender({
     defaultTagName: 'button',
     render,
@@ -61,7 +65,7 @@ function Button({
         // O primitivo forçava `type="button"` no elemento nativo. Sem este
         // default, botão sem `type` dentro de um `<form>` passaria a submeter.
         // Com `render`, quem decide é o elemento de destino.
-        ...(render ? {} : { type: 'button' as const }),
+        ...defaults,
         className: cn(buttonVariants({ variant, size, className })),
       },
       props,

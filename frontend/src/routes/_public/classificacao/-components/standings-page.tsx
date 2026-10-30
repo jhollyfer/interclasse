@@ -15,7 +15,7 @@ export function StandingsPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_nav_standings()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_nav_standings()}</SectionTitle>
       </SectionHeader>
       <StandingsExplorer
         brackets={data?.data ?? []}

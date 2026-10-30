@@ -29,7 +29,7 @@ export function BracketPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_nav_standings()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_nav_standings()}</SectionTitle>
         <SectionMore to="/">{m.common_back_home()}</SectionMore>
       </SectionHeader>
       <StandingsExplorer

@@ -23,6 +23,7 @@ export function TableResizeHandle<TRow extends RowData>({
   const isResizing = header.column.getIsResizing()
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- redimensionar é ajuste de mouse e toque; a largura tem padrão por coluna
     <div
       data-slot="table-resize-handle"
       data-test-id={`resize-${header.column.id}`}

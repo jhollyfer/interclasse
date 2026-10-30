@@ -18,7 +18,7 @@ export function AnnouncementsPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>
+        <SectionTitle level="h1">
           {m.public_nav_announcements()}
         </SectionTitle>
       </SectionHeader>

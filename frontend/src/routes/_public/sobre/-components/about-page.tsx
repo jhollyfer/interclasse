@@ -35,7 +35,7 @@ export function AboutPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>{m.public_about_title()}</SectionTitle>
+        <SectionTitle level="h1">{m.public_about_title()}</SectionTitle>
       </SectionHeader>
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
         <Picture

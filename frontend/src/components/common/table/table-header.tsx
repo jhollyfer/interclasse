@@ -37,6 +37,7 @@ function TableHeader({
 
 function TableTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -44,7 +45,9 @@ function TableTitle({
       data-slot="table-title"
       className={cn('text-2xl font-bold', className)}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 

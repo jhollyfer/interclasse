@@ -52,6 +52,7 @@ export function TableMobileCards<TRow extends RowData>({
         if (row.getIsSelected()) state = 'selected'
 
         return (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- atalho de mouse: o menu da linha dá a mesma ação ao teclado
           <div
             key={row.id}
             data-test-id={`table-card-${index}`}
@@ -73,6 +74,7 @@ export function TableMobileCards<TRow extends RowData>({
                 </div>
               )}
               {controls.length > 0 && (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
                 <div
                   className="flex shrink-0 flex-wrap items-center justify-end gap-2"
                   // Clicar na caixa de seleção ou no menu não deve também abrir

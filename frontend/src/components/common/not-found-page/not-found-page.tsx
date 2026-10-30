@@ -77,6 +77,7 @@ export function NotFoundPage({
 
 export function NotFoundPageTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<'h1'>): React.JSX.Element {
   return (
@@ -87,7 +88,9 @@ export function NotFoundPageTitle({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 
