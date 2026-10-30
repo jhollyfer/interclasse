@@ -1,6 +1,7 @@
 import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
+import { m } from '#/paraglide/messages'
 
 import {
   NotFoundPage,
@@ -24,11 +25,12 @@ export function NotFoundPageServerError({
 }>): React.JSX.Element {
   return (
     <NotFoundPage code="500">
-      <NotFoundPageTitle>Algo quebrou aqui</NotFoundPageTitle>
-      <NotFoundPageSubtitle>A falha é nossa, não sua</NotFoundPageSubtitle>
+      <NotFoundPageTitle>{m.common_server_error_title()}</NotFoundPageTitle>
+      <NotFoundPageSubtitle>
+        {m.common_server_error_subtitle()}
+      </NotFoundPageSubtitle>
       <NotFoundPageDescription>
-        Esta tela não conseguiu carregar. Tentar de novo costuma bastar; se
-        insistir, volte ao início.
+        {m.common_server_error_description()}
       </NotFoundPageDescription>
       <NotFoundPageActions>
         <Button
@@ -36,7 +38,7 @@ export function NotFoundPageServerError({
           className="w-fit rounded-md"
           onClick={onRetry}
         >
-          Tentar de novo
+          {m.common_try_again()}
         </Button>
         <NotFoundPageHomeButton />
       </NotFoundPageActions>

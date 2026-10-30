@@ -1,8 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { SITE_TITLE } from '#/lib/constant'
+import { pageHead } from '#/lib/page-head'
+import { m } from '#/paraglide/messages'
 
 /** O dado vem do loader de `_public/layout.tsx`, que todo o site já carrega. */
 export const Route = createFileRoute('/_public/sobre/')({
-  head: () => ({ meta: [{ title: `Sobre os jogos | ${SITE_TITLE}` }] }),
+  head: () =>
+    pageHead({
+      title: m.public_about_title(),
+      description: m.public_about_head_description(),
+      pathname: '/sobre',
+    }),
 })

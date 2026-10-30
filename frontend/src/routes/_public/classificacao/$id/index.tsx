@@ -6,7 +6,8 @@ import {
   storefrontBracketsQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import { SITE_TITLE } from '#/lib/constant'
+import { pageHead } from '#/lib/page-head'
+import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
 
@@ -30,11 +31,22 @@ export const Route = createFileRoute('/_public/classificacao/$id/')({
       throw error
     }
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${loaderData?.sport.name ?? 'Chave'} ${CATEGORY_LABELS[loaderData?.category ?? ''] ?? ''} | ${SITE_TITLE}`,
-      },
-    ],
-  }),
+  head: ({ loaderData, match }) => {
+    if (!loaderData)
+      return pageHead({
+        title: m.public_bracket_head_fallback(),
+        pathname: match.pathname,
+      })
+
+    const inputs = {
+      sport: loaderData.sport.name,
+      category: CATEGORY_LABELS[loaderData.category] ?? loaderData.category,
+    }
+
+    return pageHead({
+      title: m.public_bracket_head_title(inputs),
+      description: m.public_bracket_head_description(inputs),
+      pathname: match.pathname,
+    })
+  },
 })

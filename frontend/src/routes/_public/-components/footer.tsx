@@ -6,6 +6,7 @@ import { InstagramLogoIcon } from '@phosphor-icons/react'
 import { BrandMark } from '#/components/common/brand-mark'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 import { NAVIGATION } from './menu'
 import { RegulationLink } from './regulation-link'
@@ -13,14 +14,14 @@ import { RegulationLink } from './regulation-link'
 /** O link de um perfil do Instagram, com o `@` à mostra. */
 function InstagramLink({
   handle,
-  label,
-}: Readonly<{ handle: string; label: string }>): React.JSX.Element {
+  ariaLabel,
+}: Readonly<{ handle: string; ariaLabel: string }>): React.JSX.Element {
   return (
     <a
       href={`https://instagram.com/${handle}`}
       target="_blank"
       rel="noreferrer"
-      aria-label={`${label}: @${handle} no Instagram`}
+      aria-label={ariaLabel}
       className="flex items-center gap-2 py-1 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
     >
       <InstagramLogoIcon className="size-5" />@{handle}
@@ -44,19 +45,21 @@ export function Footer(): React.JSX.Element {
         <div className="flex flex-col gap-2">
           <BrandMark />
           <p className="max-w-sm text-sm text-brand-ink-foreground/70">
-            Jogos Estudantis do Centro Municipal de Educação Integral Cosme
-            Jean.
+            {m.public_footer_tagline()}
           </p>
         </div>
 
-        <nav className="flex flex-col gap-2 text-sm" aria-label="Rodapé">
+        <nav
+          className="flex flex-col gap-2 text-sm"
+          aria-label={m.public_footer_nav_label()}
+        >
           {NAVIGATION.map((item) => (
             <Link
-              key={item.label}
+              key={item.to}
               to={item.to}
               className="py-1 text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
             >
-              {item.label}
+              {item.label()}
             </Link>
           ))}
         </nav>
@@ -64,12 +67,19 @@ export function Footer(): React.JSX.Element {
         <div className="flex flex-col gap-1">
           <RegulationLink className="py-1 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground" />
           {site?.schoolInstagram && (
-            <InstagramLink handle={site.schoolInstagram} label="Escola" />
+            <InstagramLink
+              handle={site.schoolInstagram}
+              ariaLabel={m.public_footer_instagram_school({
+                handle: site.schoolInstagram,
+              })}
+            />
           )}
           {site?.developerInstagram && (
             <InstagramLink
               handle={site.developerInstagram}
-              label="Desenvolvimento"
+              ariaLabel={m.public_footer_instagram_developer({
+                handle: site.developerInstagram,
+              })}
             />
           )}
         </div>

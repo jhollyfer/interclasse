@@ -10,6 +10,7 @@ import {
   formatTime,
 } from '#/lib/labels'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /** "Quartas", "Semifinal"... */
 export function phaseLabel(
@@ -43,7 +44,7 @@ export function groupByDay(
 
   for (const match of matches) {
     let key = 'sem-horario'
-    let label = 'Horário a definir'
+    let label: string = m.common_agenda_time_tbd()
 
     if (match.scheduledAt) {
       key = formatDayKey(match.scheduledAt)
@@ -99,7 +100,10 @@ export function MatchRow({
         <span className="text-foreground font-semibold">
           {bracket.sport.name}
         </span>{' '}
-        {CATEGORY_SHORT_LABELS[bracket.category]}, {phaseLabel(match)}
+        {m.common_match_context_short({
+          category: CATEGORY_SHORT_LABELS[bracket.category] ?? bracket.category,
+          phase: phaseLabel(match),
+        })}
         {match.location && <span className="block">{match.location}</span>}
       </p>
     </li>

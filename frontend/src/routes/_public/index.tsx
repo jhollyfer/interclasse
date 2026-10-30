@@ -6,7 +6,7 @@ import {
   storefrontMatchesQueryOptions,
   storefrontPhotosQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
+import { pageHead } from '#/lib/page-head'
 
 /** As consultas da home, com os mesmos parâmetros no loader e na tela. */
 export const HOME_NEXT = { status: 'SCHEDULED', perPage: 6 }
@@ -39,10 +39,5 @@ export const Route = createFileRoute('/_public/')({
         .query(storefrontPhotosQueryOptions(HOME_PHOTOS))
         .catch(() => undefined),
     ]),
-  head: () => ({
-    meta: [
-      { title: SITE_TITLE },
-      { name: 'description', content: SITE_DESCRIPTION },
-    ],
-  }),
+  head: () => pageHead({ pathname: '/' }),
 })
