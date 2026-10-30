@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
 import { StandingsExplorer } from '../../-components/standings-explorer'
@@ -14,7 +15,7 @@ export function StandingsPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>Classificação</SectionTitle>
+        <SectionTitle render={<h1 />}>{m.public_nav_standings()}</SectionTitle>
       </SectionHeader>
       <StandingsExplorer
         brackets={data?.data ?? []}

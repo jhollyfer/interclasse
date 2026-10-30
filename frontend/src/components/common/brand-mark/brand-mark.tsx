@@ -1,6 +1,7 @@
 import type * as React from 'react'
 
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /**
  * A marca dos jogos: a logo do 2º JIC e o nome em itálico esportivo.
@@ -30,7 +31,7 @@ export function BrandMark({
         className="size-10 shrink-0 group-data-[collapsible=icon]:size-7"
       />
       <span className="font-display text-xl font-extrabold uppercase italic group-data-[collapsible=icon]:sr-only">
-        Jogos Estudantis
+        {m.common_brand_name()}
       </span>
     </span>
   )

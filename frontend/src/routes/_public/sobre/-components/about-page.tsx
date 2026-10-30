@@ -4,7 +4,7 @@ import { InstagramLogoIcon } from '@phosphor-icons/react'
 import type { StorefrontSiteShowResponse } from '@interclasse/shared'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import { plural } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 import { RegulationLink } from '../../-components/regulation-link'
 import {
@@ -17,9 +17,9 @@ import {
 /** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
 function sinceLabel(firstEditionYear: number): string {
   const years = new Date().getFullYear() - firstEditionYear
-  if (years < 1) return `Desde ${firstEditionYear}`
+  if (years < 1) return m.public_about_since({ year: firstEditionYear })
 
-  return `Desde ${firstEditionYear} · há ${plural(years, 'ano', 'anos')}`
+  return m.public_about_since_years({ year: firstEditionYear, years })
 }
 
 /**
@@ -33,12 +33,12 @@ export function AboutPage(): React.JSX.Element {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle render={<h1 />}>Sobre os jogos</SectionTitle>
+        <SectionTitle render={<h1 />}>{m.public_about_title()}</SectionTitle>
       </SectionHeader>
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
         <img
           src="/logo-512.png"
-          alt="2º JIC - II Jogos Interclasse do Cosme, CMEI 2026"
+          alt={m.public_logo_alt()}
           width={192}
           height={192}
           className="size-40 md:size-48"
@@ -53,9 +53,7 @@ function AboutContent({
   site,
 }: Readonly<{ site?: StorefrontSiteShowResponse }>): React.JSX.Element {
   if (!site || (!site.about && !site.organizer && !site.edition))
-    return (
-      <Empty>A organização ainda não escreveu a apresentação dos jogos.</Empty>
-    )
+    return <Empty>{m.public_about_empty()}</Empty>
 
   const paragraphs = (site.about ?? '')
     .split(/\n\s*\n/)
@@ -64,7 +62,9 @@ function AboutContent({
   return (
     <div className="flex max-w-prose flex-col gap-4">
       <p className="text-primary flex flex-wrap gap-x-3 font-semibold">
-        {site.edition && <span>{site.edition}ª edição</span>}
+        {site.edition && (
+          <span>{m.public_about_edition({ edition: site.edition })}</span>
+        )}
         {site.firstEditionYear && (
           <span>{sinceLabel(site.firstEditionYear)}</span>
         )}
@@ -76,7 +76,9 @@ function AboutContent({
       ))}
       {site.organizer && (
         <p>
-          <span className="text-muted-foreground">Criação e organização: </span>
+          <span className="text-muted-foreground">
+            {m.public_about_organizer()}{' '}
+          </span>
           {site.organizer}
         </p>
       )}

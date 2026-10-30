@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { m } from '#/paraglide/messages'
 
 import { HOME_PHOTOS } from '../index'
 import { Section, SectionHeader, SectionTitle } from './section'
@@ -57,11 +58,11 @@ export function PhotoCarousel(): React.JSX.Element | null {
   return (
     <Section>
       <SectionHeader>
-        <SectionTitle>Fotos dos jogos</SectionTitle>
+        <SectionTitle>{m.public_photos_title()}</SectionTitle>
         <div className="flex gap-2">
           <button
             type="button"
-            aria-label="Foto anterior"
+            aria-label={m.public_photos_previous()}
             onClick={() => step(-1)}
             className="hover:border-primary rounded-full border p-2"
           >
@@ -69,7 +70,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
           </button>
           <button
             type="button"
-            aria-label="Próxima foto"
+            aria-label={m.public_photos_next()}
             onClick={() => step(1)}
             className="hover:border-primary rounded-full border p-2"
           >
@@ -79,7 +80,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
       </SectionHeader>
       <ul
         ref={track}
-        aria-label="Fotos dos jogos"
+        aria-label={m.public_photos_title()}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
@@ -94,7 +95,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
             <figure className="overflow-hidden rounded-lg border">
               <img
                 src={photo.url}
-                alt={photo.caption ?? 'Foto dos jogos'}
+                alt={photo.caption ?? m.public_photos_alt_fallback()}
                 loading="lazy"
                 className="aspect-[4/3] w-full object-cover"
               />

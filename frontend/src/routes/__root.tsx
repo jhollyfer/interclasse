@@ -38,11 +38,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: SITE_TITLE,
+        title: SITE_TITLE(),
       },
       {
         name: 'description',
-        content: SITE_DESCRIPTION,
+        content: SITE_DESCRIPTION(),
       },
     ],
     links: [
