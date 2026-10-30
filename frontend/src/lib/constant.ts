@@ -1,3 +1,5 @@
+import { m } from '#/paraglide/messages'
+
 /**
  * O que identifica o site nos metadados de toda rota.
  *
@@ -17,9 +19,19 @@
  */
 export const SITE_TITLE = 'Jogos Estudantis'
 
+/** O nome do evento no idioma da tela, lido a cada uso (o idioma muda com a URL). */
+export function siteTitle(): string {
+  return m.common_site_title()
+}
+
 /** A descrição da raiz, herdada por rota que não escreva a sua. */
 export const SITE_DESCRIPTION =
   'Jogos Estudantis do CMEI Cosme Jean: tabela de jogos, placares, classificação e avisos.'
+
+/** A descrição do site no idioma da tela. */
+export function siteDescription(): string {
+  return m.common_site_description()
+}
 
 /**
  * O fuso da escola. Toda data do painel e do site é mostrada nele, e não no
