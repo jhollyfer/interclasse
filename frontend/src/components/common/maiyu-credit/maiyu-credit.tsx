@@ -1,7 +1,7 @@
 import type * as React from 'react'
 
-import { Picture } from '#/components/common/picture'
 import maiyuLogo from '#/assets/maiyu.png'
+import { Picture } from '#/components/common/picture'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 

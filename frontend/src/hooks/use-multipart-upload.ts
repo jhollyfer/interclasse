@@ -5,9 +5,9 @@ import {
 
 import { request, HTTPError } from '#/integrations/tanstack-query/http'
 import { missingParts, planParts } from '#/lib/chunking'
-import { putPart } from '#/lib/upload-transport'
-import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
 import { isStorageMimetype } from '#/lib/mimetype'
+import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
+import { putPart } from '#/lib/upload-transport'
 import { m } from '#/paraglide/messages'
 
 /**

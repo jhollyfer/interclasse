@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { LinkProps } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { PageShell } from '#/components/common/page-shell'
 

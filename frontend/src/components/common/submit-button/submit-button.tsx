@@ -1,9 +1,9 @@
-import type * as React from 'react'
 import type { Merge } from '@interclasse/shared'
+import type * as React from 'react'
 
+import { useIsUploading } from '#/components/common/uploading-context'
 import { Button } from '#/components/ui/button'
 import { Spinner } from '#/components/ui/spinner'
-import { useIsUploading } from '#/components/common/uploading-context'
 
 type SubmitButtonProps = Readonly<
   Merge<

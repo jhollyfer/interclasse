@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { Link } from '@tanstack/react-router'
 import type { PaginationMeta } from '@interclasse/shared'
+import { Link } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { m } from '#/paraglide/messages'
 

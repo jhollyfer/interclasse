@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { phaseLabel } from '#/components/common/match-agenda'
 import { m } from '#/paraglide/messages'

@@ -1,7 +1,7 @@
 import type * as React from 'react'
 
-import { Picture } from '#/components/common/picture'
 import logo128 from '#/assets/logo-128.png'
+import { Picture } from '#/components/common/picture'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 

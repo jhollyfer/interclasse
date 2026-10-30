@@ -1,8 +1,8 @@
+import type { Merge } from '@interclasse/shared'
 import type { QueryKey } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type { FieldValues } from 'react-hook-form'
-import type { Merge } from '@interclasse/shared'
 
 import { useMutationForm } from './use-mutation-form'
 import type {

@@ -1,10 +1,10 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { InstagramLogoIcon } from '@phosphor-icons/react'
 import type { StorefrontSiteShowResponse } from '@interclasse/shared'
+import { InstagramLogoIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
-import { Picture } from '#/components/common/picture'
 import logo512 from '#/assets/logo-512.png'
+import { Picture } from '#/components/common/picture'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 

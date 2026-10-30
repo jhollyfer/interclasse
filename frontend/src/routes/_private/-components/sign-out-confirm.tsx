@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { SignOutIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import {
   ConfirmDialog,

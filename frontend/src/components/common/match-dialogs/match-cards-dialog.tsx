@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import type * as React from 'react'
 import {
   AdministratorCardCreateValidator,
   CARD_COLORS,
@@ -8,6 +6,8 @@ import type {
   AdministratorCardCreatePayload,
   AdministratorCardPaginateResponse,
 } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import { CardList } from '#/components/common/card-list'
 import { Button } from '#/components/ui/button'

@@ -1,8 +1,8 @@
-import type * as React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DotsSixVerticalIcon } from '@phosphor-icons/react'
 import type { Header, RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'

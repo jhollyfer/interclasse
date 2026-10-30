@@ -1,5 +1,3 @@
-import type * as React from 'react'
-import { toast } from 'sonner'
 import {
   AdministratorMatchScoreValidator,
   AdministratorMatchUpdateValidator,
@@ -10,10 +8,19 @@ import type {
   AdministratorMatchScoreResponse,
   AdministratorMatchUpdateResponse,
 } from '@interclasse/shared'
+import type * as React from 'react'
+import { toast } from 'sonner'
 
+import {
+  ConfirmDialog,
+  ConfirmDialogCancel,
+  ConfirmDialogConfirm,
+  ConfirmDialogDescription,
+  ConfirmDialogFooter,
+  ConfirmDialogHeader,
+  ConfirmDialogTitle,
+} from '#/components/common/confirm-dialog'
 import { Button } from '#/components/ui/button'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
 import {
   Dialog,
   DialogContent,
@@ -25,13 +32,12 @@ import {
 import { Input } from '#/components/ui/input'
 import { NativeSelect, NativeSelectOption } from '#/components/ui/native-select'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
-import { blankToNull } from '#/lib/form-values'
-import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import { useMutationForm } from '#/hooks/use-mutation-form'
 import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
   useMatchScoreMutation,
   useMatchUnscoreMutation,
@@ -41,15 +47,9 @@ import type {
   MatchScoreVariables,
   MatchUpdateVariables,
 } from '#/integrations/tanstack-query/mutations/administrator'
-import {
-  ConfirmDialog,
-  ConfirmDialogCancel,
-  ConfirmDialogConfirm,
-  ConfirmDialogDescription,
-  ConfirmDialogFooter,
-  ConfirmDialogHeader,
-  ConfirmDialogTitle,
-} from '#/components/common/confirm-dialog'
+import { notifyError } from '#/lib/form-errors'
+import { blankToNull } from '#/lib/form-values'
+import { fromSchoolInput, toSchoolInput } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /** O mínimo de uma partida que os dois diálogos precisam. */

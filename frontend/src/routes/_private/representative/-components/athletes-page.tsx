@@ -1,9 +1,8 @@
-import type * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type * as React from 'react'
 import { toast } from 'sonner'
 
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
-import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -15,6 +14,7 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
 import { useRepresentativeEnrollmentUpdateMutation } from '#/integrations/tanstack-query/mutations/representative'
 import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
+import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /** A lista de atletas da turma do representante. A turma sai da sessão. */

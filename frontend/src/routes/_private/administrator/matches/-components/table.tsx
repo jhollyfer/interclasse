@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { Link, getRouteApi, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
+import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
@@ -8,8 +7,9 @@ import {
   NumberSquareOneIcon,
   TreeStructureIcon,
 } from '@phosphor-icons/react'
-import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
-import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import { Link, getRouteApi, useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 
 import {
   EmptyStateActions,
@@ -24,6 +24,7 @@ import {
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
+import { RowActions } from '#/components/common/row-actions'
 import {
   Table,
   TableActions,
@@ -40,7 +41,6 @@ import type { TableColumns } from '#/components/common/table'
 import { Badge } from '#/components/ui/badge'
 import { buttonVariants } from '#/components/ui/button'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
-import { RowActions } from '#/components/common/row-actions'
 import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   CATEGORY_SHORT_LABELS,

@@ -1,4 +1,3 @@
-import type { VariantProps } from 'class-variance-authority'
 import type {
   ActiveStatus,
   BracketStatus,
@@ -11,6 +10,7 @@ import type {
   UploadStatus,
   UserRole,
 } from '@interclasse/shared'
+import type { VariantProps } from 'class-variance-authority'
 
 import type { badgeVariants } from '#/components/ui/badge'
 import { m } from '#/paraglide/messages'

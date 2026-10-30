@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { useEditor } from '@tiptap/react'
 import type { JSONContent } from '@tiptap/react'
+import * as React from 'react'
 
 import { RICH_TEXT_EXTENSIONS } from '#/components/common/rich-text'
 

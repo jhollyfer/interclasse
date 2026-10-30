@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from '@interclasse/shared'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   listLocalThemes,

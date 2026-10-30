@@ -1,6 +1,3 @@
-import type * as React from 'react'
-import { useEditorState } from '@tiptap/react'
-import type { Editor } from '@tiptap/react'
 import {
   ListBulletsIcon,
   ListNumbersIcon,
@@ -8,6 +5,9 @@ import {
   TextHTwoIcon,
   TextItalicIcon,
 } from '@phosphor-icons/react'
+import { useEditorState } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { cn } from '#/lib/cn'

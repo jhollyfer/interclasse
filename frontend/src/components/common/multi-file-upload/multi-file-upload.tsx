@@ -1,6 +1,6 @@
+import type { StorageMimetype } from '@interclasse/shared'
 import * as React from 'react'
 import { toast } from 'sonner'
-import type { StorageMimetype } from '@interclasse/shared'
 
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { useAbortOnUnmount } from '#/hooks/use-abort-on-unmount'

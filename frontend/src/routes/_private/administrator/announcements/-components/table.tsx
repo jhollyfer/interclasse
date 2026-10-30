@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 
 import {
   EmptyStateActions,

@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { TranslateIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 
 import {
   DropdownMenu,
@@ -10,10 +10,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 import { getLocale, isLocale, locales, setLocale } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
-import { cn } from '#/lib/cn'
 
 /** O nome de cada idioma, no idioma da tela. */
 const LOCALE_NAMES = {

@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { ArrowLeftIcon } from '@phosphor-icons/react'
-import type { Merge } from '@interclasse/shared'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'

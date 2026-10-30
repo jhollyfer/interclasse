@@ -1,6 +1,6 @@
-import type * as React from 'react'
 import { FlexRender } from '@tanstack/react-table'
 import type { RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { cn } from '#/lib/cn'
 

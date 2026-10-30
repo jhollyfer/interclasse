@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { TableLayout } from '@interclasse/shared'
 import {
   columnOrderingFeature,
   columnPinningFeature,
@@ -18,7 +18,7 @@ import type {
   RowSelectionState,
   ColumnVisibilityState,
 } from '@tanstack/react-table'
-import { TableLayout } from '@interclasse/shared'
+import * as React from 'react'
 
 import { readLocal, writeLocal } from '#/lib/local-store'
 import { m } from '#/paraglide/messages'

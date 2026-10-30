@@ -1,7 +1,3 @@
-import { ShuffleIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import * as React from 'react'
 import {
   AdministratorBracketCreateValidator,
   CATEGORIES,
@@ -10,6 +6,10 @@ import type {
   AdministratorBracketCreatePayload,
   AdministratorBracketPaginateResponse,
 } from '@interclasse/shared'
+import { ShuffleIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import {

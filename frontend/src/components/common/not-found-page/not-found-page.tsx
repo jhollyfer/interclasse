@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { TrophyIcon } from '@phosphor-icons/react'
 import type { Merge } from '@interclasse/shared'
+import { TrophyIcon } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'

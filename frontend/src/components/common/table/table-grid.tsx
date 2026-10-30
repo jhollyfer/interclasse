@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -14,6 +13,7 @@ import {
 } from '@dnd-kit/sortable'
 import { FlexRender } from '@tanstack/react-table'
 import type { Cell, Header, RowData } from '@tanstack/react-table'
+import * as React from 'react'
 
 import {
   Table as TableRoot,

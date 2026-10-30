@@ -1,18 +1,18 @@
+import { useQuery } from '@tanstack/react-query'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 
 import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
-import { BRACKETS_INDEX } from '../../index'
-import { StandingsExplorer } from '../../../-components/standings-explorer'
 import {
   Section,
   SectionHeader,
   SectionMore,
   SectionTitle,
 } from '../../../-components/section'
+import { StandingsExplorer } from '../../../-components/standings-explorer'
+import { BRACKETS_INDEX } from '../../index'
 
 const route = getRouteApi('/_public/classificacao/$id/')
 

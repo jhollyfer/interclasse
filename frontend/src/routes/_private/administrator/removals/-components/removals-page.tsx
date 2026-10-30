@@ -1,7 +1,7 @@
+import type { AdministratorEnrollmentRemovalShowResponse } from '@interclasse/shared'
 import { CheckIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
-import type { AdministratorEnrollmentRemovalShowResponse } from '@interclasse/shared'
 
 import {
   PageHeader,
@@ -15,9 +15,9 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useEnrollmentRemovalAcknowledgeMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { cn } from '#/lib/cn'
 import { notifyError } from '#/lib/form-errors'
 import { formatDate } from '#/lib/labels'
-import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { ADMINISTRATOR_REMOVALS } from '../index'

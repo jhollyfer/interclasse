@@ -1,7 +1,8 @@
-import * as React from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 import { getRouteApi, Link, useMatches } from '@tanstack/react-router'
+import * as React from 'react'
 
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import {
   Breadcrumb,
@@ -22,17 +23,16 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { Separator } from '#/components/ui/separator'
 import { SidebarTrigger } from '#/components/ui/sidebar'
-import { LocaleSwitch } from '#/components/common/locale-switch'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
 import { initials } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-import { ThemeToggle } from './theme-toggle'
 import {
   SignOutConfirm,
   SignOutConfirmFooter,
   SignOutConfirmHeader,
 } from './sign-out-confirm'
+import { ThemeToggle } from './theme-toggle'
 
 const route = getRouteApi('/_private')
 

@@ -1,6 +1,6 @@
+import { defineConfig, devices } from '@playwright/test'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { defineConfig, devices } from '@playwright/test'
 
 // `.env.e2e` é opcional: em CI as variáveis vêm do ambiente. Carrega antes do
 // resto da config, porque `webServer` e `baseURL` leem `process.env`.

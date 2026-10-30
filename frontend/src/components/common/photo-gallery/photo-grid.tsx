@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { Picture } from '#/components/common/picture'
 import { Badge } from '#/components/ui/badge'

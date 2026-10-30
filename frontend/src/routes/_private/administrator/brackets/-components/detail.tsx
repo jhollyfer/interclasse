@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
@@ -8,8 +5,13 @@ import {
   TrashIcon,
   TrophyIcon,
 } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 import { toast } from 'sonner'
 
+import { BracketTree } from '#/components/common/bracket-tree'
+import type { BracketMatch } from '#/components/common/bracket-tree'
 import {
   ConfirmDialog,
   ConfirmDialogDescription,
@@ -19,8 +21,6 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { BracketTree } from '#/components/common/bracket-tree'
-import type { BracketMatch } from '#/components/common/bracket-tree'
 import {
   MatchCardsDialog,
   MatchScheduleDialog,
@@ -28,8 +28,6 @@ import {
   MatchScoreDialog,
 } from '#/components/common/match-dialogs'
 import type { MatchRef } from '#/components/common/match-dialogs'
-import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
   PageHeaderActions,
@@ -41,8 +39,10 @@ import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent } from '#/components/ui/card'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
+import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useBracketDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { notifyError } from '#/lib/form-errors'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,

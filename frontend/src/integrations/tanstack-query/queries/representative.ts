@@ -1,5 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
 import { RepresentativeEnrollmentShowResponse } from '@interclasse/shared'
+import { queryOptions } from '@tanstack/react-query'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 

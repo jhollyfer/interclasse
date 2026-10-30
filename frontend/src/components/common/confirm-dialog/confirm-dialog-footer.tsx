@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { Merge } from '@interclasse/shared'
+import * as React from 'react'
 
 import {
   AlertDialogAction,

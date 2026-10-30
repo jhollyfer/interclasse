@@ -1,13 +1,13 @@
-import * as React from 'react'
-
-import { cn } from '#/lib/cn'
-import { Button } from '#/components/ui/button.tsx'
-import { m } from '#/paraglide/messages'
 import {
   CaretLeftIcon,
   CaretRightIcon,
   DotsThreeIcon,
 } from '@phosphor-icons/react'
+import * as React from 'react'
+
+import { Button } from '#/components/ui/button.tsx'
+import { cn } from '#/lib/cn'
+import { m } from '#/paraglide/messages'
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (

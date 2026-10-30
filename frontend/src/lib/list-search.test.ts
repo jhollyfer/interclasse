@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { SORT_DIRECTION, TRASHED_MODE } from '@interclasse/shared'
+import { describe, expect, it } from 'vitest'
 
 import {
   validateListSearch,

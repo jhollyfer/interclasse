@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'

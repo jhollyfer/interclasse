@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { Header, RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { cn } from '#/lib/cn'
 

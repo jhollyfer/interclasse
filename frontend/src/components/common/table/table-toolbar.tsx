@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { ArchiveIcon } from '@phosphor-icons/react'
 import { TRASHED_MODE } from '@interclasse/shared'
+import { ArchiveIcon } from '@phosphor-icons/react'
+import { useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
 import { m } from '#/paraglide/messages'
 
-import { InputSearch } from './table-search-input'
 import { useTableContext } from './table-context'
+import { InputSearch } from './table-search-input'
 
 /**
  * A faixa de controles entre o cabeçalho e a tabela: busca, filtros do recurso,

@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { Merge } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { cn } from '#/lib/cn'

@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { m } from '#/paraglide/messages'

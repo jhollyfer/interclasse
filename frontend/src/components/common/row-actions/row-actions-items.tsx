@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
 import {
   ArchiveIcon,
   ArrowCounterClockwiseIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
-import type { Merge } from '@interclasse/shared'
+import * as React from 'react'
 
 import {
   ConfirmDialog,

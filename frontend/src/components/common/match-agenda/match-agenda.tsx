@@ -1,7 +1,8 @@
-import type * as React from 'react'
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 import { MATCH_STATUS } from '@interclasse/shared'
+import type * as React from 'react'
 
+import { cn } from '#/lib/cn'
 import {
   CATEGORY_SHORT_LABELS,
   MATCH_PHASE_LABELS,
@@ -9,7 +10,6 @@ import {
   formatDayKey,
   formatTime,
 } from '#/lib/labels'
-import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /** "Quartas", "Semifinal"... */

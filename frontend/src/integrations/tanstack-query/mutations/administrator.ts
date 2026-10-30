@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query'
 import {
   AdministratorAnnouncementShowResponse,
   AdministratorBracketCreateResponse,
@@ -31,6 +30,7 @@ import type {
   AdministratorUserUpdatePayload,
   Merge,
 } from '@interclasse/shared'
+import { useMutation } from '@tanstack/react-query'
 
 import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 

@@ -1,17 +1,17 @@
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import type { QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ThemeProvider } from 'next-themes'
-import type { QueryClient } from '@tanstack/react-query'
 
-import { m } from '#/paraglide/messages'
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
+import { m } from '#/paraglide/messages'
 
 import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'

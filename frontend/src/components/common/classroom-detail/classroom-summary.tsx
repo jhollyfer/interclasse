@@ -1,11 +1,11 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
-import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 import { cn } from '#/lib/cn'
+import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 import { VISIBLE_CLASSROOMS } from './classroom-detail-loader'

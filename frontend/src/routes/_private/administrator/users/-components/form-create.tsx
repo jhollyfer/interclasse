@@ -1,9 +1,9 @@
-import type * as React from 'react'
 import { AdministratorUserCreateValidator } from '@interclasse/shared'
 import type {
   AdministratorUserCreatePayload,
   AdministratorUserShowResponse,
 } from '@interclasse/shared'
+import type * as React from 'react'
 
 import {
   FormShell,
@@ -17,9 +17,9 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { useUserCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { useUserCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 import type { UserFormType } from './form-fields'

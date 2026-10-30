@@ -1,16 +1,16 @@
-import type * as React from 'react'
+import { TRASHED_MODE } from '@interclasse/shared'
 import { useNavigate } from '@tanstack/react-router'
 import type { RowData } from '@tanstack/react-table'
-import { TRASHED_MODE } from '@interclasse/shared'
+import type * as React from 'react'
 
-import { Button } from '#/components/ui/button'
-import { EmptyContent } from '#/components/ui/empty'
 import { EmptyState } from '#/components/common/empty-state'
 import type { EmptyStateReason } from '#/components/common/empty-state'
+import { Button } from '#/components/ui/button'
+import { EmptyContent } from '#/components/ui/empty'
 import { m } from '#/paraglide/messages'
 
-import type { TableInstance } from './use-table'
 import { useTableContext } from './table-context'
+import type { TableInstance } from './use-table'
 
 type TableEmptyProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>

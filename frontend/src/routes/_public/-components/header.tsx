@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'

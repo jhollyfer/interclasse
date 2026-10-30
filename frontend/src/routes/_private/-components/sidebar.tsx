@@ -1,11 +1,10 @@
-import type * as React from 'react'
-import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { SignOutIcon } from '@phosphor-icons/react'
 import { USER_ROLE } from '@interclasse/shared'
+import { SignOutIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { Link, getRouteApi, useMatchRoute } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
-import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   Sidebar as Root,
   SidebarContent,
@@ -19,15 +18,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '#/components/ui/sidebar'
+import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
 import { PENDING_REMOVALS, menuFor } from './menu'
+import type { MenuItem } from './menu'
 import {
   SignOutConfirm,
   SignOutConfirmFooter,
   SignOutConfirmHeader,
 } from './sign-out-confirm'
-import type { MenuItem } from './menu'
 
 const privateRoute = getRouteApi('/_private')
 

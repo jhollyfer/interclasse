@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
 
-import { Picture } from '#/components/common/picture'
 import logo512 from '#/assets/logo-512.png'
+import { Agenda } from '#/components/common/match-agenda'
+import { Picture } from '#/components/common/picture'
 import {
   storefrontAnnouncementsQueryOptions,
   storefrontBracketsQueryOptions,
   storefrontMatchesQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
-import { Agenda } from '#/components/common/match-agenda'
 import { m } from '#/paraglide/messages'
 
 import {
@@ -23,7 +23,6 @@ import { NextMatch } from './next-match'
 import { PhotoCarousel } from './photo-carousel'
 import { RegulationLink } from './regulation-link'
 import { ResultsTicker } from './results-ticker'
-import { StandingsExplorer } from './standings-explorer'
 import {
   Empty,
   Section,
@@ -31,6 +30,7 @@ import {
   SectionMore,
   SectionTitle,
 } from './section'
+import { StandingsExplorer } from './standings-explorer'
 
 export function HomePage(): React.JSX.Element {
   const next = useQuery(storefrontMatchesQueryOptions(HOME_NEXT))

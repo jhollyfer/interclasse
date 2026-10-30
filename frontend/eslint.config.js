@@ -1,10 +1,15 @@
 //  @ts-check
 
+import comments from '@eslint-community/eslint-plugin-eslint-comments/configs'
 import { tanstackConfig } from '@tanstack/eslint-config'
 import pluginQuery from '@tanstack/eslint-plugin-query'
 import pluginRouter from '@tanstack/eslint-plugin-router'
 import importX from 'eslint-plugin-import-x'
+import vitest from '@vitest/eslint-plugin'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import playwright from 'eslint-plugin-playwright'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
 
 export default [
   // Saída do compilador do Paraglide: gerada, não versionada (_standards/i18n.md §2).
@@ -18,6 +23,34 @@ export default [
   // que falha só no tipo, em silêncio.
   ...pluginQuery.configs['flat/recommended'],
   ...pluginRouter.configs['flat/recommended'],
+  comments.recommended,
+  { linterOptions: { reportUnusedDisableDirectives: 'error' } },
+  jsxA11y.flatConfigs.recommended,
+  reactHooks.configs.flat.recommended,
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { react },
+    rules: {
+      '@tanstack/query/prefer-query-options': 'error',
+      'react/no-danger': 'error',
+      'no-restricted-properties': [
+        'error',
+        { property: 'innerHTML', message: 'XSS: renderize pelo React.' },
+        {
+          property: 'insertAdjacentHTML',
+          message: 'XSS: renderize pelo React.',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    plugins: { vitest },
+    rules: {
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-disabled-tests': 'error',
+    },
+  },
   {
     // `projectService` no lugar do `project: true` do `tanstackConfig`: é o que
     // `_standards/tooling.md` §4 pede para as regras que dependem de tipo.
@@ -29,10 +62,8 @@ export default [
   {
     // A ordem de import da régua (`tooling.md` §4): externo, alias `#/`,
     // relativo, com linha em branco entre os grupos. O `import/order` do
-    // `tanstackConfig` sai para não brigar com este. `components/ui/**` fica
-    // de fora: é saída do shadcn, e o próximo `shadcn add` desfaria a ordem.
+    // `tanstackConfig` sai para não brigar com este.
     files: ['**/*.{js,ts,tsx}'],
-    ignores: ['src/components/ui/**'],
     plugins: { 'import-x': importX },
     rules: {
       'import-x/order': [
@@ -43,8 +74,12 @@ export default [
             'internal',
             ['parent', 'sibling', 'index'],
           ],
-          pathGroups: [{ pattern: '#/**', group: 'internal' }],
+          pathGroups: [
+            { pattern: '#/**', group: 'internal' },
+            { pattern: '@interclasse/**', group: 'internal' },
+          ],
           'newlines-between': 'always',
+          alphabetize: { order: 'asc' },
         },
       ],
     },
@@ -60,25 +95,6 @@ export default [
     },
   },
   {
-    // `src/components/ui/**` vem do registry do shadcn, e o próximo
-    // `shadcn add` reescreve o arquivo inteiro: correção de lint aqui é
-    // trabalho que a atualização seguinte desfaz.
-    //
-    // As duas regras também estariam erradas no mérito. O
-    // `no-unnecessary-condition` julga pelo TIPO, e o que estes arquivos
-    // protegem é o RUNTIME de biblioteca de terceiro - o `payload` do recharts,
-    // o slot fora de faixa do input-otp, a instância do embla capturada no
-    // cleanup. O tipo diz não-nulo; o valor em runtime nem sempre é. E o
-    // `no-shadow` reclama do `{ className, ...props }` desestruturado dentro de
-    // um componente que já tem `props` no escopo, que é a forma que o próprio
-    // registry escreve.
-    files: ['src/components/ui/**'],
-    rules: {
-      '@typescript-eslint/no-unnecessary-condition': 'off',
-      'no-shadow': 'off',
-    },
-  },
-  {
     // As regras 1 a 4 do skill `code-pattern`, cobradas pelo compilador em vez
     // de pela disciplina de quem revisa. `lowcodejs` já as tinha; aqui e em
     // `simple-hub` elas viviam só no skill.
@@ -88,11 +104,10 @@ export default [
     // async/await no lugar de cadeia `.then`) precisariam de plugin próprio e
     // seguem cobradas na revisão do diff.
     //
-    // Exceções: `routeTree.gen.ts` é gerado, e
-    // `components/ui/**` vem do registry do shadcn — o próximo `shadcn add`
-    // reescreve o arquivo e desfaz qualquer correção.
+    // Exceção: `routeTree.gen.ts` é gerado. `components/ui/**` segue as mesmas
+    // regras (tooling.md §4.2).
     files: ['**/*.{ts,tsx}'],
-    ignores: ['src/routeTree.gen.ts', 'src/components/ui/**'],
+    ignores: ['src/routeTree.gen.ts'],
     rules: {
       // regra 1: sem ternário como control flow. `??`, `?.` e `&&` seguem livres.
       'no-ternary': 'error',
@@ -111,6 +126,13 @@ export default [
       // sem `!`: o narrowing (`if (!x) return`) é quem prova o não-nulo.
       '@typescript-eslint/no-non-null-assertion': 'error',
       // promessa solta e promessa onde se espera `void` (`tooling.md` §4).
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@eslint-community/eslint-comments/require-description': 'error',
+      'no-console': 'error',
+      'max-lines': [
+        'warn',
+        { max: 1000, skipBlankLines: true, skipComments: true },
+      ],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       // colaborador vem do container, nunca de `new` (`tooling.md` §4). O

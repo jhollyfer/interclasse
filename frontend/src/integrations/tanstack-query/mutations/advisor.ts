@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query'
 import {
   AdvisorEnrollmentShowResponse,
   AdvisorStudentShowResponse,
@@ -9,6 +8,7 @@ import type {
   AdvisorStudentUpdatePayload,
   Merge,
 } from '@interclasse/shared'
+import { useMutation } from '@tanstack/react-query'
 
 import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 

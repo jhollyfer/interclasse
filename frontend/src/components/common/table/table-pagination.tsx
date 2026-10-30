@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { PaginationMeta } from '@interclasse/shared'
+import type * as React from 'react'
 
 import { PageShellFooter } from '#/components/common/page-shell'
 

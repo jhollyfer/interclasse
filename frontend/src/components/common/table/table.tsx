@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { Merge } from '@interclasse/shared'
+import * as React from 'react'
 
 import { PageShell } from '#/components/common/page-shell'
 import type { ListSearch } from '#/lib/list-search'

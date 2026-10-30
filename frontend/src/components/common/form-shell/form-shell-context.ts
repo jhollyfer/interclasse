@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { LinkProps } from '@tanstack/react-router'
+import * as React from 'react'
 
 /**
  * O que o formulário inteiro compartilha - e nada além.

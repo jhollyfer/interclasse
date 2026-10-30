@@ -1,14 +1,14 @@
-import type * as React from 'react'
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react'
+import type * as React from 'react'
 import { useState } from 'react'
 
+import type { Input } from '#/components/ui/input'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from '#/components/ui/input-group'
-import type { Input } from '#/components/ui/input'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 

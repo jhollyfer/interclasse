@@ -1,12 +1,12 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
-import type * as React from 'react'
-import { toast } from 'sonner'
 import { AccountProfileUpdateValidator } from '@interclasse/shared'
 import type {
   AccountProfileUpdatePayload,
   AccountProfileShowResponse,
 } from '@interclasse/shared'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
+import type * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   FormShell,

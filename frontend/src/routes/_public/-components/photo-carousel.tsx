@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import * as React from 'react'
 
 import { Picture } from '#/components/common/picture'
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'

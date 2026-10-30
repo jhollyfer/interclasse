@@ -4,8 +4,8 @@ import {
   storefrontBracketQueryOptions,
   storefrontBracketsQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
-import { loadOrNotFound } from '#/lib/load-or-not-found'
 import { CATEGORY_LABELS } from '#/lib/labels'
+import { loadOrNotFound } from '#/lib/load-or-not-found'
 import { pageHead } from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
 

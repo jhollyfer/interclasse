@@ -1,6 +1,6 @@
-import type * as React from 'react'
 import { XIcon } from '@phosphor-icons/react'
 import type { ColumnDef, RowData } from '@tanstack/react-table'
+import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup, ButtonGroupText } from '#/components/ui/button-group'

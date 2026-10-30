@@ -1,5 +1,5 @@
-import type * as React from 'react'
 import type { Merge } from '@interclasse/shared'
+import type * as React from 'react'
 
 /**
  * A posição decide o carregamento (`frontend.md` §9.6): imagem de LCP nunca é

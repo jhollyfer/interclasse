@@ -1,8 +1,8 @@
-import type * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { TreeStructureIcon } from '@phosphor-icons/react'
-import { toast } from 'sonner'
 import type { AdministratorBracketPaginateResponse } from '@interclasse/shared'
+import { TreeStructureIcon } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
+import type * as React from 'react'
+import { toast } from 'sonner'
 
 import {
   ConfirmDialogDescription,

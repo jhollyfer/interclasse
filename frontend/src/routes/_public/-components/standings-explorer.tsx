@@ -1,23 +1,23 @@
-import type * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrophyIcon } from '@phosphor-icons/react'
 import type {
   AdministratorBracketPaginateResponse,
   Category,
 } from '@interclasse/shared'
 import { CATEGORIES } from '@interclasse/shared'
+import { TrophyIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import type * as React from 'react'
 
 import { BracketTree } from '#/components/common/bracket-tree'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { cn } from '#/lib/cn'
 import {
   BRACKET_STATUS_LABELS,
   CATEGORY_LABELS,
   CATEGORY_SHORT_LABELS,
   championName,
 } from '#/lib/labels'
-import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { Empty } from './section'

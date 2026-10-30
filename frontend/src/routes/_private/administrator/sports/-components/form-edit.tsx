@@ -1,12 +1,12 @@
-import type * as React from 'react'
-import { getRouteApi } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministratorSportCreateValidator } from '@interclasse/shared'
 import type {
   AdministratorSportUpdatePayload,
   AdministratorSportShowResponse,
   Merge,
 } from '@interclasse/shared'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
+import type * as React from 'react'
 
 import {
   FormShell,
@@ -19,10 +19,10 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useSportUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
+import { useSportUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
+import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { m } from '#/paraglide/messages'
 
 import type { SportFormType } from './form-fields'
