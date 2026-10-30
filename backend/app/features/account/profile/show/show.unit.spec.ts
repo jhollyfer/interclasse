@@ -27,7 +27,7 @@ test.group('account/profile > show (unit)', () => {
     assert.notProperty(profile, 'password')
   })
 
-  test('falha do repositório é 500 PROFILE_SHOW_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ACCOUNT_PROFILE_SHOW_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.detail = async () => {
       throw new Error('banco fora')

@@ -3,7 +3,6 @@ import factory from '@adonisjs/lucid/factories'
 import Classroom from '#models/classroom'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 import { UserFactory } from '#database/factories/user.factory'
-import { StudentFactory } from '#database/factories/student.factory'
 
 /**
  * Turma. A categoria é derivada do ano pela mesma regra da entidade - o
@@ -23,5 +22,4 @@ export const ClassroomFactory = factory
   })
   .relation('advisor', () => UserFactory)
   .relation('representative', () => UserFactory)
-  .relation('students', () => StudentFactory)
   .build()

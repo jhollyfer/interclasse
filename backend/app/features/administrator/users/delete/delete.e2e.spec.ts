@@ -150,3 +150,15 @@ test.group('users > delete', (group) => {
     assert.isNull(await User.find(id))
   })
 })
+
+test.group('administrator/users/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/users/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
+  })
+})

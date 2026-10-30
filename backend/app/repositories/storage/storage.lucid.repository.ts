@@ -19,7 +19,11 @@ import { StorageContract } from '#services/storage/storage.contract'
  * referência a `storages` é `SET NULL` ou `CASCADE`, então o banco não impediria
  * nada: uma coluna que faltar aqui é um arquivo em uso que some sem aviso.
  */
-const REFERENCES = [{ table: 'users', column: 'avatar_id', label: 'avatar de usuário' }] as const
+const REFERENCES = [
+  { table: 'users', column: 'avatar_id', label: 'avatar de usuário' },
+  { table: 'photos', column: 'storage_id', label: 'foto da galeria' },
+  { table: 'site_settings', column: 'regulation_id', label: 'regulamento do site' },
+] as const
 
 @inject()
 export class StorageLucidRepository extends StorageRepository {

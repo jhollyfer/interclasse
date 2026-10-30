@@ -55,7 +55,7 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
-  test('falha do repositório é 500 USER_ARCHIVE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_ARCHIVE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {

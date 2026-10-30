@@ -55,7 +55,7 @@ test.group('storages/files > create (unit)', () => {
     assert.lengthOf(multipart.initiated, 1)
   })
 
-  test('falha ao gravar aborta o multipart e responde 500 FILE_CREATE_ERROR', async ({
+  test('falha ao gravar aborta o multipart e responde 500 STORAGES_FILE_CREATE_ERROR', async ({
     assert,
   }) => {
     const { storages, multipart, useCase } = await setup()

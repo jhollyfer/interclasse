@@ -6,7 +6,11 @@ import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
-import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
+import {
+  drawSport,
+  signInAsAdvisorOfClassroom,
+  classroomWithStudents,
+} from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   body,
@@ -102,7 +106,7 @@ test.group('enrollments > show', (group) => {
 
   test('o administrador abre a matriz de qualquer turma', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
-    const classroom = await ClassroomFactory.with('students', 2).create()
+    const classroom = await classroomWithStudents(2)
 
     const response = await client
       .get('/advisor/enrollments')

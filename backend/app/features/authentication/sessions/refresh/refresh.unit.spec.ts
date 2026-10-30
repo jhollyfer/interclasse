@@ -73,7 +73,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepEqual(sessions.issued, [])
   })
 
-  test('falha do repositório é 500 SESSION_REFRESH_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 AUTHENTICATION_SESSION_REFRESH_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.findById = async () => {
       throw new Error('banco fora')

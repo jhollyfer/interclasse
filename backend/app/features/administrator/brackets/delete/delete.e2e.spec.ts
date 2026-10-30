@@ -79,3 +79,15 @@ test.group('brackets > delete', (group) => {
     assert.equal(body(conselheiro).code, 'ACCESS_DENIED')
   })
 })
+
+test.group('administrator/brackets/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/brackets/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
+  })
+})

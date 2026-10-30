@@ -51,7 +51,9 @@ test.group('authentication/sessions > sign-out (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('falha do bucket de sessão é 500 SESSION_SIGN_OUT_ERROR', async ({ assert }) => {
+  test('falha do bucket de sessão é 500 AUTHENTICATION_SESSION_SIGN_OUT_ERROR', async ({
+    assert,
+  }) => {
     const { sessions, useCase } = await setup()
     sessions.revoke = async () => {
       throw new Error('banco fora')

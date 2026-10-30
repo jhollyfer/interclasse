@@ -85,3 +85,15 @@ test.group('users > unarchive', (group) => {
     assert.isNotNull(archived.deletedAt)
   })
 })
+
+test.group('administrator/users/unarchive > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.patch('/administrator/users/nao-e-uuid/unarchive').cookies(admin)
+
+    response.assertStatus(422)
+  })
+})

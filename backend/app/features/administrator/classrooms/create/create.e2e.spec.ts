@@ -6,6 +6,7 @@ import {
   body,
   resetDatabase,
   signInWithFactory,
+  authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
 /**
@@ -55,5 +56,23 @@ test.group('jogos > turmas', (group) => {
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'ADVISOR_NOT_FOUND')
+  })
+})
+
+test.group('administrator/classrooms/create > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.post('/administrator/classrooms')
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client.post('/administrator/classrooms').cookies(advisor)
+
+    response.assertStatus(403)
   })
 })

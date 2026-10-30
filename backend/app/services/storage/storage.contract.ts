@@ -28,7 +28,7 @@ export abstract class StorageContract {
   /** O que o bucket sabe sobre o objeto: tamanho e `ETag`. */
   abstract metadata(path: string): Promise<StorageMetadata>
   /**
-   * Os primeiros bytes do objeto (`SIGNATURE_BYTES`), para conferir o tipo pelo
+   * Os primeiros bytes do objeto (`STORAGE_SIGNATURE_BYTES`), para conferir o tipo pelo
    * conteúdo e não pelo que o cliente declarou.
    */
   abstract head(path: string): Promise<Uint8Array>

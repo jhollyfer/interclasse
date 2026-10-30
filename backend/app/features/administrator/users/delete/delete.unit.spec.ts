@@ -44,7 +44,7 @@ test.group('administrator/users > delete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 USER_DELETE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_DELETE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
     users.delete = async () => {

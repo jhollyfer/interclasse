@@ -44,13 +44,15 @@ export class BracketLucidRepository extends BracketRepository {
     const row = await BracketModel.query({ client: this.transaction.client() })
       .where('id', id)
       .preload('teams')
-      .preload('matches', (matches) => {
-        matches.orderBy('round', 'asc').orderBy('position', 'asc')
-      })
       .first()
     if (!row) return null
 
-    return this.toEntity(row)
+    const matches = await MatchModel.query({ client: this.transaction.client() })
+      .where('bracketId', row.id)
+      .orderBy('round', 'asc')
+      .orderBy('position', 'asc')
+
+    return this.toEntity(row, matches)
   }
 
   async findByMatchId(matchId: string): Promise<Bracket | null> {
@@ -431,7 +433,7 @@ export class BracketLucidRepository extends BracketRepository {
       .orderBy('position', 'asc')
   }
 
-  private toEntity(row: BracketModel): Bracket {
+  private toEntity(row: BracketModel, matchRows: ReadonlyArray<MatchModel>): Bracket {
     return Bracket.restore({
       id: row.id,
       sportId: row.sportId,
@@ -445,7 +447,7 @@ export class BracketLucidRepository extends BracketRepository {
         createdAt: team.createdAt.toJSDate(),
         updatedAt: team.updatedAt?.toJSDate() ?? null,
       })),
-      matches: row.matches.map((match) => ({
+      matches: matchRows.map((match) => ({
         id: match.id,
         phase: match.phase,
         round: match.round,

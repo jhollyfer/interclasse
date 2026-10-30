@@ -3,7 +3,6 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { type BracketStatus, type Category } from '@interclasse/shared'
 
 import { BracketSchema } from '#database/schema'
-import Match from '#models/match'
 import Sport from '#models/sport'
 import Team from '#models/team'
 
@@ -17,7 +16,4 @@ export default class Bracket extends BracketSchema {
 
   @hasMany(() => Team)
   declare teams: HasMany<typeof Team>
-
-  @hasMany(() => Match)
-  declare matches: HasMany<typeof Match>
 }

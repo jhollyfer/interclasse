@@ -38,7 +38,7 @@ test.group('administrator/users > show (unit)', () => {
     assert.deepInclude(missing.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 USER_SHOW_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_SHOW_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.detail = async () => {
       throw new Error('banco fora')

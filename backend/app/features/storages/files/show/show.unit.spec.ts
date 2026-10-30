@@ -32,7 +32,7 @@ test.group('storages/files > show (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 FILE_SHOW_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 STORAGES_FILE_SHOW_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     storages.detail = async () => {
       throw new Error('banco fora')

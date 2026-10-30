@@ -10,6 +10,9 @@ import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 
 import type { Registry } from '../.adonisjs/client/registry/schema.d.ts'
 
+import env from '#start/env'
+import { DatabaseGuard } from '#tests/database-guard'
+
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
  */
@@ -115,7 +118,8 @@ export const reporters: Config['reporters'] = REPORTERS[reporterMode]
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  // Antes de qualquer suíte e da primeira migration: banco sem `_test` derruba o runner.
+  setup: [() => DatabaseGuard.assertTestDatabase(env.get('DATABASE_URL'))],
   teardown: [],
 }
 

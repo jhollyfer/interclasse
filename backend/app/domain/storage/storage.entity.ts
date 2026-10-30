@@ -3,12 +3,6 @@ import { UPLOAD_STATUS, left, right, type Either, type UploadStatus } from '@int
 import type { StorageError } from './storage.errors.ts'
 
 /**
- * Quantos bytes do início do objeto bastam para conferir o tipo: a maior
- * assinatura (WebP e WAV, `RIFF....WEBP`) acaba no byte 12.
- */
-export const SIGNATURE_BYTES = 12
-
-/**
  * As assinaturas (magic bytes) de cada tipo aceito: o `Content-Type` e a
  * extensão são declaração do cliente, e o conteúdo é o que prova
  * (_standards/backend.md §5.4). Cada alternativa é uma lista de sequências de

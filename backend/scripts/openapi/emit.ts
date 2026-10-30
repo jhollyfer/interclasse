@@ -47,9 +47,9 @@ import type {
  * saem de `router.toJSON()` e da cadeia de middleware. Só resumo, payload,
  * resposta e os códigos de erro do domínio precisam ser escritos.
  *
- * O corpo de resposta é a exceção que confirma a regra: ele **sai** do model,
- * porque a resposta É o model serializado. Declará-lo de novo em VineJS era
- * manter o mesmo contrato em dois lugares, e o segundo envelhecia calado.
+ * O corpo de resposta sai do schema `…Response` de `shared/src/responses/`, pelo
+ * registro `RESPONSES` (`_standards/openapi.md`): o mesmo schema tipa o
+ * use-case, o presenter e o frontend, e o gerador nunca lê o model.
  */
 
 /** Tipos de token que `router.parsePattern` devolve para um segmento. */
@@ -686,7 +686,7 @@ function buildOperation(
     }
     warnings.push(
       `${method.toUpperCase()} ${path}: sem corpo de resposta. Registre a feature em ` +
-        '`app/core/response.ts`, apontando o model e as relações que o use-case precarrega.',
+        '`app/core/response.ts`, apontando o schema `…Response` do `shared/`.',
     )
   }
 

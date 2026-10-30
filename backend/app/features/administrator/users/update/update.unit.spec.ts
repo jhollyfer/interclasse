@@ -137,7 +137,7 @@ test.group('administrator/users > update (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
   })
 
-  test('falha do repositório é 500 USER_UPDATE_ERROR', async ({ assert }) => {
+  test('falha do repositório é 500 ADMINISTRATOR_USER_UPDATE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {

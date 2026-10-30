@@ -88,3 +88,25 @@ test.group('photos > review', (group) => {
     response.assertStatus(404)
   })
 })
+
+test.group('administrator/photos/review > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('401: sem sessão', async ({ client }) => {
+    const response = await client.put(
+      '/administrator/photos/00000000-0000-4000-8000-000000000000/review',
+    )
+
+    response.assertStatus(401)
+  })
+
+  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+    const advisor = await authenticateAsAdvisor(client)
+
+    const response = await client
+      .put('/administrator/photos/00000000-0000-4000-8000-000000000000/review')
+      .cookies(advisor)
+
+    response.assertStatus(403)
+  })
+})

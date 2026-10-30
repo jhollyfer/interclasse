@@ -88,18 +88,10 @@ const injection = {
         selector:
           'NewExpression[callee.name=/(Service|UseCase|Policy|Controller|Repository|Seeder)$/]:not([callee.name=/MemoryRepository$/])',
         message:
-          'Colaborador vem do container, não de `new`. Injete por construtor com @inject(). ' +
-          'Composition root de verdade: mova para lá com um override de `files`.',
+          'Colaborador vem do container, não de `new`. Injete por construtor com @inject(); ' +
+          'exceção só pela allowlist da régua (_standards/backend.md §2.1).',
       },
     ],
-  },
-}
-
-/** O composition root nomeado: único lugar onde o grafo é montado sem container. */
-const compositionRoot = {
-  files: ['start/**/*.ts', 'providers/**/*.ts', 'config/**/*.ts'],
-  rules: {
-    'no-restricted-syntax': 'off',
   },
 }
 
@@ -176,7 +168,6 @@ export default [
   style,
   typed,
   injection,
-  compositionRoot,
   augmentation,
   imports,
 ]

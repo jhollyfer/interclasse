@@ -5,7 +5,7 @@ import { test } from '@japa/runner'
 import Classroom from '#models/classroom'
 import Student from '#models/student'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
-import { drawnClassroom } from '#tests/classrooms-fixtures'
+import { drawnClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -18,7 +18,7 @@ test.group('classrooms > delete', (group) => {
 
   test('apaga a turma e os alunos dela vão junto', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const classroom = await ClassroomFactory.with('students', 2).create()
+    const classroom = await classroomWithStudents(2)
 
     const response = await client
       .delete(`/administrator/classrooms/${classroom.id}`)
@@ -66,5 +66,17 @@ test.group('classrooms > delete', (group) => {
 
     response.assertStatus(403)
     assert.isNotNull(await Classroom.find(classroom.id))
+  })
+})
+
+test.group('administrator/classrooms/delete > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('422: id que não é uuid', async ({ client }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/administrator/classrooms/nao-e-uuid').cookies(admin)
+
+    response.assertStatus(422)
   })
 })

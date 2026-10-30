@@ -351,12 +351,12 @@ export function controllerPath(importExpression: string, appRoot: string): strin
 /**
  * A resposta da feature, lida do registro central em `#core/response`.
  *
- * A chave é o caminho da pasta dentro de `app/features` - `administrator/notices`,
- * `storefront/albums`. Uma entrada por feature cobre as sete operações dela:
+ * A chave é o caminho da pasta dentro de `app/features` - `administrator/sports`,
+ * `storefront/photos`. Uma entrada por feature cobre as sete operações dela:
  * criar, listar, detalhar, atualizar, arquivar, restaurar e remover devolvem o
  * mesmo recurso, em envelopes que o gerador monta sozinho.
  *
- * Um arquivo de resposta por pasta declararia em VineJS o que o model já sabe:
+ * Um arquivo de resposta por pasta repetiria o schema `…Response` do `shared/`:
  * o mesmo contrato escrito duas vezes, e a segunda cópia envelhecendo calada.
  */
 export function loadResponseSchema(

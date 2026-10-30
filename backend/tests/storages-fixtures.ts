@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
+import { DateTime } from 'luxon'
 import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import Storage from '#models/storage'
@@ -37,4 +38,16 @@ export function storageRow(attributes: Partial<Storage> = {}) {
     status: UPLOAD_STATUS.UPLOADED,
     ...attributes,
   })
+}
+
+/** Se a linha de `storages` ainda existe, para o spec conferir o efeito sem importar o model. */
+export async function storageExists(id: string): Promise<boolean> {
+  return (await Storage.find(id)) !== null
+}
+
+/** Envelhece a linha no banco: é a idade que o comando de limpeza usa para decidir. */
+export async function ageStorage(id: string, hours: number): Promise<void> {
+  await Storage.query()
+    .where('id', id)
+    .update({ created_at: DateTime.now().minus({ hours }).toSQL() })
 }
