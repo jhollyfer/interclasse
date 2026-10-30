@@ -3,5 +3,6 @@
   "in_use": "File in use",
   "in_use_field": "File in use at: {places}. Unlink it before deleting it.",
   "incomplete": "Incomplete file",
-  "size_mismatch_field": "The uploaded file has {received} bytes, and {declared} were declared."
+  "size_mismatch_field": "The uploaded file has {received} bytes, and {declared} were declared.",
+  "content_mismatch_field": "The file content is not of the declared type ({mimetype})."
 }

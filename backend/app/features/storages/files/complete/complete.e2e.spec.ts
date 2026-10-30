@@ -12,6 +12,7 @@ import {
   type ResponseBody,
 } from '#tests/http-fixtures'
 import type { Session } from '#tests/http-fixtures'
+import { pngBytes } from '#tests/storages-fixtures'
 
 /**
  * O arquivo como registro neutro e compartilhado: ele não pertence ao
@@ -23,9 +24,9 @@ import type { Session } from '#tests/http-fixtures'
  * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
  * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
  */
-const FULL_PART = new Uint8Array(PART_SIZE).fill(65)
+const FULL_PART = pngBytes(PART_SIZE, 65)
 
-const SMALL = new Uint8Array(1024).fill(66)
+const SMALL = pngBytes(1024)
 
 /** Abre um upload pelo endpoint real e devolve o envelope. */
 async function open(

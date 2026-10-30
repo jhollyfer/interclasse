@@ -61,7 +61,11 @@ export default class StoragesFileCompleteUseCase {
         if (uploadId) await this.multipart.complete(path, uploadId, payload.parts ?? [])
 
         const metadata = await this.bucket.metadata(path)
-        const completed = storage.complete(metadata, new Date())
+        const head = await this.bucket.head(path)
+        const completed = storage.complete(
+          { contentLength: metadata.contentLength, head },
+          new Date(),
+        )
 
         if (completed.isLeft()) {
           await this.discard(storage)

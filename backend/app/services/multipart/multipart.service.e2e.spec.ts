@@ -53,7 +53,10 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const urls = await multipart.signParts(key, uploadId, [1, 2])
+    const urls = await multipart.signParts(key, uploadId, [
+      { partNumber: 1, size: FIRST_PART.byteLength },
+      { partNumber: 2, size: LAST_PART.byteLength },
+    ])
 
     assert.lengthOf(urls, 2)
     assert.deepEqual(
@@ -90,7 +93,10 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const first = item(await multipart.signParts(key, uploadId, [1]), 0)
+    const first = item(
+      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: FIRST_PART.byteLength }]),
+      0,
+    )
 
     await put(first.url, FIRST_PART)
 
@@ -109,7 +115,10 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const first = item(await multipart.signParts(key, uploadId, [1]), 0)
+    const first = item(
+      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: FIRST_PART.byteLength }]),
+      0,
+    )
 
     await put(first.url, FIRST_PART)
     await multipart.abort(key, uploadId)
@@ -125,7 +134,10 @@ test.group('multipart', () => {
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
-    const expiring = item(await multipart.signParts(key, uploadId, [1], 1), 0)
+    const expiring = item(
+      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: LAST_PART.byteLength }], 1),
+      0,
+    )
 
     await new Promise((resolve) => setTimeout(resolve, 1_500))
 
@@ -135,7 +147,10 @@ test.group('multipart', () => {
 
     // E o upload continua aberto: uma URL nova sobe a mesma parte. É o que
     // `GET /storages/:id/parts` faz por quem ficou horas fora do ar.
-    const renewed = item(await multipart.signParts(key, uploadId, [1]), 0)
+    const renewed = item(
+      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: LAST_PART.byteLength }]),
+      0,
+    )
 
     await put(renewed.url, LAST_PART)
 

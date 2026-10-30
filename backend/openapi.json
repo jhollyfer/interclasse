@@ -6527,7 +6527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422StorageSizeMismatchValidationError"
+                  "$ref": "#/components/schemas/Error422StorageContentMismatchStorageSizeMismatchValidationError"
                 }
               }
             }
@@ -19592,7 +19592,7 @@
           "errors"
         ]
       },
-      "Error422StorageNotFoundValidationError": {
+      "Error422StorageContentMismatchStorageSizeMismatchValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19609,7 +19609,8 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_NOT_FOUND",
+              "STORAGE_CONTENT_MISMATCH",
+              "STORAGE_SIZE_MISMATCH",
               "VALIDATION_ERROR"
             ]
           },
@@ -19628,7 +19629,7 @@
           "errors"
         ]
       },
-      "Error422StorageSizeMismatchValidationError": {
+      "Error422StorageNotFoundValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19645,7 +19646,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_SIZE_MISMATCH",
+              "STORAGE_NOT_FOUND",
               "VALIDATION_ERROR"
             ]
           },

@@ -1,5 +1,6 @@
 import {
   MultipartContract,
+  type PartToSign,
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
@@ -30,9 +31,9 @@ export class MultipartFake extends MultipartContract {
   async signParts(
     key: string,
     _uploadId: string,
-    partNumbers: ReadonlyArray<number>,
+    parts: ReadonlyArray<PartToSign>,
   ): Promise<Array<PresignedPart>> {
-    return partNumbers.map((partNumber) => ({
+    return parts.map(({ partNumber }) => ({
       partNumber,
       url: `https://bucket.test/${key}?part=${partNumber}`,
     }))
