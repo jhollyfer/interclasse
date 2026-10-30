@@ -12,6 +12,11 @@ import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
 
 import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   MatchCardsDialog,
   MatchScheduleDialog,
   MatchUnscoreDialog,
@@ -24,9 +29,6 @@ import {
   TableActions,
   TableContent,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
@@ -248,11 +250,11 @@ export function MatchesTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>{m.admin_matches_empty_title()}</TableEmptyTitle>
-          <TableEmptyDescription>
+          <EmptyStateTitle>{m.admin_matches_empty_title()}</EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_matches_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
             <Link
               to="/administrator/brackets"
               className={buttonVariants({ variant: 'default' })}
@@ -260,7 +262,7 @@ export function MatchesTable(): React.JSX.Element {
               <TreeStructureIcon />
               {m.admin_matches_go_to_brackets()}
             </Link>
-          </TableEmptyActions>
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

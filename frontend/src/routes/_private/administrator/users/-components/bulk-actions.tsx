@@ -9,8 +9,7 @@ import {
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useUserArchiveMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
-
-import { BulkArchive } from './bulk-archive'
+import { BulkArchive } from '#/components/common/bulk-archive'
 
 /**
  * As ações da barra de seleção. Só arquivar: remover em massa não existe.

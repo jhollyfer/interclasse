@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 
+import { Picture } from '#/components/common/picture'
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
@@ -93,11 +94,13 @@ export function PhotoCarousel(): React.JSX.Element | null {
             className="w-full shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
           >
             <figure className="overflow-hidden rounded-lg border">
-              <img
+              <Picture
                 src={photo.url}
                 alt={photo.caption ?? m.public_photos_alt_fallback()}
-                loading="lazy"
                 className="aspect-[4/3] w-full object-cover"
+                width={800}
+                height={600}
+                placement="fold"
               />
               {photo.caption && (
                 <figcaption className="text-muted-foreground p-3 text-sm">

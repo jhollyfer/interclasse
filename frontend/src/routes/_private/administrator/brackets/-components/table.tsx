@@ -3,13 +3,15 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   Table,
   TableActions,
   TableContent,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
@@ -58,13 +60,13 @@ export function BracketsTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>{m.admin_brackets_empty_title()}</TableEmptyTitle>
-          <TableEmptyDescription>
+          <EmptyStateTitle>{m.admin_brackets_empty_title()}</EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_brackets_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
             <DrawDialog />
-          </TableEmptyActions>
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

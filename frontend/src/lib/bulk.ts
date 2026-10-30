@@ -20,7 +20,7 @@ export async function runBulk<TItem>(
   items: ReadonlyArray<TItem>,
   action: (item: TItem) => Promise<unknown>,
 ): Promise<BulkOutcome> {
-  const results = await Promise.allSettled(items.map(action))
+  const results = await Promise.allSettled(items.map((item) => action(item)))
 
   const done = results.filter((result) => result.status === 'fulfilled').length
 

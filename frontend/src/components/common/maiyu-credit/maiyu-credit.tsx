@@ -1,5 +1,6 @@
 import type * as React from 'react'
 
+import { Picture } from '#/components/common/picture'
 import maiyuLogo from '#/assets/maiyu.png'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
@@ -21,12 +22,13 @@ export function MaiyuCredit({
       {...rest}
       className={cn('flex items-center justify-center gap-2', className)}
     >
-      <img
+      <Picture
         src={maiyuLogo}
         alt=""
         width={20}
         height={20}
         className="size-5 shrink-0"
+        placement="fold"
       />
       <span>
         {m.common_maiyu_credit_by()}{' '}

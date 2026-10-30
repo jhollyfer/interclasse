@@ -3,6 +3,7 @@ import type * as React from 'react'
 import { AuthenticationSessionSignInValidator } from '@interclasse/shared'
 import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
+import { Picture } from '#/components/common/picture'
 import logo512 from '#/assets/logo-512.png'
 import { InputPassword } from '#/components/common/input-password'
 import { SubmitButton } from '#/components/common/submit-button'
@@ -83,12 +84,13 @@ export function SignInForm(): React.JSX.Element {
               selo aparecia repetido em tamanhos diferentes. Leva ao site,
               como a marca levava. */}
           <Link to="/" aria-label={m.auth_back_to_site()}>
-            <img
+            <Picture
               src={logo512}
               alt={m.auth_logo_alt()}
               width={256}
               height={256}
               className="size-64"
+              placement="lcp"
             />
           </Link>
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
