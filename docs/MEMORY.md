@@ -16,13 +16,13 @@
 
 ## Parou em
 
-Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
+Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) e 5.7 (código e UI do frontend: ESLint completo incluindo `ui/`, dialogs por trigger/handle, Luxon, sem memo manual, tema por cookie, tokens, CSP) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
 
 ## Próximos passos
 
-1. Fase 5.7 (ESLint, dialogs, Luxon, SEO, tokens): o kit novo ainda não tem tela que o use; `RichEditor` e `MultiFileUpload` entram quando um formulário pedir.
+1. Fechar a 5.7: teste de peça em `components/common` (table, image-field, enrollment-board, form-shell, locale-switch, bracket-tree, photo-gallery, classroom-detail, match-dialogs), BreadcrumbList e JSON-LD do domínio, `size-adjust` das fontes de reserva medido.
 2. Rodar o E2E Playwright com o backend de pé antes do PR (URL do login e rotas `new`/`$id/edit` mudaram).
-3. Definir como o `robots.txt` reconhece staging: hoje é `import.meta.env.PROD`, e um staging com build de produção sairia indexável.
+3. Antes do deploy: definir `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build) na produção; sem a primeira o site sai `noindex`, sem a segunda o CSP bloqueia o upload.
 
 ## Contexto importante
 

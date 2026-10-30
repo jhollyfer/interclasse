@@ -57,7 +57,7 @@ Trazer o projeto para o padrão Maiyu inteiro.
 |---|---|---|---|---|
 | 4.1 | Índice único que garanta uma linha só em `site_settings` | Baixa | Feito | migration `add_site_settings_singleton_index` (índice sobre `(true)`); `current()` insere com `on conflict do nothing` e lê a vencedora |
 | 4.2 | Tipo do `scheduledAt` do VineJS (`DateTime \| null`, chega `undefined`) | Baixa | Feito | o retorno do `transform` diz os três estados; spec em `matches.validator.unit.spec.ts` |
-| 4.3 | Tema por cookie no servidor e tamanhos de fonte em token | Baixa | A fazer | desvios descritos em `DESIGN.md` |
+| 4.3 | Tema por cookie no servidor e tamanhos de fonte em token | Baixa | Concluída | tema por cookie no `loader` da raiz, `--text-*` por papel e fonte com `size-adjust` (`DESIGN.md` §3, §5) |
 | 4.4 | Fixar a imagem `node:24-alpine` por digest nos Dockerfiles | Média | Feita | digest pela API do registry (5.1) |
 
 ## Fase 5 · Régua estrita, auditoria de 30/10 (0/8)
@@ -74,7 +74,7 @@ tudo o que os `CLAUDE.md` dos apps chamavam de exceção. Cada frente fecha os i
 | 5.4 | Backend arquitetura: `ctx.actor` + Bouncer/policies com entidade, session repository, storage sem hook, `core/openapi` sem Lucid, resposta pelo schema, recusas em tabela, unicidade no repository, nomes de log/erro, árvore, `pattern:check` completo, `site_settings` único, `scheduledAt` | Alta | Feito (falta rodar E2E com banco) | T1, 4.1, 4.2; `ActorSchema`, `SessionRepository`, `RefusalBase`, `PostgresError`, gerador OpenAPI em `scripts/openapi/` |
 | 5.5 | Backend testes: unit/e2e faltando, matriz de status, redes obrigatórias, specs no alvo | Média | A fazer | T2, T3 |
 | 5.6 | Frontend estrutura: `_authentication/`, `request` por schema, `local-store`, `lib/` na árvore, kit comum completo, molde de recurso, sufixo `Mutation`, assets e sitemap/robots | Alta | Feita | login em `/sign-in`; `request(path, schema)`; kit comum completo; `robots`/`sitemap` por rota de servidor |
-| 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | A fazer | B4, C3, T4, SEC-9, 4.3 |
+| 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | Parcial | B4, C3, T4, SEC-9, 4.3 feitos; faltam teste de peça em `components/common` (table, image-field, enrollment-board, form-shell, locale-switch, bracket-tree, photo-gallery, classroom-detail, match-dialogs), BreadcrumbList e JSON-LD de domínio, E2E (5.8) |
 | 5.8 | Verificação final: todos os portões, suíte e2e do backend e E2E Playwright | Alta | A fazer | |
 
 ## Fase N · Ideias (fora do escopo atual)

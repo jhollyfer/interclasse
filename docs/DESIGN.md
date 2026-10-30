@@ -12,7 +12,7 @@
 
 - Direção: a identidade do site antigo dos jogos (`site-jogos-estudantis`): verde da quadra, verde-noite no cabeçalho e no rodapé, amarelo do placar. Transmite competição escolar sem perder a leitura de tabela e de placar.
 - Modo dominante: **Convencer e Ler** no site público (jogos, classificação, avisos); **Operar** no painel (tabelas, formulários, sorteio, placar). O painel usa padrão familiar de shadcn; a ousadia visual (display condensado em itálico) fica no site público.
-- Tema: claro e escuro. A escolha do tema segue `frontend.md` (cookie lido no servidor, sem atraso na hidratação); a implementação está na tarefa 5.7 de `docs/TASKS.md`.
+- Tema: claro e escuro. A preferência mora no cookie `theme` (`light`, `dark` ou `system`), lido no `loader` da raiz: o primeiro HTML já sai com a classe no `<html>`, sem atraso na hidratação. `system` resolve por um script antes da hidratação (`ThemeProvider`, `lib/theme.ts`); `suppressHydrationWarning` fica só no `<html>`, para esse caso.
 
 ## 2. Cores
 
@@ -52,8 +52,7 @@ Famílias (`@fontsource`, só os pesos usados):
 | Corpo (`--font-sans`)      | Barlow                                  | 400, 600                 | texto, formulário, tabela        |
 | Display (`--font-display`) | Barlow Condensed, com Barlow de reserva | 700 itálico, 800 itálico | títulos do site público e placar |
 
-A escala é de tokens `--text-*` nomeados por papel, como manda `frontend.md` §6; a migração dos
-componentes está na tarefa 5.7 de `docs/TASKS.md`.
+Tamanhos soltos ficam em tokens `--text-*` nomeados por papel (`--text-error-code`, `--text-error-code-lg`) e `--leading-display`, como manda `frontend.md` §6; o corpo usa a escala do Tailwind. As duas famílias têm fonte de reserva com `size-adjust` e overrides de ascent/descent (`Barlow Fallback`, `Barlow Condensed Fallback`, em `styles.css`): o `size-adjust` é estimado, a conferir com a ferramenta de métrica antes de afinar.
 Recursos de fonte: `font-feature-settings: 'ss01', 'cv01', 'cv11'`, `font-synthesis: none`.
 
 ## 4. Layout
@@ -66,7 +65,8 @@ Recursos de fonte: `font-feature-settings: 'ss01', 'cv01', 'cv11'`, `font-synthe
 ## 5. Elevação e camadas
 
 - Sombra por papel: `shadow-card` (cartão em repouso), `shadow-card-hover` e `shadow-card-elevated`. Cada uma soma um anel de 1 px, que dá contorno sem segunda borda. Os tokens `--elevation-*` viram `--shadow-card*` no `@theme inline` por causa de colisão de nome.
-- Escala de z-index nomeada em token: não definida em `styles.css`; usa os valores do shadcn nos componentes de `components/ui/`.
+- Escala de z-index nomeada no `@theme` de `styles.css`: `dropdown` (10) < `sticky` (20) < `overlay` (30) < `modal` (40) < `toast` (50) < `tooltip` (60), usada por `z-dropdown`, `z-sticky`, `z-overlay`, `z-modal`, `z-toast` e `z-tooltip`. Os popups do Base UI (menu, combobox) usam `z-modal`, para abrir por cima do dialog em que moram.
+- Valores de layout sem escala do Tailwind viram `@utility` ou token com nome de papel (`min-h-stage`, `max-w-aside`, `aspect-photo`, `scale-press`, `gap-menu-bar`); valor arbitrário em classe só dentro de `components/ui/`.
 
 ## 6. Formas
 
