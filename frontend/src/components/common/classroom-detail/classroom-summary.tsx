@@ -4,8 +4,9 @@ import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
 
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
-import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS, plural } from '#/lib/labels'
+import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 import { VISIBLE_CLASSROOMS } from './classroom-detail-loader'
 
@@ -35,32 +36,43 @@ export function ClassroomSummary({
   return (
     <Card className={cn('gap-3', className)}>
       <CardHeader>
-        <CardTitle>Sobre a turma</CardTitle>
+        <CardTitle>{m.common_summary_title()}</CardTitle>
       </CardHeader>
       <CardContent>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm">
-          <dt className="text-muted-foreground">Categoria</dt>
+          <dt className="text-muted-foreground">
+            {m.common_summary_category()}
+          </dt>
           <dd>
             {CATEGORY_LABELS[board.classroom.category]}{' '}
             <span className="text-muted-foreground">
               ({CATEGORY_SHORT_LABELS[board.classroom.category]})
             </span>
           </dd>
-          <dt className="text-muted-foreground">Conselheiro</dt>
+          <dt className="text-muted-foreground">
+            {m.common_summary_advisor()}
+          </dt>
           <dd className="truncate">
-            {classroom?.advisor?.name ?? 'Sem conselheiro'}
+            {classroom?.advisor?.name ?? m.common_summary_no_advisor()}
           </dd>
-          <dt className="text-muted-foreground">Representante</dt>
+          <dt className="text-muted-foreground">
+            {m.common_summary_representative()}
+          </dt>
           <dd className="truncate">
-            {classroom?.representative?.name ?? 'Sem representante'}
+            {classroom?.representative?.name ??
+              m.common_summary_no_representative()}
           </dd>
-          <dt className="text-muted-foreground">Alunos</dt>
+          <dt className="text-muted-foreground">
+            {m.common_summary_students()}
+          </dt>
           <dd>{board.students.length}</dd>
-          <dt className="text-muted-foreground">Atletas</dt>
+          <dt className="text-muted-foreground">
+            {m.common_summary_athletes()}
+          </dt>
           <dd>{athletes}</dd>
-          <dt className="text-muted-foreground">Modalidades</dt>
+          <dt className="text-muted-foreground">{m.common_summary_sports()}</dt>
           <dd>
-            {plural(sports.length, 'modalidade', 'modalidades')}
+            {m.common_summary_sports_count({ count: sports.length })}
             {sports.length > 0 && (
               <span className="text-muted-foreground block">
                 {sports.map((sport) => sport.name).join(', ')}

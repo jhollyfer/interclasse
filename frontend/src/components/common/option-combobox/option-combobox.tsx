@@ -10,6 +10,7 @@ import {
 } from '#/components/ui/combobox'
 import { InputGroupAddon } from '#/components/ui/input-group'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 export type OptionComboboxItem = {
   value: string
@@ -65,7 +66,7 @@ export function OptionCombobox({
   onValueChange,
   onBlur,
   id,
-  placeholder = 'Selecione',
+  placeholder = m.common_select_placeholder(),
   disabled,
   clearable = false,
   icon,
@@ -116,7 +117,7 @@ export function OptionCombobox({
       </ComboboxInput>
 
       <ComboboxContent>
-        <ComboboxEmpty>Nenhuma opção encontrada.</ComboboxEmpty>
+        <ComboboxEmpty>{m.common_no_options()}</ComboboxEmpty>
         <ComboboxList>
           {(option: OptionComboboxItem) => (
             <ComboboxItem key={option.value} value={option}>

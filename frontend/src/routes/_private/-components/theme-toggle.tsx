@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '#/components/ui/tooltip'
+import { m } from '#/paraglide/messages'
 
 /**
  * Alterna entre claro e escuro.
@@ -43,7 +44,7 @@ export function ThemeToggle(): React.JSX.Element {
             variant="ghost"
             size="icon"
             onClick={toggle}
-            aria-label="Alternar tema"
+            aria-label={m.panel_toggle_theme()}
             className="relative overflow-hidden"
           >
             <SunIcon
@@ -57,7 +58,7 @@ export function ThemeToggle(): React.JSX.Element {
           </Button>
         }
       />
-      <TooltipContent side="bottom">Alternar tema</TooltipContent>
+      <TooltipContent side="bottom">{m.panel_toggle_theme()}</TooltipContent>
     </Tooltip>
   )
 }

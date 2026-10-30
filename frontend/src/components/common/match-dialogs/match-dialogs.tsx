@@ -50,6 +50,7 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
+import { m } from '#/paraglide/messages'
 
 /** O mínimo de uma partida que os dois diálogos precisam. */
 export type MatchRef = Readonly<{
@@ -105,7 +106,7 @@ export function MatchScoreDialog({
     },
     fields: SCORE_FIELDS,
     mutation: useMatchScore,
-    success: 'Placar salvo.',
+    success: m.common_match_score_saved(),
     // Placar é escrita idempotente: reenviar grava o mesmo resultado.
     retry: 'match-score',
     payload: (values) => {
@@ -126,9 +127,12 @@ export function MatchScoreDialog({
       <DialogContent>
         <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>Placar</DialogTitle>
+            <DialogTitle>{m.common_match_score_title()}</DialogTitle>
             <DialogDescription>
-              {match.homeName} x {match.awayName}
+              {m.common_match_versus({
+                home: match.homeName ?? m.common_to_be_defined(),
+                away: match.awayName ?? m.common_to_be_defined(),
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -170,7 +174,7 @@ export function MatchScoreDialog({
               control={form.control}
               name="winnerTeamId"
               id="score-winner"
-              label="Venceu nos pênaltis"
+              label={m.common_match_penalty_winner()}
             >
               {({ field, control }) => (
                 <NativeSelect
@@ -181,7 +185,9 @@ export function MatchScoreDialog({
                   }
                   onBlur={field.onBlur}
                 >
-                  <NativeSelectOption value="">Selecione</NativeSelectOption>
+                  <NativeSelectOption value="">
+                    {m.common_select_placeholder()}
+                  </NativeSelectOption>
                   <NativeSelectOption value={match.homeTeamId ?? ''}>
                     {match.homeName}
                   </NativeSelectOption>
@@ -197,7 +203,7 @@ export function MatchScoreDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
-              Salvar placar
+              {m.common_match_score_submit()}
             </Button>
           </DialogFooter>
         </form>
@@ -252,7 +258,7 @@ export function MatchScheduleDialog({
     defaults: { scheduledAt: match.scheduledAt, location: match.location },
     fields: SCHEDULE_FIELDS,
     mutation: useMatchUpdate,
-    success: 'Agenda salva.',
+    success: m.common_match_schedule_saved(),
     retry: 'match-update',
     payload: (values) => ({
       id: match.id,
@@ -268,9 +274,12 @@ export function MatchScheduleDialog({
       <DialogContent>
         <form method="post" onSubmit={onSubmit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>Agendar partida</DialogTitle>
+            <DialogTitle>{m.common_match_schedule_title()}</DialogTitle>
             <DialogDescription>
-              {match.homeName ?? 'A definir'} x {match.awayName ?? 'A definir'}
+              {m.common_match_versus({
+                home: match.homeName ?? m.common_to_be_defined(),
+                away: match.awayName ?? m.common_to_be_defined(),
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -278,7 +287,7 @@ export function MatchScheduleDialog({
             control={form.control}
             name="scheduledAt"
             id="schedule-when"
-            label="Data e hora"
+            label={m.common_match_when()}
           >
             {({ field, control }) => (
               <Input
@@ -298,13 +307,13 @@ export function MatchScheduleDialog({
             control={form.control}
             name="location"
             id="schedule-location"
-            label="Local"
+            label={m.common_match_location()}
           >
             {({ field, control }) => (
               <Input
                 {...control}
                 maxLength={120}
-                placeholder="Quadra principal"
+                placeholder={m.common_match_location_placeholder()}
                 value={field.value ?? ''}
                 onChange={(event) =>
                   field.onChange(blankToNull(event.target.value))
@@ -318,7 +327,7 @@ export function MatchScheduleDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
-              Salvar agenda
+              {m.common_match_schedule_submit()}
             </Button>
           </DialogFooter>
         </form>
@@ -339,7 +348,7 @@ export function MatchUnscoreDialog({
   const invalidate = useInvalidate()
   const unscore = useMatchUnscore({
     onSuccess: async () => {
-      toast.success('Placar desfeito.')
+      toast.success(m.common_match_unscored())
       await invalidate(GAME_CHANGE)
     },
     onError: (error) => notifyError(error, { id: 'match-unscore' }),
@@ -353,15 +362,23 @@ export function MatchUnscoreDialog({
       onConfirm={() => unscore.mutate(match.id)}
     >
       <ConfirmDialogHeader>
-        <ConfirmDialogTitle>Desfazer o placar?</ConfirmDialogTitle>
+        <ConfirmDialogTitle>
+          {m.common_match_unscore_title()}
+        </ConfirmDialogTitle>
         <ConfirmDialogDescription>
-          {`${match.homeName ?? 'A definir'} ${match.homeScore ?? '-'} x ${match.awayScore ?? '-'} ${match.awayName ?? 'A definir'}`}
-          {' volta para "a jogar", e o vencedor sai da partida seguinte.'}
+          {m.common_match_unscore_description({
+            home: match.homeName ?? m.common_to_be_defined(),
+            homeScore: match.homeScore ?? '-',
+            awayScore: match.awayScore ?? '-',
+            away: match.awayName ?? m.common_to_be_defined(),
+          })}
         </ConfirmDialogDescription>
       </ConfirmDialogHeader>
       <ConfirmDialogFooter>
         <ConfirmDialogCancel />
-        <ConfirmDialogConfirm>Desfazer</ConfirmDialogConfirm>
+        <ConfirmDialogConfirm>
+          {m.common_match_unscore_submit()}
+        </ConfirmDialogConfirm>
       </ConfirmDialogFooter>
     </ConfirmDialog>
   )

@@ -10,6 +10,7 @@ import {
 } from '#/integrations/tanstack-query/mutations/storages'
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/mimetype'
+import { m } from '#/paraglide/messages'
 
 import { ImageFieldProvider } from './image-field-context'
 
@@ -109,7 +110,7 @@ export function ImageField({
     // passa por filtro nenhum. Recusar aqui poupa o `POST /storages` e diz
     // *qual* arquivo não serve - o servidor diria só que o tipo é inválido.
     if (!isStorageMimetype(file.type) || !accept.includes(file.type)) {
-      toast.error(`${file.name} não é um tipo de arquivo aceito neste campo.`, {
+      toast.error(m.common_file_type_not_accepted({ name: file.name }), {
         id: 'storage-create-error',
       })
       event.target.value = ''

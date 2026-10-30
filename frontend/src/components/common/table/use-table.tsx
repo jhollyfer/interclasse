@@ -20,9 +20,12 @@ import type {
   ColumnVisibilityState,
 } from '@tanstack/react-table'
 
+import { m } from '#/paraglide/messages'
+
 import { TableLayoutValidator } from './table-layout.validator'
 import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
+
 
 /**
  * As features registradas nas tabelas do painel.
@@ -226,7 +229,7 @@ export function useTable<TRow extends RowData>({
         // vazio: para quem lê a tabela por leitor de tela, a última coluna não
         // tinha nome nenhum. `sr-only` porque na tela o rótulo competiria com
         // um menu de 24px que já se explica pelo ícone.
-        header: () => <span className="sr-only">Ações</span>,
+        header: () => <span className="sr-only">{m.common_actions()}</span>,
         cell: ({ row }) => (
           // O menu não pode disparar o clique da linha atrás dele.
           <div onClick={(event) => event.stopPropagation()}>

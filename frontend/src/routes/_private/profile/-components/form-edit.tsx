@@ -41,6 +41,7 @@ import { useAccountUpdate } from '#/integrations/tanstack-query/mutations/accoun
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { blankToUndefined } from '#/lib/form-values'
 import { initials } from '#/lib/labels'
+import { m } from '#/paraglide/messages'
 
 /**
  * Os campos que o backend pode acusar.
@@ -120,14 +121,14 @@ export function ProfileFormEdit(): React.JSX.Element {
       // O redirecionamento para o login não é efeito colateral a evitar: é o
       // que já aconteceu do lado do servidor.
       if (payload.email !== account.email || payload.password) {
-        toast.success('Acesso atualizado. Entre de novo.')
+        toast.success(m.profile_access_updated())
         await router.navigate({ to: '/authentication' })
         return
       }
 
       // Volta para a ficha: é lá que o nome e o e-mail novos aparecem para
       // conferência.
-      toast.success(`${updated.name} salvo.`)
+      toast.success(m.profile_saved({ name: updated.name }))
       await router.navigate({ to: '/profile' })
     },
   })
@@ -136,7 +137,7 @@ export function ProfileFormEdit(): React.JSX.Element {
     <FormShell {...shell}>
       <FormShellHeader>
         <FormShellBack />
-        <FormShellTitle>Editar perfil</FormShellTitle>
+        <FormShellTitle>{m.profile_edit()}</FormShellTitle>
         <FormShellActions>
           <FormShellDiscard />
           <FormShellSubmit />
@@ -146,13 +147,13 @@ export function ProfileFormEdit(): React.JSX.Element {
       <FormShellContent onSubmit={onSubmit}>
         <FormShellCard>
           <FieldSet>
-            <FieldLegend>Identidade</FieldLegend>
+            <FieldLegend>{m.profile_identity()}</FieldLegend>
 
             <AppField
               control={form.control}
               name="avatarId"
               id="account-avatar"
-              label="Foto"
+              label={m.profile_photo()}
             >
               {({ field, control }) => (
                 <ImageField
@@ -166,7 +167,9 @@ export function ProfileFormEdit(): React.JSX.Element {
                   </ImageFieldPreview>
                   <ImageFieldContent>
                     <ImageFieldActions>
-                      <ImageFieldUpload>Enviar foto</ImageFieldUpload>
+                      <ImageFieldUpload>
+                        {m.profile_upload_photo()}
+                      </ImageFieldUpload>
                       <ImageFieldRemove />
                     </ImageFieldActions>
                     <ImageFieldDescription />
@@ -179,7 +182,7 @@ export function ProfileFormEdit(): React.JSX.Element {
               control={form.control}
               name="name"
               id="account-name"
-              label="Nome"
+              label={m.common_name()}
             >
               {({ field, control }) => (
                 <Input
@@ -195,7 +198,7 @@ export function ProfileFormEdit(): React.JSX.Element {
               control={form.control}
               name="email"
               id="account-email"
-              label="E-mail"
+              label={m.common_email()}
             >
               {({ field, control }) => (
                 <Input
@@ -209,13 +212,13 @@ export function ProfileFormEdit(): React.JSX.Element {
           </FieldSet>
 
           <FieldSet>
-            <FieldLegend>Senha</FieldLegend>
+            <FieldLegend>{m.common_password()}</FieldLegend>
 
             <AppField
               control={form.control}
               name="password"
               id="account-password"
-              label="Nova senha (deixe em branco para manter)"
+              label={m.profile_new_password()}
             >
               {({ field, control }) => (
                 <InputPassword
@@ -234,7 +237,7 @@ export function ProfileFormEdit(): React.JSX.Element {
               control={form.control}
               name="passwordConfirmation"
               id="account-password-confirmation"
-              label="Confirme a nova senha"
+              label={m.profile_confirm_password()}
             >
               {({ field, control }) => (
                 <InputPassword
@@ -253,7 +256,7 @@ export function ProfileFormEdit(): React.JSX.Element {
               control={form.control}
               name="currentPassword"
               id="account-current-password"
-              label="Senha atual"
+              label={m.profile_current_password()}
             >
               {({ field, control }) => (
                 <>
@@ -269,16 +272,14 @@ export function ProfileFormEdit(): React.JSX.Element {
                   {/* A regra é do validator - `requiredIfExists('password')` -,
                       e o texto está aqui para quem lê antes de digitar. */}
                   <FieldDescription>
-                    Exigida só para trocar a senha. É prova de identidade: quem
-                    sequestra uma sessão tem o cookie, mas não sabe a senha.
+                    {m.profile_current_password_help()}
                   </FieldDescription>
                 </>
               )}
             </AppField>
 
             <FieldDescription>
-              Trocar o e-mail ou a senha encerra todas as sessões desta conta, e
-              você precisará entrar de novo.
+              {m.profile_credentials_notice()}
             </FieldDescription>
           </FieldSet>
 

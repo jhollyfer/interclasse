@@ -1,6 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 import { PageHeader, PageHeaderTitle } from '#/components/common/page-shell'
+import { m } from '#/paraglide/messages'
 
 export const Route = createLazyFileRoute('/_private/advisor/')({
   component: NoClassroom,
@@ -11,11 +12,10 @@ function NoClassroom(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader>
-        <PageHeaderTitle>Minha turma</PageHeaderTitle>
+        <PageHeaderTitle>{m.advisor_title()}</PageHeaderTitle>
       </PageHeader>
       <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        Nenhuma turma vinculada a você. Peça à organização para indicá-lo como
-        conselheiro.
+        {m.advisor_no_class()}
       </p>
     </div>
   )
