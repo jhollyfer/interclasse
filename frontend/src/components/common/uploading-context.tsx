@@ -62,16 +62,24 @@ export function useRegisterUpload(active: boolean): void {
   const context = React.use(UploadingContext)
   const key = React.useId()
 
-  React.useEffect(() => {
+  // `useEffectEvent`: o efeito reage só a `active`. O contexto muda de
+  // identidade a cada render do provider (register/unregister são funções
+  // novas sem o memo manual), e tê-lo nas dependências cancelaria e refaria o
+  // registro em laço.
+  const sync = React.useEffectEvent((on: boolean): void => {
     if (!context) return
 
-    if (active) context.register(key)
-    if (!active) context.unregister(key)
+    if (on) context.register(key)
+    if (!on) context.unregister(key)
+  })
+
+  React.useEffect(() => {
+    sync(active)
 
     // Desmontar com um upload em voo tem de liberar o cadeado, senão o botão
     // de salvar fica travado para sempre.
-    return () => context.unregister(key)
-  }, [active, context, key])
+    return () => sync(false)
+  }, [active])
 }
 
 /** Há upload em andamento? Use para desabilitar o botão de salvar. */

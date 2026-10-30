@@ -37,7 +37,9 @@ import {
   toSchoolInput,
   formatBytes,
   formatDate,
+  championName,
   initials,
+  plural,
 } from './labels'
 
 /**
@@ -240,5 +242,45 @@ describe('idioma dos rótulos', () => {
 
     expect(formatBytes(1024)).toBe('1.0 KB')
     expect(formatDate('2026-03-14T13:05:00.000Z')).toContain('3/14/26')
+  })
+})
+
+describe('plural', () => {
+  it('um usa o singular, com a contagem na frente', () => {
+    expect(plural(1, 'foto', 'fotos')).toBe('1 foto')
+  })
+
+  it('zero e muitos usam o plural', () => {
+    expect(plural(0, 'foto', 'fotos')).toBe('0 fotos')
+    expect(plural(3, 'foto', 'fotos')).toBe('3 fotos')
+  })
+
+  it('withCount false devolve só o substantivo', () => {
+    expect(plural(2, 'foto', 'fotos', { withCount: false })).toBe('fotos')
+    expect(plural(1, 'foto', 'fotos', { withCount: false })).toBe('foto')
+  })
+})
+
+describe('championName', () => {
+  const matches = [
+    { homeTeamId: 'a', awayTeamId: 'b', homeName: '7A', awayName: '7B' },
+    { homeTeamId: 'c', awayTeamId: 'a', homeName: '8C', awayName: '7A' },
+  ]
+
+  it('é nulo enquanto a final não acontece', () => {
+    expect(championName({ championTeamId: null, matches })).toBeNull()
+  })
+
+  it('acha o nome da campeã jogando em casa', () => {
+    expect(championName({ championTeamId: 'a', matches })).toBe('7A')
+  })
+
+  it('acha o nome da campeã jogando fora', () => {
+    expect(championName({ championTeamId: 'c', matches })).toBe('8C')
+    expect(championName({ championTeamId: 'b', matches })).toBe('7B')
+  })
+
+  it('é nulo quando a campeã não aparece em jogo nenhum', () => {
+    expect(championName({ championTeamId: 'z', matches })).toBeNull()
   })
 })
