@@ -34,10 +34,10 @@ function joinChains(source: string): string[] {
     .split(/\n\s*\n/)
     .filter((statement) => JOIN.test(statement))
     .map((statement) => {
-      const join = statement.search(JOIN)
+      const joinAt = statement.search(JOIN)
       const start = Math.max(
-        statement.lastIndexOf('.from(', join),
-        statement.lastIndexOf('.query(', join),
+        statement.lastIndexOf('.from(', joinAt),
+        statement.lastIndexOf('.query(', joinAt),
       )
 
       return statement.slice(Math.max(start, 0))

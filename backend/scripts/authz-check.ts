@@ -25,7 +25,8 @@ import { dirname, join, resolve } from 'node:path'
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
 const DOCUMENT = join(ROOT, 'openapi.json')
-const BASELINE = join(ROOT, 'app/core/openapi/authz-baseline.json')
+// `AUTHZ_BASELINE` troca o arquivo só para a spec do script provar a recusa sem tocar o baseline real.
+const BASELINE = process.env.AUTHZ_BASELINE ?? join(ROOT, 'app/core/openapi/authz-baseline.json')
 
 type Operation = {
   'security'?: Array<Record<string, string[]>>

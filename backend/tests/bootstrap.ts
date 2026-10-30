@@ -8,9 +8,10 @@ import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 
+import type { Registry } from '../.adonisjs/client/registry/schema.d.ts'
+
 import env from '#start/env'
 import { DatabaseGuard } from '#tests/database-guard'
-import type { Registry } from '../.adonisjs/client/registry/schema.d.ts'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file

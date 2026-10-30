@@ -27,7 +27,8 @@ function forbiddenPaths(value: unknown, path = '$'): string[] {
 
   return Object.entries(value).flatMap(([key, child]) => {
     const here = `${path}.${key}`
-    const own = FORBIDDEN_KEYS.test(key) ? [here] : []
+    const own: string[] = []
+    if (FORBIDDEN_KEYS.test(key)) own.push(here)
 
     return [...own, ...forbiddenPaths(child, here)]
   })
