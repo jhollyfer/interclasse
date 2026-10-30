@@ -6,4 +6,6 @@ export const AdvisorCardPaginateValidator = z.object({
   classroomId: z.uuid(),
 })
 
-export type AdvisorCardPaginatePayload = z.infer<typeof AdvisorCardPaginateValidator>
+export type AdvisorCardPaginatePayload = z.infer<
+  typeof AdvisorCardPaginateValidator
+>

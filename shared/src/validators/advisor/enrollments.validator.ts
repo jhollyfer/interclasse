@@ -15,6 +15,10 @@ export const AdvisorEnrollmentUpdateValidator = z.object({
   reason: z.string().trim().min(5).max(500).optional(),
 })
 
-export type AdvisorEnrollmentShowPayload = z.infer<typeof AdvisorEnrollmentShowValidator>
+export type AdvisorEnrollmentShowPayload = z.infer<
+  typeof AdvisorEnrollmentShowValidator
+>
 
-export type AdvisorEnrollmentUpdatePayload = z.infer<typeof AdvisorEnrollmentUpdateValidator>
+export type AdvisorEnrollmentUpdatePayload = z.infer<
+  typeof AdvisorEnrollmentUpdateValidator
+>

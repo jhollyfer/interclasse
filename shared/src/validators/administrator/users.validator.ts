@@ -1,6 +1,6 @@
-import { USER_ROLES } from '../../enums/user-role.js'
 import { ACTIVE_STATUSES } from '../../enums/active-status.js'
 import { TRASHED_MODES } from '../../enums/trashed-mode.js'
+import { USER_ROLES } from '../../enums/user-role.js'
 import {
   emailField,
   paginationFields,
@@ -16,7 +16,13 @@ import {
  * Par de caminho e nome do VineJS de
  * `backend/app/validators/administrator/users.validator.ts`.
  */
-export const USER_SORT_COLUMNS = ['name', 'email', 'role', 'status', 'createdAt'] as const
+export const USER_SORT_COLUMNS = [
+  'name',
+  'email',
+  'role',
+  'status',
+  'createdAt',
+] as const
 
 const userFields = {
   name: z.string().trim().min(1).max(120),
@@ -63,8 +69,14 @@ export const AdministratorUserPaginateValidator = z.object({
   status: userFields.status.optional(),
 })
 
-export type AdministratorUserCreatePayload = z.infer<typeof AdministratorUserCreateValidator>
+export type AdministratorUserCreatePayload = z.infer<
+  typeof AdministratorUserCreateValidator
+>
 
-export type AdministratorUserUpdatePayload = z.infer<typeof AdministratorUserUpdateValidator>
+export type AdministratorUserUpdatePayload = z.infer<
+  typeof AdministratorUserUpdateValidator
+>
 
-export type AdministratorUserPaginatePayload = z.infer<typeof AdministratorUserPaginateValidator>
+export type AdministratorUserPaginatePayload = z.infer<
+  typeof AdministratorUserPaginateValidator
+>

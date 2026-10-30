@@ -25,7 +25,12 @@ export const StoragesFileCompleteValidator = z.object({
     .optional(),
 })
 
-export const STORAGE_SORT_COLUMNS = ['originalName', 'mimetype', 'size', 'createdAt'] as const
+export const STORAGE_SORT_COLUMNS = [
+  'originalName',
+  'mimetype',
+  'size',
+  'createdAt',
+] as const
 
 export const StoragesFilePaginateValidator = z.object({
   ...paginationFields(),
@@ -34,8 +39,14 @@ export const StoragesFilePaginateValidator = z.object({
   ...sortFields(STORAGE_SORT_COLUMNS),
 })
 
-export type StoragesFileCreatePayload = z.infer<typeof StoragesFileCreateValidator>
+export type StoragesFileCreatePayload = z.infer<
+  typeof StoragesFileCreateValidator
+>
 
-export type StoragesFileCompletePayload = z.infer<typeof StoragesFileCompleteValidator>
+export type StoragesFileCompletePayload = z.infer<
+  typeof StoragesFileCompleteValidator
+>
 
-export type StoragesFilePaginatePayload = z.infer<typeof StoragesFilePaginateValidator>
+export type StoragesFilePaginatePayload = z.infer<
+  typeof StoragesFilePaginateValidator
+>

@@ -23,4 +23,6 @@ export const AdministratorSiteUpdateValidator = z.object({
   regulationId: z.uuid().nullable().optional(),
 })
 
-export type AdministratorSiteUpdatePayload = z.infer<typeof AdministratorSiteUpdateValidator>
+export type AdministratorSiteUpdatePayload = z.infer<
+  typeof AdministratorSiteUpdateValidator
+>

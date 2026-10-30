@@ -47,4 +47,6 @@ export const AdministratorReportShowResponse = z.object({
   ),
 })
 
-export type AdministratorReportShowResponse = z.infer<typeof AdministratorReportShowResponse>
+export type AdministratorReportShowResponse = z.infer<
+  typeof AdministratorReportShowResponse
+>

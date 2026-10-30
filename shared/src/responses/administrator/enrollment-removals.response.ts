@@ -1,10 +1,9 @@
-import { z } from '../../validator.js'
-
 import {
   AdministratorClassroomPersonResponse,
   AdministratorClassroomShowResponse,
 } from './classrooms.response.js'
 import { AdministratorSportShowResponse } from './sports.response.js'
+import { z } from '../../validator.js'
 
 const datetime = () => z.iso.datetime({ offset: true })
 
@@ -23,7 +22,10 @@ export const AdministratorEnrollmentRemovalShowResponse = z.object({
   acknowledgedAt: datetime().nullable(),
   createdAt: datetime(),
   updatedAt: datetime().nullable(),
-  classroom: AdministratorClassroomShowResponse.omit({ advisor: true, representative: true }),
+  classroom: AdministratorClassroomShowResponse.omit({
+    advisor: true,
+    representative: true,
+  }),
   sport: AdministratorSportShowResponse,
   actor: AdministratorClassroomPersonResponse.nullable(),
 })
