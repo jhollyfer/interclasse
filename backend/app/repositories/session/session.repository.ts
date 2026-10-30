@@ -20,8 +20,8 @@ export type RefreshGrant = {
  * tempo. O concreto é `SessionLucidRepository`, ligado em `providers/repository.provider.ts`.
  */
 export abstract class SessionRepository {
-  /** O par de tokens da conta. */
-  abstract issue(userId: string): Promise<SessionTokens>
+  /** O par de tokens da conta; `null` quando o provider não devolveu o valor em claro. */
+  abstract issue(userId: string): Promise<SessionTokens | null>
   /**
    * Derruba todas as sessões da conta, dentro da transação em curso quando há
    * uma: a revogação precisa cair junto com a escrita que a motiva.

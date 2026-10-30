@@ -62,7 +62,8 @@ export default class AdministratorUserCreateUseCase {
       // Recarrega antes de responder: `status` vem de `DEFAULT` no banco quando
       // não foi informado, e a foto vem com a URL.
       const detail = await this.users.detail(user.id)
-      if (!detail) throw new Error('a conta gravada não foi encontrada')
+      if (!detail)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
       return right(detail)
     } catch (error) {

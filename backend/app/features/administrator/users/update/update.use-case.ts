@@ -88,7 +88,8 @@ export default class AdministratorUserUpdateUseCase {
       // Recarrega antes de responder: quem acabou de editar recebe a linha como
       // ela ficou no banco, com `updated_at` e a foto nova.
       const detail = await this.users.detail(id)
-      if (!detail) throw new Error('a conta gravada não foi encontrada')
+      if (!detail)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
       return right(detail)
     } catch (error) {

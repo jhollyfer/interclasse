@@ -97,7 +97,8 @@ export default class AccountProfileUpdateUseCase {
       // Recarrega depois de gravar: quem acabou de trocar a foto tem de receber
       // a `url` nova na mesma resposta, sem uma leitura a mais.
       const profile = await this.users.detail(actor.id)
-      if (!profile) throw new Error('a conta gravada não foi encontrada')
+      if (!profile)
+        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
       return right(profile)
     } catch (error) {

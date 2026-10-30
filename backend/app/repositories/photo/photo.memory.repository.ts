@@ -81,7 +81,7 @@ export class PhotoMemoryRepository extends PhotoRepository {
     )
     const page = MemoryPagination.slice(matching, criteria.page, criteria.perPage)
 
-    return { meta: page.meta, data: page.data.map((row) => this.toResponse(row)) }
+    return { meta: page.meta, data: page.data.flatMap((row) => this.toResponse(row) ?? []) }
   }
 
   async paginateApproved(criteria: {
@@ -106,9 +106,10 @@ export class PhotoMemoryRepository extends PhotoRepository {
     return [...this.rows.values()].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
-  private toResponse(row: PhotoProps): AdministratorPhotoShowResponse {
+  /** Foto sem o arquivo gravado não tem leitura: o mesmo que o `join` do Lucid faz. */
+  private toResponse(row: PhotoProps): AdministratorPhotoShowResponse | null {
     const storage = this.storages.get(row.storageId)
-    if (!storage) throw new Error('foto sem o arquivo no arranjo do teste')
+    if (!storage) return null
 
     return {
       id: row.id,

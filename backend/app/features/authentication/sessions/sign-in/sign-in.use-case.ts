@@ -46,7 +46,16 @@ export default class AuthenticationSessionSignInUseCase {
 
       if (!passwordMatches || !user.canSignIn()) return left(this.invalidCredentials())
 
-      return right(await this.sessions.issue(user.id))
+      const tokens = await this.sessions.issue(user.id)
+      if (!tokens)
+        return left(
+          HTTPException.InternalServerError(
+            this.i18n.t('errors.internal'),
+            'AUTHENTICATION_SESSION_SIGN_IN_ERROR',
+          ),
+        )
+
+      return right(tokens)
     } catch (error) {
       // Só credencial errada vira 401. Qualquer outra falha (banco fora, por
       // exemplo) continua sendo erro de servidor - não vale mentir 401.

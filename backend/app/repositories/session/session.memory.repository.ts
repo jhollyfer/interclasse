@@ -21,7 +21,7 @@ export class SessionMemoryRepository extends SessionRepository {
     return this
   }
 
-  async issue(userId: string): Promise<SessionTokens> {
+  async issue(userId: string): Promise<SessionTokens | null> {
     this.issued.push(userId)
     this.sequence += 1
     const refreshToken = `refresh-${userId}-${this.sequence}`

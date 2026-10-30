@@ -35,7 +35,7 @@ export class SessionLucidRepository extends SessionRepository {
    * banco depois, e é por isso que ele sobe até o controller, que o põe no
    * cookie.
    */
-  async issue(userId: string): Promise<SessionTokens> {
+  async issue(userId: string): Promise<SessionTokens | null> {
     const tokenable = this.tokenable(userId)
     const accessToken = await User.accessTokens.create(tokenable, [], {
       name: COOKIE_TOKEN.ACCESS,
@@ -49,9 +49,7 @@ export class SessionLucidRepository extends SessionRepository {
 
     // `value` só é opcional no tipo porque o mesmo `AccessToken` representa o
     // token lido do banco, sem o segredo. Recém-criado, ele sempre vem.
-    if (!accessToken.value || !refreshToken.value) {
-      throw new Error('token de sessão criado sem o valor em claro')
-    }
+    if (!accessToken.value || !refreshToken.value) return null
 
     return {
       accessToken: accessToken.value.release(),

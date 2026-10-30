@@ -36,7 +36,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
     test('o token de refresh emitido é lido de volta com o dono', async ({ assert }) => {
       const { sessions, userId } = await make()
 
-      const { refreshToken } = await sessions.issue(userId)
+      const issued = await sessions.issue(userId)
+      const refreshToken = issued?.refreshToken ?? ''
       const grant = await sessions.readRefresh(refreshToken)
 
       assert.equal(grant?.userId, userId)
@@ -50,7 +51,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
     test('revoke apaga o token uma vez; a segunda devolve false', async ({ assert }) => {
       const { sessions, userId } = await make()
-      const { refreshToken } = await sessions.issue(userId)
+      const issued = await sessions.issue(userId)
+      const refreshToken = issued?.refreshToken ?? ''
       const grant = await sessions.readRefresh(refreshToken)
 
       assert.isTrue(await sessions.revoke(userId, grant?.identifier ?? ''))
@@ -66,8 +68,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       await sessions.revokeAll(userId)
 
-      assert.isNull(await sessions.readRefresh(mine.refreshToken))
-      assert.isNotNull(await sessions.readRefresh(theirs.refreshToken))
+      assert.isNull(await sessions.readRefresh(mine?.refreshToken ?? ''))
+      assert.isNotNull(await sessions.readRefresh(theirs?.refreshToken ?? ''))
     })
   })
 }

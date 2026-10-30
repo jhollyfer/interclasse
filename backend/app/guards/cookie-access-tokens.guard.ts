@@ -111,6 +111,8 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
     // é pedido a ele, nunca construído com `new`.
     const session = await app.container.make(SessionRepository)
     const tokens = await session.issue(user.id)
+    // Sem o valor em claro não há sessão a montar: o cliente segue sem cookie e a rota responde 401.
+    if (!tokens) return { cookies: {} }
 
     return {
       cookies: {

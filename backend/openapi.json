@@ -1379,6 +1379,16 @@
               }
             }
           },
+          "404": {
+            "description": "Cartão não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404CardNotFound"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Conflito com o estado atual",
             "content": {
@@ -3427,11 +3437,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos · Arquivo não encontrado · O regulamento precisa ser PDF",
+            "description": "Dados inválidos",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422RegulationNotPdfStorageNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422ValidationError"
                 }
               }
             }
@@ -4180,6 +4190,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error403AccessDenied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404UserNotFound"
                 }
               }
             }
@@ -19419,43 +19439,6 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "PHOTO_NOT_IMAGE",
-              "STORAGE_NOT_FOUND",
-              "VALIDATION_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code",
-          "errors"
-        ]
-      },
-      "Error422RegulationNotPdfStorageNotFoundValidationError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              422
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "REGULATION_NOT_PDF",
               "STORAGE_NOT_FOUND",
               "VALIDATION_ERROR"
             ]

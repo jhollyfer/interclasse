@@ -14,6 +14,7 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  PRESIGNED_BATCH,
   type PresignedPart,
 } from '#services/multipart/multipart.contract'
 import { countParts, pendingParts } from '#features/storages/_shared.parts'
@@ -65,7 +66,11 @@ export default class StoragesFileCreateUseCase {
 
       if (totalParts > 1) {
         uploadId = await this.multipart.initiate(key, payload.mimetype)
-        parts = await this.multipart.signParts(key, uploadId, pendingParts(totalParts, []))
+        parts = await this.multipart.signParts(
+          key,
+          uploadId,
+          pendingParts({ totalParts, uploaded: [], batch: PRESIGNED_BATCH }),
+        )
       }
 
       const storage = Storage.open({

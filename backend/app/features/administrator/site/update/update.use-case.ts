@@ -3,10 +3,11 @@ import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
 import { left, right, type AdministratorSiteShowResponse, type Either } from '@interclasse/shared'
 
+import { SiteRefusal } from '../_shared.site-refusal.ts'
+
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { RegulationFile } from '#domain/site-setting/site-setting.entity'
-import type { SiteSettingError } from '#domain/site-setting/site-setting.errors'
 import type { AdministratorSiteUpdatePayload } from '#validators/administrator/site.validator'
 
 type Payload = AdministratorSiteUpdatePayload
@@ -31,7 +32,7 @@ export default class AdministratorSiteUpdateUseCase {
         regulation = await this.settings.findRegulationFile(payload.regulationId)
 
       const updated = setting.update(payload, { regulation, now: new Date() })
-      if (updated.isLeft()) return left(this.refusal(updated.value))
+      if (updated.isLeft()) return left(SiteRefusal.http(updated.value, this.i18n))
 
       await this.settings.save(setting)
 
@@ -46,32 +47,5 @@ export default class AdministratorSiteUpdateUseCase {
         ),
       )
     }
-  }
-
-  /**
-   * Cada recusa da configuração como resposta HTTP (`_standards/domain.md`
-   * §2). O `never` do fim faz o compilador apontar fato novo sem tradução.
-   */
-  private refusal(error: SiteSettingError): HTTPException {
-    switch (error.code) {
-      case 'STORAGE_NOT_FOUND':
-        return HTTPException.UnprocessableEntity(
-          this.i18n.t('site.regulation_not_found'),
-          'STORAGE_NOT_FOUND',
-          { regulationId: this.i18n.t('site.regulation_not_found') },
-        )
-      case 'REGULATION_NOT_PDF':
-        return HTTPException.UnprocessableEntity(
-          this.i18n.t('site.regulation_not_pdf'),
-          'REGULATION_NOT_PDF',
-          { regulationId: this.i18n.t('site.regulation_not_pdf_field') },
-        )
-      default:
-        return this.unreachable(error)
-    }
-  }
-
-  private unreachable(error: never): never {
-    throw new Error(`Recusa da configuração do site sem tradução: ${JSON.stringify(error)}`)
   }
 }

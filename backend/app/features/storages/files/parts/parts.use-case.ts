@@ -12,6 +12,7 @@ import { StorageContract } from '#services/storage/storage.contract'
 import {
   MultipartContract,
   PART_SIZE,
+  PRESIGNED_BATCH,
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
@@ -77,10 +78,11 @@ export default class StoragesFilePartsUseCase {
       }
 
       const uploaded = await this.uploaded(storage)
-      const missing = pendingParts(
+      const missing = pendingParts({
         totalParts,
-        uploaded.map((part) => part.partNumber),
-      )
+        uploaded: uploaded.map((part) => part.partNumber),
+        batch: PRESIGNED_BATCH,
+      })
       const parts = await this.sign(storage, missing)
 
       return right(

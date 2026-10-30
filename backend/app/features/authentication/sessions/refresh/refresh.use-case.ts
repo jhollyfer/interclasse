@@ -46,7 +46,16 @@ export default class AuthenticationSessionRefreshUseCase {
       // partir do mesmo token - rotação que não rotaciona.
       if (!(await this.sessions.revoke(user.id, grant.identifier))) return left(this.invalid())
 
-      return right(await this.sessions.issue(user.id))
+      const tokens = await this.sessions.issue(user.id)
+      if (!tokens)
+        return left(
+          HTTPException.InternalServerError(
+            this.i18n.t('errors.internal'),
+            'AUTHENTICATION_SESSION_REFRESH_ERROR',
+          ),
+        )
+
+      return right(tokens)
     } catch (error) {
       logger.error({ err: error }, '[authentication/sessions > refresh][error]')
 
