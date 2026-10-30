@@ -1,5 +1,4 @@
 import { defineConfig } from '@adonisjs/auth'
-import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
 import type { InferAuthenticators, InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
 
 import { cookieAccessTokensGuard } from '#guards/cookie-access-tokens.guard'
@@ -17,20 +16,6 @@ const authConfig = defineConfig({
      * transporte: nada de cabeçalho `Authorization`.
      */
     api: cookieAccessTokensGuard(),
-
-    /**
-     * Session-based guard for browser authentication.
-     */
-    web: sessionGuard({
-      /**
-       * Enable persistent login using remember-me tokens.
-       */
-      useRememberMeTokens: false,
-
-      provider: sessionUserProvider({
-        model: () => import('#models/user'),
-      }),
-    }),
   },
 })
 

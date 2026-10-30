@@ -22,7 +22,6 @@ Mesma ordem de blocos do `backend/.env.example`.
 | `APP_KEY` | sim | **sim** | chave de cifra da aplicação | `<segredo>` |
 | `APP_SERVER_URL` | sim | não | endereço público da API | `http://${HOST}:${PORT}` |
 | `TRUSTED_PROXIES` | atrás de proxy | não | proxy reverso confiável para `request.ip()`: um IP, sub-rede ou apelido do `proxy-addr` (`loopback`, `uniquelocal`); ausente vale `loopback`. Nunca `true` | `172.16.0.0/12` |
-| `SESSION_DRIVER` | sim | não | `cookie`, `memory` ou `database` | `cookie` |
 | `CORS_ORIGIN` | em produção | não | origens do navegador autorizadas, separadas por vírgula; ausente fora de desenvolvimento recusa todo pedido cross-origin | `https://interclass.maiyu.com.br` |
 | `COOKIE_DOMAIN` | em produção | não | `Domain` dos cookies de sessão: o menor domínio que cobre o site e a API | `.maiyu.com.br` |
 | `DATABASE_URL` | sim | **sim** | conexão com o Postgres | `postgres://<usuario>:<senha>@localhost:5434/<banco>` |
@@ -69,9 +68,6 @@ APP_KEY=<segredo>
 APP_SERVER_URL=http://${HOST}:${PORT}
 # TRUSTED_PROXIES=172.16.0.0/12
 
-# Session
-SESSION_DRIVER=cookie
-
 # CORS (produção)
 # CORS_ORIGIN=https://interclass.maiyu.com.br
 # COOKIE_DOMAIN=.maiyu.com.br
@@ -103,8 +99,8 @@ VITE_API_URL=http://localhost:3333
 `.gitignore` (raiz e apps): `.env` e `.env.local` ficam fora; `.env.example`, `.env.test` e
 `frontend/.env.production` são versionados.
 
-`backend/.env.test` tem só container local, senha de banco de teste, bucket `interclasse-test` e
-`SESSION_DRIVER=memory`. O banco `interclasse_test` é separado do de desenvolvimento porque a suíte
+`backend/.env.test` tem só container local, senha de banco de teste, bucket `interclasse-test` e a
+allowlist do CORS. O banco `interclasse_test` é separado do de desenvolvimento porque a suíte
 roda `truncate()` entre os testes.
 
 ## 4. Por ambiente

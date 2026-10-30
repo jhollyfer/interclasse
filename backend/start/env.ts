@@ -55,9 +55,6 @@ export default await Env.create(new URL('../', import.meta.url), {
    */
   TRUSTED_PROXIES: Env.schema.string.optional(),
 
-  // Session
-  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
-
   /**
    * Origens que o navegador pode usar para chamar esta API, separadas por
    * vírgula. Opcional porque em desenvolvimento o `config/cors.ts` libera tudo;

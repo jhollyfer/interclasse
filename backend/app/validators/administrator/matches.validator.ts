@@ -25,7 +25,8 @@ const isoDateTimeRule = vine.createRule((value: unknown, _options: undefined, fi
   if (typeof value !== 'string') return
   if (ISO_DATE_TIME.test(value) && DateTime.fromISO(value).isValid) return
 
-  field.report('Informe data e hora em ISO 8601 com fuso', 'isoDateTime', field)
+  // A frase mora no catálogo de `core/validator.ts` (chave `isoDateTime`), nos três idiomas.
+  field.report('Informe {{ field }}', 'isoDateTime', field)
 })
 
 /** O campo da agenda: ISO com fuso, `null` desmarca, ausente não mexe. */
