@@ -103,7 +103,7 @@ Rotas do `/storefront` são só leitura: cobrem sucesso, filtro e paginação, e
 
 ## 5. Dados de teste
 
-- Banco: `interclasse_test`, separado do de desenvolvimento, via `backend/.env.test`; a suíte roda `truncate()` entre os testes. Bucket `interclasse-test` no MinIO do `docker-compose.yml` (criado pelo serviço `storage-bootstrap`).
+- Banco: `interclasse_test`, separado do de desenvolvimento, via `backend/.env.test`; a suíte roda `truncate()` entre os testes. Bucket `interclasse-test` no MinIO do `docker-compose.yml` (criado pelo serviço `minio-setup`).
 - Factories em `backend/database/factories/`, com o papel mínimo que o teste precisa.
 - Repositórios em memória (`*.memory.repository.ts`) e fakes (`session.fake.ts`, `storage.fake.ts`) servem aos testes unitários.
 - No CI, o job do backend sobe o MinIO e roda a suíte inteira.
