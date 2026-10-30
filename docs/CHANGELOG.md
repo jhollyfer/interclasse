@@ -18,6 +18,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado
 
+- A página pública de uma chave passa a declarar a trilha de navegação (início, classificação, chave) e o evento esportivo para os buscadores.
 - O tema claro/escuro vem de um cookie lido no servidor: a página já abre no tema escolhido, sem piscar.
 - Fora de produção o site responde `noindex` e o `robots.txt` bloqueia tudo; produção precisa de `SITE_ENV=production` (`ENV.md`). Painel e telas de entrada ficam sempre fora dos buscadores.
 - O site manda cabeçalhos de segurança (CSP com `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, HSTS); o CSP precisa de `VITE_STORAGE_URL` para o upload de fotos.
