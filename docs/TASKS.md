@@ -55,8 +55,8 @@ Trazer o projeto para o padrão Maiyu inteiro.
 
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
-| 4.1 | Índice único que garanta uma linha só em `site_settings` | Baixa | A fazer | duas primeiras leituras simultâneas criariam duas linhas |
-| 4.2 | Tipo do `scheduledAt` do VineJS (`DateTime \| null`, chega `undefined`) | Baixa | A fazer | o use-case trata os dois |
+| 4.1 | Índice único que garanta uma linha só em `site_settings` | Baixa | Feito | migration `add_site_settings_singleton_index` (índice sobre `(true)`); `current()` insere com `on conflict do nothing` e lê a vencedora |
+| 4.2 | Tipo do `scheduledAt` do VineJS (`DateTime \| null`, chega `undefined`) | Baixa | Feito | o retorno do `transform` diz os três estados; spec em `matches.validator.unit.spec.ts` |
 | 4.3 | Tema por cookie no servidor e tamanhos de fonte em token | Baixa | A fazer | desvios descritos em `DESIGN.md` |
 | 4.4 | Fixar a imagem `node:24-alpine` por digest nos Dockerfiles | Média | A fazer | sem acesso ao Docker Hub nesta sessão |
 
@@ -71,7 +71,7 @@ tudo o que os `CLAUDE.md` dos apps chamavam de exceção. Cada frente fecha os i
 | 5.1 | Raiz, tooling e CI: TS `~6` nos três, tsconfig piso, eslint/prettier no `shared`, scripts `check`/`test:unit`/`test:e2e`, hooks e commitlint, workflows (`pnpm/setup`, SHA, permissions, E2E, audit), Docker (digest, `.dockerignore` único, MinIO compilado), dependabot, `.gitignore` único, libs na última versão | Alta | Em andamento | I1, I4, 1.12, 4.4 |
 | 5.2 | Docs: par `AGENTS.md`+`CLAUDE.md` por app sem "foge da régua", textos que legitimam desvio, `MEMORY.md` sem placeholder, `.claude/settings.json` | Alta | Em andamento | documentation.md §3 |
 | 5.3 | Backend borda e segurança: `trustProxy`, bodyparser, origem/CSRF, cookie em `config/`, handler (429, 500, fábricas), throttles, CSV, multipart assinado, sessão do Adonis fora, mensagens por chave | Alta | Em andamento | SEC-1..8, B1, B2, C1, C2, C4, C5, I5 |
-| 5.4 | Backend arquitetura: `ctx.actor` + Bouncer/policies com entidade, session repository, storage sem hook, `core/openapi` sem Lucid, resposta pelo schema, recusas em tabela, unicidade no repository, nomes de log/erro, árvore, `pattern:check` completo, `site_settings` único, `scheduledAt` | Alta | Em andamento | T1, 4.1, 4.2 |
+| 5.4 | Backend arquitetura: `ctx.actor` + Bouncer/policies com entidade, session repository, storage sem hook, `core/openapi` sem Lucid, resposta pelo schema, recusas em tabela, unicidade no repository, nomes de log/erro, árvore, `pattern:check` completo, `site_settings` único, `scheduledAt` | Alta | Feito (falta rodar E2E com banco) | T1, 4.1, 4.2; `ActorSchema`, `SessionRepository`, `RefusalBase`, `PostgresError`, gerador OpenAPI em `scripts/openapi/` |
 | 5.5 | Backend testes: unit/e2e faltando, matriz de status, redes obrigatórias, specs no alvo | Média | A fazer | T2, T3 |
 | 5.6 | Frontend estrutura: `_authentication/`, `request` por schema, `local-store`, `lib/` na árvore, kit comum completo, molde de recurso, sufixo `Mutation`, assets e sitemap/robots | Alta | Em andamento | |
 | 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | A fazer | B4, C3, T4, SEC-9, 4.3 |
