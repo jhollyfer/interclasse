@@ -15,6 +15,7 @@ import type {
 } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { useUnsavedChangesBlocker } from '#/hooks/use-unsaved-changes-blocker'
 import type { HTTPError } from '#/integrations/tanstack-query/http'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { applyMutationError } from '#/lib/form-errors'
@@ -145,6 +146,12 @@ export function useMutationForm<
       await onSuccess?.(record, sent)
     },
   })
+
+  // Alteração digitada e ainda não enviada: sair da tela pergunta antes. Depois
+  // de enviar, a navegação de sucesso passa livre.
+  useUnsavedChangesBlocker(
+    form.formState.isDirty && !mutation.isPending && !mutation.isSuccess,
+  )
 
   function onValid(submitted: TValues): void {
     // O `root` guarda o erro da tentativa anterior. Sem limpar, um 409 já

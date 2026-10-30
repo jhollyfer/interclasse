@@ -178,6 +178,7 @@
   "common_save": "Salvar",
   "common_confirm": "Confirmar",
   "common_cancel": "Cancelar",
+  "form_unsaved_changes_confirm": "Há alterações não salvas. Sair desta tela descarta tudo o que foi digitado.",
   "common_delete": "Excluir",
   "common_remove": "Remover",
   "common_archive": "Arquivar",

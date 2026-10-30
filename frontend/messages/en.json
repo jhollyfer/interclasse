@@ -192,6 +192,7 @@
   "common_save": "Save",
   "common_confirm": "Confirm",
   "common_cancel": "Cancel",
+  "form_unsaved_changes_confirm": "You have unsaved changes. Leaving this screen discards everything you typed.",
   "common_delete": "Delete",
   "common_remove": "Remove",
   "common_archive": "Archive",

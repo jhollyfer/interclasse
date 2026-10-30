@@ -36,6 +36,8 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('#/lib/form-errors', () => ({ applyMutationError: vi.fn() }))
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate }),
+  // O bloqueio de navegação não é o assunto: precisa de router montado.
+  useBlocker: vi.fn(),
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),

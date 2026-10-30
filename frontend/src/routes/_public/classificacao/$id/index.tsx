@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { NotFoundPage } from '#/components/common/not-found-page'
 import {
   storefrontBracketQueryOptions,
   storefrontBracketsQueryOptions,
@@ -12,6 +13,7 @@ import { m } from '#/paraglide/messages'
 import { BRACKETS_INDEX } from '../index'
 
 export const Route = createFileRoute('/_public/classificacao/$id/')({
+  notFoundComponent: () => <NotFoundPage />,
   loader: async ({ context, params }) => {
     // A lista é a barra de abas da página; falha nela não esconde a chave.
     void context.queryClient
