@@ -19,7 +19,7 @@ import type { MutationProps } from '../mutation-props'
  * vira `null` e ainda conta como presente, então o campo tem de ser **omitido**
  * do payload, e não enviado vazio.
  */
-export function useAccountUpdate(
+export function useAccountUpdateMutation(
   options?: MutationProps<
     AccountProfileShowResponse,
     AccountProfileUpdatePayload

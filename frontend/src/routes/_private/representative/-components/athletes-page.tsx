@@ -13,7 +13,7 @@ import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
-import { useRepresentativeEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/representative'
+import { useRepresentativeEnrollmentUpdateMutation } from '#/integrations/tanstack-query/mutations/representative'
 import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
 import { m } from '#/paraglide/messages'
 
@@ -27,7 +27,7 @@ export function AthletesPage(): React.JSX.Element {
   } = useQuery(representativeEnrollmentsQueryOptions())
   const queryClient = useQueryClient()
 
-  const save = useRepresentativeEnrollmentUpdate({
+  const save = useRepresentativeEnrollmentUpdateMutation({
     onSuccess: (updated) => {
       queryClient.setQueryData(
         queryKeys.representative.enrollments.board,

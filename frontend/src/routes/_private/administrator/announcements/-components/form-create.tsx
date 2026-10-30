@@ -16,7 +16,7 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useAnnouncementCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -38,7 +38,7 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     validator: AdministratorAnnouncementCreateValidator,
     defaults: ANNOUNCEMENT_FORM_DEFAULTS,
     fields: ANNOUNCEMENT_FIELDS,
-    mutation: useAnnouncementCreate,
+    mutation: useAnnouncementCreateMutation,
     invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',

@@ -37,7 +37,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAccountUpdate } from '#/integrations/tanstack-query/mutations/account'
+import { useAccountUpdateMutation } from '#/integrations/tanstack-query/mutations/account'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { blankToUndefined } from '#/lib/form-values'
 import { initials } from '#/lib/labels'
@@ -110,7 +110,7 @@ export function ProfileFormEdit(): React.JSX.Element {
       avatarId: account.avatarId,
     },
     fields: FIELDS,
-    mutation: useAccountUpdate,
+    mutation: useAccountUpdateMutation,
     // Por prefixo: o guard do layout e o cabeçalho leem a mesma chave.
     invalidate: queryKeys.account.profile.all,
     backTo: '/profile',

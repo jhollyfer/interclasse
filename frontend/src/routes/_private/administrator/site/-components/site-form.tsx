@@ -31,7 +31,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useSiteUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { blankToNull, nanToNull } from '#/lib/form-values'
 import { m } from '#/paraglide/messages'
@@ -79,7 +79,7 @@ export function SiteForm(): React.JSX.Element {
     validator: AdministratorSiteUpdateValidator,
     values: valuesOf(site),
     fields: SITE_FIELDS,
-    mutation: useSiteUpdate,
+    mutation: useSiteUpdateMutation,
     invalidate: [queryKeys.administrator.site, ...DEPENDENTS.site],
     success: m.admin_site_updated(),
     retry: 'site-update',

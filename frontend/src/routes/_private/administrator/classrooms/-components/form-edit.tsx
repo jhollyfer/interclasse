@@ -20,7 +20,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useClassroomUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -49,7 +49,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
       representativeId: classroom.representativeId,
     },
     fields: CLASSROOM_FIELDS,
-    mutation: useClassroomUpdate,
+    mutation: useClassroomUpdateMutation,
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',

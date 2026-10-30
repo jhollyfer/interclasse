@@ -39,7 +39,7 @@ import { shouldRetryQuery } from '../query-context'
 
 /** O módulo inteiro exige `ADMINISTRATOR`. */
 
-export function useUserCreate(
+export function useUserCreateMutation(
   options?: MutationProps<
     AdministratorUserShowResponse,
     AdministratorUserCreatePayload
@@ -74,7 +74,7 @@ export type UserUpdateVariables = Merge<
  * validator olha o par, e mandar `password: ''` deixaria a chave no corpo com um
  * valor que o servidor recusa.
  */
-export function useUserUpdate(
+export function useUserUpdateMutation(
   options?: MutationProps<AdministratorUserShowResponse, UserUpdateVariables>,
 ) {
   return useMutation<
@@ -97,7 +97,7 @@ export function useUserUpdate(
 }
 
 /** Manda para a lixeira: preenche `deletedAt`, não apaga nada. */
-export function useUserArchive(options?: MutationProps<void, string>) {
+export function useUserArchiveMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -109,7 +109,9 @@ export function useUserArchive(options?: MutationProps<void, string>) {
 }
 
 /** Tira da lixeira. */
-export function useUserUnarchive(options?: MutationProps<void, string>) {
+export function useUserUnarchiveMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -124,7 +126,7 @@ export function useUserUnarchive(options?: MutationProps<void, string>) {
  * Apaga de vez. O backend exige o registro arquivado, e recusa a própria conta
  * de quem está logado.
  */
-export function useUserDelete(options?: MutationProps<void, string>) {
+export function useUserDeleteMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -140,7 +142,7 @@ export function useUserDelete(options?: MutationProps<void, string>) {
  * entrou numa chave é o servidor, com `409`.
  */
 
-export function useClassroomCreate(
+export function useClassroomCreateMutation(
   options?: MutationProps<
     AdministratorClassroomShowResponse,
     AdministratorClassroomCreatePayload
@@ -170,7 +172,7 @@ export type ClassroomUpdateVariables = Merge<
   { readonly id: string }
 >
 
-export function useClassroomUpdate(
+export function useClassroomUpdateMutation(
   options?: MutationProps<
     AdministratorClassroomShowResponse,
     ClassroomUpdateVariables
@@ -195,7 +197,9 @@ export function useClassroomUpdate(
   })
 }
 
-export function useClassroomDelete(options?: MutationProps<void, string>) {
+export function useClassroomDeleteMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -206,7 +210,7 @@ export function useClassroomDelete(options?: MutationProps<void, string>) {
   })
 }
 
-export function useSportCreate(
+export function useSportCreateMutation(
   options?: MutationProps<
     AdministratorSportShowResponse,
     AdministratorSportCreatePayload
@@ -232,7 +236,7 @@ export type SportUpdateVariables = Merge<
   { readonly id: string }
 >
 
-export function useSportUpdate(
+export function useSportUpdateMutation(
   options?: MutationProps<AdministratorSportShowResponse, SportUpdateVariables>,
 ) {
   return useMutation<
@@ -254,7 +258,7 @@ export function useSportUpdate(
   })
 }
 
-export function useSportDelete(options?: MutationProps<void, string>) {
+export function useSportDeleteMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -265,7 +269,7 @@ export function useSportDelete(options?: MutationProps<void, string>) {
   })
 }
 
-export function useAnnouncementCreate(
+export function useAnnouncementCreateMutation(
   options?: MutationProps<
     AdministratorAnnouncementShowResponse,
     AdministratorAnnouncementCreatePayload
@@ -295,7 +299,7 @@ export type AnnouncementUpdateVariables = Merge<
   { readonly id: string }
 >
 
-export function useAnnouncementUpdate(
+export function useAnnouncementUpdateMutation(
   options?: MutationProps<
     AdministratorAnnouncementShowResponse,
     AnnouncementUpdateVariables
@@ -320,7 +324,9 @@ export function useAnnouncementUpdate(
   })
 }
 
-export function useAnnouncementDelete(options?: MutationProps<void, string>) {
+export function useAnnouncementDeleteMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -332,7 +338,7 @@ export function useAnnouncementDelete(options?: MutationProps<void, string>) {
 }
 
 /** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
-export function useBracketCreate(
+export function useBracketCreateMutation(
   options?: MutationProps<
     AdministratorBracketCreateResponse,
     AdministratorBracketCreatePayload
@@ -363,7 +369,9 @@ export function useBracketCreate(
 }
 
 /** Apaga a chave inteira e reabre as inscrições. É como se refaz um sorteio. */
-export function useBracketDelete(options?: MutationProps<void, string>) {
+export function useBracketDeleteMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -380,7 +388,7 @@ export type MatchUpdateVariables = Merge<
 >
 
 /** A agenda: data, hora e local. */
-export function useMatchUpdate(
+export function useMatchUpdateMutation(
   options?: MutationProps<
     AdministratorMatchUpdateResponse,
     MatchUpdateVariables
@@ -411,7 +419,7 @@ export type MatchScoreVariables = Merge<
 >
 
 /** O placar. No mata-mata o vencedor avança sozinho. */
-export function useMatchScore(
+export function useMatchScoreMutation(
   options?: MutationProps<AdministratorMatchScoreResponse, MatchScoreVariables>,
 ) {
   return useMutation<
@@ -434,7 +442,7 @@ export function useMatchScore(
 }
 
 /** Desfaz o placar: a partida volta a "a jogar" e o vencedor sai da seguinte. */
-export function useMatchUnscore(
+export function useMatchUnscoreMutation(
   options?: MutationProps<AdministratorMatchUnscoreResponse, string>,
 ) {
   return useMutation<AdministratorMatchUnscoreResponse, HTTPError, string>({
@@ -452,7 +460,7 @@ export function useMatchUnscore(
 }
 
 /** Lança um cartão. O time sai do atleta, no servidor. */
-export function useCardCreate(
+export function useCardCreateMutation(
   options?: MutationProps<
     AdministratorCardCreateResponse,
     AdministratorCardCreatePayload
@@ -473,7 +481,7 @@ export function useCardCreate(
   })
 }
 
-export function useCardDelete(options?: MutationProps<void, string>) {
+export function useCardDeleteMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -483,7 +491,7 @@ export function useCardDelete(options?: MutationProps<void, string>) {
 }
 
 /** A ciência do aviso de remoção. Repetir não muda nada. */
-export function useEnrollmentRemovalAcknowledge(
+export function useEnrollmentRemovalAcknowledgeMutation(
   options?: MutationProps<AdministratorEnrollmentRemovalShowResponse, string>,
 ) {
   return useMutation<
@@ -503,7 +511,7 @@ export function useEnrollmentRemovalAcknowledge(
 }
 
 /** Grava o "Sobre" e o regulamento. Campo ausente não muda; `null` apaga. */
-export function useSiteUpdate(
+export function useSiteUpdateMutation(
   options?: MutationProps<
     AdministratorSiteShowResponse,
     AdministratorSiteUpdatePayload
@@ -528,7 +536,7 @@ export function useSiteUpdate(
  * Envia uma foto para o carrossel. O caminho decide o estado em que ela nasce:
  * a do administrador vai direto ao site, a do conselheiro espera aprovação.
  */
-export function usePhotoCreate(
+export function usePhotoCreateMutation(
   area: 'administrator' | 'advisor',
   options?: MutationProps<
     AdministratorPhotoShowResponse,
@@ -560,7 +568,7 @@ export type PhotoReviewVariables = Merge<
 >
 
 /** Aprova (vai ao site) ou recusa (sai do site). A decisão se refaz. */
-export function usePhotoReview(
+export function usePhotoReviewMutation(
   options?: MutationProps<AdministratorPhotoShowResponse, PhotoReviewVariables>,
 ) {
   return useMutation<
@@ -583,7 +591,7 @@ export function usePhotoReview(
 }
 
 /** Apaga a foto. O conselheiro só alcança as que enviou (as outras são 404). */
-export function usePhotoDelete(
+export function usePhotoDeleteMutation(
   area: 'administrator' | 'advisor',
   options?: MutationProps<void, string>,
 ) {

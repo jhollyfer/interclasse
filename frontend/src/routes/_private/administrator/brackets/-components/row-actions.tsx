@@ -15,7 +15,7 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useBracketDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { notifyError } from '#/lib/form-errors'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
@@ -31,7 +31,7 @@ export function BracketRowActions({
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
-  const remove = useBracketDelete({
+  const remove = useBracketDeleteMutation({
     onError: (error) => notifyError(error, { id: 'bracket-delete' }),
     onSuccess: () => {
       toast.success(m.admin_brackets_deleted())

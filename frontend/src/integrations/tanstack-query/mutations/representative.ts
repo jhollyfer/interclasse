@@ -7,7 +7,7 @@ import { request } from '../http'
 import type { MutationProps } from '../mutation-props'
 
 /** A mesma troca, na turma do representante - que sai da sessão. */
-export function useRepresentativeEnrollmentUpdate(
+export function useRepresentativeEnrollmentUpdateMutation(
   options?: MutationProps<
     RepresentativeEnrollmentShowResponse,
     RepresentativeEnrollmentUpdatePayload

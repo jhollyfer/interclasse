@@ -32,8 +32,8 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
-  useCardCreate,
-  useCardDelete,
+  useCardCreateMutation,
+  useCardDeleteMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import {
   cardsQueryOptions,
@@ -83,7 +83,7 @@ export function MatchCardsDialog({
     validator: AdministratorCardCreateValidator,
     defaults: { matchId: match.id, studentId: '', note: '' },
     fields: FIELDS,
-    mutation: useCardCreate,
+    mutation: useCardCreateMutation,
     invalidate: GAME_KEYS,
     success: (card) =>
       m.common_match_card_given({
@@ -95,7 +95,7 @@ export function MatchCardsDialog({
       form.reset({ matchId: match.id, studentId: '', note: '' }),
   })
 
-  const remove = useCardDelete({
+  const remove = useCardDeleteMutation({
     onSuccess: async () => {
       await invalidate(GAME_KEYS)
     },

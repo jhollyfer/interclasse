@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useAnnouncementDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useAnnouncementDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 /** Editar e apagar. O aviso some do site na hora. */
@@ -27,7 +27,7 @@ export function AnnouncementRowActions({
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
-  const remove = useAnnouncementDelete({
+  const remove = useAnnouncementDeleteMutation({
     onError: (error) => notifyError(error, { id: 'announcement-delete' }),
     onSuccess: () => {
       toast.success(m.admin_announcements_removed())

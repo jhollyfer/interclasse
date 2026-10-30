@@ -29,7 +29,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useBracketCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useBracketCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import {
   bracketPreviewQueryOptions,
   sportsQueryOptions,
@@ -56,7 +56,7 @@ export function DrawDialog(): React.JSX.Element {
     validator: AdministratorBracketCreateValidator,
     defaults: { sportId: '' },
     fields: FIELDS,
-    mutation: useBracketCreate,
+    mutation: useBracketCreateMutation,
     invalidate: [...GAME_KEYS, ...DEPENDENTS.games],
     success: m.admin_brackets_drawn_ok(),
     payload: (values) => values,

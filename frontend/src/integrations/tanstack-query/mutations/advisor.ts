@@ -14,7 +14,7 @@ import type { HTTPError } from '../http'
 import { request, send } from '../http'
 import type { MutationProps } from '../mutation-props'
 
-export function useStudentCreate(
+export function useStudentCreateMutation(
   options?: MutationProps<
     AdvisorStudentShowResponse,
     AdvisorStudentCreatePayload
@@ -40,7 +40,7 @@ export type StudentUpdateVariables = Merge<
   { readonly id: string }
 >
 
-export function useStudentUpdate(
+export function useStudentUpdateMutation(
   options?: MutationProps<AdvisorStudentShowResponse, StudentUpdateVariables>,
 ) {
   return useMutation<
@@ -62,7 +62,9 @@ export function useStudentUpdate(
   })
 }
 
-export function useStudentDelete(options?: MutationProps<void, string>) {
+export function useStudentDeleteMutation(
+  options?: MutationProps<void, string>,
+) {
   return useMutation<void, HTTPError, string>({
     ...options,
     mutationFn: function (id) {
@@ -74,7 +76,7 @@ export function useStudentDelete(options?: MutationProps<void, string>) {
 }
 
 /** Troca a lista de atletas da turma numa modalidade, inteira. */
-export function useAdvisorEnrollmentUpdate(
+export function useAdvisorEnrollmentUpdateMutation(
   options?: MutationProps<
     AdvisorEnrollmentShowResponse,
     AdvisorEnrollmentUpdatePayload

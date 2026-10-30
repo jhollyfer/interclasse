@@ -7,7 +7,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useUserArchive } from '#/integrations/tanstack-query/mutations/administrator'
+import { useUserArchiveMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 import { BulkArchive } from './bulk-archive'
@@ -23,7 +23,7 @@ export function UserBulkActions({
 }: Readonly<{
   users: ReadonlyArray<AdministratorUserShowResponse>
 }>): React.JSX.Element {
-  const archive = useUserArchive({
+  const archive = useUserArchiveMutation({
     onError: (error) => notifyError(error, { id: 'users-archive' }),
   })
 

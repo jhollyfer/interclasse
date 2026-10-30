@@ -20,7 +20,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useSportUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useSportUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -48,7 +48,7 @@ export function SportFormEdit(): React.JSX.Element {
       maxAthletes: sport.maxAthletes,
     },
     fields: SPORT_FIELDS,
-    mutation: useSportUpdate,
+    mutation: useSportUpdateMutation,
     invalidate: queryKeys.administrator.sports.all,
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',

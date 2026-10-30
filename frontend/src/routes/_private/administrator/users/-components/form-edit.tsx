@@ -21,7 +21,7 @@ import {
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useUserUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useUserUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -41,7 +41,7 @@ export function UserFormEdit(): React.JSX.Element {
   const { data: user } = useSuspenseQuery(userQueryOptions(id))
 
   // Os três parâmetros explícitos, como na criação. O payload é o da
-  // **atualização** com o `id` no caminho, que é a forma que `useUserUpdate`
+  // **atualização** com o `id` no caminho, que é a forma que `useUserUpdateMutation`
   // recebe.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
@@ -75,7 +75,7 @@ export function UserFormEdit(): React.JSX.Element {
       avatarId: user.avatarId,
     },
     fields: USER_FIELDS,
-    mutation: useUserUpdate,
+    mutation: useUserUpdateMutation,
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users/$id',
     backParams: { id },

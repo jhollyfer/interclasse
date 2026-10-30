@@ -3,10 +3,11 @@ import { toast } from 'sonner'
 import type { StorageMimetype } from '@interclasse/shared'
 
 import { Field } from '#/components/ui/field'
+import { useAbortOnUnmount } from '#/hooks/use-abort-on-unmount'
 import { notifyError } from '#/lib/form-errors'
 import {
-  useStorageCreate,
-  useStorageDelete,
+  useStorageCreateMutation,
+  useStorageDeleteMutation,
 } from '#/integrations/tanstack-query/mutations/storages'
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { IMAGE_MIMETYPES, isStorageMimetype } from '#/lib/mimetype'
@@ -76,13 +77,15 @@ export function ImageField({
    */
   const [orphan, setOrphan] = React.useState<string | null>(null)
 
-  const remove = useStorageDelete({
+  const remove = useStorageDeleteMutation({
     // Silencioso de propósito: é faxina, não uma ação que a pessoa pediu.
     // Falhar aqui deixa um arquivo órfão, que é exatamente o estado de antes.
     onError: () => undefined,
   })
 
-  const upload = useStorageCreate({
+  const nextSignal = useAbortOnUnmount()
+
+  const upload = useStorageCreateMutation({
     onSuccess(storage) {
       // Trocar a imagem duas vezes seguidas não pode deixar a primeira para
       // trás: a que sai daqui nunca chegou a ser referenciada por ninguém.
@@ -117,7 +120,7 @@ export function ImageField({
       return
     }
 
-    upload.mutate(file)
+    upload.mutate({ file, signal: nextSignal() })
     // Sem isto, escolher o mesmo arquivo duas vezes seguidas não dispara o
     // `change` de novo, e a segunda tentativa depois de um erro não acontece.
     event.target.value = ''

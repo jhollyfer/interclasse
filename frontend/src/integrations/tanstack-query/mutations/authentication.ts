@@ -10,7 +10,7 @@ import type { MutationProps } from '../mutation-props'
  * não há nada a guardar na tela, e quem passa a saber quem está logado é o
  * `GET /account`.
  */
-export function useAuthenticationSignIn(
+export function useAuthenticationSignInMutation(
   options?: MutationProps<void, AuthenticationSessionSignInPayload>,
 ) {
   // Os generics ficam explícitos: são eles que dão tipo contextual aos
@@ -28,7 +28,9 @@ export function useAuthenticationSignIn(
 }
 
 /** Encerra a sessão no servidor, e não só na tela. */
-export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
+export function useAuthenticationSignOutMutation(
+  options?: MutationProps<void, void>,
+) {
   return useMutation<void, HTTPError, void>({
     ...options,
     mutationFn: async function () {

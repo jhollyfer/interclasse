@@ -13,7 +13,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations/authentication'
+import { useAuthenticationSignInMutation } from '#/integrations/tanstack-query/mutations/authentication'
 import { SITE_DESCRIPTION } from '#/lib/constant'
 import { m } from '#/paraglide/messages'
 
@@ -54,7 +54,7 @@ export function SignInForm(): React.JSX.Element {
     // formulário, não de um campo", e ele o usa porque não revela se falhou o
     // e-mail, a senha, a conta inativa ou a arquivada.
     fields: FIELDS,
-    mutation: useAuthenticationSignIn,
+    mutation: useAuthenticationSignInMutation,
     // O sign-in responde 204 e não diz quem entrou - quem sabe é o
     // `GET /account`. Sem invalidar, o cache ainda guarda a ausência de sessão
     // de um segundo atrás, e o guard do painel mandaria de volta ao login.

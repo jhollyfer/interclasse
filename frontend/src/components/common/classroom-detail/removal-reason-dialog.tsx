@@ -21,7 +21,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { useAdvisorEnrollmentUpdate } from '#/integrations/tanstack-query/mutations/advisor'
+import { useAdvisorEnrollmentUpdateMutation } from '#/integrations/tanstack-query/mutations/advisor'
 import { m } from '#/paraglide/messages'
 
 /** A lista que espera o motivo para ser gravada. */
@@ -64,7 +64,7 @@ export function RemovalReasonDialog({
       reason: '',
     },
     fields: FIELDS,
-    mutation: useAdvisorEnrollmentUpdate,
+    mutation: useAdvisorEnrollmentUpdateMutation,
     invalidate: [queryKeys.administrator.enrollmentRemovals.all],
     success: m.common_removal_saved(),
     payload: (values) => values,

@@ -45,10 +45,10 @@ import { Input } from '#/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import {
-  useAdvisorEnrollmentUpdate,
-  useStudentCreate,
-  useStudentDelete,
-  useStudentUpdate,
+  useAdvisorEnrollmentUpdateMutation,
+  useStudentCreateMutation,
+  useStudentDeleteMutation,
+  useStudentUpdateMutation,
 } from '#/integrations/tanstack-query/mutations/advisor'
 import {
   advisorEnrollmentsQueryOptions,
@@ -99,7 +99,7 @@ export function ClassroomDetail({
       updated,
     )
 
-  const save = useAdvisorEnrollmentUpdate({
+  const save = useAdvisorEnrollmentUpdateMutation({
     onSuccess: (updated) => {
       store(updated)
       toast.success(m.common_classroom_saved())
@@ -206,7 +206,7 @@ function Students({
     validator: AdvisorStudentCreateValidator,
     defaults: { classroomId, name: '' },
     fields: STUDENT_FIELDS,
-    mutation: useStudentCreate,
+    mutation: useStudentCreateMutation,
     invalidate: STUDENT_CHANGE,
     payload: (values) => values,
     onSuccess: (): void => form.reset({ classroomId, name: '' }),
@@ -277,14 +277,14 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
     validator: AdvisorStudentUpdateValidator,
     values: { name: student.name },
     fields: STUDENT_FIELDS,
-    mutation: useStudentUpdate,
+    mutation: useStudentUpdateMutation,
     invalidate: STUDENT_CHANGE,
     // Renomear é escrita idempotente: reenviar grava o mesmo nome.
     retry: 'student-update',
     payload: (values) => ({ ...values, id: student.id }),
     onSuccess: () => setEditing(false),
   })
-  const remove = useStudentDelete({
+  const remove = useStudentDeleteMutation({
     onSuccess: onChange,
     // Aluno inscrito numa modalidade já sorteada: `409 STUDENT_IN_COMPETITION`.
     onError: (error) => notifyError(error, { id: 'student-delete' }),
