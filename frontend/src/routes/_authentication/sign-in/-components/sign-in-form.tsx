@@ -14,7 +14,6 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import { useAuthenticationSignInMutation } from '#/integrations/tanstack-query/mutations/authentication'
-import { SITE_DESCRIPTION } from '#/lib/constant'
 import { m } from '#/paraglide/messages'
 
 import {
@@ -94,7 +93,7 @@ export function SignInForm(): React.JSX.Element {
           {/* O nome por extenso, e a mesma constante que o `head` da raiz
               anuncia: a marca desenha a sigla, e é aqui que ela é dita
               inteira. */}
-          <AuthShellTagline>{SITE_DESCRIPTION()}</AuthShellTagline>
+          <AuthShellTagline>{m.common_site_description()}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
 

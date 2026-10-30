@@ -1,4 +1,5 @@
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '#/lib/constant'
+import { env } from '#/env'
+import { m } from '#/paraglide/messages'
 import { getLocale, locales, localizeUrl } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
 
@@ -10,7 +11,7 @@ const OG_LOCALES = {
 } satisfies Record<Locale, string>
 
 /** A imagem do cartão do link: a logo dos jogos. */
-const OG_IMAGE = `${SITE_URL}/logo-512.png`
+const OG_IMAGE = `${env.VITE_SITE_URL}/logo-512.png`
 
 type PageHeadInput = Readonly<{
   /** O assunto da página; o sufixo do site é somado aqui. Ausente, vale só o nome do site. */
@@ -25,7 +26,7 @@ type PageHeadInput = Readonly<{
 
 /** A URL absoluta da página no idioma pedido (`localizeUrl` devolve `URL`). */
 function urlIn(pathname: string, locale: Locale): string {
-  const url = localizeUrl(new URL(pathname, SITE_URL), { locale })
+  const url = localizeUrl(new URL(pathname, env.VITE_SITE_URL), { locale })
   // `/es/` e `/es` são o mesmo endereço, e o site responde na forma sem barra.
   if (url.pathname.length > 1 && url.pathname.endsWith('/'))
     url.pathname = url.pathname.slice(0, -1)
@@ -46,11 +47,11 @@ function urlIn(pathname: string, locale: Locale): string {
  */
 export function pageHead({
   title,
-  description = SITE_DESCRIPTION(),
+  description = m.common_site_description(),
   pathname,
   noindex = false,
 }: PageHeadInput) {
-  const siteTitle = SITE_TITLE()
+  const siteTitle = m.common_site_title()
   let fullTitle: string = siteTitle
   if (title) fullTitle = `${title} | ${siteTitle}`
 

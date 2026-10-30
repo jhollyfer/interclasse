@@ -3,16 +3,16 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ThemeProvider } from 'next-themes'
 import type { QueryClient } from '@tanstack/react-query'
 
+import { m } from '#/paraglide/messages'
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
-import { SITE_DESCRIPTION, SITE_TITLE } from '#/lib/constant'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'
 
@@ -38,11 +38,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: SITE_TITLE(),
+        title: m.common_site_title(),
       },
       {
         name: 'description',
-        content: SITE_DESCRIPTION(),
+        content: m.common_site_description(),
       },
     ],
     links: [
@@ -116,7 +116,10 @@ function RootDocument({
                 name: 'Tanstack Router',
                 render: <TanStackRouterDevtoolsPanel />,
               },
-              TanStackQueryDevtools,
+              {
+                name: 'Tanstack Query',
+                render: <ReactQueryDevtoolsPanel />,
+              },
             ]}
           />
         )}

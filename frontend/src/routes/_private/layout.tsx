@@ -11,7 +11,6 @@ import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar'
 import { Spinner } from '#/components/ui/spinner'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 import { breadcrumbTitle, buildBreadcrumbs } from '#/lib/breadcrumbs'
-import { SITE_TITLE } from '#/lib/constant'
 import { m } from '#/paraglide/messages'
 
 import { Sidebar } from './-components/sidebar'
@@ -70,7 +69,9 @@ export const Route = createFileRoute('/_private')({
     const title = breadcrumbTitle(buildBreadcrumbs(matches))
 
     return {
-      meta: [{ title: [title, SITE_TITLE()].filter(Boolean).join(' | ') }],
+      meta: [
+        { title: [title, m.common_site_title()].filter(Boolean).join(' | ') },
+      ],
     }
   },
   component: RouteComponent,

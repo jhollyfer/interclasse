@@ -1,6 +1,6 @@
 import type { UseMutationOptions } from '@tanstack/react-query'
 
-import type { HTTPError } from './http'
+import type { HTTPError } from '#/integrations/tanstack-query/http'
 
 /**
  * As opções que todo hook deste arquivo aceita: o contrato do TanStack Query

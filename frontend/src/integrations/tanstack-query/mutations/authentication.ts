@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
+
 import type { HTTPError } from '../http'
 import { send } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 /**
  * Entra. Responde `204` e entrega os dois tokens em `Set-Cookie`, `httpOnly` -

@@ -2,7 +2,6 @@ import type * as React from 'react'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
-import { SITE_TITLE } from '#/lib/constant'
 import { m } from '#/paraglide/messages'
 
 import { validateSearch } from './-search'
@@ -35,7 +34,7 @@ export const Route = createFileRoute('/_authentication')({
     throw redirect({ to: '/painel' })
   },
   head: () => ({
-    meta: [{ title: `${m.auth_page_title()} | ${SITE_TITLE()}` }],
+    meta: [{ title: `${m.auth_page_title()} | ${m.common_site_title()}` }],
   }),
   component: RouteComponent,
 })

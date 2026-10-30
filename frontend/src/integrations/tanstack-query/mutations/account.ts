@@ -2,9 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 import { AccountProfileShowResponse } from '@interclasse/shared'
 import type { AccountProfileUpdatePayload } from '@interclasse/shared'
 
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
+
 import type { HTTPError } from '../http'
 import { request } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 /**
  * A própria conta. Sem `id` no payload nem no caminho: o usuário vem sempre da

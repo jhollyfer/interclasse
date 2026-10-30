@@ -14,6 +14,7 @@
 interface ImportMetaEnv {
   /** Base da API AdonisJS. Lida e checada em `src/env.ts`. */
   readonly VITE_API_URL?: string
+  readonly VITE_SITE_URL?: string
 }
 
 interface ImportMeta {

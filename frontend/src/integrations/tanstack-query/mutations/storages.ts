@@ -2,10 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 import type { StoragesFileShowResponse } from '@interclasse/shared'
 
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 
 import type { HTTPError } from '../http'
 import { send } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 /** O arquivo e o sinal que cancela o envio: quem sabe quando cancelar é a tela. */
 export type StorageCreateVariables = {

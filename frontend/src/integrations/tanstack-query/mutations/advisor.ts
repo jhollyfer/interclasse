@@ -10,9 +10,10 @@ import type {
   Merge,
 } from '@interclasse/shared'
 
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
+
 import type { HTTPError } from '../http'
 import { request, send } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 export function useStudentCreateMutation(
   options?: MutationProps<
