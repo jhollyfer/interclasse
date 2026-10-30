@@ -4,6 +4,7 @@ import { tanstackConfig } from '@tanstack/eslint-config'
 import pluginQuery from '@tanstack/eslint-plugin-query'
 import pluginRouter from '@tanstack/eslint-plugin-router'
 import importX from 'eslint-plugin-import-x'
+import playwright from 'eslint-plugin-playwright'
 
 export default [
   // Saída do compilador do Paraglide: gerada, não versionada (_standards/i18n.md §2).
@@ -136,6 +137,19 @@ export default [
     },
   },
   {
+    // O E2E (`tooling.md` §4.2): espera fixa, `networkidle`, teste focado e
+    // teste pulado reprovam no lint, não na revisão.
+    files: ['e2e/**/*.ts'],
+    ...playwright.configs['flat/recommended'],
+    rules: {
+      ...playwright.configs['flat/recommended'].rules,
+      'playwright/no-wait-for-timeout': 'error',
+      'playwright/no-networkidle': 'error',
+      'playwright/no-focused-test': 'error',
+      'playwright/no-skipped-test': 'error',
+    },
+  },
+  {
     // Arquivos gerados e artefatos de build.
     //
     // `src/routeTree.gen.ts` é saída versionada, não código: o plugin do Router
@@ -151,6 +165,9 @@ export default [
       'src/routeTree.gen.ts',
       '.output/**',
       '.tanstack/**',
+      'test-results/**',
+      'playwright-report/**',
+      '*.tmp.cjs',
     ],
   },
 ]

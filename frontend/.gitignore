@@ -14,3 +14,9 @@ todos.json
 
 # Saída do compilador do Paraglide: gerada no dev e no build (_standards/i18n.md §2).
 src/paraglide/
+
+# Credenciais do E2E: o versionado é `.env.e2e.example`.
+.env.e2e
+test-results
+playwright-report
+e2e/.auth
