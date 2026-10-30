@@ -6,12 +6,12 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** 21 tarefas · 18 feitas · 1 em andamento · 2 a fazer — atualizado 2026-10-29
+**Resumo:** 23 tarefas · 20 feitas · 0 em andamento · 3 a fazer — atualizado 2026-10-29
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
 
-## Fase 1 · Régua (9/10)
+## Fase 1 · Régua (11/12)
 
 Trazer o projeto para o padrão Maiyu inteiro.
 
@@ -25,7 +25,9 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 1.6 | Frontend: Paraglide pt-BR/es/en e troca de idioma | Alta | Feita | |
 | 1.7 | Frontend: queries/mutations por módulo, `-search.ts`, guard por área | Alta | Feita | |
 | 1.8 | Frontend: tipos e validators do `shared/` (Zod + zodResolver) | Alta | Feita | VineJS saiu do frontend |
-| 1.9 | Frontend: todos os textos nos três idiomas | Alta | Em andamento | site, painel do admin, partes comuns |
+| 1.9 | Frontend: todos os textos nos três idiomas | Alta | Feita | 600 chaves por idioma |
+| 1.11 | Suíte E2E (Playwright) dos fluxos críticos | Alta | Feita | 14 testes, `pnpm e2e` |
+| 1.12 | E2E no CI (API e banco em container no job) | Média | A fazer | hoje roda só local |
 | 1.10 | Docs do projeto preenchidos a partir do código | Média | Feita | |
 
 ## Fase 2 · Pedidos do Geison, 29/10 (9/9)
@@ -48,6 +50,15 @@ Trazer o projeto para o padrão Maiyu inteiro.
 |---|---|---|---|---|
 | 3.1 | Itens de `maiyu-pattern/_findings/interclasse.md` (B1–B4, I1–I5, T1–T4, C1–C6) | Média | A fazer | |
 | 3.2 | Segurança SEC-1..SEC-9 do mesmo arquivo | Alta | A fazer | SEC-1 `trustProxy` primeiro |
+
+## Fase 4 · Pendências conhecidas
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 4.1 | Índice único que garanta uma linha só em `site_settings` | Baixa | A fazer | duas primeiras leituras simultâneas criariam duas linhas |
+| 4.2 | Tipo do `scheduledAt` do VineJS (`DateTime \| null`, chega `undefined`) | Baixa | A fazer | o use-case trata os dois |
+| 4.3 | Tema por cookie no servidor e tamanhos de fonte em token | Baixa | A fazer | desvios descritos em `DESIGN.md` |
+| 4.4 | Fixar a imagem `node:24-alpine` por digest nos Dockerfiles | Média | A fazer | sem acesso ao Docker Hub nesta sessão |
 
 ## Fase N · Ideias (fora do escopo atual)
 

@@ -1,4 +1,3 @@
-
 /** O resultado de uma ação em massa: quantos passaram e quantos não. */
 export type BulkOutcome = {
   done: number
@@ -27,4 +26,3 @@ export async function runBulk<TItem>(
 
   return { done, failed: results.length - done }
 }
-

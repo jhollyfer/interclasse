@@ -97,9 +97,7 @@
         "input edition",
         "local editionOrdinal = edition: plural type=ordinal"
       ],
-      "selectors": [
-        "editionOrdinal"
-      ],
+      "selectors": ["editionOrdinal"],
       "match": {
         "editionOrdinal=one": "{edition}st edition",
         "editionOrdinal=two": "{edition}nd edition",
@@ -116,9 +114,7 @@
         "input years",
         "local yearsPlural = years: plural"
       ],
-      "selectors": [
-        "yearsPlural"
-      ],
+      "selectors": ["yearsPlural"],
       "match": {
         "yearsPlural=one": "Since {year} · for {years} year",
         "yearsPlural=*": "Since {year} · for {years} years"
@@ -227,13 +223,8 @@
   "table_per_page": "Items per page",
   "table_records": [
     {
-      "declarations": [
-        "input total",
-        "local totalPlural = total: plural"
-      ],
-      "selectors": [
-        "totalPlural"
-      ],
+      "declarations": ["input total", "local totalPlural = total: plural"],
+      "selectors": ["totalPlural"],
       "match": {
         "totalPlural=one": "{total} record",
         "totalPlural=*": "{total} records"
@@ -274,13 +265,8 @@
   "common_enrollment_drawn": "Drawn",
   "common_enrollment_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} athlete · {min} to {max}",
         "countPlural=*": "{count} athletes · {min} to {max}"
@@ -298,13 +284,8 @@
   "common_student_name": "Student name",
   "common_students_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} student",
         "countPlural=*": "{count} students"
@@ -327,13 +308,8 @@
   "common_summary_no_representative": "No representative",
   "common_summary_sports_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} sport",
         "countPlural=*": "{count} sports"
@@ -464,10 +440,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} athletes were removed from a sport by the advisors. See the reason.",
         "countExact=*, countPlural=one": "{count} athlete was removed from a sport by the advisors. See the reason.",
@@ -511,12 +484,7 @@
         "local minExact = min",
         "local minPlural = min: plural"
       ],
-      "selectors": [
-        "eligibleExact",
-        "eligiblePlural",
-        "minExact",
-        "minPlural"
-      ],
+      "selectors": ["eligibleExact", "eligiblePlural", "minExact", "minPlural"],
       "match": {
         "eligibleExact=0, eligiblePlural=*, minExact=0, minPlural=*": "{eligible} classes take part (minimum of {min} athletes)",
         "eligibleExact=0, eligiblePlural=*, minExact=*, minPlural=one": "{eligible} classes take part (minimum of {min} athlete)",
@@ -548,12 +516,7 @@
         "local redExact = red",
         "local redPlural = red: plural"
       ],
-      "selectors": [
-        "cardsExact",
-        "cardsPlural",
-        "redExact",
-        "redPlural"
-      ],
+      "selectors": ["cardsExact", "cardsPlural", "redExact", "redPlural"],
       "match": {
         "cardsExact=0, cardsPlural=*, redExact=0, redPlural=*": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
         "cardsExact=0, cardsPlural=*, redExact=*, redPlural=one": "{cards} cards, {red} red. To enter one, open the match in the bracket or in Matches and use \"Cards\".",
@@ -577,10 +540,7 @@
         "local pendingExact = pending",
         "local pendingPlural = pending: plural"
       ],
-      "selectors": [
-        "pendingExact",
-        "pendingPlural"
-      ],
+      "selectors": ["pendingExact", "pendingPlural"],
       "match": {
         "pendingExact=0, pendingPlural=*": "Who the advisors removed from sports, and why. {pending} pending notices.",
         "pendingExact=*, pendingPlural=one": "Who the advisors removed from sports, and why. {pending} pending notice.",
@@ -619,10 +579,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} athletes",
         "countExact=*, countPlural=one": "{count} athlete",
@@ -637,10 +594,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} students",
         "countExact=*, countPlural=one": "{count} student",
@@ -655,10 +609,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} sports",
         "countExact=*, countPlural=one": "{count} sport",
@@ -789,10 +740,7 @@
         "local countExact = count",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countExact",
-        "countPlural"
-      ],
+      "selectors": ["countExact", "countPlural"],
       "match": {
         "countExact=0, countPlural=*": "{count} accounts lose access to the dashboard and leave the list. They can be restored later.",
         "countExact=*, countPlural=one": "{count} account loses access to the dashboard and leaves the list. It can be restored later.",
@@ -807,10 +755,7 @@
         "local doneExact = done",
         "local donePlural = done: plural"
       ],
-      "selectors": [
-        "doneExact",
-        "donePlural"
-      ],
+      "selectors": ["doneExact", "donePlural"],
       "match": {
         "doneExact=0, donePlural=*": "{done} archived.",
         "doneExact=*, donePlural=one": "{done} archived.",
@@ -825,10 +770,7 @@
         "local totalExact = total",
         "local totalPlural = total: plural"
       ],
-      "selectors": [
-        "totalExact",
-        "totalPlural"
-      ],
+      "selectors": ["totalExact", "totalPlural"],
       "match": {
         "totalExact=0, totalPlural=*": "None archived: {total} failed.",
         "totalExact=*, totalPlural=one": "None archived: {total} failed.",
@@ -843,10 +785,7 @@
         "local failedExact = failed",
         "local failedPlural = failed: plural"
       ],
-      "selectors": [
-        "failedExact",
-        "failedPlural"
-      ],
+      "selectors": ["failedExact", "failedPlural"],
       "match": {
         "failedExact=0, failedPlural=*": "{done} of {total} archived; {failed} failed.",
         "failedExact=*, failedPlural=one": "{done} of {total} archived; {failed} failed.",

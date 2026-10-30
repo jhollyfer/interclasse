@@ -7,28 +7,30 @@
 
 | Atualizado | Fase atual | Progresso | Status |
 |---|---|---|---|
-| AAAA-MM-DD HH:MM | <2 · Pedidos> | <21%> | <Em desenvolvimento · MVP v1.0> |
+| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90% | Em revisão, branch `claude/modest-planck-jx0izx` |
 
 ## Já feito
 
-- <Projeto, banco e login prontos>
-- <Cardápio publicado>
+- Pedidos do Geison (29/10): menu da conta, sorteio idempotente, excluir chave, classificação em abas, turmas em cartões, conselheiro com uma turma, Sobre/regulamento/Instagram editáveis, fotos com aprovação, relatórios com CSV.
+- Régua inteira: workspace com `shared/`, backend em domínio/repositório/presenter com i18n, frontend com Zod do `shared/`, textos em pt-BR/es/en, E2E Playwright, `docs/` preenchidos.
 
 ## Parou em
 
-<Uma ou duas frases concretas, com arquivo e o que falta.>
-Ex.: Tela do carrinho: falta conferir o estoque antes de fechar o pedido
-(`app/features/orders/create-order/create-order.use-case.ts`).
+Tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
 
 ## Próximos passos
 
-1. <próxima ação, na ordem>
-2.
+1. Dono revisa e decide o PR para `main`.
+2. Primeiro deploy: a imagem da API agora sai da raiz (`docker build -f backend/Dockerfile-production .`); o pré-deploy `node ace migration:run --force` não muda. A migration de conselheiro único solta turmas de quem tinha mais de uma.
+3. Pendências da Fase 4 de `TASKS.md` e E2E no CI.
 
 ## Contexto importante
 
-- <coisa que não está no código e que a próxima sessão precisa saber — ex.: cliente pediu
-  para não mostrar preço no cardápio público até AAAA-MM-DD>
+- Geison (professor, usuário do painel) vai mandar prints das turmas para ajuste visual fino.
+- Cada conselheiro aconselha uma turma só (decisão do Jhollyfer com o Geison, 29/10).
+- Quem criou os jogos e desde quando não está no código: a organização preenche em Painel › Site.
+- Infraestrutura (banco, VPS) é do Jhollyfer.
+- Um merge desta branch saiu com a mensagem padrão do git citando o nome do branch temporário; corrigir exige force push, que não foi autorizado.
 
 ## Lições
 
