@@ -5,13 +5,12 @@ import type {
   AdvisorEnrollmentShowResponse,
   AdvisorPhotoShowResponse,
   AdvisorStudentShowResponse,
-  Paginated,
+  Paginated, Merge 
 } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import type { ListSearch, StudentListSearch } from '#/lib/list-search'
 import { queryString } from '#/lib/list-search'
-import type { Merge } from '#/lib/merge'
 
 import { request } from '../http'
 

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FilePdfIcon } from '@phosphor-icons/react'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**

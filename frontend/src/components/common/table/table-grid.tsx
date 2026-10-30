@@ -23,7 +23,7 @@ import {
   TableHeader as HeaderRoot,
   TableRow as RowRoot,
 } from '#/components/ui/table'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 import { TableDraggableHeader } from './table-draggable-header'
 import { TableMobileCards } from './table-mobile-cards'

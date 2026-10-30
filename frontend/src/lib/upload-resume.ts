@@ -1,4 +1,4 @@
-import type { Merge } from '#/lib/merge'
+import type { Merge } from '@interclasse/shared'
 /**
  * O que o upload precisa lembrar para sobreviver a um reload.
  *

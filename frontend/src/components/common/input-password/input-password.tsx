@@ -9,7 +9,7 @@ import {
   InputGroupInput,
 } from '#/components/ui/input-group'
 import type { Input } from '#/components/ui/input'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 type PasswordInputProps = Readonly<

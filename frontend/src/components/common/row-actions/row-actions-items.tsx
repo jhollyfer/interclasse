@@ -4,6 +4,7 @@ import {
   ArrowCounterClockwiseIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import type { Merge } from '@interclasse/shared'
 
 import {
   ConfirmDialog,
@@ -13,7 +14,6 @@ import {
   ConfirmDialogHeader,
 } from '#/components/common/confirm-dialog'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
-import type { Merge } from '#/lib/merge'
 import { m } from '#/paraglide/messages'
 
 import { useCloseRowActions } from './row-actions'
@@ -33,7 +33,10 @@ type RowActionsItemProps = Readonly<{
 
 type MenuConfirmProps = Readonly<
   Merge<
-    RowActionsItemProps,
+    Omit<
+      RowActionsItemProps,
+      'slot' | 'icon' | 'label' | 'confirmLabel' | 'destructive'
+    >,
     {
       slot: string
       icon: React.ReactNode
@@ -129,7 +132,7 @@ export function RowActionsUnarchive(
 
 type RowActionsDeleteProps = Readonly<
   Merge<
-    RowActionsItemProps,
+    Omit<RowActionsItemProps, 'label'>,
     {
       /** O texto do item. "Excluir" por padrão. */
       label?: string

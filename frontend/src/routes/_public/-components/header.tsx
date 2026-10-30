@@ -5,7 +5,7 @@ import type { VariantProps } from 'class-variance-authority'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { AUTHENTICATION, NAVIGATION } from './menu'

@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { TrophyIcon } from '@phosphor-icons/react'
+import type { Merge } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 type NotFoundPageProps = Readonly<
   Merge<
-    React.ComponentProps<'div'>,
+    Omit<React.ComponentProps<'div'>, 'code'>,
     {
       /**
        * O número gigante do painel escuro. `404` por padrão porque é para isso

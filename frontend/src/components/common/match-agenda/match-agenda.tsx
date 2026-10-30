@@ -9,7 +9,7 @@ import {
   formatDayKey,
   formatTime,
 } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /** "Quartas", "Semifinal"... */

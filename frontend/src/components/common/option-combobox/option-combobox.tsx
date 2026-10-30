@@ -9,7 +9,7 @@ import {
   ComboboxList,
 } from '#/components/ui/combobox'
 import { InputGroupAddon } from '#/components/ui/input-group'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 export type OptionComboboxItem = {

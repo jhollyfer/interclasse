@@ -17,7 +17,7 @@ import { useEnrollmentRemovalAcknowledge } from '#/integrations/tanstack-query/m
 import { enrollmentRemovalsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
 import { formatDate } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { ADMINISTRATOR_REMOVALS } from '../index'

@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type * as React from 'react'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 /**
  * Uma seção do site. Compound sem contexto (`frontend.md` §6.1): as partes não

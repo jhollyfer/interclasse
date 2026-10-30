@@ -1,6 +1,4 @@
-import type { SortDirection, TrashedMode } from '@interclasse/shared'
-
-import type { Merge } from './merge'
+import type { Merge, SortDirection, TrashedMode } from '@interclasse/shared'
 
 /**
  * Os filtros de qualquer listagem do painel, na URL.

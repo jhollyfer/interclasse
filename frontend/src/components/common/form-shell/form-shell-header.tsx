@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
+import type { Merge } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -10,7 +11,6 @@ import {
   PageShellHeader,
 } from '#/components/common/page-shell'
 import { SubmitButton } from '#/components/common/submit-button'
-import type { Merge } from '#/lib/merge'
 import { m } from '#/paraglide/messages'
 
 import { useFormShellContext } from './form-shell-context'
@@ -94,7 +94,7 @@ export function FormShellDiscard({
 // `Merge` substitui a chave em vez de intersectar.
 type FormShellSubmitProps = Readonly<
   Merge<
-    React.ComponentProps<typeof SubmitButton>,
+    Omit<React.ComponentProps<typeof SubmitButton>, 'children'>,
     { children?: React.ReactNode }
   >
 >

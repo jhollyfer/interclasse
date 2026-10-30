@@ -4,7 +4,7 @@ import type { AdministratorBracketShowResponse } from '@interclasse/shared'
 import { MATCH_STATUS } from '@interclasse/shared'
 
 import { MATCH_PHASE_LABELS, championName, formatWhen } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /** Uma partida da chave, como `GET /brackets/:id` a devolve. */

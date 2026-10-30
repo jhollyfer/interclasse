@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 /**
  * O cabeçalho fixo da listagem: título e descrição à esquerda, ações à direita.

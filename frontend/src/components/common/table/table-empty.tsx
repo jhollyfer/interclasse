@@ -10,7 +10,7 @@ import {
   EmptyDescription,
   EmptyTitle,
 } from '#/components/ui/empty'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import type { TableInstance } from './use-table'

@@ -1,10 +1,10 @@
 import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
+import type { Merge } from '@interclasse/shared'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -103,7 +103,7 @@ function AuthShellHeader({
   children,
   ...props
 }: Merge<
-  React.ComponentProps<'header'>,
+  Omit<React.ComponentProps<'header'>, 'title'>,
   { title: React.ReactNode }
 >): React.JSX.Element {
   return (

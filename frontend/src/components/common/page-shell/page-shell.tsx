@@ -2,11 +2,11 @@ import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
+import type { Merge } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
-import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/merge'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -26,7 +26,10 @@ import { m } from '#/paraglide/messages'
  * a ordem no JSX é a ordem na tela.
  */
 type PageShellProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 export function PageShell({
@@ -60,7 +63,10 @@ export function PageShell({
 // A linha divisória é sempre desenhada: quem não a quer passa `border-b-0`
 // em `className`, e o `cn` resolve o conflito - estrutura não vira prop.
 type PageShellHeaderProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { readonly children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { readonly children: React.ReactNode }
+  >
 >
 
 export function PageShellHeader({
@@ -120,7 +126,10 @@ export function PageShellContent({
 }
 
 type PageShellFooterProps = Readonly<
-  Merge<React.ComponentProps<'div'>, { children?: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    { children?: React.ReactNode }
+  >
 >
 
 export function PageShellFooter({
