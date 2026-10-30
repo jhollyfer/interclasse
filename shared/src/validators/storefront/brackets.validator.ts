@@ -8,4 +8,6 @@ export const StorefrontBracketPaginateValidator = z.object({
   category: z.enum(CATEGORIES).optional(),
 })
 
-export type StorefrontBracketPaginatePayload = z.infer<typeof StorefrontBracketPaginateValidator>
+export type StorefrontBracketPaginatePayload = z.infer<
+  typeof StorefrontBracketPaginateValidator
+>

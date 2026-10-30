@@ -97,9 +97,17 @@ export function useValidatorLocale(locale: Locale): void {
         return messages.maxLength(Number(issue.maximum))
 
       // Limites de número: só o inclusivo (`min`/`max`) tem a frase da casa.
-      if (issue.code === 'too_small' && issue.origin === 'number' && issue.inclusive)
+      if (
+        issue.code === 'too_small' &&
+        issue.origin === 'number' &&
+        issue.inclusive
+      )
         return messages.min(Number(issue.minimum))
-      if (issue.code === 'too_big' && issue.origin === 'number' && issue.inclusive)
+      if (
+        issue.code === 'too_big' &&
+        issue.origin === 'number' &&
+        issue.inclusive
+      )
         return messages.max(Number(issue.maximum))
 
       if (issue.code === 'too_big' && issue.origin === 'array')
@@ -108,8 +116,10 @@ export function useValidatorLocale(locale: Locale): void {
       // Campo sem valor (`undefined`) é "preencha", não "esperava texto,
       // recebeu undefined"; número apagado no input chega como `NaN`.
       if (issue.code === 'invalid_type') {
-        if (issue.input === undefined || issue.input === null) return messages.required
-        if (typeof issue.input === 'number' && Number.isNaN(issue.input)) return messages.number
+        if (issue.input === undefined || issue.input === null)
+          return messages.required
+        if (typeof issue.input === 'number' && Number.isNaN(issue.input))
+          return messages.number
         if (issue.expected === 'int') return messages.integer
       }
 
@@ -156,9 +166,9 @@ export function paginationFields() {
 }
 
 /** A ordenação de uma listagem: as colunas que ela aceita, e o sentido. */
-export function sortFields<const TColumns extends readonly [string, ...string[]]>(
-  columns: TColumns,
-) {
+export function sortFields<
+  const TColumns extends readonly [string, ...string[]],
+>(columns: TColumns) {
   return {
     sort: z.enum(columns).optional(),
     direction: z.enum(SORT_DIRECTIONS).optional(),
@@ -182,11 +192,13 @@ export function athleteListFields() {
 /** As mensagens das regras de identidade (senha e e-mail), por idioma. */
 export const IDENTITY_MESSAGES = {
   'pt-BR': {
-    weakPassword: 'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
+    weakPassword:
+      'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
     passwordMismatch: 'As senhas não são iguais',
   },
   es: {
-    weakPassword: 'La contraseña necesita minúscula, mayúscula, número y carácter especial',
+    weakPassword:
+      'La contraseña necesita minúscula, mayúscula, número y carácter especial',
     passwordMismatch: 'Las contraseñas no coinciden',
   },
   en: {
@@ -225,13 +237,19 @@ export function passwordField() {
  * Acusa `passwordConfirmation` diferente de `password`. Recebe os dois valores
  * já lidos: o `refine` do objeto os passa, e a regra fica num lugar só.
  */
-export function passwordsMatch(password: string | undefined, confirmation: string | undefined) {
+export function passwordsMatch(
+  password: string | undefined,
+  confirmation: string | undefined,
+) {
   return password === undefined || password === confirmation
 }
 
 /** Opções do `refine` que cobra um campo preenchido, na mensagem da casa. */
 export function requiredIssue(path: ReadonlyArray<string>) {
-  return { path: [...path], error: () => VALIDATION_MESSAGES[activeLocale].required }
+  return {
+    path: [...path],
+    error: () => VALIDATION_MESSAGES[activeLocale].required,
+  }
 }
 
 /** Opções do `refine` de objeto que cobra a confirmação da senha. */

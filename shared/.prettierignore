@@ -1,0 +1,2 @@
+# Saída do tsc: gerada, e o .gitignore da raiz não vale daqui.
+dist

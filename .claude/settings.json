@@ -1,0 +1,25 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if printf '%s' \"$input\" | grep -qE 'git +(reset +--hard|clean +-[a-zA-Z]*f|branch +-D|checkout +\\.|restore +\\.)|git +push[^|;&]*( --force( |\"|$)| -f( |\"|$))'; then echo 'bloqueado pela guarda do projeto (tooling.md §6): reset --hard, clean -f, branch -D, checkout ., restore . e push --force sem --force-with-lease' >&2; exit 2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

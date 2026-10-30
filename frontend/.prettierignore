@@ -10,3 +10,17 @@ src/paraglide
 # Cache do inlang: gerado, e o próprio `project.inlang/.gitignore` já o mantém
 # fora do versionamento. Formatá-lo é trabalho que a próxima compilação desfaz.
 project.inlang/cache
+
+# Saída de build e de teste: gerada, e o .gitignore da raiz não vale daqui (o
+# Prettier só lê o .gitignore do diretório em que roda).
+.output
+.nitro
+.tanstack
+dist
+test-results
+playwright-report
+
+# Arquivos que o inlang gera dentro do projeto (ignorados pelo git dele).
+project.inlang/.lix
+project.inlang/.meta.json
+project.inlang/README.md

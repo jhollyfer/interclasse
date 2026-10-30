@@ -1,26 +1,56 @@
 name: Commitlint
 
-# Os commits deste repositorio sao Conventional Commits em pt-BR, e isso estava
-# escrito na regua e cobrado por ninguem. O `pre-commit` nao os valida, e quem
-# usa `--no-verify` passa direto.
+# Conventional Commits em pt-BR, cobrado também fora do hook local: quem usa
+# `--no-verify` passa direto pelo `commit-msg` (_standards/tooling.md §6, §7).
+# Workflow próprio para uma mensagem inválida não esperar nem bloquear a suíte.
 on:
   pull_request:
+    types: [opened, edited, synchronize, reopened]
 
 permissions:
   contents: read
-  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # O historico inteiro: sem ele o `--from` do PR nao resolve.
+          # O histórico inteiro: sem ele o `--from` do PR não resolve.
           fetch-depth: 0
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+          persist-credentials: false
+
+      - name: Setup pnpm e Node
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: "24"
-      - name: Validar commits do PR
-        # O mesmo comando do hook `commit-msg`, lendo o `.commitlintrc.json` do repo.
-        run: npx --yes -p @commitlint/cli@21 -p @commitlint/config-conventional@21 commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          runtime: node@24
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # A versão da devDependency, lendo o `.commitlintrc.json` do repositório.
+      - name: Commits do PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
+
+      - name: Título e branch do PR
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: |
+          printf '%s\n' "$PR_TITLE" | pnpm exec commitlint
+          printf '%s\n' "$PR_BRANCH" | grep -qE '^(feat|fix|refactor|docs|test|chore|ci|build|perf|style|revert)/[a-z0-9][a-z0-9-]*$' \
+            || { echo "branch fora do padrão <tipo>/<escopo>-<assunto>: $PR_BRANCH" >&2; exit 1; }
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -qiE 'claude|anthropic|codex|cursor'; then
+            echo "nome de agente no título ou na branch do PR" >&2
+            exit 1
+          fi

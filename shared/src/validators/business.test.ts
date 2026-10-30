@@ -8,8 +8,13 @@ import { RepresentativeEnrollmentUpdateValidator } from './representative/enroll
 const ID = '0a1b2c3d-1111-4222-8333-444455556666'
 const OTHER = '0a1b2c3d-1111-4222-8333-444455557777'
 
-function failed(result: { success: boolean; error?: { issues: ReadonlyArray<{ path: PropertyKey[] }> } }) {
-  return (result.error?.issues ?? []).map((issue) => issue.path.join('.')).sort()
+function failed(result: {
+  success: boolean
+  error?: { issues: ReadonlyArray<{ path: PropertyKey[] }> }
+}) {
+  return (result.error?.issues ?? [])
+    .map((issue) => issue.path.join('.'))
+    .sort()
 }
 
 describe('regras de negócio dos validators', () => {
@@ -24,7 +29,9 @@ describe('regras de negócio dos validators', () => {
   })
 
   it('usuário: a edição aceita não trocar a senha', () => {
-    expect(AdministratorUserUpdateValidator.safeParse({ name: 'Ana' }).success).toBe(true)
+    expect(
+      AdministratorUserUpdateValidator.safeParse({ name: 'Ana' }).success,
+    ).toBe(true)
   })
 
   it('usuário: senha nova pede confirmação igual', () => {
@@ -37,7 +44,9 @@ describe('regras de negócio dos validators', () => {
   })
 
   it('perfil: trocar só a foto não pede a senha atual', () => {
-    expect(AccountProfileUpdateValidator.safeParse({ avatarId: null }).success).toBe(true)
+    expect(
+      AccountProfileUpdateValidator.safeParse({ avatarId: null }).success,
+    ).toBe(true)
   })
 
   it('perfil: senha nova exige a senha atual', () => {
@@ -50,7 +59,10 @@ describe('regras de negócio dos validators', () => {
   })
 
   it('inscrição: a lista vazia vale, o aluno repetido não', () => {
-    const empty = RepresentativeEnrollmentUpdateValidator.safeParse({ sportId: ID, studentIds: [] })
+    const empty = RepresentativeEnrollmentUpdateValidator.safeParse({
+      sportId: ID,
+      studentIds: [],
+    })
     const repeated = RepresentativeEnrollmentUpdateValidator.safeParse({
       sportId: ID,
       studentIds: [OTHER, OTHER],

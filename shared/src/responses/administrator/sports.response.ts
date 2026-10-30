@@ -15,4 +15,6 @@ export const AdministratorSportShowResponse = z.object({
   updatedAt: z.iso.datetime({ offset: true }).nullable(),
 })
 
-export type AdministratorSportShowResponse = z.infer<typeof AdministratorSportShowResponse>
+export type AdministratorSportShowResponse = z.infer<
+  typeof AdministratorSportShowResponse
+>

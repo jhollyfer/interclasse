@@ -1,5 +1,5 @@
-import { AdministratorSportShowResponse } from '../administrator/sports.response.js'
 import type { z } from '../../validator.js'
+import { AdministratorSportShowResponse } from '../administrator/sports.response.js'
 
 /**
  * A modalidade no site: a mesma forma do painel. Nada nela é privado - nome e
@@ -7,4 +7,6 @@ import type { z } from '../../validator.js'
  */
 export const StorefrontSportShowResponse = AdministratorSportShowResponse
 
-export type StorefrontSportShowResponse = z.infer<typeof StorefrontSportShowResponse>
+export type StorefrontSportShowResponse = z.infer<
+  typeof StorefrontSportShowResponse
+>

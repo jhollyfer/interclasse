@@ -22,4 +22,6 @@ export const AdministratorUserShowResponse = z.object({
   deletedAt: date().nullable(),
 })
 
-export type AdministratorUserShowResponse = z.infer<typeof AdministratorUserShowResponse>
+export type AdministratorUserShowResponse = z.infer<
+  typeof AdministratorUserShowResponse
+>

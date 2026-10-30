@@ -18,4 +18,6 @@ export const StorefrontSiteShowResponse = z.object({
     .nullable(),
 })
 
-export type StorefrontSiteShowResponse = z.infer<typeof StorefrontSiteShowResponse>
+export type StorefrontSiteShowResponse = z.infer<
+  typeof StorefrontSiteShowResponse
+>

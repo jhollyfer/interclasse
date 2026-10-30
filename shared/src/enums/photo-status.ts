@@ -13,4 +13,7 @@ export type PhotoStatus = (typeof PHOTO_STATUS)[keyof typeof PHOTO_STATUS]
 export const PHOTO_STATUSES = Object.values(PHOTO_STATUS)
 
 /** O que a revisão do administrador decide: aprovar ou recusar. */
-export const PHOTO_REVIEW_STATUSES = [PHOTO_STATUS.APPROVED, PHOTO_STATUS.REJECTED] as const
+export const PHOTO_REVIEW_STATUSES = [
+  PHOTO_STATUS.APPROVED,
+  PHOTO_STATUS.REJECTED,
+] as const

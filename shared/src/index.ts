@@ -49,7 +49,6 @@ export * from './responses/administrator/reports.response.js'
 export * from './responses/advisor/photos.response.js'
 export * from './responses/storefront/photos.response.js'
 
-
 export * from './validators/administrator/classrooms.validator.js'
 export * from './validators/administrator/enrollment-removals.validator.js'
 export * from './validators/advisor/classrooms.validator.js'

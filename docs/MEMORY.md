@@ -16,7 +16,7 @@
 
 ## Parou em
 
-Fase 5.4 (backend arquitetura) aplicada na branch `frente-5-4`: lint, typecheck, `pattern:check`, `authz:check`, `openapi:check` e 371 unit verdes; E2E do backend não rodou (sem banco no ambiente) e precisa rodar antes do merge. Antes disso, tudo verde na branch: shared 18, frontend 187 + build, backend 911 (1 falha só do S3 local que não expira URL), E2E 14/14. Falta revisão do dono, PR e deploy.
+Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
 
 ## Próximos passos
 
@@ -46,8 +46,9 @@ Fase 5.4 (backend arquitetura) aplicada na branch `frente-5-4`: lint, typecheck,
 
 | Problema | Onde | Contorno |
 |---|---|---|
-| <…> | <arquivo/tela> | <…> |
+| `pnpm depcruise` acusa 18 violações de camada e ciclo (policies, guard e session service importando model; controllers de sessão importando o `CookieService`; ciclos entre models) | `backend/app` | corrigir na tarefa 5.4; o passo do CI falha até lá |
+| Dockerfiles, job E2E do frontend e workflows novos escritos sem acesso a Docker daemon nem a GitHub Actions | `.github/workflows/`, `*/Dockerfile-production` | validar no primeiro PR e na tarefa 5.8 |
 
 ## Links úteis
 
-- Repositório: <url> · Produção: <url> · Design: <url>
+- Repositório: https://github.com/jhollyfer/interclasse · Produção: https://interclass.maiyu.com.br · Design: `docs/DESIGN.md`

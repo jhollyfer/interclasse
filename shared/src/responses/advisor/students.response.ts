@@ -9,4 +9,6 @@ export const AdvisorStudentShowResponse = z.object({
   updatedAt: z.iso.datetime({ offset: true }).nullable(),
 })
 
-export type AdvisorStudentShowResponse = z.infer<typeof AdvisorStudentShowResponse>
+export type AdvisorStudentShowResponse = z.infer<
+  typeof AdvisorStudentShowResponse
+>

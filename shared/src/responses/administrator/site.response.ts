@@ -47,4 +47,6 @@ export type AdministratorSiteRegulationResponse = z.infer<
   typeof AdministratorSiteRegulationResponse
 >
 
-export type AdministratorSiteShowResponse = z.infer<typeof AdministratorSiteShowResponse>
+export type AdministratorSiteShowResponse = z.infer<
+  typeof AdministratorSiteShowResponse
+>

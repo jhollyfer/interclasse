@@ -12,7 +12,7 @@
 - Mudança pequena, um assunto por commit; todo ajuste vem com teste.
 - Procurar o que já existe antes de criar (`_standards/architecture.md` §1, item 10).
 - Ler `docs/DECISIONS.md` antes de uma escolha difícil de desfazer.
-- Mexeu em migration, rota, controller ou policy: regenerar `database/schema.ts`, `.adonisjs/**` e `openapi.json` no mesmo commit (`backend/CLAUDE.md`).
+- Mexeu em migration, rota, controller ou policy: regenerar `database/schema.ts`, `.adonisjs/**` e `openapi.json` no mesmo commit (`backend/AGENTS.md`).
 
 ## 2. O agente não mexe sem perguntar
 
@@ -49,8 +49,7 @@
 
 Tela em `frontend/`, regra em `backend/` (entidade em `app/domain/`, operação em
 `app/features/<módulo>/<recurso>/<ação>/`), contrato de endpoint, validator e enum em `shared/`;
-nada solto na raiz. A árvore é a de `_standards/architecture.md` §3, §4 e §9; desvio deste projeto
-fica registrado em `ARCHITECTURE.md` §3, com motivo.
+nada solto na raiz. A árvore é a de `_standards/architecture.md` §3, §4 e §9, sem desvio.
 
 ## 5. Definição de pronto
 

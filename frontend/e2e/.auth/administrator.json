@@ -1,0 +1,45 @@
+{
+  "cookies": [
+    {
+      "name": "adonis-session",
+      "value": "s%3AeyJtZXNzYWdlIjoiZGVmNzFmY2QtMWNiZC00YzRhLTkxMjctYmU5MmZhOTBlNWYwIiwicHVycG9zZSI6ImFkb25pcy1zZXNzaW9uIn0.bomNrByYfFTD6x79N2DDFdGB6viAjYYPF9DUAgSoyD4",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1793329691.336522,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "access-token",
+      "value": "s%3AeyJtZXNzYWdlIjoib2F0X01qQTFPR1ZoWlRjdFlUWTBZeTAwTm1RM0xUZ3pabU10TWpVMU0yWTBNVEkzTlRkaC5Xa3RCWkdkaGMyUlNURk5vYVVaTlRYWmhkR0ZUVTFWWFRrYzBialpQUW1WbldITm1hV2xOTVRJM09EVTVNREEzT0RjIiwicHVycG9zZSI6ImFjY2Vzcy10b2tlbiJ9.M7q4NgFiENOzaQbhQDYfqEqzbN1q4PqWXRD9czRMwEc",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1793408891.321129,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "refresh-token",
+      "value": "s%3AeyJtZXNzYWdlIjoib2F0X1lUTTROV1EwTldZdFlqY3laaTAwTlRoaUxUZ3lZVE10TWpBM05tVXhNRGt5T1RnMy5NMWczUlcxQk1VSllkVTVsYWxVd2NFaHlUalp4TjJSbllYRXhTblpuUkZCa09UYzJWVk5CWWpNek1qZzRPRFkyTkRnIiwicHVycG9zZSI6InJlZnJlc2gtdG9rZW4ifQ.aY4fBnao0K61LsKBZkP_YaAPj_xeflbmZ76ATWclLe4",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1793927291.321247,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3010",
+      "localStorage": [
+        {
+          "name": "tanstack_devtools_state",
+          "value": "{\"activeTab\":\"plugins\",\"height\":400,\"layout\":null,\"persistOpen\":false,\"subheaderCollapsed\":false}"
+        }
+      ]
+    }
+  ]
+}

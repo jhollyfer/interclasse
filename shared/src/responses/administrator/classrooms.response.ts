@@ -36,17 +36,20 @@ export const AdministratorClassroomShowResponse = z.object({
 })
 
 /** Cada item da lista do painel: a turma e os totais do cartão. */
-export const AdministratorClassroomPaginateResponse = AdministratorClassroomShowResponse.extend({
-  studentsCount: z.number().int(),
-  athletesCount: z.number().int(),
-  sportsCount: z.number().int(),
-})
+export const AdministratorClassroomPaginateResponse =
+  AdministratorClassroomShowResponse.extend({
+    studentsCount: z.number().int(),
+    athletesCount: z.number().int(),
+    sportsCount: z.number().int(),
+  })
 
 export type AdministratorClassroomPersonResponse = z.infer<
   typeof AdministratorClassroomPersonResponse
 >
 
-export type AdministratorClassroomShowResponse = z.infer<typeof AdministratorClassroomShowResponse>
+export type AdministratorClassroomShowResponse = z.infer<
+  typeof AdministratorClassroomShowResponse
+>
 
 export type AdministratorClassroomPaginateResponse = z.infer<
   typeof AdministratorClassroomPaginateResponse

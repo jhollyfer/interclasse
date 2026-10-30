@@ -1,12 +1,16 @@
-FROM node:24-alpine
+# Construída a partir da RAIZ do workspace, como a do backend:
+#   docker build -f frontend/Dockerfile-production .
+# Imagem fixada por digest, atualizada pelo Dependabot (tooling.md §8.2, §9).
+FROM node:24-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85
 
 WORKDIR /app
 
 # curl para healthcheck
 RUN apk add --no-cache curl
 
-# Copia .output pronto (vem do artifact)
-COPY .output/ ./.output/
+# Copia .output pronto (vem do artifact do build). O `.dockerignore` da raiz
+# reabre só `frontend/.output`.
+COPY frontend/.output/ ./.output/
 
 # Usuario nao-root
 RUN addgroup --system --gid 1001 nodejs && \

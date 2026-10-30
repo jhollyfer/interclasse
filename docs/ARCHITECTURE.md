@@ -30,7 +30,7 @@ pacote `shared/` (`_standards/architecture.md` §9).
 | Monorepo | pnpm workspace: `backend/`, `frontend/`, `shared/`, um `pnpm-lock.yaml` | pnpm 12 | `_standards/architecture.md` §9 |
 | Web | TanStack Start + Router + Query + Table, React, Tailwind, shadcn sobre Base UI, ícones Phosphor | Start 1.168, React 19, Tailwind 4 | `_doc-lib/tanstack-start.md` |
 | API | AdonisJS (Lucid, Auth, Bouncer, Limiter, Drive, i18n) | 7.6 | `_doc-lib/adonisjs.md` |
-| Validação | Zod no `shared/` (contrato e resposta); VineJS no backend e, por enquanto, no frontend (TASKS 1.8) | Zod 4, Vine 4 | `_doc-lib/vinejs.md` |
+| Validação | Zod no `shared/` (contrato e resposta) e no frontend; VineJS só no backend Adonis, onde é nativo | Zod 4, Vine 4 | `_doc-lib/vinejs.md` |
 | Idiomas | Paraglide no front (`frontend/messages/`, hoje só o seletor de idioma; telas em pt-BR, TASKS 1.8); `@adonisjs/i18n` no back (`backend/resources/lang/`, mensagens nos três) | pt-BR, es, en | `_standards/i18n.md` |
 | Banco | PostgreSQL + Lucid | `pg` 8 | `_doc-lib/adonisjs.md` |
 | Fila | Não se aplica: nenhuma tarefa assíncrona | | |
@@ -40,10 +40,8 @@ pacote `shared/` (`_standards/architecture.md` §9).
 
 ## 3. Estrutura de pastas
 
-Segue `_standards/architecture.md` §3 (backend), §4 (frontend) e §9 (raiz e `shared/`). Nenhum
-desvio de árvore aceito. Os desvios de configuração e tooling do projeto (TypeScript 7 com o 6 ao
-lado, `moduleResolution`, `authentication/` com path, `vitest.config.ts` próprio) estão em
-`backend/CLAUDE.md` e `frontend/CLAUDE.md`.
+Segue `_standards/architecture.md` §3 (backend), §4 (frontend) e §9 (raiz e `shared/`), sem
+desvio: o que diverge da régua se corrige (`AGENTS.md`).
 
 ## 4. Módulos (features)
 
@@ -109,7 +107,7 @@ Migrations em `backend/database/migrations/`. Chaves primárias em `uuid`.
 | Entidade | Campos principais | Relações | Observação |
 |---|---|---|---|
 | `users` | `name`, `email` (único), `password`, `role`, `status`, `avatar_id`, `deleted_at` | `avatar_id` → `storages` | papel `ADMINISTRATOR`, `ADVISOR` ou `REPRESENTATIVE`; soft delete |
-| `auth_access_tokens` | tokens de acesso e de refresh | `users` | revogação por apagar a linha (`backend/CLAUDE.md`) |
+| `auth_access_tokens` | tokens de acesso e de refresh | `users` | revogação por apagar a linha |
 | `classrooms` | `name` (único, até 20), `grade` (3 a 9), `category`, `advisor_id` (único), `representative_id` | `users` | índice único em `advisor_id` (um conselheiro, uma turma) |
 | `students` | `name`, `classroom_id` | `classrooms` | |
 | `sports` | `name` (único), `slug` (único), `min_athletes`, `max_athletes` | | |
@@ -125,7 +123,7 @@ Migrations em `backend/database/migrations/`. Chaves primárias em `uuid`.
 | `storages` | `filename`, `original_name`, `mimetype`, `size`, `path`, `status` (`PENDING`, `UPLOADED`), `upload_id`, `deleted_at` | | o binário está no bucket |
 | `rate_limits` | contador do `@adonisjs/limiter` | | store `database`, compartilhado entre réplicas |
 
-`database/schema.ts` é gerado e commitado (`backend/CLAUDE.md`).
+`database/schema.ts` é gerado e commitado (`backend/AGENTS.md`).
 
 ## 6. Fluxo de dados
 

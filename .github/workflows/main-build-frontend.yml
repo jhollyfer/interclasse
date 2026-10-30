@@ -1,90 +1,79 @@
 name: Build Frontend
 
-# Reusable: quem chama é o `main.yml`, no push para `main`. O gatilho de push
-# direto que este arquivo tinha existia enquanto a cadeia de deploy não existia
-# neste projeto; agora ela existe, e dois gatilhos para o mesmo build rodariam o
-# mesmo trabalho duas vezes.
+# Reutilizável: quem chama é o `main.yml`, no push para `main`. Repete os portões
+# do PR (`main-check-frontend.yml`) e publica o `.output` como artifact, que é o
+# que a imagem empacota (_standards/tooling.md §7, §8.1).
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
+  check:
+    uses: ./.github/workflows/main-check-frontend.yml
+
   build:
     name: Compile & Package
+    needs: check
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          version: 12.11.2
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - name: Setup pnpm e Node
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: pnpm-lock.yaml
+          runtime: node@24
+          cache: true
+          install: false
 
       - name: Install dependencies
-        run: pnpm --filter "{./frontend}..." install --frozen-lockfile --fail-if-no-match
+        run: pnpm install --frozen-lockfile
 
-      # O frontend importa o `dist/` do `@interclasse/shared`.
       - name: Build shared
-        run: pnpm --filter ./shared run build
+        run: pnpm --filter ./shared --fail-if-no-match run build
 
-      # As mensagens do Paraglide compiladas antes de lint e typecheck: a saída
-      # (`src/paraglide/`) não é versionada (_standards/i18n.md §2), e o
-      # `inlang check` reprova tradução faltando nos três idiomas (§4).
-      - name: Compile and check messages
-        working-directory: ./frontend
-        run: pnpm i18n:compile && pnpm i18n:check
+      - name: Compile messages
+        run: pnpm --filter ./frontend --fail-if-no-match i18n:compile
 
-      # O carimbo da revisão: vira `https://interclass.maiyu.com.br/revision.txt`
-      # e é o que o smoke test do deploy confere. Antes do build e em `public/`:
-      # o Nitro serve `public/` por um manifesto congelado no build, e arquivo
-      # escrito depois cai no catch-all de SSR (200 com HTML). Lição do
-      # maiyu.com.br.
+      # O carimbo da revisão: vira `/revision.txt` e é o que o smoke test do
+      # deploy confere. Antes do build e em `public/`: o Nitro serve `public/` por
+      # um manifesto congelado no build, e arquivo escrito depois cai no
+      # catch-all de SSR (200 com HTML).
       - name: Carimba a revisão antes do build
-        run: echo "${{ github.sha }}" > frontend/public/revision.txt
+        env:
+          REVISION: ${{ github.sha }}
+        run: echo "$REVISION" > frontend/public/revision.txt
 
       - name: Build
-        working-directory: ./frontend
         env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
-        run: pnpm build
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: pnpm --filter ./frontend --fail-if-no-match run build
 
       - name: O carimbo entrou no manifesto do Nitro
         working-directory: ./frontend
         run: |
-          set -euo pipefail
           if ! grep -q '"/revision.txt"' .output/server/index.mjs; then
             echo 'revision.txt não está no manifesto de assets do Nitro.'
             echo 'O carimbo precisa ser escrito ANTES do build, em public/.'
             exit 1
           fi
 
-      # Sobe antes da conferência, e não depois: quando o guarda abaixo reprova,
-      # o `.output/` é justamente o que se precisa abrir para achar a leitura
-      # culpada. Reprovar sem artifact deixa a investigação sem material.
+      # Sobe antes da conferência: quando o guarda reprova, o `.output/` é o que
+      # se precisa abrir para achar a leitura culpada.
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: frontend-build
           retention-days: 1
           include-hidden-files: true
-          path: |
-            frontend/.output/
+          path: frontend/.output/
 
-      # O job falha aqui, então o artifact existe mas nenhuma imagem sai dele:
-      # `docker-frontend` depende deste job, e não do artifact.
-      #
-      # O que se recusa não é o ciclo — o router do TanStack sai em dois chunks
-      # que se reexportam, e isso é inerte —, é a **leitura antecipada** de um
-      # binding que vem de um chunk em ciclo. Essa passa o build verde e só
-      # quebra no primeiro SSR em produção.
-      - name: Check chunk cycles
-        working-directory: ./frontend
-        run: pnpm check-cycles
+      # Falha o job, mas nenhuma imagem sai dele: `docker-frontend` depende deste
+      # job, e não do artifact.
+      - name: Ciclos de chunk
+        run: pnpm --filter ./frontend --fail-if-no-match check-cycles
