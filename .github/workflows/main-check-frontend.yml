@@ -177,7 +177,7 @@ jobs:
       # depois a API de pé. Valores só de teste; nenhum serve fora deste job.
       - name: Sobe a API
         env:
-          SEED_OWNER_PASSWORD: Ci-Owner-1!
+          SEED_ADMINISTRATOR_PASSWORD: Ci-Owner-1!
           SEED_DEMO_PASSWORD: Ci-Demo-1!
         run: |
           cat > "$RUNNER_TEMP/api.env" <<ENV
@@ -188,7 +188,7 @@ jobs:
           APP_KEY=ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL=http://localhost:3333
           SESSION_DRIVER=cookie
-          CORS_ORIGIN=http://localhost:3010
+          CORS_ORIGINS=http://localhost:3010
           DATABASE_URL=postgres://interclasse:interclasse@localhost:5434/interclasse
           UPLOAD_MAX_SIZE=1073741824
           STORAGE_KEY=interclasse
@@ -196,8 +196,8 @@ jobs:
           STORAGE_BUCKET=interclasse
           STORAGE_ENDPOINT=http://localhost:9004
           STORAGE_FORCE_PATH_STYLE=true
-          SEED_OWNER_EMAIL=administrator@mail.com
-          SEED_OWNER_PASSWORD=${SEED_OWNER_PASSWORD}
+          SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
+          SEED_ADMINISTRATOR_PASSWORD=${SEED_ADMINISTRATOR_PASSWORD}
           SEED_DEMO_PASSWORD=${SEED_DEMO_PASSWORD}
           ENV
           docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace migration:run --force

@@ -11,7 +11,7 @@ node_modules/
 
 # Credenciais do E2E do frontend: o versionado é `.env.e2e.example`.
 .env.e2e
-e2e/.auth
+**/e2e/.auth/
 
 # Saída de build. `shared/dist/` é gerada pelo `tsc`; `backend/build/` pelo
 # `node ace build`; `frontend/.output/` pelo Nitro. Nunca versionadas
