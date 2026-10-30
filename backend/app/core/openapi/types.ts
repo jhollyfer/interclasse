@@ -54,9 +54,9 @@ export type FeatureResponse = DocumentedValidator | z.ZodType
  * O que uma operação pode devolver num dado status.
  *
  * Existe para a operação cuja resposta **não** é o recurso da feature: o plano
- * de upload de `storages` é um envelope declarado em VineJS, e o redirect do
- * download não tem corpo nenhum. Sem isto, as duas sairiam documentadas como o
- * model de `Storage`, que não é o que elas respondem.
+ * de upload de `storages` é um envelope próprio, e o redirect do download não
+ * tem corpo nenhum. Sem isto, as duas sairiam documentadas como o recurso
+ * `Storage`, que não é o que elas respondem.
  */
 export type ResponseBody = DocumentedValidator | PaginatedResponse | z.ZodType | 'no-content'
 

@@ -20,6 +20,8 @@ import {
 } from './classroom.repository.ts'
 
 import ClassroomModel from '#models/classroom'
+import EnrollmentModel from '#models/enrollment'
+import StudentModel from '#models/student'
 import { PostgresError } from '#core/postgres-error'
 import type { ClassroomError } from '#domain/classroom/classroom.errors'
 import TeamModel from '#models/team'
@@ -31,6 +33,13 @@ import {
   type ClassroomPeopleFacts,
 } from '#domain/classroom/classroom.entity'
 import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+
+/** Os totais do cartão de cada turma, por id. */
+type ClassroomTotals = {
+  readonly students: ReadonlyMap<string, number>
+  readonly athletes: ReadonlyMap<string, number>
+  readonly sports: ReadonlyMap<string, number>
+}
 
 @inject()
 export class ClassroomLucidRepository extends ClassroomRepository {
@@ -179,18 +188,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   async paginate(
     criteria: ClassroomListCriteria,
   ): Promise<Paginated<AdministratorClassroomPaginateResponse>> {
-    // Os totais do cartão da turma, contados no banco sem carregar alunos nem
-    // inscrições (_doc-lib/lucid.md#relationships, `withCount`/`withAggregate`).
     const query = ClassroomModel.query({ client: this.transaction.client() })
       .preload('advisor')
       .preload('representative')
-      .withCount('students')
-      .withAggregate('enrollments', (enrollments) => {
-        enrollments.countDistinct('enrollments.student_id').as('athletes_count')
-      })
-      .withAggregate('enrollments', (enrollments) => {
-        enrollments.countDistinct('enrollments.sport_id').as('sports_count')
-      })
 
     if (criteria.category) query.where('category', criteria.category)
     if (criteria.search) query.whereILike('name', `%${criteria.search}%`)
@@ -199,14 +199,48 @@ export class ClassroomLucidRepository extends ClassroomRepository {
       .orderBy(criteria.sort, criteria.direction)
       .paginate(criteria.page, criteria.perPage)
 
+    const rows = page.all()
+    const totals = await this.totalsOf(rows.map((row) => row.id))
+
     return {
       meta: page.getMeta(),
-      data: page.all().map((row) => ({
+      data: rows.map((row) => ({
         ...this.toResponse(row),
-        studentsCount: Number(row.$extras.students_count),
-        athletesCount: Number(row.$extras.athletes_count),
-        sportsCount: Number(row.$extras.sports_count),
+        studentsCount: totals.students.get(row.id) ?? 0,
+        athletesCount: totals.athletes.get(row.id) ?? 0,
+        sportsCount: totals.sports.get(row.id) ?? 0,
       })),
+    }
+  }
+
+  /**
+   * Os totais do cartão da turma, contados no banco sem carregar alunos nem
+   * inscrições: o Lucid só calcula agregado por relação, e a turma não declara a
+   * inversa para o model não importar o do aluno (`domain.md` §8, `no-circular`).
+   */
+  private async totalsOf(classroomIds: ReadonlyArray<string>): Promise<ClassroomTotals> {
+    const client = this.transaction.client()
+    const students = await StudentModel.query({ client })
+      .whereIn('classroomId', [...classroomIds])
+      .select('students.classroom_id')
+      .count('students.id as total')
+      .groupBy('students.classroom_id')
+    const enrolled = await EnrollmentModel.query({ client })
+      .join('students', 'students.id', 'enrollments.student_id')
+      .whereIn('students.classroom_id', [...classroomIds])
+      .select('students.classroom_id')
+      .countDistinct('enrollments.student_id as athletes')
+      .countDistinct('enrollments.sport_id as sports')
+      .groupBy('students.classroom_id')
+
+    return {
+      students: new Map(students.map((row) => [row.classroomId, Number(row.$extras.total)])),
+      athletes: new Map(
+        enrolled.map((row) => [row.$extras.classroom_id, Number(row.$extras.athletes)]),
+      ),
+      sports: new Map(
+        enrolled.map((row) => [row.$extras.classroom_id, Number(row.$extras.sports)]),
+      ),
     }
   }
 

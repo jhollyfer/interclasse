@@ -1,5 +1,6 @@
 import type Sport from '#models/sport'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
+import { StudentFactory } from '#database/factories/student.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 
 /**
@@ -7,9 +8,10 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
  * inscritos. É o que trava apagar a modalidade e baixar o máximo de atletas.
  */
 export async function enrollRoster(sport: Sport, total: number) {
-  const classroom = await ClassroomFactory.with('students', total).create()
+  const classroom = await ClassroomFactory.create()
+  const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(total)
 
   return EnrollmentFactory.merge(
-    classroom.students.map((student) => ({ studentId: student.id, sportId: sport.id })),
+    students.map((student) => ({ studentId: student.id, sportId: sport.id })),
   ).createMany(total)
 }

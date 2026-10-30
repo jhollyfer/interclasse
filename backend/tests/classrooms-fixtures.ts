@@ -10,6 +10,14 @@ import { TeamFactory } from '#database/factories/team.factory'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 import { signInWithFactory } from '#tests/http-fixtures'
 
+/** Uma turma com `total` alunos, no lugar da relação inversa que o model não declara. */
+export async function classroomWithStudents(total: number): Promise<Classroom> {
+  const classroom = await ClassroomFactory.create()
+  await StudentFactory.merge({ classroomId: classroom.id }).createMany(total)
+
+  return classroom
+}
+
 /**
  * Um professor conselheiro com sessão e a turma que ele aconselha. É o ponto de
  * partida de toda spec de `/advisor`: a policy só deixa passar a turma do

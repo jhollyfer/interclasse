@@ -5,7 +5,7 @@ import { test } from '@japa/runner'
 import Classroom from '#models/classroom'
 import Student from '#models/student'
 import { ClassroomFactory } from '#database/factories/classroom.factory'
-import { drawnClassroom } from '#tests/classrooms-fixtures'
+import { drawnClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -18,7 +18,7 @@ test.group('classrooms > delete', (group) => {
 
   test('apaga a turma e os alunos dela vão junto', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    const classroom = await ClassroomFactory.with('students', 2).create()
+    const classroom = await classroomWithStudents(2)
 
     const response = await client
       .delete(`/administrator/classrooms/${classroom.id}`)
