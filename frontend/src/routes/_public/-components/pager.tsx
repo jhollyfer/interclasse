@@ -2,6 +2,8 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import type { PaginationMeta } from '@interclasse/shared'
 
+import { m } from '#/paraglide/messages'
+
 /**
  * Anterior e próxima, para as listas do site. Sem número de página clicável:
  * ninguém pula para a página 7 de avisos.
@@ -21,7 +23,7 @@ export function Pager({
   return (
     <nav
       className="flex items-center justify-center gap-4 text-sm"
-      aria-label="Paginação"
+      aria-label={m.public_pager_label()}
     >
       {page > 1 && (
         <Link
@@ -32,11 +34,11 @@ export function Pager({
           })}
           className="text-primary px-2 py-2 font-semibold hover:underline"
         >
-          Anterior
+          {m.public_pager_previous()}
         </Link>
       )}
       <span className="text-muted-foreground">
-        Página {page} de {meta.lastPage}
+        {m.public_pager_status({ page, total: meta.lastPage })}
       </span>
       {page < meta.lastPage && (
         <Link
@@ -47,7 +49,7 @@ export function Pager({
           })}
           className="text-primary px-2 py-2 font-semibold hover:underline"
         >
-          Próxima
+          {m.public_pager_next()}
         </Link>
       )}
     </nav>

@@ -2,6 +2,7 @@ import type * as React from 'react'
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 
 import { phaseLabel } from '#/components/common/match-agenda'
+import { m } from '#/paraglide/messages'
 
 /**
  * A faixa amarela de resultados, a marca do site anterior.
@@ -32,7 +33,7 @@ export function ResultsTicker({
   return (
     <div
       className="ticker bg-brand text-brand-ink overflow-x-auto"
-      aria-label="Últimos resultados"
+      aria-label={m.public_ticker_label()}
     >
       <div className="ticker-track flex w-max py-2.5">
         <ul className="flex">{items}</ul>

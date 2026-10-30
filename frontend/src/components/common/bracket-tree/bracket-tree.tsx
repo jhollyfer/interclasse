@@ -5,6 +5,7 @@ import { MATCH_STATUS } from '@interclasse/shared'
 
 import { MATCH_PHASE_LABELS, championName, formatWhen } from '#/lib/labels'
 import { cn } from '#/lib/utils'
+import { m } from '#/paraglide/messages'
 
 /** Uma partida da chave, como `GET /brackets/:id` a devolve. */
 export type BracketMatch = AdministratorBracketShowResponse['matches'][number]
@@ -72,9 +73,9 @@ function feederLabel(
       item.position === match.position * 2 + offset,
   )
   const number = feeder && numbers.get(feeder.id)
-  if (!number) return 'A definir'
+  if (!number) return m.common_bracket_pending()
 
-  return `Vencedor do Jogo ${number}`
+  return m.common_bracket_winner_of({ number })
 }
 
 /** As colunas da chave, uma por fase, com o número de vagas de cada uma. */
@@ -124,7 +125,8 @@ export function BracketTree({
         {tree.map((column) => (
           <li key={column.round} className="flex w-56 flex-col">
             <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
-              {MATCH_PHASE_LABELS[column.phase ?? ''] ?? `Fase ${column.round}`}
+              {MATCH_PHASE_LABELS[column.phase ?? ''] ??
+                m.common_bracket_round({ round: column.round })}
             </h3>
             <ul className="flex flex-1 flex-col justify-around gap-4">
               {column.items.map((slot) => {
@@ -134,7 +136,9 @@ export function BracketTree({
                       key={slot.key}
                       className="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs"
                     >
-                      {slot.teamName ?? 'A definir'} · folga, avançou direto
+                      {m.common_bracket_bye({
+                        team: slot.teamName ?? m.common_bracket_pending(),
+                      })}
                     </li>
                   )
 
@@ -165,7 +169,7 @@ export function BracketTree({
         ))}
         <li className="flex w-44 flex-col">
           <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
-            Campeã
+            {m.common_bracket_champion()}
           </h3>
           <div className="flex flex-1 flex-col justify-around">
             <div
@@ -176,7 +180,7 @@ export function BracketTree({
               )}
             >
               <TrophyIcon className="size-5 shrink-0" weight="fill" />
-              {champion ?? 'A definir'}
+              {champion ?? m.common_bracket_pending()}
             </div>
           </div>
         </li>
@@ -202,11 +206,15 @@ function MatchBox({
 }: MatchBoxProps): React.JSX.Element {
   const finished = match.status === MATCH_STATUS.FINISHED
 
+  let when = formatWhen(match.scheduledAt)
+  if (match.location)
+    when = m.common_match_when_location({ when, location: match.location })
+
   return (
     <div className="bg-card overflow-hidden rounded-lg border text-sm shadow-xs">
       {number && (
         <p className="text-muted-foreground border-b px-3 py-1 text-xs font-medium">
-          Jogo {number}
+          {m.common_bracket_game_number({ number })}
         </p>
       )}
       <TeamRow
@@ -225,8 +233,7 @@ function MatchBox({
       />
       {!finished && (
         <p className="text-muted-foreground border-t px-3 py-1 text-xs">
-          {formatWhen(match.scheduledAt)}
-          {match.location && ` · ${match.location}`}
+          {when}
         </p>
       )}
     </div>
@@ -269,10 +276,14 @@ function TeamRow({
       {won && (
         <span className="text-primary flex items-center gap-0.5 text-xs">
           <CheckIcon weight="bold" />
-          Avançou
+          {m.common_bracket_advanced()}
         </span>
       )}
-      {lost && <span className="text-muted-foreground text-xs">Fora</span>}
+      {lost && (
+        <span className="text-muted-foreground text-xs">
+          {m.common_bracket_out()}
+        </span>
+      )}
       <span className="w-5 text-right tabular-nums">{score ?? ''}</span>
     </div>
   )
