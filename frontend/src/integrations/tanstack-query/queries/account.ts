@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
+import type { AccountProfileShowResponse } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import type { IUser } from '#/lib/interfaces'
 
 import { request } from '../http'
 
@@ -21,7 +21,8 @@ export const accountQueryOptions = () =>
     // O `signal` vem da própria biblioteca e é repassado ao `fetch`: sem ele,
     // query que desmonta antes de resolver não cancela nada, e a resposta
     // atrasada de uma sessão anterior chega depois da atual.
-    queryFn: ({ signal }) => request<IUser>('/account', { signal }),
+    queryFn: ({ signal }) =>
+      request<AccountProfileShowResponse>('/account', { signal }),
     // O 401 já foi tratado dentro de `request`, que tentou renovar a sessão e
     // não conseguiu. Repetir a chamada não muda a resposta, só atrasa o
     // redirecionamento para o login.

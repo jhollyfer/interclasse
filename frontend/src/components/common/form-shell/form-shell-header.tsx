@@ -10,7 +10,7 @@ import {
   PageShellHeader,
 } from '#/components/common/page-shell'
 import { SubmitButton } from '#/components/common/submit-button'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useFormShellContext } from './form-shell-context'
 

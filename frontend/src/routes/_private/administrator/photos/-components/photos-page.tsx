@@ -3,6 +3,8 @@ import { getRouteApi } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { CheckIcon, TrashIcon, XIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
+import { PHOTO_STATUS, PHOTO_STATUSES } from '@interclasse/shared'
 
 import {
   ConfirmDialog,
@@ -28,9 +30,7 @@ import {
   usePhotoReview,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import { photosQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { PHOTO_STATUS, PHOTO_STATUSES } from '#/lib/entity'
 import { notifyError } from '#/lib/form-errors'
-import type { IPhoto } from '#/lib/interfaces'
 
 import { PHOTO_PAGE } from '../index'
 
@@ -105,7 +105,7 @@ export function PhotosPage(): React.JSX.Element {
 /** Aprovar, recusar e apagar. Só o que muda a situação atual aparece. */
 function ReviewActions({
   photo,
-}: Readonly<{ photo: IPhoto }>): React.JSX.Element {
+}: Readonly<{ photo: AdministratorPhotoShowResponse }>): React.JSX.Element {
   const invalidate = useInvalidate()
   const done = (message: string) => async (): Promise<void> => {
     toast.success(message)

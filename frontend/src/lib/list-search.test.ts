@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import { SORT_DIRECTION, TRASHED_MODE } from '@interclasse/shared'
 
 import {
   validateListSearch,
   validateStorefrontSearch,
   withExtra,
 } from './list-search'
-import { SORT_DIRECTION, TRASHED_MODE } from './entity'
 
 /**
  * O recorte de lixeira. Vale um teste próprio porque os valores aceitos são

@@ -1,9 +1,9 @@
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { InstagramLogoIcon } from '@phosphor-icons/react'
+import type { StorefrontSiteShowResponse } from '@interclasse/shared'
 
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import type { IStorefrontSite } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 
 import { RegulationLink } from '../../-components/regulation-link'
@@ -51,7 +51,7 @@ export function AboutPage(): React.JSX.Element {
 
 function AboutContent({
   site,
-}: Readonly<{ site?: IStorefrontSite }>): React.JSX.Element {
+}: Readonly<{ site?: StorefrontSiteShowResponse }>): React.JSX.Element {
   if (!site || (!site.about && !site.organizer && !site.edition))
     return (
       <Empty>A organização ainda não escreveu a apresentação dos jogos.</Empty>

@@ -1,7 +1,6 @@
 import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
-
-import type { IPaginationMeta } from '#/lib/interfaces'
+import type { PaginationMeta } from '@interclasse/shared'
 
 /**
  * Anterior e próxima, para as listas do site. Sem número de página clicável:
@@ -13,7 +12,7 @@ import type { IPaginationMeta } from '#/lib/interfaces'
 export function Pager({
   meta,
 }: Readonly<{
-  meta?: IPaginationMeta
+  meta?: PaginationMeta
 }>): React.JSX.Element | null {
   if (!meta || meta.lastPage <= 1) return null
 

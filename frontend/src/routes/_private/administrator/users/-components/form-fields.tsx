@@ -1,5 +1,7 @@
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorUserUpdatePayload } from '@interclasse/shared'
+import { ACTIVE_STATUS, ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import {
@@ -18,16 +20,15 @@ import {
 } from '#/components/common/image-field'
 import { InputPassword } from '#/components/common/input-password'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
-import { ACTIVE_STATUSES, ACTIVE_STATUS, USER_ROLES } from '#/lib/entity'
+import { blankToUndefined } from '#/lib/form-values'
 import {
   ACCOUNT_STATUS_LABELS,
   ACTIVE_STATUS_DOTS,
   USER_ROLE_LABELS,
   initials,
 } from '#/lib/labels'
-import type { UserCreatePayload } from '#/validators/administrator/users.validator'
 
-export type UserFormType = UserCreatePayload
+export type UserFormType = AdministratorUserUpdatePayload
 
 /**
  * O formulário vazio.
@@ -44,8 +45,6 @@ export type UserFormType = UserCreatePayload
 export const USER_FORM_DEFAULTS: DefaultValues<UserFormType> = {
   name: '',
   email: '',
-  password: '',
-  passwordConfirmation: '',
   status: ACTIVE_STATUS.ACTIVE,
   avatarId: null,
 }
@@ -188,13 +187,17 @@ export function UserFormFields({
       >
         {({ field, control }) => (
           <>
-            {/* Sem `?? ''`: o tipo do formulário é o payload de **criação**,
-                onde a senha e a confirmação são obrigatórias. Na edição as duas
-                começam `''` e em branco significa "não trocar" - quem descarta
-                as chaves antes de enviar é o `payload` de `form-edit.tsx`. */}
+            {/* A senha e a confirmação em branco são **ausentes**, e não `''`:
+                o schema do `shared/` recusaria `''` por tamanho. O tipo do
+                formulário é o da atualização (tudo opcional); na criação é o
+                validator de criação que cobra os dois campos. */}
             <InputPassword
-              {...field}
               {...control}
+              value={field.value ?? ''}
+              onChange={(event) =>
+                field.onChange(blankToUndefined(event.target.value))
+              }
+              onBlur={field.onBlur}
               autoComplete="new-password"
             />
             <FieldDescription>
@@ -212,7 +215,15 @@ export function UserFormFields({
         label="Confirme a senha"
       >
         {({ field, control }) => (
-          <InputPassword {...field} {...control} autoComplete="new-password" />
+          <InputPassword
+            {...control}
+            value={field.value ?? ''}
+            onChange={(event) =>
+              field.onChange(blankToUndefined(event.target.value))
+            }
+            onBlur={field.onBlur}
+            autoComplete="new-password"
+          />
         )}
       </AppField>
 

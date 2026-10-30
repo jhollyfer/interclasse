@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { RowData } from '@tanstack/react-table'
+import { TRASHED_MODE } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -10,7 +11,6 @@ import {
   EmptyTitle,
 } from '#/components/ui/empty'
 import { cn } from '#/lib/utils'
-import { TRASHED_MODE } from '#/lib/entity'
 
 import type { TableInstance } from './use-table'
 import { useTableContext } from './table-context'

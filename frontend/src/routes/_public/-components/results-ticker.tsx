@@ -1,6 +1,6 @@
 import type * as React from 'react'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
 
-import type { IMatch } from '#/lib/interfaces'
 import { phaseLabel } from '#/components/common/match-agenda'
 
 /**
@@ -14,16 +14,16 @@ import { phaseLabel } from '#/components/common/match-agenda'
 export function ResultsTicker({
   matches,
 }: Readonly<{
-  matches: ReadonlyArray<IMatch>
+  matches: ReadonlyArray<AdministratorMatchPaginateResponse>
 }>): React.JSX.Element | null {
   if (matches.length === 0) return null
 
   const items = matches.map((match) => (
     <li key={match.id} className="flex shrink-0 items-center gap-2 px-6">
-      <span className="font-semibold">{match.bracket?.sport?.name}</span>
+      <span className="font-semibold">{match.bracket.sport.name}</span>
       <span className="font-display text-lg font-extrabold uppercase italic">
-        {match.homeTeam?.classroom.name} {match.homeScore} x {match.awayScore}{' '}
-        {match.awayTeam?.classroom.name}
+        {match.homeTeam.classroom.name} {match.homeScore} x {match.awayScore}{' '}
+        {match.awayTeam.classroom.name}
       </span>
       <span className="text-brand-ink/70 text-sm">{phaseLabel(match)}</span>
     </li>

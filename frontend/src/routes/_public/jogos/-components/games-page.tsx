@@ -1,13 +1,13 @@
 import type * as React from 'react'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
   storefrontMatchesQueryOptions,
   storefrontSportsQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
-import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import { CATEGORY_LABELS, MATCH_STATUS_LABELS } from '#/lib/labels'
 import { Agenda } from '#/components/common/match-agenda'
 

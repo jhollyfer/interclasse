@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorSportCreatePayload } from '@interclasse/shared'
 
 import { FieldDescription, FieldGroup } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
@@ -7,9 +8,8 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import type { SportCreatePayload } from '#/validators/administrator/sports.validator'
 
-export type SportFormType = SportCreatePayload
+export type SportFormType = AdministratorSportCreatePayload
 
 export const SPORT_FORM_DEFAULTS: DefaultValues<SportFormType> = {
   name: '',

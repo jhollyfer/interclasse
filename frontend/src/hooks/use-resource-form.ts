@@ -3,7 +3,7 @@ import { useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type { FieldValues } from 'react-hook-form'
 
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useMutationForm } from './use-mutation-form'
 import type {

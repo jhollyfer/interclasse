@@ -23,13 +23,10 @@ Aqui fica só o que este projeto faz diferente dela, e os comandos.
   React CJS no runner do Vitest. O glob inclui `scripts/**/*.test.ts`.
 - **`authentication/` continua com path**, e não `_authentication/` pathless:
   sem o segmento, o login cairia em `/`, a home pública.
-- **Data é texto no validator.** O backend declara `vine.date()`; aqui é
-  `vine.string()` com teto, senão o `Infer` vira `Date` e o corpo sai em ISO
-  completo, que o servidor recusa (`lib/validator.ts`, `wireDate`).
 - **`request<T>` tem um `as` de fronteira** (`integrations/tanstack-query/http.ts`):
   o corpo de sucesso não tem schema no cliente. O corpo de erro é estreitado.
-- **`lib/upload-resume.ts` estreita o `localStorage` com type guard**, não com
-  VineJS: a API de retomada é síncrona e o `validate` do VineJS não é.
+- **`lib/upload-resume.ts` estreita o `localStorage` com type guard**, e não
+  com schema: é uma forma pequena, lida em caminho síncrono.
 - **ESLint**: o `no-restricted-syntax` de `new *Controller` ignora o
   `AbortController` (API da plataforma); `import-x/order` não roda em
   `components/ui/**` (saída do shadcn).

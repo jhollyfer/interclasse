@@ -1,3 +1,4 @@
+import * as shared from '@interclasse/shared'
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
@@ -12,10 +13,16 @@ import {
 import { HTTPError } from '#/integrations/tanstack-query/http'
 
 import { getContext } from './integrations/tanstack-query/query-context'
-import { deLocalizeUrl, localizeUrl } from './paraglide/runtime'
+import { deLocalizeUrl, getLocale, localizeUrl } from './paraglide/runtime'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
+  // As mensagens de validação do Zod saem no idioma da tela. Só o cliente
+  // valida formulário; no servidor a configuração global do Zod seria dividida
+  // entre requisições de idiomas diferentes. `shared.` e não o nome solto: a
+  // função não é um hook, e o prefixo `use` do contrato dispararia a regra.
+  if (typeof window !== 'undefined') shared.useValidatorLocale(getLocale())
+
   const context = getContext()
 
   const router = createTanStackRouter({

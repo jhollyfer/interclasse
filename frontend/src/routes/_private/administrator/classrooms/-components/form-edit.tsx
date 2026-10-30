@@ -1,6 +1,12 @@
 import type * as React from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { AdministratorClassroomCreateValidator } from '@interclasse/shared'
+import type {
+  AdministratorClassroomUpdatePayload,
+  AdministratorClassroomShowResponse,
+  Merge,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -13,9 +19,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { ClassroomCreateValidator } from '#/validators/administrator/classrooms.validator'
-import type { IClassroom, Merge } from '#/lib/interfaces'
-import type { ClassroomUpdatePayload } from '#/validators/administrator/classrooms.validator'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -33,11 +36,11 @@ export function ClassroomFormEdit(): React.JSX.Element {
 
   const { form, onSubmit, shell } = useResourceForm<
     ClassroomFormType,
-    IClassroom,
-    Merge<ClassroomUpdatePayload, { id: string }>
+    AdministratorClassroomShowResponse,
+    Merge<AdministratorClassroomUpdatePayload, { id: string }>
   >({
     formId: 'classroom-update',
-    validator: ClassroomCreateValidator,
+    validator: AdministratorClassroomCreateValidator,
     values: {
       name: classroom.name,
       grade: classroom.grade,

@@ -1,6 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { USER_ROLE } from '@interclasse/shared'
 
 import {
   Table,
@@ -22,7 +23,6 @@ import {
   TableTrashToggle,
   useTable,
 } from '#/components/common/table'
-import { USER_ROLE } from '#/lib/entity'
 import { usersQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 import { UserBulkActions } from './bulk-actions'

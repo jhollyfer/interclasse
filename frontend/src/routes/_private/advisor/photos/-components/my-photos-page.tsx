@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { TrashIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialog,
@@ -24,7 +25,6 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { usePhotoDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { advisorPhotosQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import { notifyError } from '#/lib/form-errors'
-import type { IPhoto } from '#/lib/interfaces'
 
 import { MY_PHOTOS } from '../index'
 
@@ -59,7 +59,7 @@ export function MyPhotosPage(): React.JSX.Element {
 
 function DeleteAction({
   photo,
-}: Readonly<{ photo: IPhoto }>): React.JSX.Element {
+}: Readonly<{ photo: AdministratorPhotoShowResponse }>): React.JSX.Element {
   const invalidate = useInvalidate()
   const remove = usePhotoDelete('advisor', {
     onSuccess: async () => {

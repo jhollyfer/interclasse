@@ -5,7 +5,7 @@ import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { FieldContent, FieldDescription } from '#/components/ui/field'
 import { Spinner } from '#/components/ui/spinner'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useImageFieldContext } from './image-field-context'
 

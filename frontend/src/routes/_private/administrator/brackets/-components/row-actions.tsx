@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { TreeStructureIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorBracketPaginateResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -16,7 +17,6 @@ import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { notifyError } from '#/lib/form-errors'
-import type { IBracket } from '#/lib/interfaces'
 import { CATEGORY_LABELS } from '#/lib/labels'
 
 /**
@@ -26,7 +26,7 @@ import { CATEGORY_LABELS } from '#/lib/labels'
 export function BracketRowActions({
   bracket,
 }: Readonly<{
-  bracket: IBracket
+  bracket: AdministratorBracketPaginateResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
@@ -51,7 +51,7 @@ export function BracketRowActions({
       <DropdownMenuSeparator />
       <RowActionsDelete onConfirm={() => remove.mutate(bracket.id)}>
         <ConfirmDialogTitle>
-          {`Apagar a chave de ${bracket.sport?.name ?? 'modalidade'} · ${CATEGORY_LABELS[bracket.category]}?`}
+          {`Apagar a chave de ${bracket.sport.name} · ${CATEGORY_LABELS[bracket.category]}?`}
         </ConfirmDialogTitle>
         <ConfirmDialogDescription>
           As partidas da chave são apagadas e as inscrições reabrem. Chave com

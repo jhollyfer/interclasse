@@ -1,4 +1,9 @@
 import type * as React from 'react'
+import { AdministratorAnnouncementCreateValidator } from '@interclasse/shared'
+import type {
+  AdministratorAnnouncementCreatePayload,
+  AdministratorAnnouncementShowResponse,
+} from '@interclasse/shared'
 
 import {
   FormShell,
@@ -11,9 +16,6 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { AnnouncementCreateValidator } from '#/validators/administrator/announcements.validator'
-import type { IAnnouncement } from '#/lib/interfaces'
-import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 import { useAnnouncementCreate } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
@@ -28,11 +30,11 @@ import {
 export function AnnouncementFormCreate(): React.JSX.Element {
   const { form, onSubmit, shell } = useResourceForm<
     AnnouncementFormType,
-    IAnnouncement,
-    AnnouncementCreatePayload
+    AdministratorAnnouncementShowResponse,
+    AdministratorAnnouncementCreatePayload
   >({
     formId: 'announcement-create',
-    validator: AnnouncementCreateValidator,
+    validator: AdministratorAnnouncementCreateValidator,
     defaults: ANNOUNCEMENT_FORM_DEFAULTS,
     fields: ANNOUNCEMENT_FIELDS,
     mutation: useAnnouncementCreate,
