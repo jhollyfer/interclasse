@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 
+import { signInAsRepresentativeOfClassroom } from '#tests/classrooms-fixtures'
 import { MatchCardFactory } from '#database/factories/match-card.factory'
 import { matchWithTeams } from '#tests/classrooms-fixtures'
 import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
@@ -38,5 +39,34 @@ test.group('advisor cards > paginate', (group) => {
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
+  })
+})
+
+test.group('advisor/cards/paginate > acesso e validação', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('sem sessão responde 401, e o representante responde 403', async ({ client }) => {
+    const { session } = await signInAsRepresentativeOfClassroom(client)
+
+    const anonymous = await client.get('/advisor/cards')
+    const forbidden = await client.get('/advisor/cards').cookies(session)
+
+    anonymous.assertStatus(401)
+    forbidden.assertStatus(403)
+  })
+
+  test('sem a turma, ou com a turma malformada, responde 422 apontando o campo', async ({
+    client,
+    assert,
+  }) => {
+    const { session } = await signInWithFactory(client)
+
+    const missing = await client.get('/advisor/cards').cookies(session)
+    const malformed = await client.get('/advisor/cards').qs({ classroomId: 'x' }).cookies(session)
+
+    missing.assertStatus(422)
+    malformed.assertStatus(422)
+    assert.property(body(missing).errors, 'classroomId')
+    assert.property(body(malformed).errors, 'classroomId')
   })
 })

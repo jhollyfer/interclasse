@@ -66,3 +66,19 @@ test.group('administrator/enrollment-removals/paginate > acesso e validação', 
     response.assertStatus(401)
   })
 })
+
+test.group('administrator/enrollment-removals/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .get('/administrator/enrollment-removals')
+      .qs({ classroomId: 'x' })
+      .cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'classroomId')
+  })
+})

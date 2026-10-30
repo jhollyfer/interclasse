@@ -74,3 +74,16 @@ test.group('students > delete', (group) => {
     assert.isNotNull(await Stored.student(student.id))
   })
 })
+
+test.group('advisor/students/delete > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const { session } = await signInWithFactory(client)
+
+    const response = await client.delete('/advisor/students/x').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
+  })
+})

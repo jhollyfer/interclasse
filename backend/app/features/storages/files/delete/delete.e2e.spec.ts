@@ -198,3 +198,16 @@ test.group('storages > delete', (group) => {
     response.assertStatus(401)
   })
 })
+
+test.group('storages > delete > identificador', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client.delete('/storages/x').cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'id')
+  })
+})

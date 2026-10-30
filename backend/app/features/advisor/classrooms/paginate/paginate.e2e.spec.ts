@@ -83,3 +83,16 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
     assert.equal(body(response).code, 'ACCESS_DENIED')
   })
 })
+
+test.group('advisor/classrooms/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('página malformada responde 422 apontando o campo', async ({ client, assert }) => {
+    const { session } = await signInWithFactory(client)
+
+    const response = await client.get('/advisor/classrooms').qs({ page: 'x' }).cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'page')
+  })
+})

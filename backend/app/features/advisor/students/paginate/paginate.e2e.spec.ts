@@ -82,3 +82,16 @@ test.group('students > paginate', (group) => {
     assert.equal(body(negado).code, 'ACCESS_DENIED')
   })
 })
+
+test.group('advisor/students/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+    const { session } = await signInWithFactory(client)
+
+    const response = await client.get('/advisor/students').qs({ classroomId: 'x' }).cookies(session)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'classroomId')
+  })
+})

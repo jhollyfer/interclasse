@@ -158,3 +158,23 @@ test.group('storages > create', (group) => {
     response.assertStatus(401)
   })
 })
+
+test.group('storages > create > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('tipo fora da lista responde 422 apontando o campo, e nenhuma linha nasce', async ({
+    client,
+    assert,
+  }) => {
+    const session = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .post('/storages')
+      .cookies(session)
+      .json({ fileName: 'script.sh', mimetype: 'application/x-sh', size: 128 })
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'mimetype')
+    assert.lengthOf(await Stored.storages(), 0)
+  })
+})

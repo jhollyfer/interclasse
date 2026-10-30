@@ -34,6 +34,10 @@ export class Stored {
     return AnnouncementModel.findOrFail(id)
   }
 
+  static brackets() {
+    return BracketModel.all()
+  }
+
   static bracketOrFail(id: string) {
     return BracketModel.findOrFail(id)
   }
@@ -44,6 +48,10 @@ export class Stored {
 
   static card(id: string) {
     return MatchCardModel.find(id)
+  }
+
+  static classrooms() {
+    return ClassroomModel.all()
   }
 
   static classroom(id: string) {
@@ -89,6 +97,10 @@ export class Stored {
 
   static sportOrFail(id: string) {
     return SportModel.findOrFail(id)
+  }
+
+  static storages() {
+    return StorageModel.all()
   }
 
   static storage(id: string) {

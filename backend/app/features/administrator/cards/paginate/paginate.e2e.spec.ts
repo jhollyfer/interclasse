@@ -52,3 +52,19 @@ test.group('administrator/cards/paginate > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 })
+
+test.group('administrator/cards/paginate > 422', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+    const admin = await authenticateAsAdministrator(client)
+
+    const response = await client
+      .get('/administrator/cards')
+      .qs({ classroomId: 'x' })
+      .cookies(admin)
+
+    response.assertStatus(422)
+    assert.property(body(response).errors, 'classroomId')
+  })
+})

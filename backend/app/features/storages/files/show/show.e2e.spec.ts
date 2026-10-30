@@ -66,3 +66,15 @@ test.group('storages > detalhe', (group) => {
     assert.property(body(response).errors, 'id')
   })
 })
+
+test.group('storages > detalhe > acesso', (group) => {
+  group.each.setup(() => resetDatabase())
+
+  test('sem sessão responde 401', async ({ client }) => {
+    const storage = await storageRow()
+
+    const response = await client.get(`/storages/${storage.id}`)
+
+    response.assertStatus(401)
+  })
+})
