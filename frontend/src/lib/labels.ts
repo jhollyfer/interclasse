@@ -1,8 +1,4 @@
 import type { VariantProps } from 'class-variance-authority'
-
-import type { badgeVariants } from '#/components/ui/badge'
-
-import { SCHOOL_TIME_ZONE } from './constant'
 import type {
   ActiveStatus,
   BracketStatus,
@@ -14,7 +10,11 @@ import type {
   StorageMimetype,
   UploadStatus,
   UserRole,
-} from './entity'
+} from '@interclasse/shared'
+
+import type { badgeVariants } from '#/components/ui/badge'
+
+import { SCHOOL_TIME_ZONE } from './constant'
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 

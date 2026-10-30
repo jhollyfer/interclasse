@@ -6,7 +6,7 @@ import {
   AlertDialogFooter,
 } from '#/components/ui/alert-dialog'
 import { Button } from '#/components/ui/button'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useConfirmDialogContext } from './confirm-dialog-context'
 

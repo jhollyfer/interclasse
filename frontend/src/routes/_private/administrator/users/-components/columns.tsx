@@ -1,3 +1,5 @@
+import type { AdministratorUserShowResponse } from '@interclasse/shared'
+
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { Badge } from '#/components/ui/badge'
 import { TableColumnHeader } from '#/components/common/table'
@@ -10,7 +12,6 @@ import {
   formatDate,
   initials,
 } from '#/lib/labels'
-import type { IUser } from '#/lib/interfaces'
 
 /**
  * `meta.label` é o rótulo em texto puro, para o menu de colunas visíveis:
@@ -20,7 +21,7 @@ import type { IUser } from '#/lib/interfaces'
  * `email`, `role`, `status` e `createdAt`. Qualquer outra coluna oferecendo a
  * ordem viraria `422` ao primeiro clique no cabeçalho.
  */
-export const userColumns: TableColumns<IUser> = [
+export const userColumns: TableColumns<AdministratorUserShowResponse> = [
   {
     accessorKey: 'name',
     meta: { label: 'Usuário' },

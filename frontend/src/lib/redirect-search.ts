@@ -6,9 +6,9 @@ export type RedirectSearch = {
 /**
  * Valida o `?redirect=` da tela de autenticação.
  *
- * À mão, e não com o `lib/validator.ts`: o `validateSearch` do roteador é
- * síncrono e o `validate` do VineJS devolve promessa. Nem via Standard Schema
- * dá - o roteador aceita a interface e continua exigindo resposta síncrona.
+ * À mão, e não com um schema Zod: a regra é de caminho (`/`, nunca `//` nem
+ * `/\`), não de forma, e o `validateSearch` do roteador precisa devolver o
+ * objeto limpo, sem lançar.
  *
  * Mora fora de `routes/` para poder ser testado sem que o gerador da árvore de
  * rotas trate o arquivo de teste como uma rota.

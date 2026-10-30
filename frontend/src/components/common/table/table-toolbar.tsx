@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArchiveIcon } from '@phosphor-icons/react'
+import { TRASHED_MODE } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { Spinner } from '#/components/ui/spinner'
-import { TRASHED_MODE } from '#/lib/entity'
 
 import { InputSearch } from './table-search-input'
 import { useTableContext } from './table-context'

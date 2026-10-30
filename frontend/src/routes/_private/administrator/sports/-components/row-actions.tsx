@@ -2,6 +2,7 @@ import type * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import type { AdministratorSportShowResponse } from '@interclasse/shared'
 
 import {
   ConfirmDialogDescription,
@@ -16,7 +17,6 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useSportDelete } from '#/integrations/tanstack-query/mutations/administrator'
-import type { ISport } from '#/lib/interfaces'
 
 /**
  * Editar e apagar. Modalidade com inscrições é recusada pelo servidor com
@@ -25,7 +25,7 @@ import type { ISport } from '#/lib/interfaces'
 export function SportRowActions({
   sport,
 }: Readonly<{
-  sport: ISport
+  sport: AdministratorSportShowResponse
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 

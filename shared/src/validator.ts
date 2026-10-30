@@ -22,10 +22,25 @@ const ZOD_LOCALES = {
 
 /** As mensagens que a casa escreve por cima do locale, por idioma. */
 export const VALIDATION_MESSAGES = {
-  'pt-BR': { required: 'Preencha este campo' },
-  es: { required: 'Completa este campo' },
-  en: { required: 'Fill in this field' },
-} satisfies Record<Locale, { readonly required: string }>
+  'pt-BR': {
+    required: 'Preencha este campo',
+    option: 'Selecione uma opção válida',
+    number: 'Informe um número válido',
+  },
+  es: {
+    required: 'Completa este campo',
+    option: 'Selecciona una opción válida',
+    number: 'Ingresa un número válido',
+  },
+  en: {
+    required: 'Fill in this field',
+    option: 'Select a valid option',
+    number: 'Enter a valid number',
+  },
+} satisfies Record<
+  Locale,
+  { readonly required: string; readonly option: string; readonly number: string }
+>
 
 /** O idioma em vigor, para as regras da casa que escrevem a própria mensagem. */
 let activeLocale: Locale = BASE_LOCALE
@@ -42,6 +57,24 @@ export function useValidatorLocale(locale: Locale): void {
       // Texto obrigatório vazio chega como `too_small` com mínimo 1: "Preencha
       // este campo" diz o que fazer, "Muito pequeno: esperado 1 caractere" não.
       if (issue.code === 'too_small' && issue.origin === 'string' && issue.minimum === 1)
+        return VALIDATION_MESSAGES[locale].required
+
+      // Campo sem valor (`undefined`) é "preencha", não "esperava texto,
+      // recebeu undefined"; número apagado no input chega como `NaN`.
+      if (issue.code === 'invalid_type') {
+        if (issue.input === undefined || issue.input === null)
+          return VALIDATION_MESSAGES[locale].required
+        if (typeof issue.input === 'number' && Number.isNaN(issue.input))
+          return VALIDATION_MESSAGES[locale].number
+      }
+
+      // Lista fechada (enum) e id: o que o usuário faz é escolher, não digitar.
+      if (issue.code === 'invalid_value') return VALIDATION_MESSAGES[locale].option
+      if (issue.code === 'invalid_format' && issue.format === 'uuid')
+        return VALIDATION_MESSAGES[locale].option
+
+      // E-mail (ou outro formato) em branco é campo vazio, não formato errado.
+      if (issue.code === 'invalid_format' && issue.input === '')
         return VALIDATION_MESSAGES[locale].required
 
       return undefined
@@ -148,6 +181,11 @@ export function passwordField() {
  */
 export function passwordsMatch(password: string | undefined, confirmation: string | undefined) {
   return password === undefined || password === confirmation
+}
+
+/** Opções do `refine` que cobra um campo preenchido, na mensagem da casa. */
+export function requiredIssue(path: ReadonlyArray<string>) {
+  return { path: [...path], error: () => VALIDATION_MESSAGES[activeLocale].required }
 }
 
 /** Opções do `refine` de objeto que cobra a confirmação da senha. */

@@ -2,6 +2,8 @@ import type * as React from 'react'
 import { getRouteApi, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { PlusIcon } from '@phosphor-icons/react'
+import type { AdministratorClassroomPaginateResponse } from '@interclasse/shared'
+import { CATEGORIES } from '@interclasse/shared'
 
 import {
   PageHeader,
@@ -20,8 +22,6 @@ import {
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { classroomsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { CATEGORIES } from '#/lib/entity'
-import type { IClassroom } from '#/lib/interfaces'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS, plural } from '#/lib/labels'
 
 import { CLASSROOM_GRID } from '../index'
@@ -119,7 +119,9 @@ export function ClassroomGrid(): React.JSX.Element {
 /** O cartão da turma: o link cobre o cartão, e o menu fica por cima, no canto. */
 function ClassroomCard({
   classroom,
-}: Readonly<{ classroom: IClassroom }>): React.JSX.Element {
+}: Readonly<{
+  classroom: AdministratorClassroomPaginateResponse
+}>): React.JSX.Element {
   return (
     <Card className="hover:border-primary relative h-full transition-colors">
       <CardHeader>
@@ -152,9 +154,9 @@ function ClassroomCard({
           </dd>
         </dl>
         <p className="text-muted-foreground mt-3 text-sm">
-          {plural(classroom.studentsCount ?? 0, 'aluno', 'alunos')} ·{' '}
-          {plural(classroom.athletesCount ?? 0, 'atleta', 'atletas')} ·{' '}
-          {plural(classroom.sportsCount ?? 0, 'modalidade', 'modalidades')}
+          {plural(classroom.studentsCount, 'aluno', 'alunos')} ·{' '}
+          {plural(classroom.athletesCount, 'atleta', 'atletas')} ·{' '}
+          {plural(classroom.sportsCount, 'modalidade', 'modalidades')}
         </p>
       </CardContent>
     </Card>

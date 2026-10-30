@@ -6,7 +6,7 @@ import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 /**
  * A casca de uma tela do painel: cabeçalho fixo, conteúdo que rola, rodapé fixo.

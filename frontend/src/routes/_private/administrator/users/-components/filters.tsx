@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { ACTIVE_STATUSES, USER_ROLES } from '@interclasse/shared'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import {
@@ -7,7 +8,6 @@ import {
   ACTIVE_STATUS_DOTS,
   USER_ROLE_LABELS,
 } from '#/lib/labels'
-import { ACTIVE_STATUSES, USER_ROLES } from '#/lib/entity'
 import type { UserListSearch } from '#/lib/list-search'
 
 /**

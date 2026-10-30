@@ -13,7 +13,7 @@ import {
   ConfirmDialogHeader,
 } from '#/components/common/confirm-dialog'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 import { useCloseRowActions } from './row-actions'
 

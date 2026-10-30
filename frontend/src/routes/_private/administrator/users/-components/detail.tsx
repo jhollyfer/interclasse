@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { USER_ROLE } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { notifyError } from '#/lib/form-errors'
@@ -34,7 +35,6 @@ import {
   ConfirmDialogHeader,
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
-import { USER_ROLE } from '#/lib/entity'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   useUserArchive,

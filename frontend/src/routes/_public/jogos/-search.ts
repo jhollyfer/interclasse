@@ -1,6 +1,6 @@
-import type { Merge } from '#/lib/interfaces'
 import { validateStorefrontSearch } from '#/lib/list-search'
 import type { StorefrontSearch } from '#/lib/list-search'
+import type { Merge } from '#/lib/merge'
 
 /** Os filtros da tabela de jogos vivem na URL: o link compartilhado abre o mesmo recorte. */
 export type GamesSearch = Merge<

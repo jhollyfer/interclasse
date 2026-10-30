@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-
-import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
+import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
 import type { HTTPError } from '../http'
 import { send } from '../http'
@@ -12,12 +11,12 @@ import type { MutationProps } from '../mutation-props'
  * `GET /account`.
  */
 export function useAuthenticationSignIn(
-  options?: MutationProps<void, SessionSignInPayload>,
+  options?: MutationProps<void, AuthenticationSessionSignInPayload>,
 ) {
   // Os generics ficam explícitos: são eles que dão tipo contextual aos
   // callbacks do chamador. A regra "tipe a queryFn, não o hook" vale para
   // query, onde `select` e `data` dependem da inferência em cadeia.
-  return useMutation<void, HTTPError, SessionSignInPayload>({
+  return useMutation<void, HTTPError, AuthenticationSessionSignInPayload>({
     ...options,
     mutationFn: async function (payload) {
       await send('/authentication/sign-in', {

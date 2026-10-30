@@ -20,6 +20,7 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { BracketTree } from '#/components/common/bracket-tree'
+import type { BracketMatch } from '#/components/common/bracket-tree'
 import {
   MatchCardsDialog,
   MatchScheduleDialog,
@@ -42,7 +43,6 @@ import { Card, CardContent } from '#/components/ui/card'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import type { IBracketMatch } from '#/lib/interfaces'
 import {
   BRACKET_STATUS_LABELS,
   BRACKET_STATUS_VARIANTS,
@@ -69,9 +69,9 @@ const UNSCORE_TITLE: Record<string, string> = {
  * diz isso antes, em vez de dar erro.
  */
 function nextOf(
-  matches: ReadonlyArray<IBracketMatch>,
-  match: IBracketMatch,
-): IBracketMatch | undefined {
+  matches: ReadonlyArray<BracketMatch>,
+  match: BracketMatch,
+): BracketMatch | undefined {
   return matches.find(
     (item) =>
       item.round === match.round + 1 &&

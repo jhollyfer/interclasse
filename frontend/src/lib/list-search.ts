@@ -1,5 +1,6 @@
-import type { SortDirection, TrashedMode } from './entity'
-import type { Merge } from './interfaces'
+import type { SortDirection, TrashedMode } from '@interclasse/shared'
+
+import type { Merge } from './merge'
 
 /**
  * Os filtros de qualquer listagem do painel, na URL.
@@ -8,15 +9,16 @@ import type { Merge } from './interfaces'
  * compartilhado - a tabela na página 2 com um filtro aplicado tem que voltar
  * igual.
  *
- * À mão, e não com `lib/validator.ts`: o `validateSearch` do roteador é
- * síncrono e o `validate` do VineJS devolve promessa.
+ * À mão, e não com os validators de listagem do `shared/`: o `validateSearch`
+ * do roteador precisa devolver o objeto limpo, descartando o parâmetro inválido
+ * em vez de lançar, e aqui o filtro vem de uma URL que qualquer um edita.
  *
  * Mora fora de `routes/` para poder ser testado sem que o gerador da árvore
  * trate o arquivo de teste como uma rota.
  */
 
 /**
- * Os valores são literais, e `SORT_DIRECTION`/`TRASHED_MODE` de `entity.ts`
+ * Os valores são literais, e `SORT_DIRECTION`/`TRASHED_MODE` de `@interclasse/shared`
  * entram só como **tipo**. Não é descuido: este arquivo é importado por toda
  * rota que declara `validateSearch`, então ele cai no chunk do router, enquanto
  * o enum mora com o resto do vocabulário. Ler o enum aqui, em escopo de módulo,

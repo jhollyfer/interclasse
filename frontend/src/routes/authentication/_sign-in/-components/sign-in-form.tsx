@@ -1,5 +1,7 @@
 import { Link, getRouteApi, useRouter } from '@tanstack/react-router'
 import type * as React from 'react'
+import { AuthenticationSessionSignInValidator } from '@interclasse/shared'
+import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
 import { InputPassword } from '#/components/common/input-password'
 import { SubmitButton } from '#/components/common/submit-button'
@@ -13,8 +15,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useAuthenticationSignIn } from '#/integrations/tanstack-query/mutations/authentication'
 import { SITE_DESCRIPTION } from '#/lib/constant'
-import { SessionSignInValidator } from '#/validators/authentication/sessions.validator'
-import type { SessionSignInPayload } from '#/validators/authentication/sessions.validator'
 
 import {
   AuthShell,
@@ -41,11 +41,11 @@ export function SignInForm(): React.JSX.Element {
   const search = route.useSearch()
 
   const { form, mutation, onSubmit } = useMutationForm<
-    SessionSignInPayload,
+    AuthenticationSessionSignInPayload,
     void,
-    SessionSignInPayload
+    AuthenticationSessionSignInPayload
   >({
-    validator: SessionSignInValidator,
+    validator: AuthenticationSessionSignInValidator,
     // Sem isto os campos nascem `undefined`, e o input monta não controlado
     // para virar controlado na primeira tecla.
     defaults: { email: '', password: '' },

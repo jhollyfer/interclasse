@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { LockSimpleIcon } from '@phosphor-icons/react'
+import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
 
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import type { IEnrollmentBoard } from '#/lib/interfaces'
 import { plural } from '#/lib/labels'
 
 type EnrollmentBoardProps = Readonly<{
-  board: IEnrollmentBoard
+  board: AdvisorEnrollmentShowResponse
   /**
    * Grava a lista inteira da modalidade. `removed` são os nomes de quem estava
    * salvo e saiu: o conselheiro precisa justificar a saída.
@@ -88,8 +88,8 @@ function SportCard({
   isSaving,
   canRemove,
 }: Readonly<{
-  sport: IEnrollmentBoard['sports'][number]
-  students: IEnrollmentBoard['students']
+  sport: AdvisorEnrollmentShowResponse['sports'][number]
+  students: AdvisorEnrollmentShowResponse['students']
   onSave: EnrollmentBoardProps['onSave']
   isSaving?: boolean
   canRemove: boolean

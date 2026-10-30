@@ -8,6 +8,8 @@ import {
   NumberSquareOneIcon,
   TreeStructureIcon,
 } from '@phosphor-icons/react'
+import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
+import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
 
 import {
   MatchCardsDialog,
@@ -38,7 +40,6 @@ import { buttonVariants } from '#/components/ui/button'
 import { DropdownMenuItem } from '#/components/ui/dropdown-menu'
 import { RowActions } from '#/components/common/row-actions'
 import { matchesQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { CATEGORIES, MATCH_STATUSES } from '#/lib/entity'
 import {
   CATEGORY_SHORT_LABELS,
   CATEGORY_LABELS,
@@ -47,24 +48,23 @@ import {
   MATCH_STATUS_VARIANTS,
   formatDate,
 } from '#/lib/labels'
-import type { IMatch } from '#/lib/interfaces'
 
 const route = getRouteApi('/_private/administrator/matches/')
 
 /** A partida no formato que os diálogos esperam: nomes já resolvidos. */
-function toRef(match: IMatch): MatchRef {
+function toRef(match: AdministratorMatchPaginateResponse): MatchRef {
   return {
     ...match,
-    homeName: match.homeTeam?.classroom.name ?? null,
-    awayName: match.awayTeam?.classroom.name ?? null,
+    homeName: match.homeTeam.classroom.name,
+    awayName: match.awayTeam.classroom.name,
   }
 }
 
-function phaseOf(match: IMatch): string {
+function phaseOf(match: AdministratorMatchPaginateResponse): string {
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
-const columns: TableColumns<IMatch> = [
+const columns: TableColumns<AdministratorMatchPaginateResponse> = [
   // O jogo primeiro: é o que se procura na lista, e é o que a tabela estreita
   // não pode cortar.
   {
@@ -75,11 +75,11 @@ const columns: TableColumns<IMatch> = [
     header: () => 'Jogo',
     cell: ({ row }) => (
       <span className="font-medium">
-        {row.original.homeTeam?.classroom.name ?? 'A definir'}{' '}
+        {row.original.homeTeam.classroom.name}{' '}
         <span className="tabular-nums">
           {row.original.homeScore ?? '-'} x {row.original.awayScore ?? '-'}
         </span>{' '}
-        {row.original.awayTeam?.classroom.name ?? 'A definir'}
+        {row.original.awayTeam.classroom.name}
       </span>
     ),
     enableHiding: false,
@@ -98,13 +98,13 @@ const columns: TableColumns<IMatch> = [
   },
   {
     id: 'sport',
-    accessorFn: (row) => row.bracket?.sport?.name ?? '',
+    accessorFn: (row) => row.bracket.sport.name,
     meta: { label: 'Modalidade' },
     size: 170,
     header: () => 'Modalidade',
     cell: ({ row }) => {
       const bracket = row.original.bracket
-      return `${bracket?.sport?.name ?? ''} · ${CATEGORY_SHORT_LABELS[bracket?.category ?? ''] ?? ''}`
+      return `${bracket.sport.name} · ${CATEGORY_SHORT_LABELS[bracket.category] ?? ''}`
     },
   },
   {

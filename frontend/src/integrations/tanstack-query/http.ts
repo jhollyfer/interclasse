@@ -446,7 +446,7 @@ export async function request<T>(
 
   const body: unknown = await response.json()
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (`lib/interfaces.ts` explica por quê), e o `T` é o contrato que cada `queryOptions`/mutation declara.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (sem schema de resposta no cliente), e o `T` é o contrato que cada `queryOptions`/mutation declara.
   return body as T
 }
 

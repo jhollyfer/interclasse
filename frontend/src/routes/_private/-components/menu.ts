@@ -16,9 +16,8 @@ import {
   UsersIcon,
 } from '@phosphor-icons/react'
 import { linkOptions } from '@tanstack/react-router'
-
-import { USER_ROLE } from '#/lib/entity'
-import type { UserRole } from '#/lib/entity'
+import { USER_ROLE } from '@interclasse/shared'
+import type { UserRole } from '@interclasse/shared'
 
 /**
  * Os destinos do menu, tipados contra a árvore de rotas.

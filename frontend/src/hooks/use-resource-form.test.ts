@@ -9,9 +9,9 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
+import { z } from '@interclasse/shared'
 
 import { applyMutationError } from '#/lib/form-errors'
-import { vine } from '#/lib/validator'
 import { HTTPError } from '#/integrations/tanstack-query/http'
 
 import { useResourceForm } from './use-resource-form'
@@ -40,9 +40,9 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),
 }))
-vi.mock('@hookform/resolvers/vine', () => ({
+vi.mock('@hookform/resolvers/zod', () => ({
   // O resolver não é o assunto: aceita o que vier e devolve sem erro.
-  vineResolver: () => (values: unknown) => ({ values, errors: {} }),
+  zodResolver: () => (values: unknown) => ({ values, errors: {} }),
 }))
 
 type Values = { name: string }
@@ -51,7 +51,7 @@ type Payload = { name: string; id?: string }
 
 const FIELDS = ['name'] as const
 
-const NameValidator = vine.create({ name: vine.string() })
+const NameValidator = z.object({ name: z.string() })
 
 /** O quarto argumento dos callbacks; o hook não o lê. */
 const CONTEXT = fromPartial<MutationFunctionContext>({})

@@ -3,6 +3,16 @@ import type { LinkProps } from '@tanstack/react-router'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { PencilSimpleIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import {
+  AdvisorStudentCreateValidator,
+  AdvisorStudentUpdateValidator,
+} from '@interclasse/shared'
+import type {
+  AdvisorStudentCreatePayload,
+  AdvisorStudentUpdatePayload,
+  AdvisorEnrollmentShowResponse,
+  AdvisorStudentShowResponse,
+} from '@interclasse/shared'
 
 import {
   ConfirmDialog,
@@ -21,14 +31,6 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import type { StudentUpdateVariables } from '#/integrations/tanstack-query/mutations/advisor'
-import {
-  StudentCreateValidator,
-  StudentUpdateValidator,
-} from '#/validators/advisor/students.validator'
-import type {
-  StudentCreatePayload,
-  StudentUpdatePayload,
-} from '#/validators/advisor/students.validator'
 import { notifyError } from '#/lib/form-errors'
 import {
   PageHeader,
@@ -53,7 +55,6 @@ import {
   studentsQueryOptions,
 } from '#/integrations/tanstack-query/queries/advisor'
 import { CATEGORY_LABELS } from '#/lib/labels'
-import type { IEnrollmentBoard, IStudent } from '#/lib/interfaces'
 
 import { ClassroomCards } from './classroom-cards'
 import { studentsOf } from './classroom-detail-loader'
@@ -91,7 +92,7 @@ export function ClassroomDetail({
   const queryClient = useQueryClient()
   const [pending, setPending] = React.useState<PendingRemoval | null>(null)
 
-  const store = (updated: IEnrollmentBoard) =>
+  const store = (updated: AdvisorEnrollmentShowResponse) =>
     queryClient.setQueryData(
       queryKeys.advisor.enrollments.board(classroomId),
       updated,
@@ -189,11 +190,11 @@ function Students({
   const invalidate = useInvalidate()
 
   const { form, mutation, onSubmit } = useMutationForm<
-    StudentCreatePayload,
-    IStudent,
-    StudentCreatePayload
+    AdvisorStudentCreatePayload,
+    AdvisorStudentShowResponse,
+    AdvisorStudentCreatePayload
   >({
-    validator: StudentCreateValidator,
+    validator: AdvisorStudentCreateValidator,
     defaults: { classroomId, name: '' },
     fields: STUDENT_FIELDS,
     mutation: useStudentCreate,
@@ -250,7 +251,7 @@ function Students({
 }
 
 type StudentRowProps = Readonly<{
-  student: IStudent
+  student: AdvisorStudentShowResponse
   onChange: () => Promise<void>
 }>
 
@@ -258,11 +259,11 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
   const [editing, setEditing] = React.useState(false)
 
   const { form, mutation, onSubmit } = useMutationForm<
-    StudentUpdatePayload,
-    IStudent,
+    AdvisorStudentUpdatePayload,
+    AdvisorStudentShowResponse,
     StudentUpdateVariables
   >({
-    validator: StudentUpdateValidator,
+    validator: AdvisorStudentUpdateValidator,
     values: { name: student.name },
     fields: STUDENT_FIELDS,
     mutation: useStudentUpdate,

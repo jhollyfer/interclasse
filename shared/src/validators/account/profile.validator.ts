@@ -3,6 +3,7 @@ import {
   passwordField,
   passwordMismatchIssue,
   passwordsMatch,
+  requiredIssue,
   z,
 } from '../../validator.js'
 
@@ -27,9 +28,9 @@ export const AccountProfileUpdateValidator = z
     (value) => passwordsMatch(value.password, value.passwordConfirmation),
     passwordMismatchIssue(),
   )
-  .refine((value) => value.password === undefined || value.currentPassword !== undefined, {
-    path: ['currentPassword'],
-    error: 'required',
-  })
+  .refine(
+    (value) => value.password === undefined || value.currentPassword !== undefined,
+    requiredIssue(['currentPassword']),
+  )
 
 export type AccountProfileUpdatePayload = z.infer<typeof AccountProfileUpdateValidator>

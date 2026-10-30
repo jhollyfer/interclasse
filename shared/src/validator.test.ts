@@ -36,4 +36,26 @@ describe('validator', () => {
 
     expect(english).not.toBe(portuguese)
   })
+
+  it('campo sem valor, número apagado, id e enum inválidos têm mensagem da casa', () => {
+    const schema = z.object({
+      name: z.string(),
+      amount: z.number(),
+      id: z.uuid(),
+      kind: z.enum(['A', 'B']),
+      email: z.email(),
+    })
+    const issues = schema.safeParse({ amount: Number.NaN, id: '', kind: 'C', email: '' }).error
+      ?.issues
+    const messages = Object.fromEntries((issues ?? []).map((i) => [i.path.join('.'), i.message]))
+    const texts = VALIDATION_MESSAGES['pt-BR']
+
+    expect(messages).toEqual({
+      name: texts.required,
+      amount: texts.number,
+      id: texts.option,
+      kind: texts.option,
+      email: texts.required,
+    })
+  })
 })

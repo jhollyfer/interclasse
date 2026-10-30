@@ -1,6 +1,11 @@
 import type * as React from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { FilePdfIcon } from '@phosphor-icons/react'
+import { AdministratorSiteUpdateValidator } from '@interclasse/shared'
+import type {
+  AdministratorSiteUpdatePayload,
+  AdministratorSiteShowResponse,
+} from '@interclasse/shared'
 
 import {
   ImageField,
@@ -28,9 +33,7 @@ import {
 } from '#/integrations/react-hook-form/app-field'
 import { useSiteUpdate } from '#/integrations/tanstack-query/mutations/administrator'
 import { siteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import type { ISiteSetting } from '#/lib/interfaces'
-import { SiteUpdateValidator } from '#/validators/administrator/site.validator'
-import type { SiteUpdatePayload } from '#/validators/administrator/site.validator'
+import { blankToNull, nanToNull } from '#/lib/form-values'
 
 const SITE_FIELDS = [
   'about',
@@ -45,22 +48,10 @@ const SITE_FIELDS = [
 /** Só PDF: o regulamento é para baixar e imprimir. */
 const PDF = ['application/pdf'] as const
 
-/** Campo de texto vazio vai como `null`: apaga, em vez de gravar `''`. */
-function textOrNull(value: string): string | null {
-  if (value.trim() === '') return null
-
-  return value
-}
-
-/** Campo numérico vazio (`NaN`) vai como `null`. */
-function numberOrNull(value: number): number | null {
-  if (Number.isNaN(value)) return null
-
-  return value
-}
-
 /** O registro como o formulário o edita: tudo o que o PUT aceita. */
-function valuesOf(site: ISiteSetting): SiteUpdatePayload {
+function valuesOf(
+  site: AdministratorSiteShowResponse,
+): AdministratorSiteUpdatePayload {
   return {
     about: site.about,
     organizer: site.organizer,
@@ -80,11 +71,11 @@ export function SiteForm(): React.JSX.Element {
   const { data: site } = useSuspenseQuery(siteQueryOptions())
 
   const { form, mutation, onSubmit } = useMutationForm<
-    SiteUpdatePayload,
-    ISiteSetting,
-    SiteUpdatePayload
+    AdministratorSiteUpdatePayload,
+    AdministratorSiteShowResponse,
+    AdministratorSiteUpdatePayload
   >({
-    validator: SiteUpdateValidator,
+    validator: AdministratorSiteUpdateValidator,
     values: valuesOf(site),
     fields: SITE_FIELDS,
     mutation: useSiteUpdate,
@@ -126,7 +117,7 @@ export function SiteForm(): React.JSX.Element {
                     maxLength={4000}
                     value={field.value ?? ''}
                     onChange={(event) =>
-                      field.onChange(textOrNull(event.target.value))
+                      field.onChange(blankToNull(event.target.value))
                     }
                     onBlur={field.onBlur}
                   />
@@ -144,7 +135,7 @@ export function SiteForm(): React.JSX.Element {
                     maxLength={160}
                     value={field.value ?? ''}
                     onChange={(event) =>
-                      field.onChange(textOrNull(event.target.value))
+                      field.onChange(blankToNull(event.target.value))
                     }
                     onBlur={field.onBlur}
                   />
@@ -165,7 +156,7 @@ export function SiteForm(): React.JSX.Element {
                       min={1}
                       value={field.value ?? ''}
                       onChange={(event) =>
-                        field.onChange(numberOrNull(event.target.valueAsNumber))
+                        field.onChange(nanToNull(event.target.valueAsNumber))
                       }
                       onBlur={field.onBlur}
                     />
@@ -186,7 +177,7 @@ export function SiteForm(): React.JSX.Element {
                       max={2100}
                       value={field.value ?? ''}
                       onChange={(event) =>
-                        field.onChange(numberOrNull(event.target.valueAsNumber))
+                        field.onChange(nanToNull(event.target.valueAsNumber))
                       }
                       onBlur={field.onBlur}
                     />
@@ -216,7 +207,7 @@ export function SiteForm(): React.JSX.Element {
                     placeholder="cmei_cosmejean"
                     value={field.value ?? ''}
                     onChange={(event) =>
-                      field.onChange(textOrNull(event.target.value))
+                      field.onChange(blankToNull(event.target.value))
                     }
                     onBlur={field.onBlur}
                   />
@@ -234,7 +225,7 @@ export function SiteForm(): React.JSX.Element {
                     maxLength={30}
                     value={field.value ?? ''}
                     onChange={(event) =>
-                      field.onChange(textOrNull(event.target.value))
+                      field.onChange(blankToNull(event.target.value))
                     }
                     onBlur={field.onBlur}
                   />

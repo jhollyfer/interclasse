@@ -5,7 +5,7 @@ import { TrophyIcon } from '@phosphor-icons/react'
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 type NotFoundPageProps = Readonly<
   Merge<

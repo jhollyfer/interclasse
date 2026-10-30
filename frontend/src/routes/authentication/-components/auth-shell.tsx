@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { BrandMark } from '#/components/common/brand-mark'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { cn } from '#/lib/utils'
-import type { Merge } from '#/lib/interfaces'
+import type { Merge } from '#/lib/merge'
 
 /**
  * A moldura das telas de autenticação: lateral de marca à esquerda e o

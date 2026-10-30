@@ -1,5 +1,5 @@
 import type * as React from 'react'
-import { vineResolver } from '@hookform/resolvers/vine'
+import { zodResolver } from '@hookform/resolvers/zod'
 import type {
   QueryKey,
   UseMutationOptions,
@@ -13,6 +13,7 @@ import type {
   UseFormReturn,
 } from 'react-hook-form'
 import { toast } from 'sonner'
+import type { z } from '@interclasse/shared'
 
 import type { HTTPError } from '#/integrations/tanstack-query/http'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
@@ -38,8 +39,8 @@ export type UseMutationFormOptions<
   TRecord,
   TPayload,
 > = Readonly<{
-  /** O validator espelho do backend (`src/validators/`). */
-  validator: Parameters<typeof vineResolver>[0]
+  /** O validator Zod de `@interclasse/shared`, o mesmo que o backend usa. */
+  validator: z.ZodType<TValues, TValues>
   /** O formulário vazio. */
   defaults?: DefaultValues<TValues>
   /**
@@ -88,7 +89,7 @@ export type UseMutationFormReturn<
 
 /**
  * Formulário que dispara uma mutation: `useForm` com o resolver do validator
- * espelho, a mutation com o erro levado aos campos (`applyMutationError`), a
+ * do `shared/`, a mutation com o erro levado aos campos (`applyMutationError`), a
  * invalidação, o aviso de sucesso e um `onValid` que limpa o `root` antes de
  * reenviar.
  *
@@ -119,7 +120,7 @@ export function useMutationForm<
   const invalidateKeys = useInvalidate()
 
   const form = useForm<TValues>({
-    resolver: vineResolver(validator),
+    resolver: zodResolver(validator),
     mode: 'onTouched',
     defaultValues: defaults,
     values,

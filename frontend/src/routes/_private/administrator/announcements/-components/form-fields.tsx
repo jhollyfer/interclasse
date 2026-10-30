@@ -1,6 +1,7 @@
 import type * as React from 'react'
 import { Controller } from 'react-hook-form'
 import type { DefaultValues, UseFormReturn } from 'react-hook-form'
+import type { AdministratorAnnouncementCreatePayload } from '@interclasse/shared'
 
 import { Checkbox } from '#/components/ui/checkbox'
 import {
@@ -15,9 +16,8 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import type { AnnouncementCreatePayload } from '#/validators/administrator/announcements.validator'
 
-export type AnnouncementFormType = AnnouncementCreatePayload
+export type AnnouncementFormType = AdministratorAnnouncementCreatePayload
 
 export const ANNOUNCEMENT_FORM_DEFAULTS: DefaultValues<AnnouncementFormType> = {
   title: '',
