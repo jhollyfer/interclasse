@@ -14,3 +14,6 @@ export type Locale = (typeof LOCALE)[keyof typeof LOCALE]
 export const LOCALES = Object.values(LOCALE)
 
 export const BASE_LOCALE: Locale = LOCALE.PT_BR
+
+/** Conteúdo de registro que existe nos três idiomas, lido por `localized()` no frontend. */
+export type LocalizedText = Record<Locale, string>

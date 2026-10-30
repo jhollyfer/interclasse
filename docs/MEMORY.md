@@ -5,9 +5,9 @@
 > O agente lê **no início** de toda sessão e atualiza **no fim**. Curto: é um ponto de
 > retomada, não um diário. Histórico vai para `CHANGELOG.md` e `DECISIONS.md`.
 
-| Atualizado | Fase atual | Progresso | Status |
-|---|---|---|---|
-| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90% | Em revisão, branch `claude/modest-planck-jx0izx` |
+| Atualizado | Fase atual                                   | Progresso | Status                                           |
+| ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
+| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90%       | Em revisão, branch `claude/modest-planck-jx0izx` |
 
 ## Já feito
 
@@ -16,13 +16,13 @@
 
 ## Parou em
 
-Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
+Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5.1/5.2 (tooling, CI, Docker, docs), 5.3 (borda e segurança) e 5.4 (arquitetura do backend) e 5.6 (estrutura do frontend: login em `/sign-in`, `request(path, schema)`, kit comum completo) integradas; workflows e Dockerfiles ainda não rodaram de verdade (sem dockerd nem Actions na sessão).
 
 ## Próximos passos
 
-1. Dono revisa e decide o PR para `main`.
-2. Primeiro deploy: a imagem da API agora sai da raiz (`docker build -f backend/Dockerfile-production .`); o pré-deploy `node ace migration:run --force` não muda. A migration de conselheiro único solta turmas de quem tinha mais de uma.
-3. Pendências da Fase 4 de `TASKS.md` e E2E no CI.
+1. Fase 5.7 (ESLint, dialogs, Luxon, SEO, tokens): o kit novo ainda não tem tela que o use; `RichEditor` e `MultiFileUpload` entram quando um formulário pedir.
+2. Rodar o E2E Playwright com o backend de pé antes do PR (URL do login e rotas `new`/`$id/edit` mudaram).
+3. Definir como o `robots.txt` reconhece staging: hoje é `import.meta.env.PROD`, e um staging com build de produção sairia indexável.
 
 ## Contexto importante
 
@@ -37,10 +37,10 @@ Fase 5 em integração na branch `refactor/interclasse-regua-estrita`: frentes 5
 > Uma linha por correção do dono (`AGENTS.md`, "Modo de trabalho" item 3). Lida no início de toda
 > sessão. Lição que vale para todo projeto sobe para a régua e sai daqui.
 
-| Data | Erro | Regra que evita | Vale para |
-|---|---|---|---|
-| 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature | backend, migration e regra de domínio |
-| 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`) | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI |
+| Data       | Erro                                                                                                                                                                     | Regra que evita                                                                                                       | Vale para                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature        | backend, migration e regra de domínio |
+| 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`)          | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI    |
 
 ## Problemas conhecidos
 

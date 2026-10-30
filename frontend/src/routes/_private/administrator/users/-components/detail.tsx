@@ -37,9 +37,9 @@ import {
 } from '#/components/common/confirm-dialog'
 import { userQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
-  useUserArchive,
-  useUserDelete,
-  useUserUnarchive,
+  useUserArchiveMutation,
+  useUserDeleteMutation,
+  useUserUnarchiveMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import {
@@ -75,7 +75,7 @@ export function UserDetail(): React.JSX.Element {
     })
   }
 
-  const archive = useUserArchive({
+  const archive = useUserArchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     async onSuccess() {
       toast.success(m.admin_users_archived_ok({ name: user.name }))
@@ -85,11 +85,11 @@ export function UserDetail(): React.JSX.Element {
       await router.navigate({ to: '/administrator/users' })
     },
   })
-  const unarchive = useUserUnarchive({
+  const unarchive = useUserUnarchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: invalidate,
   })
-  const remove = useUserDelete({
+  const remove = useUserDeleteMutation({
     onError: (error) => notifyError(error, { id: 'user-delete' }),
     async onSuccess() {
       await invalidate()

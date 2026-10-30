@@ -24,7 +24,7 @@ import {
   AppField,
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
-import { usePhotoCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { usePhotoCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 const PHOTO_FIELDS = ['storageId', 'caption'] as const
@@ -56,7 +56,7 @@ export function PhotoUploadForm({
     validator: AdministratorPhotoCreateValidator,
     defaults: EMPTY,
     fields: PHOTO_FIELDS,
-    mutation: (options) => usePhotoCreate(area, options),
+    mutation: (options) => usePhotoCreateMutation(area, options),
     invalidate: DEPENDENTS.photos,
     success,
     payload: (values) => values,

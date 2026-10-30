@@ -16,7 +16,7 @@ import {
   FormShellTitle,
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
-import { useClassroomCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useClassroomCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -38,7 +38,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     validator: AdministratorClassroomCreateValidator,
     defaults: CLASSROOM_FORM_DEFAULTS,
     fields: CLASSROOM_FIELDS,
-    mutation: useClassroomCreate,
+    mutation: useClassroomCreateMutation,
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',

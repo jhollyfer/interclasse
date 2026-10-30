@@ -3,15 +3,17 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   Table,
   TableActions,
   TableColumnToggle,
   TableContent,
   TableCreateButton,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
@@ -68,15 +70,15 @@ export function SportsTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>{m.admin_sports_empty_title()}</TableEmptyTitle>
-          <TableEmptyDescription>
+          <EmptyStateTitle>{m.admin_sports_empty_title()}</EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_sports_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
             <TableCreateButton to="/administrator/sports/new">
               {m.admin_sports_create()}
             </TableCreateButton>
-          </TableEmptyActions>
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

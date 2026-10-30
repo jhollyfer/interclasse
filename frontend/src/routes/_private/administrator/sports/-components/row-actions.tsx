@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useSportDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useSportDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -30,7 +30,7 @@ export function SportRowActions({
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
-  const remove = useSportDelete({
+  const remove = useSportDeleteMutation({
     onError: (error) => notifyError(error, { id: 'sport-delete' }),
     onSuccess: () => {
       toast.success(m.admin_sports_removed())

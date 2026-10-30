@@ -37,3 +37,25 @@ test('recusa barra no fim, que dobraria a barra do caminho', async () => {
 
   await expect(load()).rejects.toThrow('não pode terminar em "/"')
 })
+
+test('sem VITE_SITE_URL, cai no frontend de dev', async () => {
+  vi.stubEnv('VITE_SITE_URL', '')
+
+  const { env } = await load()
+
+  expect(env.VITE_SITE_URL).toBe('http://localhost:3001')
+})
+
+test('aceita o endereço público do site como veio', async () => {
+  vi.stubEnv('VITE_SITE_URL', 'https://interclass.maiyu.com.br')
+
+  const { env } = await load()
+
+  expect(env.VITE_SITE_URL).toBe('https://interclass.maiyu.com.br')
+})
+
+test('recusa VITE_SITE_URL com barra no fim', async () => {
+  vi.stubEnv('VITE_SITE_URL', 'https://interclass.maiyu.com.br/')
+
+  await expect(load()).rejects.toThrow('VITE_SITE_URL não pode terminar')
+})

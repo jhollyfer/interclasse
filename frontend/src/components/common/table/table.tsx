@@ -1,14 +1,17 @@
 import * as React from 'react'
+import type { Merge } from '@interclasse/shared'
 
 import { PageShell } from '#/components/common/page-shell'
 import type { ListSearch } from '#/lib/list-search'
-import type { Merge } from '#/lib/merge'
 
 import { TableProvider } from './table-context'
 
 type TableProps = Readonly<
   Merge<
-    React.ComponentProps<typeof PageShell>,
+    Omit<
+      React.ComponentProps<typeof PageShell>,
+      'to' | 'search' | 'isPlaceholderData' | 'isError' | 'onRetry'
+    >,
     {
       /** A rota desta listagem, para busca, ordenação e paginação. */
       to: string

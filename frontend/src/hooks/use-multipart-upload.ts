@@ -1,4 +1,4 @@
-import type {
+import {
   StoragesFileShowResponse,
   StoragesFileUploadResponse,
 } from '@interclasse/shared'
@@ -72,8 +72,9 @@ export function useMultipartUpload({
 
       // O plano traz o arquivo sem a `url` derivada; o registro com ela vem do
       // `GET /storages/:id`.
-      return request<StoragesFileShowResponse>(
+      return request(
         '/storages/'.concat(plan.storage.id),
+        StoragesFileShowResponse,
         { signal },
       )
     }
@@ -111,8 +112,9 @@ async function open(
 
   if (saved) {
     try {
-      return await request<StoragesFileUploadResponse>(
+      return await request(
         `/storages/${saved.storageId}/parts`,
+        StoragesFileUploadResponse,
       )
     } catch (error) {
       if (!(error instanceof HTTPError) || error.status !== 404) throw error
@@ -121,7 +123,7 @@ async function open(
     }
   }
 
-  return request<StoragesFileUploadResponse>('/storages', {
+  return request('/storages', StoragesFileUploadResponse, {
     method: 'POST',
     body: JSON.stringify({
       fileName: file.name,
@@ -181,8 +183,9 @@ async function send(
     // O lote acabou e ainda falta parte: peça o próximo, que vem com URLs
     // recém-assinadas - as antigas podem já ter expirado.
     if (ready.length === 0) {
-      batch = await request<StoragesFileUploadResponse>(
+      batch = await request(
         `/storages/${initial.storage.id}/parts`,
+        StoragesFileUploadResponse,
       )
 
       for (const part of batch.uploaded) {
@@ -237,7 +240,7 @@ async function complete(
 
   if (uploadId) body.parts = parts
 
-  return request<StoragesFileShowResponse>(`/storages/${storageId}/complete`, {
+  return request(`/storages/${storageId}/complete`, StoragesFileShowResponse, {
     method: 'POST',
     body: JSON.stringify(body),
   })

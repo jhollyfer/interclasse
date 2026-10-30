@@ -33,9 +33,9 @@ import {
   AppFormRootError,
 } from '#/integrations/react-hook-form/app-field'
 import {
-  useMatchScore,
-  useMatchUnscore,
-  useMatchUpdate,
+  useMatchScoreMutation,
+  useMatchUnscoreMutation,
+  useMatchUpdateMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import type {
   MatchScoreVariables,
@@ -105,7 +105,7 @@ export function MatchScoreDialog({
       winnerTeamId: match.winnerTeamId ?? undefined,
     },
     fields: SCORE_FIELDS,
-    mutation: useMatchScore,
+    mutation: useMatchScoreMutation,
     success: m.common_match_score_saved(),
     // Placar é escrita idempotente: reenviar grava o mesmo resultado.
     retry: 'match-score',
@@ -257,7 +257,7 @@ export function MatchScheduleDialog({
     // `null`. O relógio da escola é só o que o campo mostra.
     defaults: { scheduledAt: match.scheduledAt, location: match.location },
     fields: SCHEDULE_FIELDS,
-    mutation: useMatchUpdate,
+    mutation: useMatchUpdateMutation,
     success: m.common_match_schedule_saved(),
     retry: 'match-update',
     payload: (values) => ({
@@ -346,7 +346,7 @@ export function MatchUnscoreDialog({
   onOpenChange,
 }: DialogProps): React.JSX.Element {
   const invalidate = useInvalidate()
-  const unscore = useMatchUnscore({
+  const unscore = useMatchUnscoreMutation({
     onSuccess: async () => {
       toast.success(m.common_match_unscored())
       await invalidate(GAME_CHANGE)

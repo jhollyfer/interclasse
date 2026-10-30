@@ -26,8 +26,8 @@ import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { DEPENDENTS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import {
-  usePhotoDelete,
-  usePhotoReview,
+  usePhotoDeleteMutation,
+  usePhotoReviewMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import { photosQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
@@ -112,7 +112,7 @@ function ReviewActions({
     await invalidate(DEPENDENTS.photos)
   }
 
-  const review = usePhotoReview({
+  const review = usePhotoReviewMutation({
     onSuccess: async (updated) => {
       if (updated.status === PHOTO_STATUS.APPROVED)
         return done(m.admin_photos_approved())()
@@ -120,7 +120,7 @@ function ReviewActions({
     },
     onError: (error) => notifyError(error, { id: 'photo-review' }),
   })
-  const remove = usePhotoDelete('administrator', {
+  const remove = usePhotoDeleteMutation('administrator', {
     onSuccess: done(m.admin_photos_deleted()),
     onError: (error) => notifyError(error, { id: 'photo-delete' }),
   })

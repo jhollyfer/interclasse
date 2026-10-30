@@ -20,7 +20,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { announcementQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useAnnouncementUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useAnnouncementUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -28,7 +28,7 @@ import { m } from '#/paraglide/messages'
 import type { AnnouncementFormType } from './form-fields'
 import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/announcements/$id/edit/')
+const route = getRouteApi('/_private/administrator/announcements/$id/edit')
 
 /** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
 export function AnnouncementFormEdit(): React.JSX.Element {
@@ -48,7 +48,7 @@ export function AnnouncementFormEdit(): React.JSX.Element {
       pinned: announcement.pinned,
     },
     fields: ANNOUNCEMENT_FIELDS,
-    mutation: useAnnouncementUpdate,
+    mutation: useAnnouncementUpdateMutation,
     invalidate: queryKeys.administrator.announcements.all,
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',

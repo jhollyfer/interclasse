@@ -3,15 +3,17 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   Table,
   TableActions,
   TableColumnToggle,
   TableContent,
   TableCreateButton,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
@@ -70,17 +72,17 @@ export function AnnouncementsTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>
+          <EmptyStateTitle>
             {m.admin_announcements_empty_title()}
-          </TableEmptyTitle>
-          <TableEmptyDescription>
+          </EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_announcements_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
             <TableCreateButton to="/administrator/announcements/new">
               {m.admin_announcements_create()}
             </TableCreateButton>
-          </TableEmptyActions>
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

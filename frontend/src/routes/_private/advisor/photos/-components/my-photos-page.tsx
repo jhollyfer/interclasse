@@ -22,7 +22,7 @@ import { PhotoGrid, PhotoUploadForm } from '#/components/common/photo-gallery'
 import { Button } from '#/components/ui/button'
 import { DEPENDENTS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { usePhotoDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { usePhotoDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { advisorPhotosQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
@@ -62,7 +62,7 @@ function DeleteAction({
   photo,
 }: Readonly<{ photo: AdministratorPhotoShowResponse }>): React.JSX.Element {
   const invalidate = useInvalidate()
-  const remove = usePhotoDelete('advisor', {
+  const remove = usePhotoDeleteMutation('advisor', {
     onSuccess: async () => {
       toast.success(m.advisor_photo_deleted())
       await invalidate(DEPENDENTS.photos)

@@ -16,7 +16,7 @@ import type { badgeVariants } from '#/components/ui/badge'
 import { m } from '#/paraglide/messages'
 import { getLocale } from '#/paraglide/runtime'
 
-import { SCHOOL_TIME_ZONE } from './constant'
+import { SCHOOL_TIME_ZONE, formatNumber } from './i18n'
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 
@@ -405,17 +405,16 @@ export function fromSchoolInput(value: string): string {
  * mostra o mesmo número na coluna e no detalhe, e duas implementações
  * divergiriam na primeira mudança de arredondamento.
  */
+/** Uma casa decimal fixa: "1,5 MB", e não "1,5 MB" num tamanho e "2 MB" no outro. */
+const ONE_DECIMAL = { minimumFractionDigits: 1, maximumFractionDigits: 1 }
+
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
 
-  const oneDecimal = new Intl.NumberFormat(getLocale(), {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  })
   const kb = bytes / 1024
-  if (kb < 1024) return `${oneDecimal.format(kb)} KB`
+  if (kb < 1024) return `${formatNumber(kb, ONE_DECIMAL)} KB`
 
-  return `${oneDecimal.format(kb / 1024)} MB`
+  return `${formatNumber(kb / 1024, ONE_DECIMAL)} MB`
 }
 
 /**
@@ -442,7 +441,7 @@ export function plural(
 
   if (!withCount) return word
 
-  return `${new Intl.NumberFormat(getLocale()).format(count)} ${word}`
+  return `${formatNumber(count)} ${word}`
 }
 
 /** A turma campeã: quem venceu a final. Nula enquanto a final não acontece. */

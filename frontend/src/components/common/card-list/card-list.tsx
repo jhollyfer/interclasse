@@ -11,7 +11,7 @@ import {
   MATCH_PHASE_LABELS,
   formatDate,
 } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 type CardListProps = Readonly<{

@@ -8,16 +8,21 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticationLayoutRouteImport } from './routes/_authentication/layout'
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
-import { Route as AuthenticationLayoutRouteImport } from './routes/authentication/layout'
 import { Route as HealthCheckRouteImport } from './routes/health-check'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivateAdministratorLayoutRouteImport } from './routes/_private/administrator/layout'
 import { Route as PrivateAdvisorLayoutRouteImport } from './routes/_private/advisor/layout'
 import { Route as PrivateRepresentativeLayoutRouteImport } from './routes/_private/representative/layout'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
+import { Route as AuthenticationSignInIndexRouteImport } from './routes/_authentication/sign-in/index'
 import { Route as PrivateAdministratorIndexRouteImport } from './routes/_private/administrator/index'
 import { Route as PrivateAdvisorIndexRouteImport } from './routes/_private/advisor/index'
 import { Route as PrivatePainelIndexRouteImport } from './routes/_private/painel/index'
@@ -27,7 +32,6 @@ import { Route as PublicAvisosIndexRouteImport } from './routes/_public/avisos/i
 import { Route as PublicClassificacaoIndexRouteImport } from './routes/_public/classificacao/index'
 import { Route as PublicJogosIndexRouteImport } from './routes/_public/jogos/index'
 import { Route as PublicSobreIndexRouteImport } from './routes/_public/sobre/index'
-import { Route as AuthenticationSignInIndexRouteImport } from './routes/authentication/_sign-in/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
 import { Route as PrivateAdministratorCardsIndexRouteImport } from './routes/_private/administrator/cards/index'
@@ -44,18 +48,31 @@ import { Route as PrivateAdvisorClassroomIdIndexRouteImport } from './routes/_pr
 import { Route as PrivateAdvisorPhotosIndexRouteImport } from './routes/_private/advisor/photos/index'
 import { Route as PrivateProfileEditIndexRouteImport } from './routes/_private/profile/edit/index'
 import { Route as PublicClassificacaoIdIndexRouteImport } from './routes/_public/classificacao/$id/index'
-import { Route as PrivateAdministratorAnnouncementsNewIndexRouteImport } from './routes/_private/administrator/announcements/new/index'
+import { Route as PrivateAdministratorAnnouncementsIdEditRouteImport } from './routes/_private/administrator/announcements/$id/edit'
 import { Route as PrivateAdministratorBracketsIdIndexRouteImport } from './routes/_private/administrator/brackets/$id/index'
 import { Route as PrivateAdministratorClassroomsIdIndexRouteImport } from './routes/_private/administrator/classrooms/$id/index'
-import { Route as PrivateAdministratorClassroomsNewIndexRouteImport } from './routes/_private/administrator/classrooms/new/index'
-import { Route as PrivateAdministratorSportsNewIndexRouteImport } from './routes/_private/administrator/sports/new/index'
+import { Route as PrivateAdministratorClassroomsIdEditRouteImport } from './routes/_private/administrator/classrooms/$id/edit'
+import { Route as PrivateAdministratorSportsIdEditRouteImport } from './routes/_private/administrator/sports/$id/edit'
 import { Route as PrivateAdministratorUsersIdIndexRouteImport } from './routes/_private/administrator/users/$id/index'
-import { Route as PrivateAdministratorUsersNewIndexRouteImport } from './routes/_private/administrator/users/new/index'
-import { Route as PrivateAdministratorAnnouncementsIdEditIndexRouteImport } from './routes/_private/administrator/announcements/$id/edit/index'
-import { Route as PrivateAdministratorClassroomsIdEditIndexRouteImport } from './routes/_private/administrator/classrooms/$id/edit/index'
-import { Route as PrivateAdministratorSportsIdEditIndexRouteImport } from './routes/_private/administrator/sports/$id/edit/index'
-import { Route as PrivateAdministratorUsersIdEditIndexRouteImport } from './routes/_private/administrator/users/$id/edit/index'
+import { Route as PrivateAdministratorUsersIdEditRouteImport } from './routes/_private/administrator/users/$id/edit'
 
+const PrivateAdministratorAnnouncementsNewLazyRouteImport = createFileRoute(
+  '/_private/administrator/announcements/new',
+)()
+const PrivateAdministratorClassroomsNewLazyRouteImport = createFileRoute(
+  '/_private/administrator/classrooms/new',
+)()
+const PrivateAdministratorSportsNewLazyRouteImport = createFileRoute(
+  '/_private/administrator/sports/new',
+)()
+const PrivateAdministratorUsersNewLazyRouteImport = createFileRoute(
+  '/_private/administrator/users/new',
+)()
+
+const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
+  id: '/_authentication',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivateLayoutRoute = PrivateLayoutRouteImport.update({
   id: '/_private',
   getParentRoute: () => rootRouteImport,
@@ -64,14 +81,19 @@ const PublicLayoutRoute = PublicLayoutRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticationLayoutRoute = AuthenticationLayoutRouteImport.update({
-  id: '/authentication',
-  path: '/authentication',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HealthCheckRoute = HealthCheckRouteImport.update({
   id: '/health-check',
   path: '/health-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivateAdministratorLayoutRoute =
@@ -101,6 +123,14 @@ const PublicSplatRoute = PublicSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => PublicLayoutRoute,
 } as any)
+const AuthenticationSignInIndexRoute =
+  AuthenticationSignInIndexRouteImport.update({
+    id: '/sign-in/',
+    path: '/sign-in/',
+    getParentRoute: () => AuthenticationLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_authentication/sign-in/index.lazy').then((d) => d.Route),
+  )
 const PrivateAdministratorIndexRoute =
   PrivateAdministratorIndexRouteImport.update({
     id: '/',
@@ -165,14 +195,6 @@ const PublicSobreIndexRoute = PublicSobreIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_public/sobre/index.lazy').then((d) => d.Route),
 )
-const AuthenticationSignInIndexRoute =
-  AuthenticationSignInIndexRouteImport.update({
-    id: '/_sign-in/',
-    path: '/',
-    getParentRoute: () => AuthenticationLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/authentication/_sign-in/index.lazy').then((d) => d.Route),
-  )
 const PrivateAdministratorAnnouncementsIndexRoute =
   PrivateAdministratorAnnouncementsIndexRouteImport.update({
     id: '/announcements/',
@@ -180,6 +202,16 @@ const PrivateAdministratorAnnouncementsIndexRoute =
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
     import('./routes/_private/administrator/announcements/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdministratorAnnouncementsNewLazyRoute =
+  PrivateAdministratorAnnouncementsNewLazyRouteImport.update({
+    id: '/announcements/new',
+    path: '/announcements/new',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/announcements/new.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -210,6 +242,16 @@ const PrivateAdministratorClassroomsIndexRoute =
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
     import('./routes/_private/administrator/classrooms/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdministratorClassroomsNewLazyRoute =
+  PrivateAdministratorClassroomsNewLazyRouteImport.update({
+    id: '/classrooms/new',
+    path: '/classrooms/new',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/classrooms/new.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -279,6 +321,16 @@ const PrivateAdministratorSportsIndexRoute =
       (d) => d.Route,
     ),
   )
+const PrivateAdministratorSportsNewLazyRoute =
+  PrivateAdministratorSportsNewLazyRouteImport.update({
+    id: '/sports/new',
+    path: '/sports/new',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/sports/new.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const PrivateAdministratorUsersIndexRoute =
   PrivateAdministratorUsersIndexRouteImport.update({
     id: '/users/',
@@ -286,6 +338,16 @@ const PrivateAdministratorUsersIndexRoute =
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
     import('./routes/_private/administrator/users/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const PrivateAdministratorUsersNewLazyRoute =
+  PrivateAdministratorUsersNewLazyRouteImport.update({
+    id: '/users/new',
+    path: '/users/new',
+    getParentRoute: () => PrivateAdministratorLayoutRoute,
+  } as any).lazy(() =>
+    import('./routes/_private/administrator/users/new.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -324,13 +386,13 @@ const PublicClassificacaoIdIndexRoute =
       (d) => d.Route,
     ),
   )
-const PrivateAdministratorAnnouncementsNewIndexRoute =
-  PrivateAdministratorAnnouncementsNewIndexRouteImport.update({
-    id: '/announcements/new/',
-    path: '/announcements/new/',
+const PrivateAdministratorAnnouncementsIdEditRoute =
+  PrivateAdministratorAnnouncementsIdEditRouteImport.update({
+    id: '/announcements/$id/edit',
+    path: '/announcements/$id/edit',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
-    import('./routes/_private/administrator/announcements/new/index.lazy').then(
+    import('./routes/_private/administrator/announcements/$id/edit.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -354,23 +416,23 @@ const PrivateAdministratorClassroomsIdIndexRoute =
       (d) => d.Route,
     ),
   )
-const PrivateAdministratorClassroomsNewIndexRoute =
-  PrivateAdministratorClassroomsNewIndexRouteImport.update({
-    id: '/classrooms/new/',
-    path: '/classrooms/new/',
+const PrivateAdministratorClassroomsIdEditRoute =
+  PrivateAdministratorClassroomsIdEditRouteImport.update({
+    id: '/classrooms/$id/edit',
+    path: '/classrooms/$id/edit',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
-    import('./routes/_private/administrator/classrooms/new/index.lazy').then(
+    import('./routes/_private/administrator/classrooms/$id/edit.lazy').then(
       (d) => d.Route,
     ),
   )
-const PrivateAdministratorSportsNewIndexRoute =
-  PrivateAdministratorSportsNewIndexRouteImport.update({
-    id: '/sports/new/',
-    path: '/sports/new/',
+const PrivateAdministratorSportsIdEditRoute =
+  PrivateAdministratorSportsIdEditRouteImport.update({
+    id: '/sports/$id/edit',
+    path: '/sports/$id/edit',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
-    import('./routes/_private/administrator/sports/new/index.lazy').then(
+    import('./routes/_private/administrator/sports/$id/edit.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -384,65 +446,27 @@ const PrivateAdministratorUsersIdIndexRoute =
       (d) => d.Route,
     ),
   )
-const PrivateAdministratorUsersNewIndexRoute =
-  PrivateAdministratorUsersNewIndexRouteImport.update({
-    id: '/users/new/',
-    path: '/users/new/',
+const PrivateAdministratorUsersIdEditRoute =
+  PrivateAdministratorUsersIdEditRouteImport.update({
+    id: '/users/$id/edit',
+    path: '/users/$id/edit',
     getParentRoute: () => PrivateAdministratorLayoutRoute,
   } as any).lazy(() =>
-    import('./routes/_private/administrator/users/new/index.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const PrivateAdministratorAnnouncementsIdEditIndexRoute =
-  PrivateAdministratorAnnouncementsIdEditIndexRouteImport.update({
-    id: '/announcements/$id/edit/',
-    path: '/announcements/$id/edit/',
-    getParentRoute: () => PrivateAdministratorLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/_private/administrator/announcements/$id/edit/index.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const PrivateAdministratorClassroomsIdEditIndexRoute =
-  PrivateAdministratorClassroomsIdEditIndexRouteImport.update({
-    id: '/classrooms/$id/edit/',
-    path: '/classrooms/$id/edit/',
-    getParentRoute: () => PrivateAdministratorLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/_private/administrator/classrooms/$id/edit/index.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const PrivateAdministratorSportsIdEditIndexRoute =
-  PrivateAdministratorSportsIdEditIndexRouteImport.update({
-    id: '/sports/$id/edit/',
-    path: '/sports/$id/edit/',
-    getParentRoute: () => PrivateAdministratorLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/_private/administrator/sports/$id/edit/index.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const PrivateAdministratorUsersIdEditIndexRoute =
-  PrivateAdministratorUsersIdEditIndexRouteImport.update({
-    id: '/users/$id/edit/',
-    path: '/users/$id/edit/',
-    getParentRoute: () => PrivateAdministratorLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/_private/administrator/users/$id/edit/index.lazy').then(
+    import('./routes/_private/administrator/users/$id/edit.lazy').then(
       (d) => d.Route,
     ),
   )
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
-  '/authentication': typeof AuthenticationLayoutRouteWithChildren
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
   '/$': typeof PublicSplatRoute
+  '/sign-in/': typeof AuthenticationSignInIndexRoute
   '/administrator/': typeof PrivateAdministratorIndexRoute
   '/advisor/': typeof PrivateAdvisorIndexRoute
   '/painel/': typeof PrivatePainelIndexRoute
@@ -452,7 +476,10 @@ export interface FileRoutesByFullPath {
   '/classificacao/': typeof PublicClassificacaoIndexRoute
   '/jogos/': typeof PublicJogosIndexRoute
   '/sobre/': typeof PublicSobreIndexRoute
-  '/authentication/': typeof AuthenticationSignInIndexRoute
+  '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
+  '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
+  '/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
+  '/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
   '/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
@@ -469,22 +496,21 @@ export interface FileRoutesByFullPath {
   '/advisor/photos/': typeof PrivateAdvisorPhotosIndexRoute
   '/profile/edit/': typeof PrivateProfileEditIndexRoute
   '/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
-  '/administrator/announcements/new/': typeof PrivateAdministratorAnnouncementsNewIndexRoute
+  '/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
+  '/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
+  '/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
+  '/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/administrator/brackets/$id/': typeof PrivateAdministratorBracketsIdIndexRoute
   '/administrator/classrooms/$id/': typeof PrivateAdministratorClassroomsIdIndexRoute
-  '/administrator/classrooms/new/': typeof PrivateAdministratorClassroomsNewIndexRoute
-  '/administrator/sports/new/': typeof PrivateAdministratorSportsNewIndexRoute
   '/administrator/users/$id/': typeof PrivateAdministratorUsersIdIndexRoute
-  '/administrator/users/new/': typeof PrivateAdministratorUsersNewIndexRoute
-  '/administrator/announcements/$id/edit/': typeof PrivateAdministratorAnnouncementsIdEditIndexRoute
-  '/administrator/classrooms/$id/edit/': typeof PrivateAdministratorClassroomsIdEditIndexRoute
-  '/administrator/sports/$id/edit/': typeof PrivateAdministratorSportsIdEditIndexRoute
-  '/administrator/users/$id/edit/': typeof PrivateAdministratorUsersIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$': typeof PublicSplatRoute
+  '/sign-in': typeof AuthenticationSignInIndexRoute
   '/administrator': typeof PrivateAdministratorIndexRoute
   '/advisor': typeof PrivateAdvisorIndexRoute
   '/painel': typeof PrivatePainelIndexRoute
@@ -494,7 +520,10 @@ export interface FileRoutesByTo {
   '/classificacao': typeof PublicClassificacaoIndexRoute
   '/jogos': typeof PublicJogosIndexRoute
   '/sobre': typeof PublicSobreIndexRoute
-  '/authentication': typeof AuthenticationSignInIndexRoute
+  '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
+  '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
+  '/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
+  '/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/administrator/announcements': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/administrator/brackets': typeof PrivateAdministratorBracketsIndexRoute
   '/administrator/cards': typeof PrivateAdministratorCardsIndexRoute
@@ -511,29 +540,28 @@ export interface FileRoutesByTo {
   '/advisor/photos': typeof PrivateAdvisorPhotosIndexRoute
   '/profile/edit': typeof PrivateProfileEditIndexRoute
   '/classificacao/$id': typeof PublicClassificacaoIdIndexRoute
-  '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewIndexRoute
+  '/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
+  '/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
+  '/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
+  '/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/administrator/brackets/$id': typeof PrivateAdministratorBracketsIdIndexRoute
   '/administrator/classrooms/$id': typeof PrivateAdministratorClassroomsIdIndexRoute
-  '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewIndexRoute
-  '/administrator/sports/new': typeof PrivateAdministratorSportsNewIndexRoute
   '/administrator/users/$id': typeof PrivateAdministratorUsersIdIndexRoute
-  '/administrator/users/new': typeof PrivateAdministratorUsersNewIndexRoute
-  '/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditIndexRoute
-  '/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditIndexRoute
-  '/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditIndexRoute
-  '/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authentication': typeof AuthenticationLayoutRouteWithChildren
   '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
-  '/authentication': typeof AuthenticationLayoutRouteWithChildren
   '/health-check': typeof HealthCheckRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_private/administrator': typeof PrivateAdministratorLayoutRouteWithChildren
   '/_private/advisor': typeof PrivateAdvisorLayoutRouteWithChildren
   '/_private/representative': typeof PrivateRepresentativeLayoutRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
   '/_public/': typeof PublicIndexRoute
+  '/_authentication/sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/': typeof PrivateAdministratorIndexRoute
   '/_private/advisor/': typeof PrivateAdvisorIndexRoute
   '/_private/painel/': typeof PrivatePainelIndexRoute
@@ -543,7 +571,10 @@ export interface FileRoutesById {
   '/_public/classificacao/': typeof PublicClassificacaoIndexRoute
   '/_public/jogos/': typeof PublicJogosIndexRoute
   '/_public/sobre/': typeof PublicSobreIndexRoute
-  '/authentication/_sign-in/': typeof AuthenticationSignInIndexRoute
+  '/_private/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
+  '/_private/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
+  '/_private/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
+  '/_private/administrator/users/new': typeof PrivateAdministratorUsersNewLazyRoute
   '/_private/administrator/announcements/': typeof PrivateAdministratorAnnouncementsIndexRoute
   '/_private/administrator/brackets/': typeof PrivateAdministratorBracketsIndexRoute
   '/_private/administrator/cards/': typeof PrivateAdministratorCardsIndexRoute
@@ -560,28 +591,26 @@ export interface FileRoutesById {
   '/_private/advisor/photos/': typeof PrivateAdvisorPhotosIndexRoute
   '/_private/profile/edit/': typeof PrivateProfileEditIndexRoute
   '/_public/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
-  '/_private/administrator/announcements/new/': typeof PrivateAdministratorAnnouncementsNewIndexRoute
+  '/_private/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
+  '/_private/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
+  '/_private/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
+  '/_private/administrator/users/$id/edit': typeof PrivateAdministratorUsersIdEditRoute
   '/_private/administrator/brackets/$id/': typeof PrivateAdministratorBracketsIdIndexRoute
   '/_private/administrator/classrooms/$id/': typeof PrivateAdministratorClassroomsIdIndexRoute
-  '/_private/administrator/classrooms/new/': typeof PrivateAdministratorClassroomsNewIndexRoute
-  '/_private/administrator/sports/new/': typeof PrivateAdministratorSportsNewIndexRoute
   '/_private/administrator/users/$id/': typeof PrivateAdministratorUsersIdIndexRoute
-  '/_private/administrator/users/new/': typeof PrivateAdministratorUsersNewIndexRoute
-  '/_private/administrator/announcements/$id/edit/': typeof PrivateAdministratorAnnouncementsIdEditIndexRoute
-  '/_private/administrator/classrooms/$id/edit/': typeof PrivateAdministratorClassroomsIdEditIndexRoute
-  '/_private/administrator/sports/$id/edit/': typeof PrivateAdministratorSportsIdEditIndexRoute
-  '/_private/administrator/users/$id/edit/': typeof PrivateAdministratorUsersIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/authentication'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/administrator'
     | '/advisor'
     | '/representative'
     | '/$'
+    | '/sign-in/'
     | '/administrator/'
     | '/advisor/'
     | '/painel/'
@@ -591,7 +620,10 @@ export interface FileRouteTypes {
     | '/classificacao/'
     | '/jogos/'
     | '/sobre/'
-    | '/authentication/'
+    | '/administrator/announcements/new'
+    | '/administrator/classrooms/new'
+    | '/administrator/sports/new'
+    | '/administrator/users/new'
     | '/administrator/announcements/'
     | '/administrator/brackets/'
     | '/administrator/cards/'
@@ -608,22 +640,21 @@ export interface FileRouteTypes {
     | '/advisor/photos/'
     | '/profile/edit/'
     | '/classificacao/$id/'
-    | '/administrator/announcements/new/'
+    | '/administrator/announcements/$id/edit'
+    | '/administrator/classrooms/$id/edit'
+    | '/administrator/sports/$id/edit'
+    | '/administrator/users/$id/edit'
     | '/administrator/brackets/$id/'
     | '/administrator/classrooms/$id/'
-    | '/administrator/classrooms/new/'
-    | '/administrator/sports/new/'
     | '/administrator/users/$id/'
-    | '/administrator/users/new/'
-    | '/administrator/announcements/$id/edit/'
-    | '/administrator/classrooms/$id/edit/'
-    | '/administrator/sports/$id/edit/'
-    | '/administrator/users/$id/edit/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$'
+    | '/sign-in'
     | '/administrator'
     | '/advisor'
     | '/painel'
@@ -633,7 +664,10 @@ export interface FileRouteTypes {
     | '/classificacao'
     | '/jogos'
     | '/sobre'
-    | '/authentication'
+    | '/administrator/announcements/new'
+    | '/administrator/classrooms/new'
+    | '/administrator/sports/new'
+    | '/administrator/users/new'
     | '/administrator/announcements'
     | '/administrator/brackets'
     | '/administrator/cards'
@@ -650,28 +684,27 @@ export interface FileRouteTypes {
     | '/advisor/photos'
     | '/profile/edit'
     | '/classificacao/$id'
-    | '/administrator/announcements/new'
-    | '/administrator/brackets/$id'
-    | '/administrator/classrooms/$id'
-    | '/administrator/classrooms/new'
-    | '/administrator/sports/new'
-    | '/administrator/users/$id'
-    | '/administrator/users/new'
     | '/administrator/announcements/$id/edit'
     | '/administrator/classrooms/$id/edit'
     | '/administrator/sports/$id/edit'
     | '/administrator/users/$id/edit'
+    | '/administrator/brackets/$id'
+    | '/administrator/classrooms/$id'
+    | '/administrator/users/$id'
   id:
     | '__root__'
+    | '/_authentication'
     | '/_private'
     | '/_public'
-    | '/authentication'
     | '/health-check'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/_private/administrator'
     | '/_private/advisor'
     | '/_private/representative'
     | '/_public/$'
     | '/_public/'
+    | '/_authentication/sign-in/'
     | '/_private/administrator/'
     | '/_private/advisor/'
     | '/_private/painel/'
@@ -681,7 +714,10 @@ export interface FileRouteTypes {
     | '/_public/classificacao/'
     | '/_public/jogos/'
     | '/_public/sobre/'
-    | '/authentication/_sign-in/'
+    | '/_private/administrator/announcements/new'
+    | '/_private/administrator/classrooms/new'
+    | '/_private/administrator/sports/new'
+    | '/_private/administrator/users/new'
     | '/_private/administrator/announcements/'
     | '/_private/administrator/brackets/'
     | '/_private/administrator/cards/'
@@ -698,28 +734,33 @@ export interface FileRouteTypes {
     | '/_private/advisor/photos/'
     | '/_private/profile/edit/'
     | '/_public/classificacao/$id/'
-    | '/_private/administrator/announcements/new/'
+    | '/_private/administrator/announcements/$id/edit'
+    | '/_private/administrator/classrooms/$id/edit'
+    | '/_private/administrator/sports/$id/edit'
+    | '/_private/administrator/users/$id/edit'
     | '/_private/administrator/brackets/$id/'
     | '/_private/administrator/classrooms/$id/'
-    | '/_private/administrator/classrooms/new/'
-    | '/_private/administrator/sports/new/'
     | '/_private/administrator/users/$id/'
-    | '/_private/administrator/users/new/'
-    | '/_private/administrator/announcements/$id/edit/'
-    | '/_private/administrator/classrooms/$id/edit/'
-    | '/_private/administrator/sports/$id/edit/'
-    | '/_private/administrator/users/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
   PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
-  AuthenticationLayoutRoute: typeof AuthenticationLayoutRouteWithChildren
   HealthCheckRoute: typeof HealthCheckRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authentication': {
+      id: '/_authentication'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticationLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_private': {
       id: '/_private'
       path: ''
@@ -734,18 +775,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/authentication': {
-      id: '/authentication'
-      path: '/authentication'
-      fullPath: '/authentication'
-      preLoaderRoute: typeof AuthenticationLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/health-check': {
       id: '/health-check'
       path: '/health-check'
       fullPath: '/health-check'
       preLoaderRoute: typeof HealthCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_private/administrator': {
@@ -782,6 +830,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$'
       preLoaderRoute: typeof PublicSplatRouteImport
       parentRoute: typeof PublicLayoutRoute
+    }
+    '/_authentication/sign-in/': {
+      id: '/_authentication/sign-in/'
+      path: '/sign-in'
+      fullPath: '/sign-in/'
+      preLoaderRoute: typeof AuthenticationSignInIndexRouteImport
+      parentRoute: typeof AuthenticationLayoutRoute
     }
     '/_private/administrator/': {
       id: '/_private/administrator/'
@@ -846,18 +901,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicSobreIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/authentication/_sign-in/': {
-      id: '/authentication/_sign-in/'
-      path: '/'
-      fullPath: '/authentication/'
-      preLoaderRoute: typeof AuthenticationSignInIndexRouteImport
-      parentRoute: typeof AuthenticationLayoutRoute
-    }
     '/_private/administrator/announcements/': {
       id: '/_private/administrator/announcements/'
       path: '/announcements'
       fullPath: '/administrator/announcements/'
       preLoaderRoute: typeof PrivateAdministratorAnnouncementsIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
+    '/_private/administrator/announcements/new': {
+      id: '/_private/administrator/announcements/new'
+      path: '/announcements/new'
+      fullPath: '/administrator/announcements/new'
+      preLoaderRoute: typeof PrivateAdministratorAnnouncementsNewLazyRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/brackets/': {
@@ -879,6 +934,13 @@ declare module '@tanstack/react-router' {
       path: '/classrooms'
       fullPath: '/administrator/classrooms/'
       preLoaderRoute: typeof PrivateAdministratorClassroomsIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
+    '/_private/administrator/classrooms/new': {
+      id: '/_private/administrator/classrooms/new'
+      path: '/classrooms/new'
+      fullPath: '/administrator/classrooms/new'
+      preLoaderRoute: typeof PrivateAdministratorClassroomsNewLazyRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/matches/': {
@@ -930,11 +992,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorSportsIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
+    '/_private/administrator/sports/new': {
+      id: '/_private/administrator/sports/new'
+      path: '/sports/new'
+      fullPath: '/administrator/sports/new'
+      preLoaderRoute: typeof PrivateAdministratorSportsNewLazyRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
     '/_private/administrator/users/': {
       id: '/_private/administrator/users/'
       path: '/users'
       fullPath: '/administrator/users/'
       preLoaderRoute: typeof PrivateAdministratorUsersIndexRouteImport
+      parentRoute: typeof PrivateAdministratorLayoutRoute
+    }
+    '/_private/administrator/users/new': {
+      id: '/_private/administrator/users/new'
+      path: '/users/new'
+      fullPath: '/administrator/users/new'
+      preLoaderRoute: typeof PrivateAdministratorUsersNewLazyRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/advisor/$classroomId/': {
@@ -965,11 +1041,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicClassificacaoIdIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/_private/administrator/announcements/new/': {
-      id: '/_private/administrator/announcements/new/'
-      path: '/announcements/new'
-      fullPath: '/administrator/announcements/new/'
-      preLoaderRoute: typeof PrivateAdministratorAnnouncementsNewIndexRouteImport
+    '/_private/administrator/announcements/$id/edit': {
+      id: '/_private/administrator/announcements/$id/edit'
+      path: '/announcements/$id/edit'
+      fullPath: '/administrator/announcements/$id/edit'
+      preLoaderRoute: typeof PrivateAdministratorAnnouncementsIdEditRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/brackets/$id/': {
@@ -986,18 +1062,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorClassroomsIdIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
-    '/_private/administrator/classrooms/new/': {
-      id: '/_private/administrator/classrooms/new/'
-      path: '/classrooms/new'
-      fullPath: '/administrator/classrooms/new/'
-      preLoaderRoute: typeof PrivateAdministratorClassroomsNewIndexRouteImport
+    '/_private/administrator/classrooms/$id/edit': {
+      id: '/_private/administrator/classrooms/$id/edit'
+      path: '/classrooms/$id/edit'
+      fullPath: '/administrator/classrooms/$id/edit'
+      preLoaderRoute: typeof PrivateAdministratorClassroomsIdEditRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
-    '/_private/administrator/sports/new/': {
-      id: '/_private/administrator/sports/new/'
-      path: '/sports/new'
-      fullPath: '/administrator/sports/new/'
-      preLoaderRoute: typeof PrivateAdministratorSportsNewIndexRouteImport
+    '/_private/administrator/sports/$id/edit': {
+      id: '/_private/administrator/sports/$id/edit'
+      path: '/sports/$id/edit'
+      fullPath: '/administrator/sports/$id/edit'
+      preLoaderRoute: typeof PrivateAdministratorSportsIdEditRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
     '/_private/administrator/users/$id/': {
@@ -1007,46 +1083,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdministratorUsersIdIndexRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
-    '/_private/administrator/users/new/': {
-      id: '/_private/administrator/users/new/'
-      path: '/users/new'
-      fullPath: '/administrator/users/new/'
-      preLoaderRoute: typeof PrivateAdministratorUsersNewIndexRouteImport
-      parentRoute: typeof PrivateAdministratorLayoutRoute
-    }
-    '/_private/administrator/announcements/$id/edit/': {
-      id: '/_private/administrator/announcements/$id/edit/'
-      path: '/announcements/$id/edit'
-      fullPath: '/administrator/announcements/$id/edit/'
-      preLoaderRoute: typeof PrivateAdministratorAnnouncementsIdEditIndexRouteImport
-      parentRoute: typeof PrivateAdministratorLayoutRoute
-    }
-    '/_private/administrator/classrooms/$id/edit/': {
-      id: '/_private/administrator/classrooms/$id/edit/'
-      path: '/classrooms/$id/edit'
-      fullPath: '/administrator/classrooms/$id/edit/'
-      preLoaderRoute: typeof PrivateAdministratorClassroomsIdEditIndexRouteImport
-      parentRoute: typeof PrivateAdministratorLayoutRoute
-    }
-    '/_private/administrator/sports/$id/edit/': {
-      id: '/_private/administrator/sports/$id/edit/'
-      path: '/sports/$id/edit'
-      fullPath: '/administrator/sports/$id/edit/'
-      preLoaderRoute: typeof PrivateAdministratorSportsIdEditIndexRouteImport
-      parentRoute: typeof PrivateAdministratorLayoutRoute
-    }
-    '/_private/administrator/users/$id/edit/': {
-      id: '/_private/administrator/users/$id/edit/'
+    '/_private/administrator/users/$id/edit': {
+      id: '/_private/administrator/users/$id/edit'
       path: '/users/$id/edit'
-      fullPath: '/administrator/users/$id/edit/'
-      preLoaderRoute: typeof PrivateAdministratorUsersIdEditIndexRouteImport
+      fullPath: '/administrator/users/$id/edit'
+      preLoaderRoute: typeof PrivateAdministratorUsersIdEditRouteImport
       parentRoute: typeof PrivateAdministratorLayoutRoute
     }
   }
 }
 
+interface AuthenticationLayoutRouteChildren {
+  AuthenticationSignInIndexRoute: typeof AuthenticationSignInIndexRoute
+}
+
+const AuthenticationLayoutRouteChildren: AuthenticationLayoutRouteChildren = {
+  AuthenticationSignInIndexRoute: AuthenticationSignInIndexRoute,
+}
+
+const AuthenticationLayoutRouteWithChildren =
+  AuthenticationLayoutRoute._addFileChildren(AuthenticationLayoutRouteChildren)
+
 interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorIndexRoute: typeof PrivateAdministratorIndexRoute
+  PrivateAdministratorAnnouncementsNewLazyRoute: typeof PrivateAdministratorAnnouncementsNewLazyRoute
+  PrivateAdministratorClassroomsNewLazyRoute: typeof PrivateAdministratorClassroomsNewLazyRoute
+  PrivateAdministratorSportsNewLazyRoute: typeof PrivateAdministratorSportsNewLazyRoute
+  PrivateAdministratorUsersNewLazyRoute: typeof PrivateAdministratorUsersNewLazyRoute
   PrivateAdministratorAnnouncementsIndexRoute: typeof PrivateAdministratorAnnouncementsIndexRoute
   PrivateAdministratorBracketsIndexRoute: typeof PrivateAdministratorBracketsIndexRoute
   PrivateAdministratorCardsIndexRoute: typeof PrivateAdministratorCardsIndexRoute
@@ -1059,22 +1122,26 @@ interface PrivateAdministratorLayoutRouteChildren {
   PrivateAdministratorSiteIndexRoute: typeof PrivateAdministratorSiteIndexRoute
   PrivateAdministratorSportsIndexRoute: typeof PrivateAdministratorSportsIndexRoute
   PrivateAdministratorUsersIndexRoute: typeof PrivateAdministratorUsersIndexRoute
-  PrivateAdministratorAnnouncementsNewIndexRoute: typeof PrivateAdministratorAnnouncementsNewIndexRoute
+  PrivateAdministratorAnnouncementsIdEditRoute: typeof PrivateAdministratorAnnouncementsIdEditRoute
+  PrivateAdministratorClassroomsIdEditRoute: typeof PrivateAdministratorClassroomsIdEditRoute
+  PrivateAdministratorSportsIdEditRoute: typeof PrivateAdministratorSportsIdEditRoute
+  PrivateAdministratorUsersIdEditRoute: typeof PrivateAdministratorUsersIdEditRoute
   PrivateAdministratorBracketsIdIndexRoute: typeof PrivateAdministratorBracketsIdIndexRoute
   PrivateAdministratorClassroomsIdIndexRoute: typeof PrivateAdministratorClassroomsIdIndexRoute
-  PrivateAdministratorClassroomsNewIndexRoute: typeof PrivateAdministratorClassroomsNewIndexRoute
-  PrivateAdministratorSportsNewIndexRoute: typeof PrivateAdministratorSportsNewIndexRoute
   PrivateAdministratorUsersIdIndexRoute: typeof PrivateAdministratorUsersIdIndexRoute
-  PrivateAdministratorUsersNewIndexRoute: typeof PrivateAdministratorUsersNewIndexRoute
-  PrivateAdministratorAnnouncementsIdEditIndexRoute: typeof PrivateAdministratorAnnouncementsIdEditIndexRoute
-  PrivateAdministratorClassroomsIdEditIndexRoute: typeof PrivateAdministratorClassroomsIdEditIndexRoute
-  PrivateAdministratorSportsIdEditIndexRoute: typeof PrivateAdministratorSportsIdEditIndexRoute
-  PrivateAdministratorUsersIdEditIndexRoute: typeof PrivateAdministratorUsersIdEditIndexRoute
 }
 
 const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteChildren =
   {
     PrivateAdministratorIndexRoute: PrivateAdministratorIndexRoute,
+    PrivateAdministratorAnnouncementsNewLazyRoute:
+      PrivateAdministratorAnnouncementsNewLazyRoute,
+    PrivateAdministratorClassroomsNewLazyRoute:
+      PrivateAdministratorClassroomsNewLazyRoute,
+    PrivateAdministratorSportsNewLazyRoute:
+      PrivateAdministratorSportsNewLazyRoute,
+    PrivateAdministratorUsersNewLazyRoute:
+      PrivateAdministratorUsersNewLazyRoute,
     PrivateAdministratorAnnouncementsIndexRoute:
       PrivateAdministratorAnnouncementsIndexRoute,
     PrivateAdministratorBracketsIndexRoute:
@@ -1094,28 +1161,19 @@ const PrivateAdministratorLayoutRouteChildren: PrivateAdministratorLayoutRouteCh
     PrivateAdministratorSiteIndexRoute: PrivateAdministratorSiteIndexRoute,
     PrivateAdministratorSportsIndexRoute: PrivateAdministratorSportsIndexRoute,
     PrivateAdministratorUsersIndexRoute: PrivateAdministratorUsersIndexRoute,
-    PrivateAdministratorAnnouncementsNewIndexRoute:
-      PrivateAdministratorAnnouncementsNewIndexRoute,
+    PrivateAdministratorAnnouncementsIdEditRoute:
+      PrivateAdministratorAnnouncementsIdEditRoute,
+    PrivateAdministratorClassroomsIdEditRoute:
+      PrivateAdministratorClassroomsIdEditRoute,
+    PrivateAdministratorSportsIdEditRoute:
+      PrivateAdministratorSportsIdEditRoute,
+    PrivateAdministratorUsersIdEditRoute: PrivateAdministratorUsersIdEditRoute,
     PrivateAdministratorBracketsIdIndexRoute:
       PrivateAdministratorBracketsIdIndexRoute,
     PrivateAdministratorClassroomsIdIndexRoute:
       PrivateAdministratorClassroomsIdIndexRoute,
-    PrivateAdministratorClassroomsNewIndexRoute:
-      PrivateAdministratorClassroomsNewIndexRoute,
-    PrivateAdministratorSportsNewIndexRoute:
-      PrivateAdministratorSportsNewIndexRoute,
     PrivateAdministratorUsersIdIndexRoute:
       PrivateAdministratorUsersIdIndexRoute,
-    PrivateAdministratorUsersNewIndexRoute:
-      PrivateAdministratorUsersNewIndexRoute,
-    PrivateAdministratorAnnouncementsIdEditIndexRoute:
-      PrivateAdministratorAnnouncementsIdEditIndexRoute,
-    PrivateAdministratorClassroomsIdEditIndexRoute:
-      PrivateAdministratorClassroomsIdEditIndexRoute,
-    PrivateAdministratorSportsIdEditIndexRoute:
-      PrivateAdministratorSportsIdEditIndexRoute,
-    PrivateAdministratorUsersIdEditIndexRoute:
-      PrivateAdministratorUsersIdEditIndexRoute,
   }
 
 const PrivateAdministratorLayoutRouteWithChildren =
@@ -1199,22 +1257,13 @@ const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(
   PublicLayoutRouteChildren,
 )
 
-interface AuthenticationLayoutRouteChildren {
-  AuthenticationSignInIndexRoute: typeof AuthenticationSignInIndexRoute
-}
-
-const AuthenticationLayoutRouteChildren: AuthenticationLayoutRouteChildren = {
-  AuthenticationSignInIndexRoute: AuthenticationSignInIndexRoute,
-}
-
-const AuthenticationLayoutRouteWithChildren =
-  AuthenticationLayoutRoute._addFileChildren(AuthenticationLayoutRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
   PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
-  AuthenticationLayoutRoute: AuthenticationLayoutRouteWithChildren,
   HealthCheckRoute: HealthCheckRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

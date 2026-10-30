@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import type {
+import {
   AdministratorAnnouncementShowResponse,
   AdministratorBracketPaginateResponse,
   AdministratorBracketPreviewResponse,
@@ -15,7 +15,7 @@ import type {
   AdministratorSiteShowResponse,
   AdministratorSportShowResponse,
   AdministratorUserShowResponse,
-  Paginated,
+  paginatedResponse,
 } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
@@ -41,8 +41,9 @@ export const usersQueryOptions = (params: UserListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.users.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorUserShowResponse>>(
+      request(
         '/administrator/users'.concat(queryString(params)),
+        paginatedResponse(AdministratorUserShowResponse),
         {
           signal,
         },
@@ -55,8 +56,9 @@ export const userQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.users.detail(id),
     queryFn: ({ signal }) =>
-      request<AdministratorUserShowResponse>(
+      request(
         '/administrator/users/'.concat(id),
+        AdministratorUserShowResponse,
         { signal },
       ),
   })
@@ -65,8 +67,9 @@ export const classroomsQueryOptions = (params: ClassroomListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.classrooms.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorClassroomPaginateResponse>>(
+      request(
         '/administrator/classrooms'.concat(queryString(params)),
+        paginatedResponse(AdministratorClassroomPaginateResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -76,8 +79,9 @@ export const classroomQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.classrooms.detail(id),
     queryFn: ({ signal }) =>
-      request<AdministratorClassroomShowResponse>(
+      request(
         '/administrator/classrooms/'.concat(id),
+        AdministratorClassroomShowResponse,
         { signal },
       ),
   })
@@ -86,8 +90,9 @@ export const sportsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.sports.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorSportShowResponse>>(
+      request(
         '/administrator/sports'.concat(queryString(params)),
+        paginatedResponse(AdministratorSportShowResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -97,8 +102,9 @@ export const sportQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.sports.detail(id),
     queryFn: ({ signal }) =>
-      request<AdministratorSportShowResponse>(
+      request(
         '/administrator/sports/'.concat(id),
+        AdministratorSportShowResponse,
         { signal },
       ),
   })
@@ -107,8 +113,9 @@ export const announcementsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.announcements.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorAnnouncementShowResponse>>(
+      request(
         '/administrator/announcements'.concat(queryString(params)),
+        paginatedResponse(AdministratorAnnouncementShowResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -118,8 +125,9 @@ export const announcementQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.announcements.detail(id),
     queryFn: ({ signal }) =>
-      request<AdministratorAnnouncementShowResponse>(
+      request(
         '/administrator/announcements/'.concat(id),
+        AdministratorAnnouncementShowResponse,
         {
           signal,
         },
@@ -130,8 +138,9 @@ export const bracketsQueryOptions = (params: BracketListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorBracketPaginateResponse>>(
+      request(
         '/administrator/brackets'.concat(queryString(params)),
+        paginatedResponse(AdministratorBracketPaginateResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -142,8 +151,9 @@ export const bracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.detail(id),
     queryFn: ({ signal }) =>
-      request<AdministratorBracketShowResponse>(
+      request(
         '/administrator/brackets/'.concat(id),
+        AdministratorBracketShowResponse,
         {
           signal,
         },
@@ -154,8 +164,9 @@ export const matchesQueryOptions = (params: MatchListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.matches.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorMatchPaginateResponse>>(
+      request(
         '/administrator/matches'.concat(queryString(params)),
+        paginatedResponse(AdministratorMatchPaginateResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -166,10 +177,11 @@ export const bracketPreviewQueryOptions = (sportId: string, category: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.preview(sportId, category),
     queryFn: ({ signal }) =>
-      request<AdministratorBracketPreviewResponse>(
+      request(
         '/administrator/brackets/preview'.concat(
           queryString({ sportId, category }),
         ),
+        AdministratorBracketPreviewResponse,
         { signal },
       ),
     // A prévia muda a cada lista salva pelas turmas: o diálogo sempre relê.
@@ -180,8 +192,9 @@ export const matchAthletesQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.matches.athletes(id),
     queryFn: ({ signal }) =>
-      request<AdministratorMatchAthletesResponse>(
+      request(
         '/administrator/matches/'.concat(id, '/athletes'),
+        AdministratorMatchAthletesResponse,
         { signal },
       ),
   })
@@ -190,8 +203,9 @@ export const cardsQueryOptions = (params: CardListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.cards.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorCardPaginateResponse>>(
+      request(
         '/administrator/cards'.concat(queryString(params)),
+        paginatedResponse(AdministratorCardPaginateResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -201,8 +215,9 @@ export const enrollmentRemovalsQueryOptions = (params: RemovalListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.enrollmentRemovals.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorEnrollmentRemovalShowResponse>>(
+      request(
         '/administrator/enrollment-removals'.concat(queryString(params)),
+        paginatedResponse(AdministratorEnrollmentRemovalShowResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -213,8 +228,9 @@ export const photosQueryOptions = (params: PhotoListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.photos.list(params),
     queryFn: ({ signal }) =>
-      request<Paginated<AdministratorPhotoShowResponse>>(
+      request(
         '/administrator/photos'.concat(queryString(params)),
+        paginatedResponse(AdministratorPhotoShowResponse),
         { signal },
       ),
     placeholderData: keepPreviousData,
@@ -225,7 +241,7 @@ export const reportQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.reports,
     queryFn: ({ signal }) =>
-      request<AdministratorReportShowResponse>('/administrator/reports', {
+      request('/administrator/reports', AdministratorReportShowResponse, {
         signal,
       }),
     staleTime: 0,
@@ -236,5 +252,5 @@ export const siteQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.site,
     queryFn: ({ signal }) =>
-      request<AdministratorSiteShowResponse>('/administrator/site', { signal }),
+      request('/administrator/site', AdministratorSiteShowResponse, { signal }),
   })

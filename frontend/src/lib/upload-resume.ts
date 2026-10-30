@@ -1,4 +1,12 @@
-import type { Merge } from '#/lib/merge'
+import { UploadResume } from '@interclasse/shared'
+
+import {
+  listLocalThemes,
+  readLocal,
+  removeLocal,
+  writeLocal,
+} from './local-store'
+
 /**
  * O que o upload precisa lembrar para sobreviver a um reload.
  *
@@ -11,17 +19,9 @@ import type { Merge } from '#/lib/merge'
  * que atravessa o recarregamento, e a cache não atravessa.
  */
 
-export type ResumeEntry = {
-  storageId: string
-  /** Nulo em upload de parte única. */
-  uploadId: string | null
-  partSize: number
-}
+export type ResumeEntry = Omit<UploadResume, 'savedAt'>
 
-/** O que vai para o disco: a entrada mais a hora em que foi escrita. */
-type StoredEntry = Merge<ResumeEntry, { savedAt: number }>
-
-const PREFIX = 'upload:'
+const THEME_PREFIX = 'upload:'
 
 /**
  * Quanto tempo uma retomada continua fazendo sentido, em ms.
@@ -46,18 +46,22 @@ const TTL = 24 * 60 * 60 * 1000
  * campos. A confirmação pega o caso: o tamanho declarado no servidor não vai
  * bater com o que subiu, e a resposta é `422`.
  */
-export function resumeKey(file: File): string {
-  return `${PREFIX}${file.name}:${file.size}:${file.lastModified}`
+export function resumeTheme(file: File): string {
+  return `${THEME_PREFIX}${file.name}:${file.size}:${file.lastModified}`
 }
 
 export function readResume(file: File): ResumeEntry | null {
-  const key = resumeKey(file)
-  const entry = parse(safeRead(key))
+  const theme = resumeTheme(file)
+  const entry = readLocal({
+    theme,
+    schema: UploadResume.nullable(),
+    fallback: null,
+  })
 
   if (!entry) return null
 
   if (expired(entry)) {
-    safeRemove(key)
+    removeLocal(theme)
     return null
   }
 
@@ -72,11 +76,11 @@ export function readResume(file: File): ResumeEntry | null {
 
 export function writeResume(file: File, entry: ResumeEntry): void {
   sweep()
-  safeWrite(resumeKey(file), JSON.stringify({ ...entry, savedAt: Date.now() }))
+  writeLocal(resumeTheme(file), { ...entry, savedAt: Date.now() })
 }
 
 export function clearResume(file: File): void {
-  safeRemove(resumeKey(file))
+  removeLocal(resumeTheme(file))
 }
 
 /**
@@ -89,90 +93,18 @@ export function clearResume(file: File): void {
  * este módulo é chamado sabendo que vai mexer no disco de qualquer jeito.
  */
 function sweep(): void {
-  try {
-    const stale: Array<string> = []
+  for (const theme of listLocalThemes(THEME_PREFIX)) {
+    const entry = readLocal({
+      theme,
+      schema: UploadResume.nullable(),
+      fallback: null,
+    })
 
-    for (let index = 0; index < globalThis.localStorage.length; index += 1) {
-      const key = globalThis.localStorage.key(index)
-
-      if (!key?.startsWith(PREFIX)) continue
-
-      const entry = parse(safeRead(key))
-
-      // Ilegível conta como vencida: não há como retomar a partir dela.
-      if (!entry || expired(entry)) stale.push(key)
-    }
-
-    for (const key of stale) safeRemove(key)
-  } catch {
-    // Sem varredura, e o upload segue.
+    // Ilegível conta como vencida: não há como retomar a partir dela.
+    if (!entry || expired(entry)) removeLocal(theme)
   }
 }
 
-function parse(stored: string | null): StoredEntry | null {
-  if (!stored) return null
-
-  try {
-    const parsed: unknown = JSON.parse(stored)
-
-    if (!isStoredEntry(parsed)) return null
-
-    return parsed
-  } catch {
-    return null
-  }
-}
-
-function expired(entry: StoredEntry): boolean {
+function expired(entry: UploadResume): boolean {
   return Date.now() - entry.savedAt > TTL
-}
-
-/** Estreita o que veio do `localStorage`, que é texto de origem desconhecida. */
-function isStoredEntry(value: unknown): value is StoredEntry {
-  if (typeof value !== 'object' || value === null) return false
-
-  const candidate: Record<string, unknown> = { ...value }
-
-  if (typeof candidate.storageId !== 'string') return false
-  if (typeof candidate.partSize !== 'number') return false
-  if (typeof candidate.savedAt !== 'number') return false
-  if (candidate.uploadId !== null && typeof candidate.uploadId !== 'string') {
-    return false
-  }
-
-  return true
-}
-
-/**
- * O acesso ao `localStorage` é protegido porque ele não está sempre lá: no SSR
- * não existe, e no navegador em modo restrito ou com a cota cheia ele lança.
- * Perder a retomada é aceitável; derrubar o upload por causa dela, não.
- *
- * `try/catch` e não uma checagem de existência: o tipo do DOM declara
- * `localStorage` como sempre presente, então o compilador considera qualquer
- * guarda supérflua - e as duas falhas que importam (ausente no SSR, cota cheia
- * no navegador) chegam aqui como exceção de qualquer forma.
- */
-function safeRead(key: string): string | null {
-  try {
-    return globalThis.localStorage.getItem(key)
-  } catch {
-    return null
-  }
-}
-
-function safeWrite(key: string, value: string): void {
-  try {
-    globalThis.localStorage.setItem(key, value)
-  } catch {
-    // Sem retomada, e o upload segue.
-  }
-}
-
-function safeRemove(key: string): void {
-  try {
-    globalThis.localStorage.removeItem(key)
-  } catch {
-    // Idem.
-  }
 }

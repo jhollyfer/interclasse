@@ -17,7 +17,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { FieldDescription, FieldLegend, FieldSet } from '#/components/ui/field'
-import { useUserCreate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useUserCreateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -46,7 +46,7 @@ export function UserFormCreate(): React.JSX.Element {
     validator: AdministratorUserCreateValidator,
     defaults: USER_FORM_DEFAULTS,
     fields: USER_FIELDS,
-    mutation: useUserCreate,
+    mutation: useUserCreateMutation,
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users',
     success: (user) => m.admin_users_created_ok({ name: user.name }),

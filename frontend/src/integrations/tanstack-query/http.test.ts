@@ -1,7 +1,11 @@
+import { z } from '@interclasse/shared'
 import { afterEach, expect, test, vi } from 'vitest'
 
 import { HTTPError, HTTPErrorCode, HTTPStatus, request, send } from './http'
 import { runInRequestScope } from './http.server'
+
+/** O schema que aceita tudo: aqui o que se mede é o transporte, não o contrato. */
+const ANY = z.unknown()
 
 /**
  * Responde 401 com o `code` do guard em toda rota privada, e 204 no refresh,
@@ -25,7 +29,7 @@ function respondExpired() {
       JSON.stringify({
         message: 'Sessão expirada',
         status: 401,
-        code: HTTPErrorCode.UNAUTHORIZED,
+        code: HTTPErrorCode.AUTHENTICATION_REQUIRED,
       }),
       { status: 401, headers: { 'Content-Type': 'application/json' } },
     )
@@ -66,7 +70,7 @@ afterEach(() => {
 test('toda requisição leva o cookie da sessão', async () => {
   const fetcher = respond(200, { id: '1' })
 
-  await request('/account')
+  await request('/account', ANY)
 
   // O cookie é `httpOnly` e assinado: o JavaScript não o lê nem o escreve, e
   // sem `credentials: 'include'` ele simplesmente não sai do navegador - o
@@ -84,7 +88,7 @@ test('204 resolve sem tentar ler corpo vazio', async () => {
 test('204 onde se esperava registro vira HTTPError, não SyntaxError', async () => {
   respond(204)
 
-  const error = await rejection(request('/account'))
+  const error = await rejection(request('/account', ANY))
   expect(error.code).toBe(HTTPErrorCode.UNKNOWN_ERROR)
   expect(error.status).toBe(204)
 })
@@ -99,7 +103,7 @@ test('422 vira erro de campo', async () => {
     errors: { email: 'O campo email deve ser um e-mail válido' },
   })
 
-  const error = await rejection(request('/authentication/sign-in'))
+  const error = await rejection(request('/authentication/sign-in', ANY))
 
   expect(error).toBeInstanceOf(HTTPError)
   expect(error.isFieldError).toBe(true)
@@ -116,7 +120,7 @@ test('401 de credencial inválida não é erro de campo nem de servidor', async 
     code: HTTPErrorCode.INVALID_CREDENTIALS,
   })
 
-  const error = await rejection(request('/authentication/sign-in'))
+  const error = await rejection(request('/authentication/sign-in', ANY))
 
   expect(error.isFieldError).toBe(false)
   expect(error.isServerError).toBe(false)
@@ -130,7 +134,7 @@ test('401 de credencial inválida não dispara refresh', async () => {
     code: HTTPErrorCode.INVALID_CREDENTIALS,
   })
 
-  await rejection(request('/authentication/sign-in'))
+  await rejection(request('/authentication/sign-in', ANY))
 
   // Senha errada e sessão expirada são os dois 401 do backend, e só o segundo
   // tem token a renovar. Renovar aqui seria um pedido a mais por engano.
@@ -148,7 +152,7 @@ test('500 é erro de servidor', async () => {
     code: 'TESTIMONIAL_LIST_ERROR',
   })
 
-  const error = await rejection(request('/administrator/testimonials'))
+  const error = await rejection(request('/administrator/testimonials', ANY))
 
   expect(error.isServerError).toBe(true)
 })
@@ -158,7 +162,7 @@ test('corpo ilegível mantém o status real da resposta', async () => {
     new Response('<html>502 Bad Gateway</html>', { status: 502 }),
   )
 
-  const error = await rejection(request('/account'))
+  const error = await rejection(request('/account', ANY))
 
   expect(error.status).toBe(502)
   expect(error.code).toBe(HTTPErrorCode.UNKNOWN_ERROR)
@@ -170,7 +174,7 @@ test('falha de rede vira HTTPError com status sintético', async () => {
     new TypeError('Failed to fetch'),
   )
 
-  const error = await rejection(request('/account'))
+  const error = await rejection(request('/account', ANY))
 
   expect(error).toBeInstanceOf(HTTPError)
   expect(error.status).toBe(HTTPStatus.NETWORK)
@@ -180,7 +184,7 @@ test('falha de rede vira HTTPError com status sintético', async () => {
 test('401 do guard renova a sessão e repete a requisição uma vez só', async () => {
   const refreshes = respondExpired()
 
-  await runInRequestScope(() => rejection(request('/account')))
+  await runInRequestScope(() => rejection(request('/account', ANY)))
 
   expect(refreshes).toHaveLength(1)
 
@@ -199,7 +203,7 @@ test('no mesmo escopo, cinco 401 simultâneos renovam uma vez só', async () => 
 
   await runInRequestScope(async () => {
     const pending = Array.from({ length: 5 }, () =>
-      rejection(request('/account')),
+      rejection(request('/account', ANY)),
     )
 
     await Promise.all(pending)
@@ -216,8 +220,8 @@ test('escopos diferentes renovam cada um por conta própria', async () => {
   // São dois visitantes, com cookies diferentes. Compartilhar a renovação entre
   // eles daria a um o token do outro.
   await Promise.all([
-    runInRequestScope(() => rejection(request('/account'))),
-    runInRequestScope(() => rejection(request('/account'))),
+    runInRequestScope(() => rejection(request('/account', ANY))),
+    runInRequestScope(() => rejection(request('/account', ANY))),
   ])
 
   expect(refreshes).toHaveLength(2)
@@ -226,7 +230,7 @@ test('escopos diferentes renovam cada um por conta própria', async () => {
 test('FormData monta o próprio Content-Type', async () => {
   const fetcher = respond(201, { id: '1' })
 
-  await request('/storages', { method: 'POST', body: new FormData() })
+  await request('/storages', ANY, { method: 'POST', body: new FormData() })
 
   // Declarar `application/json` por cima faria o servidor procurar o `boundary`
   // num cabeçalho que não o tem, e o corpo chegaria vazio.
@@ -237,7 +241,7 @@ test('FormData monta o próprio Content-Type', async () => {
 test('corpo de objeto continua declarando JSON', async () => {
   const fetcher = respond(201, { id: '1' })
 
-  await request('/administrator/testimonials', {
+  await request('/administrator/testimonials', ANY, {
     method: 'POST',
     body: JSON.stringify({ name: 'Maria' }),
   })
@@ -252,7 +256,7 @@ test('o signal do queryFn chega ao fetch', async () => {
   const fetcher = respond(200, { id: '1' })
   const controller = new AbortController()
 
-  await request('/account', { signal: controller.signal })
+  await request('/account', ANY, { signal: controller.signal })
 
   // O `signal` vem de graça no `RequestInit`, mas só se `request` não o perder
   // ao montar as próprias opções - que é o que este teste tranca. Sem ele,
@@ -272,7 +276,7 @@ test('o signal do queryFn chega ao fetch', async () => {
 test('a requisição tem prazo mesmo sem signal do chamador', async () => {
   const fetcher = respond(200, { id: '1' })
 
-  await request('/account')
+  await request('/account', ANY)
 
   // Sem prazo, um servidor que aceita a conexão e não responde deixa a promessa
   // pendurada até o limite do sistema operacional - e no SSR isso prende a
@@ -287,7 +291,7 @@ test('o signal sobrevive ao replay depois do refresh', async () => {
   const controller = new AbortController()
 
   await runInRequestScope(() =>
-    rejection(request('/account', { signal: controller.signal })),
+    rejection(request('/account', ANY, { signal: controller.signal })),
   )
 
   // O replay reusa o `init` original. Perder o signal aqui deixaria a segunda
@@ -307,4 +311,24 @@ test('o signal sobrevive ao replay depois do refresh', async () => {
   controller.abort()
 
   for (const [, init] of replay) expect(init?.signal?.aborted).toBe(true)
+})
+
+test('corpo de sucesso fora do schema vira HTTPError de servidor', async () => {
+  respond(200, { id: 1 })
+
+  const error = await rejection(
+    request('/account', z.object({ id: z.string() })),
+  )
+
+  expect(error.status).toBe(HTTPStatus.BAD_GATEWAY)
+  expect(error.code).toBe(HTTPErrorCode.INVALID_RESPONSE)
+  expect(error.isServerError).toBe(true)
+})
+
+test('corpo de sucesso dentro do schema devolve o dado tipado', async () => {
+  respond(200, { id: 'a' })
+
+  await expect(
+    request('/account', z.object({ id: z.string() })),
+  ).resolves.toEqual({ id: 'a' })
 })

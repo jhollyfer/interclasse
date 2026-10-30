@@ -6,7 +6,7 @@ import type { Header, RowData } from '@tanstack/react-table'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import type { TableFeatures } from './use-table'

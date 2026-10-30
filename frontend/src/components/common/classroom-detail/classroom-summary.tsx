@@ -5,7 +5,7 @@ import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { VISIBLE_CLASSROOMS } from './classroom-detail-loader'

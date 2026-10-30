@@ -10,6 +10,7 @@ import type {
 
 import { Alert, AlertDescription } from '#/components/ui/alert'
 import { Field, FieldError, FieldLabel } from '#/components/ui/field'
+import { errorId, invalidProps } from '#/lib/form-a11y'
 
 /** O que o controle de um campo recebe para se ligar ao rótulo e ao erro. */
 export type AppFieldBinding<
@@ -18,7 +19,11 @@ export type AppFieldBinding<
 > = Readonly<{
   field: ControllerRenderProps<TValues, TName>
   /** Espalhe no controle: liga o `<label>` e marca o campo inválido. */
-  control: Readonly<{ id: string; 'aria-invalid': boolean }>
+  control: Readonly<{
+    id: string
+    'aria-invalid': boolean
+    'aria-describedby'?: string
+  }>
 }>
 
 type AppFieldProps<
@@ -62,9 +67,11 @@ export function AppField<
           <FieldLabel htmlFor={id}>{label}</FieldLabel>
           {children({
             field,
-            control: { id, 'aria-invalid': fieldState.invalid },
+            control: { id, ...invalidProps(fieldState.invalid, id) },
           })}
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          {fieldState.invalid && (
+            <FieldError id={errorId(id)} errors={[fieldState.error]} />
+          )}
         </Field>
       )}
     />

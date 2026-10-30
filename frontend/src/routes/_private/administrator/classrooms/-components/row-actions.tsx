@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '#/components/ui/dropdown-menu'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useClassroomDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useClassroomDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -30,7 +30,7 @@ export function ClassroomRowActions({
 }>): React.JSX.Element {
   const invalidate = useInvalidate()
 
-  const remove = useClassroomDelete({
+  const remove = useClassroomDeleteMutation({
     onError: (error) => notifyError(error, { id: 'classroom-delete' }),
     onSuccess: () => {
       toast.success(m.admin_classrooms_removed())

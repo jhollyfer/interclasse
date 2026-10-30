@@ -7,10 +7,9 @@ import {
   ConfirmDialogTitle,
 } from '#/components/common/confirm-dialog'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
-import { useUserArchive } from '#/integrations/tanstack-query/mutations/administrator'
+import { useUserArchiveMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
-
-import { BulkArchive } from './bulk-archive'
+import { BulkArchive } from '#/components/common/bulk-archive'
 
 /**
  * As ações da barra de seleção. Só arquivar: remover em massa não existe.
@@ -23,7 +22,7 @@ export function UserBulkActions({
 }: Readonly<{
   users: ReadonlyArray<AdministratorUserShowResponse>
 }>): React.JSX.Element {
-  const archive = useUserArchive({
+  const archive = useUserArchiveMutation({
     onError: (error) => notifyError(error, { id: 'users-archive' }),
   })
 

@@ -9,6 +9,6 @@ export default defineConfig({
   plugins: [viteReact()],
   resolve: { tsconfigPaths: true },
   test: {
-    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
   },
 })

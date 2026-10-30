@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import type { Header, RowData } from '@tanstack/react-table'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 import type { TableFeatures } from './use-table'
 

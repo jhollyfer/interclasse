@@ -1,11 +1,11 @@
 import type * as React from 'react'
 import { TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react'
+import type { Merge } from '@interclasse/shared'
 
 import { Button } from '#/components/ui/button'
 import { ButtonGroup } from '#/components/ui/button-group'
 import { FieldContent, FieldDescription } from '#/components/ui/field'
 import { Spinner } from '#/components/ui/spinner'
-import type { Merge } from '#/lib/merge'
 import { m } from '#/paraglide/messages'
 
 import { useImageFieldContext } from './image-field-context'
@@ -36,7 +36,10 @@ export function ImageFieldActions({
 }
 
 type ImageFieldUploadProps = Readonly<
-  Merge<React.ComponentProps<typeof Button>, { children: React.ReactNode }>
+  Merge<
+    Omit<React.ComponentProps<typeof Button>, 'children'>,
+    { children: React.ReactNode }
+  >
 >
 
 /**

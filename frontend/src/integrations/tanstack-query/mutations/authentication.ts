@@ -1,16 +1,17 @@
 import { useMutation } from '@tanstack/react-query'
 import type { AuthenticationSessionSignInPayload } from '@interclasse/shared'
 
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
+
 import type { HTTPError } from '../http'
 import { send } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 /**
  * Entra. Responde `204` e entrega os dois tokens em `Set-Cookie`, `httpOnly` -
  * não há nada a guardar na tela, e quem passa a saber quem está logado é o
  * `GET /account`.
  */
-export function useAuthenticationSignIn(
+export function useAuthenticationSignInMutation(
   options?: MutationProps<void, AuthenticationSessionSignInPayload>,
 ) {
   // Os generics ficam explícitos: são eles que dão tipo contextual aos
@@ -28,7 +29,9 @@ export function useAuthenticationSignIn(
 }
 
 /** Encerra a sessão no servidor, e não só na tela. */
-export function useAuthenticationSignOut(options?: MutationProps<void, void>) {
+export function useAuthenticationSignOutMutation(
+  options?: MutationProps<void, void>,
+) {
   return useMutation<void, HTTPError, void>({
     ...options,
     mutationFn: async function () {

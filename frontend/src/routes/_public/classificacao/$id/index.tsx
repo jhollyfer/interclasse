@@ -1,10 +1,10 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
-import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 import {
   storefrontBracketQueryOptions,
   storefrontBracketsQueryOptions,
 } from '#/integrations/tanstack-query/queries/storefront'
+import { loadOrNotFound } from '#/lib/load-or-not-found'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { pageHead } from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
@@ -18,18 +18,12 @@ export const Route = createFileRoute('/_public/classificacao/$id/')({
       .query(storefrontBracketsQueryOptions(BRACKETS_INDEX))
       .catch(() => undefined)
 
-    try {
-      return await context.queryClient.query({
+    return loadOrNotFound(() =>
+      context.queryClient.query({
         ...storefrontBracketQueryOptions(params.id),
         staleTime: 'static',
-      })
-    } catch (error) {
-      if (error instanceof HTTPError && error.status === HTTPStatus.NOT_FOUND) {
-        throw notFound()
-      }
-
-      throw error
-    }
+      }),
+    )
   },
   head: ({ loaderData, match }) => {
     if (!loaderData)

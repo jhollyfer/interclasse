@@ -41,6 +41,7 @@ Mesma ordem de blocos do `backend/.env.example`.
 | Variável | Obrigatória | Segredo | O que é | Exemplo |
 |---|---|---|---|---|
 | `VITE_API_URL` | não | não | endereço da API visto pelo navegador, sem barra no fim; embutida no bundle em tempo de build. Ausente em dev, usa `http://localhost:3333` | `https://api-interclass.maiyu.com.br` |
+| `VITE_SITE_URL` | não | não | endereço público do site, sem barra no fim: base do `canonical`, dos `hreflang` e do sitemap; embutida no bundle em tempo de build. Ausente em dev, usa `http://localhost:3001` | `https://interclass.maiyu.com.br` |
 | `SERVER_API_URL` | não | não | endereço da API visto de dentro do servidor de SSR (nome do serviço na rede do Docker); lida em runtime, nunca chega ao navegador. Ausente, o SSR usa `VITE_API_URL` | `http://api:3333` |
 
 Regras:
@@ -92,6 +93,7 @@ SEED_ADMINISTRATOR_PASSWORD=<segredo>
 
 ```dotenv
 VITE_API_URL=http://localhost:3333
+VITE_SITE_URL=http://localhost:3001
 ```
 
 ## 3. Segredo fora do Git

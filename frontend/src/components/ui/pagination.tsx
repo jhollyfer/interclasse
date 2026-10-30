@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { cn } from '#/lib/utils.ts'
+import { cn } from '#/lib/cn'
 import { Button } from '#/components/ui/button.tsx'
 import { m } from '#/paraglide/messages'
 import {

@@ -22,9 +22,9 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import {
-  useUserArchive,
-  useUserDelete,
-  useUserUnarchive,
+  useUserArchiveMutation,
+  useUserDeleteMutation,
+  useUserUnarchiveMutation,
 } from '#/integrations/tanstack-query/mutations/administrator'
 import { m } from '#/paraglide/messages'
 
@@ -70,21 +70,21 @@ export function UserRowActions({
     })
   }
 
-  const archive = useUserArchive({
+  const archive = useUserArchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
       toast.success(m.admin_users_archived_ok({ name: user.name }))
       return invalidate()
     },
   })
-  const unarchive = useUserUnarchive({
+  const unarchive = useUserUnarchiveMutation({
     onError: (error) => notifyError(error, { id: 'user-archive' }),
     onSuccess: () => {
       toast.success(m.admin_users_restored_ok({ name: user.name }))
       return invalidate()
     },
   })
-  const remove = useUserDelete({
+  const remove = useUserDeleteMutation({
     onError: (error) => notifyError(error, { id: 'user-delete' }),
     onSuccess: () => {
       toast.success(m.admin_users_removed_ok({ name: user.name }))

@@ -1,4 +1,3 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
 import * as React from 'react'
 import {
   columnOrderingFeature,
@@ -19,11 +18,11 @@ import type {
   RowSelectionState,
   ColumnVisibilityState,
 } from '@tanstack/react-table'
+import { TableLayout } from '@interclasse/shared'
 
+import { readLocal, writeLocal } from '#/lib/local-store'
 import { m } from '#/paraglide/messages'
 
-import { TableLayoutValidator } from './table-layout.validator'
-import type { TableLayoutPayload } from './table-layout.validator'
 import { selectionColumn } from './table-selection'
 
 /**
@@ -56,29 +55,20 @@ export type TableColumns<TRow extends RowData> = Array<
 >
 
 /** O que persiste entre sessões. Seleção não entra: ela morre com a página. */
-type PersistedLayout = TableLayoutPayload
+type PersistedLayout = TableLayout
 
 /**
- * O `localStorage`, que só existe no navegador. `createIsomorphicFn` e não
- * `typeof window` solto: o primeiro render acontece no servidor, e lá a
- * resposta é "não há onde ler".
- */
-const layoutStorage = createIsomorphicFn()
-  .client((): Storage | null => window.localStorage)
-  .server((): Storage | null => null)
-
-/**
- * `v2` porque o layout salvo é durável e o que já está gravado está errado.
+ * O tema do layout no `lib/local-store.ts`, que monta a chave
+ * `interclasse:data-table:<recurso>:v1`.
  *
- * Até aqui um `columnVisibility['_actions'] === false` gravado escondia o menu
- * de ações **para sempre**: o `table-core` consulta o estado salvo antes de
- * olhar a definição da coluna, então `enableHiding: false` não protegia nada
+ * A chave nova descarta de propósito o layout gravado antes (`data-table:v2:`):
+ * um `columnVisibility['_actions'] === false` salvo escondia o menu de ações
+ * **para sempre**, porque o `table-core` consulta o estado salvo antes de olhar
+ * a definição da coluna, e `enableHiding: false` não protegia nada
  * (`features/column-visibility/columnVisibilityFeature.utils.js`,
- * `column_getIsVisible`). Recarregar não resolvia, e trocar o código também
- * não - a chave é por navegador e por recurso, o que explica o menu sumido em
- * alguns recursos e não em outros. Subir a versão descarta o que está lá.
+ * `column_getIsVisible`). Quando o formato mudar de novo, sobe o `v1` de lá.
  */
-const STORAGE_PREFIX = 'data-table:v2:'
+const THEME_PREFIX = 'data-table:'
 
 /**
  * As colunas que esta casca monta sozinha. Não são conteúdo, são âncoras: sem a
@@ -104,48 +94,37 @@ const MAX_COLUMN_SIZE = 640
 function readLayout(key: string | undefined): PersistedLayout {
   if (!key) return {}
 
-  try {
-    const raw = layoutStorage()?.getItem(STORAGE_PREFIX.concat(key))
-    if (!raw) return {}
+  const saved = readLocal({
+    theme: THEME_PREFIX.concat(key),
+    schema: TableLayout,
+    fallback: {},
+  })
 
-    const parsed: unknown = JSON.parse(raw)
-    const result = TableLayoutValidator.safeParse(parsed)
-    if (!result.success) return {}
-
-    const saved = result.data
-
-    let columnVisibility = saved.columnVisibility
-    if (columnVisibility) {
-      columnVisibility = Object.fromEntries(
-        Object.entries(columnVisibility).filter(
-          ([id]) => !ANCHOR_COLUMNS.includes(id),
-        ),
-      )
-    }
-
-    let columnSizing = saved.columnSizing
-    if (columnSizing) {
-      columnSizing = Object.fromEntries(
-        Object.entries(columnSizing).filter(
-          ([, size]) => size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE,
-        ),
-      )
-    }
-
-    return { ...saved, columnVisibility, columnSizing }
-  } catch {
-    return {}
+  let columnVisibility = saved.columnVisibility
+  if (columnVisibility) {
+    columnVisibility = Object.fromEntries(
+      Object.entries(columnVisibility).filter(
+        ([id]) => !ANCHOR_COLUMNS.includes(id),
+      ),
+    )
   }
+
+  let columnSizing = saved.columnSizing
+  if (columnSizing) {
+    columnSizing = Object.fromEntries(
+      Object.entries(columnSizing).filter(
+        ([, size]) => size >= MIN_COLUMN_SIZE && size <= MAX_COLUMN_SIZE,
+      ),
+    )
+  }
+
+  return { ...saved, columnVisibility, columnSizing }
 }
 
 function writeLayout(key: string | undefined, layout: PersistedLayout): void {
   if (!key) return
 
-  try {
-    layoutStorage()?.setItem(STORAGE_PREFIX.concat(key), JSON.stringify(layout))
-  } catch {
-    // Cota estourada ou modo privativo: o layout não persiste e a tela segue.
-  }
+  writeLocal(THEME_PREFIX.concat(key), layout)
 }
 
 type UseTableOptions<TRow extends RowData> = {

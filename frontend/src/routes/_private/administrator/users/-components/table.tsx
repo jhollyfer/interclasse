@@ -4,15 +4,17 @@ import { useQuery } from '@tanstack/react-query'
 import { USER_ROLE } from '@interclasse/shared'
 
 import {
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   Table,
   TableActions,
   TableColumnToggle,
   TableContent,
   TableCreateButton,
   TableEmpty,
-  TableEmptyActions,
-  TableEmptyDescription,
-  TableEmptyTitle,
   TableGrid,
   TableHeader,
   TablePagination,
@@ -99,15 +101,15 @@ export function UsersTable(): React.JSX.Element {
 
       <TableContent>
         <TableEmpty table={table}>
-          <TableEmptyTitle>{m.admin_users_empty_title()}</TableEmptyTitle>
-          <TableEmptyDescription>
+          <EmptyStateTitle>{m.admin_users_empty_title()}</EmptyStateTitle>
+          <EmptyStateDescription>
             {m.admin_users_empty_description()}
-          </TableEmptyDescription>
-          <TableEmptyActions>
+          </EmptyStateDescription>
+          <EmptyStateActions>
             <TableCreateButton to="/administrator/users/new">
               {m.admin_users_create()}
             </TableCreateButton>
-          </TableEmptyActions>
+          </EmptyStateActions>
         </TableEmpty>
 
         <TableGrid table={table} />

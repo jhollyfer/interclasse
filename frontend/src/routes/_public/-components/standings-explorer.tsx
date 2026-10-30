@@ -17,7 +17,7 @@ import {
   CATEGORY_SHORT_LABELS,
   championName,
 } from '#/lib/labels'
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { Empty } from './section'

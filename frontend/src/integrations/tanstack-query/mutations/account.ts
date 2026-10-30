@@ -1,12 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
-import type {
-  AccountProfileUpdatePayload,
-  AccountProfileShowResponse,
-} from '@interclasse/shared'
+import { AccountProfileShowResponse } from '@interclasse/shared'
+import type { AccountProfileUpdatePayload } from '@interclasse/shared'
+
+import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 
 import type { HTTPError } from '../http'
 import { request } from '../http'
-import type { MutationProps } from '../mutation-props'
 
 /**
  * A própria conta. Sem `id` no payload nem no caminho: o usuário vem sempre da
@@ -21,7 +20,7 @@ import type { MutationProps } from '../mutation-props'
  * vira `null` e ainda conta como presente, então o campo tem de ser **omitido**
  * do payload, e não enviado vazio.
  */
-export function useAccountUpdate(
+export function useAccountUpdateMutation(
   options?: MutationProps<
     AccountProfileShowResponse,
     AccountProfileUpdatePayload
@@ -34,7 +33,7 @@ export function useAccountUpdate(
   >({
     ...options,
     mutationFn: function (payload) {
-      return request<AccountProfileShowResponse>('/account', {
+      return request('/account', AccountProfileShowResponse, {
         method: 'PUT',
         body: JSON.stringify(payload),
       })

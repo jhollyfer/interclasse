@@ -32,24 +32,24 @@ Trazer o projeto para o padrão Maiyu inteiro.
 
 ## Fase 2 · Pedidos do Geison, 29/10 (9/9)
 
-| # | Tarefa | Prioridade | Status | Notas |
-|---|---|---|---|---|
-| 2.1 | Menu da conta derrubava a tela ("Algo quebrou", 500) | Alta | Feita | `DropdownMenuLabel` fora de `DropdownMenuGroup` |
-| 2.2 | Sorteio da chave mostra erro mas cria a chave | Alta | Feita | sorteio idempotente + retry no cliente |
-| 2.3 | Excluir chave pela lista | Média | Feita | menu da linha |
-| 2.4 | Classificação na home com abas por categoria e modalidade, sem sair da página | Alta | Feita | `StandingsExplorer` |
-| 2.5 | Turmas do admin em cartões (F1/F2), detalhe com conselheiro e representante; conselheiro com uma turma só | Alta | Feita | `components/common/classroom-detail` |
-| 2.6 | Página "Sobre o JIC" e Instagram no rodapé | Média | Feita | conteúdo editável em Painel › Site |
-| 2.7 | Regulamento em PDF enviado pelo admin, para baixar no site | Média | Feita | |
-| 2.8 | Carrossel de fotos: conselheiro envia, admin aprova | Média | Feita | |
-| 2.9 | Relatórios (turmas, alunos, atletas) com CSV | Média | Feita | |
+| #   | Tarefa                                                                                                    | Prioridade | Status | Notas                                           |
+| --- | --------------------------------------------------------------------------------------------------------- | ---------- | ------ | ----------------------------------------------- |
+| 2.1 | Menu da conta derrubava a tela ("Algo quebrou", 500)                                                      | Alta       | Feita  | `DropdownMenuLabel` fora de `DropdownMenuGroup` |
+| 2.2 | Sorteio da chave mostra erro mas cria a chave                                                             | Alta       | Feita  | sorteio idempotente + retry no cliente          |
+| 2.3 | Excluir chave pela lista                                                                                  | Média      | Feita  | menu da linha                                   |
+| 2.4 | Classificação na home com abas por categoria e modalidade, sem sair da página                             | Alta       | Feita  | `StandingsExplorer`                             |
+| 2.5 | Turmas do admin em cartões (F1/F2), detalhe com conselheiro e representante; conselheiro com uma turma só | Alta       | Feita  | `components/common/classroom-detail`            |
+| 2.6 | Página "Sobre o JIC" e Instagram no rodapé                                                                | Média      | Feita  | conteúdo editável em Painel › Site              |
+| 2.7 | Regulamento em PDF enviado pelo admin, para baixar no site                                                | Média      | Feita  |                                                 |
+| 2.8 | Carrossel de fotos: conselheiro envia, admin aprova                                                       | Média      | Feita  |                                                 |
+| 2.9 | Relatórios (turmas, alunos, atletas) com CSV                                                              | Média      | Feita  |                                                 |
 
 ## Fase 3 · Achados da auditoria (0/2)
 
-| # | Tarefa | Prioridade | Status | Notas |
-|---|---|---|---|---|
-| 3.1 | Itens de `maiyu-pattern/_findings/interclasse.md` (B1–B4, I1–I5, T1–T4, C1–C6) | Média | A fazer | |
-| 3.2 | Segurança SEC-1..SEC-9 do mesmo arquivo | Alta | A fazer | SEC-1 `trustProxy` primeiro |
+| #   | Tarefa                                                                         | Prioridade | Status  | Notas                       |
+| --- | ------------------------------------------------------------------------------ | ---------- | ------- | --------------------------- |
+| 3.1 | Itens de `maiyu-pattern/_findings/interclasse.md` (B1–B4, I1–I5, T1–T4, C1–C6) | Média      | A fazer |                             |
+| 3.2 | Segurança SEC-1..SEC-9 do mesmo arquivo                                        | Alta       | A fazer | SEC-1 `trustProxy` primeiro |
 
 ## Fase 4 · Pendências conhecidas
 
@@ -58,7 +58,7 @@ Trazer o projeto para o padrão Maiyu inteiro.
 | 4.1 | Índice único que garanta uma linha só em `site_settings` | Baixa | Feito | migration `add_site_settings_singleton_index` (índice sobre `(true)`); `current()` insere com `on conflict do nothing` e lê a vencedora |
 | 4.2 | Tipo do `scheduledAt` do VineJS (`DateTime \| null`, chega `undefined`) | Baixa | Feito | o retorno do `transform` diz os três estados; spec em `matches.validator.unit.spec.ts` |
 | 4.3 | Tema por cookie no servidor e tamanhos de fonte em token | Baixa | A fazer | desvios descritos em `DESIGN.md` |
-| 4.4 | Fixar a imagem `node:24-alpine` por digest nos Dockerfiles | Média | A fazer | sem acesso ao Docker Hub nesta sessão |
+| 4.4 | Fixar a imagem `node:24-alpine` por digest nos Dockerfiles | Média | Feita | digest pela API do registry (5.1) |
 
 ## Fase 5 · Régua estrita, auditoria de 30/10 (0/8)
 
@@ -73,7 +73,7 @@ tudo o que os `CLAUDE.md` dos apps chamavam de exceção. Cada frente fecha os i
 | 5.3 | Backend borda e segurança: `trustProxy`, bodyparser, origem/CSRF, cookie em `config/`, handler (429, 500, fábricas), throttles, CSV, multipart assinado, sessão do Adonis fora, mensagens por chave | Alta | Feito (e2e pendente) | SEC-1..8, B1, B2, C1, C2, C4, C5, I5 |
 | 5.4 | Backend arquitetura: `ctx.actor` + Bouncer/policies com entidade, session repository, storage sem hook, `core/openapi` sem Lucid, resposta pelo schema, recusas em tabela, unicidade no repository, nomes de log/erro, árvore, `pattern:check` completo, `site_settings` único, `scheduledAt` | Alta | Feito (falta rodar E2E com banco) | T1, 4.1, 4.2; `ActorSchema`, `SessionRepository`, `RefusalBase`, `PostgresError`, gerador OpenAPI em `scripts/openapi/` |
 | 5.5 | Backend testes: unit/e2e faltando, matriz de status, redes obrigatórias, specs no alvo | Média | A fazer | T2, T3 |
-| 5.6 | Frontend estrutura: `_authentication/`, `request` por schema, `local-store`, `lib/` na árvore, kit comum completo, molde de recurso, sufixo `Mutation`, assets e sitemap/robots | Alta | Em andamento | |
+| 5.6 | Frontend estrutura: `_authentication/`, `request` por schema, `local-store`, `lib/` na árvore, kit comum completo, molde de recurso, sufixo `Mutation`, assets e sitemap/robots | Alta | Feita | login em `/sign-in`; `request(path, schema)`; kit comum completo; `robots`/`sitemap` por rota de servidor |
 | 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | A fazer | B4, C3, T4, SEC-9, 4.3 |
 | 5.8 | Verificação final: todos os portões, suíte e2e do backend e E2E Playwright | Alta | A fazer | |
 

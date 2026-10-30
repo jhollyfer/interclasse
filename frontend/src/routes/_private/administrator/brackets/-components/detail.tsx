@@ -41,7 +41,7 @@ import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent } from '#/components/ui/card'
 import { DEPENDENTS, GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
-import { useBracketDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useBracketDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { bracketQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import {
   BRACKET_STATUS_LABELS,
@@ -92,7 +92,7 @@ export function BracketDetailView(): React.JSX.Element {
 
   const invalidate = () => invalidateKeys([...GAME_KEYS, ...DEPENDENTS.games])
 
-  const remove = useBracketDelete({
+  const remove = useBracketDeleteMutation({
     onSuccess: async () => {
       toast.success(m.admin_brackets_deleted())
       await invalidate()

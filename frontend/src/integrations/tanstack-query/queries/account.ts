@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import type { AccountProfileShowResponse } from '@interclasse/shared'
+import { AccountProfileShowResponse } from '@interclasse/shared'
 
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 
@@ -22,7 +22,7 @@ export const accountQueryOptions = () =>
     // query que desmonta antes de resolver não cancela nada, e a resposta
     // atrasada de uma sessão anterior chega depois da atual.
     queryFn: ({ signal }) =>
-      request<AccountProfileShowResponse>('/account', { signal }),
+      request('/account', AccountProfileShowResponse, { signal }),
     // O 401 já foi tratado dentro de `request`, que tentou renovar a sessão e
     // não conseguiu. Repetir a chamada não muda a resposta, só atrasa o
     // redirecionamento para o login.

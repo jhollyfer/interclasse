@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { FlexRender } from '@tanstack/react-table'
 import type { RowData } from '@tanstack/react-table'
 
-import { cn } from '#/lib/utils'
+import { cn } from '#/lib/cn'
 
 import type { TableInstance } from './use-table'
 

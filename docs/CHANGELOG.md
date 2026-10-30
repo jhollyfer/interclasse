@@ -16,6 +16,12 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
 - `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` viram `SEED_ADMINISTRATOR_EMAIL` e `SEED_ADMINISTRATOR_PASSWORD`; `SESSION_DRIVER` deixa de existir.
 
+### Alterado
+
+- A tela de entrada do painel passa de `/authentication` para `/sign-in`.
+- `robots.txt` e `sitemap.xml` passam a ser gerados pelo servidor: o mapa do site lista as páginas públicas e as chaves, uma entrada por idioma, e fora de produção o `robots.txt` proíbe a indexação.
+- O layout salvo das tabelas (colunas escondidas, ordem, largura) volta ao padrão uma vez, porque a chave de armazenamento mudou.
+
 ## [0.1.0] - 2026-10-29
 
 ### Adicionado

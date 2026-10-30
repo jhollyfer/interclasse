@@ -10,7 +10,7 @@ import {
 } from '#/components/common/page-shell'
 import { GAME_KEYS } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
-import { useCardDelete } from '#/integrations/tanstack-query/mutations/administrator'
+import { useCardDeleteMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { cardsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
@@ -27,7 +27,7 @@ export function CardsPage(): React.JSX.Element {
   const cards = data?.data ?? []
   const red = cards.filter((card) => card.color === 'RED').length
 
-  const remove = useCardDelete({
+  const remove = useCardDeleteMutation({
     onSuccess: async () => {
       toast.success(m.admin_cards_deleted())
       await invalidate(GAME_KEYS)

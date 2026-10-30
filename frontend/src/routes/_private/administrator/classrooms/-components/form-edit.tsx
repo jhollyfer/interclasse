@@ -20,7 +20,7 @@ import {
 } from '#/components/common/form-shell'
 import { Card, CardContent } from '#/components/ui/card'
 import { classroomQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
-import { useClassroomUpdate } from '#/integrations/tanstack-query/mutations/administrator'
+import { useClassroomUpdateMutation } from '#/integrations/tanstack-query/mutations/administrator'
 import { DEPENDENTS, queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useResourceForm } from '#/hooks/use-resource-form'
 import { m } from '#/paraglide/messages'
@@ -28,7 +28,7 @@ import { m } from '#/paraglide/messages'
 import type { ClassroomFormType } from './form-fields'
 import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
 
-const route = getRouteApi('/_private/administrator/classrooms/$id/edit/')
+const route = getRouteApi('/_private/administrator/classrooms/$id/edit')
 
 /** Valida com o schema de criação: nome e ano não podem ser apagados. */
 export function ClassroomFormEdit(): React.JSX.Element {
@@ -49,7 +49,7 @@ export function ClassroomFormEdit(): React.JSX.Element {
       representativeId: classroom.representativeId,
     },
     fields: CLASSROOM_FIELDS,
-    mutation: useClassroomUpdate,
+    mutation: useClassroomUpdateMutation,
     invalidate: queryKeys.administrator.classrooms.all,
     alsoInvalidate: DEPENDENTS.classrooms,
     backTo: '/administrator/classrooms',

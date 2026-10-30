@@ -7,6 +7,7 @@
  * "senha errada" como sucesso e o `onError` do hook nunca é chamado.
  */
 
+import type { z } from '@interclasse/shared'
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { env } from '#/env'
@@ -68,7 +69,7 @@ export const HTTPErrorCode = {
    * merece um refresh: o `INVALID_CREDENTIALS` do sign-in também é 401, e
    * renovar token por causa de senha errada seria um pedido a mais por engano.
    */
-  UNAUTHORIZED: 'UNAUTHORIZED',
+  AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   /** 403 do middleware de papel: tem sessão, não tem o papel exigido. */
   ACCESS_DENIED: 'ACCESS_DENIED',
@@ -88,6 +89,8 @@ export const HTTPErrorCode = {
   NETWORK_ERROR: 'NETWORK_ERROR',
   /** Local: resposta de erro sem corpo JSON válido (proxy, HTML de erro). */
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  /** Local: o corpo de sucesso não bate com o schema `*Response` do `shared/`. */
+  INVALID_RESPONSE: 'INVALID_RESPONSE',
 } as const
 
 export class HTTPError extends Error {
@@ -404,7 +407,7 @@ async function perform(
 
     if (
       response.status === HTTPStatus.UNAUTHORIZED &&
-      body?.code === HTTPErrorCode.UNAUTHORIZED &&
+      body?.code === HTTPErrorCode.AUTHENTICATION_REQUIRED &&
       !retry?.skipRefresh
     ) {
       // Se o refresh também falhar, o `HTTPError` dele sobe daqui e o guard da
@@ -427,15 +430,21 @@ async function perform(
   return response
 }
 
-/** Requisição que devolve um registro: o corpo JSON tipado como `T`. */
-export async function request<T>(
+/**
+ * Requisição que devolve um registro: o corpo `unknown` vira tipo aqui, e só
+ * aqui, pelo schema `*Response` de `@interclasse/shared` (`frontend.md` §3.3).
+ * Corpo fora do contrato é falha de servidor (`BAD_GATEWAY`), nunca um dado
+ * torto que estoura na tela.
+ */
+export async function request<TSchema extends z.ZodType>(
   path: string,
+  schema: TSchema,
   init?: RequestInit,
   retry?: RequestRetry,
-): Promise<T> {
+): Promise<z.infer<TSchema>> {
   const response = await perform(path, init, retry)
 
-  // Quem pede um `T` e recebe 204 está chamando a rota errada - e `.json()`
+  // Quem pede um registro e recebe 204 está chamando a rota errada - e `.json()`
   // estouraria com um `SyntaxError`, fora do contrato de sempre `HTTPError`.
   if (response.status === HTTPStatus.NO_CONTENT) {
     throw new HTTPError({
@@ -445,10 +454,17 @@ export async function request<T>(
     })
   }
 
-  const body: unknown = await response.json()
+  const parsed = schema.safeParse(await response.json())
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- fronteira do `fetch` (lib.dom, `Response.json()`): o corpo de sucesso não tem schema no cliente (sem schema de resposta no cliente), e o `T` é o contrato que cada `queryOptions`/mutation declara.
-  return body as T
+  if (!parsed.success) {
+    throw new HTTPError({
+      message: m.common_error_unknown(),
+      status: HTTPStatus.BAD_GATEWAY,
+      code: HTTPErrorCode.INVALID_RESPONSE,
+    })
+  }
+
+  return parsed.data
 }
 
 /**

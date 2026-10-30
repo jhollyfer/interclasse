@@ -2,8 +2,7 @@ import type { QueryKey } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type { FieldValues } from 'react-hook-form'
-
-import type { Merge } from '#/lib/merge'
+import type { Merge } from '@interclasse/shared'
 
 import { useMutationForm } from './use-mutation-form'
 import type {
@@ -16,7 +15,15 @@ type UseResourceFormOptions<
   TRecord,
   TPayload,
 > = Merge<
-  UseMutationFormOptions<TValues, TRecord, TPayload>,
+  Omit<
+    UseMutationFormOptions<TValues, TRecord, TPayload>,
+    | 'formId'
+    | 'invalidate'
+    | 'alsoInvalidate'
+    | 'backTo'
+    | 'backParams'
+    | 'onSuccess'
+  >,
   Readonly<{
     /** O id do `<form>`, que liga o `Salvar` do cabeçalho ao formulário que rola. */
     formId: string
@@ -44,7 +51,7 @@ type UseResourceFormReturn<
   TRecord,
   TPayload,
 > = Merge<
-  UseMutationFormReturn<TValues, TRecord, TPayload>,
+  Omit<UseMutationFormReturn<TValues, TRecord, TPayload>, 'shell'>,
   Readonly<{
     /** As quatro props do `FormShell`, prontas para espalhar. */
     shell: {
