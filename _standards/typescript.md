@@ -229,7 +229,11 @@ para ler, quebre em tipos nomeados.
     objeto;
   - interseção que precisa **preservar uma união discriminada**: `Merge` sobre uma união achata as
     variantes num objeto só e o `switch` do §3 perde o estreitamento. Caso real: props de
-    componente que são `A | B` pelo modo (`mode: 'single' | 'range'`) somadas a um bloco comum.
+    componente que são `A | B` pelo modo (`mode: 'single' | 'range'`) somadas a um bloco comum;
+  - interseção sobre **parâmetro de tipo genérico ainda aberto** (`Props & { createdAt: Date }`
+    num contêiner genérico): o `Merge` é mapeado e, sobre `Props` não resolvido, fica adiado e
+    perde a relação com `Props` (`Props['updatedAt'] & (Date | null)` não aceita o `Date` gravado,
+    TS2322). Trocar por `as` é proibido (§1) e por tipo concreto desfaz o genérico: fica o `&`.
 
 ```ts
 // & keeps the discriminated union; Merge would collapse the variants
@@ -300,7 +304,10 @@ Mistura no mesmo identificador (`getUsuarioAtivo`) é desvio. Termo de domínio 
 
 **Comentário diz o porquê** *(opinião da casa)*: a decisão, o defeito que a linha evita, a
 restrição de fora. Comentário que narra a linha, que conta o histórico ("mudou de X para Y") e
-código comentado se apagam. `TODO` só com dono e referência de tarefa (`docs/TASKS.md`); entrega
+código comentado se apagam. Comentário que descreve uma condição muda **no mesmo diff** que a
+condição (afrouxou o `if`, reescreve o "só quando"). **Renomear símbolo** inclui `grep` do nome
+antigo em comentário, mensagem, doc e `.specs/`, no mesmo commit; o compilador só acha o código.
+`TODO` só com dono e referência de tarefa (`docs/TASKS.md`); entrega
 não leva `// ...` nem stub no lugar de código pedido.
 
 ## 13. Sem ternário: formas aceitas *(opinião da casa; lint `no-ternary`)*

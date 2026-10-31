@@ -62,13 +62,21 @@ parecidos com propósito diferente ficam separados.
 ```
 <recurso>/
 ├── index.tsx  index.lazy.tsx         # lista
-├── new.lazy.tsx                      # new.tsx só se houver loader
+├── new.tsx  new.lazy.tsx             # new.tsx leva o `head` (e o loader, se houver); ver abaixo
 ├── $id/index.tsx  $id/index.lazy.tsx # detalhe
 ├── $id/edit.tsx   $id/edit.lazy.tsx  # edição
 ├── -search.ts
 └── -components/{table,columns,filters,row-actions,bulk-actions,detail,
                  form-fields,form-create,form-edit}.tsx
 ```
+
+**`new.tsx` existe em toda tela que tem `head`** *(opinião da casa, `DECISIONS.md` #257)*: o
+`createLazyFileRoute` só aceita `component`, `errorComponent`, `pendingComponent` e
+`notFoundComponent` (_doc-lib/tanstack-router.md#guide/code-splitting,
+https://raw.githubusercontent.com/tanstack/router/main/docs/router/guide/code-splitting.md, aberta em
+2026-10-31), e o título da tela (§9.7) tem de estar no arquivo crítico para sair no HTML do
+servidor. Sem loader, `new.tsx` é só `createFileRoute` com `head`; a regra do §1.3 (configuração
+no `index.tsx`, UI no `.lazy.tsx`) vale igual.
 
 Detalhe e edição são URLs separadas (`$id` e `$id/edit`), nunca a mesma rota com `?mode=edit`:
 cada uma tem `head`, guard e `pendingComponent` próprios (`DECISIONS.md` #113, C8).
@@ -485,7 +493,11 @@ _doc-lib/shadcn.md#docs/theming, #docs/components-json.
   `-[var(--x)]` repetido) é desvio; valor repetido vira token ou `@utility`.
   _doc-lib/tailwindcss.md#theme, #adding-custom-styles.
 - Nome de token diz papel, não valor (`--text-heading`, nunca `--font-size-16`). z-index é escala
-  nomeada em token (`dropdown < sticky < overlay < modal < toast < tooltip`) *(opinião da casa)*.
+  nomeada em token (`sticky < overlay < modal < dropdown < toast < tooltip`) *(opinião da casa,
+  `DECISIONS.md` #257)*: o `dropdown` (popup de select, menu, popover e combobox do Base UI) fica
+  **acima** do `modal`, porque abre de dentro de dialog e sheet, e popup abaixo do modal que o
+  abriu é inalcançável. A doc não fixa a ordem; só pede o `isolation: isolate` do app
+  (_doc-lib/base-ui.md#react/overview/quick-start). z-index local (`z-10`) fica fora da escala.
 - Tema claro/escuro decidido no servidor (cookie lido no `loader` da raiz), sem flash.
   _doc-lib/shadcn.md#docs/dark-mode/tanstack-start.
 - Popup do Base UI anima entrada e saída por `data-starting-style`/`data-ending-style` com
@@ -1187,6 +1199,10 @@ dentro do que a doc permite, a linha diz *(opinião da casa)*.
   _doc-lib/tanstack-query.md#guides/testing.
 - Dado parcial por `fromPartial()` (`@total-typescript/shoehorn`), nunca `as` nem `fromAny()`.
 - Lista e tabela têm um caso para cada um dos quatro estados (§10.1).
+- **Hook que centraliza fiação repetida** (invalidar, avisar, navegar) tem teste próprio: o
+  typecheck não vê a ligação removida.
+- **Schema local** (o que `shared/` não cobre, em `lib/`) nasce com teste dos limites no mesmo
+  commit: o tipo não vê um teto trocado.
 - Tempo por `vi.useFakeTimers()` com `vi.useRealTimers()` no `afterEach`.
   _doc-lib/vitest.md#mocking/timers.
 

@@ -812,9 +812,17 @@ diferente da do deploy.
   (Coolify) não dá acesso ao host para o `chown`. O `su-exec` faz `exec` direto, e o servidor vira
   o PID 1 como `node` (github.com/ncopa/su-exec). Nada além disso roda como root: nem migration,
   nem seed (regra abaixo).
-- **Sem `ENTRYPOINT` que migra**: migration roda como comando de pré-deploy da plataforma
+- **Sem `ENTRYPOINT` que migra**: migration roda como comando de deploy da plataforma
   (`node ace migration:run --force`, _doc-lib/adonisjs.md#deployment), para que subir réplica não
-  seja o mesmo evento que alterar schema. `CMD` só inicia o servidor.
+  seja o mesmo evento que alterar schema. `CMD` só inicia o servidor. **No Coolify, é o
+  *Post-deployment command*, com o *Pre-deployment* vazio**: o *Pre-deployment* roda no começo do
+  deploy, antes do build, por `docker exec` no container que está no ar (a versão que sai) e é
+  pulado sem container; o *Post-deployment* roda no container novo, depois que ele sobe
+  (`app/Jobs/ApplicationDeploymentJob.php` do coollabsio/coolify, `v4.x`; a página da doc não cobre
+  os dois). No *Pre-deployment*, cada migration nova só rodaria no deploy seguinte. Custo aceito:
+  a versão nova atende alguns segundos antes de migrar (migration que remove coluna ou muda
+  contrato vai em duas releases, expandir e depois contrair) e falha no pós-deploy só aparece no
+  log do deploy.
 - Nunca `--inspect`, `--insecure-http-parser` ou `insecureHTTPParser` em `CMD`, `NODE_OPTIONS` ou
   config de produção.
 - Frontend: Nitro com preset node (_doc-lib/nitro.md#deploy/runtimes/node); a imagem empacota o
@@ -854,7 +862,7 @@ diferente da do deploy.
   `docs/TASKS.md`) o gatilho de rollback e o passo: redeploy da tag SHA anterior. Isso só funciona se
   a migration for compatível com a imagem anterior (expandir, migrar, contrair); passo destrutivo
   (apagar coluna, tabela) é deploy à parte, depois que a versão nova se provou.
-- O que a plataforma faz e o repositório não (pré-deploy, `COOKIE_DOMAIN`, worker de fila,
+- O que a plataforma faz e o repositório não (comando de migration do deploy, `COOKIE_DOMAIN`, worker de fila,
   healthcheck do painel, CORS do bucket, compressão do proxy) mora em `docs/ARCHITECTURE.md`,
   seção Ambientes (`documentation.md`).
 
@@ -1040,6 +1048,9 @@ Processo das etapas 5 a 7 do `AGENTS.md`. As skills (`systematic-debugging`,
   ou confere os E2E de caracterização dos fluxos críticos que o plano toca (cadastro, login,
   dinheiro, permissão, webhook) e registra o resultado como linha de base. As fases do meio seguem
   só com unitário; a final roda tudo e compara com a linha de base. O CI continua rodando E2E em todo PR (§7): a regra é do ritmo da sessão, não do portão.
+- **Critério atrás de ENV, sem instância real que se possa exercitar com segurança** (produção, por
+  exemplo): prova-se pelo mecanismo de gating já exercitado em outro ambiente, e o relatório diz
+  que é evidência indireta, não execução direta.
 - **Verificar não amplia escopo**: ao verificar não se edita produto nem se acrescenta teste fora do
   critério. Achado vira linha em `docs/TASKS.md`.
 - **Atalho de teste é proibido** e cobrado (§4, §7): `.only`, `.skip` ou `test.fixme` sem motivo e
@@ -1165,3 +1176,26 @@ Como se cobra:
 Conferido em 2026-10-26: `_doc-lib`-equivalente ainda não existe para o Claude Code; as páginas
 usadas foram `https://code.claude.com/docs/en/model-config.md` (aliases, `opusplan`, versões, fixar
 versão) e `https://code.claude.com/docs/en/sub-agents.md` ("Choose a model", embutidos).
+
+### 10.6 Suíte que não leva horas *(opinião da casa, a partir de Twenty, n8n, Medusa, Cal.com, Payload e Immich; `DECISIONS.md` #253)*
+
+Qualidade é toda rota e toda jornada crítica provadas; tempo é o que decide se a prova roda. Os seis
+projetos fazem o mesmo, e a casa adota:
+
+| Peça | Regra | Contrato |
+|---|---|---|
+| Banco | sobe **uma vez** por execução (serviço do CI ou `globalSetup`), migra e semeia uma vez; cada worker ganha um clone: no Postgres, `CREATE DATABASE <worker> TEMPLATE <base>`; no Mongo, banco próprio do worker, limpo por `deleteMany` entre arquivos e reaplicando o seed salvo | `_doc-lib/vitest.md#config/globalsetup`; `_doc-lib/japa.md#docs/test-suites` |
+| Aplicação | o kernel sobe uma vez por worker e a rota é chamada por `inject`/`supertest`, sem porta aberta; `isolate: false`, e o spec que suja estado global vai para um projeto isolado à parte | `_doc-lib/vitest.md#config/isolate`, `#improving-performance` |
+| Redis e fila | um prefixo por worker (`test:<worker>:`), a mesma regra de namespace de `backend.md` §5.7 item 15; nada de uma instância de Redis por fatia | `backend.md` §5.7 |
+| Paralelismo | vários workers (`maxWorkers`), cada um no seu banco e no seu prefixo | `_doc-lib/vitest.md#config/maxworkers` |
+| CI | suíte inteira **sempre no CI**, em matriz de shards (`--shard=i/N` no Vitest, no Japa e no Playwright), relatório juntado por blob + `merge-reports`; reexecução só do que falhou (`--last-failed` no Playwright) | `_doc-lib/vitest.md#improving-performance`; `_doc-lib/playwright.md#docs/test-sharding`, `#docs/ci` |
+| Navegador | Playwright só nas jornadas críticas (login, dinheiro, a feature principal), login reaproveitado por `storageState` e dado criado pela API, não clicado | `_doc-lib/playwright.md#docs/auth`, `#docs/test-parallel` |
+| Tela e componente | Vitest + Testing Library com rede mockada (MSW ou `fetch` mockado); a resposta mockada passa pelo schema Zod de `shared/`, para o front quebrar quando o contrato mudar | `_doc-lib/vitest.md`, `_doc-lib/zod.md#basics` |
+
+**Na sessão do agente, nunca a suíte inteira.** A sessão roda o unitário, a integração **afetada**
+(`vitest run --changed origin/main`; no Japa, `--files` dos specs tocados) e as jornadas Playwright da
+feature (`--only-changed origin/main`). A suíte completa é do CI, que sobrevive à queda do container;
+o agente lê o resultado do job e corrige o que falhou. Isso ajusta #212 e #242: a "fase final" do plano
+passa a ser o CI verde no PR, não uma execução local de horas.
+
+*MSW sem entrada na `_doc-lib`: não coberto; entra quando um projeto o adotar, com a página aberta.*

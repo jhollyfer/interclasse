@@ -58,7 +58,7 @@ tarefa").
 | Momento (etapa) | Skill | Apoio, só no caso dito |
 |---|---|---|
 | ideia vaga (1) | `superpowers:brainstorming` | `grilling` estressa ideia já formada; `the-fool` faz pré-mortem |
-| feature nova (1, 3) | `tlc-spec-driven` | `tlc-discover` (veredito em aberto); `tlc-spec-lean` só se o `AGENTS.md` do projeto declarar |
+| feature nova (1, 3) | `tlc-spec-driven` | `tlc-prd` antes, quando o problema e o escopo ainda não estão decididos (grava em `docs/PRD.md`); `tlc-discover` (veredito em aberto); `tlc-spec-lean` só se o `AGENTS.md` do projeto declarar |
 | escolha difícil de desfazer (1→8) | `the-jury` | `create-rfc` quando várias partes opinam; registro é linha em `docs/DECISIONS.md` |
 | plano de trabalho não-feature (3) | `superpowers:writing-plans` | `tlc-plan` corta PRD/design já decidido; `legacy-migration-planner` para migrar camada (model direto → repository) |
 | executar plano (4) | `superpowers:executing-plans` / `superpowers:subagent-driven-development` | `tlc-implement` executa checklist com verificador |
@@ -222,6 +222,9 @@ A skill perde. Os casos já vistos:
 | Skill diz | A casa faz |
 |---|---|
 | `playwright-skill`: `data-testid` primeiro, `waitForTimeout`, `networkidle`, script em `/tmp` | papel + nome acessível primeiro; sem espera fixa; teste em `frontend/e2e/*.spec.ts` |
+| `tlc-prd`: grava `.prd/<slug>.md` | o PRD é `docs/PRD.md` (`documentation.md` §1): a skill aceita o caminho que o dono indicar, e o agente indica esse |
+| `tlc-*`: `.specs/STATE.md` com decisões e `.specs/lessons.json` com lições | decisão vira linha de `docs/DECISIONS.md` e lição vira linha em "Lições" de `docs/MEMORY.md`; `.specs/features/<f>/` (spec, design, tasks, `plan.md`) fica, é o artefato permitido (`documentation.md`) |
+| `tlc-implement`/`tlc-spec-*`: `mutate.py` grava `tlc-mutation-journal.json` | já fica dentro da pasta do Git (`git rev-parse --absolute-git-dir`), fora do commit; nada a fazer |
 | `create-adr`, `engineering:architecture`, `domain-modeling`: arquivo por ADR, `CONTEXT.md` | linha em `docs/DECISIONS.md`; glossário em `docs/ARCHITECTURE.md` §4.1 (`documentation.md` §1) |
 | `security-threat-model`: `<repo>-threat-model.md` solto | conteúdo dentro de `docs/SECURITY.md` §2 |
 | `caveman-commit`, `tlc-*`, `triage`, sessão do agente: atribuição de IA, `Co-Authored-By` | autor único, sem coautoria nem marca de agente (`code-pattern` §9) |
@@ -308,7 +311,8 @@ Terceira lista (ranking "Top 10 Fastest Growing Claude Skills", set/2026):
 | Ponytail | já instalada | sempre ligada |
 | Matt Pocock Skills | `mattpocock/skills` | já instaladas as que a casa usa (`grilling`, `tdd`, `diagnosing-bugs`, `code-review`, `codebase-design`, `domain-modeling`, `setup-pre-commit`, `git-guardrails-claude-code`, `prototype`, `wizard`, `research`); entram também `setup-ts-deep-modules` (dependency-cruiser por camada, `domain.md` §8) e `handoff` (só quando a sessão passa a outro agente; o estado durável continua no `docs/MEMORY.md`). `to-spec`, `to-tickets`, `triage`, `wayfinder` publicam em issue tracker e repetem `tlc-spec-driven` + `docs/TASKS.md`: não entram |
 | I Have ADHD | **não identificado** | o repositório `i-have-adhd/i-have-adhd` é um placeholder de pesquisa de segurança, sem código, que avisa que a referência de quem mandou instalar estava errada. Fora |
-| Security Audit Skill | `cloudflare/security-audit-skill` | instalada em 2026-10-26 (`c1c8a8c`, MIT) como `security-audit`: guia por classe de ataque e auditoria completa sob pedido; a varredura de rotina continua sendo `claude-security` |
+| Security Audit Skill | `tech-leads-club/agent-skills` | `cebf9d4` | MIT (o `SKILL.md` declara CC-BY-4.0) | 2026-10-31: `tlc-implement`, `tlc-plan`, `tlc-spec-driven` e `tlc-spec-lean` trocadas; `tlc-prd` nova; `tlc-discover` e `tlc-generative-engine-optimization` já iguais |
+| `cloudflare/security-audit-skill` | instalada em 2026-10-26 (`c1c8a8c`, MIT) como `security-audit`: guia por classe de ataque e auditoria completa sob pedido; a varredura de rotina continua sendo `claude-security` |
 | Superpowers | `obra/superpowers` | plugin obrigatório |
 | Diagram Design | não identificado | fora; diagrama da casa é `mermaid-studio` ou `excalidraw-studio` |
 | Humanizer | `blader/humanizer` | etapa 8 |

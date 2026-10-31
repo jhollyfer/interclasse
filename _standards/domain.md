@@ -262,8 +262,9 @@ export abstract class UnitOfWork {
 }
 ```
 
-- `unit-of-work.lucid.ts`: abre transação manual (`db.transaction()`), põe o `trx` num
-  `AsyncLocalStorage` que os repositories leem em `transaction.client()`, faz `commit` em `right`,
+- `unit-of-work.lucid.ts`: abre transação manual (`db.transaction()`), põe o `trx` no
+  `TransactionContext` (`core/transaction-context.ts`, um `AsyncLocalStorage`) que os repositories
+  leem em `transaction.client()`, faz `commit` em `right`,
   `rollback` em `left` e em exceção (_doc-lib/lucid.md#transactions). No Mongo, sessão com
   `withTransaction` (exige replica set).
 - `unit-of-work.memory.ts`: só executa `work`.
@@ -357,6 +358,8 @@ Abstraction com `legacy-migration-planner` (`backend.md` §11.1). Os pontos de t
   a implementação em memória ou o `.fake.ts`. Tempo vem do `ClockContract` injetado; `Date.now()`
   cru na asserção é teste que falha à meia-noite.
 - Teste não conta chamada, não recalcula o esperado do mesmo jeito que o código, não é horizontal.
+  **Não reimplementa a lógica no próprio arquivo**: a função sob teste é importada do módulo
+  (exporta-se, se preciso); cópia local mede a biblioteca, não o módulo.
   O resultado se prova lendo **estado real** (a linha gravada, o corpo devolvido, o que o fake
   guardou). Verificar a chamada só vale quando a proposição **é** a chamada externa ("envia o
   e-mail", "cobra no gateway").
@@ -375,7 +378,19 @@ WHILE the account is suspended the system SHALL refuse POST /posts with 403
 
 - Matriz requisito × teste em `docs/TEST-PLAN.md`; especificação da feature em
   `.specs/features/<f>/` (`tlc-spec-driven`). Enfraquecer, pular ou apagar teste para passar é
-  proibido.
+  proibido. Antes de escrever a matriz, liste os testes que a referência já tem (`find`): camada
+  que a lista tem e a matriz não tem fica sem cobertura sem ninguém ver.
+- **Critério que se prova** *(opinião da casa, `DECISIONS.md` #255)*: antes de aprovar a spec,
+  cada critério passa por quatro perguntas.
+  - *Nomeia o que existe?* Campo, coluna, rota ou chave citados no critério são conferidos no
+    schema ou no código; "apenas os campos alterados" nomeia o mecanismo (`dirtyFields`) ou vira
+    "apenas os grupos que a pessoa editou".
+  - *O design nomeia a tela?* "A tela de X" exige essa tela no design: a tela genérica de erro
+    satisfaz o critério sem entregar nada.
+  - *Diz onde mora o limite?* "Recusar antes de abrir o upload" diz se o teto é checado no
+    cliente; só no servidor vira ida à rede.
+  - *A referência concorda?* Se a referência recusa por escrito um comportamento que a spec pede,
+    o texto da spec muda no mesmo commit do desvio.
 - Feature grande termina com **verificador independente** (autor ≠ verificador) que injeta falhas
   numa cópia isolada (`git worktree`, nunca `git stash`), uma por superfície de asserção distinta, e
   exige que os testes as peguem; mutante que sobrevive reprova. Até três rodadas de correção, depois

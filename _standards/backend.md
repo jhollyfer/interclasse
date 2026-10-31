@@ -254,10 +254,13 @@ export default class AdministratorPostUpdateController {
   `app/core/openapi/` (`openapi.md`). As derivadas (`create`, `paginate`, `show`, `update`,
   `archive`, `unarchive`, `delete`, `sign-in`, `sign-out`, `refresh`, `complete`, `parts`,
   `download`) não precisam.
-- **`errors:` só para o que nasce fora da pasta da ação.** O introspector do OpenAPI colhe por
-  AST os `HTTPException` escritos no use-case irmão; esses **não** se declaram, senão viram uma
-  segunda fonte que envelhece. O gerador não enxerga o que um `_shared.<recurso>-refusal.ts` ou
-  um service traduzido levanta: esses se declaram, com comentário dizendo de onde o código nasce.
+- **`errors:` só para o que nasce fora do que o gerador lê.** O introspector do OpenAPI colhe por
+  AST os `HTTPException` do use-case irmão, da tabela de tradução de fatos e do
+  `_shared.<recurso>-refusal.ts` que o use-case importa (`openapi.md` #erros-do-use-case); esses
+  **não** se declaram, senão viram uma segunda fonte que envelhece. Declara-se só o que nasce em
+  outra camada da cadeia (o 403 da policy, o que um middleware recusa), com comentário dizendo de
+  onde vem. O gerador que não segue o import do refusal tem defeito: corrige-se nele, nunca
+  duplicando a fábrica em dois use-cases nem declarando à mão (`DECISIONS.md` #259).
   A prosa da `description` **não** lista códigos.
 - Import do use-case irmão por caminho relativo com extensão.
 
@@ -863,8 +866,9 @@ evento ou fila, ou o fluxo é idempotente para poder repetir.
 - **Tabela criada na branch tem a forma inteira numa migration só**: antes do merge, corrige-se a
   migration da branch em vez de empilhar migrations corretivas da mesma tabela.
 - Invariante no banco (índice único, `NOT NULL`, FK, `check`): §4.4.
-- Pré-deploy roda `migration:run --force`; o `Dockerfile-production` não tem `ENTRYPOINT` que
-  migra (`tooling.md`).
+- O comando de deploy da plataforma roda `migration:run --force` (no Coolify, o
+  *Post-deployment command*); o `Dockerfile-production` não tem `ENTRYPOINT` que migra
+  (`tooling.md` §8.2).
 
 ---
 
@@ -1197,9 +1201,10 @@ stack e que as seções acima não fechavam. Cada item completa a seção citada
 
 Um só leitor, `start/env.ts` (`Env.create` no Adonis; leitor síncrono no Fastify,
 `architecture.md` §5), com blocos nesta ordem: `# Node` · `# App` · `# Session` · `# CORS` ·
-`# Banco de dados` · `# Armazenamento` · `# Semeadura` · `# Envio de e-mail` ·
-`# Endereço do site` · `# Fila`, e depois os blocos de domínio do projeto. Chave da casa tem o
-mesmo nome, validador e comentário em todo projeto.
+`# Database` · `# Storage` · `# Seeding` · `# Mail` · `# Site URL` · `# Queue`, e depois os
+blocos de domínio do projeto. Chave da casa tem o mesmo nome, validador e comentário em todo
+projeto. **Nome de bloco e comentário do `.env.example` e do `.env.test` são em inglês**
+(`typescript.md` §12, `DECISIONS.md` #260); o texto em português é o `docs/ENV.md`.
 
 Regras:
 
@@ -1359,10 +1364,11 @@ defeito real passar pelas duas.
 inteira antes de qualquer asserção.
 
 **Formato de saída de todo `scripts/<nome>-check.ts`** *(opinião da casa)*: cada achado é
-`{ arquivo, linha, regra, secao, mensagem }` (`secao` = seção do `_standards` violada); a saída
-agrupa por `secao` e o processo sai com código 1 se a lista não for vazia. Exceção de qualquer
-check entra em `scripts/pattern-check.config.ts` tipado, cada uma com `motivo`; exceção sem uso
-reprova (`architecture.md` §6).
+`{ file, line, rule, section, message }` (`section` = seção do `_standards` violada); a saída
+agrupa por `section` e o processo sai com código 1 se a lista não for vazia. Exceção de qualquer
+check entra em `scripts/pattern-check.config.ts` tipado, cada uma com `reason`; exceção sem uso
+reprova (`architecture.md` §6). Os nomes dos campos são inglês por `typescript.md` §12
+(`DECISIONS.md` #258).
 
 **Revisão de diff de backend** (o que nenhum guard pega): a lista de segurança comum está em
 `tooling.md` §10.2. Próprio do backend: rota pública nova sem limite e resposta que expõe campo fora
