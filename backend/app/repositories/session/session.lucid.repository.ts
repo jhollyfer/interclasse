@@ -9,7 +9,7 @@ import {
   type RefreshGrant,
   type SessionTokens,
 } from '#repositories/session/session.repository'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 /** A tabela do `DbAccessTokensProvider`, criada pela migration de `auth_access_tokens`. */
 const SESSION_TABLE = 'auth_access_tokens'

@@ -14,7 +14,7 @@ import EnrollmentModel from '#models/enrollment'
 import SportModel from '#models/sport'
 import StudentModel from '#models/student'
 import { Enrollment } from '#domain/enrollment/enrollment.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class EnrollmentLucidRepository extends EnrollmentRepository {

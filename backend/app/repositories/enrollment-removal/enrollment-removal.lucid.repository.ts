@@ -19,7 +19,7 @@ import {
   EnrollmentRemoval,
   type EnrollmentRemovalProps,
 } from '#domain/enrollment-removal/enrollment-removal.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 type RelatedResponse = Pick<
   AdministratorEnrollmentRemovalShowResponse,

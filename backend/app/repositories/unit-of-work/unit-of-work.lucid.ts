@@ -2,8 +2,9 @@ import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { Either } from '@interclasse/shared'
 
-import { TransactionContext } from './transaction-context.ts'
 import { UnitOfWork } from './unit-of-work.ts'
+
+import { TransactionContext } from '#core/transaction-context'
 
 /**
  * A unidade de trabalho sobre a transação gerenciada à mão do Lucid

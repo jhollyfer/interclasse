@@ -11,7 +11,7 @@ import {
 
 import StorageModel from '#models/storage'
 import { Storage } from '#domain/storage/storage.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 /**
  * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro

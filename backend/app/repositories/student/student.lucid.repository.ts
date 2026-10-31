@@ -14,7 +14,7 @@ import ClassroomModel from '#models/classroom'
 import EnrollmentModel from '#models/enrollment'
 import StudentModel from '#models/student'
 import { Student } from '#domain/student/student.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class StudentLucidRepository extends StudentRepository {

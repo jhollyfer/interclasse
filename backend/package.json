@@ -27,7 +27,7 @@
     "sync:check": "node --import @poppinss/ts-exec scripts/sync-check.ts",
     "pattern:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts",
     "authz:check": "node --import @poppinss/ts-exec scripts/authz-check.ts",
-    "depcruise": "depcruise app",
+    "depcruise": "depcruise app --config scripts/depcruise.config.ts",
     "di:check": "node ace di:check"
   },
   "imports": {

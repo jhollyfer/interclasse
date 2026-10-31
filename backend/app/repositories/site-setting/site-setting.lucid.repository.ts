@@ -13,7 +13,7 @@ import {
 import SiteSettingModel from '#models/site-setting'
 import StorageModel from '#models/storage'
 import { SiteSetting, type RegulationFile } from '#domain/site-setting/site-setting.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class SiteSettingLucidRepository extends SiteSettingRepository {

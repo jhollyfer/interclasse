@@ -10,7 +10,7 @@ import { PostgresError } from '#core/postgres-error'
 import { User } from '#domain/user/user.entity'
 import type { UserError } from '#domain/user/user.errors'
 import { StorageRepository } from '#repositories/storage/storage.repository'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class UserLucidRepository extends UserRepository {

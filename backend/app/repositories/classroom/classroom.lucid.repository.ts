@@ -32,7 +32,7 @@ import {
   type ClassroomLinks,
   type ClassroomPeopleFacts,
 } from '#domain/classroom/classroom.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 /** Os totais do cartão de cada turma, por id. */
 type ClassroomTotals = {
