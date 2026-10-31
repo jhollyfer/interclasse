@@ -11,8 +11,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdministratorClassroomUpdateController {
   static docs = defineDocs({
     description:
-      'Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. ' +
-      'Trocar o ano para outra categoria responde `409` se a turma já está numa chave sorteada.',
+      'A missing field means "leave alone"; `null` on advisor or representative undoes the link. ' +
+      'Changing the year to another category responds `409` if the classroom is already in a drawn bracket.',
   })
 
   constructor(private readonly useCase: AdministratorClassroomUpdateUseCase) {}

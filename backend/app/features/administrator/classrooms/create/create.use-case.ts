@@ -21,8 +21,8 @@ type Payload = AdministratorClassroomCreatePayload
 type Response = Either<HTTPException, AdministratorClassroomShowResponse>
 
 /**
- * Cadastra a turma: a entidade deriva a categoria e confere os vínculos pelos
- * fatos que o repository traz, e o nome repetido é 409.
+ * Registers the classroom: the entity derives the category and checks the links through the
+ * facts the repository brings, and a repeated name is 409.
  */
 @inject()
 export default class AdministratorClassroomCreateUseCase {

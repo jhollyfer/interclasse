@@ -15,7 +15,7 @@ import {
 test.group('classrooms > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('apaga a turma e os alunos dela vão junto', async ({ client, assert }) => {
+  test('deletes the classroom and its students go along', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await classroomWithStudents(2)
 
@@ -28,7 +28,7 @@ test.group('classrooms > delete', (group) => {
     assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
-  test('turma inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent classroom responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -39,7 +39,7 @@ test.group('classrooms > delete', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('turma numa chave sorteada responde 409 e continua lá', async ({ client, assert }) => {
+  test('classroom in a drawn bracket responds 409 and stays', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await drawnClassroom()
 
@@ -52,7 +52,7 @@ test.group('classrooms > delete', (group) => {
     assert.isNotNull(await Stored.classroom(classroom.id))
   })
 
-  test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
     const classroom = await ClassroomFactory.create()
 
     const anonymous = await client.delete(`/administrator/classrooms/${classroom.id}`)
@@ -68,10 +68,10 @@ test.group('classrooms > delete', (group) => {
   })
 })
 
-test.group('administrator/classrooms/delete > acesso e validação', (group) => {
+test.group('administrator/classrooms/delete > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/administrator/classrooms/nao-e-uuid').cookies(admin)
