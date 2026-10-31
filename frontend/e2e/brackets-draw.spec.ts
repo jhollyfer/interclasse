@@ -18,7 +18,7 @@ async function readPage<T>(
   return body.data
 }
 
-/** A turma da conselheira e o primeiro aluno dela: o atleta do teste. */
+/** The advisor's classroom and its first student: the test athlete. */
 async function firstAthlete(
   request: APIRequestContext,
 ): Promise<Readonly<{ classroomId: string; studentId: string }>> {
@@ -47,7 +47,7 @@ async function enroll(
   expect(response.ok(), 'PUT /advisor/enrollments').toBe(true)
 }
 
-/** A modalidade criada pela tela, achada pelo nome único. */
+/** The sport created through the UI, found by its unique name. */
 async function sportNamed(
   request: APIRequestContext,
   name: string,
@@ -61,7 +61,7 @@ async function sportNamed(
   return sport
 }
 
-/** Abre o diálogo de sorteio e escolhe a modalidade e a categoria. */
+/** Opens the draw dialog and picks the sport and the category. */
 async function openDraw(page: Page, sport: string): Promise<void> {
   await page.getByRole('button', { name: 'Sortear chave' }).click()
   const dialog = page.getByRole('dialog', { name: 'Sortear chave' })
@@ -77,7 +77,7 @@ async function openDraw(page: Page, sport: string): Promise<void> {
   )
 }
 
-/** Abre o combobox e escolhe a opção pelo nome (a lista sai num popup fora do diálogo). */
+/** Opens the combobox and picks the option by name (the list renders in a popup outside the dialog). */
 async function choose(
   page: Page,
   combobox: Locator,
@@ -87,7 +87,7 @@ async function choose(
   await page.getByRole('option', { name: option, exact: true }).click()
 }
 
-// docs/USER-FLOWS.md, "Cadastrar uma modalidade" e "Sortear uma chave".
+// docs/USER-FLOWS.md, "Cadastrar uma modalidade" and "Sortear uma chave".
 test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apaga a chave', async ({
   administrator: { page, context },
   advisor,
@@ -98,7 +98,7 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
   const teams = [advisor.context.request, secondAdvisor.context.request]
 
   try {
-    // 1. Cria a modalidade pela tela (mínimo 1, para uma lista de um atleta bastar).
+    // 1. Creates the sport through the UI (minimum 1, so a one-athlete list is enough).
     await page.goto('/administrator/sports/new')
     await waitForHydration(page)
     await page.getByLabel('Nome', { exact: true }).fill(name)
@@ -109,7 +109,7 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
 
     const sport = await sportNamed(admin, name)
 
-    // 2. Duas turmas da mesma categoria inscrevem um atleta cada (o sorteio exige duas).
+    // 2. Two classrooms of the same category each enroll one athlete (the draw needs two).
     for (const request of teams) {
       const athlete = await firstAthlete(request)
       await enroll(request, {
@@ -119,7 +119,7 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
       })
     }
 
-    // 3. Sorteia: o diálogo mostra as duas turmas e abre a chave inteira.
+    // 3. Draws: the dialog shows both classrooms and opens the whole bracket.
     await page.goto('/administrator/brackets')
     await waitForHydration(page)
     await openDraw(page, name)
@@ -131,7 +131,7 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
     const bracketUrl = page.url()
     await expect(page.getByText('Algo quebrou aqui')).toHaveCount(0)
 
-    // 4. Repetir o sorteio devolve a mesma chave, sem erro e sem outra.
+    // 4. Repeating the draw returns the same bracket, with no error and no second one.
     await page.goto('/administrator/brackets')
     await waitForHydration(page)
     await openDraw(page, name)
@@ -151,7 +151,7 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
       1,
     )
 
-    // 5. Apaga a chave pela lista: pede confirmação, e as inscrições reabrem.
+    // 5. Deletes the bracket from the list: asks for confirmation, and enrollments reopen.
     await page.goto('/administrator/brackets')
     await waitForHydration(page)
     const row = page.getByRole('row').filter({ hasText: name })
@@ -170,9 +170,9 @@ test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apag
 })
 
 /**
- * Devolve o banco ao que era, mesmo se o teste cair no meio: chave, inscrições
- * (com motivo, que a API exige) e a modalidade. O aviso de remoção some junto
- * com a modalidade (`ON DELETE CASCADE`).
+ * Restores the database to what it was, even if the test dies midway: bracket,
+ * enrollments (with a reason, which the API requires) and the sport. The
+ * removal notice goes away with the sport (`ON DELETE CASCADE`).
  */
 async function cleanUp(
   admin: APIRequestContext,

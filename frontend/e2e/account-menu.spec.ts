@@ -2,7 +2,7 @@ import { credentialsOf } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
-// Regressão: abrir o perfil pelo menu da conta caía em "Algo quebrou aqui" (500).
+// Regression: opening the profile from the account menu fell into "Algo quebrou aqui" (500).
 test('o administrador abre o menu da conta e chega ao perfil sem erro', async ({
   administrator: { page },
 }) => {

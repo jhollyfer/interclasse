@@ -7,9 +7,9 @@ import { waitForHydration } from './hydration'
 import { storageStatePath } from './session'
 
 /**
- * Entra uma vez por papel e guarda a sessão em arquivo
- * (_doc-lib/playwright.md#docs/auth). A API limita o login a 5 por minuto por
- * IP e 20 por hora por conta, então logar a cada teste bloquearia a suíte.
+ * Signs in once per role and saves the session to a file
+ * (_doc-lib/playwright.md#docs/auth). The API limits login to 5 per minute per
+ * IP and 20 per hour per account, so logging in on every test would block the suite.
  */
 async function signIn(role: Role, area: string, page: Page): Promise<void> {
   const { email, password } = credentialsOf(role)
@@ -34,7 +34,7 @@ setup('entra como conselheira', async ({ page }) => {
   await expect(page).toHaveURL(/\/advisor/)
 })
 
-// A segunda turma do mesmo sorteio precisa de outro conselheiro.
+// The second classroom of the same draw needs a different advisor.
 setup('entra como a segunda conselheira', async ({ page }) => {
   await signIn('secondAdvisor', 'advisor', page)
   await expect(page).toHaveURL(/\/advisor/)

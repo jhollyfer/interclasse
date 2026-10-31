@@ -8,16 +8,16 @@ import { storageStatePath } from './session'
 type RoleSession = Readonly<{ page: Page; context: BrowserContext }>
 
 type Fixtures = Readonly<{
-  /** Aba já entrada como organização (sessão de `auth.setup.ts`). */
+  /** Tab already signed in as the organization (session from `auth.setup.ts`). */
   administrator: RoleSession
-  /** Aba já entrada como a conselheira do seed. */
+  /** Tab already signed in as the seed's advisor. */
   advisor: RoleSession
-  /** Outra conselheira, de outra turma da mesma categoria (sorteio precisa de duas). */
+  /** Another advisor, from another classroom of the same category (the draw needs two). */
   secondAdvisor: RoleSession
   /**
-   * Varre a aba com o axe e reprova violação séria ou crítica
-   * (_doc-lib/playwright.md#docs/accessibility-testing). Só pega o detectável
-   * por máquina; o resto fica na revisão manual.
+   * Scans the tab with axe and fails on serious or critical violations
+   * (_doc-lib/playwright.md#docs/accessibility-testing). It only catches what
+   * a machine can detect; the rest is left to manual review.
    */
   expectAccessible: (page: Page) => Promise<void>
 }>
@@ -35,10 +35,10 @@ async function openSession(
 }
 
 /**
- * O `test` da suíte: `page` é o visitante sem conta (site público), e
- * `administrator`/`advisor` são o mesmo navegador com a sessão do papel
- * (_doc-lib/playwright.md#docs/test-fixtures). Um contexto novo por teste, com
- * o `storageState` guardado: nenhum login a mais na API.
+ * The suite's `test`: `page` is the visitor without an account (public site),
+ * and `administrator`/`advisor` are the same browser with the role's session
+ * (_doc-lib/playwright.md#docs/test-fixtures). A new context per test, with
+ * the saved `storageState`: no extra login against the API.
  */
 export const test = base.extend<Fixtures>({
   expectAccessible: async ({}, provide) => {

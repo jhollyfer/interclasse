@@ -1,7 +1,7 @@
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
-// _standards/i18n.md §4: a troca de idioma confere o texto nos três.
+// _standards/i18n.md §4: the language switch checks the text in all three.
 const HOME = {
   'pt-BR': 'Jogos Estudantis 2026',
   es: 'Juegos Estudiantiles 2026',

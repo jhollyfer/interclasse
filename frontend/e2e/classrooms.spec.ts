@@ -1,7 +1,7 @@
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
-// docs/USER-FLOWS.md, "Cadastrar uma turma", passos 1 e 4.
+// docs/USER-FLOWS.md, "Cadastrar uma turma", steps 1 and 4.
 test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre uma turma', async ({
   administrator: { page },
   expectAccessible,
@@ -10,7 +10,7 @@ test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre u
   await waitForHydration(page)
   await expectAccessible(page)
 
-  // O título de cada cartão é o link para a turma ("3º A").
+  // Each card's title is the link to the classroom ("3º A").
   const cards = page
     .getByRole('main')
     .getByRole('link', { name: /^\d+º [A-Z]$/ })
@@ -19,7 +19,7 @@ test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre u
   await expect(cards.first()).toBeVisible()
   const all = await cards.count()
 
-  // Filtra pelo Fundamental 1: a URL ganha o filtro e só ficam cartões dele.
+  // Filters by Fundamental 1: the URL gains the filter and only its cards remain.
   await category.getByRole('tab', { name: /Fundamental 1/ }).click()
   await expect(page).toHaveURL(/category=F1/)
   await expect(
@@ -29,7 +29,7 @@ test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre u
   await expect(page.getByText('Fundamental 1 ·').first()).toBeVisible()
   expect(await cards.count()).toBeLessThan(all)
 
-  // Abre a primeira turma: quadro "Sobre a turma" e a aba Jogos.
+  // Opens the first classroom: "Sobre a turma" panel and the Jogos tab.
   const first = cards.first()
   const name = await first.innerText()
   await first.click()

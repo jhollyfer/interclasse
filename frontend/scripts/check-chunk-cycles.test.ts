@@ -3,18 +3,18 @@ import { describe, expect, it } from 'vitest'
 import { eagerOnly } from './check-chunk-cycles.mjs'
 
 /**
- * O `eagerOnly` separa o que roda **na avaliação** do módulo do que só roda
- * depois. É a peça que decide se o guarda de chunk cíclico trava o CI ou deixa
- * o bug passar, e ela errou nos dois sentidos antes de chegar aqui:
+ * `eagerOnly` separates what runs **during evaluation** of the module from what
+ * only runs later. It is the piece that decides whether the cyclic-chunk guard
+ * blocks CI or lets the bug through, and it got both wrong before reaching this point:
  *
- * - `function f({ a }) { ... }` - a chave da desestruturação era lida como o
- *   corpo, e o corpo inteiro virava código de avaliação. Todo componente com
- *   props desestruturadas virava falso-positivo.
- * - `loader: () => usar(x)` - arrow sem bloco não tem chave que marque o fim, e
- *   sem tratá-la em separado toda rota do app virava falso-positivo.
+ * - `function f({ a }) { ... }` - the destructuring brace was read as the
+ *   body, and the whole body became evaluation code. Every component with
+ *   destructured props became a false positive.
+ * - `loader: () => use(x)` - a block-less arrow has no brace to mark the end,
+ *   and without handling it separately every route of the app became a false positive.
  *
- * O contrato: o retorno tem o **mesmo comprimento** da entrada e preserva as
- * quebras de linha, para que o número de linha do achado seja o do arquivo.
+ * The contract: the return value has the **same length** as the input and keeps
+ * the line breaks, so the finding's line number is the file's.
  */
 describe('eagerOnly', () => {
   const eager = (code: string): string => eagerOnly(code)
@@ -37,8 +37,8 @@ describe('eagerOnly', () => {
   })
 
   it('apaga corpo de função com parâmetro desestruturado', () => {
-    // A chave de `{ className }` não é o corpo. Confundi-las deixava passar
-    // todo componente do bundle.
+    // The brace in `{ className }` is not the body. Confusing them let
+    // every component in the bundle through.
     const code =
       'function Overlay({ className, ...props }) {\n  return cn(className)\n}'
 
@@ -70,8 +70,8 @@ describe('eagerOnly', () => {
   })
 
   it('não confunde literal de expressão regular com divisão', () => {
-    // Sem o corte, a barra abriria uma "string" que engoliria o resto do
-    // arquivo - e o guarda passaria a não achar nada, em silêncio.
+    // Without the cut, the slash would open a "string" that swallowed the rest of
+    // the file - and the guard would find nothing, silently.
     expect(eager('var re = /contar()/g\nvar total = somar(1)')).toContain(
       'somar',
     )

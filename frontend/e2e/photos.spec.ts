@@ -7,7 +7,7 @@ import { expect, test } from './support/test'
 
 type PhotoRow = Readonly<{ id: string; caption: string | null }>
 
-/** Um bloco PNG: tamanho, tipo, dados e CRC32 do tipo + dados. */
+/** A PNG chunk: length, type, data and CRC32 of type + data. */
 function chunk(type: string, data: Buffer): Buffer {
   const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
   const length = Buffer.alloc(4)
@@ -17,13 +17,13 @@ function chunk(type: string, data: Buffer): Buffer {
   return Buffer.concat([length, body, crc])
 }
 
-/** PNG verdadeiro de 16x16, uma cor só: o servidor valida o tipo do arquivo. */
+/** A real 16x16 PNG, a single color: the server validates the file type. */
 function solidPng(): Buffer {
   const size = 16
   const header = Buffer.alloc(13)
   header.writeUInt32BE(size, 0)
   header.writeUInt32BE(size, 4)
-  header.writeUInt8(8, 8) // 8 bits por canal
+  header.writeUInt8(8, 8) // 8 bits per channel
   header.writeUInt8(2, 9) // RGB
 
   const row = Buffer.concat([Buffer.from([0]), Buffer.alloc(size * 3, 0x2f)])
@@ -37,7 +37,7 @@ function solidPng(): Buffer {
   ])
 }
 
-/** Apaga pela API toda foto com a legenda: o teste não deixa lixo mesmo se cair no meio. */
+/** Deletes through the API every photo with the caption: the test leaves no junk even if it dies midway. */
 async function purge(
   request: APIRequestContext,
   caption: string,
@@ -70,8 +70,8 @@ test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é 
       mimeType: 'image/png',
       buffer: solidPng(),
     })
-    // O envio sobe na hora da escolha; "Remover" só aparece com a imagem pronta,
-    // e clicar em "Enviar foto" antes disso é ignorado (o submit fica travado).
+    // The upload starts as soon as the file is chosen; "Remover" only appears with the image ready,
+    // and clicking "Enviar foto" before that is ignored (the submit stays locked).
     await expect(
       advisor.page.getByRole('button', { name: 'Remover' }),
     ).toBeVisible()
@@ -87,7 +87,7 @@ test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é 
     await expect(mine).toBeVisible()
     await expect(mine.getByText('Aguardando aprovação')).toBeVisible()
 
-    // 2. A organização aprova.
+    // 2. The organization approves.
     const { page } = administrator
     await page.goto('/administrator/photos')
     await waitForHydration(page)
@@ -99,7 +99,7 @@ test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é 
       page.getByText('Foto aprovada: já está no site.'),
     ).toBeVisible()
 
-    // 3. O visitante vê a foto no carrossel da home.
+    // 3. The visitor sees the photo in the home carousel.
     const visitor = await browser.newContext({ baseURL })
     try {
       const home = await visitor.newPage()
@@ -110,7 +110,7 @@ test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é 
       await visitor.close()
     }
 
-    // 4. A organização apaga, pela lista.
+    // 4. The organization deletes it from the list.
     await page.getByRole('tab', { name: 'No site' }).click()
     const approved = page.getByRole('listitem').filter({ hasText: caption })
     await expect(approved).toBeVisible()

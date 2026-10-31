@@ -1,27 +1,26 @@
 /**
- * Recusa um `.output/` em que um chunk **lê**, durante a própria avaliação, um
- * binding importado de outro chunk que está em ciclo com ele.
+ * Refuses an `.output/` in which a chunk **reads**, during its own evaluation,
+ * a binding imported from another chunk that is in a cycle with it.
  *
- * O Rolldown parte o app em chunks por conteúdo, e nada garante que o grafo
- * resultante seja acíclico. Num ciclo, o ESM do Node avalia um dos chunks antes
- * do outro terminar, e todo binding vindo do que ficou pela metade vale
- * `undefined` - o Rolldown emite `var` para a declaração, então hoista como
- * `undefined` em vez de dar TDZ. Uma leitura em escopo de módulo estoura ali:
+ * Rolldown splits the app into chunks by content, and nothing guarantees the
+ * resulting graph is acyclic. In a cycle, Node's ESM evaluates one chunk before
+ * the other finishes, and every binding coming from the half-evaluated one is
+ * `undefined` - Rolldown emits `var` for the declaration, so it hoists as
+ * `undefined` instead of raising a TDZ error. A read at module scope blows up there:
  *
  *     TypeError: Cannot read properties of undefined (reading 'ONLY')
  *         at .output/server/_ssr/router-DvSsmf4q.mjs:38:21
  *
- * O build passa verde, o container sobe, e só a primeira requisição descobre.
+ * The build passes green, the container starts, and only the first request finds out.
  *
- * **Ciclo sozinho não é defeito, e é por isso que este script não para nele.**
- * A maior parte das arestas de um ciclo é lida tarde - dentro de `loader`, de
- * componente, de re-export - e essas nunca veem binding pela metade. O router do
- * TanStack passou a sair em dois chunks que se reexportam mutuamente, e falhar
- * nisso seria um vermelho permanente que ninguém consegue apagar. O que se
- * recusa é a leitura **antecipada**: chamada de função, acesso a propriedade e
- * spread que rodam na avaliação do módulo.
+ * **A cycle alone is not a defect, which is why this script does not stop on it.**
+ * Most edges of a cycle are read late - inside a `loader`, a component, a
+ * re-export - and those never see a half-built binding. TanStack's router came
+ * to ship as two chunks that re-export each other, and failing on that would be
+ * a permanent red nobody can clear. What gets refused is the **early** read:
+ * function calls, property access and spreads that run during module evaluation.
  *
- * Uso: `node scripts/check-chunk-cycles.mjs [dir]` - `dir` default `.output/server`.
+ * Usage: `node scripts/check-chunk-cycles.mjs [dir]` - `dir` defaults to `.output/server`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, normalize, relative } from 'node:path'
@@ -29,12 +28,12 @@ import { dirname, join, normalize, relative } from 'node:path'
 const root = process.argv[2] ?? '.output/server'
 
 /**
- * Só aresta **estática**: `from "..."` e o `import "..."` de efeito colateral.
+ * **Static** edges only: `from "..."` and the side-effect `import "..."`.
  *
- * `import()` fica de fora de propósito. Ele é resolvido na chamada, quando todo
- * módulo já terminou de avaliar, então nunca devolve binding pela metade - e é
- * assim que o router carrega cada rota sob demanda. Contá-lo apontaria um ciclo
- * em toda rota do app, que é ruído, não defeito.
+ * `import()` is left out on purpose. It is resolved at call time, when every
+ * module has already finished evaluating, so it never returns a half-built
+ * binding - and that is how the router loads each route on demand. Counting it
+ * would flag a cycle on every route of the app, which is noise, not a defect.
  */
 const SPECIFIERS = [
   /\bfrom\s*["']([^"']+)["']/g,
@@ -59,8 +58,8 @@ function edges(file, source) {
 
   for (const pattern of SPECIFIERS)
     for (const match of source.matchAll(pattern)) {
-      // Só aresta interna interessa: `node:fs` e pacote do node_modules não
-      // participam do grafo de chunks.
+      // Only internal edges matter: `node:fs` and node_modules packages do not
+      // take part in the chunk graph.
       if (!match[1].startsWith('.')) continue
 
       found.add(normalize(join(dirname(file), match[1])))
@@ -69,7 +68,7 @@ function edges(file, source) {
   return [...found]
 }
 
-/** Os nomes locais que `file` importa de `target`, já com o `as` resolvido. */
+/** The local names that `file` imports from `target`, with `as` already resolved. */
 function importedFrom(source, file, target) {
   const names = new Set()
 
@@ -92,28 +91,28 @@ function importedFrom(source, file, target) {
 }
 
 /**
- * O código que roda **na avaliação** do módulo, com todo o resto apagado.
+ * The code that runs **during evaluation** of the module, with everything else erased.
  *
- * Devolve uma string do mesmo comprimento da original - cada caractere adiado
- * vira espaço, e as quebras de linha ficam de pé - para que o número de linha
- * do achado continue sendo o número de linha do arquivo.
+ * Returns a string of the same length as the original - every deferred
+ * character becomes a space, and line breaks stay in place - so that the
+ * finding's line number remains the file's line number.
  *
- * Some daqui: string, template, comentário, literal de expressão regular, corpo
- * de função (`function`, arrow com bloco e arrow de expressão) e corpo de
- * classe. Sobra o que o Node executa ao carregar o arquivo.
+ * Erased here: string, template, comment, regular expression literal, function
+ * body (`function`, block arrow and expression arrow) and class body. What is
+ * left is what Node executes when it loads the file.
  */
 function eagerOnly(source) {
   const out = new Array(source.length).fill(' ')
   const brackets = []
-  // Profundidades onde começou uma arrow **sem bloco** (`() => algo`). O corpo
-  // dela acaba na vírgula, no ponto e vírgula ou no fechamento do delimitador
-  // que a contém - não há chave para marcar o fim.
+  // Depths where an arrow **without a block** started (`() => something`). Its
+  // body ends at the comma, the semicolon or the closing of the enclosing
+  // delimiter - there is no brace to mark the end.
   const looseArrows = []
   let deferred = 0
-  // Profundidade em que se viu `function`, `class` ou `=> {`. O corpo é a
-  // primeira chave **nessa mesma profundidade** - a chave que aparece mais
-  // fundo é desestruturação de parâmetro (`function f({ a, ...b }) {`), e
-  // confundir as duas deixa o corpo inteiro passando por código de avaliação.
+  // Depth at which `function`, `class` or `=> {` was seen. The body is the
+  // first brace **at that same depth** - a deeper brace is parameter
+  // destructuring (`function f({ a, ...b }) {`), and confusing the two makes
+  // the whole body pass as evaluation code.
   let pendingAtDepth = null
   let i = 0
 
@@ -131,7 +130,7 @@ function eagerOnly(source) {
       continue
     }
 
-    // Comentários.
+    // Comments.
     if (char === '/' && at(1) === '/') {
       while (i < source.length && source[i] !== '\n') i++
       continue
@@ -147,9 +146,9 @@ function eagerOnly(source) {
       continue
     }
 
-    // Strings e templates. O `${}` de template pode conter código, mas o que
-    // interessa aqui é só não confundir chave de template com chave de bloco -
-    // e código dentro de template não é padrão neste bundle.
+    // Strings and templates. A template's `${}` can hold code, but all that
+    // matters here is not confusing a template brace with a block brace -
+    // and code inside a template is not a pattern in this bundle.
     if (char === '"' || char === "'" || char === '`') {
       const quote = char
       i++
@@ -162,8 +161,8 @@ function eagerOnly(source) {
       continue
     }
 
-    // Literal de expressão regular. Distinguir de divisão pelo caractere
-    // anterior: depois de valor vem divisão, depois de operador vem regex.
+    // Regular expression literal. Told apart from division by the previous
+    // character: after a value comes division, after an operator comes a regex.
     if (char === '/') {
       let back = i - 1
       while (back >= 0 && /\s/.test(source[back])) back--
@@ -182,7 +181,7 @@ function eagerOnly(source) {
       }
     }
 
-    // `=>`: com bloco, o corpo é a próxima chave; sem bloco, começa agora.
+    // `=>`: with a block, the body is the next brace; without one, it starts now.
     if (char === '=' && at(1) === '>') {
       keep()
       i += 2
@@ -217,7 +216,7 @@ function eagerOnly(source) {
     }
 
     if (char === '}' || char === ')' || char === ']') {
-      // Uma arrow de expressão morre junto com o delimitador que a contém.
+      // An expression arrow dies together with the delimiter that contains it.
       while (looseArrows.length && looseArrows.at(-1) >= brackets.length) {
         looseArrows.pop()
         deferred--
@@ -245,13 +244,13 @@ function eagerOnly(source) {
   return out.join('')
 }
 
-// `eagerOnly` carrega toda a heurística deste arquivo e é o que erra em silêncio:
-// um corpo de função lido como código de avaliação vira falso-positivo que
-// trava o CI, e o inverso deixa o bug passar. Está exportado para
+// `eagerOnly` carries all of this file's heuristic and is what fails silently:
+// a function body read as evaluation code becomes a false positive that
+// blocks CI, and the opposite lets the bug through. It is exported for
 // `check-chunk-cycles.test.ts`.
 export { eagerOnly }
 
-// Sob `import` - o teste - este arquivo é só a biblioteca acima.
+// Under `import` - the test - this file is just the library above.
 if (import.meta.main) main()
 
 function main() {
@@ -263,8 +262,8 @@ function main() {
     files.map((file) => [file, edges(file, sources.get(file))]),
   )
 
-  // DFS com três cores: sem marca, na pilha, fechado. Aresta para quem está na
-  // pilha é o ciclo, e o caminho dele é o pedaço da pilha a partir do alvo.
+  // DFS with three colors: unmarked, on the stack, closed. An edge to something on
+  // the stack is the cycle, and its path is the stack slice starting at the target.
   const state = new Map()
   const stack = []
   const cycles = []
@@ -311,9 +310,9 @@ function main() {
       const original = source.split('\n')
 
       eager.forEach((line, index) => {
-        // A própria declaração de import, e o `export { ... }` que o Rolldown junta
-        // no fim do arquivo, citam todo nome sem ler nenhum: reexportar um binding
-        // não o avalia.
+        // The import declaration itself, and the `export { ... }` that Rolldown gathers
+        // at the end of the file, name every identifier without reading any:
+        // re-exporting a binding does not evaluate it.
         if (/^\s*(import\b|export\s*\{)/.test(original[index])) return
 
         const match = line.match(pattern)

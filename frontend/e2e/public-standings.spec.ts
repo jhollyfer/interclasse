@@ -4,7 +4,7 @@ import { apiUrl } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
-/** Uma chave que o seed sorteou: o link compartilhado do teste. */
+/** A bracket the seed drew: the test's shared link. */
 async function firstBracketId(request: APIRequestContext): Promise<string> {
   const response = await request.get(`${apiUrl()}/storefront/brackets`)
   expect(response.ok()).toBe(true)
@@ -14,7 +14,7 @@ async function firstBracketId(request: APIRequestContext): Promise<string> {
   return first.id
 }
 
-// docs/USER-FLOWS.md, "Consultar o site público", passos 1 e 3.
+// docs/USER-FLOWS.md, "Consultar o site público", steps 1 and 3.
 test.describe('classificação pública', () => {
   test('a home troca de categoria e de modalidade sem mudar de página', async ({
     page,
@@ -42,7 +42,7 @@ test.describe('classificação pública', () => {
     await expect(title).toContainText('Fundamental 2')
     await expect(page).toHaveURL('/')
 
-    // Volta e troca de modalidade dentro da categoria.
+    // Goes back and switches sport within the category.
     await category.getByRole('tab', { name: /Fundamental 1/ }).click()
     await expect(title).toContainText('Fundamental 1')
 
