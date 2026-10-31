@@ -11,7 +11,7 @@ import {
 test.group('administrator/photos > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: lista as fotos com o arquivo e quem enviou, e filtra por status', async ({
+  test('200: lists the photos with the file and who submitted, and filters by status', async ({
     client,
     assert,
   }) => {
@@ -35,13 +35,13 @@ test.group('administrator/photos > paginate', (group) => {
     assert.equal(body(pending).data[0].status, 'PENDING')
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/photos')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não lê a fila da organização', async ({ client }) => {
+  test('403: advisor does not read the organization queue', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/photos').cookies(advisor)
@@ -49,7 +49,7 @@ test.group('administrator/photos > paginate', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: status fora do enum', async ({ client }) => {
+  test('422: status outside the enum', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/photos').qs({ status: 'XYZ' }).cookies(admin)

@@ -23,8 +23,8 @@ type Payload = Merge<
 type Response = Either<HTTPException, AdministratorPhotoShowResponse>
 
 /**
- * Aprovar põe a foto no site; recusar tira. A decisão se refaz: foto recusada
- * por engano é aprovada de novo, e a aprovada pode sair do ar sem ser apagada.
+ * Approving puts the photo on the site; rejecting takes it off. The decision can be redone: a photo rejected
+ * by mistake is approved again, and an approved one can go offline without being deleted.
  */
 @inject()
 export default class AdministratorPhotoReviewUseCase extends PhotoReadBase {

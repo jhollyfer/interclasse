@@ -10,10 +10,10 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorPhotoReviewController {
   static docs = defineDocs({
-    summary: 'Aprovar ou recusar foto',
+    summary: 'Approve or reject photo',
     description:
-      '`APPROVED` põe a foto no carrossel do site; `REJECTED` tira. A decisão pode ser ' +
-      'refeita a qualquer momento.',
+      '`APPROVED` puts the photo on the site carousel; `REJECTED` takes it off. The decision can be ' +
+      'redone at any time.',
   })
 
   constructor(private readonly useCase: AdministratorPhotoReviewUseCase) {}

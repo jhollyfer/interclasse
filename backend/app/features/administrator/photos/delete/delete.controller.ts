@@ -9,7 +9,8 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorPhotoDeleteController {
   static docs = defineDocs({
-    description: '**Irreversível**: a foto some do site e da lista de quem enviou.',
+    description:
+      '**Irreversible**: the photo disappears from the site and from the submitter list.',
   })
 
   constructor(private readonly useCase: AdministratorPhotoDeleteUseCase) {}

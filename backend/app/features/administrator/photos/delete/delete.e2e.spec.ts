@@ -15,7 +15,7 @@ const NOT_FOUND_ID = '00000000-0000-4000-8000-000000000000'
 test.group('administrator/photos > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  /** Uma foto aprovada, enviada pela organização. */
+  /** An approved photo, submitted by the organization. */
   async function photoBy(client: ApiClient, admin: Session): Promise<string> {
     const image = await StorageFactory.create()
     const created = await client
@@ -26,7 +26,7 @@ test.group('administrator/photos > delete', (group) => {
     return body(created).id
   }
 
-  test('204: apaga a foto e ela some da lista', async ({ client, assert }) => {
+  test('204: deletes the photo and it disappears from the list', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const id = await photoBy(client, admin)
 
@@ -38,13 +38,13 @@ test.group('administrator/photos > delete', (group) => {
     assert.lengthOf(body(list).data, 0)
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.delete(`/administrator/photos/${NOT_FOUND_ID}`)
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não apaga pela rota da organização', async ({ client }) => {
+  test('403: advisor does not delete through the organization route', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const id = await photoBy(client, admin)
@@ -54,7 +54,7 @@ test.group('administrator/photos > delete', (group) => {
     response.assertStatus(403)
   })
 
-  test('404: foto inexistente', async ({ client, assert }) => {
+  test('404: nonexistent photo', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete(`/administrator/photos/${NOT_FOUND_ID}`).cookies(admin)
@@ -63,7 +63,7 @@ test.group('administrator/photos > delete', (group) => {
     assert.equal(body(response).code, 'PHOTO_NOT_FOUND')
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/administrator/photos/nao-e-uuid').cookies(admin)
