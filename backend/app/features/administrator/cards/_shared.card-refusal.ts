@@ -4,7 +4,7 @@ import { RefusalBase, type RefusalTable } from '#features/_shared.refusal.base'
 import HTTPException from '#exceptions/http.exception'
 import type { MatchCardError } from '#domain/match-card/match-card.errors'
 
-/** Cada recusa do cartão como resposta HTTP (`_standards/domain.md` §2). */
+/** Each refusal of the card as an HTTP response (`_standards/domain.md` §2). */
 export class CardRefusal extends RefusalBase {
   private static readonly TABLE = {
     MATCH_TEAMS_PENDING: (_fact, i18n) =>

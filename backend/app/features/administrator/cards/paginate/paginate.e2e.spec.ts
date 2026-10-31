@@ -12,7 +12,7 @@ import {
 test.group('cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lista os cartões e filtra pela turma', async ({ client, assert }) => {
+  test('lists the cards and filters by classroom', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } = await matchWithTeams()
     await MatchCardFactory.merge([
@@ -35,16 +35,16 @@ test.group('cards > paginate', (group) => {
   })
 })
 
-test.group('administrator/cards/paginate > acesso e validação', (group) => {
+test.group('administrator/cards/paginate > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/cards')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/cards').cookies(advisor)
@@ -56,7 +56,10 @@ test.group('administrator/cards/paginate > acesso e validação', (group) => {
 test.group('administrator/cards/paginate > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+  test('malformed classroom filter responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
