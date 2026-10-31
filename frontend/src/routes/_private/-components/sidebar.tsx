@@ -36,7 +36,7 @@ const privateRoute = getRouteApi('/_private')
  *
  * The rule is "the most specific wins", and here it is not preparation for the
  * future: `/administrator` is a prefix of every dashboard screen, so with fuzzy
- * matching alone the Início item would light up on the testimonials listing,
+ * matching alone the "Início" item would light up on the testimonials listing,
  * the news one and every other at the same time.
  *
  * Fuzzy is what is wanted for the rest: on `/administrator/testimonials/123/edit`

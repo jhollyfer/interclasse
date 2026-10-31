@@ -29,7 +29,7 @@ type NotFoundPageProps = Readonly<
  * code has ten characters, and that did not fit in a text prop without becoming
  * one more text prop for the other four.
  *
- * The default title used to be "Ops!". Besides being the cliché that the art direction bans
+ * The default title used to be "Ops!". Besides being the cliche that the art direction bans
  * by name, it spent the screen's heaviest line saying nothing: whoever
  * lands here already knows something went wrong, and what they need to know is **what**.
  */
