@@ -64,8 +64,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await repository.save(volleyball)
 
       assert.isTrue(await repository.existsByNameOrSlug('Vôlei', 'x'))
-      assert.isTrue(await repository.existsByNameOrSlug('x', 'volleyball'))
-      assert.isFalse(await repository.existsByNameOrSlug('Vôlei', 'volleyball', volleyball.id))
+      assert.isTrue(await repository.existsByNameOrSlug('x', 'volei'))
+      assert.isFalse(await repository.existsByNameOrSlug('Vôlei', 'volei', volleyball.id))
     })
 
     test('paginate searches and sorts', async ({ assert }) => {
