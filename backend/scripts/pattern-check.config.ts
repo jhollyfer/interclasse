@@ -1,6 +1,6 @@
 /**
  * As exceções e os dados do projeto que o `pattern:check` lê
- * (`_standards/backend.md` §10). Toda exceção leva o `motivo`; exceção sem uso
+ * (`_standards/backend.md` §10). Toda exceção leva o `reason`; exceção sem uso
  * reprova (`_standards/architecture.md` §6).
  */
 
@@ -11,11 +11,11 @@ export type NewException = {
   /** Onde o uso vive. Aceita `**` e `*`. */
   readonly file: string
   /** Por que aquele `new` é legítimo. */
-  readonly motivo: string
+  readonly reason: string
 }
 
 export type PatternCheckConfig = {
-  /** Chave de ambiente que nunca passa por `env.get()`, com o motivo. §6. */
+  /** Chave de ambiente que nunca passa por `env.get()`, com o reason. §6. */
   readonly envOutsideReader: Readonly<Record<string, string>>
   readonly newAllowlist: ReadonlyArray<NewException>
   readonly softDeleteExempt: ReadonlyArray<string>
@@ -40,12 +40,12 @@ export const CONFIG: PatternCheckConfig = {
     {
       symbol: 'CookieAccessTokensGuard',
       file: 'app/guards/cookie-access-tokens.guard.ts',
-      motivo: 'factory exigida por config/auth.ts; recebe o HttpContext da requisição',
+      reason: 'factory exigida por config/auth.ts; recebe o HttpContext da requisição',
     },
     {
       symbol: 'SimpleMessagesProvider',
       file: 'app/core/validator.ts',
-      motivo: 'API do VineJS, atribuída a vine.messagesProvider no boot',
+      reason: 'API do VineJS, atribuída a vine.messagesProvider no boot',
     },
   ],
   softDeleteExempt: [],

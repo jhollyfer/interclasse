@@ -47,7 +47,7 @@ test.group('scripts > authz-check (unit)', () => {
     const run = runScript('authz-check.ts')
 
     assert.equal(run.status, 0, run.output)
-    assert.include(run.output, 'nenhuma mudanca')
+    assert.include(run.output, 'no changes')
   })
 
   test('rota que passou a ser pública reprova e aparece no relatório', ({ assert }) => {
@@ -84,7 +84,7 @@ test.group('scripts > authz-check (unit)', () => {
     const run = runScript('authz-check.ts', { AUTHZ_BASELINE: join(tmpdir(), 'nao-existe.json') })
 
     assert.equal(run.status, 1)
-    assert.include(run.output, 'baseline ausente')
+    assert.include(run.output, 'baseline missing')
   })
 })
 

@@ -168,7 +168,7 @@ const RULES: Rule[] = [
     scope: /\.use-case\.ts$/,
     pattern: /from\s+'#policies\//,
     message:
-      'policy nao entra no caso de uso: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
+      'a policy does not enter the use case: the controller checks with `ctx.bouncer.with(Policy).authorize(...)`',
   },
   {
     name: 'injected-policy',
@@ -176,7 +176,7 @@ const RULES: Rule[] = [
     scope: /app\/(?:features|services|middleware)\//,
     pattern: /\bprivate\s+readonly\s+\w+\s*:\s*\w+Policy\b/,
     message:
-      'policy nao se injeta nem se chama direto; o unico caminho e `ctx.bouncer` (authorize/allows/denies/execute)',
+      'a policy is neither injected nor called directly; the only path is `ctx.bouncer` (authorize/allows/denies/execute)',
   },
   {
     name: 'vine-outside-core',
@@ -185,7 +185,7 @@ const RULES: Rule[] = [
     // `#core/validator`; importar a lib direto pula essa configuracao.
     scope: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
     pattern: /from\s+'@vinejs\/vine'/,
-    message: 'importe `vine` (e `Infer`) de `#core/validator`, nunca de `@vinejs/vine`',
+    message: 'import `vine` (and `Infer`) from `#core/validator`, never from `@vinejs/vine`',
   },
   {
     name: 'validator-outside-resource',
@@ -195,21 +195,21 @@ const RULES: Rule[] = [
     scope: /^app\/(?!core\/).*(?<!\.validator)\.ts$/,
     pattern: /\bvine\.create\(/,
     message:
-      'validator mora em `app/features/<modulo>/<recurso>/<recurso>.validator.ts` (ou e global em `app/core/validator.ts`)',
+      'a validator lives in `app/features/<module>/<resource>/<resource>.validator.ts` (or is global in `app/core/validator.ts`)',
   },
   {
     name: 'context-serializer',
     section: '4.5',
     pattern: /\b(?:ctx|context)\.serialize\b/,
     message:
-      '`context.serialize` foi removido junto com o `api_provider`; o envelope e `{ meta, data }` montado no caso de uso',
+      '`context.serialize` was removed with `api_provider`; the envelope is `{ meta, data }` built in the use case',
   },
   {
     name: 'local-pagination-constant',
     section: '4.5',
     scope: /app\/features\//,
     pattern: /^\s*const\s+(?:PAGE|PER_PAGE)\s*=/m,
-    message: 'default de paginacao nao se redeclara por caso de uso',
+    message: 'the pagination default is not redeclared per use case',
   },
   {
     name: 'actor-as-id',
@@ -217,7 +217,7 @@ const RULES: Rule[] = [
     scope: /\.use-case\.ts$/,
     pattern: /\bactor\s*:\s*string\b/,
     message:
-      '`actor` e o objeto `Actor` validado pelo schema, nao o id — a policy recebe (actor, target)',
+      '`actor` is the `Actor` object validated by the schema, not the id; the policy receives (actor, target)',
   },
   {
     name: 'throw-in-use-case-or-repository',
@@ -227,7 +227,7 @@ const RULES: Rule[] = [
     // violacao de unique e relanca o resto); o que a regua proibe e criar a falha.
     pattern: /\bthrow\s+(?!error\b)/,
     message:
-      'falha de negocio e `left(...)`, nunca `throw`; o repository devolve `null` ou o fato, e o use-case decide',
+      'a business failure is `left(...)`, never `throw`; the repository returns `null` or the fact, and the use case decides',
   },
   {
     name: 'or-fail-in-use-case-or-repository',
@@ -235,7 +235,7 @@ const RULES: Rule[] = [
     scope: /\.(?:use-case|lucid\.repository|memory\.repository)\.ts$/,
     pattern: /\.\w*OrFail\s*\(/,
     message:
-      '`*OrFail()` lanca e vira 500 onde deveria haver 404: use `.first()`/`.find()` e devolva `null`',
+      '`*OrFail()` throws and becomes 500 where 404 belongs: use `.first()`/`.find()` and return `null`',
   },
   {
     name: 'shared-with-io',
@@ -247,14 +247,14 @@ const RULES: Rule[] = [
     pattern:
       /^(?!import type\b).*from\s+'(?:#models\/|#repositories\/|#services\/|@adonisjs\/lucid|@adonisjs\/drive|node:fs|@adonisjs\/core\/services\/db)/,
     message:
-      '`_shared` e so funcao pura: sem model, repository, service, `db`, `drive` nem arquivo',
+      '`_shared` is pure functions only: no model, repository, service, `db`, `drive` or file',
   },
   {
     name: 'core-imports-upper-layer',
     section: '1.3',
     scope: /app\/core\//,
     pattern: /from\s+'#(?:features|services)\//,
-    message: '`app/core/` nao importa de features nem de services',
+    message: '`app/core/` does not import from features or services',
   },
   {
     name: 'service-imports-feature',
@@ -264,7 +264,7 @@ const RULES: Rule[] = [
     // compartilhada, e importa-la nao acopla o service a nenhuma feature. O que a
     // regra recusa e depender de um modulo — `#features/administrator/...`.
     pattern: /from\s+'#features\/(?!_shared\.)/,
-    message: '`app/services/` nao importa de um modulo de features (so de `_shared.<tema>`)',
+    message: '`app/services/` does not import from a features module (only from `_shared.<theme>`)',
   },
 ]
 
@@ -326,7 +326,7 @@ function checkClassName(relativePath: string, source: string): Finding[] {
       line: lineOf(clean, declaration.index),
       rule: 'class-name',
       section: '3',
-      message: `classe \`${name}\` deveria ser \`${accepted.join('` ou `')}\`, derivado do caminho`,
+      message: `class \`${name}\` should be \`${accepted.join('` or `')}\`, derived from the path`,
     },
   ]
 }
@@ -350,7 +350,7 @@ function checkActionFolder(relativePath: string): Finding[] {
       line: 1,
       rule: 'action-outside-folder',
       section: 'arquitetura 3',
-      message: `mova para \`${dirname(relativePath)}/${match[1]}/${basename(relativePath)}\``,
+      message: `move to \`${dirname(relativePath)}/${match[1]}/${basename(relativePath)}\``,
     },
   ]
 }
@@ -383,7 +383,7 @@ function checkCrossFeatureImport(relativePath: string, source: string): Finding[
       line: lineOf(clean, match.index),
       rule: 'feature-importa-feature',
       section: '1.3',
-      message: `\`${owner.join('/')}\` importa \`#features/${target}\`; o compartilhado vai para \`_shared.<tema>\` ou service`,
+      message: `\`${owner.join('/')}\` imports \`#features/${target}\`; shared code goes to \`_shared.<theme>\` or a service`,
     })
   }
   return findings
@@ -408,7 +408,7 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
       line: lineOf(clean, exported.index),
       rule: 'validator-without-resource',
       section: '4.4',
-      message: `\`${name}\` deveria ser \`${resource}<Acao>Validator\``,
+      message: `\`${name}\` should be \`${resource}<Action>Validator\``,
     })
   }
   return findings
@@ -439,7 +439,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
         line: 1,
         rule: 'validator-without-pair',
         section: 'arquitetura 10',
-        message: `nao ha \`${pair}\` no backend`,
+        message: `there is no \`${pair}\` in the backend`,
       })
       continue
     }
@@ -451,7 +451,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
         line: lineOf(sharedSource, exported.index),
         rule: 'validator-without-pair',
         section: 'arquitetura 10',
-        message: `\`${name}\` nao existe em \`${pair}\``,
+        message: `\`${name}\` does not exist in \`${pair}\``,
       })
     }
   }
@@ -469,7 +469,7 @@ function checkModelName(relativePath: string): Finding[] {
       line: 1,
       rule: 'model-snake-case',
       section: '3',
-      message: `model usa kebab-case: renomeie para \`${suggested}\``,
+      message: `model uses kebab-case: rename to \`${suggested}\``,
     },
   ]
 }
@@ -479,7 +479,7 @@ function checkModelName(relativePath: string): Finding[] {
  *
  * Chave declarada que nenhum codigo le e chave morta, e sai. A excecao e o que
  * nunca passa pelo leitor - `PORT` e `HOST` (lidas por `@adonisjs/core`),
- * `NODE_ENV` e `TZ` -, listado em `envOutsideReader` da config com o motivo.
+ * `NODE_ENV` e `TZ` -, listado em `envOutsideReader` da config com `reason`.
  *
  * A leitura ignora comentario: um bloco de driver comentado em `config/` nao e
  * uma chave de verdade.
@@ -512,7 +512,7 @@ async function checkEnv(files: string[]): Promise<Finding[]> {
           line: lineOf(clean, match.index),
           rule: 'env-without-schema',
           section: '6',
-          message: `\`${key}\` e lida aqui e nao esta declarada em \`start/env.ts\``,
+          message: `\`${key}\` is read here and not declared in \`start/env.ts\``,
         })
       }
       readKeys.add(key)
@@ -527,7 +527,7 @@ async function checkEnv(files: string[]): Promise<Finding[]> {
       line: lineOf(cleanSchema, cleanSchema.indexOf(key)),
       rule: 'env-without-reader',
       section: '6',
-      message: `\`${key}\` nao e lida por nenhum \`env.get()\`; remova, ou registre em \`envOutsideReader\` com o motivo`,
+      message: `\`${key}\` is not read by any \`env.get()\`; remove it, or register it in \`envOutsideReader\` with the reason`,
     })
   }
 
@@ -545,7 +545,7 @@ async function checkDirectories(): Promise<Finding[]> {
         line: 1,
         rule: 'required-directory',
         section: '1.1',
-        message: 'diretorio transversal nasce presente, mesmo vazio',
+        message: 'a cross-cutting directory is born present, even when empty',
       })
     }
   }
@@ -573,7 +573,7 @@ function pathPattern(glob: string): RegExp {
  *
  * O ESLint ja recusa `new X()` onde `X` termina em Service, UseCase, Policy ou
  * Controller (secao 2.1). O config e onde as excecoes ficam nomeadas com o
- * motivo ao lado, e o que se cobra aqui e o outro lado da lista: entrada sem uso.
+ * `reason` ao lado, e o que se cobra aqui e o outro lado da lista: entrada sem uso.
  *
  * Existe porque a lista era letra morta — nenhuma funcao a lia. Uma excecao que
  * ninguem exerce nao e excecao, e uma afirmacao falsa sobre o codigo; e quem le
@@ -601,7 +601,7 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
       line: 1,
       rule: 'unused-new-allowlist-entry',
       section: '2.1',
-      message: `\`newAllowlist\` isenta \`new ${entry.symbol}\` em \`${entry.file}\`, e nao ha esse uso; tire a entrada ou corrija o caminho`,
+      message: `\`newAllowlist\` exempts \`new ${entry.symbol}\` in \`${entry.file}\`, and there is no such use; drop the entry or fix the path`,
     })
   }
 
@@ -641,7 +641,7 @@ async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]>
       rule: 'soft-delete-without-scope',
       section: '4.8',
       message:
-        'troque por `withScopes((scopes) => scopes.notDeleted())`; se a consulta e sobre `LucidModel` generico, nomeie o arquivo em `softDeleteExempt`',
+        'replace with `withScopes((scopes) => scopes.notDeleted())`; if the query is over a generic `LucidModel`, name the file in `softDeleteExempt`',
     })
   }
 
@@ -680,7 +680,7 @@ async function checkShape(): Promise<Finding[]> {
       line: 1,
       rule: 'missing-shape',
       section: '5',
-      message: `\`${filePath}\` e FORMA no config e nao existe aqui; crie o arquivo ou tire o caminho de \`shape\``,
+      message: `\`${filePath}\` is SHAPE in the config and does not exist here; create the file or drop the path from \`shape\``,
     })
   }
 
@@ -719,7 +719,7 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
       rule: 'use-case-without-payload',
       section: '4.2',
       message:
-        'declare `type Payload` no topo e use-o na assinatura; o tipo do validator direto nao tem onde receber `actor`',
+        'declare `type Payload` at the top and use it in the signature; the validator type alone has nowhere to receive `actor`',
     })
   }
 
@@ -731,7 +731,7 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
       line: 1,
       rule: 'use-case-without-response',
       section: '4.2',
-      message: 'declare `type Response = Either<HTTPException, T>` no topo',
+      message: 'declare `type Response = Either<HTTPException, T>` at the top',
     })
   }
 
@@ -765,7 +765,7 @@ function checkUseCaseNames(relativePath: string, source: string): Finding[] {
       line: lineOf(clean, found.index),
       rule: 'log-tag',
       section: '3',
-      message: `a tag de log deriva do caminho: \`${tag}[error]\``,
+      message: `the log tag derives from the path: \`${tag}[error]\``,
     })
   }
 
@@ -776,7 +776,7 @@ function checkUseCaseNames(relativePath: string, source: string): Finding[] {
       line: lineOf(clean, found.index),
       rule: 'internal-error-code',
       section: '3',
-      message: `o codigo de 500 deriva do caminho: \`${code}\``,
+      message: `the 500 code derives from the path: \`${code}\``,
     })
   }
 
@@ -804,7 +804,7 @@ function checkActorName(relativePath: string, source: string): Finding[] {
       line: lineOf(clean, payload.index),
       rule: 'actor-name',
       section: '4.3',
-      message: `o payload chama \`${wrong[0].replace(/\W/g, '')}\` o que e o \`actor\`; use \`actor: Actor\``,
+      message: `the payload calls \`${wrong[0].replace(/\W/g, '')}\` what is the \`actor\`; use \`actor: Actor\``,
     },
   ]
 }
@@ -824,7 +824,7 @@ function checkBouncerRequired(sources: Map<string, string>): Finding[] {
         line: 1,
         rule: 'bouncer-required-missing-file',
         section: '4.6',
-        message: `\`BOUNCER_REQUIRED\` lista \`${file}\`, que nao existe`,
+        message: `\`BOUNCER_REQUIRED\` lists \`${file}\`, which does not exist`,
       })
       continue
     }
@@ -835,7 +835,7 @@ function checkBouncerRequired(sources: Map<string, string>): Finding[] {
       rule: 'bouncer-required',
       section: '4.6',
       message:
-        'regra por registro: o controller checa com `ctx.bouncer.with(Policy).authorize(...)`',
+        'per-record rule: the controller checks with `ctx.bouncer.with(Policy).authorize(...)`',
     })
   }
 
@@ -866,7 +866,7 @@ function checkRelativeImportBetweenActions(relativePath: string, source: string)
       line: lineOf(clean, found.index),
       rule: 'import-between-actions',
       section: '1.3',
-      message: `importa \`${found[1]}\`, de outra acao; suba o compartilhado para \`_shared.<tema>\``,
+      message: `imports \`${found[1]}\` from another action; move the shared code to \`_shared.<theme>\``,
     })
   }
 
@@ -917,7 +917,7 @@ async function checkRoute(files: string[]): Promise<Finding[]> {
       line: 1,
       rule: 'controller-without-route',
       section: '1.2',
-      message: `nenhuma rota referencia \`${key}\`; registre a rota ou apague o arquivo e o caso de uso irmao`,
+      message: `no route references \`${key}\`; register the route or delete the file and its sibling use case`,
     })
   }
 
@@ -926,22 +926,21 @@ async function checkRoute(files: string[]): Promise<Finding[]> {
 
 function report(findings: Finding[]): void {
   if (findings.length === 0) {
-    console.log('pattern:check: nenhuma violacao.')
+    console.log('pattern:check: no violations.')
     return
   }
 
-  const byRule = new Map<string, number>()
-  for (const a of findings) byRule.set(a.rule, (byRule.get(a.rule) ?? 0) + 1)
-
-  console.log(`pattern:check: ${findings.length} violacoes\n`)
-  for (const a of findings) {
-    console.log(`  ${a.file}:${a.line}`)
-    console.log(`      [${a.rule}] ${a.message}  (_standards/backend.md ${a.section})`)
+  const bySection = new Map<string, Finding[]>()
+  for (const finding of findings) {
+    bySection.set(finding.section, [...(bySection.get(finding.section) ?? []), finding])
   }
 
-  console.log('\n  Por regra:')
-  for (const [rule, total] of [...byRule].sort((a, b) => b[1] - a[1])) {
-    console.log(`    ${String(total).padStart(4)}  ${rule}`)
+  console.log(`pattern:check: ${findings.length} violations\n`)
+  for (const [section, group] of [...bySection].sort((x, y) => y[1].length - x[1].length)) {
+    console.log(`  _standards/backend.md ${section} (${group.length})`)
+    for (const finding of group) {
+      console.log(`    ${finding.file}:${finding.line}  [${finding.rule}] ${finding.message}`)
+    }
   }
 }
 
