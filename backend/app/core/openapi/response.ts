@@ -38,15 +38,15 @@ import {
 import type { FeatureResponse } from '#core/openapi/types'
 
 /**
- * O registro de qual schema de resposta responde por cada ação da API
- * (`_standards/openapi.md`, "registro-de-resposta"). O registro só aponta: o
- * schema mora em `shared/src/responses/`, o mesmo que o presenter tipa e o
- * frontend lê, e `core/` não importa `models/`.
+ * The registry of which response schema answers for each API action
+ * (`_standards/openapi.md`, "response-registry"). The registry only points: the
+ * schema lives in `shared/src/responses/`, the same one the presenter types and the
+ * frontend reads, and `core/` does not import `models/`.
  *
- * A chave é o diretório do recurso em `app/features` (`administrator/sports`),
- * e vale para todas as ações dele; a chave com a ação (`administrator/brackets/show`)
- * ganha quando a ação devolve outra forma. Listagem ganha o envelope de
- * paginação sozinha.
+ * The key is the resource directory in `app/features` (`administrator/sports`),
+ * and holds for all its actions; the key with the action (`administrator/brackets/show`)
+ * wins when the action returns another shape. A listing gets the pagination
+ * envelope on its own.
  */
 export const RESPONSES: Record<string, FeatureResponse> = {
   'account/profile': AccountProfileShowResponse,

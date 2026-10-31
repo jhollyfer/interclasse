@@ -7,17 +7,17 @@ import app from '@adonisjs/core/services/app'
 import * as core from '#core/validator'
 import { FIELD_LABELS as LABELS_BY_LOCALE } from '#core/validator'
 
-/** O pt-BR é a referência: o compilador já cobra as mesmas chaves em es e en. */
+/** pt-BR is the reference: the compiler already enforces the same keys in es and en. */
 const FIELD_LABELS = LABELS_BY_LOCALE['pt-BR']
 
 /**
- * As auditorias estáticas dos validators, todas pelo `toJSONSchema()`.
+ * The static audits of the validators, all through `toJSONSchema()`.
  *
- * A lista de campos sai dos próprios validators, e não de uma segunda lista
- * para manter em dia - campo novo em desacordo nasce vermelho.
+ * The field list comes from the validators themselves, not from a second list
+ * to keep up to date - a new field out of line is born red.
  *
- * Ao lado de `validator.ts` porque é spec transversal: cobre todo validator do
- * projeto, e não uma ação (_standards/backend.md §7).
+ * Next to `validator.ts` because it is a cross-cutting spec: it covers every validator of the
+ * project, not one action (_standards/backend.md §7).
  */
 
 type Introspectable = { toJSONSchema: () => unknown }
@@ -29,14 +29,14 @@ function isValidator<T>(value: T): value is T & Introspectable {
   return typeof value.toJSONSchema === 'function'
 }
 
-/** O filho de `node` em `key`, sempre como lista, para a recursão não ramificar. */
+/** The child of `node` at `key`, always as a list, so the recursion does not branch. */
 function branch(node: unknown, key: string): Array<unknown> {
   if (typeof node !== 'object' || node === null) return []
 
-  // `Reflect.get` e não índice: `key in node` estreita `node`, mas não torna
-  // válido indexá-lo por uma `string` qualquer - e a asserção que resolvia
-  // isso é a regra 3 do `code-pattern`. Chave ausente devolve `undefined`,
-  // que aqui significa o mesmo que ramo vazio.
+  // `Reflect.get` and not an index: `key in node` narrows `node`, but does not make
+  // it valid to index it by any `string` - and the assertion that solved
+  // that is rule 3 of `code-pattern`. A missing key returns `undefined`,
+  // which here means the same as an empty branch.
   const value = Reflect.get(node, key)
 
   if (value === undefined) return []
@@ -47,29 +47,29 @@ function branch(node: unknown, key: string): Array<unknown> {
 }
 
 /**
- * Todo validator do projeto: os globais de `#core/validator` e o
- * `<recurso>.validator.ts` de cada recurso em `app/validators` (_standards/backend.md
- * §4.4). O glob
- * é o que deixa quebrar o validator por recurso sem perder a rede.
+ * Every validator of the project: the globals of `#core/validator` and the
+ * `<resource>.validator.ts` of each resource in `app/validators` (_standards/backend.md
+ * §4.4). The glob
+ * is what lets us split the validator per resource without losing the net.
  */
-const modulos: Array<Record<string, unknown>> = [core]
-for await (const arquivo of glob('app/validators/**/*.validator.ts', {
+const modules: Array<Record<string, unknown>> = [core]
+for await (const file of glob('app/validators/**/*.validator.ts', {
   cwd: app.appRoot.pathname,
 })) {
-  modulos.push(await import(pathToFileURL(app.makePath(arquivo)).href))
+  modules.push(await import(pathToFileURL(app.makePath(file)).href))
 }
 
-const validators = modulos.flatMap((modulo) => Object.values(modulo)).filter(isValidator)
+const validators = modules.flatMap((mod) => Object.values(mod)).filter(isValidator)
 
-test.group('validator > varredura', () => {
-  // Sem esta guarda, um glob que não casa nada deixaria as auditorias abaixo
-  // verdes olhando só os validators globais.
-  test('acha o validator de cada recurso', ({ assert }) => {
-    assert.isAbove(modulos.length, 10)
+test.group('validator > sweep', () => {
+  // Without this guard, a glob that matches nothing would leave the audits below
+  // green looking only at the global validators.
+  test('finds the validator of each resource', ({ assert }) => {
+    assert.isAbove(modules.length, 10)
   })
 })
 
-/** Todo caminho cujo nó é `type: 'string'`, com o nó junto. */
+/** Every path whose node is `type: 'string'`, with the node along. */
 function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {
   const found: Array<[string, unknown]> = []
 
@@ -92,19 +92,19 @@ function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {
 }
 
 /**
- * O teto de tamanho de todo campo de texto.
+ * The size ceiling of every text field.
  *
- * As colunas de texto são `varchar(255)` - é o que `table.string()` do Knex
- * cria - quando a migration não diz outro tamanho. Campo sem teto no validator
- * deixa o valor grande atravessar a validação e estourar no Postgres: o que
- * deveria ser um 422 apontando o campo vira 500 com "erro interno" na tela, e o
- * log do servidor é o único lugar onde aparece o que houve.
+ * Text columns are `varchar(255)` - which is what Knex's `table.string()`
+ * creates - when the migration does not say another size. A field with no ceiling in the validator
+ * lets a large value cross validation and blow up in Postgres: what
+ * should be a 422 pointing at the field becomes a 500 with "internal error" on screen, and the
+ * server log is the only place showing what happened.
  */
-test.group('validator > tetos de texto', () => {
-  test('todo campo de texto tem limite de tamanho', ({ assert }) => {
-    // `format` e `pattern` cobrem quem já limita por outro caminho - `email()`,
-    // `uuid()` -, e `enum` não é texto livre.
-    const semTeto = validators
+test.group('validator > text ceilings', () => {
+  test('every text field has a size limit', ({ assert }) => {
+    // `format` and `pattern` cover whoever already limits by another path - `email()`,
+    // `uuid()` -, and `enum` is not free text.
+    const withoutCeiling = validators
       .flatMap((each) => strings(each.toJSONSchema()))
       .filter(([, node]) => {
         if (typeof node !== 'object' || node === null) return false
@@ -113,15 +113,15 @@ test.group('validator > tetos de texto', () => {
       })
       .map(([path]) => path)
 
-    assert.deepEqual([...new Set(semTeto)].sort(), [])
+    assert.deepEqual([...new Set(withoutCeiling)].sort(), [])
   })
 })
 
-/** Todo caminho de campo do schema, incluindo os aninhados (`parts.etag`). */
+/** Every field path of the schema, including nested ones (`parts.etag`). */
 function walk(schema: unknown, prefix = ''): Array<string> {
   const paths: Array<string> = []
 
-  // `anyOf` é o que o `.optional()` de um objeto produz: o objeto e o nulo.
+  // `anyOf` is what an object's `.optional()` produces: the object and null.
   for (const each of branch(schema, 'anyOf')) paths.push(...walk(each, prefix))
   for (const each of branch(schema, 'items')) paths.push(...walk(each, prefix))
 
@@ -142,28 +142,28 @@ function walk(schema: unknown, prefix = ''): Array<string> {
 const fields = new Set(validators.flatMap((each) => walk(each.toJSONSchema())))
 
 /**
- * Rótulo legítimo que nunca vai aparecer no `toJSONSchema()`.
+ * Legitimate label that will never appear in `toJSONSchema()`.
  *
- * `passwordConfirmation` não é campo declarado: nasce de
- * `.confirmed({ as: 'passwordConfirmation' })` em `password()`, que é uma
- * regra. O erro é reportado nesse nome, então o rótulo precisa existir - mas o
- * schema não conhece a chave, e sem esta lista o teste de órfãos o acusaria.
+ * `passwordConfirmation` is not a declared field: it is born from
+ * `.confirmed({ as: 'passwordConfirmation' })` in `password()`, which is a
+ * rule. The error is reported under that name, so the label must exist - but the
+ * schema does not know the key, and without this list the orphan test would flag it.
  */
 const SEM_CAMPO_NO_SCHEMA = ['passwordConfirmation']
 
 /**
- * O nome amigável de todo campo, nos dois sentidos.
+ * The friendly name of every field, in both directions.
  *
- * Campo sem rótulo não quebra nada - só faz a resposta pedir "Informe avatarId"
- * em vez de "Informe o avatar". Por não quebrar, passa despercebido, e é
- * exatamente por isso que a cobrança precisa ser automática.
+ * A field without a label breaks nothing - it only makes the response ask "Informe avatarId"
+ * instead of "Informe o avatar". Because it breaks nothing, it goes unnoticed, and that is
+ * exactly why the enforcement needs to be automatic.
  */
-test.group('validator > rótulos', () => {
-  test('todo campo dos validators tem nome nos três idiomas', ({ assert }) => {
-    // O nome cru serve de fallback do VineJS, então basta o último segmento ter
-    // rótulo - `parts.etag` cai em `etag` se o caminho completo não estiver
-    // listado. Os dois valem, e o caminho completo ganha quando existe.
-    const semRotulo = [...fields].filter((path) => {
+test.group('validator > labels', () => {
+  test('every validator field has a name in the three languages', ({ assert }) => {
+    // The raw name serves as the VineJS fallback, so it is enough for the last segment to have
+    // a label - `parts.etag` falls to `etag` if the full path is not
+    // listed. Both count, and the full path wins when it exists.
+    const withoutLabel = [...fields].filter((path) => {
       if (path in FIELD_LABELS) return false
 
       const leaf = path.slice(path.lastIndexOf('.') + 1)
@@ -171,20 +171,20 @@ test.group('validator > rótulos', () => {
       return !(leaf in FIELD_LABELS)
     })
 
-    assert.deepEqual(semRotulo.sort(), [])
+    assert.deepEqual(withoutLabel.sort(), [])
   })
 
-  test('não sobra rótulo de campo que não existe mais', ({ assert }) => {
-    // O contrário do teste acima: rótulo de campo que já saiu do validator não
-    // avisa que está morto, e vai sendo copiado para o próximo recurso.
+  test('no label is left for a field that no longer exists', ({ assert }) => {
+    // The opposite of the test above: a label for a field that already left the validator does not
+    // warn that it is dead, and keeps being copied to the next resource.
     const leaves = new Set([...fields].map((path) => path.slice(path.lastIndexOf('.') + 1)))
 
-    const orfaos = Object.keys(FIELD_LABELS).filter((key) => {
+    const orphans = Object.keys(FIELD_LABELS).filter((key) => {
       if (SEM_CAMPO_NO_SCHEMA.includes(key)) return false
 
       return !fields.has(key) && !leaves.has(key)
     })
 
-    assert.deepEqual(orfaos.sort(), [])
+    assert.deepEqual(orphans.sort(), [])
   })
 })

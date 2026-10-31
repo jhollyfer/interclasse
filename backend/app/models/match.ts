@@ -6,7 +6,7 @@ import { MatchSchema } from '#database/schema'
 import Bracket from '#models/bracket'
 import Team from '#models/team'
 
-/** Uma partida: de grupo ou de mata-mata, marcada ou com placar. */
+/** A match: group or knockout, scheduled or with a score. */
 export default class Match extends MatchSchema {
   declare phase: MatchPhase
   declare status: MatchStatus

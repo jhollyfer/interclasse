@@ -2,7 +2,7 @@ import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
- * O aviso, como o painel o publica. Par de caminho e nome do Zod de
+ * The announcement, as the panel publishes it. Mirror (path and name) of the Zod one in
  * `shared/src/validators/administrator/announcements.validator.ts`.
  */
 export const ANNOUNCEMENT_SORT_COLUMNS = ['title', 'createdAt'] as const

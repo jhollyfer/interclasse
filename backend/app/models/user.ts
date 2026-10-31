@@ -10,10 +10,10 @@ import Storage from '#models/storage'
 import { UserSchema } from '#database/schema'
 
 /**
- * O mixin faz duas coisas que precisam andar juntas: gera o hash da senha antes
- * de gravar e expõe `verifyCredentials`, que busca pelo uid e confere o hash em
- * tempo constante. Separá-las é como nasce o caminho de criação que grava senha
- * em texto puro.
+ * The mixin does two things that must go together: it hashes the password before
+ * saving and exposes `verifyCredentials`, which looks up by uid and checks the hash in
+ * constant time. Separating them is how a creation path that saves a plain-text
+ * password is born.
  */
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -22,18 +22,18 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 
 export default class User extends compose(UserSchema, AuthFinder) {
   /**
-   * Só o que não foi arquivado.
+   * Only what has not been archived.
    *
-   * O filtro é de segurança, e por isso mora num ponto só: escrito à mão em cada
-   * consulta, ele depende de alguém lembrar, e a consulta que esquecer devolve
-   * registro arquivado sem avisar. Consulta que precisa ver o arquivado pede
-   * `trashed` de propósito, e a que não pede não tem como esquecer.
+   * The filter is a security one, and so lives in a single place: written by hand in each
+   * query, it depends on someone remembering, and the query that forgets returns
+   * an archived record without warning. A query that needs to see the archived asks for
+   * `trashed` on purpose, and the one that does not ask cannot forget.
    */
   static notDeleted = scope((query) => {
     query.whereNull('deletedAt')
   })
 
-  /** O espelho de `notDeleted`: só o que está na lixeira (`unarchive`, `?trashed=only`). */
+  /** The mirror of `notDeleted`: only what is in the trash (`unarchive`, `?trashed=only`). */
   static onlyDeleted = scope((query) => {
     query.whereNotNull('deletedAt')
   })
@@ -41,26 +41,26 @@ export default class User extends compose(UserSchema, AuthFinder) {
   static accessTokens = DbAccessTokensProvider.forModel(User)
 
   /**
-   * O token que autenticou **esta** requisição, preenchido pelo guard de
-   * cookie. Fora do ciclo de uma requisição não existe, e por isso é opcional.
+   * The token that authenticated **this** request, filled in by the cookie
+   * guard. Outside a request's lifecycle it does not exist, which is why it is optional.
    */
   declare currentAccessToken?: AccessToken
 
   /**
-   * Redeclarados só para estreitar o tipo: `database/schema.ts` é gerado das
-   * colunas e entrega todo enum como `string`. Sem isto, comparar `role` com um
-   * literal errado compilaria e só apareceria quando o Postgres recusasse a
-   * escrita.
+   * Redeclared only to narrow the type: `database/schema.ts` is generated from the
+   * columns and delivers every enum as `string`. Without this, comparing `role` with a
+   * wrong literal would compile and only show up when Postgres refused the
+   * write.
    */
   declare role: UserRole
   declare status: ActiveStatus
 
   /**
-   * Avatar, no máximo um. Relação declarada à mão: `database/schema.ts` é
-   * gerado a partir das colunas e não conhece relacionamento nenhum.
+   * Avatar, at most one. A hand-declared relation: `database/schema.ts` is
+   * generated from the columns and knows no relationship at all.
    *
-   * Quem anexa é que guarda a referência - é o que permite uma tabela de
-   * arquivos só, sem coluna de "tipo de dono".
+   * Whoever attaches keeps the reference - it is what allows a single files table,
+   * with no "owner type" column.
    */
   @belongsTo(() => Storage, { foreignKey: 'avatarId' })
   declare avatar: BelongsTo<typeof Storage>

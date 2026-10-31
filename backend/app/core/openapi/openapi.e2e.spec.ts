@@ -7,133 +7,131 @@ import router from '@adonisjs/core/services/router'
 import openapi from '#config/openapi'
 
 /**
- * O documento OpenAPI commitado.
+ * The committed OpenAPI document.
  *
- * O gerador **deriva** o documento do AST dos controllers, e é justamente por
- * isso que ele pode perder uma operação em silêncio: renomear o export de um
- * validator sem mexer no controller não quebra o build, o `loadValidator`
- * engole a falha do import e a operação sai do documento sem um erro sequer.
+ * The generator **derives** the document from the controllers' AST, which is exactly
+ * why it can silently lose an operation: renaming a validator export without
+ * touching the controller does not break the build, `loadValidator` swallows the
+ * import failure and the operation leaves the document without a single error.
  *
- * A guarda contra isso é `node ace openapi:generate --check`. Este arquivo é a
- * segunda metade da guarda: confere que o `openapi.json` do repositório
- * descreve o roteador de verdade, comparando com `router.toJSON()` em vez de
- * com uma lista escrita à mão - uma rota nova cai na comparação por construção.
+ * The guard against that is `node ace openapi:generate --check`. This file is the
+ * second half of the guard: it checks that the repository's `openapi.json` describes
+ * the real router, comparing with `router.toJSON()` instead of a hand-written
+ * list - a new route falls into the comparison by construction.
  */
 
 type Documento = {
   paths: Record<string, Record<string, { operationId: string; responses: Record<string, unknown> }>>
 }
 
-let documento: Documento | undefined
+let document: Documento | undefined
 
-async function lerDocumento(): Promise<Documento> {
-  if (documento) return documento
+async function readDocument(): Promise<Documento> {
+  if (document) return document
 
-  const lido: Documento = JSON.parse(await readFile(app.makePath('openapi.json'), 'utf-8'))
-  documento = lido
-  return lido
+  const read: Documento = JSON.parse(await readFile(app.makePath('openapi.json'), 'utf-8'))
+  document = read
+  return read
 }
 
 /**
- * `/administrator/notices/:id` -> `/administrator/notices/{id}`, que é a forma
- * que o OpenAPI usa. A conversão é a mesma de `document.ts`; repeti-la aqui é
- * o que permite comparar as duas fontes sem importar o gerador.
+ * `/administrator/notices/:id` -> `/administrator/notices/{id}`, which is the form
+ * OpenAPI uses. The conversion is the same as `document.ts`; repeating it here is
+ * what allows comparing the two sources without importing the generator.
  */
-function paraOpenAPI(pattern: string): string {
+function toOpenApiPath(pattern: string): string {
   return pattern.replace(/:(\w+)/g, '{$1}')
 }
 
-/** Toda operação registrada: caminho e verbo, sem os `HEAD` que o framework gera. */
-function operacoesRegistradas(): Array<{ caminho: string; metodo: string }> {
-  const operacoes: Array<{ caminho: string; metodo: string }> = []
+/** Every registered operation: path and verb, without the `HEAD`s the framework generates. */
+function registeredOperations(): Array<{ path: string; method: string }> {
+  const operations: Array<{ path: string; method: string }> = []
 
-  for (const rota of Object.values(router.toJSON()).flat()) {
-    const caminho = paraOpenAPI(rota.pattern)
+  for (const route of Object.values(router.toJSON()).flat()) {
+    const path = toOpenApiPath(route.pattern)
 
-    if (openapi.ignore.includes(caminho) || openapi.ignore.includes(rota.pattern)) continue
+    if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern)) continue
 
-    for (const metodo of rota.methods) {
-      if (metodo === 'HEAD') continue
+    for (const method of route.methods) {
+      if (method === 'HEAD') continue
 
-      operacoes.push({ caminho, metodo: metodo.toLowerCase() })
+      operations.push({ path, method: method.toLowerCase() })
     }
   }
 
-  return operacoes
+  return operations
 }
 
-test.group('documentação > o documento descreve o roteador', () => {
-  test('toda rota registrada está no documento', async ({ assert }) => {
-    const { paths } = await lerDocumento()
-    const faltando = operacoesRegistradas().filter(
-      ({ caminho, metodo }) => !paths[caminho]?.[metodo],
-    )
+test.group('documentation > the document describes the router', () => {
+  test('every registered route is in the document', async ({ assert }) => {
+    const { paths } = await readDocument()
+    const missing = registeredOperations().filter(({ path, method }) => !paths[path]?.[method])
 
-    // A mensagem lista o que falta em vez de só falhar: quem quebrar isto
-    // renomeando um validator precisa saber qual operação sumiu, e o `--check`
-    // sozinho só diz que o arquivo divergiu.
+    // The message lists what is missing instead of just failing: whoever breaks this
+    // by renaming a validator needs to know which operation vanished, and `--check`
+    // alone only says the file diverged.
     assert.deepEqual(
-      faltando,
+      missing,
       [],
-      `operações registradas e ausentes do openapi.json: ${faltando
-        .map(({ metodo, caminho }) => `${metodo.toUpperCase()} ${caminho}`)
-        .join(', ')}. Rode \`node ace openapi:generate\`.`,
+      `operações registered e absent do openapi.json: ${missing
+        .map(({ method, path }) => `${method.toUpperCase()} ${path}`)
+        .join(', ')}. Run \`node ace openapi:generate\`.`,
     )
   })
 
-  test('o documento não descreve rota que não existe', async ({ assert }) => {
-    const { paths } = await lerDocumento()
-    const registradas = new Set(
-      operacoesRegistradas().map(({ caminho, metodo }) => `${metodo} ${caminho}`),
+  test('the document does not describe a route that does not exist', async ({ assert }) => {
+    const { paths } = await readDocument()
+    const registered = new Set(
+      registeredOperations().map(({ path, method }) => `${method} ${path}`),
     )
 
-    const sobrando: string[] = []
+    const extra: string[] = []
 
-    for (const [caminho, operacoes] of Object.entries(paths)) {
-      for (const metodo of Object.keys(operacoes)) {
-        if (!registradas.has(`${metodo} ${caminho}`)) sobrando.push(`${metodo} ${caminho}`)
+    for (const [path, operations] of Object.entries(paths)) {
+      for (const method of Object.keys(operations)) {
+        if (!registered.has(`${method} ${path}`)) extra.push(`${method} ${path}`)
       }
     }
 
-    assert.deepEqual(sobrando, [], `o documento promete o que o roteador não serve: ${sobrando}`)
+    assert.deepEqual(extra, [], `the document promises what the router does not serve: ${extra}`)
   })
 
-  test('nenhuma operação fica sem resposta descrita', async ({ assert }) => {
-    const { paths } = await lerDocumento()
-    const mudas: string[] = []
+  test('no operation is left without a described response', async ({ assert }) => {
+    const { paths } = await readDocument()
+    const silent: string[] = []
 
-    for (const [caminho, operacoes] of Object.entries(paths)) {
-      for (const [metodo, operacao] of Object.entries(operacoes)) {
-        // Só as respostas de sucesso contam: as de falha o gerador monta
-        // sozinho a partir da proteção da rota, então estarem lá não prova nada
-        // sobre o contrato de quem chamou e deu certo.
-        const sucesso = Object.keys(operacao.responses).filter((status) => Number(status) < 400)
+    for (const [path, operations] of Object.entries(paths)) {
+      for (const [method, operation] of Object.entries(operations)) {
+        // Only success responses count: the failure ones the generator builds
+        // on its own from the route protection, so their being there proves nothing
+        // about the contract of whoever called and succeeded.
+        const success = Object.keys(operation.responses).filter((status) => Number(status) < 400)
 
-        if (sucesso.length === 0) mudas.push(`${metodo.toUpperCase()} ${caminho}`)
+        if (success.length === 0) silent.push(`${method.toUpperCase()} ${path}`)
       }
     }
 
-    assert.deepEqual(mudas, [], `operações sem resposta de sucesso descrita: ${mudas}`)
+    assert.deepEqual(silent, [], `operations with no success response described: ${silent}`)
   })
 
-  test('o identificador de cada operação é único', async ({ assert }) => {
-    const { paths } = await lerDocumento()
-    const vistos = new Map<string, string>()
-    const repetidos: string[] = []
+  test('each operation identifier is unique', async ({ assert }) => {
+    const { paths } = await readDocument()
+    const seen = new Map<string, string>()
+    const repeated: string[] = []
 
-    for (const [caminho, operacoes] of Object.entries(paths)) {
-      for (const [metodo, operacao] of Object.entries(operacoes)) {
-        const anterior = vistos.get(operacao.operationId)
+    for (const [path, operations] of Object.entries(paths)) {
+      for (const [method, operation] of Object.entries(operations)) {
+        const previous = seen.get(operation.operationId)
 
-        // `operationId` é o que vira nome de função em cliente gerado. Dois
-        // iguais não quebram o documento, quebram o cliente - silenciosamente,
-        // sobrescrevendo uma das duas.
-        if (anterior) repetidos.push(`${operacao.operationId}: ${anterior} e ${metodo} ${caminho}`)
+        // `operationId` is what becomes a function name in a generated client. Two
+        // equal ones do not break the document, they break the client - silently,
+        // overwriting one of the two.
+        if (previous) repeated.push(`${operation.operationId}: ${previous} e ${method} ${path}`)
 
-        vistos.set(operacao.operationId, `${metodo} ${caminho}`)
+        seen.set(operation.operationId, `${method} ${path}`)
       }
     }
 
-    assert.deepEqual(repetidos, [], `operationId repetido: ${repetidos}`)
+    assert.deepEqual(repeated, [], `operationId repetido: ${repeated}`)
   })
 })

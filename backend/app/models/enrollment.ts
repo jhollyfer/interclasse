@@ -5,7 +5,7 @@ import { EnrollmentSchema } from '#database/schema'
 import Sport from '#models/sport'
 import Student from '#models/student'
 
-/** O aluno inscrito como atleta numa modalidade. */
+/** The student enrolled as an athlete in a sport. */
 export default class Enrollment extends EnrollmentSchema {
   @belongsTo(() => Student)
   declare student: BelongsTo<typeof Student>

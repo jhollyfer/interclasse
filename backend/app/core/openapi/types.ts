@@ -2,32 +2,32 @@ import type { z } from '@interclasse/shared'
 import type { JSONSchema7 } from 'json-schema'
 
 /**
- * Vocabulário do gerador de documentação.
+ * Vocabulary of the documentation generator.
  *
- * Nasceu antes do gerador porque `defineDocs` é consumido
- * por todo controller e por `#core/response` desde a primeira feature -
- * declarar o contrato só quando o gerador existisse obrigaria a voltar em cada
- * controller para acrescentá-lo.
+ * It was born before the generator because `defineDocs` is consumed
+ * by every controller and by `#core/response` since the first feature -
+ * declaring the contract only when the generator existed would force going back to every
+ * controller to add it.
  *
- * O tipo central é `OperationDocs`: o que cada controller declara sobre a
- * própria operação. Só entra aqui o que o código não conta sozinho - rota,
- * método, parâmetros de caminho, segurança e os erros de infraestrutura são
- * derivados do router em `document.ts`.
+ * The central type is `OperationDocs`: what each controller declares about its
+ * own operation. Only what the code does not tell by itself goes in here - route,
+ * method, path parameters, security and the infrastructure errors are
+ * derived from the router in `document.ts`.
  */
 
-/** Um nó de JSON Schema, como o VineJS emite e como o OpenAPI 3.1 consome. */
+/** A JSON Schema node, as VineJS emits it and OpenAPI 3.1 consumes it. */
 export type SchemaObject = JSONSchema7
 
 /**
- * Um validator do VineJS, visto só pelo que o gerador precisa dele.
+ * A VineJS validator, seen only for what the generator needs from it.
  *
- * Estrutural em vez de `VineValidator<any, any>`: o gerador guarda validators
- * de formatos diferentes na mesma lista, e o genérico só serviria para ser
- * apagado com `any`. Declarar os dois métodos usados diz mais e não mente.
+ * Structural instead of `VineValidator<any, any>`: the generator keeps validators
+ * of different shapes in the same list, and the generic would only serve to be
+ * erased with `any`. Declaring the two methods used says more and does not lie.
  *
- * `toJSONSchema()` entrega o schema publicável. `toJSON()` entrega a árvore
- * interna, que é o único lugar onde o subtipo de um campo sobrevive - é dela
- * que `schema.ts` descobre que um `{}` vazio era um `vine.date()`.
+ * `toJSONSchema()` delivers the publishable schema. `toJSON()` delivers the internal
+ * tree, which is the only place where a field's subtype survives - it is from it
+ * that `schema.ts` finds out an empty `{}` was a `vine.date()`.
  */
 export type DocumentedValidator = {
   toJSONSchema(): SchemaObject
@@ -35,9 +35,9 @@ export type DocumentedValidator = {
 }
 
 /**
- * Resposta paginada. Marcador em vez de schema pronto porque `Paginated<T>` tem
- * forma fixa (`shared/src/records/pagination.ts`): o gerador monta o envelope e referencia
- * `PaginationMeta` uma vez só, em vez de repeti-lo em cada listagem.
+ * Paginated response. A marker instead of a ready schema because `Paginated<T>` has a
+ * fixed shape (`shared/src/records/pagination.ts`): the generator builds the envelope and references
+ * `PaginationMeta` only once, instead of repeating it in every listing.
  */
 export type PaginatedResponse = {
   kind: 'paginated'
@@ -45,53 +45,53 @@ export type PaginatedResponse = {
 }
 
 /**
- * O que o registro de resposta guarda por ação: o schema `…Response` do `shared/`
- * (Zod, a fonte da régua) ou, para o que ainda não tem resposta lá, o validator.
+ * What the response registry keeps per action: the `…Response` schema of `shared/`
+ * (Zod, the source of the standard) or, for what does not have a response there yet, the validator.
  */
 export type FeatureResponse = DocumentedValidator | z.ZodType
 
 /**
- * O que uma operação pode devolver num dado status.
+ * What an operation can return at a given status.
  *
- * Existe para a operação cuja resposta **não** é o recurso da feature: o plano
- * de upload de `storages` é um envelope próprio, e o redirect do download não
- * tem corpo nenhum. Sem isto, as duas sairiam documentadas como o recurso
- * `Storage`, que não é o que elas respondem.
+ * It exists for the operation whose response is **not** the feature resource: the
+ * `storages` upload plan is its own envelope, and the download redirect has
+ * no body at all. Without this, both would be documented as the `Storage`
+ * resource, which is not what they answer.
  */
 export type ResponseBody = DocumentedValidator | PaginatedResponse | z.ZodType | 'no-content'
 
 /**
- * O contrato público de uma operação, declarado como `static docs` no
+ * The public contract of an operation, declared as `static docs` in the
  * controller.
  *
- * Todo campo é opcional, e a maioria dos controllers só usa `summary` e
- * `description`: o gerador deriva rota, método, payload, resposta, status e os
- * erros de infraestrutura do próprio código (`introspect.ts`). Este bloco
- * existe para o que o código não conta - a prosa que explica a regra de negócio
- * - e para corrigir uma derivação errada.
+ * Every field is optional, and most controllers only use `summary` and
+ * `description`: the generator derives route, method, payload, response, status and the
+ * infrastructure errors from the code itself (`introspect.ts`). This block
+ * exists for what the code does not tell - the prose that explains the business rule
+ * - and to correct a wrong derivation.
  *
- * `errors` mapeia status para o(s) `code` que aquela operação pode devolver
- * naquele status, e é o que torna a lista de falhas exaustiva para quem gera
- * cliente a partir do documento. Os automáticos - 401 com `auth`, 403 com
- * `role`, 422 com qualquer validator, 500 sempre - e os que o gerador lê (o
- * use-case, a tabela de fatos e o `_shared.<recurso>-refusal.ts` que ele
- * importa) não se declaram: só o que nasce em outra camada da cadeia, como o
- * 403 da policy (`_standards/openapi.md`, "erros-do-use-case").
+ * `errors` maps status to the `code`(s) that operation can return
+ * at that status, and is what makes the failure list exhaustive for whoever generates a
+ * client from the document. The automatic ones - 401 with `auth`, 403 with
+ * `role`, 422 with any validator, 500 always - and the ones the generator reads (the
+ * use case, the facts table and the `_shared.<resource>-refusal.ts` it
+ * imports) are not declared: only what is born in another layer of the chain, like the
+ * policy's 403 (`_standards/openapi.md`, "use-case-errors").
  *
- * `overrides` é a saída de emergência para o que o VineJS não expressa. É feito
- * merge por último, sobre o schema derivado.
+ * `overrides` is the escape hatch for what VineJS does not express. It is
+ * merged last, over the derived schema.
  */
 export type OperationDocs = {
   summary?: string
   description?: string
-  /** Sobrescreve a tag derivada do caminho. Raro. */
+  /** Overrides the tag derived from the path. Rare. */
   tag?: string
   body?: DocumentedValidator
   query?: DocumentedValidator
   params?: DocumentedValidator
   /**
-   * A resposta por status, quando ela não é o recurso da feature. Raro: só
-   * `storages`, que responde um plano de upload e um redirect sem corpo.
+   * The response per status, when it is not the feature resource. Rare: only
+   * `storages`, which answers an upload plan and a redirect with no body.
    */
   responses?: Record<number, ResponseBody>
   errors?: Record<number, string | string[]>
@@ -103,20 +103,20 @@ export type OperationDocs = {
 }
 
 /**
- * Identidade tipada. Existe para dar inferência e autocomplete na declaração
- * dentro do controller, sem custo em runtime.
+ * Typed identity. It exists to give inference and autocomplete in the declaration
+ * inside the controller, at no runtime cost.
  */
 export function defineDocs(docs: OperationDocs): OperationDocs {
   return docs
 }
 
-/** Um controller visto pelo gerador: pode ou não ter declarado sua documentação. */
+/** A controller as the generator sees it: it may or may not have declared its documentation. */
 export type DocumentedController = {
   docs?: OperationDocs
 }
 
 // ---------------------------------------------------------------------------
-// Documento
+// Document
 // ---------------------------------------------------------------------------
 
 export type OpenAPIOperation = {
@@ -126,7 +126,7 @@ export type OpenAPIOperation = {
   'tags': string[]
   'deprecated'?: boolean
   'security'?: Array<Record<string, string[]>>
-  /** Os papéis que a cadeia de middleware exige. Lido por `authz:check`. */
+  /** The roles the middleware chain requires. Read by `authz:check`. */
   'x-roles'?: string[]
   'parameters'?: OpenAPIParameter[]
   'requestBody'?: {

@@ -1,7 +1,7 @@
 import { vine, athleteListFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-/** Sem `classroomId`: a turma do representante sai da sessão, nunca do payload. */
+/** No `classroomId`: the representative's classroom comes from the session, never from the payload. */
 export const RepresentativeEnrollmentUpdateValidator = vine.create({
   ...athleteListFields(),
 })

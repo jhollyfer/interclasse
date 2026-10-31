@@ -6,9 +6,9 @@ import { LoggerManager } from '@adonisjs/core/logger'
 import loggerConfig from '#config/logger'
 
 /**
- * A spec que prova a redação de log (_standards/backend.md §7): loga o corpo de
- * um sign-in com a senha e afirma que ela não aparece. O logger é o da
- * configuração do projeto, só com o destino trocado por um coletor.
+ * The spec that proves log redaction (_standards/backend.md §7): it logs the body of
+ * a sign-in with the password and asserts it does not appear. The logger is the one from
+ * the project configuration, with only the destination swapped for a collector.
  */
 class Sink extends Writable {
   readonly lines: string[] = []
@@ -29,8 +29,8 @@ function collectingLogger(sink: Sink) {
   return new LoggerManager({ default: 'app', loggers: { app: config } }).use('app')
 }
 
-test.group('config > logger > redação (unit)', () => {
-  test('a senha do corpo não sai no log, nem aninhada', ({ assert }) => {
+test.group('config > logger > redaction (unit)', () => {
+  test('the body password does not reach the log, even nested', ({ assert }) => {
     const sink = new Sink()
 
     collectingLogger(sink).info(
@@ -42,7 +42,7 @@ test.group('config > logger > redação (unit)', () => {
     assert.include(sink.output, '[redigido]')
   })
 
-  test('token, cookie e authorization saem redigidos', ({ assert }) => {
+  test('token, cookie and authorization come out redacted', ({ assert }) => {
     const sink = new Sink()
 
     collectingLogger(sink).info(
@@ -58,7 +58,7 @@ test.group('config > logger > redação (unit)', () => {
     assert.notInclude(sink.output, 'segredo')
   })
 
-  test('o que não é segredo continua no log', ({ assert }) => {
+  test('what is not a secret stays in the log', ({ assert }) => {
     const sink = new Sink()
 
     collectingLogger(sink).info({ email: 'ana@mail.com' }, 'sign-in')

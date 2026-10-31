@@ -12,24 +12,24 @@ import {
 } from '@interclasse/shared'
 
 /**
- * O `vine` configurado e o que é de todos os validators (_standards/backend.md §4.4).
+ * The configured `vine` and what belongs to all validators (_standards/backend.md §4.4).
  *
- * Cada recurso tem o próprio `app/features/<módulo>/<recurso>/<recurso>.validator.ts`,
- * e importa daqui o `vine` - nunca de `@vinejs/vine` direto: é por este módulo
- * que as mensagens pt-BR e o transform de data valem em todo schema. Aqui ficam
- * só as regras usadas por dois ou mais recursos (como funções, para o
- * `optional()` de um validator não vazar para outro), `LIST_LIMITS`, os
- * validators globais e as mensagens.
+ * Each resource has its own `app/features/<module>/<resource>/<resource>.validator.ts`,
+ * and imports `vine` from here - never from `@vinejs/vine` directly: it is through this module
+ * that the pt-BR messages and the date transform apply to every schema. Only the rules
+ * used by two or more resources stay here (as functions, so one validator's
+ * `optional()` does not leak into another), `LIST_LIMITS`, the global
+ * validators and the messages.
  *
- * O gerador de OpenAPI resolve os validators pelo AST dos controllers, lendo o
- * especificador do import e reimportando o módulo. Renomear um export sem
- * atualizar o controller não quebra o build: a operação some do documento em
- * silêncio, e `node ace openapi:generate --check` é o que pega isso.
+ * The OpenAPI generator resolves validators through the controllers' AST, reading the
+ * import specifier and re-importing the module. Renaming an export without
+ * updating the controller does not break the build: the operation silently vanishes from
+ * the document, and `node ace openapi:generate --check` is what catches it.
  */
 
 export { vine }
 export type { Infer }
-/** Os erros do VineJS, para o `handler.ts` traduzir o 422 sem importar a lib direto. */
+/** The VineJS errors, so `handler.ts` translates the 422 without importing the lib directly. */
 export { errors as vineErrors } from '@vinejs/vine'
 
 declare module '@vinejs/vine/types' {
@@ -39,37 +39,37 @@ declare module '@vinejs/vine/types' {
 }
 
 /**
- * Datas validadas saem como `DateTime` do Luxon, prontas para o Lucid - e não
- * como o `Date` nativo, que o model teria de converter em cada caso de uso.
+ * Validated dates come out as Luxon `DateTime`, ready for Lucid - and not
+ * as the native `Date`, which the model would have to convert in each use case.
  */
 VineDate.transform((value) => DateTime.fromJSDate(value))
 
 /**
- * Regras reaproveitadas por mais de um recurso.
+ * Rules reused by more than one resource.
  *
- * São funções, não constantes: reaproveitar o mesmo nó de schema em dois
- * validators compartilharia as opções entre eles - o `optional()` de um
- * apareceria no outro.
+ * They are functions, not constants: reusing the same schema node in two
+ * validators would share the options between them - one's `optional()`
+ * would show up in the other.
  */
 
 /**
- * Quantos itens cada lista aceita.
+ * How many items each list accepts.
  *
- * Sem teto, `vine.array()` aceita o array que couber no corpo da requisição, e
- * o que chega vai inteiro para o banco.
+ * Without a ceiling, `vine.array()` accepts whatever array fits in the request body, and
+ * what arrives goes whole into the database.
  */
 export const LIST_LIMITS = {
-  /** Atletas de uma turma numa modalidade. Nenhuma modalidade escolar inscreve mais. */
+  /** Athletes of a classroom in a sport. No school sport enrolls more. */
   ATHLETES: 40,
 } as const
 
 /**
- * `null` explícito recusado num campo `optional()` que não é `nullable()`.
+ * Explicit `null` refused on an `optional()` field that is not `nullable()`.
  *
- * O `optional()` do VineJS 4 trata `null` como ausente e o tira do payload, e o
- * bodyparser converte `""` em `null` (`convertEmptyStringsToNull`). Juntos, um
- * `title: ""` num update virava "não mexer" e respondia 200 com o valor antigo.
- * `implicit` porque a regra precisa rodar justamente quando o valor é `null`.
+ * VineJS 4's `optional()` treats `null` as absent and drops it from the payload, and the
+ * bodyparser converts `""` into `null` (`convertEmptyStringsToNull`). Together, a
+ * `title: ""` on an update became "leave alone" and answered 200 with the old value.
+ * `implicit` because the rule must run precisely when the value is `null`.
  */
 const notNullRule = vine.createRule(
   (value: unknown, _options: undefined, field: FieldContext) => {
@@ -87,13 +87,13 @@ export function email() {
 }
 
 /**
- * Força da senha: um `regex` por classe de caractere, para a mensagem apontar
- * exatamente o que falta em vez de um "senha fraca" que não diz o que fazer.
+ * Password strength: one `regex` per character class, so the message points at
+ * exactly what is missing instead of a "weak password" that does not say what to do.
  *
- * `confirmed` exige `passwordConfirmation` com o mesmo valor, lido do input
- * cru. Nenhum schema daqui o declara, e é só por isso que ele não aparece no
- * payload validado - não há o que descartar antes do `merge()`/`create()` no
- * use-case. O que o VineJS entrega é o que o schema declara.
+ * `confirmed` requires `passwordConfirmation` with the same value, read from the raw
+ * input. No schema here declares it, and that is the only reason it does not show up in the
+ * validated payload - there is nothing to discard before `merge()`/`create()` in the
+ * use case. What VineJS delivers is what the schema declares.
  */
 export function password() {
   return vine
@@ -108,20 +108,20 @@ export function password() {
 }
 
 /**
- * Status de conta. Canônico em inglês: o valor é identificador, e o rótulo em
- * português é do frontend.
+ * Account status. Canonical in English: the value is an identifier, and the
+ * Portuguese label belongs to the frontend.
  */
 export function activeStatus() {
   return vine.enum(ACTIVE_STATUSES)
 }
 
 /**
- * Os três campos que toda listagem aceita. Espalhados
- * (`...paginationFields()`) pelos validators que ainda somam um filtro
- * próprio, para o teto de `perPage` viver num lugar só - repetido à mão em
- * cada recurso, é uma divergência esperando acontecer.
+ * The three fields every listing accepts. Spread
+ * (`...paginationFields()`) by the validators that still add a filter
+ * of their own, so the `perPage` ceiling lives in one place - repeated by hand in
+ * each resource, it is a divergence waiting to happen.
  */
-/** Página e tamanho, para a listagem que não busca (_standards/backend.md §4.4). */
+/** Page and size, for a listing that does not search (_standards/backend.md §4.4). */
 export function pageFields() {
   return {
     page: vine.number().min(1).optional(),
@@ -129,7 +129,7 @@ export function pageFields() {
   }
 }
 
-/** Página, tamanho e `search` - só para quem de fato lê `payload.search`. */
+/** Page, size and `search` - only for whoever actually reads `payload.search`. */
 export function paginationFields() {
   return {
     ...pageFields(),
@@ -138,32 +138,32 @@ export function paginationFields() {
 }
 
 /**
- * O recorte de lixeira, para as listagens que têm o que restaurar.
+ * The trash cut, for listings that have something to restore.
  *
- * Fora de `paginationFields()` de propósito: se estivesse lá, apareceria também
- * nas listagens da vitrine, que nunca enxergam registro arquivado. O parâmetro
- * seria aceito, ignorado em silêncio, e o documento OpenAPI passaria a prometer
- * um filtro que não existe.
+ * Outside `paginationFields()` on purpose: if it were there, it would also show up
+ * in the storefront listings, which never see an archived record. The parameter
+ * would be accepted, silently ignored, and the OpenAPI document would start promising
+ * a filter that does not exist.
  */
 export function trashedField() {
   return { trashed: vine.enum(TRASHED_MODES).optional() }
 }
 
 /**
- * A ordem de uma listagem, em dois campos: `sort` (a coluna) e `direction`.
+ * The order of a listing, in two fields: `sort` (the column) and `direction`.
  *
- * **Um par, e não um `order-<coluna>` por coluna.** Dois parâmetros de ordem ao
- * mesmo tempo não expressam precedência - `?order-title=asc&order-date=desc`
- * não diz qual vence -, e a consulta ordena por uma coluna só.
+ * **A pair, and not one `order-<column>` per column.** Two order parameters at the
+ * same time do not express precedence - `?order-title=asc&order-date=desc`
+ * does not say which wins -, and the query sorts by a single column.
  *
- * **A coluna vem de uma lista fechada, declarada por recurso.** O valor entra
- * direto no `orderBy`, que o compõe no SQL: aceitar texto livre da URL seria
- * entregar a cláusula ao cliente. Coluna fora da lista é 422 apontando o campo,
- * e não um 500 do banco reclamando de coluna inexistente.
+ * **The column comes from a closed list, declared per resource.** The value goes
+ * straight into `orderBy`, which composes it into the SQL: accepting free text from the URL would be
+ * handing the clause to the client. A column outside the list is a 422 pointing at the field,
+ * and not a database 500 complaining about a nonexistent column.
  *
- * Fora de `paginationFields()` pelo mesmo motivo de `trashedField()`: cada
- * recurso ordena pelo que tem, e um conjunto global prometeria no OpenAPI
- * colunas que metade das listagens não conhece.
+ * Outside `paginationFields()` for the same reason as `trashedField()`: each
+ * resource sorts by what it has, and a global set would promise in OpenAPI
+ * columns that half the listings do not know.
  */
 export function sortFields<const TColumns extends readonly [string, ...string[]]>(
   columns: TColumns,
@@ -175,10 +175,10 @@ export function sortFields<const TColumns extends readonly [string, ...string[]]
 }
 
 /**
- * O identificador na URL. Vale para todo recurso: a PK é uuid em toda tabela.
+ * The identifier in the URL. Holds for every resource: the PK is a uuid in every table.
  *
- * Existe para que um `:id` malformado seja 422 apontando o campo, e não um 500
- * do Postgres recusando o literal na cláusula `where`.
+ * It exists so a malformed `:id` is a 422 pointing at the field, and not a Postgres
+ * 500 refusing the literal in the `where` clause.
  */
 export const IdentifierValidator = vine.create({
   id: vine.string().uuid(),
@@ -193,11 +193,11 @@ export type IdentifierPayload = Infer<typeof IdentifierValidator>
 export type PagePayload = Infer<typeof PageValidator>
 export type PaginationPayload = Infer<typeof PaginationValidator>
 
-/** Os filtros da tabela de jogos, iguais no painel e no site. */
+/** The match table filters, the same in the panel and on the site. */
 export function matchFilterFields() {
   return {
     bracketId: vine.string().uuid().optional(),
-    // Os jogos de uma turma: a aba "Jogos" do detalhe da turma.
+    // A classroom's matches: the "Matches" tab of the classroom detail.
     classroomId: vine.string().uuid().optional(),
     sportId: vine.string().uuid().optional(),
     category: vine.enum(CATEGORIES).optional(),
@@ -206,7 +206,7 @@ export function matchFilterFields() {
   }
 }
 
-/** A lista de atletas de uma modalidade, inteira: substitui a anterior. */
+/** The athlete list of a sport, whole: it replaces the previous one. */
 export function athleteListFields() {
   return {
     sportId: vine.string().uuid(),
@@ -216,36 +216,36 @@ export function athleteListFields() {
 
 /*
 |--------------------------------------------------------------------------
-| Mensagens de validação
+| Validation messages
 |--------------------------------------------------------------------------
 |
-| Sem isto o VineJS responde no default em inglês, e a 422 sai bilíngue: o
-| envelope de `app/exceptions/handler.ts` é português ("Dados inválidos") e os
-| valores de `errors` sairiam em inglês, porque o handler copia a mensagem
-| verbatim. Todo erro de negócio dos use-cases já é pt-BR - só o erro de
-| validação, que é o mais frequente, destoaria.
+| Without this VineJS answers in its English default, and the 422 comes out bilingual: the
+| envelope of `app/exceptions/handler.ts` is localized ("Dados inválidos") and the
+| `errors` values would come out in English, because the handler copies the message
+| verbatim. Every business error of the use cases is already localized - only the
+| validation error, which is the most frequent, would stand out.
 |
-| Duas armadilhas, se for mexer:
+| Two traps, if you change this:
 |
-| - `FIELD_LABELS` troca só o `{{ field }}` **exibido**. A chave do erro segue
-|   sendo o nome do campo (`avatarId`), e é ela que o frontend usa para marcar
-|   o input certo. Renomear chave quebra o formulário.
-| - Não configure `vine.errorReporter`. O handler depende do formato de array
-|   `{ field, rule, message }` do `SimpleErrorReporter`.
+| - `FIELD_LABELS` swaps only the **displayed** `{{ field }}`. The error key stays
+|   the field name (`avatarId`), and it is what the frontend uses to mark
+|   the right input. Renaming a key breaks the form.
+| - Do not configure `vine.errorReporter`. The handler depends on the array format
+|   `{ field, rule, message }` of the `SimpleErrorReporter`.
 |
 */
 
 /**
- * O nome amigável de cada campo, na forma que cai bem depois de "Informe".
+ * The friendly name of each field, in the form that reads well after "Informe".
  *
- * É exportado, e não escrito direto na chamada abaixo, porque
- * `app/core/validator.spec.ts` precisa importá-lo pelo nome - sem
- * depender da ordem dos argumentos do `SimpleMessagesProvider`. Esse mesmo
- * teste cobra rótulo para todo campo dos validators e acusa rótulo órfão, então
- * campo novo em `#core/validator` nasce vermelho até entrar aqui.
+ * It is exported, and not written straight into the call below, because
+ * `app/core/validator.spec.ts` needs to import it by name - without
+ * depending on the order of the `SimpleMessagesProvider` arguments. That same
+ * test enforces a label for every validator field and flags orphan labels, so a
+ * new field in `#core/validator` is born red until it enters here.
  */
 const PT_BR_FIELD_LABELS = {
-  // Identidade e conta
+  // Identity and account
   name: 'o nome',
   email: 'o e-mail',
   password: 'a senha',
@@ -256,14 +256,14 @@ const PT_BR_FIELD_LABELS = {
   avatarId: 'o avatar',
   id: 'o identificador',
 
-  // Turma e aluno
+  // Classroom and student
   grade: 'o ano',
   category: 'a categoria',
   advisorId: 'o professor conselheiro',
   representativeId: 'o aluno representante',
   classroomId: 'a turma',
 
-  // Modalidade e inscrição
+  // Sport and enrollment
   minAthletes: 'o mínimo de atletas',
   maxAthletes: 'o máximo de atletas',
   sportId: 'a modalidade',
@@ -272,7 +272,7 @@ const PT_BR_FIELD_LABELS = {
   reason: 'o motivo',
   pending: 'o filtro de pendentes',
 
-  // Site e fotos
+  // Site and photos
   about: 'o texto do Sobre',
   organizer: 'quem organiza',
   firstEditionYear: 'o ano da primeira edição',
@@ -283,12 +283,12 @@ const PT_BR_FIELD_LABELS = {
   storageId: 'o arquivo',
   caption: 'a legenda',
 
-  // Aviso
+  // Announcement
   title: 'o título',
   body: 'o texto',
   pinned: 'o destaque',
 
-  // Chave e partida
+  // Bracket and match
   bracketId: 'a chave',
   phase: 'a fase',
   scheduledAt: 'a data e hora',
@@ -300,7 +300,7 @@ const PT_BR_FIELD_LABELS = {
   color: 'a cor do cartão',
   note: 'a observação',
 
-  // Arquivo. Estes não passam por formulário do painel.
+  // File. These do not go through a panel form.
   fileName: 'o nome do arquivo',
   mimetype: 'o tipo do arquivo',
   size: 'o tamanho',
@@ -308,7 +308,7 @@ const PT_BR_FIELD_LABELS = {
   partNumber: 'o número da parte',
   etag: 'o ETag',
 
-  // Listagem
+  // Listing
   page: 'a página',
   perPage: 'o total por página',
   search: 'a busca',
@@ -317,16 +317,16 @@ const PT_BR_FIELD_LABELS = {
   trashed: 'o filtro de arquivados',
 }
 
-/** As chaves de `PT_BR_FIELD_LABELS`: o compilador cobra a mesma lista nos outros idiomas. */
+/** The keys of `PT_BR_FIELD_LABELS`: the compiler enforces the same list in the other languages. */
 type FieldLabels = Record<keyof typeof PT_BR_FIELD_LABELS, string>
 
 /**
- * O nome amigável de cada campo, por idioma, na forma que cai bem depois de
- * "Informe" (pt-BR), "Ingresa" (es) e "Enter" (en) - `_standards/i18n.md` §3.
+ * The friendly name of each field, per language, in the form that reads well after
+ * "Informe" (pt-BR), "Ingresa" (es) and "Enter" (en) - `_standards/i18n.md` §3.
  *
- * É exportado porque `app/core/validator.unit.spec.ts` cobra rótulo para todo
- * campo dos validators e acusa rótulo órfão, então campo novo nasce vermelho
- * até entrar aqui, nos três idiomas.
+ * It is exported because `app/core/validator.unit.spec.ts` enforces a label for every
+ * validator field and flags orphan labels, so a new field is born red
+ * until it enters here, in the three languages.
  */
 export const FIELD_LABELS = {
   'pt-BR': PT_BR_FIELD_LABELS,
@@ -447,12 +447,12 @@ export const FIELD_LABELS = {
 } satisfies Record<Locale, FieldLabels>
 
 const PT_BR_RULE_MESSAGES = {
-  // Genéricas
-  // O `{{ field }}` só aparece onde a frase começa por verbo. Os rótulos
-  // carregam artigo ("o resumo"), então campo no início da frase sairia em
-  // minúscula, e `'em {{ field }}'` sairia como "em a senha". Nas demais
-  // regras o nome é omitido: o erro é renderizado sob o campo rotulado, e na
-  // API vem indexado pelo nome dele.
+  // Generic
+  // `{{ field }}` only appears where the phrase starts with a verb. The labels
+  // carry an article ("o resumo"), so a field at the start of the phrase would come out
+  // in lower case, and `'em {{ field }}'` would come out as "em a senha". In the other
+  // rules the name is omitted: the error is rendered under the labeled field, and in the
+  // API it comes indexed by its name.
   'required': 'Informe {{ field }}',
   'string': 'Informe {{ field }}',
   'enum': 'Selecione {{ field }}',
@@ -472,23 +472,23 @@ const PT_BR_RULE_MESSAGES = {
   'array.maxLength': 'Informe no máximo {{ max }} itens',
   'isoDateTime': 'Informe data e hora em ISO 8601 com fuso',
 
-  // Senha
-  // Os quatro `.regex()` de `password()` reportam todos a chave
-  // `password.regex`, e o VineJS para na primeira que falha - não há como dar
-  // uma mensagem por classe de caractere. Daí a mensagem combinada.
+  // Password
+  // The four `.regex()` of `password()` all report the key
+  // `password.regex`, and VineJS stops at the first that fails - there is no way to give
+  // a message per character class. Hence the combined message.
   'password.regex': 'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
   'password.minLength': 'A senha deve ter ao menos {{ min }} caracteres',
   'password.maxLength': 'A senha deve ter no máximo {{ max }} caracteres',
-  // `confirmed` roda em `password` mas reporta em `passwordConfirmation`.
+  // `confirmed` runs on `password` but reports on `passwordConfirmation`.
   'passwordConfirmation.confirmed': 'As senhas não são iguais',
 }
 
 type RuleMessages = Record<keyof typeof PT_BR_RULE_MESSAGES, string>
 
 /**
- * A frase de cada regra de validação, por idioma. Exportado pelo mesmo motivo
- * de `FIELD_LABELS`: a meta-spec cobra que toda regra usada pelos validators
- * tenha tradução nos três idiomas.
+ * The phrase of each validation rule, per language. Exported for the same reason
+ * as `FIELD_LABELS`: the meta-spec enforces that every rule used by the validators
+ * has a translation in the three languages.
  */
 export const RULE_MESSAGES = {
   'pt-BR': PT_BR_RULE_MESSAGES,
@@ -544,9 +544,9 @@ export const RULE_MESSAGES = {
 } satisfies Record<Locale, RuleMessages>
 
 /**
- * Um provider de mensagens por idioma. O middleware de idioma escolhe o da
- * requisição (`detect-user-locale.middleware.ts`); fora de requisição vale o
- * idioma base (_doc-lib/vinejs.md#custom_error_messages).
+ * One messages provider per language. The language middleware picks the request's
+ * (`detect-user-locale.middleware.ts`); outside a request the base
+ * language applies (_doc-lib/vinejs.md#custom_error_messages).
  */
 export const VALIDATION_MESSAGES = {
   'pt-BR': new SimpleMessagesProvider(RULE_MESSAGES['pt-BR'], FIELD_LABELS['pt-BR']),

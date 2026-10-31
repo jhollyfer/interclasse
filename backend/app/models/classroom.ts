@@ -5,7 +5,7 @@ import { type Category } from '@interclasse/shared'
 import { ClassroomSchema } from '#database/schema'
 import User from '#models/user'
 
-/** A turma: a unidade que compete. Cada modalidade forma um time por turma. */
+/** The classroom: the unit that competes. Each sport forms one team per classroom. */
 export default class Classroom extends ClassroomSchema {
   declare category: Category
 

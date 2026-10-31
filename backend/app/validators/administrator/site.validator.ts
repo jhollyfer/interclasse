@@ -1,12 +1,12 @@
 import { vine } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-/** `@usuario` do Instagram: letras, números, ponto e sublinhado, até 30. */
+/** Instagram `@handle`: letters, digits, dot and underscore, up to 30. */
 const INSTAGRAM = /^[A-Za-z0-9._]{1,30}$/
 
 /**
- * Tudo opcional e anulável: ausente é "não mexer", `null` apaga. O site esconde
- * o que estiver vazio.
+ * All optional and nullable: absent means "leave alone", `null` erases. The site hides
+ * whatever is empty.
  */
 export const AdministratorSiteUpdateValidator = vine.create({
   about: vine.string().trim().maxLength(4000).nullable().optional(),
