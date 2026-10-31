@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 
 import { inject } from '@adonisjs/core'
+import { I18n } from '@adonisjs/i18n'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
 import { left, right, type Either } from '@interclasse/shared'
@@ -20,6 +21,8 @@ type Response = Either<HTTPException, string>
 export default class DocumentationOpenapiShowUseCase {
   private static specification: string | undefined
 
+  constructor(private readonly i18n: I18n) {}
+
   async execute(): Promise<Response> {
     try {
       if (!DocumentationOpenapiShowUseCase.specification) {
@@ -35,7 +38,7 @@ export default class DocumentationOpenapiShowUseCase {
 
       return left(
         HTTPException.InternalServerError(
-          'Erro interno do servidor',
+          this.i18n.t('errors.internal'),
           'DOCUMENTATION_OPENAPI_SHOW_ERROR',
         ),
       )
