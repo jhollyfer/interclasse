@@ -9,8 +9,8 @@ import { defineDocs } from '#core/openapi/types'
 export default class RepresentativeEnrollmentShowController {
   static docs = defineDocs({
     description:
-      'A matriz aluno x modalidade da turma do representante. A turma sai da sessão: ' +
-      'representante sem turma vinculada responde `404`.',
+      'The student x sport matrix of the representative classroom. The classroom comes from the session: ' +
+      'a representative without a linked classroom responds `404`.',
   })
 
   constructor(private readonly useCase: RepresentativeEnrollmentShowUseCase) {}

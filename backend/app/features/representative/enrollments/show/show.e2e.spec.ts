@@ -15,12 +15,12 @@ import {
 test.group('enrollments > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a matriz da turma vinculada à sessão', async ({ client, assert }) => {
+  test('the matrix of the classroom linked to the session', async ({ client, assert }) => {
     const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
     await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
-    // Aluno de outra turma não entra na matriz.
+    // A student from another classroom does not enter the matrix.
     await StudentFactory.with('classroom').create()
 
     const response = await client.get('/representative/enrollments').cookies(session)
@@ -46,7 +46,7 @@ test.group('enrollments > show', (group) => {
     ])
   })
 
-  test('modalidade sorteada na categoria da turma aparece travada', async ({ client, assert }) => {
+  test('a sport drawn in the classroom category shows as locked', async ({ client, assert }) => {
     const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
     await drawSport(sport, classroom)
@@ -57,7 +57,7 @@ test.group('enrollments > show', (group) => {
     assert.isTrue(body(response).sports[0].locked)
   })
 
-  test('representante sem turma vinculada responde 404', async ({ client, assert }) => {
+  test('representative without a linked classroom responds 404', async ({ client, assert }) => {
     const { session } = await signInWithFactory(client, 'representative')
 
     const response = await client.get('/representative/enrollments').cookies(session)
@@ -66,18 +66,21 @@ test.group('enrollments > show', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('sem sessão é 401; conselheiro e administrador recebem 403', async ({ client, assert }) => {
+  test('without a session is 401; advisor and administrator get 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const admin = await authenticateAsAdministrator(client)
 
-    const anonimo = await client.get('/representative/enrollments')
-    const negados = [
+    const anonymous = await client.get('/representative/enrollments')
+    const denied = [
       await client.get('/representative/enrollments').cookies(advisor),
       await client.get('/representative/enrollments').cookies(admin),
     ]
 
-    anonimo.assertStatus(401)
-    for (const response of negados) {
+    anonymous.assertStatus(401)
+    for (const response of denied) {
       response.assertStatus(403)
       assert.equal(body(response).code, 'ACCESS_DENIED')
     }

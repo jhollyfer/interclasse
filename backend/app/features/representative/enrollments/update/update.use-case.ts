@@ -21,9 +21,9 @@ type Payload = Merge<RepresentativeEnrollmentUpdatePayload, { actor: Actor }>
 type Response = Either<HTTPException, RepresentativeEnrollmentShowResponse>
 
 /**
- * O representante só acrescenta atletas à lista da própria turma, e só antes do
- * sorteio (regras da entidade). A turma sai da sessão. O fluxo é o da base
- * compartilhada com o conselheiro.
+ * The representative only adds athletes to the list of their own classroom, and only before the
+ * draw (entity rules). The classroom comes from the session. The flow is the one of the base
+ * shared with the advisor.
  */
 @inject()
 export default class RepresentativeEnrollmentUpdateUseCase extends EnrollmentReplaceBase {
