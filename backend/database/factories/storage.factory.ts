@@ -4,19 +4,19 @@ import { UPLOAD_STATUS } from '@interclasse/shared'
 import Storage from '#models/storage'
 
 /**
- * Registro de arquivo. A factory grava só a linha na tabela: nada vai para o
+ * File record. The factory writes only the table row: nothing goes to the
  * bucket.
  *
- * Isso basta para tudo o que o teste precisa - `avatar_id`, `storage_id` de foto,
- * `regulation_id` - porque a `url` da resposta é derivada
- * pelo hook de `app/models/storage.ts` a partir de `path`. A URL sai
- * preenchida no JSON; abrir a URL dá 404, e é o esperado.
+ * That is enough for everything the test needs - `avatar_id`, a photo's `storage_id`,
+ * `regulation_id` - because the response `url` is derived
+ * by the hook in `app/models/storage.ts` from `path`. The URL comes out
+ * filled in the JSON; opening the URL gives 404, and that is expected.
  *
- * `path` é igual a `filename`, sem diretório nenhum: é exatamente a chave que
- * o upload grava no bucket.
+ * `path` equals `filename`, with no directory at all: it is exactly the key the
+ * upload writes to the bucket.
  *
- * Nasce `UPLOADED` porque é o único estado anexável a um recurso - um
- * `PENDING` é upload em andamento, e nenhum use-case aceita.
+ * Born `UPLOADED` because it is the only state attachable to a resource - a
+ * `PENDING` is an upload in progress, and no use case accepts it.
  */
 export const StorageFactory = factory
   .define(Storage, ({ faker }) => {

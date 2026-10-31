@@ -3,51 +3,54 @@ import { test } from '@japa/runner'
 import { body } from '#tests/http-fixtures'
 
 /**
- * A allowlist de `config/cors.ts`, que vem de `CORS_ORIGINS`.
+ * The allowlist of `config/cors.ts`, which comes from `CORS_ORIGINS`.
  *
- * O teste roda fora de desenvolvimento - `NODE_ENV=test` -, que é a única
- * condição em que a lista vale: em dev a configuração libera qualquer origem e
- * não haveria o que medir. A rota escolhida é `/health-check`, porque é pública e o
- * que se afere é o cabeçalho da resposta, não o corpo.
+ * The test runs outside development - `NODE_ENV=test` -, the only
+ * condition in which the list applies: in dev the configuration allows any origin and
+ * there would be nothing to measure. The chosen route is `/health-check`, because it is public and what
+ * is asserted is the response header, not the body.
  */
 test.group('cors > allowlist', () => {
-  test('origem na allowlist recebe o cabeçalho', async ({ client, assert }) => {
+  test('an origin in the allowlist receives the header', async ({ client, assert }) => {
     const response = await client.get('/health-check').header('origin', 'http://localhost:5173')
 
     response.assertStatus(200)
     assert.equal(response.header('access-control-allow-origin'), 'http://localhost:5173')
-    // Com credencial o navegador só aceita origem nomeada, nunca `*`: sem este
-    // cabeçalho o cookie de sessão não sobe na requisição cross-origin.
+    // With credentials the browser only accepts a named origin, never `*`: without this
+    // header the session cookie is not sent on the cross-origin request.
     assert.equal(response.header('access-control-allow-credentials'), 'true')
   })
 
-  test('origem fora da allowlist não recebe o cabeçalho', async ({ client, assert }) => {
+  test('an origin outside the allowlist does not receive the header', async ({
+    client,
+    assert,
+  }) => {
     const response = await client.get('/health-check').header('origin', 'http://intruso.example')
 
-    // A requisição em si passa - CORS é decisão do navegador, e o servidor
-    // apenas deixa de autorizar. Sem o cabeçalho, o navegador descarta a
-    // resposta.
+    // The request itself goes through - CORS is the browser's decision, and the server
+    // merely stops authorizing. Without the header, the browser discards the
+    // response.
     response.assertStatus(200)
     assert.isUndefined(response.header('access-control-allow-origin'))
   })
 })
 
 /**
- * A barreira de CSRF: toda escrita confere a origem, qualquer que seja o `Content-Type`.
- * O caso sem `Origin` e sem `Sec-Fetch-Site` é do `origin.middleware.unit.spec.ts`:
- * o cliente de teste sempre manda a origem da allowlist (`tests/bootstrap.ts`).
+ * The CSRF barrier: every write checks the origin, whatever the `Content-Type`.
+ * The case without `Origin` and without `Sec-Fetch-Site` belongs to `origin.middleware.unit.spec.ts`:
+ * the test client always sends the allowlist origin (`tests/bootstrap.ts`).
  *
- * `config/shield.ts` tem `csrf.enabled: false`, e o bodyparser aceita
- * `multipart/form-data` e `application/x-www-form-urlencoded` — content-types
- * **simples**, que um `<form>` de outra origem envia sem preflight nenhum. Em
- * produção o cookie viaja junto, que é exatamente a condição de um CSRF.
+ * `config/shield.ts` has `csrf.enabled: false`, and the bodyparser accepts
+ * `multipart/form-data` and `application/x-www-form-urlencoded` — **simple**
+ * content types, which a `<form>` from another origin sends with no preflight. In
+ * production the cookie travels along, which is exactly the condition for CSRF.
  *
- * `origin_middleware` é quem fecha isso, e este grupo é o que impede a barreira
- * de sumir sem ninguém notar: ela não tem efeito visível em requisição
- * legítima, então nada mais reprovaria a sua remoção.
+ * `origin_middleware` is what closes that, and this group is what keeps the barrier
+ * from vanishing unnoticed: it has no visible effect on a legitimate
+ * request, so nothing else would fail on its removal.
  */
-test.group('cors > escrita cross-origin', () => {
-  test('origem fora da allowlist é recusada com 403', async ({ client, assert }) => {
+test.group('cors > cross-origin writes', () => {
+  test('an origin outside the allowlist is refused with 403', async ({ client, assert }) => {
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://intruso.example')
@@ -59,7 +62,7 @@ test.group('cors > escrita cross-origin', () => {
     assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('origem na allowlist passa da barreira', async ({ client, assert }) => {
+  test('an origin in the allowlist passes the barrier', async ({ client, assert }) => {
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://localhost:5173')
@@ -67,14 +70,14 @@ test.group('cors > escrita cross-origin', () => {
       .field('email', 'quem@exemplo.com')
       .field('password', 'nao-importa')
 
-    // Passa da barreira e chega ao validator ou às credenciais: o que importa
-    // é **não** ser o 403 de origem.
+    // It passes the barrier and reaches the validator or the credentials: what matters
+    // is that it is **not** the origin 403.
     assert.notEqual(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('JSON de origem fora da allowlist também é recusado', async ({ client, assert }) => {
-    // A barreira não olha `Content-Type`: `text/plain` e POST vazio também cruzam
-    // sites sem preflight (_standards/backend.md §4.10).
+  test('JSON from an origin outside the allowlist is also refused', async ({ client, assert }) => {
+    // The barrier does not look at `Content-Type`: `text/plain` and an empty POST also cross
+    // sites without preflight (_standards/backend.md §4.10).
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://intruso.example')
@@ -84,7 +87,7 @@ test.group('cors > escrita cross-origin', () => {
     assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('text/plain de origem fora da allowlist é recusado', async ({ client, assert }) => {
+  test('text/plain from an origin outside the allowlist is refused', async ({ client, assert }) => {
     const response = await client
       .post('/authentication/sign-out')
       .header('origin', 'http://intruso.example')

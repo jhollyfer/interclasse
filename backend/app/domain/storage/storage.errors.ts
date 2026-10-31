@@ -1,6 +1,6 @@
 /**
- * O que o arquivo recusa, como fato (`_standards/domain.md` §2): sem status
- * HTTP nem texto de tela. O use-case traduz cada um.
+ * What the file refuses, as a fact (`_standards/domain.md` §2): no
+ * HTTP status or screen text. The use case translates each one.
  */
 export type StorageError =
   | {

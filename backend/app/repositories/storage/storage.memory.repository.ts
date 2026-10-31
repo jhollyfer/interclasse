@@ -10,19 +10,19 @@ import {
 import { Storage, type StorageProps } from '#domain/storage/storage.entity'
 import { MemoryPagination } from '#core/memory-pagination'
 
-/** O sinal da comparação por sentido de ordenação. */
+/** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class StorageMemoryRepository extends StorageRepository {
   private readonly rows = new Map<string, StorageProps>()
   private readonly uses = new Map<string, string[]>()
 
-  /** Arranjo do teste: o arquivo está em uso nestes rótulos. */
+  /** Test arrangement: the file is in use under these labels. */
   markUsed(id: string, labels: string[]): this {
     this.uses.set(id, labels)
     return this

@@ -25,9 +25,9 @@ server.errorHandler(() => import('#exceptions/handler'))
 server.use([
   () => import('#middleware/force-json-response.middleware'),
   () => import('#middleware/container-bindings.middleware'),
-  // Cabeçalhos de segurança antes de tudo que pode recusar: a resposta de CORS,
-  // de origem proibida e de 404 também sai com `X-Frame-Options` e HSTS
-  // (_standards/backend.md §4.10, "Ordem da cadeia").
+  // Security headers before everything that can refuse: the CORS response,
+  // the forbidden-origin one and the 404 also go out with `X-Frame-Options` and HSTS
+  // (_standards/backend.md §4.10, "Chain order").
   () => import('@adonisjs/shield/shield_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
 ])
@@ -37,16 +37,16 @@ server.use([
  * requests with a registered route.
  */
 router.use([
-  // Primeiro: todo erro abaixo (origem, autenticação, papel) já sai no idioma
-  // de quem pediu (_standards/i18n.md §3).
+  // First: every error below (origin, authentication, role) already goes out in the
+  // language of whoever asked (_standards/i18n.md §3).
   () => import('#middleware/detect-user-locale.middleware'),
   /**
-   * Antes do bodyparser, de propósito.
+   * Before the bodyparser, on purpose.
    *
-   * A barreira decide pelo método e pelo `Content-Type`, que são header - não
-   * precisa do corpo para nada. Depois do bodyparser, um `multipart` de origem
-   * proibida seria lido inteiro, gravado em disco temporário e só então
-   * recusado: o trabalho todo, para uma requisição que nunca teve permissão.
+   * The barrier decides by method and `Content-Type`, which are headers - it needs
+   * no body at all. After the bodyparser, a `multipart` from a forbidden origin would
+   * be read in full, written to a temporary disk and only then refused:
+   * all the work, for a request that never had permission.
    */
   () => import('#middleware/origin.middleware'),
   () => import('@adonisjs/core/bodyparser_middleware'),

@@ -3,11 +3,11 @@ import { GRADES } from '../../enums/grades.js'
 import { paginationFields, sortFields, z } from '../../validator.js'
 
 /**
- * A turma, como o painel a cadastra. Par de caminho e nome do VineJS de
+ * The classroom, as the panel registers it. Mirror (path and name) of the VineJS one in
  * `backend/app/validators/administrator/classrooms.validator.ts`
- * (`_standards/architecture.md` §10). A categoria sai do ano e por isso não é
- * campo de entrada; que a conta indicada exista e tenha o papel do vínculo é
- * regra do domínio, não do formulário.
+ * (`_standards/architecture.md` §10). The category comes from the grade, so it is not
+ * an input field; that the given account exists and has the link's role is a domain
+ * rule, not a form one.
  */
 export const CLASSROOM_SORT_COLUMNS = [
   'name',
@@ -23,7 +23,7 @@ export const AdministratorClassroomCreateValidator = z.object({
   representativeId: z.uuid().nullable().optional(),
 })
 
-/** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
+/** Absent field means "leave alone"; `null` on advisor or representative undoes the link. */
 export const AdministratorClassroomUpdateValidator =
   AdministratorClassroomCreateValidator.partial()
 

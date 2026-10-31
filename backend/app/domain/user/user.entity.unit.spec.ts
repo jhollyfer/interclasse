@@ -18,7 +18,7 @@ function advisor(): User {
 }
 
 test.group('User', () => {
-  test('nasce ativa, sem avatar e fora da lixeira', ({ assert }) => {
+  test('is born active, without avatar and outside the trash', ({ assert }) => {
     assert.deepInclude(advisor().snapshot(), {
       status: 'ACTIVE',
       avatarId: null,
@@ -27,7 +27,7 @@ test.group('User', () => {
     })
   })
 
-  test('só conta viva e ativa entra', ({ assert }) => {
+  test('only a live and active account gets in', ({ assert }) => {
     const active = advisor()
     const inactive = advisor()
     inactive.update({ status: 'INACTIVE' }, NOW)
@@ -39,7 +39,7 @@ test.group('User', () => {
     assert.isFalse(archived.canSignIn())
   })
 
-  test('arquivar carimba a lixeira e arquivar de novo é USER_ALREADY_ARCHIVED', ({ assert }) => {
+  test('archiving stamps the trash and archiving again is USER_ALREADY_ARCHIVED', ({ assert }) => {
     const user = advisor()
 
     assert.isTrue(user.archive(LATER).isRight())
@@ -47,7 +47,7 @@ test.group('User', () => {
     assert.deepEqual(user.archive(LATER).value, { code: 'USER_ALREADY_ARCHIVED' })
   })
 
-  test('restaurar limpa a lixeira e só vale para conta arquivada', ({ assert }) => {
+  test('restoring clears the trash and only holds for an archived account', ({ assert }) => {
     const user = advisor()
 
     assert.deepEqual(user.unarchive(LATER).value, { code: 'USER_NOT_ARCHIVED' })
@@ -57,7 +57,7 @@ test.group('User', () => {
     assert.isNull(user.snapshot().deletedAt)
   })
 
-  test('apagar de vez exige a conta arquivada', ({ assert }) => {
+  test('deleting for good requires the archived account', ({ assert }) => {
     const user = advisor()
 
     assert.deepEqual(user.remove().value, { code: 'USER_NOT_ARCHIVED' })
@@ -66,7 +66,9 @@ test.group('User', () => {
     assert.isTrue(user.remove().isRight())
   })
 
-  test('trocar e-mail, senha, papel ou desativar derruba as sessões; nome não', ({ assert }) => {
+  test('changing e-mail, password, role or deactivating drops the sessions; name does not', ({
+    assert,
+  }) => {
     assert.isTrue(advisor().update({ email: 'outra@mail.com' }, LATER).revokesSessions)
     assert.isTrue(advisor().update({ password: 'Nova@1234' }, LATER).revokesSessions)
     assert.isTrue(advisor().update({ role: 'ADMINISTRATOR' }, LATER).revokesSessions)
@@ -77,12 +79,12 @@ test.group('User', () => {
     )
   })
 
-  test('mudar o papel avisa para soltar as turmas', ({ assert }) => {
+  test('changing the role warns to release the classrooms', ({ assert }) => {
     assert.isTrue(advisor().update({ role: 'REPRESENTATIVE' }, LATER).roleChanged)
     assert.isFalse(advisor().update({ role: 'ADVISOR' }, LATER).roleChanged)
   })
 
-  test('campo ausente não mexe e avatarId null tira a foto', ({ assert }) => {
+  test('an absent field leaves alone and avatarId null removes the photo', ({ assert }) => {
     const user = advisor()
     user.update({ avatarId: 'foto' }, NOW)
 
@@ -93,7 +95,7 @@ test.group('User', () => {
     assert.isNull(user.snapshot().avatarId)
   })
 
-  test('a própria conta troca a senha só com a atual confirmada e outra diferente', ({
+  test('the account itself changes the password only with the current one confirmed and a different one', ({
     assert,
   }) => {
     const wrong = advisor().updateOwn(
@@ -114,7 +116,7 @@ test.group('User', () => {
     assert.deepEqual(ok.value, { revokesSessions: true, roleChanged: false })
   })
 
-  test('a própria conta sem trocar a senha dispensa a prova', ({ assert }) => {
+  test('the account itself without changing the password skips the proof', ({ assert }) => {
     const result = advisor().updateOwn(
       { name: 'Ana Maria' },
       { currentConfirmed: false, sameAsCurrent: false },
@@ -124,7 +126,9 @@ test.group('User', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('reativa a conta arquivada com os dados novos e preserva id e criação', ({ assert }) => {
+  test('reactivates the archived account with the new data and preserves id and creation', ({
+    assert,
+  }) => {
     const user = advisor()
     user.archive(NOW)
 
@@ -143,7 +147,7 @@ test.group('User', () => {
     })
   })
 
-  test('o e-mail de conta viva é USER_ALREADY_EXISTS', ({ assert }) => {
+  test('the e-mail of a live account is USER_ALREADY_EXISTS', ({ assert }) => {
     const result = advisor().revive({ name: 'Ana', password: 'Nova@1234', role: 'ADVISOR' }, LATER)
 
     assert.deepEqual(result.value, { code: 'USER_ALREADY_EXISTS' })

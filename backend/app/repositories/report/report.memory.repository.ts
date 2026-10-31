@@ -20,9 +20,9 @@ type ClassroomRow = {
 type Count = AdministratorReportShowResponse['classrooms'][number]
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3): guarda as linhas cruas que o teste arranja e
- * conta delas, com as mesmas regras do SQL da implementação Lucid.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3): it keeps the raw rows the test arranges and
+ * counts from them, with the same rules as the Lucid implementation's SQL.
  */
 export class ReportMemoryRepository extends ReportRepository {
   private readonly classroomRows: ClassroomRow[] = []
@@ -31,7 +31,7 @@ export class ReportMemoryRepository extends ReportRepository {
   private readonly enrollmentRows: Array<{ studentId: string; sportId: string }> = []
   private readonly matchStatuses: MatchStatus[] = []
 
-  /** Arranjo do teste: uma turma. */
+  /** Test arrangement: a classroom. */
   withClassroom(
     classroom: Omit<ClassroomRow, 'advisor' | 'representative'> & Partial<ClassroomRow>,
   ): this {
@@ -39,7 +39,7 @@ export class ReportMemoryRepository extends ReportRepository {
     return this
   }
 
-  /** Arranjo do teste: um aluno da turma. */
+  /** Test arrangement: a student of the classroom. */
   withStudent(id: string, classroomId: string): this {
     this.studentRows.push({ id, classroomId })
     return this
@@ -50,7 +50,7 @@ export class ReportMemoryRepository extends ReportRepository {
     return this
   }
 
-  /** Arranjo do teste: o aluno inscrito na modalidade. */
+  /** Test arrangement: the student enrolled in the sport. */
   withEnrollment(studentId: string, sportId: string): this {
     this.enrollmentRows.push({ studentId, sportId })
     return this

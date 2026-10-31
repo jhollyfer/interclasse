@@ -4,8 +4,8 @@ import { StudentFactory } from '#database/factories/student.factory'
 import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 
 /**
- * A lista de uma turma na modalidade: `total` alunos da mesma turma, todos
- * inscritos. É o que trava apagar a modalidade e baixar o máximo de atletas.
+ * A classroom's list in the sport: `total` students of the same classroom, all
+ * enrolled. It is what locks deleting the sport and lowering the maximum of athletes.
  */
 export async function enrollRoster(sport: Sport, total: number) {
   const classroom = await ClassroomFactory.create()

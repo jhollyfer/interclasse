@@ -10,7 +10,7 @@ import { TeamFactory } from '#database/factories/team.factory'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 import { signInWithFactory } from '#tests/http-fixtures'
 
-/** Uma turma com `total` alunos, no lugar da relação inversa que o model não declara. */
+/** A classroom with `total` students, in place of the inverse relation the model does not declare. */
 export async function classroomWithStudents(total: number): Promise<Classroom> {
   const classroom = await ClassroomFactory.create()
   await StudentFactory.merge({ classroomId: classroom.id }).createMany(total)
@@ -19,9 +19,9 @@ export async function classroomWithStudents(total: number): Promise<Classroom> {
 }
 
 /**
- * Um professor conselheiro com sessão e a turma que ele aconselha. É o ponto de
- * partida de toda spec de `/advisor`: a policy só deixa passar a turma do
- * próprio conselheiro.
+ * A teacher advisor with a session and the classroom they advise. It is the starting
+ * point of every `/advisor` spec: the policy only lets the advisor's own classroom
+ * through.
  */
 export async function signInAsAdvisorOfClassroom(client: ApiClient) {
   const { user, session } = await signInWithFactory(client)
@@ -31,8 +31,8 @@ export async function signInAsAdvisorOfClassroom(client: ApiClient) {
 }
 
 /**
- * Um representante com sessão e a turma que ele representa. Em
- * `/representative` a turma sai da sessão, então o vínculo é o que a rota lê.
+ * A representative with a session and the classroom they represent. In
+ * `/representative` the classroom comes from the session, so the link is what the route reads.
  */
 export async function signInAsRepresentativeOfClassroom(client: ApiClient) {
   const { user, session } = await signInWithFactory(client, 'representative')
@@ -42,19 +42,19 @@ export async function signInAsRepresentativeOfClassroom(client: ApiClient) {
 }
 
 /**
- * Fecha a modalidade na categoria da turma, como o sorteio faria: a chave
- * existir é o que trava as inscrições.
+ * Closes the sport in the classroom's category, as the draw would: the bracket
+ * existing is what locks enrollments.
  */
 export function drawSport(sport: Sport, classroom: Classroom) {
   return BracketFactory.merge({ sportId: sport.id, category: classroom.category }).create()
 }
 
 /**
- * Uma turma já numa chave sorteada: a linha de `teams` que a liga a uma chave.
+ * A classroom already in a drawn bracket: the `teams` row that links it to a bracket.
  *
- * É o estado que trava `delete` e a troca de categoria em `update`. Não passa
- * pelo sorteio, que exige modalidade, inscrições e outras turmas: para a guarda
- * basta a turma ter um time.
+ * It is the state that locks `delete` and the category change in `update`. It does
+ * not go through the draw, which requires a sport, enrollments and other classrooms:
+ * for the guard it is enough that the classroom has a team.
  */
 export async function drawnClassroom(grade = 7) {
   const classroom = await ClassroomFactory.merge({
@@ -69,8 +69,8 @@ export async function drawnClassroom(grade = 7) {
 }
 
 /**
- * Uma partida com os dois times definidos e um aluno em cada turma: o mínimo
- * para lançar cartão.
+ * A match with both teams defined and a student in each classroom: the minimum
+ * to enter a card.
  */
 export async function matchWithTeams() {
   const bracket = await BracketFactory.with('sport').create()
@@ -78,7 +78,7 @@ export async function matchWithTeams() {
     grade: 3,
     category: ClassroomEntity.categoryOf(3),
   }).createMany(2)
-  if (!home || !away) throw new Error('factory criou menos turmas que o pedido')
+  if (!home || !away) throw new Error('factory created fewer classrooms than requested')
   const homeTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: home.id }).create()
   const awayTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: away.id }).create()
   const match = await MatchFactory.merge({

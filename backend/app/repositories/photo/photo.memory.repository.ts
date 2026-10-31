@@ -20,22 +20,22 @@ type StorageRow = PhotoRead['storage']
 type AuthorRow = NonNullable<AdministratorPhotoShowResponse['author']>
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class PhotoMemoryRepository extends PhotoRepository {
   private readonly rows = new Map<string, PhotoProps>()
   private readonly storages = new Map<string, StorageRow>()
   private readonly authors = new Map<string, AuthorRow>()
 
-  /** Arranjo do teste: um arquivo já enviado. */
+  /** Test arrangement: an already uploaded file. */
   withStorage(storage: StorageRow): this {
     this.storages.set(storage.id, storage)
     return this
   }
 
-  /** Arranjo do teste: uma conta que pode ter enviado fotos. */
+  /** Test arrangement: an account that may have uploaded photos. */
   withAuthor(author: AuthorRow): this {
     this.authors.set(author.id, author)
     return this
@@ -111,7 +111,7 @@ export class PhotoMemoryRepository extends PhotoRepository {
     return [...this.rows.values()].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
-  /** Foto sem o arquivo gravado não tem leitura: o mesmo que o `join` do Lucid faz. */
+  /** A photo without the saved file has no read: the same as Lucid's `join` does. */
   private toResponse(row: PhotoProps): PhotoRead | null {
     const storage = this.storages.get(row.storageId)
     if (!storage) return null

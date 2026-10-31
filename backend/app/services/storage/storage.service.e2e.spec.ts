@@ -6,8 +6,8 @@ import { StorageContract } from '#services/storage/storage.contract'
 import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * O adaptador real do bucket contra o S3 local (`_standards/architecture.md` §8):
- * a chave sai do tipo, e os bytes, o tamanho e a URL assinada vêm do objeto gravado.
+ * The real bucket adapter against local S3 (`_standards/architecture.md` §8):
+ * the key comes from the type, and the bytes, size and signed URL come from the stored object.
  */
 test.group('services > storage > bucket real', (group) => {
   let storage: StorageContract
@@ -21,14 +21,14 @@ test.group('services > storage > bucket real', (group) => {
     await Promise.all(written.map((path) => drive.use().delete(path)))
   })
 
-  test('a chave leva a extensão do tipo e nunca repete', ({ assert }) => {
+  test('the key carries the type extension and never repeats', ({ assert }) => {
     const first = storage.key('image/png')
 
     assert.match(first, /^[0-9a-f-]{36}\.png$/)
     assert.notEqual(first, storage.key('image/png'))
   })
 
-  test('metadata e head leem o objeto gravado', async ({ assert }) => {
+  test('metadata and head read the stored object', async ({ assert }) => {
     const path = storage.key('image/png')
     written.push(path)
     await drive.use().put(path, pngBytes(2048), { contentType: 'image/png' })
@@ -40,7 +40,7 @@ test.group('services > storage > bucket real', (group) => {
     assert.lengthOf(head, 12)
   })
 
-  test('a URL assinada de leitura entrega o objeto', async ({ assert }) => {
+  test('the signed read URL delivers the object', async ({ assert }) => {
     const path = storage.key('image/png')
     written.push(path)
     await drive.use().put(path, pngBytes(512), { contentType: 'image/png' })
@@ -53,7 +53,9 @@ test.group('services > storage > bucket real', (group) => {
     assert.equal(received.byteLength, 512)
   })
 
-  test('o download assinado leva o nome original no Content-Disposition', async ({ assert }) => {
+  test('the signed download carries the original name in Content-Disposition', async ({
+    assert,
+  }) => {
     const path = storage.key('image/png')
     written.push(path)
     await drive.use().put(path, pngBytes(256), { contentType: 'image/png' })
@@ -69,7 +71,7 @@ test.group('services > storage > bucket real', (group) => {
     assert.include(response.headers.get('content-disposition') ?? '', "filename*=UTF-8''")
   })
 
-  test('discard apaga o binário do bucket', async ({ assert }) => {
+  test('discard deletes the binary from the bucket', async ({ assert }) => {
     const path = storage.key('image/png')
     await drive.use().put(path, pngBytes(128), { contentType: 'image/png' })
 

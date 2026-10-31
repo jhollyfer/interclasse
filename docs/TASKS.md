@@ -83,7 +83,7 @@ Nada vira exceção local: a régua muda e volta pelo sync.
 
 | Item | Situação |
 |---|---|
-| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-so-model-da-conta` no `scripts/depcruise.config.ts`. `pnpm depcruise` sem violação |
+| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-only-account-model` no `scripts/depcruise.config.ts`. `pnpm depcruise` sem violação |
 | Spec de comando Ace em `commands/_<nome>.command.e2e.spec.ts` | Na régua (decisão #248, maiyu-pattern#4) |
 | Modelos de `docs/` sem "desvio aceito" | Na régua (maiyu-pattern#4) |
 | `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |
@@ -125,14 +125,14 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 7.9 | Lições do adacaibs conferidas contra o código | Média | Feita | #255. Conferido: hook de fiação sem teste próprio (`use-mutation-form`, agora com teste); sem schema local em `lib/`; renomeios desta fase com `grep` do nome antigo. Cobertura de “spec reimplementa a função” e “comentário muda com a condição” não é verificável por varredura e fica para a revisão de cada diff |
 | 7.10 | Estreitar o left dos métodos de domínio por operação (`Extract<BracketError, …>`) para o `openapi.json` não listar código de outra operação | Baixa | A fazer | efeito da 7.5 |
 
-## Fase 8 · Idioma inglês no código (0/3)
+## Fase 8 · Idioma inglês no código (3/3)
 
 `_standards/typescript.md` §12: identificador, comentário, JSDoc, justificativa de `eslint-disable`, título de teste e rota em inglês; Markdown segue em pt-BR. Rotas públicas trocam sem redirect (decisão do dono, 31/10).
 
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 8.1 | Backend `app/features/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, `defineDocs` (`openapi.json` regerado) e identificadores em português (`semTeto`, `alvo`, `conselheiro`...). Ficam em português só dados de teste e a mensagem de `HTTPException.InternalServerError` (texto ao usuário) |
-| 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Em andamento | |
+| 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, saídas de scripts e identificadores em inglês; `pnpm check`, `depcruise`, shared e E2E (692) verdes |
 | 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Feita | sem redirect; `/painel` virou `/dashboard`. Comentários, títulos de teste, identificadores, configs e mensagens de erro de desenvolvedor em inglês; Playwright 14/14 |
 
 ## Fase N · Ideias (fora do escopo atual)

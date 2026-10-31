@@ -11,10 +11,10 @@ import { MemoryPagination } from '#core/memory-pagination'
 import type { BracketRepository } from '#repositories/bracket/bracket.repository'
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência. A partida e o time vêm do repositório da chave que o teste
- * passa; os alunos que o cartão só lê são arranjados pelo teste.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference. The match and the team come from the bracket repository the test
+ * passes; the students the card only reads are arranged by the test.
  */
 export class MatchCardMemoryRepository extends MatchCardRepository {
   private readonly rows = new Map<string, MatchCardProps>()
@@ -24,7 +24,7 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
     super()
   }
 
-  /** Arranjo do teste: um aluno existente. */
+  /** Test arrangement: an existing student. */
   withStudent(student: CardStudent): this {
     this.students.set(student.id, student)
     return this
@@ -81,7 +81,7 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
     return this.assemble(card, student, match)
   }
 
-  /** O time do cartão é da turma pedida. */
+  /** The card's team belongs to the requested classroom. */
   private async playsFor(card: MatchCardProps, classroomId: string): Promise<boolean> {
     const bracket = await this.brackets.findByMatchId(card.matchId)
     const team = bracket?.snapshot().teams.find((candidate) => candidate.id === card.teamId)

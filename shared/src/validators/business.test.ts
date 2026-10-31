@@ -17,8 +17,8 @@ function failed(result: {
     .sort()
 }
 
-describe('regras de negócio dos validators', () => {
-  it('modalidade: atletas fora de 1 a 40 e fracionários são recusados', () => {
+describe('validators business rules', () => {
+  it('sport: athletes outside 1 to 40 and fractional ones are rejected', () => {
     const result = AdministratorSportCreateValidator.safeParse({
       name: 'Futsal',
       minAthletes: 0,
@@ -28,13 +28,13 @@ describe('regras de negócio dos validators', () => {
     expect(failed(result)).toEqual(['maxAthletes', 'minAthletes'])
   })
 
-  it('usuário: a edição aceita não trocar a senha', () => {
+  it('user: an update may leave the password unchanged', () => {
     expect(
       AdministratorUserUpdateValidator.safeParse({ name: 'Ana' }).success,
     ).toBe(true)
   })
 
-  it('usuário: senha nova pede confirmação igual', () => {
+  it('user: a new password requires a matching confirmation', () => {
     const result = AdministratorUserUpdateValidator.safeParse({
       password: 'Abcdef1!',
       passwordConfirmation: 'outra',
@@ -43,13 +43,13 @@ describe('regras de negócio dos validators', () => {
     expect(failed(result)).toEqual(['passwordConfirmation'])
   })
 
-  it('perfil: trocar só a foto não pede a senha atual', () => {
+  it('profile: changing only the photo does not ask for the current password', () => {
     expect(
       AccountProfileUpdateValidator.safeParse({ avatarId: null }).success,
     ).toBe(true)
   })
 
-  it('perfil: senha nova exige a senha atual', () => {
+  it('profile: a new password requires the current password', () => {
     const result = AccountProfileUpdateValidator.safeParse({
       password: 'Abcdef1!',
       passwordConfirmation: 'Abcdef1!',
@@ -58,7 +58,7 @@ describe('regras de negócio dos validators', () => {
     expect(failed(result)).toEqual(['currentPassword'])
   })
 
-  it('inscrição: a lista vazia vale, o aluno repetido não', () => {
+  it('enrollment: an empty list is valid, a repeated student is not', () => {
     const empty = RepresentativeEnrollmentUpdateValidator.safeParse({
       sportId: ID,
       studentIds: [],

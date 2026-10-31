@@ -12,8 +12,8 @@ import {
 } from '../../validator.js'
 
 /**
- * Por quais colunas a listagem de usuários ordena: as que a tela mostra.
- * Par de caminho e nome do VineJS de
+ * By which columns the user listing sorts: the ones the screen shows.
+ * Mirror (path and name) of the VineJS one in
  * `backend/app/validators/administrator/users.validator.ts`.
  */
 export const USER_SORT_COLUMNS = [
@@ -32,7 +32,7 @@ const userFields = {
   avatarId: z.uuid().nullable().optional(),
 }
 
-/** `role` é obrigatório: o papel é sempre explícito. */
+/** `role` is required: the role is always explicit. */
 export const AdministratorUserCreateValidator = z
   .object({
     ...userFields,
@@ -45,7 +45,7 @@ export const AdministratorUserCreateValidator = z
     passwordMismatchIssue(),
   )
 
-/** Todo campo é opcional: ausente é "não mexer"; só `avatarId` aceita `null`. */
+/** Every field is optional: absent means "leave alone"; only `avatarId` accepts `null`. */
 export const AdministratorUserUpdateValidator = z
   .object({
     name: userFields.name.optional(),

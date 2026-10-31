@@ -2,7 +2,7 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import type { SiteSettingError } from './site-setting.errors.ts'
 
-/** O regulamento é para baixar e imprimir: só PDF. */
+/** The regulation is for downloading and printing: PDF only. */
 export const REGULATION_MIMETYPE = 'application/pdf'
 
 export type SiteSettingProps = {
@@ -18,7 +18,7 @@ export type SiteSettingProps = {
   updatedAt: Date | null
 }
 
-/** Ausente é "não mexer"; `null` apaga. */
+/** Absent means "leave alone"; `null` erases. */
 type SiteSettingChanges = {
   readonly about?: string | null
   readonly organizer?: string | null
@@ -29,19 +29,19 @@ type SiteSettingChanges = {
   readonly regulationId?: string | null
 }
 
-/** O que a entidade precisa saber do arquivo para aceitá-lo como regulamento. */
+/** What the entity needs to know about the file to accept it as the regulation. */
 export type RegulationFile = {
   readonly mimetype: string
 }
 
 /**
- * O "Sobre" dos jogos e o regulamento: uma linha só (`_standards/domain.md`
- * §1). A regra que guarda é a do regulamento - arquivo já enviado e em PDF.
+ * The games "About" and the regulation: a single row (`_standards/domain.md`
+ * §1). The rule it holds is the regulation's - an already uploaded file, and a PDF.
  */
 export class SiteSetting {
   private constructor(private readonly props: SiteSettingProps) {}
 
-  /** Nascimento: tudo vazio. O site mostra o que a organização preencher, nada inventado. */
+  /** Birth: everything empty. The site shows what the organization fills in, nothing invented. */
   static create(input: { readonly id: string; readonly now: Date }): SiteSetting {
     return new SiteSetting({
       id: input.id,
@@ -57,20 +57,20 @@ export class SiteSetting {
     })
   }
 
-  /** Reidratação pelo repository. */
+  /** Rehydration by the repository. */
   static restore(props: SiteSettingProps): SiteSetting {
     return new SiteSetting({ ...props })
   }
 
-  /** Se estas mudanças trocam o regulamento por outro arquivo: só aí vale conferi-lo. */
+  /** Whether these changes swap the regulation for another file: only then is it worth checking it. */
   replacesRegulation(regulationId: string | null | undefined): regulationId is string {
     return Boolean(regulationId)
   }
 
   /**
-   * Grava o que veio. O `regulation` é o arquivo que o repository achou para o
-   * `regulationId` pedido (ou `null`, se não achou): só é conferido quando as
-   * mudanças trocam o regulamento.
+   * Writes what came. The `regulation` is the file the repository found for the
+   * requested `regulationId` (or `null`, if it found none): it is only checked when the
+   * changes swap the regulation.
    */
   update(
     changes: SiteSettingChanges,

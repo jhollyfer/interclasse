@@ -6,7 +6,7 @@ import { BracketSchema } from '#database/schema'
 import Sport from '#models/sport'
 import Team from '#models/team'
 
-/** A competição de uma modalidade numa categoria: os times, os grupos e as partidas. */
+/** The competition of a sport in a category: the teams, the groups and the matches. */
 export default class Bracket extends BracketSchema {
   declare category: Category
   declare status: BracketStatus

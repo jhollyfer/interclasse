@@ -1,13 +1,13 @@
 /**
- * O recorte de lixeira das listagens. Ausente é o de sempre - só ativos -,
- * então nenhuma leitura muda de resposta para quem não pediu.
+ * The trash cut of listings. Absent is the usual one - active only -, so no read
+ * changes its response for whoever did not ask.
  *
- * Aqui é `deletedAt`, a remoção lógica.
+ * Here it is `deletedAt`, the soft delete.
  */
 export const TRASHED_MODE = {
-  /** Só o que está na lixeira. É a listagem da tela de restauração. */
+  /** Only what is in the trash. It is the listing of the restore screen. */
   ONLY: 'only',
-  /** Ativos e removidos juntos. */
+  /** Active and removed together. */
   WITH: 'with',
 } as const
 

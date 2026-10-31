@@ -1,13 +1,13 @@
 /**
- * A página de referência da API.
+ * The API reference page.
  *
- * O Scalar entra pelo bundle standalone da CDN, pinado por versão. Instalar
- * `@scalar/api-reference` como dependência traria uma árvore de frontend para
- * dentro do build do backend só para servir um `<script>`, e o `node ace build`
- * teria de aprender a copiá-la.
+ * Scalar comes in through the standalone CDN bundle, pinned by version. Installing
+ * `@scalar/api-reference` as a dependency would bring a frontend tree into
+ * the backend build just to serve a `<script>`, and `node ace build`
+ * would have to learn to copy it.
  *
- * A versão é pinada de propósito: `@latest` faria a documentação mudar de
- * comportamento sem nenhum commit no repositório.
+ * The version is pinned on purpose: `@latest` would make the documentation change
+ * behavior without any commit in the repository.
  */
 
 const SCALAR_VERSION = '1.64.0'
@@ -15,19 +15,19 @@ const SCALAR_VERSION = '1.64.0'
 const CDN = `https://cdn.jsdelivr.net/npm/@scalar/api-reference@${SCALAR_VERSION}/dist/browser/standalone.js`
 
 /**
- * O chrome da interface fica em inglês: o Scalar traduz para `en`, `ru`, `es`,
- * `fr`, `de`, `zh-CN` e `ar`, e português não está na lista. O conteúdo -
- * resumo, descrição e mensagem de erro - é em português, que é o que importa.
+ * The interface chrome stays in English: Scalar translates to `en`, `ru`, `es`,
+ * `fr`, `de`, `zh-CN` and `ar`, and Portuguese is not on the list. The content -
+ * summary, description and error message - is in English as well.
  */
 export function scalarPage(specUrl: string, title: string): string {
   const configuration = JSON.stringify({
     url: specUrl,
     theme: 'default',
     hideDownloadButton: false,
-    // `components.schemas` existe para as operações referenciarem e para quem
-    // gera cliente tipado. Como seção de menu ele só convida a ler a API pelo
-    // formato dos dados, que é o oposto do que esta documentação descreve - o
-    // contrato é a operação, não a entidade.
+    // `components.schemas` exists for the operations to reference and for whoever
+    // generates a typed client. As a menu section it only invites reading the API by the
+    // shape of the data, which is the opposite of what this documentation describes - the
+    // contract is the operation, not the entity.
     hideModels: true,
   })
 

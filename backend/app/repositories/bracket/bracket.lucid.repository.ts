@@ -143,8 +143,8 @@ export class BracketLucidRepository extends BracketRepository {
   }
 
   /**
-   * A chave nova, com times e partidas. Dois sorteios ao mesmo tempo esbarram no
-   * `unique` de modalidade e categoria, e o segundo volta como fato.
+   * The new bracket, with teams and matches. Two simultaneous draws run into the
+   * `unique` of sport and category, and the second comes back as a fact.
    */
   private async insert(bracket: Bracket): Promise<Either<BracketError, void>> {
     const client = this.transaction.client()
@@ -172,8 +172,8 @@ export class BracketLucidRepository extends BracketRepository {
         })),
         { client },
       )
-      // Num `createMany` só: um INSERT por partida eram até 15 idas ao banco
-      // com a linha da modalidade travada.
+      // In a single `createMany`: one INSERT per match meant up to 15 round trips to the database
+      // with the sport row locked.
       await MatchModel.createMany(
         snapshot.matches.map((match) => this.toMatchColumns(snapshot.id, match)),
         { client },
@@ -187,7 +187,7 @@ export class BracketLucidRepository extends BracketRepository {
     }
   }
 
-  /** O que mudou numa chave já gravada: o status e as partidas. */
+  /** What changed in an already saved bracket: the status and the matches. */
   private async update(existing: BracketModel, snapshot: Readonly<BracketProps>): Promise<void> {
     const client = this.transaction.client()
 
@@ -268,7 +268,7 @@ export class BracketLucidRepository extends BracketRepository {
 
     if (criteria.order === 'newest') query.orderBy('createdAt', 'desc')
 
-    // Por modalidade e categoria: é como o site agrupa as abas.
+    // By sport and category: it is how the site groups the tabs.
     if (criteria.order === 'sport-name')
       query
         .orderBy(
@@ -417,7 +417,7 @@ export class BracketLucidRepository extends BracketRepository {
     }
   }
 
-  /** As marcadas por horário, depois as sem horário por rodada; resultado, o mais recente. */
+  /** The ones scheduled by time, then the unscheduled by round; results, the most recent. */
   private orderMatches(
     query: ModelQueryBuilderContract<typeof MatchModel>,
     criteria: MatchListCriteria,
@@ -486,7 +486,7 @@ export class BracketLucidRepository extends BracketRepository {
     }
   }
 
-  /** O que mudou na partida desde que a linha foi lida: só estas viram UPDATE. */
+  /** What changed in the match since the row was read: only these become an UPDATE. */
   private differs(row: MatchModel, match: MatchProps): boolean {
     return (
       row.status !== match.status ||

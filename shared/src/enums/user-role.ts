@@ -1,18 +1,18 @@
 /**
- * O papel do usuário. Lookup object em vez de union solto: a chave nomeia o
- * papel no código, o valor é o que vai para o banco e para a API, e o tipo sai
- * derivado - não há literal repetido para divergir.
+ * The user role. A lookup object instead of a loose union: the key names the role in
+ * code, the value is what goes to the database and the API, and the type is derived
+ * from it - no repeated literal to drift apart.
  *
- * Três papéis, um por responsabilidade nos jogos:
+ * Three roles, one per responsibility in the games:
  *
- * - `ADMINISTRATOR`: a organização. Cadastra turmas, modalidades e contas,
- *   sorteia as chaves e lança placar.
- * - `ADVISOR`: o professor conselheiro. Mantém os alunos das turmas que
- *   aconselha e as inscrições delas.
- * - `REPRESENTATIVE`: o aluno representante. Monta a lista de atletas por
- *   modalidade da própria turma, e nada além disso.
+ * - `ADMINISTRATOR`: the organization. Registers classrooms, sports and accounts,
+ *   draws the brackets and enters scores.
+ * - `ADVISOR`: the teacher advisor. Maintains the students of the classrooms they
+ *   advise and their enrollments.
+ * - `REPRESENTATIVE`: the student representative. Builds the athlete list per sport
+ *   for their own classroom, and nothing else.
  *
- * Sem `OWNER`: o purge fica com o administrador.
+ * No `OWNER`: purge stays with the administrator.
  */
 export const USER_ROLE = {
   ADMINISTRATOR: 'ADMINISTRATOR',

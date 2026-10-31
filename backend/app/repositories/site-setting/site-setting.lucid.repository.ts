@@ -26,10 +26,10 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
     const row = await SiteSettingModel.query({ client }).first()
     if (row) return this.toEntity(row)
 
-    // Duas primeiras leituras simultâneas: o índice único `site_settings_singleton`
-    // deixa uma criar a linha, e a outra não faz nada e lê a que ficou. Insere
-    // com `on conflict do nothing` e não captura a violação, porque o erro
-    // abortaria a transação em curso.
+    // Two simultaneous first reads: the unique index `site_settings_singleton`
+    // lets one create the row, and the other does nothing and reads the one that stayed. It inserts
+    // with `on conflict do nothing` and does not catch the violation, because the error
+    // would abort the transaction in progress.
     const now = new Date()
     const born = SiteSetting.create({ id: randomUUID(), now })
     await client.rawQuery(
@@ -107,7 +107,7 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
     }
   }
 
-  /** O arquivo do regulamento, quando há; `null` sem regulamento ou com o arquivo já apagado. */
+  /** The regulation file, when there is one; `null` without a regulation or with the file already deleted. */
   private async regulationOf(id: string | null): Promise<StorageModel | null> {
     if (!id) return null
 

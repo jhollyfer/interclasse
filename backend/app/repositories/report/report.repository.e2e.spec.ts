@@ -15,10 +15,10 @@ import { StudentFactory } from '#database/factories/student.factory'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4). Cada
- * uma arranja o mesmo mundo do seu jeito - linhas no banco, linhas na memória -
- * e as asserções são iguais: uma turma do Fundamental 2 com dois alunos, um
- * deles inscrito no futsal.
+ * The same contract in both implementations (`_standards/domain.md` §5.4). Each
+ * arranges the same world its own way - rows in the database, rows in memory -
+ * and the assertions are the same: a Fundamental 2 classroom with two students, one
+ * of them enrolled in futsal.
  */
 type Arranged = ReportRepository
 
@@ -32,7 +32,7 @@ const IMPLEMENTATIONS = {
     const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(2)
     const sport = await SportFactory.merge({ name: 'Futsal' }).create()
     const [athlete] = students
-    if (!athlete) throw new Error('arranjo sem aluno')
+    if (!athlete) throw new Error('arrangement without a student')
     await EnrollmentFactory.merge({ studentId: athlete.id, sportId: sport.id }).create()
 
     return app.container.make(ReportLucidRepository)
@@ -55,7 +55,7 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`ReportRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('conta turmas, alunos, atletas, inscrições e modalidades', async ({ assert }) => {
+    test('counts classrooms, students, athletes, enrollments and sports', async ({ assert }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()
@@ -71,7 +71,7 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       })
     })
 
-    test('separa por categoria, com as duas categorias sempre presentes', async ({ assert }) => {
+    test('separates by category, with both categories always present', async ({ assert }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()
@@ -82,7 +82,7 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       ])
     })
 
-    test('traz a modalidade e a turma com os próprios totais', async ({ assert }) => {
+    test('brings the sport and the classroom with their own totals', async ({ assert }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()

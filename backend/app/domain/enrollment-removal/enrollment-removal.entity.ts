@@ -7,7 +7,7 @@ export type EnrollmentRemovalProps = {
   readonly classroomId: string
   readonly sportId: string
   readonly studentId: string | null
-  /** Copiado, e não só referenciado: o aluno pode sair da turma e o aviso segue dizendo quem foi. */
+  /** Copied, not just referenced: the student may leave the classroom and the notice keeps saying who it was. */
   readonly studentName: string
   readonly reason: string
   readonly actorId: string | null
@@ -17,16 +17,16 @@ export type EnrollmentRemovalProps = {
 }
 
 /**
- * O aviso de atleta tirado de uma modalidade, com o motivo. O conselheiro tira
- * a qualquer momento, inclusive depois do sorteio, e o administrador recebe o
- * aviso com a justificativa (`_standards/domain.md` §1).
+ * The notice of an athlete removed from a sport, with the reason. The advisor removes
+ * at any time, including after the draw, and the administrator receives the
+ * notice with the justification (`_standards/domain.md` §1).
  */
 export class EnrollmentRemoval {
   private constructor(private readonly props: EnrollmentRemovalProps) {}
 
   /**
-   * Registra a saída. O administrador não avisa a si mesmo: a remoção dele já
-   * nasce lida.
+   * Records the removal. The administrator does not notify themselves: their removal is
+   * born already read.
    */
   static record(input: {
     readonly id: string
@@ -56,12 +56,12 @@ export class EnrollmentRemoval {
     })
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: EnrollmentRemovalProps): EnrollmentRemoval {
     return new EnrollmentRemoval({ ...props })
   }
 
-  /** A ciência do administrador. Repetir não muda a data da primeira. */
+  /** The administrator's acknowledgement. Repeating it does not change the first date. */
   acknowledge(at: Date): Either<EnrollmentRemovalError, EnrollmentRemoval> {
     if (this.props.acknowledgedAt) return left({ code: 'ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED' })
 

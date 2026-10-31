@@ -15,44 +15,44 @@ import {
 import { URL_TTL } from '#config/drive'
 
 /**
- * Tudo que envolve o bucket: a chave sob a qual o arquivo vive, o que o
- * bucket sabe sobre ele, as URLs assinadas e como o binário sai de cena. A linha
- * em `storages` e quem a referencia são do `StorageRepository`.
+ * Everything involving the bucket: the key under which the file lives, what the
+ * bucket knows about it, the signed URLs and how the binary leaves the scene. The row
+ * in `storages` and whoever references it belong to the `StorageRepository`.
  *
- * O binário **não** passa por aqui: ele vai do navegador direto ao
- * bucket por URL assinada. O que atravessa esta camada é metadado.
+ * The binary does **not** pass through here: it goes from the browser straight to the
+ * bucket by signed URL. What crosses this layer is metadata.
  */
 export default class StorageService extends StorageContract {
   /**
-   * A chave sob a qual o objeto vai viver no bucket.
+   * The key under which the object will live in the bucket.
    *
-   * Um uuid mais a extensão do tipo declarado. O nome que o usuário enviou fica
-   * só em `originalName`, como rótulo, e **nunca** vira caminho: ele é texto de
-   * terceiro, e caminho montado com texto de terceiro é como se escreve por
-   * cima do arquivo alheio.
+   * A uuid plus the extension of the declared type. The name the user sent stays
+   * only in `originalName`, as a label, and **never** becomes a path: it is
+   * third-party text, and a path built from third-party text is how one writes
+   * over somebody else's file.
    *
-   * A extensão sai do `mimetype` e não do nome enviado porque o nome não é
-   * fonte confiável - `foto.png` pode ser um pdf. O `mimetype` é o mesmo valor
-   * com que a URL é assinada, então o que o bucket aceita e o que a chave diz
-   * não têm como divergir.
+   * The extension comes from the `mimetype` and not from the sent name because the name is not
+   * a trustworthy source - `foto.png` can be a pdf. The `mimetype` is the same value
+   * the URL is signed with, so what the bucket accepts and what the key says
+   * cannot diverge.
    */
   key(mimetype: StorageMimetype): string {
     return `${randomUUID()}.${STORAGE_EXTENSIONS[mimetype]}`
   }
 
   /**
-   * O que o bucket sabe sobre o objeto: tamanho, tipo, `ETag`.
+   * What the bucket knows about the object: size, type, `ETag`.
    *
-   * É com isto que a confirmação do upload confere o que **de fato** subiu
-   * contra o que o cliente declarou ao pedir as URLs.
+   * It is with this that the upload confirmation checks what **actually** went up
+   * against what the client declared when asking for the URLs.
    */
   async metadata(path: string): Promise<StorageMetadata> {
     return drive.use().getMetaData(path)
   }
 
   /**
-   * Os primeiros bytes do objeto: lê o início do fluxo e o fecha, sem baixar o
-   * resto do arquivo.
+   * The first bytes of the object: reads the start of the stream and closes it, without downloading the
+   * rest of the file.
    */
   async head(path: string): Promise<Uint8Array> {
     const stream = await drive.use().getStream(path)
@@ -74,30 +74,30 @@ export default class StorageService extends StorageContract {
   }
 
   /**
-   * A URL assinada de leitura, com prazo: o disco é privado, então nenhum
-   * endereço do registro autoriza sozinho. Não custa rede: o FlyDrive assina por
-   * `@aws-sdk/s3-request-presigner`, que calcula a SigV4 localmente. Vence em
-   * `URL_TTL`, e quem a guardar recebe 403 depois disso.
+   * The signed read URL, with a deadline: the disk is private, so no
+   * record address authorizes anything on its own. It costs no network: FlyDrive signs through
+   * `@aws-sdk/s3-request-presigner`, which computes SigV4 locally. It expires at
+   * `URL_TTL`, and whoever keeps it gets 403 after that.
    */
   async signedUrl(path: string): Promise<string> {
     return drive.use().getSignedUrl(path, { expiresIn: URL_TTL })
   }
 
-  /** Apaga o binário do bucket. */
+  /** Deletes the binary from the bucket. */
   async discard(path: string): Promise<void> {
     await drive.use().delete(path)
   }
 
   /**
-   * Uma URL temporária que entrega o arquivo com o nome original.
+   * A temporary URL that delivers the file with the original name.
    *
-   * O `Content-Disposition` viaja assinado dentro da própria URL, e é o bucket
-   * que o devolve no download - por isso o binário não precisa atravessar esta
-   * aplicação só para ganhar um header - atravessando, cada download ocuparia
-   * a aplicação pelo tempo da transferência.
+   * The `Content-Disposition` travels signed inside the URL itself, and it is the bucket
+   * that returns it on download - which is why the binary does not need to cross this
+   * application just to gain a header - if it crossed, each download would occupy
+   * the application for the duration of the transfer.
    *
-   * Expira em minutos porque é endereço de uma ação, não de um recurso: quem
-   * quiser o arquivo de novo pede outra.
+   * It expires in minutes because it is the address of an action, not of a resource: whoever
+   * wants the file again asks for another.
    */
   async signedDownload(file: StorageDownload): Promise<string> {
     return drive.use().getSignedUrl(file.path, {
@@ -108,26 +108,26 @@ export default class StorageService extends StorageContract {
   }
 
   /**
-   * O header `Content-Disposition` de um download, com o nome original.
+   * The `Content-Disposition` header of a download, with the original name.
    *
-   * Dois nomes no mesmo header porque a RFC 6266 pede os dois: `filename=` só
-   * carrega ASCII e é o que navegador antigo lê, e `filename*=UTF-8''` é o que
-   * preserva acento e cedilha. Mandar só o segundo faz o arquivo chegar com o
-   * nome errado em quem não o entende; mandar só o primeiro perde o acento em
-   * todo mundo.
+   * Two names in the same header because RFC 6266 asks for both: `filename=` only
+   * carries ASCII and is what an old browser reads, and `filename*=UTF-8''` is what
+   * preserves accents and cedillas. Sending only the second makes the file arrive with the
+   * wrong name for whoever does not understand it; sending only the first loses the accent for
+   * everyone.
    *
-   * O fallback ASCII decompõe o acento e joga fora o diacrítico (`ó` -> `o`) em
-   * vez de passar por uma normalização de slug: slug trocaria o ponto da
-   * extensão por hífen, e `relatorio-2026-pdf` não abre em programa nenhum.
-   * Aspas e barra viram `_` porque escapariam do valor entre aspas do header.
+   * The ASCII fallback decomposes the accent and drops the diacritic (`ó` -> `o`) instead
+   * of going through a slug normalization: a slug would swap the extension dot
+   * for a hyphen, and `relatorio-2026-pdf` opens in no program.
+   * Quotes and slash become `_` because they would escape the quoted header value.
    */
   contentDisposition(originalName: string): string {
     const ascii = originalName
       .normalize('NFD')
-      // Os diacríticos que o NFD separou da letra base.
+      // The diacritics NFD separated from the base letter.
       .replace(/[\u0300-\u036f]/g, '')
-      // O que sobrou fora do ASCII imprimível, mais aspas e barra, que
-      // escapariam do valor entre aspas do header.
+      // What is left outside printable ASCII, plus quotes and slash, which
+      // would escape the quoted header value.
       .replace(/["\\]|[^\u0020-\u007e]/g, '_')
 
     return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(originalName)}`

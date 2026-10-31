@@ -2,7 +2,7 @@ import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
- * Par de caminho e nome do Zod de
+ * Mirror (path and name) of the Zod one in
  * `shared/src/validators/advisor/photos.validator.ts`.
  */
 export const AdvisorPhotoCreateValidator = vine.create({

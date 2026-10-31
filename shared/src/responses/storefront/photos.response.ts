@@ -1,8 +1,8 @@
 import { z } from '../../validator.js'
 
 /**
- * A foto do carrossel no site anônimo: a URL assinada e a legenda, sem quem
- * enviou nem o caminho no bucket.
+ * The carousel photo on the anonymous site: the signed URL and the caption, without
+ * who uploaded it or the path in the bucket.
  */
 export const StorefrontPhotoShowResponse = z.object({
   id: z.uuid(),

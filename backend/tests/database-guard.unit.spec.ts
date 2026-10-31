@@ -3,33 +3,33 @@ import { test } from '@japa/runner'
 import { DatabaseGuard } from '#tests/database-guard'
 
 test.group('tests > database-guard (unit)', () => {
-  test('aceita o banco que termina em _test', ({ assert }) => {
+  test('accepts a database that ends in _test', ({ assert }) => {
     assert.doesNotThrow(() =>
       DatabaseGuard.assertTestDatabase('postgres://u:p@localhost:5434/interclasse_test'),
     )
   })
 
-  test('aceita a query string depois do nome do banco', ({ assert }) => {
+  test('accepts the query string after the database name', ({ assert }) => {
     assert.doesNotThrow(() =>
       DatabaseGuard.assertTestDatabase('postgres://u:p@localhost/interclasse_test?sslmode=disable'),
     )
   })
 
-  test('recusa o banco de desenvolvimento', ({ assert }) => {
+  test('refuses the development database', ({ assert }) => {
     assert.throws(
       () => DatabaseGuard.assertTestDatabase('postgres://u:p@localhost:5434/interclasse'),
-      /recusa subir/,
+      /refuses to start/,
     )
   })
 
-  test('recusa _test no meio do nome', ({ assert }) => {
+  test('rejects _test in the middle of the name', ({ assert }) => {
     assert.throws(
       () => DatabaseGuard.assertTestDatabase('postgres://u:p@localhost/interclasse_test_prod'),
-      /recusa subir/,
+      /refuses to start/,
     )
   })
 
-  test('recusa URL ausente', ({ assert }) => {
-    assert.throws(() => DatabaseGuard.assertTestDatabase(undefined), /DATABASE_URL ausente/)
+  test('refuses a missing URL', ({ assert }) => {
+    assert.throws(() => DatabaseGuard.assertTestDatabase(undefined), /DATABASE_URL missing/)
   })
 })

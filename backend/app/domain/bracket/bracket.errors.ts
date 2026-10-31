@@ -1,6 +1,6 @@
 /**
- * O que a chave recusa, como fato (`_standards/domain.md` §2): sem status HTTP
- * nem texto de tela. O use-case traduz cada um.
+ * What the bracket refuses, as a fact (`_standards/domain.md` §2): no HTTP status
+ * or screen text. The use case translates each one.
  */
 export type BracketError =
   | {
@@ -10,16 +10,16 @@ export type BracketError =
     }
   | { readonly code: 'TOO_MANY_TEAMS'; readonly maxTeams: number }
   | { readonly code: 'BRACKET_HAS_RESULTS' }
-  /** A modalidade já tem chave sorteada nesta categoria: a corrida de dois sorteios. */
+  /** The sport already has a drawn bracket in this category: the race of two draws. */
   | { readonly code: 'BRACKET_ALREADY_EXISTS' }
 
-/** O que a partida, filha da chave, recusa ao agendar, lançar ou desfazer o placar. */
+/** What the match, a child of the bracket, refuses when scheduling, entering or undoing the score. */
 export type MatchError =
   | { readonly code: 'MATCH_NOT_FOUND' }
   | { readonly code: 'MATCH_TEAMS_PENDING' }
   | { readonly code: 'MATCH_WINNER_REQUIRED' }
   | { readonly code: 'MATCH_NOT_PLAYED' }
-  /** Corrigir o vencedor depois que ele já jogou a seguinte reescreveria o que houve em quadra. */
+  /** Correcting the winner after they have played the next one would rewrite what happened on the court. */
   | { readonly code: 'MATCH_NEXT_PLAYED_ON_SCORE' }
-  /** Desfazer este placar deixaria na seguinte um time que não se sabe mais por que está lá. */
+  /** Undoing this score would leave in the next one a team nobody knows why is there. */
   | { readonly code: 'MATCH_NEXT_PLAYED_ON_UNSCORE' }

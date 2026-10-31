@@ -15,8 +15,8 @@ import { TeamFactory } from '#database/factories/team.factory'
 import { UserFactory } from '#database/factories/user.factory'
 
 /**
- * O que cada implementação precisa para o teste arranjar o mundo: contas com
- * papel e uma turma com time numa chave. O contrato roda igual nas duas
+ * What each implementation needs for the test to arrange the world: accounts with
+ * a role and a classroom with a team in a bracket. The contract runs the same on both
  * (`_standards/domain.md` §5.4).
  */
 type Harness = {
@@ -74,7 +74,7 @@ async function born(
 ): Promise<Classroom> {
   const facts = await repository.peopleFacts(links)
   const created = Classroom.create({ id: randomUUID(), name, grade, ...links, now: NOW }, facts)
-  if (created.isLeft()) throw new Error('turma inválida no arranjo')
+  if (created.isLeft()) throw new Error('invalid classroom in the arrangement')
   await repository.save(created.value)
 
   return created.value
@@ -84,7 +84,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`ClassroomRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem a mesma turma', async ({ assert }) => {
+    test('save and findById return the same classroom', async ({ assert }) => {
       const { repository } = await make()
       const classroom = await born(repository, '7º A', 7)
 
@@ -93,13 +93,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(found?.snapshot(), classroom.snapshot())
     })
 
-    test('findById de id inexistente é null', async ({ assert }) => {
+    test('findById of a nonexistent id is null', async ({ assert }) => {
       const { repository } = await make()
 
       assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('save de turma existente atualiza em vez de duplicar', async ({ assert }) => {
+    test('save of an existing classroom updates instead of duplicating', async ({ assert }) => {
       const { repository } = await make()
       const classroom = await born(repository, '7º A', 7)
       classroom.update({ name: '7º B' }, { facts: {}, inCompetition: false, now: NOW })
@@ -112,7 +112,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(listed.meta.total, 1)
     })
 
-    test('findOwned: o administrador alcança todas, o conselheiro só a dele', async ({
+    test('findOwned: the administrator reaches all, the advisor only their own', async ({
       assert,
     }) => {
       const { repository, account } = await make()
@@ -127,7 +127,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(await repository.findOwned({ id: foreign.id, actor: administrator }))
     })
 
-    test('findOfRepresentative acha a turma da conta', async ({ assert }) => {
+    test("findOfRepresentative finds the account's classroom", async ({ assert }) => {
       const { repository, account } = await make()
       const representativeId = await account(USER_ROLE.REPRESENTATIVE)
       const own = await born(repository, '7º A', 7, { representativeId })
@@ -138,7 +138,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findOfRepresentative(await account(USER_ROLE.REPRESENTATIVE)))
     })
 
-    test('existsByName acha pelo nome, menos a própria', async ({ assert }) => {
+    test('existsByName finds by name, except itself', async ({ assert }) => {
       const { repository } = await make()
       const classroom = await born(repository, '7º A', 7)
 
@@ -147,7 +147,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isFalse(await repository.existsByName('7º B'))
     })
 
-    test('peopleFacts: papel certo existe, papel errado não, e turma alheia ocupa', async ({
+    test('peopleFacts: the right role exists, the wrong role does not, and a foreign classroom takes it', async ({
       assert,
     }) => {
       const { repository, account } = await make()
@@ -166,7 +166,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(await repository.peopleFacts({}), {})
     })
 
-    test('isInCompetition só é verdade com time numa chave', async ({ assert }) => {
+    test('isInCompetition is only true with a team in a bracket', async ({ assert }) => {
       const { repository, compete } = await make()
       const classroom = await born(repository, '7º A', 7)
 
@@ -175,7 +175,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isTrue(await repository.isInCompetition(classroom.id))
     })
 
-    test('delete tira a turma', async ({ assert }) => {
+    test('delete removes the classroom', async ({ assert }) => {
       const { repository } = await make()
       const classroom = await born(repository, '7º A', 7)
 
@@ -184,7 +184,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findById(classroom.id))
     })
 
-    test('detachAccount desfaz os dois vínculos da conta e só os dela', async ({ assert }) => {
+    test("detachAccount undoes the account's two links and only its own", async ({ assert }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       const other = await account(USER_ROLE.ADVISOR)
@@ -199,7 +199,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(untouched?.snapshot().advisorId, other)
     })
 
-    test('findDetail traz conselheiro e representante aninhados', async ({ assert }) => {
+    test('findDetail brings the advisor and the representative nested', async ({ assert }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       const classroom = await born(repository, '7º A', 7, { advisorId })
@@ -211,7 +211,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findDetail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('paginate filtra por categoria e nome, ordena e traz os totais', async ({ assert }) => {
+    test('paginate filters by category and name, sorts and brings the totals', async ({
+      assert,
+    }) => {
       const { repository } = await make()
       await born(repository, '4º A', 4)
       await born(repository, '9º A', 9)
@@ -233,7 +235,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(found.meta.total, 1)
     })
 
-    test('paginateOwned: o conselheiro lista só as dele, em ordem de nome', async ({ assert }) => {
+    test('paginateOwned: the advisor lists only their own, in name order', async ({ assert }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       await born(repository, '9º A', 9, { advisorId })

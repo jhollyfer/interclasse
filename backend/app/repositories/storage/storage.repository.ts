@@ -8,8 +8,8 @@ import type {
 import type { Storage } from '#domain/storage/storage.entity'
 
 /**
- * O registro do arquivo na forma da resposta, sem a `url`: assinar é do use-case, pelo
- * contrato do bucket (`_standards/architecture.md` §2, `StorageContract.withUrl`).
+ * The file record in the response shape, without the `url`: signing belongs to the use case, through the
+ * bucket contract (`_standards/architecture.md` §2, `StorageContract.withUrl`).
  */
 export type StorageFileRead = Omit<StoragesFileShowResponse, 'url'>
 
@@ -24,23 +24,23 @@ export type StorageListCriteria = {
 }
 
 /**
- * A persistência do arquivo, por intenção (`_standards/domain.md` §5.1). O
- * escritor único da tabela `storages`; lê as colunas que apontam para ela só
- * para dizer onde o arquivo está em uso.
+ * The file persistence, by intent (`_standards/domain.md` §5.1). The
+ * single writer of the `storages` table; it reads the columns that point to it only
+ * to say where the file is in use.
  */
 export abstract class StorageRepository {
-  /** O arquivo vivo, em qualquer estado do upload. */
+  /** The live file, in any upload state. */
   abstract findById(id: string): Promise<Storage | null>
-  /** Leitura leve: o registro na forma da resposta, sem a URL. */
+  /** Lightweight read: the record in the response shape, without the URL. */
   abstract detail(id: string): Promise<StorageFileRead | null>
-  /** O mesmo registro de vários ids de uma vez; id sem arquivo vivo fica de fora. */
+  /** The same record for several ids at once; an id without a live file is left out. */
   abstract detailsOf(ids: ReadonlyArray<string>): Promise<StorageFileRead[]>
-  /** Todos os ids são de arquivo vivo e já confirmado (`UPLOADED`): só esses anexam. */
+  /** All the ids are live, already confirmed (`UPLOADED`) files: only those attach. */
   abstract areAttachable(ids: ReadonlyArray<string>): Promise<boolean>
-  /** Onde o arquivo está em uso, em rótulos legíveis; vazio quer dizer órfão. */
+  /** Where the file is in use, in readable labels; empty means orphan. */
   abstract usedBy(id: string): Promise<string[]>
   abstract save(storage: Storage): Promise<void>
-  /** Apaga a linha de vez: `storages` não tem lixeira. */
+  /** Deletes the row for good: `storages` has no trash. */
   abstract delete(storage: Storage): Promise<void>
   abstract paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>>
 }

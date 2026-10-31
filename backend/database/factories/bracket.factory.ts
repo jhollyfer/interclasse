@@ -5,8 +5,8 @@ import Bracket from '#models/bracket'
 import { SportFactory } from '#database/factories/sport.factory'
 
 /**
- * Chave de uma modalidade numa categoria, já em disputa. Só a linha: times e
- * partidas são do sorteio, e a spec que precisa deles sorteia pela rota.
+ * Bracket of a sport in a category, already in progress. Only the row: teams and
+ * matches belong to the draw, and the spec that needs them draws through the route.
  */
 export const BracketFactory = factory
   .define(Bracket, () => ({ category: CATEGORY.F1, status: BRACKET_STATUS.KNOCKOUT }))

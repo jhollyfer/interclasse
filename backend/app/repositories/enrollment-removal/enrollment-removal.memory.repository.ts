@@ -19,30 +19,30 @@ type Classroom = AdministratorEnrollmentRemovalShowResponse['classroom']
 type Sport = AdministratorEnrollmentRemovalShowResponse['sport']
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class EnrollmentRemovalMemoryRepository extends EnrollmentRemovalRepository {
   private readonly rows = new Map<string, EnrollmentRemovalProps>()
-  /** O que o aviso aninha, como o teste arranja das outras tabelas. */
+  /** What the notice nests, as the test arranges it from the other tables. */
   private readonly classrooms = new Map<string, Classroom>()
   private readonly sports = new Map<string, Sport>()
   private readonly actors = new Map<string, AdministratorClassroomPersonResponse>()
 
-  /** Arranjo do teste: a turma do aviso. */
+  /** Test arrangement: the notice's classroom. */
   withClassroom(classroom: Classroom): this {
     this.classrooms.set(classroom.id, classroom)
     return this
   }
 
-  /** Arranjo do teste: a modalidade do aviso. */
+  /** Test arrangement: the notice's sport. */
   withSport(sport: Sport): this {
     this.sports.set(sport.id, sport)
     return this
   }
 
-  /** Arranjo do teste: quem tirou o atleta. */
+  /** Test arrangement: who removed the athlete. */
   withActor(actor: AdministratorClassroomPersonResponse): this {
     this.actors.set(actor.id, actor)
     return this

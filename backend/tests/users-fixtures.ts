@@ -1,11 +1,11 @@
 import User from '#models/user'
 
-/** A conta pelo e-mail, lida direto do banco: o spec confere o efeito sem importar o model. */
+/** The account by e-mail, read straight from the database: the spec checks the effect without importing the model. */
 export function findUserByEmail(email: string): Promise<User> {
   return User.findByOrFail('email', email)
 }
 
-/** Se a linha da conta ainda existe, apagada de vez ou não. */
+/** Whether the account row still exists, deleted for good or not. */
 export async function userExists(id: string): Promise<boolean> {
   return (await User.find(id)) !== null
 }

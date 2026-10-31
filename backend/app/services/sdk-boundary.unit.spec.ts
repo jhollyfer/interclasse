@@ -4,9 +4,9 @@ import { join, relative } from 'node:path'
 import { test } from '@japa/runner'
 
 /**
- * A rede "SDK só no adaptador" (_standards/backend.md §7): import de SDK de
- * fornecedor só existe em `services/<nome>/<nome>.service.ts`. O resto do código
- * fala com o contrato (`<nome>.contract.ts`), e o provider liga a implementação.
+ * The "SDK only in the adapter" net (_standards/backend.md §7): a vendor SDK import
+ * only exists in `services/<name>/<name>.service.ts`. The rest of the code
+ * talks to the contract (`<name>.contract.ts`), and the provider binds the implementation.
  */
 const BACKEND = join(import.meta.dirname, '..', '..')
 const ROOTS = ['app', 'commands']
@@ -15,7 +15,7 @@ const SERVICE = /^app\/services\/([^/]+)\/\1\.service\.ts$/
 const SPEC = /\.(unit|e2e)\.spec\.ts$/
 const IMPORT = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g
 
-/** Os arquivos de produção sob `app/` e `commands/`, com caminho relativo ao backend. */
+/** The production files under `app/` and `commands/`, with a path relative to the backend. */
 function productionFiles(): string[] {
   return ROOTS.flatMap((root) =>
     readdirSync(join(BACKEND, root), { recursive: true, encoding: 'utf-8' })
@@ -24,15 +24,15 @@ function productionFiles(): string[] {
   )
 }
 
-/** Os especificadores importados por um arquivo. */
+/** The specifiers imported by a file. */
 function importsOf(file: string): string[] {
   const source = readFileSync(join(BACKEND, file), 'utf-8')
 
   return [...source.matchAll(IMPORT)].map((match) => match[1] ?? '')
 }
 
-test.group('services > fronteira do SDK (unit)', () => {
-  test('SDK de fornecedor só é importado pelo adaptador do service', ({ assert }) => {
+test.group('services > SDK boundary (unit)', () => {
+  test('a vendor SDK is only imported by the service adapter', ({ assert }) => {
     const offenders = productionFiles()
       .filter((file) => !SERVICE.test(file))
       .filter((file) =>
@@ -42,7 +42,7 @@ test.group('services > fronteira do SDK (unit)', () => {
     assert.deepEqual(offenders, [])
   })
 
-  test('a varredura enxerga o adaptador: sem alvo, o guard não guardaria', ({ assert }) => {
+  test('the scan sees the adapter: without a target, the guard would not guard', ({ assert }) => {
     const adapters = productionFiles().filter((file) => SERVICE.test(file))
 
     assert.isAbove(adapters.length, 0)

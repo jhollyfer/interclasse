@@ -1,7 +1,7 @@
 import { paginationFields, z } from '../../validator.js'
 
 /**
- * Os alunos de uma turma do conselheiro. Par do VineJS de
+ * The students of an advisor's classroom. Mirror of the VineJS one in
  * `backend/app/validators/advisor/students.validator.ts`.
  */
 const studentName = () => z.string().trim().min(1).max(120)
@@ -16,7 +16,7 @@ export const AdvisorStudentCreateValidator = z.object({
   name: studentName(),
 })
 
-/** Só o nome: trocar o aluno de turma é apagar e cadastrar na outra. */
+/** Name only: moving a student to another classroom is delete and register in the other. */
 export const AdvisorStudentUpdateValidator = z.object({
   name: studentName(),
 })

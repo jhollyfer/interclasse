@@ -22,23 +22,23 @@ import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 
 /**
- * As rotas são agrupadas por **papel**, e não por recurso : o que um
- * grupo tem em comum é quem pode entrar nele, e é o grupo que carrega o
- * middleware. Rota nova nasce protegida pelo módulo onde foi colocada, em vez
- * de depender de alguém lembrar de repetir a proteção.
+ * Routes are grouped by **role**, not by resource: what a
+ * group has in common is who can enter it, and it is the group that carries the
+ * middleware. A new route is born protected by the module where it was placed, instead
+ * of depending on someone remembering to repeat the protection.
  *
- * Os controllers vêm de `#generated/controllers`, gerado do diretório
- * `app/features`: mover ou renomear um arquivo quebra o build aqui, e não em
- * produção como uma string de caminho quebraria.
+ * The controllers come from `#generated/controllers`, generated from the
+ * `app/features` directory: moving or renaming a file breaks the build here, and not in
+ * production as a path string would.
  */
 
-/** Sonda de vida do container; o porquê está no controller. */
+/** Container liveness probe; the why is in the controller. */
 router.get('/health-check', [controllers.HealthCheck]).as('health-check')
 
 /**
- * Documentação da API: o documento e a referência navegável. Fora de qualquer
- * grupo autenticado, em `openapi.ignore` junto com `/health-check` - o
- * documento não se documenta -, e atrás de `middleware.documentation()`.
+ * API documentation: the document and the browsable reference. Outside any
+ * authenticated group, in `openapi.ignore` together with `/health-check` - the
+ * document does not document itself -, and behind `middleware.documentation()`.
  */
 router
   .get('/openapi.json', [controllers.documentation.openapi.show.Show])
@@ -50,11 +50,11 @@ router
   .use(middleware.documentation())
 
 /**
- * O site público. **Sem middleware algum**, e não por esquecimento: é a
- * característica do bloco - ler a tabela de jogos não exige conta.
+ * The public site. **No middleware at all**, and not by oversight: it is the
+ * characteristic of the block - reading the match table does not require an account.
  *
- * **Somente leitura.** Nada aqui cria, altera ou remove: um `POST` neste grupo
- * seria escrita anônima no banco.
+ * **Read-only.** Nothing here creates, changes or removes: a `POST` in this group
+ * would be an anonymous write to the database.
  */
 router
   .group(() => {
@@ -78,24 +78,24 @@ router
   .as('storefront')
 
 /**
- * Sessão. Sem middleware de propósito - não é esquecimento, é a característica
- * do bloco: é a porta de entrada, e exigir sessão aqui a tornaria inalcançável.
+ * Session. No middleware on purpose - not an oversight, it is the characteristic
+ * of the block: it is the entry door, and requiring a session here would make it unreachable.
  *
- * As três rotas respondem `204` sem corpo. O que muda de estado viaja no
- * `Set-Cookie`, com o par de tokens `httpOnly`.
+ * The three routes answer `204` with no body. What changes state travels in
+ * `Set-Cookie`, with the `httpOnly` token pair.
  */
 router
   .group(() => {
     router
       .post('sign-in', [controllers.authentication.sessions.signIn.SignIn])
       .use([signInThrottle, signInAccountThrottle])
-    // O único do grupo que exige sessão: sair é apagar os tokens *desta*
-    // sessão, e sem saber qual é ela não há o que apagar.
+    // The only one in the group that requires a session: signing out is erasing the tokens of *this*
+    // session, and without knowing which one it is there is nothing to erase.
     router
       .post('sign-out', [controllers.authentication.sessions.signOut.SignOut])
       .use(middleware.auth())
-    // Fora do `auth()` porque é o token de acesso vencido que traz alguém até
-    // aqui. Quem autoriza é o cookie de refresh, e nada mais.
+    // Outside `auth()` because it is the expired access token that brings someone here.
+    // Who authorizes is the refresh cookie, and nothing else.
     router
       .post('refresh', [controllers.authentication.sessions.refresh.Refresh])
       .use(refreshThrottle)
@@ -104,11 +104,11 @@ router
   .as('authentication')
 
 /**
- * A própria conta, seja qual for o papel.
+ * The account itself, whatever the role.
  *
- * Sem identificador no caminho: o escopo vem da sessão, nunca do payload. O
- * `middleware.auth()` está no grupo, e não em cada rota - sem sessão o papel é
- * desconhecido, e a resposta é 401, nunca 403.
+ * No identifier in the path: the scope comes from the session, never from the payload. The
+ * `middleware.auth()` is on the group, not on each route - without a session the role is
+ * unknown, and the answer is 401, never 403.
  */
 router
   .group(() => {
@@ -120,22 +120,22 @@ router
   .use(middleware.auth())
 
 /**
- * Anexos, na raiz autenticada como `/account`: todo papel do painel envia
- * arquivo, e o registro nasce sem dono porque quem anexa é que guarda a
- * referência.
+ * Attachments, at the authenticated root like `/account`: every panel role uploads a
+ * file, and the record is born without an owner because whoever attaches
+ * keeps the reference.
  *
- * O upload tem três passos, e não um, porque o binário não passa por aqui: o `POST` abre e devolve URLs assinadas, o navegador sobe as partes
- * direto no bucket, e o `complete` confirma. O `GET :id/parts` é o quarto
- * caminho, e o mesmo para dois casos - retomar depois de uma queda e buscar o
- * próximo lote de URLs de um arquivo com partes demais.
+ * The upload has three steps, not one, because the binary does not pass through here: `POST` opens and returns signed URLs, the browser uploads the parts
+ * straight to the bucket, and `complete` confirms. `GET :id/parts` is the fourth
+ * path, and the same for two cases - resuming after a drop and fetching the
+ * next batch of URLs for a file with too many parts.
  *
- * O `DELETE` é o par do `POST` e serve aos dois estados: cancela o upload em
- * andamento e apaga o arquivo pronto. Só alcança arquivo órfão - como o
- * registro é neutro e compartilhado, a posse não serve de autorização, e quem
- * decide é a referência viva.
+ * `DELETE` is the pair of `POST` and serves both states: it cancels the upload in
+ * progress and deletes the finished file. It only reaches orphan files - since the
+ * record is neutral and shared, ownership does not serve as authorization, and what
+ * decides is the live reference.
  *
- * As duas leituras - `GET /` e `GET :id` - são a biblioteca de arquivos do
- * painel. Não há `PUT`: arquivo não se edita, se troca.
+ * The two reads - `GET /` and `GET :id` - are the panel file library.
+ * There is no `PUT`: a file is not edited, it is replaced.
  */
 router
   .group(() => {
@@ -149,19 +149,19 @@ router
       .get(':id/parts', [controllers.storages.files.parts.Parts])
       .as('parts')
       .use(uploadThrottle)
-    // Depois de `:id/parts`: o caminho de duas partes é o mais específico, e
-    // registrado antes ele não pode ser engolido pelo genérico.
+    // After `:id/parts`: the two-segment path is the most specific, and
+    // registered before it, it cannot be swallowed by the generic one.
     router.get(':id', [controllers.storages.files.show.Show])
     router.delete(':id', [controllers.storages.files.delete.Delete])
 
-    // O download com o nome original entra aqui, e não mais solto.
+    // The download with the original name goes here, and no longer loose.
     //
-    // Ficava fora porque o bucket era público: exigir sessão só nesta rota
-    // trancaria a porta da frente com a dos fundos aberta. Com o disco privado
-    // a porta dos fundos fechou, e esta passa a valer - solta, ela virou a
-    // própria porta dos fundos, emitindo URL assinada para qualquer uuid sem
-    // sessão. O `<a>` de salvar arquivo continua funcionando: navegação de
-    // mesmo site manda o cookie.
+    // It used to be outside because the bucket was public: requiring a session only on this route
+    // would lock the front door with the back door open. With the private disk
+    // the back door closed, and this one now counts - loose, it became the
+    // back door itself, issuing a signed URL for any uuid without a
+    // session. The save-file `<a>` keeps working: same-site
+    // navigation sends the cookie.
     router.get(':id/download', [controllers.storages.files.download.Download]).as('download')
   })
   .prefix('storages')
@@ -169,11 +169,11 @@ router
   .use(middleware.auth())
 
 /**
- * Painel administrativo: a organização dos jogos.
+ * Administrative panel: the organization of the games.
  *
- * `auth()` **antes** de `role()`, e os dois no grupo: sem sessão o papel do
- * requisitante ainda é desconhecido, e a resposta é `401` e não `403`. Estando
- * no grupo, uma rota nova nasce protegida pelo módulo onde foi colocada.
+ * `auth()` **before** `role()`, and both on the group: without a session the requester's
+ * role is still unknown, and the answer is `401` and not `403`. Being
+ * on the group, a new route is born protected by the module where it was placed.
  */
 router
   .group(() => {
@@ -240,14 +240,14 @@ router
       .as('announcements')
 
     /**
-     * As chaves. `POST /` é o sorteio, que já monta o mata-mata inteiro. Não há
-     * `PUT`: chave não se edita, se apaga e sorteia de novo.
+     * The brackets. `POST /` is the draw, which already builds the whole knockout. There is no
+     * `PUT`: a bracket is not edited, it is deleted and drawn again.
      */
     router
       .group(() => {
         router.get('/', [controllers.administrator.brackets.paginate.Paginate])
         router.post('/', [controllers.administrator.brackets.create.Create])
-        // Antes de `:id`: senão `preview` seria lido como o id de uma chave.
+        // Before `:id`: otherwise `preview` would be read as a bracket id.
         router.get('preview', [controllers.administrator.brackets.preview.Preview]).as('preview')
         router.get(':id', [controllers.administrator.brackets.show.Show])
         router.delete(':id', [controllers.administrator.brackets.delete.Delete])
@@ -256,9 +256,9 @@ router
       .as('brackets')
 
     /**
-     * As partidas nascem do sorteio, nunca à mão: aqui só se
-     * agenda (`PUT :id`), se lança placar (`PUT :id/score`) e se desfaz o
-     * placar errado (`DELETE :id/score`).
+     * Matches are born from the draw, never by hand: here one only
+     * schedules (`PUT :id`), enters a score (`PUT :id/score`) and undoes a
+     * wrong score (`DELETE :id/score`).
      */
     router
       .group(() => {
@@ -275,7 +275,7 @@ router
       .prefix('matches')
       .as('matches')
 
-    /** Os cartões amarelos e vermelhos que os atletas levaram nas partidas. */
+    /** The yellow and red cards athletes received in matches. */
     router
       .group(() => {
         router.get('/', [controllers.administrator.cards.paginate.Paginate])
@@ -286,8 +286,8 @@ router
       .as('cards')
 
     /**
-     * Os avisos de atleta tirado de modalidade pelo conselheiro, com o motivo.
-     * Nascem da escrita da lista (`PUT /advisor/enrollments`), nunca daqui.
+     * The notices of an athlete removed from a sport by the advisor, with the reason.
+     * They are born from writing the list (`PUT /advisor/enrollments`), never from here.
      */
     router
       .group(() => {
@@ -302,9 +302,9 @@ router
       .as('enrollmentRemovals')
 
     /**
-     * Contas de acesso. O ciclo de vida mora no subgrupo `lifecycle` por causa
-     * do nome derivado da rota: com `archive`, `unarchive` e `delete` num grupo
-     * plano, os nomes colidiriam.
+     * Access accounts. The lifecycle lives in the `lifecycle` subgroup because of
+     * the route-derived name: with `archive`, `unarchive` and `delete` in a flat
+     * group, the names would collide.
      */
     router
       .group(() => {
@@ -339,10 +339,10 @@ router
   .use(middleware.role([USER_ROLE.ADMINISTRATOR]))
 
 /**
- * O professor conselheiro: alunos e inscrições das turmas que aconselha.
+ * The teacher advisor: students and enrollments of the classrooms they advise.
  *
- * O administrador entra junto para cobrir a falta de um conselheiro. Qual turma
- * cada um alcança não é regra de rota - é o escopo da consulta no `ClassroomRepository` (`findOwned`).
+ * The administrator comes in too, to cover for a missing advisor. Which classroom
+ * each one reaches is not a route rule - it is the query scope in `ClassroomRepository` (`findOwned`).
  */
 router
   .group(() => {
@@ -382,8 +382,8 @@ router
   .use(middleware.role([USER_ROLE.ADMINISTRATOR, USER_ROLE.ADVISOR]))
 
 /**
- * O aluno representante: a lista de atletas da própria turma, e nada além.
- * Sem identificador no caminho - a turma sai da sessão.
+ * The student representative: the athlete list of their own classroom, and nothing else.
+ * No identifier in the path - the classroom comes from the session.
  */
 router
   .group(() => {

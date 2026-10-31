@@ -3,11 +3,11 @@ import app from '@adonisjs/core/services/app'
 import env from '#start/env'
 
 /**
- * Os nomes e as validades da sessão, num lugar só.
+ * The names and lifetimes of the session, in one place.
  *
- * O `name` de cada token não é decoração: é o que o guard confere para recusar
- * um token de refresh apresentado como token de acesso. Os dois saem do mesmo
- * `DbAccessTokensProvider` e são indistinguíveis sem ele.
+ * Each token's `name` is not decoration: it is what the guard checks to refuse
+ * a refresh token presented as an access token. Both come out of the same
+ * `DbAccessTokensProvider` and are indistinguishable without it.
  */
 export const COOKIE_TOKEN = {
   DRIVER_NAME: 'cookie-access-tokens',
@@ -18,18 +18,18 @@ export const COOKIE_TOKEN = {
 } as const
 
 /**
- * Os atributos que identificam o cookie de sessão, sem o prazo.
+ * The attributes that identify the session cookie, without the lifetime.
  *
- * Valem para emitir e para apagar: apagar é casar `name` + `domain` + `path`, e
- * errar um dos três não apaga nada, o prazo não entra na conta.
+ * They apply to issuing and to clearing: clearing means matching `name` + `domain` + `path`, and
+ * getting one of the three wrong clears nothing, the lifetime does not count.
  *
- * `sameSite` é `lax` e fica `lax` (_standards/backend.md §4.10). `none` manda o
- * cookie em toda requisição de outro site e só entra por decisão registrada,
- * quando app e API estiverem em sites diferentes; configuração faltando nunca o
- * escolhe. `domain` só existe com `COOKIE_DOMAIN`: sem ele o cookie nasce
- * host-only e o SSR do frontend, em outro host, não o recebe. A chave não existe
- * quando não há valor, porque um `domain: undefined` explícito chega a alguns
- * proxies como a string "undefined" no `Set-Cookie`
+ * `sameSite` is `lax` and stays `lax` (_standards/backend.md §4.10). `none` sends the
+ * cookie on every request from another site and only enters by a recorded decision,
+ * when app and API are on different sites; missing configuration never
+ * chooses it. `domain` only exists with `COOKIE_DOMAIN`: without it the cookie is born
+ * host-only and the frontend SSR, on another host, does not receive it. The key does not exist
+ * when there is no value, because an explicit `domain: undefined` reaches some
+ * proxies as the string "undefined" in `Set-Cookie`
  * (_doc-lib/adonisjs.md#guides/basics/cookies,
  * https://docs.adonisjs.com/guides/basics/cookies).
  */

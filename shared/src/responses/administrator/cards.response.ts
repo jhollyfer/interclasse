@@ -6,8 +6,8 @@ import { CARD_COLORS } from '../../enums/card-color.js'
 import { z } from '../../validator.js'
 
 /**
- * O cartão como as telas o leem: com o atleta, o time por que jogava e a
- * partida (`_standards/architecture.md` §10).
+ * The card as the screens read it: with the athlete, the team they played for and the
+ * match (`_standards/architecture.md` §10).
  */
 export const AdministratorCardPaginateResponse = z.object({
   id: z.uuid(),
@@ -29,7 +29,7 @@ export const AdministratorCardPaginateResponse = z.object({
   match: AdministratorMatchUpdateResponse,
 })
 
-/** O cartão lançado volta lido do banco, como a lista o mostra. */
+/** The entered card comes back read from the database, as the list shows it. */
 export const AdministratorCardCreateResponse = AdministratorCardPaginateResponse
 
 export type AdministratorCardPaginateResponse = z.infer<

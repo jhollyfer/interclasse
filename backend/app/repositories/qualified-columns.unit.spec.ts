@@ -4,21 +4,21 @@ import { join } from 'node:path'
 import { test } from '@japa/runner'
 
 /**
- * A rede "coluna qualificada" (_standards/backend.md §4.7 e §7): em consulta com
- * `join`, toda coluna de `where`, `orderBy`, `groupBy`, `select` e agregado leva
- * a tabela (`students.classroom_id`). Coluna solta é ambígua assim que a tabela
- * do join ganha uma coluna de mesmo nome, e só falha em runtime.
+ * The "qualified column" net (_standards/backend.md §4.7 and §7): in a query with
+ * `join`, every column of `where`, `orderBy`, `groupBy`, `select` and aggregate carries
+ * the table (`students.classroom_id`). A loose column is ambiguous as soon as the joined table
+ * gains a column of the same name, and only fails at runtime.
  */
 const DIRECTORY = import.meta.dirname
 const JOIN = /\.(?:left|right|inner)?[jJ]oin(?:Raw)?\(/
 const COLUMN_CALL =
   /\.(?:where|whereNot|whereIn|whereNotIn|whereNull|whereNotNull|whereILike|orWhere|orderBy|groupBy|select|count|countDistinct|sum|min|max)\(\s*'([^']+)'/g
-/** Alias de agregado (`count('x as total')`) e expressão não são coluna solta. */
+/** An aggregate alias (`count('x as total')`) and an expression are not loose columns. */
 const NOT_A_COLUMN = /\s|\*|\(/
 
 type Finding = { readonly file: string; readonly column: string }
 
-/** Os repositórios Lucid, um por pasta. */
+/** The Lucid repositories, one per folder. */
 function lucidRepositories(): string[] {
   return readdirSync(DIRECTORY, { recursive: true, encoding: 'utf-8' }).filter((file) =>
     file.endsWith('.lucid.repository.ts'),
@@ -26,8 +26,8 @@ function lucidRepositories(): string[] {
 }
 
 /**
- * A cadeia de uma consulta com join: do `.from(` ou `.query(` que a abre até o fim
- * do trecho (duas linhas em branco separam os statements).
+ * The chain of a query with join: from the `.from(` or `.query(` that opens it to the end
+ * of the snippet (two blank lines separate the statements).
  */
 function joinChains(source: string): string[] {
   return source
@@ -44,7 +44,7 @@ function joinChains(source: string): string[] {
     })
 }
 
-/** Aliases declarados na própria cadeia (`count('x as total')`): ordenar por alias é inequívoco. */
+/** Aliases declared in the chain itself (`count('x as total')`): sorting by alias is unambiguous. */
 function aliasesOf(chain: string): ReadonlySet<string> {
   return new Set([...chain.matchAll(/\bas\s+(\w+)'/g)].map((match) => match[1] ?? ''))
 }
@@ -64,14 +64,14 @@ function unqualifiedColumns(file: string): Finding[] {
   })
 }
 
-test.group('repositories > coluna qualificada (unit)', () => {
-  test('consulta com join só usa coluna qualificada pela tabela', ({ assert }) => {
+test.group('repositories > qualified column (unit)', () => {
+  test('a query with join only uses columns qualified by the table', ({ assert }) => {
     const findings = lucidRepositories().flatMap((file) => unqualifiedColumns(file))
 
     assert.deepEqual(findings, [])
   })
 
-  test('a varredura enxerga repositórios com join: sem alvo, o guard não guardaria', ({
+  test('the scan sees the repositories with join: without a target, the guard would not guard', ({
     assert,
   }) => {
     const withJoin = lucidRepositories().filter((file) =>

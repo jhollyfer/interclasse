@@ -12,8 +12,8 @@ export default class extends BaseSchema {
         .references('id')
         .inTable('students')
         .onDelete('CASCADE')
-      // `RESTRICT`: apagar a modalidade com atletas inscritos perderia as listas
-      // que os representantes montaram. O caso de uso responde `409` antes.
+      // `RESTRICT`: deleting the sport with enrolled athletes would lose the lists
+      // the representatives built. The use case answers `409` first.
       table
         .uuid('sport_id')
         .notNullable()

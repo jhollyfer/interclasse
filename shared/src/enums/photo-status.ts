@@ -1,6 +1,6 @@
 /**
- * A foto do carrossel do site. A do conselheiro nasce `PENDING` e só aparece
- * no site depois que o administrador aprova: é foto de aluno, em site aberto.
+ * A photo of the site carousel. The advisor's photo is born `PENDING` and only shows
+ * on the site after the administrator approves it: it is a student photo, on an open site.
  */
 export const PHOTO_STATUS = {
   PENDING: 'PENDING',
@@ -12,7 +12,7 @@ export type PhotoStatus = (typeof PHOTO_STATUS)[keyof typeof PHOTO_STATUS]
 
 export const PHOTO_STATUSES = Object.values(PHOTO_STATUS)
 
-/** O que a revisão do administrador decide: aprovar ou recusar. */
+/** What the administrator's review decides: approve or reject. */
 export const PHOTO_REVIEW_STATUSES = [
   PHOTO_STATUS.APPROVED,
   PHOTO_STATUS.REJECTED,

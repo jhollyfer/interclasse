@@ -1,11 +1,11 @@
 import { emailField, z } from '../../validator.js'
 
 /**
- * Par de caminho e nome do VineJS de
+ * Mirror (path and name) of the VineJS one in
  * `backend/app/validators/authentication/sessions.validator.ts`
  * (`_standards/architecture.md` §10).
  *
- * Entrar não valida força: a senha só é comparada com o hash guardado.
+ * Signing in does not validate strength: the password is only compared with the stored hash.
  */
 export const AuthenticationSessionSignInValidator = z.object({
   email: emailField(),

@@ -11,7 +11,7 @@ export const REMOVAL_CLASSROOM_ID = 'c1a55a00-0000-4000-8000-000000000001'
 export const REMOVAL_SPORT_ID = '5a0a7000-0000-4000-8000-000000000002'
 export const REMOVAL_ACTOR_ID = 'ac707000-0000-4000-8000-000000000003'
 
-/** O repositório em memória com a turma, a modalidade e quem tirou o atleta. */
+/** The in-memory repository with the classroom, the sport and who removed the athlete. */
 export function memoryRemovals(): EnrollmentRemovalMemoryRepository {
   return new EnrollmentRemovalMemoryRepository()
     .withClassroom({
@@ -46,7 +46,7 @@ export function memoryRemovals(): EnrollmentRemovalMemoryRepository {
     })
 }
 
-/** Grava um aviso de remoção e devolve o id. */
+/** Saves a removal notice and returns the id. */
 export async function seedRemoval(
   removals: EnrollmentRemovalMemoryRepository,
   options: { readonly role?: UserRole; readonly at?: Date } = {},

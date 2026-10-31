@@ -6,8 +6,8 @@ import { StoragesFileShowResponse } from '../storages/files.response.js'
 const date = () => z.iso.datetime({ offset: true })
 
 /**
- * A conta como a API devolve: com o avatar, e nunca a senha. Vale no detalhe,
- * no cadastro, na edição e em cada item da lista.
+ * The account as the API returns it: with the avatar, and never the password. Holds
+ * in detail, create, update and each list item.
  */
 export const AdministratorUserShowResponse = z.object({
   id: z.uuid(),

@@ -5,16 +5,16 @@ import type { Infer } from '#core/validator'
 
 export const CLASSROOM_SORT_COLUMNS = ['name', 'grade', 'category', 'createdAt'] as const
 
-/** O ano da turma. A categoria sai dele, e por isso ela não é campo de entrada. */
+/** The classroom grade. The category comes from it, which is why it is not an input field. */
 export function grade() {
   return vine.number().withoutDecimals().min(GRADES.MIN).max(GRADES.MAX)
 }
 
 /**
- * O que `POST /administrator/classrooms` recebe.
+ * What `POST /administrator/classrooms` receives.
  *
- * Conselheiro e representante são opcionais: a turma nasce antes de alguém ser
- * indicado. Que a conta exista e tenha o papel certo é checado no use-case.
+ * Advisor and representative are optional: the classroom is born before anyone is
+ * named. That the account exists and has the right role is checked in the use case.
  */
 export const AdministratorClassroomCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(20),
@@ -23,7 +23,7 @@ export const AdministratorClassroomCreateValidator = vine.create({
   representativeId: vine.string().uuid().nullable().optional(),
 })
 
-/** Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. */
+/** An absent field means "leave alone"; `null` on advisor or representative undoes the link. */
 export const AdministratorClassroomUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(20).optional().use(notNull()),
   grade: grade().optional().use(notNull()),

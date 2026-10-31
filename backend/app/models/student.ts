@@ -4,7 +4,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { StudentSchema } from '#database/schema'
 import Classroom from '#models/classroom'
 
-/** O aluno de uma turma. Só vira atleta quando inscrito numa modalidade. */
+/** The student of a classroom. Only becomes an athlete when enrolled in a sport. */
 export default class Student extends StudentSchema {
   @belongsTo(() => Classroom)
   declare classroom: BelongsTo<typeof Classroom>

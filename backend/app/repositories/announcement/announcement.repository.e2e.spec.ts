@@ -9,9 +9,9 @@ import { resetDatabase } from '#tests/http-fixtures'
 import { Announcement } from '#domain/announcement/announcement.entity'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double.
  */
 const IMPLEMENTATIONS = {
   lucid: () => app.container.make(AnnouncementLucidRepository),
@@ -37,23 +37,29 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`AnnouncementRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem o mesmo aviso', async ({ assert }) => {
+    test('save and findById return the same announcement', async ({ assert }) => {
       const repository = await make()
-      const aviso = announcement({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91', title: 'Adiado' })
+      const announcementRow = announcement({
+        id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91',
+        title: 'Adiado',
+      })
 
-      await repository.save(aviso)
-      const found = await repository.findById(aviso.id)
+      await repository.save(announcementRow)
+      const found = await repository.findById(announcementRow.id)
 
-      assert.deepEqual(found?.snapshot(), aviso.snapshot())
+      assert.deepEqual(found?.snapshot(), announcementRow.snapshot())
     })
 
-    test('save de aviso existente atualiza em vez de duplicar', async ({ assert }) => {
+    test('save of an existing announcement updates instead of duplicating', async ({ assert }) => {
       const repository = await make()
-      const aviso = announcement({ id: '0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d', title: 'Antes' })
-      await repository.save(aviso)
+      const announcementRow = announcement({
+        id: '0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d',
+        title: 'Antes',
+      })
+      await repository.save(announcementRow)
 
-      aviso.edit({ title: 'Depois', pinned: true }, new Date('2026-10-30T12:00:00.000Z'))
-      await repository.save(aviso)
+      announcementRow.edit({ title: 'Depois', pinned: true }, new Date('2026-10-30T12:00:00.000Z'))
+      await repository.save(announcementRow)
       const page = await repository.paginate({
         page: 1,
         perPage: 10,
@@ -66,13 +72,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepInclude(page.data[0], { title: 'Depois', pinned: true })
     })
 
-    test('findById de id inexistente é null', async ({ assert }) => {
+    test('findById of a nonexistent id is null', async ({ assert }) => {
       const repository = await make()
 
       assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('paginate com fixados primeiro e depois do mais novo', async ({ assert }) => {
+    test('paginate with pinned first and then newest', async ({ assert }) => {
       const repository = await make()
       await repository.save(
         announcement({
@@ -111,7 +117,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('paginate busca pelo título e ordena pela coluna pedida', async ({ assert }) => {
+    test('paginate searches by title and sorts by the requested column', async ({ assert }) => {
       const repository = await make()
       await repository.save(
         announcement({ id: '5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d', title: 'Jogo da final' }),
@@ -139,14 +145,17 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(page.meta.total, 2)
     })
 
-    test('delete tira o aviso', async ({ assert }) => {
+    test('delete removes the announcement', async ({ assert }) => {
       const repository = await make()
-      const aviso = announcement({ id: '8d9e0f1a-2b3c-4d4e-9f5a-6b7c8d9e0f1a', title: 'Vencido' })
-      await repository.save(aviso)
+      const announcementRow = announcement({
+        id: '8d9e0f1a-2b3c-4d4e-9f5a-6b7c8d9e0f1a',
+        title: 'Vencido',
+      })
+      await repository.save(announcementRow)
 
-      await repository.delete(aviso)
+      await repository.delete(announcementRow)
 
-      assert.isNull(await repository.findById(aviso.id))
+      assert.isNull(await repository.findById(announcementRow.id))
     })
   })
 }

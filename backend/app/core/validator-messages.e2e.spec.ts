@@ -5,24 +5,24 @@ import { body } from '#tests/http-fixtures'
 import { RULE_MESSAGES } from '#core/validator'
 
 /**
- * A frase de cada regra, em português.
+ * The phrase of each rule, in Portuguese.
  *
- * O mapa do backend é o que a API devolve para qualquer cliente, e é o lado sem
- * guarda: uma regra nova em `#core/validator` sem entrada aqui cai no default
- * do VineJS e a 422 sai híbrida - o rótulo em português dentro da frase em
- * inglês, "The o link field must be a valid URL".
+ * The backend map is what the API returns to any client, and it is the side without a
+ * guard: a new rule in `#core/validator` with no entry here falls to the VineJS default
+ * and the 422 comes out hybrid - the Portuguese label inside the English phrase,
+ * "The o link field must be a valid URL".
  */
 
-test.group('mensagens > provider de validação', () => {
-  test('as regras que os validators usam estão em português', ({ assert }) => {
-    // A lista é escrita à mão, e é isso que deixa a regra nova passar: ela só é
-    // cobrada aqui depois que alguém a acrescenta. Regra nova em
-    // `app/core/validator.ts` entra nesta lista no mesmo commit.
+test.group('messages > validation provider', () => {
+  test('the rules the validators use are in Portuguese', ({ assert }) => {
+    // The list is hand-written, and that is what lets a new rule through: it is only
+    // enforced here after someone adds it. A new rule in
+    // `app/core/validator.ts` goes in this list in the same commit.
     //
-    // `regex` e `confirmed` ficam de fora de propósito: os únicos usos delas
-    // são em `password()`, e ambos já têm chave `campo.regra`. Cobrar a
-    // genérica seria cobrar código morto.
-    const obrigatorias = [
+    // `regex` and `confirmed` are left out on purpose: their only uses
+    // are in `password()`, and both already have a `field.rule` key. Enforcing the
+    // generic one would be enforcing dead code.
+    const required = [
       'required',
       'string',
       'enum',
@@ -45,31 +45,31 @@ test.group('mensagens > provider de validação', () => {
       'passwordConfirmation.confirmed',
     ]
 
-    const faltando = LOCALES.flatMap((locale) =>
-      obrigatorias
+    const missing = LOCALES.flatMap((locale) =>
+      required
         .filter((rule) => !(rule in RULE_MESSAGES[locale]))
         .map((rule) => `${locale}:${rule}`),
     )
 
-    assert.deepEqual(faltando, [])
+    assert.deepEqual(missing, [])
   })
 
-  test('nenhuma mensagem escapou em inglês', ({ assert }) => {
-    // `{{ field }}` é o marcador do VineJS, e não texto exibido - sai antes da
-    // busca, senão toda mensagem que nomeia o campo seria acusada de inglesa.
-    const suspeitas = Object.entries(RULE_MESSAGES['pt-BR']).filter(([, message]) =>
+  test('no message escaped in English', ({ assert }) => {
+    // `{{ field }}` is the VineJS marker, not displayed text - it goes out before the
+    // search, otherwise every message that names the field would be accused of being English.
+    const suspect = Object.entries(RULE_MESSAGES['pt-BR']).filter(([, message]) =>
       /\b(the|must|field|should|at least|at most|invalid|value)\b/i.test(
         message.replace(/\{\{.*?\}\}/g, ''),
       ),
     )
 
-    assert.deepEqual(suspeitas, [])
+    assert.deepEqual(suspect, [])
   })
 
-  test('a 422 de uma rota real sai inteira em português', async ({ client, assert }) => {
-    // Os dois testes acima leem o mapa; este lê a resposta. É o que prova que o
-    // `SimpleMessagesProvider` foi de fato instalado - um mapa correto que
-    // ninguém registrou passaria nos outros dois.
+  test('the 422 of a real route comes out entirely in Portuguese', async ({ client, assert }) => {
+    // The two tests above read the map; this one reads the response. It is what proves the
+    // `SimpleMessagesProvider` was actually installed - a correct map that
+    // nobody registered would pass the other two.
     const response = await client
       .post('/authentication/sign-in')
       .json({ email: 'nao-e-email', password: 'Qualquer1!' })
@@ -79,7 +79,7 @@ test.group('mensagens > provider de validação', () => {
     assert.deepEqual(body(response).errors, { email: 'Informe um e-mail válido' })
   })
 
-  test('a 422 sai no idioma do Accept-Language', async ({ client, assert }) => {
+  test('the 422 comes out in the Accept-Language language', async ({ client, assert }) => {
     const english = await client
       .post('/authentication/sign-in')
       .header('accept-language', 'en-US,en;q=0.9')

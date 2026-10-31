@@ -11,23 +11,23 @@ import { Student, type StudentProps } from '#domain/student/student.entity'
 import { MemoryPagination } from '#core/memory-pagination'
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class StudentMemoryRepository extends StudentRepository {
   private readonly rows = new Map<string, StudentProps>()
-  /** O conselheiro de cada turma: o que o teste arranja da tabela `classrooms`. */
+  /** The advisor of each classroom: what the test arranges from the `classrooms` table. */
   private readonly advisors = new Map<string, string | null>()
   private readonly drawn = new Set<string>()
 
-  /** Arranjo do teste: a turma existe, com este conselheiro. */
+  /** Test arrangement: the classroom exists, with this advisor. */
   withClassroom(classroomId: string, advisorId: string | null): this {
     this.advisors.set(classroomId, advisorId)
     return this
   }
 
-  /** Arranjo do teste: o aluno está inscrito numa modalidade já sorteada. */
+  /** Test arrangement: the student is enrolled in an already drawn sport. */
   markInDrawnSport(studentId: string): this {
     this.drawn.add(studentId)
     return this
@@ -76,7 +76,7 @@ export class StudentMemoryRepository extends StudentRepository {
     }
   }
 
-  /** O administrador alcança todas as turmas; os outros, a que aconselham. */
+  /** The administrator reaches all classrooms; the others, the one they advise. */
   private reaches(actor: Actor, classroomId: string): boolean {
     return actor.role === USER_ROLE.ADMINISTRATOR || this.advisors.get(classroomId) === actor.id
   }

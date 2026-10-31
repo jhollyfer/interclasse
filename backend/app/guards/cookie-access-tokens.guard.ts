@@ -11,21 +11,21 @@ import { COOKIE_TOKEN } from '#config/cookie'
 import { SessionRepository } from '#repositories/session/session.repository'
 
 /**
- * O usuário já autenticado, onde `currentAccessToken` deixou de ser opcional.
+ * The already authenticated user, where `currentAccessToken` is no longer optional.
  *
- * Interseção, e não `Merge`: `User` é uma classe do Lucid, e mapear as chaves
- * dela achataria os métodos e o tipo nominal que `GuardContract` espera.
+ * An intersection, not `Merge`: `User` is a Lucid class, and mapping its
+ * keys would flatten the methods and the nominal type `GuardContract` expects.
  */
 type GuardUser = User & { currentAccessToken: AccessToken }
 
 /**
- * Reaproveita a maquinaria nativa de access tokens opacos do Adonis - hash,
- * expiração e persistência pelo `DbAccessTokensProvider` - e troca só o
- * transporte: o token é lido do cookie `access-token`.
+ * Reuses Adonis' native machinery of opaque access tokens - hash,
+ * expiry and persistence by the `DbAccessTokensProvider` - and swaps only the
+ * transport: the token is read from the `access-token` cookie.
  *
- * **Sem fallback para o cabeçalho `Authorization`.** O cookie é `httpOnly`
- * justamente para o JavaScript da página não alcançar o token; aceitar
- * o mesmo token pelo cabeçalho reabriria o caminho que o `httpOnly` fecha.
+ * **No fallback to the `Authorization` header.** The cookie is `httpOnly`
+ * precisely so the page JavaScript cannot reach the token; accepting
+ * the same token by header would reopen the path `httpOnly` closes.
  */
 export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
   readonly driverName = COOKIE_TOKEN.DRIVER_NAME
@@ -66,17 +66,17 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
 
     const accessToken = await User.accessTokens.verify(secret)
 
-    // O token de refresh sai do mesmo provedor e é válido pela mesma
-    // verificação: sem conferir o `name`, apresentá-lo como token de acesso
-    // daria uma sessão com a validade do refresh.
+    // The refresh token comes out of the same provider and is valid by the same
+    // verification: without checking the `name`, presenting it as an access token
+    // would give a session with the refresh's lifetime.
     if (!accessToken || accessToken.name !== COOKIE_TOKEN.ACCESS) throw this.#authenticationFailed()
 
-    // O filtro estava só no sign-in, e o token vive um dia: arquivar ou
-    // desativar alguém não o expulsava, apenas o impedia de entrar de novo.
-    // Revogar acesso precisa ter efeito na requisição seguinte.
+    // The filter was only on sign-in, and the token lives a day: archiving or
+    // deactivating someone did not kick them out, only stopped them from signing in again.
+    // Revoking access must take effect on the next request.
     const user = await User.query()
-      // `tokenableId` é tipado como `string | number | BigInt` pelo pacote de
-      // auth, e o query builder não aceita `BigInt`. Aqui a chave é sempre uuid.
+      // `tokenableId` is typed `string | number | BigInt` by the auth
+      // package, and the query builder does not accept `BigInt`. Here the key is always a uuid.
       .where('id', String(accessToken.tokenableId))
       .withScopes((scopes) => scopes.notDeleted())
       .where('status', ACTIVE_STATUS.ACTIVE)
@@ -84,9 +84,9 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
 
     if (!user) throw this.#authenticationFailed()
 
-    // `Object.assign` em vez de `as GuardUser`: ele devolve
-    // `User & { currentAccessToken: AccessToken }` porque o campo foi de fato
-    // atribuído, e não porque alguém afirmou ao compilador que estava lá.
+    // `Object.assign` instead of `as GuardUser`: it returns
+    // `User & { currentAccessToken: AccessToken }` because the field was actually
+    // assigned, and not because someone asserted to the compiler that it was there.
     this.user = Object.assign(user, { currentAccessToken: accessToken })
     this.isAuthenticated = true
     return this.user
@@ -102,16 +102,16 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
   }
 
   /**
-   * Como o api client do Japa autentica um usuário nos testes. Sem isto,
-   * `client.get(...).loginAs(user)` não teria como montar a sessão, e cada
-   * spec teria de fazer o sign-in por HTTP antes de cada requisição.
+   * How Japa's api client authenticates a user in tests. Without this,
+   * `client.get(...).loginAs(user)` would have no way to build the session, and each
+   * spec would have to sign in over HTTP before every request.
    */
   async authenticateAsClient(user: User): Promise<AuthClientResponse> {
-    // O guard nasce fora do container (factory de `config/auth.ts`); o service
-    // é pedido a ele, nunca construído com `new`.
+    // The guard is born outside the container (`config/auth.ts` factory); the service
+    // is requested from it, never built with `new`.
     const session = await app.container.make(SessionRepository)
     const tokens = await session.issue(user.id)
-    // Sem o valor em claro não há sessão a montar: o cliente segue sem cookie e a rota responde 401.
+    // Without the plain value there is no session to build: the client stays without a cookie and the route answers 401.
     if (!tokens) return { cookies: {} }
 
     return {

@@ -7,9 +7,9 @@ import {
 const PNG_HEAD = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 
 /**
- * O bucket em memória, para o teste unitário. Honra o mesmo contrato do
- * `StorageService`: o teste arranja o que o bucket "recebeu" com `put` e lê o
- * que foi apagado em `discarded`.
+ * The in-memory bucket, for the unit test. It honors the same contract as
+ * `StorageService`: the test arranges what the bucket "received" with `put` and reads
+ * what was deleted in `discarded`.
  */
 export class StorageFake extends StorageContract {
   readonly discarded: string[] = []
@@ -18,8 +18,8 @@ export class StorageFake extends StorageContract {
   private keys = 0
 
   /**
-   * Arranjo do teste: o objeto que o cliente subiu. Sem `head`, o conteúdo é um
-   * PNG, o tipo dos arquivos de teste.
+   * Test arrangement: the object the client uploaded. Without `head`, the content is a
+   * PNG, the type of the test files.
    */
   put(path: string, metadata: StorageMetadata, head: Uint8Array = PNG_HEAD): this {
     this.objects.set(path, metadata)
@@ -29,7 +29,7 @@ export class StorageFake extends StorageContract {
 
   async head(path: string): Promise<Uint8Array> {
     const head = this.heads.get(path)
-    if (!head) throw new Error(`objeto ausente no bucket: ${path}`)
+    if (!head) throw new Error(`object missing from the bucket: ${path}`)
 
     return head
   }
@@ -42,7 +42,7 @@ export class StorageFake extends StorageContract {
 
   async metadata(path: string): Promise<StorageMetadata> {
     const metadata = this.objects.get(path)
-    if (!metadata) throw new Error(`objeto ausente no bucket: ${path}`)
+    if (!metadata) throw new Error(`object missing from the bucket: ${path}`)
 
     return metadata
   }

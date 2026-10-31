@@ -4,8 +4,8 @@ import { z } from '../../validator.js'
 const count = () => z.number().int()
 
 /**
- * O relatório dos jogos: totais, por categoria, por modalidade e por turma. Atleta
- * é aluno inscrito em ao menos uma modalidade (`_standards/architecture.md` §10).
+ * The games report: totals, by category, by sport and by classroom. An athlete is a
+ * student enrolled in at least one sport (`_standards/architecture.md` §10).
  */
 export const AdministratorReportShowResponse = z.object({
   totals: z.object({

@@ -9,7 +9,7 @@ async function service(): Promise<StorageContract> {
 }
 
 test.group('services > storage (unit)', () => {
-  test('a chave é um uuid com a extensão do tipo, para cada tipo aceito', async ({ assert }) => {
+  test('the key is a uuid with the type extension, for each accepted type', async ({ assert }) => {
     const storage = await service()
 
     for (const mimetype of STORAGE_MIMETYPES) {
@@ -20,13 +20,15 @@ test.group('services > storage (unit)', () => {
     }
   })
 
-  test('duas chaves do mesmo tipo nunca coincidem', async ({ assert }) => {
+  test('two keys of the same type never coincide', async ({ assert }) => {
     const storage = await service()
 
     assert.notEqual(storage.key('image/png'), storage.key('image/png'))
   })
 
-  test('o Content-Disposition leva o nome ASCII e o UTF-8 codificado', async ({ assert }) => {
+  test('Content-Disposition carries the ASCII name and the encoded UTF-8 one', async ({
+    assert,
+  }) => {
     const storage = await service()
 
     const header = storage.contentDisposition('relatório final.pdf')
@@ -37,7 +39,9 @@ test.group('services > storage (unit)', () => {
     )
   })
 
-  test('aspas e barra do nome viram _ para não escapar do valor do header', async ({ assert }) => {
+  test('quotes and slash in the name become _ so they do not escape the header value', async ({
+    assert,
+  }) => {
     const storage = await service()
 
     const header = storage.contentDisposition('a"b\\c.png')
@@ -45,7 +49,7 @@ test.group('services > storage (unit)', () => {
     assert.include(header, 'filename="a_b_c.png"')
   })
 
-  test('withUrl devolve o registro com a URL assinada do próprio path', async ({ assert }) => {
+  test('withUrl returns the record with the signed URL of its own path', async ({ assert }) => {
     const storage = await service()
 
     const signed = await storage.withUrl({ path: 'a/b.png', originalName: 'b.png' })
@@ -54,7 +58,7 @@ test.group('services > storage (unit)', () => {
     assert.equal(signed.url.split('?')[0]?.endsWith('/a/b.png'), true)
   })
 
-  test('a URL assinada de leitura é calculada localmente e vence', async ({ assert }) => {
+  test('the signed read URL is computed locally and expires', async ({ assert }) => {
     const storage = await service()
 
     const url = new URL(await storage.signedUrl('abc.png'))
@@ -63,7 +67,7 @@ test.group('services > storage (unit)', () => {
     assert.isTrue(url.searchParams.has('X-Amz-Expires'))
   })
 
-  test('o download assinado prende o nome original na assinatura', async ({ assert }) => {
+  test('the signed download binds the original name to the signature', async ({ assert }) => {
     const storage = await service()
 
     const url = new URL(

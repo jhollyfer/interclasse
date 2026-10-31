@@ -12,13 +12,13 @@ import { resetDatabase } from '#tests/http-fixtures'
 import { StorageFactory } from '#database/factories/storage.factory'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double.
  */
 type Subject = {
   readonly repository: SiteSettingRepository
-  /** Arranja um arquivo enviado e devolve o id. */
+  /** Arranges an uploaded file and returns the id. */
   readonly addFile: (mimetype: string) => Promise<string>
 }
 
@@ -65,7 +65,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`SiteSettingRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('current nasce vazia e devolve sempre a mesma linha', async ({ assert }) => {
+    test('current is born empty and always returns the same row', async ({ assert }) => {
       const { repository } = await make()
 
       const first = await repository.current()
@@ -80,7 +80,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       })
     })
 
-    test('save e current devolvem o que foi gravado', async ({ assert }) => {
+    test('save and current return what was saved', async ({ assert }) => {
       const { repository } = await make()
       const setting = await repository.current()
       setting.update(
@@ -91,7 +91,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await repository.save(setting)
       const found = await repository.current()
 
-      // `updatedAt` fica de fora: o Lucid carimba a edição ao regravar a linha.
+      // `updatedAt` is left out: Lucid stamps the edit when rewriting the row.
       assert.deepInclude(found.snapshot(), {
         id: setting.id,
         about: 'Os jogos do CMEI',
@@ -101,7 +101,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       })
     })
 
-    test('findRegulationFile acha o arquivo enviado e é null para o desconhecido', async ({
+    test('findRegulationFile finds the uploaded file and is null for the unknown one', async ({
       assert,
     }) => {
       const { repository, addFile } = await make()
@@ -111,7 +111,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findRegulationFile('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('show sem regulamento devolve regulation null', async ({ assert }) => {
+    test('show without a regulation returns regulation null', async ({ assert }) => {
       const { repository } = await make()
 
       const shown = await repository.show()
@@ -121,7 +121,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(shown.about)
     })
 
-    test('show e showPublic trazem o regulamento depois de gravado', async ({ assert }) => {
+    test('show and showPublic bring the regulation after it is saved', async ({ assert }) => {
       const { repository, addFile } = await make()
       const id = await addFile('application/pdf')
       const setting = await repository.current()

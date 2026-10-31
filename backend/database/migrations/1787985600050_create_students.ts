@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table.string('name', 120).notNullable()
-      // `CASCADE`: aluno não existe fora de uma turma.
+      // `CASCADE`: a student does not exist outside a classroom.
       table
         .uuid('classroom_id')
         .notNullable()

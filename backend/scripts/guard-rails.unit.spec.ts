@@ -6,10 +6,10 @@ import { join } from 'node:path'
 import { test } from '@japa/runner'
 
 /**
- * A spec dos scripts de guard-rail (_standards/backend.md §7 e §10): sem container,
- * cada script roda como processo e a spec lê o código de saída e o relatório.
- * `authz-check` tem o caso de recusa; `pattern-check` roda sobre o repositório
- * real, que precisa estar limpo.
+ * The spec of the guard-rail scripts (_standards/backend.md §7 and §10): no container,
+ * each script runs as a process and the spec reads the exit code and the report.
+ * `authz-check` has the refusal case; `pattern-check` runs over the real
+ * repository, which must be clean.
  */
 const BACKEND = join(import.meta.dirname, '..')
 const BASELINE = join(BACKEND, 'app/core/openapi/authz-baseline.json')
@@ -17,7 +17,7 @@ const TS_EXEC = ['--import', '@poppinss/ts-exec']
 
 type Run = { readonly status: number | null; readonly output: string }
 
-/** Roda um script do backend e devolve o código de saída e tudo o que ele imprimiu. */
+/** Runs a backend script and returns the exit code and everything it printed. */
 function runScript(script: string, env: Record<string, string> = {}): Run {
   const result = spawnSync(process.execPath, [...TS_EXEC, join(BACKEND, 'scripts', script)], {
     cwd: BACKEND,
@@ -28,7 +28,7 @@ function runScript(script: string, env: Record<string, string> = {}): Run {
   return { status: result.status, output: `${result.stdout}${result.stderr}` }
 }
 
-/** Grava um baseline alterado num diretório temporário e devolve o caminho dele. */
+/** Writes a changed baseline in a temporary directory and returns its path. */
 function tamperedBaseline(change: (baseline: Record<string, string>) => void): {
   readonly path: string
   readonly cleanup: () => void
@@ -43,14 +43,14 @@ function tamperedBaseline(change: (baseline: Record<string, string>) => void): {
 }
 
 test.group('scripts > authz-check (unit)', () => {
-  test('o baseline commitado confere com o openapi.json', ({ assert }) => {
+  test('the committed baseline matches openapi.json', ({ assert }) => {
     const run = runScript('authz-check.ts')
 
     assert.equal(run.status, 0, run.output)
     assert.include(run.output, 'no changes')
   })
 
-  test('rota que passou a ser pública reprova e aparece no relatório', ({ assert }) => {
+  test('a route that became public fails and shows up in the report', ({ assert }) => {
     const tampered = tamperedBaseline((baseline) => {
       baseline['GET /storefront/site'] = 'ADMINISTRATOR'
     })
@@ -65,7 +65,7 @@ test.group('scripts > authz-check (unit)', () => {
     }
   })
 
-  test('rota nova fora do baseline reprova', ({ assert }) => {
+  test('a new route outside the baseline fails', ({ assert }) => {
     const tampered = tamperedBaseline((baseline) => {
       delete baseline['GET /storefront/site']
     })
@@ -80,8 +80,10 @@ test.group('scripts > authz-check (unit)', () => {
     }
   })
 
-  test('baseline ausente reprova em vez de passar calado', ({ assert }) => {
-    const run = runScript('authz-check.ts', { AUTHZ_BASELINE: join(tmpdir(), 'nao-existe.json') })
+  test('a missing baseline fails instead of passing silently', ({ assert }) => {
+    const run = runScript('authz-check.ts', {
+      AUTHZ_BASELINE: join(tmpdir(), 'does-not-exist.json'),
+    })
 
     assert.equal(run.status, 1)
     assert.include(run.output, 'baseline missing')
@@ -89,7 +91,7 @@ test.group('scripts > authz-check (unit)', () => {
 })
 
 test.group('scripts > pattern-check (unit)', () => {
-  test('o repositório cumpre a árvore, os nomes e o ENV', ({ assert }) => {
+  test('the repository complies with the tree, the names and the ENV', ({ assert }) => {
     const run = runScript('pattern-check.ts')
 
     assert.equal(run.status, 0, run.output)

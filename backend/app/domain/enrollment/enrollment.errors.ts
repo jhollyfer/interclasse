@@ -1,12 +1,12 @@
-/** O que a lista de atletas recusa, como fato (`_standards/domain.md` §2). */
+/** What the athlete list refuses, as a fact (`_standards/domain.md` §2). */
 export type EnrollmentError =
-  /** Mais atletas que o máximo da modalidade. */
+  /** More athletes than the sport maximum. */
   | { readonly code: 'ENROLLMENT_LIMIT_EXCEEDED'; readonly maxAthletes: number }
-  /** Aluno que não é da turma: sem isto, o uuid de outra turma entraria na lista. */
+  /** A student who is not in the classroom: without this, the uuid of another classroom would enter the list. */
   | { readonly code: 'ENROLLMENT_STUDENT_NOT_IN_CLASSROOM' }
-  /** O representante só acrescenta; tirar atleta é do professor conselheiro. */
+  /** The representative only adds; removing an athlete belongs to the teacher advisor. */
   | { readonly code: 'ENROLLMENT_REMOVAL_FORBIDDEN' }
-  /** Depois do sorteio a lista do representante trava. */
+  /** After the draw the representative's list locks. */
   | { readonly code: 'ENROLLMENT_LOCKED' }
-  /** O conselheiro que tira atleta diz por quê. */
+  /** The advisor who removes an athlete says why. */
   | { readonly code: 'ENROLLMENT_REASON_REQUIRED' }

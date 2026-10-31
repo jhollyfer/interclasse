@@ -18,8 +18,8 @@ import { UserFactory } from '#database/factories/user.factory'
 type World = { classroomId: string; sportId: string; studentId: string; actorId: string }
 
 /**
- * O que cada implementação precisa para o teste arranjar o mundo do aviso: turma,
- * modalidade, aluno e quem tirou. O contrato roda igual nas duas
+ * What each implementation needs for the test to arrange the notice's world: classroom,
+ * sport, student and who removed. The contract runs the same on both
  * (`_standards/domain.md` §5.4).
  */
 type Harness = {
@@ -115,7 +115,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`EnrollmentRemovalRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem o mesmo aviso', async ({ assert }) => {
+    test('save and findById return the same notice', async ({ assert }) => {
       const { repository, world } = await make()
       const saved = removal(await world(), NOW)
 
@@ -126,7 +126,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findById(randomUUID()))
     })
 
-    test('saveAll grava todos os avisos da troca; lista vazia não faz nada', async ({ assert }) => {
+    test("saveAll saves all the swap's notices; an empty list does nothing", async ({ assert }) => {
       const { repository, world } = await make()
       const data = await world()
       const first = removal(data, NOW)
@@ -139,7 +139,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(await repository.findById(second.id))
     })
 
-    test('save de aviso existente grava a ciência', async ({ assert }) => {
+    test('save of an existing notice saves the acknowledgement', async ({ assert }) => {
       const { repository, world } = await make()
       const saved = removal(await world(), NOW)
       await repository.save(saved)
@@ -151,7 +151,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(found?.snapshot().acknowledgedAt)
     })
 
-    test('findDetail traz turma, modalidade e quem tirou', async ({ assert }) => {
+    test('findDetail brings classroom, sport and who removed', async ({ assert }) => {
       const { repository, world } = await make()
       const data = await world()
       const saved = removal(data, NOW)
@@ -166,9 +166,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findDetail(randomUUID()))
     })
 
-    test('paginate: pendentes primeiro, depois do mais novo ao mais antigo, com filtros', async ({
-      assert,
-    }) => {
+    test('paginate: pending first, then newest to oldest, with filters', async ({ assert }) => {
       const { repository, world } = await make()
       const data = await world()
       const readOld = removal(data, new Date('2026-10-01T12:00:00Z'), USER_ROLE.ADMINISTRATOR)

@@ -10,7 +10,7 @@ import { BASE_LOCALE } from '@interclasse/shared'
 import OriginMiddleware from '#middleware/origin.middleware'
 import HTTPException from '#exceptions/http.exception'
 
-/** A allowlist de `.env.test`. */
+/** The `.env.test` allowlist. */
 const ALLOWED = 'http://localhost:5173'
 
 async function run(method: string, headers: Record<string, string>) {
@@ -37,21 +37,21 @@ async function run(method: string, headers: Record<string, string>) {
 }
 
 test.group('middleware > origin (CSRF, unit)', () => {
-  test('GET passa sem Origin', async ({ assert }) => {
+  test('GET passes without Origin', async ({ assert }) => {
     const result = await run('GET', {})
 
     assert.isTrue(result.reached)
   })
 
-  test('escrita com Origin da allowlist passa, seja qual for o Content-Type', async ({
-    assert,
-  }) => {
+  test('a write with an allowlist Origin passes, whatever the Content-Type', async ({ assert }) => {
     const result = await run('POST', { 'origin': ALLOWED, 'content-type': 'text/plain' })
 
     assert.isTrue(result.reached)
   })
 
-  test('escrita com Origin fora da allowlist é 403 ORIGIN_NOT_ALLOWED', async ({ assert }) => {
+  test('a write with an Origin outside the allowlist is 403 ORIGIN_NOT_ALLOWED', async ({
+    assert,
+  }) => {
     const result = await run('POST', {
       'origin': 'http://intruso.example',
       'content-type': 'application/json',
@@ -62,7 +62,7 @@ test.group('middleware > origin (CSRF, unit)', () => {
     assert.equal(result.code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('text/plain de outro site é recusado', async ({ assert }) => {
+  test('text/plain from another site is refused', async ({ assert }) => {
     const result = await run('POST', {
       'origin': 'http://intruso.example',
       'content-type': 'text/plain',
@@ -71,19 +71,19 @@ test.group('middleware > origin (CSRF, unit)', () => {
     assert.equal(result.code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('sem Origin, Sec-Fetch-Site same-origin passa', async ({ assert }) => {
+  test('without Origin, Sec-Fetch-Site same-origin passes', async ({ assert }) => {
     const result = await run('DELETE', { 'sec-fetch-site': 'same-origin' })
 
     assert.isTrue(result.reached)
   })
 
-  test('sem Origin, Sec-Fetch-Site cross-site é recusado', async ({ assert }) => {
+  test('without Origin, a cross-site Sec-Fetch-Site is refused', async ({ assert }) => {
     const result = await run('POST', { 'sec-fetch-site': 'cross-site' })
 
     assert.equal(result.code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('escrita sem Origin e sem Sec-Fetch-Site é recusada', async ({ assert }) => {
+  test('a write without Origin and without Sec-Fetch-Site is refused', async ({ assert }) => {
     const result = await run('PUT', {})
 
     assert.isFalse(result.reached)

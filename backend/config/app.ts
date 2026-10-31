@@ -21,9 +21,9 @@ export const http = defineConfig({
   generateRequestId: true,
 
   /**
-   * Os proxies cuja palavra sobre o IP do cliente vale (`TRUSTED_PROXIES`).
-   * Ausente cai no `loopback` do Adonis. Sem o proxy da produção aqui,
-   * `request.ip()` é o IP dele e o limite por IP vira global
+   * The proxies whose word about the client IP counts (`TRUSTED_PROXIES`).
+   * Absent falls back to Adonis' `loopback`. Without the production proxy here,
+   * `request.ip()` is its IP and the per-IP limit becomes global
    * (_standards/backend.md §4.10; _doc-lib/adonisjs.md#guides/basics/request,
    * https://docs.adonisjs.com/guides/basics/request).
    */
@@ -37,8 +37,8 @@ export const http = defineConfig({
   allowMethodSpoofing: false,
 
   /**
-   * Desligado: o idioma da requisição chega ao use-case por injeção do `I18n`
-   * (`providers/i18n.provider.ts`), a forma que a doc prefere ao async local
+   * Off: the request language reaches the use case by `I18n` injection
+   * (`providers/i18n.provider.ts`), the form the doc prefers over async local
    * storage (_doc-lib/adonisjs.md#guides/basics/http-context).
    */
   useAsyncLocalStorage: false,

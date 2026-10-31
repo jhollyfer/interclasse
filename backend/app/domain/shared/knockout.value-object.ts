@@ -1,31 +1,31 @@
 import { MATCH_PHASE, type MatchPhase } from '@interclasse/shared'
 
-/** Sorteia um inteiro em `[0, max)`. Injetável para o teste ser determinístico. */
+/** Draws an integer in `[0, max)`. Injectable so the test is deterministic. */
 export type Random = (max: number) => number
 
-/** Um confronto da primeira fase. `away` nulo é folga: o mandante avança direto. */
+/** A first-phase matchup. A null `away` is a bye: the home team advances straight. */
 export type Pairing<T> = { readonly home: T; readonly away: T | null }
 
-/** Para onde vai o vencedor: a posição na fase seguinte e o lado em que entra. */
+/** Where the winner goes: the position in the next phase and the side they enter on. */
 export type AdvanceSlot = { readonly position: number; readonly side: 'home' | 'away' }
 
 /**
- * As regras puras do mata-mata: sorteio, tamanho da chave, fase e avanço
- * (`_standards/domain.md` §4). Sobre dados em mãos, sem banco nem relógio - o
- * sorteio recebe o `Random`, e é isso que o deixa testável.
+ * The pure knockout rules: draw, bracket size, phase and advance
+ * (`_standards/domain.md` §4). Over data in hand, no database or clock - the
+ * draw receives the `Random`, and that is what makes it testable.
  *
- * O formato é o da escola: mata-mata direto, do sorteio à final. Quando o
- * número de turmas não fecha uma potência de dois, as que sobram ficam de
- * folga e entram direto na fase seguinte.
+ * The format is the school's: straight knockout, from the draw to the final. When the
+ * number of classrooms does not fill a power of two, the leftovers get a
+ * bye and enter the next phase directly.
  */
 export class Knockout {
-  /** Com menos de dois times não há partida a jogar. */
+  /** With fewer than two teams there is no match to play. */
   static readonly MIN_TEAMS = 2
 
-  /** A maior chave que existe: oitavas de final. A escola tem até 13 turmas por categoria. */
+  /** The largest bracket that exists: round of 16. The school has up to 13 classrooms per category. */
   static readonly MAX_TEAMS = 16
 
-  /** A fase pelo número de vagas que ela tem. */
+  /** The phase by the number of slots it has. */
   private static readonly PHASE_BY_SIZE: Readonly<Record<number, MatchPhase>> = {
     2: MATCH_PHASE.FINAL,
     4: MATCH_PHASE.SEMI,
@@ -33,14 +33,14 @@ export class Knockout {
     16: MATCH_PHASE.ROUND_OF_16,
   }
 
-  /** A fase seguinte do mata-mata. A final não tem. */
+  /** The next knockout phase. The final has none. */
   private static readonly NEXT_PHASE: Readonly<Partial<Record<MatchPhase, MatchPhase>>> = {
     [MATCH_PHASE.ROUND_OF_16]: MATCH_PHASE.QUARTER,
     [MATCH_PHASE.QUARTER]: MATCH_PHASE.SEMI,
     [MATCH_PHASE.SEMI]: MATCH_PHASE.FINAL,
   }
 
-  /** Fisher-Yates. Não altera a lista recebida. */
+  /** Fisher-Yates. Does not alter the received list. */
   static shuffle<T>(items: ReadonlyArray<T>, random: Random): T[] {
     const result = [...items]
 
@@ -48,7 +48,7 @@ export class Knockout {
       const other = random(index + 1)
       const current = result[index]
       const swapped = result[other]
-      // Índices dentro da lista por construção; a guarda só estreita o tipo.
+      // Indices within the list by construction; the guard only narrows the type.
       if (current === undefined || swapped === undefined) continue
       result[index] = swapped
       result[other] = current
@@ -65,7 +65,7 @@ export class Knockout {
     return Knockout.NEXT_PHASE[phase]
   }
 
-  /** O tamanho da chave: a menor potência de dois que cabe todos os times. */
+  /** The bracket size: the smallest power of two that fits all the teams. */
   static sizeFor(teams: number): number {
     let size = 2
     while (size < teams) size *= 2
@@ -74,10 +74,10 @@ export class Knockout {
   }
 
   /**
-   * O sorteio: embaralha e forma os confrontos da primeira fase.
+   * The draw: shuffles and forms the first-phase matchups.
    *
-   * As folgas vão para os primeiros confrontos, uma por confronto - nunca dois
-   * times de folga um contra o outro, que seria um jogo que não existe.
+   * The byes go to the first matchups, one per matchup - never two
+   * bye teams against each other, which would be a match that does not exist.
    */
   static pair<T>(teams: ReadonlyArray<T>, random: Random): Pairing<T>[] {
     const shuffled = Knockout.shuffle(teams, random)
@@ -88,7 +88,7 @@ export class Knockout {
     let next = 0
     for (let position = 0; position < size / 2; position++) {
       const home = shuffled[next++]
-      // `size` é a menor potência de dois que cabe os times: toda posição tem mandante.
+      // `size` is the smallest power of two that fits the teams: every position has a home team.
       if (home === undefined) break
 
       if (position < byes) {
@@ -103,8 +103,8 @@ export class Knockout {
   }
 
   /**
-   * Para onde vai o vencedor da partida na posição `position`: a posição
-   * `position / 2` da fase seguinte, como mandante quando `position` é par.
+   * Where the winner of the match at position `position` goes: position
+   * `position / 2` of the next phase, as home team when `position` is even.
    */
   static advanceSlot(position: number): AdvanceSlot {
     if (position % 2 === 0) return { position: position / 2, side: 'home' }

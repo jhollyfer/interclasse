@@ -4,9 +4,9 @@ import { defineConfig, syncDestination, targets } from '@adonisjs/core/logger'
 import env from '#start/env'
 
 /**
- * O destino síncrono, só fora de produção: em produção não há destino a montar,
- * e `syncDestination()` é assíncrono - o ternário obrigava um `await` dentro do
- * literal de configuração para um valor que metade dos ambientes descarta.
+ * The synchronous destination, only outside production: in production there is no destination to build,
+ * and `syncDestination()` is asynchronous - the ternary forced an `await` inside the
+ * configuration literal for a value that half the environments discard.
  */
 let destination: Awaited<ReturnType<typeof syncDestination>> | undefined
 if (!app.inProduction) destination = await syncDestination()
@@ -25,13 +25,13 @@ const loggerConfig = defineConfig({
       enabled: true,
 
       /**
-       * O nome que aparece em cada registro de log.
+       * The name that appears in every log record.
        *
-       * Literal, e não `env.get('APP_NAME')` como vinha do esqueleto do Adonis:
-       * é o nome da aplicação, e ele não muda de ambiente para ambiente -
-       * variável de ambiente para um valor fixo é configuração que ninguém
-       * escolhe, e que ainda obriga o estágio de build do Dockerfile a
-       * inventá-la só para o schema passar.
+       * Literal, and not `env.get('APP_NAME')` as it came from the Adonis skeleton:
+       * it is the application name, and it does not change from environment to environment -
+       * an environment variable for a fixed value is configuration nobody
+       * chooses, and that still forces the Dockerfile build stage to
+       * invent it just so the schema passes.
        */
       name: 'interclasse',
 
@@ -41,15 +41,15 @@ const loggerConfig = defineConfig({
       level: env.get('LOG_LEVEL'),
 
       /**
-       * O que nunca sai no log, mesmo que alguém passe o objeto inteiro.
+       * What never goes into the log, even if someone passes the whole object.
        *
-       * Hoje nada aqui loga corpo, header ou cookie — o `logger.error({ err })`
-       * dos use-cases leva só o erro. Esta lista não conserta um vazamento
-       * existente: ela é a rede para o primeiro `logger.info({ payload })` que
-       * alguém escrever, que é quando o vazamento nasce em silêncio.
+       * Today nothing here logs body, header or cookie — the use cases'
+       * `logger.error({ err })` carries only the error. This list does not fix an
+       * existing leak: it is the net for the first `logger.info({ payload })` that
+       * someone writes, which is when the leak is born silently.
        *
-       * `censor` explícito para o campo aparecer redigido em vez de sumir: um
-       * campo ausente lê-se como "não veio", e não como "foi escondido".
+       * Explicit `censor` so the field shows up redacted instead of vanishing: an
+       * absent field reads as "did not come", not as "was hidden".
        */
       redact: {
         paths: [

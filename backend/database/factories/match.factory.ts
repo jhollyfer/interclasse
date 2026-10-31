@@ -4,7 +4,7 @@ import { MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 import Match from '#models/match'
 import { BracketFactory } from '#database/factories/bracket.factory'
 
-/** Partida agendável, sem times nem placar: a forma que o sorteio cria. */
+/** Schedulable match, with no teams or score: the shape the draw creates. */
 export const MatchFactory = factory
   .define(Match, () => ({
     phase: MATCH_PHASE.FINAL,

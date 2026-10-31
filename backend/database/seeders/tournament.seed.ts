@@ -6,11 +6,11 @@ import Sport from '#models/sport'
 import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity'
 
 /**
- * As modalidades e as turmas da escola, como estavam no site anterior.
+ * The school's sports and classrooms, as they were on the previous site.
  *
- * Fora de `test`: a suíte cria o que precisa, e uma modalidade semeada com o
- * mesmo nome esbarraria no `unique` do teste. Idempotente - rodar de novo não
- * duplica, só reafirma.
+ * Outside `test`: the suite creates what it needs, and a seeded sport with the
+ * same name would collide with the test `unique`. Idempotent - running again does not
+ * duplicate, it only reasserts.
  */
 export default class TournamentSeeder extends BaseSeeder {
   static override environment = ['development', 'production']

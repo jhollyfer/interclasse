@@ -18,14 +18,14 @@ async function run(error: unknown) {
 }
 
 test.group('exceptions > handler (unit)', () => {
-  test('401 do guard usa o código da fábrica de HTTPException', async ({ assert }) => {
+  test("the guard's 401 uses the HTTPException factory code", async ({ assert }) => {
     const result = await run(new authErrors.E_UNAUTHORIZED_ACCESS('x', { guardDriverName: 'api' }))
 
     assert.equal(result.status, 401)
     assert.deepInclude(result.body, { status: 401, code: 'AUTHENTICATION_REQUIRED' })
   })
 
-  test('429 do limiter vira o envelope com code estável', async ({ assert }) => {
+  test("the limiter's 429 becomes the envelope with a stable code", async ({ assert }) => {
     const response = new LimiterResponse({ limit: 5, remaining: 0, consumed: 5, availableIn: 600 })
     const result = await run(new limiterErrors.E_TOO_MANY_REQUESTS(response))
 
@@ -33,7 +33,9 @@ test.group('exceptions > handler (unit)', () => {
     assert.deepInclude(result.body, { status: 429, code: 'TOO_MANY_REQUESTS' })
   })
 
-  test('erro desconhecido vira 500 genérico e não vaza a mensagem', async ({ assert }) => {
+  test('an unknown error becomes a generic 500 and does not leak the message', async ({
+    assert,
+  }) => {
     const result = await run(new Error('relation "users" does not exist'))
 
     assert.equal(result.status, 500)
@@ -41,7 +43,7 @@ test.group('exceptions > handler (unit)', () => {
     assert.notInclude(JSON.stringify(result.body), 'users')
   })
 
-  test('HTTPException segue com a própria mensagem e código', async ({ assert }) => {
+  test('HTTPException keeps its own message and code', async ({ assert }) => {
     const result = await run(HTTPException.Conflict('já existe', 'ALREADY_EXISTS'))
 
     assert.equal(result.status, 409)

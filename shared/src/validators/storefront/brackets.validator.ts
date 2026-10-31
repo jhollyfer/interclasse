@@ -1,7 +1,7 @@
 import { CATEGORIES } from '../../enums/category.js'
 import { pageFields, z } from '../../validator.js'
 
-/** As chaves no site: sem filtro de status, o site só mostra o que foi sorteado. */
+/** The brackets on the site: no status filter, the site only shows what was drawn. */
 export const StorefrontBracketPaginateValidator = z.object({
   ...pageFields(),
   sportId: z.uuid().optional(),

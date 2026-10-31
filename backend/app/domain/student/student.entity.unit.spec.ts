@@ -16,10 +16,10 @@ function ana(): Student {
 }
 
 test.group('Student', () => {
-  test('nasce com o nome aparado e a edição carimbada', ({ assert }) => {
+  test('is born with the name trimmed and the edit stamped', ({ assert }) => {
     const created = Student.create({ id: 'id', classroomId: 'c', name: '  Bia  ', now: NOW })
 
-    if (created.isLeft()) throw new Error('aluno recusado')
+    if (created.isLeft()) throw new Error('student refused')
     assert.deepInclude(created.value.snapshot(), {
       name: 'Bia',
       classroomId: 'c',
@@ -27,7 +27,7 @@ test.group('Student', () => {
     })
   })
 
-  test('recusa nome em branco ao nascer e ao renomear', ({ assert }) => {
+  test('refuses a blank name on birth and on rename', ({ assert }) => {
     const born = Student.create({ id: 'id', classroomId: 'c', name: '   ', now: NOW })
     const student = ana()
     const renamed = student.rename('', LATER)
@@ -37,14 +37,14 @@ test.group('Student', () => {
     assert.equal(student.snapshot().name, 'Ana')
   })
 
-  test('renomear troca o nome e carimba a edição', ({ assert }) => {
+  test('renaming changes the name and stamps the edit', ({ assert }) => {
     const student = ana()
     student.rename(' Ana Clara ', LATER)
 
     assert.deepInclude(student.snapshot(), { name: 'Ana Clara', updatedAt: LATER })
   })
 
-  test('não sai da turma se joga numa modalidade já sorteada', ({ assert }) => {
+  test('does not leave the classroom if they play in an already drawn sport', ({ assert }) => {
     assert.isTrue(ana().remove({ inDrawnSport: false }).isRight())
     assert.deepEqual(ana().remove({ inDrawnSport: true }).value, {
       code: 'STUDENT_IN_COMPETITION',

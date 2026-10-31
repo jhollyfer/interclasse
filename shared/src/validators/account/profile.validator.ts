@@ -8,12 +8,12 @@ import {
 } from '../../validator.js'
 
 /**
- * A própria conta, editada pelo dono. Par de caminho e nome do VineJS de
+ * The account itself, edited by its owner. Mirror (path and name) of the VineJS one in
  * `backend/app/validators/account/profile.validator.ts`.
  *
- * Todo campo é opcional: ausente é "não mexer". `role` e `status` não entram:
- * ninguém muda o próprio papel. `currentPassword` é prova de identidade,
- * exigida só quando `password` vem.
+ * Every field is optional: absent means "leave alone". `role` and `status` are not
+ * here: nobody changes their own role. `currentPassword` is proof of identity,
+ * required only when `password` is sent.
  */
 export const AccountProfileUpdateValidator = z
   .object({

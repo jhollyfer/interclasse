@@ -8,8 +8,8 @@ import { z } from '../../validator.js'
 const datetime = () => z.iso.datetime({ offset: true })
 
 /**
- * O aviso de atleta tirado da lista: a turma, a modalidade e quem tirou.
- * `acknowledgedAt` nulo é aviso pendente.
+ * The notice of an athlete removed from the list: the classroom, the sport and who
+ * removed them. A null `acknowledgedAt` means a pending notice.
  */
 export const AdministratorEnrollmentRemovalShowResponse = z.object({
   id: z.uuid(),

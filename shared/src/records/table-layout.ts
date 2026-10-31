@@ -1,12 +1,12 @@
 import { z } from '../validator.js'
 
 /**
- * O layout de tabela que o navegador guarda (`lib/local-store.ts`). Não tem
- * par no backend, por isso não é `*.validator.ts` (sem o par VineJS que o
- * `pattern:check` cobra): é preferência de tela, não payload de API.
+ * The table layout the browser stores (`lib/local-store.ts`). It has no backend
+ * counterpart, so it is not `*.validator.ts` (no VineJS pair, which `pattern:check`
+ * demands): it is a screen preference, not an API payload.
  *
- * Dado de fora entra como `unknown` (`typescript.md` §2): o que está gravado
- * sobrevive a deploy, e a forma de ontem não é garantia da de hoje.
+ * External data comes in as `unknown` (`typescript.md` §2): what is stored survives
+ * deploys, and yesterday's shape is no guarantee of today's.
  */
 export const TableLayout = z.object({
   columnVisibility: z.record(z.string(), z.boolean()).optional(),

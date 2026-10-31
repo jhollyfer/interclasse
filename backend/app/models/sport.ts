@@ -1,4 +1,4 @@
 import { SportSchema } from '#database/schema'
 
-/** A modalidade: futsal, vôlei, queimada... */
+/** The sport: futsal, volleyball, dodgeball... */
 export default class Sport extends SportSchema {}

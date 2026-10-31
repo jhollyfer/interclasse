@@ -5,9 +5,9 @@ import {
 } from '#repositories/session/session.repository'
 
 /**
- * Os tokens da sessão em memória, para o teste unitário. Honra o contrato do
- * `SessionLucidRepository`: o token emitido é lido de volta, a revogação o
- * tira, e o teste lê o que foi emitido e revogado.
+ * The session tokens in memory, for the unit test. It honors the contract of
+ * `SessionLucidRepository`: the issued token is read back, revocation removes
+ * it, and the test reads what was issued and revoked.
  */
 export class SessionMemoryRepository extends SessionRepository {
   readonly issued: string[] = []
@@ -15,7 +15,7 @@ export class SessionMemoryRepository extends SessionRepository {
   private readonly refresh = new Map<string, RefreshGrant>()
   private sequence = 0
 
-  /** Arranjo do teste: um token de refresh válido para a conta. */
+  /** Test arrangement: a valid refresh token for the account. */
   withRefresh(value: string, grant: RefreshGrant): this {
     this.refresh.set(value, grant)
     return this

@@ -17,21 +17,21 @@ export type SportListCriteria = {
 }
 
 /**
- * A persistência da modalidade, por intenção (`_standards/domain.md` §5.1). O
- * escritor único da tabela `sports`; lê as inscrições e as chaves só para
- * responder o que a regra da modalidade pergunta.
+ * The sport persistence, by intent (`_standards/domain.md` §5.1). The
+ * single writer of the `sports` table; it reads enrollments and brackets only to
+ * answer what the sport rule asks.
  */
 export abstract class SportRepository {
   abstract findById(id: string): Promise<Sport | null>
-  /** Outra modalidade, que não `exceptId`, já usa o nome ou o slug. */
+  /** Another sport, other than `exceptId`, already uses the name or the slug. */
   abstract existsByNameOrSlug(name: string, slug: string, exceptId?: string): Promise<boolean>
-  /** O maior número de atletas que uma turma tem inscritos nesta modalidade. */
+  /** The largest number of athletes a classroom has enrolled in this sport. */
   abstract largestRoster(sportId: string): Promise<number>
-  /** Tem inscrição ou chave: apagar deixaria as duas sem modalidade. */
+  /** Has an enrollment or a bracket: deleting would leave both without a sport. */
   abstract isInUse(sportId: string): Promise<boolean>
-  /** Grava a modalidade; nome ou slug de outra (a corrida no `unique`) volta como `SPORT_ALREADY_EXISTS`. */
+  /** Saves the sport; the name or slug of another (the race on the `unique`) comes back as `SPORT_ALREADY_EXISTS`. */
   abstract save(sport: Sport): Promise<Either<SportError, void>>
   abstract delete(sport: Sport): Promise<void>
-  /** Leitura leve: a forma da resposta direto da query, sem hidratar entidade. */
+  /** Lightweight read: the response shape straight from the query, without hydrating an entity. */
   abstract paginate(criteria: SportListCriteria): Promise<Paginated<AdministratorSportShowResponse>>
 }

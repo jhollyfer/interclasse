@@ -23,7 +23,7 @@ const bodyParserConfig = defineConfig({
     types: ['application/x-www-form-urlencoded'],
 
     /**
-     * Teto do corpo, explícito (_standards/backend.md §4.10).
+     * Explicit body ceiling (_standards/backend.md §4.10).
      */
     limit: '1mb',
   },
@@ -48,18 +48,18 @@ const bodyParserConfig = defineConfig({
     ],
 
     /**
-     * Teto do corpo, explícito (_standards/backend.md §4.10).
+     * Explicit body ceiling (_standards/backend.md §4.10).
      */
     limit: '1mb',
   },
 
   /**
-   * Nenhuma rota recebe multipart: o binário do upload vai direto ao bucket por
-   * URL assinada e nunca atravessa a API (_standards/backend.md §5.4). Por isso
-   * `autoProcess: false`: o parser não lê o corpo nem grava arquivo temporário,
-   * e um `multipart/form-data` anônimo não enche o disco do container (SEC-2).
-   * Rota que um dia precisar receber arquivo entra em `autoProcess` por padrão
-   * de rota, com limite próprio
+   * No route receives multipart: the upload binary goes straight to the bucket by
+   * signed URL and never crosses the API (_standards/backend.md §5.4). Hence
+   * `autoProcess: false`: the parser neither reads the body nor writes a temporary file,
+   * and an anonymous `multipart/form-data` does not fill the container disk (SEC-2).
+   * A route that one day needs to receive a file enters `autoProcess` through a
+   * route default, with its own limit
    * (_doc-lib/adonisjs.md#guides/basics/body-parser,
    * https://docs.adonisjs.com/guides/basics/body-parser).
    */
@@ -69,7 +69,7 @@ const bodyParserConfig = defineConfig({
     convertEmptyStringsToNull: true,
 
     /**
-     * Teto de corpo caso uma rota passe a processar multipart; hoje sem efeito.
+     * Body ceiling in case a route starts processing multipart; no effect today.
      */
     limit: '1mb',
 

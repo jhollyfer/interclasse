@@ -1,13 +1,13 @@
 /**
- * Erros do Postgres que o repository reconhece e devolve como fato de domínio,
- * em vez de deixá-los subir como 500. Existe porque a checagem de duplicado
- * antes do `INSERT` não fecha a corrida: dois pedidos simultâneos passam pela
- * leitura e o segundo esbarra no `unique` do banco (_standards/backend.md §4.4).
+ * Postgres errors the repository recognizes and returns as a domain fact,
+ * instead of letting them rise as a 500. It exists because the duplicate check
+ * before the `INSERT` does not close the race: two simultaneous requests pass the
+ * read and the second runs into the database `unique` (_standards/backend.md §4.4).
  *
- * Só leitura do erro em mãos, sem import: o `core/` não conhece Lucid nem driver.
+ * Only reads the error in hand, no import: `core/` knows neither Lucid nor the driver.
  */
 export class PostgresError {
-  /** Código do Postgres para violação de `unique`. */
+  /** Postgres code for a `unique` violation. */
   private static readonly UNIQUE_VIOLATION = '23505'
 
   static isUniqueViolation(error: unknown): boolean {
@@ -16,7 +16,7 @@ export class PostgresError {
     )
   }
 
-  /** O nome do `unique` violado, quando o Postgres o informa. */
+  /** The name of the violated `unique`, when Postgres reports it. */
   static violatedConstraint(error: unknown): string | undefined {
     if (!PostgresError.isUniqueViolation(error) || !(error instanceof Error)) return undefined
     if (!('constraint' in error) || typeof error.constraint !== 'string') return undefined

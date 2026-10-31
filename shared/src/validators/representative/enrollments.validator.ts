@@ -1,8 +1,8 @@
 import { athleteListFields, z } from '../../validator.js'
 
 /**
- * Sem `classroomId`: a turma do representante sai da sessão, nunca do payload.
- * Par do VineJS de `backend/app/validators/representative/enrollments.validator.ts`.
+ * No `classroomId`: the representative's classroom comes from the session, never from the payload.
+ * Mirror of the VineJS one in `backend/app/validators/representative/enrollments.validator.ts`.
  */
 export const RepresentativeEnrollmentUpdateValidator = z.object({
   ...athleteListFields(),

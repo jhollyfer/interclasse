@@ -2,8 +2,8 @@ import type { z } from '../../validator.js'
 import { AdministratorAnnouncementShowResponse } from '../administrator/announcements.response.js'
 
 /**
- * O aviso no site: a mesma forma do painel. Nada nele é privado - aviso é
- * público por natureza.
+ * The announcement on the site: the same shape as the panel. Nothing in it is
+ * private - an announcement is public by nature.
  */
 export const StorefrontAnnouncementShowResponse =
   AdministratorAnnouncementShowResponse

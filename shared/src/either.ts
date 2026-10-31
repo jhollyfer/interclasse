@@ -1,10 +1,10 @@
 /**
- * O resultado de uma operação que pode falhar por regra de negócio: `left` é a
- * falha esperada, `right` o sucesso. Falha de negócio é valor, não `throw`
- * (`_standards/backend.md` §4.2) - o `throw` fica para o bug.
+ * The result of an operation that can fail on a business rule: `left` is the
+ * expected failure, `right` the success. A business failure is a value, not a `throw`
+ * (`_standards/backend.md` §4.2) - `throw` is for bugs.
  *
- * Mora no `shared/` porque value object, entidade e use-case devolvem o mesmo
- * tipo, e o frontend lê os value objects daqui.
+ * Lives in `shared/` because value objects, entities and use cases return the same
+ * type, and the frontend reads the value objects from here.
  */
 export class Left<L, R> {
   readonly value: L

@@ -11,15 +11,15 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * A rede "vazamento por allowlist" (_standards/backend.md §7): nenhuma resposta
- * carrega chave de credencial em nenhum nível da árvore, nem o valor da senha
- * em lugar nenhum. As rotas são as que devolvem conta, direta ou aninhada
- * (turma com conselheiro e representante, foto com autor, aviso com ator).
+ * The "allowlist leak" net (_standards/backend.md §7): no response
+ * carries a credential key at any level of the tree, nor the password value
+ * anywhere. The routes are the ones that return an account, directly or nested
+ * (classroom with advisor and representative, photo with author, announcement with actor).
  */
 const FORBIDDEN_KEYS =
   /^(password|passwordHash|currentPassword|token|tokenHash|hash|secret|rememberMeToken)$/i
 
-/** Todo caminho de chave proibida numa árvore de JSON. */
+/** Every forbidden-key path in a JSON tree. */
 function forbiddenPaths(value: unknown, path = '$'): string[] {
   if (Array.isArray(value))
     return value.flatMap((item, index) => forbiddenPaths(item, `${path}[${index}]`))
@@ -34,10 +34,10 @@ function forbiddenPaths(value: unknown, path = '$'): string[] {
   })
 }
 
-test.group('respostas > vazamento (e2e)', (group) => {
+test.group('responses > leak (e2e)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('rotas que devolvem conta não carregam credencial nem a senha', async ({
+  test('routes that return an account carry neither credential nor password', async ({
     client,
     assert,
   }) => {
@@ -63,13 +63,20 @@ test.group('respostas > vazamento (e2e)', (group) => {
       const response = await client.get(path).cookies(session)
       response.assertStatus(200)
 
-      assert.deepEqual(forbiddenPaths(body(response)), [], `${path}: chave proibida na resposta`)
-      assert.notInclude(response.text(), FACTORY_PASSWORD, `${path}: valor da senha na resposta`)
-      assert.notInclude(response.text(), ADMINISTRATOR.password, `${path}: senha do administrador`)
+      assert.deepEqual(forbiddenPaths(body(response)), [], `${path}: forbidden key in the response`)
+      assert.notInclude(
+        response.text(),
+        FACTORY_PASSWORD,
+        `${path}: password value in the response`,
+      )
+      assert.notInclude(response.text(), ADMINISTRATOR.password, `${path}: administrator password`)
     }
   })
 
-  test('criar e atualizar conta também respondem sem credencial', async ({ client, assert }) => {
+  test('creating and updating an account also respond without credentials', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const created = await client.post('/administrator/users').cookies(session).json({
@@ -92,7 +99,7 @@ test.group('respostas > vazamento (e2e)', (group) => {
     }
   })
 
-  test('a varredura enxerga chave proibida em qualquer nível', ({ assert }) => {
+  test('the scan sees a forbidden key at any level', ({ assert }) => {
     const leaked = forbiddenPaths({ data: [{ advisor: { password: 'x' } }], token: 'y' })
 
     assert.deepEqual(leaked, ['$.data[0].advisor.password', '$.token'])

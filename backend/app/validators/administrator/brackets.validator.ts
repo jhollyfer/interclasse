@@ -4,15 +4,15 @@ import { vine, pageFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
- * O que `POST /administrator/brackets` recebe: qual competição sortear. O resto
- * - times, grupos e partidas - sai das inscrições e do sorteio.
+ * What `POST /administrator/brackets` receives: which competition to draw. The rest
+ * - teams, groups and matches - comes from the enrollments and the draw.
  */
 export const AdministratorBracketCreateValidator = vine.create({
   sportId: vine.string().uuid(),
   category: vine.enum(CATEGORIES),
 })
 
-/** A prévia do sorteio pergunta o mesmo que o sorteio. */
+/** The draw preview asks the same as the draw. */
 export const AdministratorBracketPreviewValidator = vine.create({
   sportId: vine.string().uuid(),
   category: vine.enum(CATEGORIES),

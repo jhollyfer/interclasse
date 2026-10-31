@@ -3,12 +3,12 @@ import { z } from '@interclasse/shared'
 import type { SchemaObject } from '#core/openapi/types'
 
 /**
- * O schema Zod de resposta do `shared/` como JSON Schema, sem AST
+ * The Zod response schema of `shared/` as JSON Schema, without an AST
  * (`_standards/openapi.md`, "schema-de-resposta"; _doc-lib/zod.md#json-schema).
  *
- * `io: 'output'` porque o documento descreve o que a rota devolve. Tipo sem
- * representação em JSON Schema (`z.date()`, `transform`) o Zod recusa em vez de
- * calar, e é o que se quer: o schema de resposta usa o tipo de transporte.
+ * `io: 'output'` because the document describes what the route returns. A type with no
+ * JSON Schema representation (`z.date()`, `transform`) Zod refuses instead of
+ * silencing, and that is what we want: the response schema uses the transport type.
  */
 export class ZodSchema {
   static is(value: unknown): value is z.ZodType {
@@ -16,10 +16,10 @@ export class ZodSchema {
   }
 
   static toOpenAPI(schema: z.ZodType): SchemaObject {
-    // O tipo de JSON Schema do Zod é mais largo que o do documento; a ida e
-    // volta pelo JSON entrega dado puro, e a guarda estreita sem `as`.
+    // Zod's JSON Schema type is wider than the document's; the round trip
+    // through JSON yields plain data, and the guard narrows without `as`.
     const json: unknown = JSON.parse(JSON.stringify(z.toJSONSchema(schema, { io: 'output' })))
-    if (!ZodSchema.isObject(json)) throw new Error('JSON Schema do Zod não é objeto')
+    if (!ZodSchema.isObject(json)) throw new Error('Zod JSON Schema is not an object')
 
     const { $schema: _dialect, ...body } = json
 

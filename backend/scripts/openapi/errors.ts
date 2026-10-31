@@ -1,46 +1,46 @@
 import type { OpenAPIResponse, SchemaObject } from '#core/openapi/types'
 
 /**
- * As respostas de falha.
+ * The failure responses.
  *
- * A API tem um corpo de erro só - `HTTPExceptionPayload`, em
- * `app/exceptions/http.exception.ts` - e é ele que sai daqui. O que varia entre
- * uma falha e outra é o `code`, e é justamente o `code` que o cliente usa para
- * decidir o que fazer. Por isso cada status vira um schema com o `code`
- * restrito por `enum` aos valores que aquela operação realmente devolve: a lista
- * de falhas fica exaustiva em vez de decorativa.
+ * The API has a single error body - `HTTPExceptionPayload`, in
+ * `app/exceptions/http.exception.ts` - and that is what comes out of here. What varies between
+ * one failure and another is the `code`, and the `code` is exactly what the client uses to
+ * decide what to do. So each status becomes a schema with the `code`
+ * restricted by `enum` to the values that operation really returns: the failure
+ * list is exhaustive instead of decorative.
  *
- * Quando a operação não declara code nenhum para um status, o `code` sai como
- * string livre. Enum vazio seria mentira, e enum inventado seria pior.
+ * When the operation declares no code for a status, the `code` comes out as a
+ * free string. An empty enum would be a lie, and an invented enum would be worse.
  */
 
-/** Nomeada porque `forbiddenDescription` a compõe sem passar pelo índice. */
-const FORBIDDEN_DESCRIPTION = 'Acesso negado'
+/** Named because `forbiddenDescription` composes it without going through the index. */
+const FORBIDDEN_DESCRIPTION = 'Access denied'
 
 const DESCRIPTIONS: Record<number, string> = {
-  400: 'Requisição inválida',
-  401: 'Não autenticado',
+  400: 'Invalid request',
+  401: 'Not authenticated',
   403: FORBIDDEN_DESCRIPTION,
-  404: 'Recurso não encontrado',
-  409: 'Conflito com o estado atual',
-  422: 'Payload recusado pela validação',
-  500: 'Erro interno do servidor',
+  404: 'Resource not found',
+  409: 'Conflict with the current state',
+  422: 'Payload rejected by validation',
+  500: 'Internal server error',
 }
 
 /**
- * O `errors` por campo só existe em falha de validação e em conflito de
- * unicidade. Declará-lo obrigatório onde ele não vem faria o cliente tratar
- * ausência como erro.
+ * The per-field `errors` only exists on a validation failure and on a uniqueness
+ * conflict. Declaring it required where it does not come would make the client treat
+ * its absence as an error.
  */
 const REQUIRES_FIELD_ERRORS = 422
 
 /**
- * Nome do componente que descreve uma falha.
+ * Name of the component that describes a failure.
  *
- * O corpo do erro é sempre o mesmo; o que muda é o `enum` do `code`. Nomear pelo
- * status mais os códigos faz operações que falham igual compartilharem um
- * componente só - o documento encolhe, e quem gera cliente tipado ganha um tipo
- * nomeado por falha em vez de um objeto anônimo repetido em cada endpoint.
+ * The error body is always the same; what changes is the `code` `enum`. Naming by the
+ * status plus the codes makes operations that fail the same way share a single
+ * component - the document shrinks, and whoever generates a typed client gets a type
+ * named per failure instead of an anonymous object repeated in every endpoint.
  */
 export function errorComponentName(status: number, codes: string[]): string {
   const suffix = [...codes]
@@ -60,7 +60,7 @@ export function errorComponentName(status: number, codes: string[]): string {
 }
 
 export function errorSchema(status: number, codes: string[]): SchemaObject {
-  const code: SchemaObject = { type: 'string', description: 'Identificador de máquina da falha.' }
+  const code: SchemaObject = { type: 'string', description: 'Machine identifier of the failure.' }
 
   if (codes.length > 0) {
     code.enum = [...codes].sort()
@@ -73,13 +73,13 @@ export function errorSchema(status: number, codes: string[]): SchemaObject {
   return {
     type: 'object',
     properties: {
-      message: { type: 'string', description: 'Mensagem em português, exibível ao usuário.' },
+      message: { type: 'string', description: 'Message in Portuguese, displayable to the user.' },
       status: { type: 'integer', enum: [status] },
       code,
       errors: {
         type: 'object',
         additionalProperties: { type: 'string' },
-        description: 'Mensagem por campo, quando a falha é atribuível a campos do payload.',
+        description: 'Message per field, when the failure is attributable to payload fields.',
       },
     },
     required,
@@ -92,31 +92,31 @@ export function errorResponse(
   description?: string,
 ): OpenAPIResponse {
   return {
-    description: description ?? DESCRIPTIONS[status] ?? 'Falha',
+    description: description ?? DESCRIPTIONS[status] ?? 'Failure',
     content: { 'application/json': { schema: { $ref: reference } } },
   }
 }
 
 // ---------------------------------------------------------------------------
-// Falhas automáticas
+// Automatic failures
 // ---------------------------------------------------------------------------
 
 /**
- * Códigos que não vêm de nenhum use-case: são produzidos pelo middleware ou pelo
- * handler global, e por isso valem para toda rota que passe por eles. Nenhum
- * controller precisa declará-los.
+ * Codes that come from no use case: they are produced by the middleware or by the
+ * global handler, and so hold for every route that goes through them. No
+ * controller needs to declare them.
  */
 export const AUTOMATIC_CODES = {
-  /** `HttpExceptionHandler` traduz `E_UNAUTHORIZED_ACCESS` do guard. */
+  /** `HttpExceptionHandler` translates the guard's `E_UNAUTHORIZED_ACCESS`. */
   unauthenticated: 'AUTHENTICATION_REQUIRED',
-  /** `role.middleware.ts` recusa o papel. */
+  /** `role.middleware.ts` refuses the role. */
   forbidden: 'ACCESS_DENIED',
-  /** `HttpExceptionHandler` traduz `E_VALIDATION_ERROR` do VineJS. */
+  /** `HttpExceptionHandler` translates VineJS's `E_VALIDATION_ERROR`. */
   validation: 'VALIDATION_ERROR',
 } as const
 
 export function forbiddenDescription(roles: string[]): string {
   if (roles.length === 0) return FORBIDDEN_DESCRIPTION
 
-  return `${FORBIDDEN_DESCRIPTION}. Exige um destes papéis: ${roles.join(', ')}.`
+  return `${FORBIDDEN_DESCRIPTION}. Requires one of these roles: ${roles.join(', ')}.`
 }

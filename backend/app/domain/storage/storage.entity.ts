@@ -3,11 +3,11 @@ import { UPLOAD_STATUS, left, right, type Either, type UploadStatus } from '@int
 import type { StorageError } from './storage.errors.ts'
 
 /**
- * As assinaturas (magic bytes) de cada tipo aceito: o `Content-Type` e a
- * extensão são declaração do cliente, e o conteúdo é o que prova
- * (_standards/backend.md §5.4). Cada alternativa é uma lista de sequências de
- * bytes em uma posição, e todas da lista precisam conferir; o tipo confere
- * quando alguma alternativa confere.
+ * The signatures (magic bytes) of each accepted type: the `Content-Type` and the
+ * extension are the client's declaration, and the content is what proves it
+ * (_standards/backend.md §5.4). Each alternative is a list of byte sequences
+ * at a position, and all of the list must match; the type matches
+ * when some alternative matches.
  */
 type Signature = { readonly offset: number; readonly bytes: ReadonlyArray<number> }
 
@@ -48,7 +48,7 @@ export type StorageProps = {
   readonly filename: string
   readonly originalName: string
   readonly mimetype: string
-  /** O tamanho que o cliente declarou ao abrir o upload. */
+  /** The size the client declared when opening the upload. */
   readonly size: number
   readonly path: string
   status: UploadStatus
@@ -60,16 +60,16 @@ export type StorageProps = {
 }
 
 /**
- * O arquivo no bucket: nasce `PENDING`, e só passa a `UPLOADED` quando o que
- * subiu tem o tamanho que o cliente declarou (`_standards/domain.md` §1). Só
- * `UPLOADED` pode ser anexado a alguma coisa.
+ * The file in the bucket: born `PENDING`, and only becomes `UPLOADED` when what
+ * went up has the size the client declared (`_standards/domain.md` §1). Only
+ * `UPLOADED` can be attached to anything.
  */
 export class Storage {
   private constructor(private readonly props: StorageProps) {}
 
   /**
-   * Nascimento: o registro de um upload que vai começar. O id e o relógio
-   * chegam de fora; a chave do objeto também, porque quem a sorteia é o bucket.
+   * Birth: the record of an upload that is about to start. The id and the clock
+   * come from outside; so does the object key, because the bucket is what draws it.
    */
   static open(input: {
     readonly id: string
@@ -97,15 +97,15 @@ export class Storage {
     })
   }
 
-  /** Reidratação pelo repository: o dado passou pelas regras ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the rules when it was saved. */
   static restore(props: StorageProps): Storage {
     return new Storage({ ...props })
   }
 
   /**
-   * Confirma o upload contra o que o bucket de fato recebeu. Chamar de novo
-   * num arquivo já confirmado devolve o mesmo arquivo: o cliente que perdeu a
-   * resposta reenvia a confirmação.
+   * Confirms the upload against what the bucket actually received. Calling again
+   * on an already confirmed file returns the same file: a client that lost the
+   * response resends the confirmation.
    */
   complete(
     received: { readonly contentLength: number; readonly head: Uint8Array },
@@ -124,8 +124,8 @@ export class Storage {
       return left({ code: 'STORAGE_CONTENT_MISMATCH', mimetype: this.props.mimetype })
 
     this.props.status = UPLOAD_STATUS.UPLOADED
-    // O upload acabou: guardar o identificador só manteria vivo um ponteiro
-    // para uma conversa que o bucket já encerrou.
+    // The upload is over: keeping the identifier would only keep alive a pointer
+    // to a conversation the bucket has already closed.
     this.props.uploadId = null
     this.props.updatedAt = now
 
@@ -133,9 +133,9 @@ export class Storage {
   }
 
   /**
-   * Se o arquivo pode sair. `PENDING` é upload em andamento e sempre pode: não
-   * tem como estar referenciado. `UPLOADED` em uso, não: apagar esvaziaria o
-   * que o referencia sem erro nenhum, porque as chaves são `SET NULL`.
+   * Whether the file can go. `PENDING` is an upload in progress and always can: it
+   * cannot be referenced. `UPLOADED` in use, no: deleting would empty
+   * whatever references it with no error at all, because the keys are `SET NULL`.
    */
   remove(usedBy: ReadonlyArray<string>): Either<StorageError, Storage> {
     if (this.isPending()) return right(this)
@@ -145,8 +145,8 @@ export class Storage {
   }
 
   /**
-   * O início do objeto bate com a assinatura do tipo declarado. Tipo sem
-   * assinatura conhecida não confirma: a allowlist e a tabela andam juntas.
+   * The start of the object matches the signature of the declared type. A type without
+   * a known signature does not confirm: the allowlist and the table go together.
    */
   private matchesSignature(head: Uint8Array): boolean {
     const alternatives = SIGNATURES[this.props.mimetype] ?? []

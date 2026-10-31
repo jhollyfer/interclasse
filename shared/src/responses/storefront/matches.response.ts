@@ -1,7 +1,7 @@
 import type { z } from '../../validator.js'
 import { AdministratorMatchPaginateResponse } from '../administrator/matches.response.js'
 
-/** A tabela de jogos do site: a mesma forma do painel. */
+/** The match table of the site: the same shape as the panel. */
 export const StorefrontMatchPaginateResponse =
   AdministratorMatchPaginateResponse
 

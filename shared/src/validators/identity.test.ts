@@ -13,12 +13,12 @@ const VALID = {
   passwordConfirmation: 'Senha@123',
 } as const
 
-describe('validators de identidade', () => {
-  it('aceita a conta válida', () => {
+describe('identity validators', () => {
+  it('accepts the valid account', () => {
     expect(AdministratorUserCreateValidator.safeParse(VALID).success).toBe(true)
   })
 
-  it('senha fraca e confirmação diferente usam a mensagem do idioma em vigor', () => {
+  it('weak password and mismatched confirmation use the message of the language in force', () => {
     for (const locale of LOCALES) {
       useValidatorLocale(locale)
 
@@ -43,7 +43,7 @@ describe('validators de identidade', () => {
     useValidatorLocale('pt-BR')
   })
 
-  it('trocar a senha do perfil exige a senha atual', () => {
+  it('changing the profile password requires the current password', () => {
     const result = AccountProfileUpdateValidator.safeParse({
       password: 'Senha@123',
       passwordConfirmation: 'Senha@123',

@@ -6,9 +6,9 @@ import {
 } from '#services/multipart/multipart.contract'
 
 /**
- * O S3 multipart em memória, para o teste unitário. Honra o contrato do
- * `MultipartService`: guarda as partes que o teste "enviou" e registra os
- * uploads abertos, completados e abortados.
+ * In-memory S3 multipart, for the unit test. It honors the contract of
+ * `MultipartService`: it keeps the parts the test "sent" and records the
+ * uploads opened, completed and aborted.
  */
 export class MultipartFake extends MultipartContract {
   readonly initiated: string[] = []
@@ -16,7 +16,7 @@ export class MultipartFake extends MultipartContract {
   readonly aborted: string[] = []
   private readonly uploaded = new Map<string, UploadedPart[]>()
 
-  /** Arranjo do teste: as partes que o bucket já recebeu deste upload. */
+  /** Test arrangement: the parts the bucket has already received for this upload. */
   withUploaded(uploadId: string, parts: UploadedPart[]): this {
     this.uploaded.set(uploadId, parts)
     return this

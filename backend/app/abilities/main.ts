@@ -1,8 +1,8 @@
 /**
- * Abilities do Bouncer: regra de autorização que não pertence a um registro.
+ * Bouncer abilities: an authorization rule that does not belong to a record.
  *
- * Vazio de propósito - toda regra deste projeto depende do alvo e mora numa
- * policy (`app/policies/<entidade>.policy.ts`). O arquivo existe porque o
- * middleware do Bouncer o importa (_standards/backend.md §1.1).
+ * Empty on purpose - every rule in this project depends on the target and lives in a
+ * policy (`app/policies/<entity>.policy.ts`). The file exists because the
+ * Bouncer middleware imports it (_standards/backend.md §1.1).
  */
 export {}

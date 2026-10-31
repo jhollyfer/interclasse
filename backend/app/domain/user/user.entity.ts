@@ -14,9 +14,9 @@ export type UserProps = {
   name: string
   email: string
   /**
-   * O hash, depois de gravada. Texto puro só entre `create`/`update` e o
-   * `save` do repository: quem cifra é a persistência (hook do model), e não a
-   * regra da conta.
+   * The hash, once saved. Plain text only between `create`/`update` and the
+   * repository's `save`: whoever hashes is persistence (model hook), not the
+   * account rule.
    */
   password: string
   role: UserRole
@@ -27,7 +27,7 @@ export type UserProps = {
   deletedAt: Date | null
 }
 
-/** O que `update` muda; campo ausente é "não mexer", e só `avatarId` aceita `null`. */
+/** What `update` changes; an absent field means "leave alone", and only `avatarId` accepts `null`. */
 export type UserChanges = {
   readonly name?: string
   readonly email?: string
@@ -37,29 +37,29 @@ export type UserChanges = {
   readonly avatarId?: string | null
 }
 
-/** O que uma edição obriga a fazer além de gravar a conta. */
+/** What an edit obliges to do besides saving the account. */
 export type UserUpdateEffects = {
-  /** O acesso mudou: as sessões vivas não valem mais. */
+  /** Access changed: live sessions are no longer valid. */
   readonly revokesSessions: boolean
-  /** O papel mudou: a conta deixa de aconselhar ou representar turma. */
+  /** The role changed: the account stops advising or representing a classroom. */
   readonly roleChanged: boolean
 }
 
-/** O que a prova de identidade da troca de senha encontrou, já conferido contra o hash. */
+/** What the password-change identity proof found, already checked against the hash. */
 export type PasswordProof = {
   readonly currentConfirmed: boolean
   readonly sameAsCurrent: boolean
 }
 
 /**
- * A conta de quem entra no sistema: papel, status e ciclo de arquivamento
- * (`_standards/domain.md` §1). Arquivar é remoção lógica; apagar de vez só vale
- * para a conta arquivada.
+ * The account of whoever enters the system: role, status and archive cycle
+ * (`_standards/domain.md` §1). Archiving is a soft delete; deleting for good only holds
+ * for an archived account.
  */
 export class User {
   private constructor(private readonly props: UserProps) {}
 
-  /** Nascimento. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Birth. The id and the clock come from outside: the domain does no I/O. */
   static create(input: {
     readonly id: string
     readonly name: string
@@ -84,16 +84,16 @@ export class User {
     })
   }
 
-  /** Reidratação pelo repository: o dado passou pelas regras ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the rules when it was saved. */
   static restore(props: UserProps): User {
     return new User({ ...props })
   }
 
   /**
-   * Reativa a conta arquivada que ocupa o e-mail com os dados novos. O `email`
-   * é `UNIQUE` global e a remoção é lógica: inserir de novo esbarraria no
-   * índice, e reaproveitar a linha preserva `id` e `createdAt`. Conta viva
-   * ocupando o e-mail é conflito.
+   * Reactivates the archived account that holds the e-mail with the new data. The `email`
+   * is globally `UNIQUE` and removal is soft: inserting again would run into the
+   * index, and reusing the row preserves `id` and `createdAt`. A live account
+   * holding the e-mail is a conflict.
    */
   revive(
     input: UserChanges & Required<Pick<UserChanges, 'name' | 'password' | 'role'>>,
@@ -107,14 +107,14 @@ export class User {
     return right(this)
   }
 
-  /** Edição pelo administrador. */
+  /** Edit by the administrator. */
   update(changes: UserChanges, now: Date): UserUpdateEffects {
     return this.apply(changes, now)
   }
 
   /**
-   * Edição da própria conta. Trocar a senha exige a atual, e a nova tem de ser
-   * outra: a sessão prova posse do cookie, não identidade.
+   * Edit of the account itself. Changing the password requires the current one, and the new one must be
+   * different: the session proves possession of the cookie, not identity.
    */
   updateOwn(
     changes: Omit<UserChanges, 'role' | 'status'>,
@@ -147,14 +147,14 @@ export class User {
     return right(this)
   }
 
-  /** Apagar de vez exige a passagem pela lixeira: um clique não perde a conta. */
+  /** Deleting for good requires passing through the trash: one click does not lose the account. */
   remove(): Either<UserError, User> {
     if (!this.isArchived()) return left({ code: 'USER_NOT_ARCHIVED' })
 
     return right(this)
   }
 
-  /** Conta viva e ativa: arquivada e inativa recebem a mesma recusa de quem erra a senha. */
+  /** A live, active account: archived and inactive get the same refusal as someone who gets the password wrong. */
   canSignIn(): boolean {
     return !this.isArchived() && this.props.status === ACTIVE_STATUS.ACTIVE
   }
@@ -172,9 +172,9 @@ export class User {
   }
 
   /**
-   * Escreve só as chaves presentes. E-mail e senha trocados, mudança de papel e
-   * desativação derrubam as sessões: o guard não lê `status`, e um token
-   * anterior sobreviveria à troca de acesso.
+   * Writes only the present keys. A changed e-mail and password, a role change and
+   * deactivation drop the sessions: the guard does not read `status`, and an earlier
+   * token would survive the access change.
    */
   private apply(changes: UserChanges, now: Date): UserUpdateEffects {
     const emailChanged = changes.email !== undefined && changes.email !== this.props.email

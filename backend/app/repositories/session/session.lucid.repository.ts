@@ -11,16 +11,16 @@ import {
 } from '#repositories/session/session.repository'
 import { TransactionContext } from '#core/transaction-context'
 
-/** A tabela do `DbAccessTokensProvider`, criada pela migration de `auth_access_tokens`. */
+/** The `DbAccessTokensProvider` table, created by the `auth_access_tokens` migration. */
 const SESSION_TABLE = 'auth_access_tokens'
 
 /**
- * Os tokens da sessão no banco: emitir, ler o de refresh e revogar. A
- * revogação em lote passa pela transação em curso, e é por isso que mora num
- * repository e não num service de I/O externo.
+ * The session tokens in the database: issue, read the refresh one and revoke. Batch
+ * revocation goes through the transaction in progress, which is why it lives in a
+ * repository and not in an external I/O service.
  *
- * Separado do controller, que escreve a resposta HTTP: emitir token toca o
- * banco, escrever cookie toca o transporte, e são duas razões para mudar.
+ * Separate from the controller, which writes the HTTP response: issuing a token touches the
+ * database, writing a cookie touches the transport, and those are two reasons to change.
  */
 @inject()
 export class SessionLucidRepository extends SessionRepository {
@@ -29,10 +29,10 @@ export class SessionLucidRepository extends SessionRepository {
   }
 
   /**
-   * O par de tokens, emitido para a conta.
+   * The token pair, issued for the account.
    *
-   * `release()` só existe na criação: o valor em claro do token não volta do
-   * banco depois, e é por isso que ele sobe até o controller, que o põe no
+   * `release()` only exists at creation: the token's plain value does not come back from the
+   * database afterwards, which is why it goes up to the controller, who puts it in the
    * cookie.
    */
   async issue(userId: string): Promise<SessionTokens | null> {
@@ -47,8 +47,8 @@ export class SessionLucidRepository extends SessionRepository {
       expiresIn: COOKIE_TOKEN.REFRESH_EXPIRY,
     })
 
-    // `value` só é opcional no tipo porque o mesmo `AccessToken` representa o
-    // token lido do banco, sem o segredo. Recém-criado, ele sempre vem.
+    // `value` is only optional in the type because the same `AccessToken` represents the
+    // token read from the database, without the secret. Freshly created, it always comes.
     if (!accessToken.value || !refreshToken.value) return null
 
     return {
@@ -58,12 +58,12 @@ export class SessionLucidRepository extends SessionRepository {
   }
 
   /**
-   * Derruba todas as sessões da conta.
+   * Drops all the account's sessions.
    *
-   * Pela tabela, e não por `User.accessTokens.deleteAll`: o provider do
-   * `@adonisjs/auth` usa a conexão do model e não aceita transação, e a
-   * revogação precisa cair junto com a escrita que a motivou (troca de senha,
-   * de papel, arquivamento) - duas escritas, uma transação (_standards/backend.md §4.2).
+   * By table, and not by `User.accessTokens.deleteAll`: the `@adonisjs/auth` provider
+   * uses the model's connection and does not accept a transaction, and the
+   * revocation must land together with the write that motivated it (password change,
+   * role change, archiving) - two writes, one transaction (_standards/backend.md §4.2).
    */
   async revokeAll(userId: string): Promise<void> {
     await this.transaction.client().from(SESSION_TABLE).where('tokenable_id', userId).delete()
@@ -76,7 +76,7 @@ export class SessionLucidRepository extends SessionRepository {
   }
 
   async readRefresh(value: string): Promise<RefreshGrant | null> {
-    // Um token ilegível faz o `verify` LANÇAR em vez de devolver null.
+    // An unreadable token makes `verify` THROW instead of returning null.
     try {
       const token = await User.accessTokens.verify(new Secret(value))
 
@@ -84,15 +84,15 @@ export class SessionLucidRepository extends SessionRepository {
 
       return { userId: String(token.tokenableId), identifier: String(token.identifier) }
     } catch (error) {
-      logger.debug({ err: error }, '[session > readRefresh] token ilegível')
+      logger.debug({ err: error }, '[session > readRefresh] unreadable token')
 
       return null
     }
   }
 
   /**
-   * O dono do token para o provider, que só lê a chave primária dele. Montar o
-   * model com o id poupa a consulta que a emissão e a revogação não precisam.
+   * The token owner for the provider, which only reads its primary key. Building the
+   * model with the id saves the query that issuing and revoking do not need.
    */
   private tokenable(userId: string): User {
     const tokenable = new User()

@@ -7,12 +7,12 @@ import { TeamFactory } from '#database/factories/team.factory'
 import { body, type Session } from '#tests/http-fixtures'
 
 /**
- * A montagem das specs de chave e partida.
+ * The assembly of the bracket and match specs.
  *
- * Dois caminhos, e cada spec usa o que a ação pede: o sorteio pela rota
- * (`draw`), quando o teste depende da chave inteira - fases, folga, avanço do
- * vencedor -, e a partida solta pela factory (`scheduledMatch`), quando basta
- * uma linha com os dois times.
+ * Two paths, and each spec uses what the action asks for: the draw through the route
+ * (`draw`), when the test depends on the whole bracket - phases, bye, winner
+ * advancing -, and the standalone match through the factory (`scheduledMatch`), when
+ * a row with the two teams is enough.
  */
 
 export async function createSport(
@@ -31,7 +31,7 @@ export async function createSport(
   return body(response)
 }
 
-/** Cria `total` turmas do 6º ao 9º, cada uma com um aluno inscrito na modalidade. */
+/** Creates `total` classrooms from 6th to 9th grade, each with one student enrolled in the sport. */
 export async function enrolledClassrooms(
   client: ApiClient,
   admin: Session,
@@ -81,7 +81,7 @@ export async function draw(client: ApiClient, admin: Session, sportId: string) {
   return body(response)
 }
 
-/** Modalidade, `total` turmas inscritas e o sorteio, tudo pela rota. */
+/** Sport, `total` enrolled classrooms and the draw, all through the route. */
 export async function drawnBracket(client: ApiClient, admin: Session, total: number) {
   const sport = await createSport(client, admin)
   const classroomIds = await enrolledClassrooms(client, admin, sport.id, total)
@@ -90,7 +90,7 @@ export async function drawnBracket(client: ApiClient, admin: Session, total: num
   return { sport, classroomIds, bracket }
 }
 
-/** Lança 2 x 1 em toda partida da fase que já tem os dois times. */
+/** Enters 2 x 1 on every match of the phase that already has both teams. */
 export async function scoreAll(
   client: ApiClient,
   admin: Session,
@@ -112,8 +112,8 @@ export async function scoreAll(
 }
 
 /**
- * Uma final avulsa com os dois times definidos e sem placar: a chave, as duas
- * turmas e a partida saem da factory.
+ * A standalone final with both teams defined and no score: the bracket, the two
+ * classrooms and the match come out of the factory.
  */
 export async function scheduledMatch() {
   const bracket = await BracketFactory.with('sport').create()

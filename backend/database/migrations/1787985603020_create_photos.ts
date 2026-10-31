@@ -2,9 +2,9 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 import { PHOTO_STATUSES } from '@interclasse/shared'
 
 /**
- * As fotos do carrossel do site: atletas, jogos, a torcida. Quem envia é o
- * conselheiro ou o administrador; quem decide se vai para o site é o
- * administrador.
+ * The site carousel photos: athletes, games, the crowd. Whoever uploads is the
+ * advisor or the administrator; whoever decides whether it goes to the site is the
+ * administrator.
  */
 export default class extends BaseSchema {
   protected tableName = 'photos'
@@ -12,8 +12,8 @@ export default class extends BaseSchema {
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
-      // `RESTRICT`: o arquivo só sai do storage depois da foto - apagá-lo antes
-      // deixaria um buraco no carrossel.
+      // `RESTRICT`: the file only leaves the storage after the photo - deleting it first
+      // would leave a hole in the carousel.
       table
         .uuid('storage_id')
         .notNullable()
@@ -22,7 +22,7 @@ export default class extends BaseSchema {
         .onDelete('RESTRICT')
       table.string('caption', 200).nullable()
       table.enum('status', PHOTO_STATUSES).notNullable().index()
-      // `SET NULL`: a conta apagada não leva a foto aprovada junto.
+      // `SET NULL`: the deleted account does not take the approved photo along.
       table
         .uuid('author_id')
         .nullable()
