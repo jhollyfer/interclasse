@@ -12,7 +12,7 @@ function required(name: string): string {
   const value = process.env[name]
   if (!value) {
     throw new Error(
-      `${name} não definida. Copie frontend/.env.e2e.example para frontend/.env.e2e e preencha.`,
+      `${name} is not set. Copy frontend/.env.e2e.example to frontend/.env.e2e and fill it in.`,
     )
   }
   return value

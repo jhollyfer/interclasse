@@ -24,18 +24,27 @@ async function signIn(role: Role, area: string, page: Page): Promise<void> {
   await page.context().storageState({ path: storageStatePath(role) })
 }
 
-setup('entra como organização', async ({ page }) => {
-  await signIn('administrator', 'administrator', page)
-  await expect(page).toHaveURL(/\/administrator/)
-})
+setup(
+  'when the organization signs in, reaches the administrator area',
+  async ({ page }) => {
+    await signIn('administrator', 'administrator', page)
+    await expect(page).toHaveURL(/\/administrator/)
+  },
+)
 
-setup('entra como conselheira', async ({ page }) => {
-  await signIn('advisor', 'advisor', page)
-  await expect(page).toHaveURL(/\/advisor/)
-})
+setup(
+  'when the advisor signs in, reaches the advisor area',
+  async ({ page }) => {
+    await signIn('advisor', 'advisor', page)
+    await expect(page).toHaveURL(/\/advisor/)
+  },
+)
 
 // The second classroom of the same draw needs a different advisor.
-setup('entra como a segunda conselheira', async ({ page }) => {
-  await signIn('secondAdvisor', 'advisor', page)
-  await expect(page).toHaveURL(/\/advisor/)
-})
+setup(
+  'when the second advisor signs in, reaches the advisor area',
+  async ({ page }) => {
+    await signIn('secondAdvisor', 'advisor', page)
+    await expect(page).toHaveURL(/\/advisor/)
+  },
+)
