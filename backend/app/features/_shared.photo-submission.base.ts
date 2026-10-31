@@ -18,12 +18,12 @@ type Submission = {
 }
 
 /**
- * O envio de foto, o mesmo para o conselheiro e para o painel: só muda quem
- * envia, e com isso o estado em que a foto nasce (a entidade decide). Fica aqui
- * e não em cada use-case para a regra do arquivo não existir em dois lugares
+ * Submitting a photo, the same for the advisor and the panel: only who
+ * submits changes, and with it the state the photo is born in (the entity decides). It lives here
+ * and not in each use case so the file rule does not exist in two places
  * (template method, `_standards/backend.md` §4.2).
  *
- * Erro de infraestrutura sobe: quem trata é o try/catch do use-case.
+ * Infrastructure errors bubble up: the use case's try/catch handles them.
  */
 export abstract class PhotoSubmissionBase extends PhotoReadBase {
   protected constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {

@@ -5,9 +5,9 @@ import type { PhotoRead, PhotoRepository } from '#repositories/photo/photo.repos
 import type { StorageContract } from '#services/storage/storage.contract'
 
 /**
- * A leitura da foto do painel, a mesma para o administrador e o conselheiro. O
- * repository devolve a foto sem a `url` do arquivo (`_standards/architecture.md`
- * §2); aqui ela é assinada, num ponto só, pelo contrato do bucket (template method,
+ * Reading the panel photo, the same for the administrator and the advisor. The
+ * repository returns the photo without the file `url` (`_standards/architecture.md`
+ * §2); here it is signed, in one place only, by the bucket contract (template method,
  * `_standards/backend.md` §4.2).
  */
 export abstract class PhotoReadBase {
