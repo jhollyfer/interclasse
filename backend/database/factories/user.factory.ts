@@ -4,20 +4,20 @@ import { ACTIVE_STATUS, USER_ROLE } from '@interclasse/shared'
 import User from '#models/user'
 
 /**
- * Senha de todo usuário criado por factory. Passa na política de
- * `password()` (`#core/validator`): 8-32 caracteres, com minúscula, maiúscula,
- * dígito e símbolo - então serve para entrar de verdade pelo
+ * Password of every user created by factory. It passes the `password()` policy
+ * (`#core/validator`): 8-32 characters, with lower case, upper case,
+ * digit and symbol - so it works to really sign in through
  * `POST /authentication/sign-in`.
  *
- * Vai em texto puro: o mixin `withAuthFinder` de `app/models/user.ts` cifra ao
- * salvar. Passar o hash aqui geraria um hash de hash e nenhum login funcionaria.
+ * Plain text: the `withAuthFinder` mixin in `app/models/user.ts` hashes on
+ * save. Passing the hash here would produce a hash of a hash and no login would work.
  */
 export const FACTORY_PASSWORD = 'Demo1234!'
 
 /**
- * Usuário. O papel padrão é `ADVISOR`, que não alcança o painel administrativo
- * - um teste que precisa de administrador pede o estado, e nenhum ganha
- * privilégio por esquecimento.
+ * User. The default role is `ADVISOR`, which does not reach the administrative panel
+ * - a test that needs an administrator asks for the state, and none gains
+ * privilege by oversight.
  */
 export const UserFactory = factory
   .define(User, ({ faker }) => ({

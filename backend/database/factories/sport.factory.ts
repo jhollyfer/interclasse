@@ -3,7 +3,7 @@ import { Slug } from '@interclasse/shared'
 
 import Sport from '#models/sport'
 
-/** Modalidade. Nome único por sufixo aleatório; o slug sai da normalização do projeto. */
+/** Sport. Unique name through a random suffix; the slug comes from the project's normalization. */
 export const SportFactory = factory
   .define(Sport, ({ faker }) => {
     const name = `Modalidade ${faker.string.alphanumeric(8)}`

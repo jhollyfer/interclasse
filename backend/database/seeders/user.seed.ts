@@ -5,15 +5,15 @@ import env from '#start/env'
 import User from '#models/user'
 
 /**
- * O primeiro administrador. Nenhum endpoint cria conta sem sessão - o painel é
- * a única porta de entrada de usuário -, então sem este seeder um banco novo
- * não teria por onde começar.
+ * The first administrator. No endpoint creates an account without a session - the panel is
+ * the only user entry door -, so without this seeder a new database
+ * would have nowhere to start.
  */
 export default class extends BaseSeeder {
   /**
-   * Fora de produção: lá o primeiro administrador é criado à mão, e este
-   * registro seria só uma credencial padrão conhecida com poder de
-   * administrador.
+   * Outside production: there the first administrator is created by hand, and this
+   * record would be just a known default credential with administrator
+   * power.
    */
   static override environment = ['development', 'test']
 
@@ -22,31 +22,31 @@ export default class extends BaseSeeder {
     const password = env.get('SEED_ADMINISTRATOR_PASSWORD')
 
     /*
-     * Sem senha o seeder para, e não inventa uma.
+     * Without a password the seeder stops, and does not invent one.
      *
-     * Ela era literal aqui, e o repositório é o lugar errado para uma
-     * credencial: quem lesse este arquivo entrava como administrador em todo ambiente
-     * que tivesse rodado o seeder - inclusive o de produção. Um default,
-     * mesmo "temporário", volta a ser exatamente isso.
+     * It used to be a literal here, and the repository is the wrong place for a
+     * credential: whoever read this file signed in as administrator in every environment
+     * that had run the seeder - production included. A default,
+     * even a "temporary" one, goes back to being exactly that.
      *
-     * Falhar aqui é seguro porque seeder roda à mão: a aplicação sobe sem esta
-     * variável, e só quem semeia precisa dela.
+     * Failing here is safe because the seeder runs by hand: the application starts without this
+     * variable, and only whoever seeds needs it.
      */
     if (!password) {
       throw new Error(
-        'SEED_ADMINISTRATOR_PASSWORD ausente. Defina uma senha no ambiente antes de rodar o seeder: ' +
-          'SEED_ADMINISTRATOR_PASSWORD=<senha> node ace db:seed',
+        'SEED_ADMINISTRATOR_PASSWORD missing. Set a password in the environment before running the seeder: ' +
+          'SEED_ADMINISTRATOR_PASSWORD=<password> node ace db:seed',
       )
     }
 
-    // `updateOrCreate(searchPayload, savePayload)`: o primeiro argumento é só a
-    // chave de busca. Passar `password` nele nunca casaria, porque a coluna
-    // guarda o hash - e o registro nasceria sem `name` nem `password`, que são
+    // `updateOrCreate(searchPayload, savePayload)`: the first argument is only the
+    // search key. Passing `password` in it would never match, because the column
+    // stores the hash - and the record would be born without `name` or `password`, which are
     // `notNullable`.
-    // `status` e `deletedAt` entram no `savePayload` mesmo tendo default no
-    // banco: rodar o seeder é o caminho de recuperação quando alguém desativa
-    // ou arquiva o último administrador pelo painel. Sem estas duas linhas o
-    // registro seria encontrado, atualizado e continuaria sem conseguir entrar.
+    // `status` and `deletedAt` go in the `savePayload` even though they have a default in the
+    // database: running the seeder is the recovery path when someone deactivates
+    // or archives the last administrator through the panel. Without these two lines the
+    // record would be found, updated and still unable to sign in.
     await User.updateOrCreate(
       { email },
       {

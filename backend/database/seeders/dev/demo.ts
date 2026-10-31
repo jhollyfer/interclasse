@@ -17,22 +17,22 @@ import AdministratorBracketCreateUseCase from '#features/administrator/brackets/
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
 
 /**
- * Um campeonato de demonstração, no meio do caminho: contas dos três papéis,
- * alunos com nome de gente, inscrições, chaves sorteadas, placares lançados e
- * agenda marcada. É o que se mostra para a escola antes dos jogos de verdade.
+ * A demonstration championship, midway through: accounts of the three roles,
+ * students with real-sounding names, enrollments, drawn brackets, scores entered and
+ * a schedule set. It is what is shown to the school before the real games.
  *
- * Só em desenvolvimento, e só roda à mão:
+ * Development only, and only runs by hand:
  *
- *   SEED_DEMO_PASSWORD=<senha> pnpm db:seed:demo
+ *   SEED_DEMO_PASSWORD=<password> pnpm db:seed:demo
  *
- * Mora em `dev/`, sem o sufixo `.seed.ts`, por ser seed manual de demonstração
+ * Lives in `dev/`, without the `.seed.ts` suffix, being a manual demonstration seed
  * (_standards/backend.md §3).
  *
- * Banco que já tem chave sorteada é deixado em paz: o seeder não sabe distinguir
- * demonstração de campeonato real, e apagar o segundo não tem volta.
+ * A database that already has a drawn bracket is left alone: the seeder cannot tell a
+ * demonstration from a real championship, and deleting the latter is irreversible.
  *
- * O sorteio e o placar passam pelos casos de uso de verdade, pelo container, e
- * não por insert direto: a demonstração mostra exatamente o que o sistema faz.
+ * The draw and the score go through the real use cases, through the container, and
+ * not through direct insert: the demonstration shows exactly what the system does.
  */
 type Stage = 'final' | 'semi' | 'first' | 'drawn'
 
@@ -42,20 +42,20 @@ export default class extends BaseSeeder {
   override async run() {
     const password = env.get('SEED_DEMO_PASSWORD')
 
-    // Sem senha a demonstração é pulada, e não o `db:seed` inteiro: quem só
-    // quer o administrador e as turmas não precisa decidir senha de demo.
+    // Without a password the demonstration is skipped, not the whole `db:seed`: whoever only
+    // wants the administrator and the classrooms does not need to decide a demo password.
     if (!password) {
-      console.info('[demo] SEED_DEMO_PASSWORD ausente; demonstração pulada.')
+      console.info('[demo] SEED_DEMO_PASSWORD missing; demonstration skipped.')
       return
     }
 
     if (await Bracket.query().first()) {
-      console.info('[demo] já existe chave sorteada; nada a fazer.')
+      console.info('[demo] a drawn bracket already exists; nothing to do.')
       return
     }
 
-    // Pelo container, não por `new` (_standards/backend.md §2.1): o construtor do
-    // seeder ganha dependência e a chamada continua montando o objeto inteiro.
+    // Through the container, not `new` (_standards/backend.md §2.1): the seeder's
+    // constructor gains a dependency and the call still builds the whole object.
     const tournament = await app.container.make(TournamentSeeder, [this.client])
     await tournament.run()
 
@@ -64,9 +64,9 @@ export default class extends BaseSeeder {
 
     for (const [index, classroom] of classrooms.entries()) {
       const representative = await this.representative(classroom, password)
-      // Um conselheiro por turma (índice único): as turmas além do número de
-      // professores ficam "Sem conselheiro", como fica a escola de verdade
-      // enquanto a organização não indica todos.
+      // One advisor per classroom (unique index): classrooms beyond the number of
+      // teachers stay "No advisor", as the real school does
+      // while the organization has not named them all.
       const advisor = advisors.at(index)
       classroom.merge({
         advisorId: advisor?.id ?? null,
@@ -81,7 +81,7 @@ export default class extends BaseSeeder {
     await this.championship()
   }
 
-  /** Os professores conselheiros, um para cada uma das primeiras turmas. */
+  /** The teacher advisors, one for each of the first classrooms. */
   private async advisors(password: string): Promise<User[]> {
     const people = [
       ['Raimunda Tananta', 'raimunda.tananta'],
@@ -112,7 +112,7 @@ export default class extends BaseSeeder {
     return users
   }
 
-  /** Um aluno representante por turma, com login derivado do nome da turma. */
+  /** One student representative per classroom, with a login derived from the classroom name. */
   private async representative(classroom: Classroom, password: string): Promise<User> {
     const login = `representante.${classroom.grade}${classroom.name.slice(-1).toLowerCase()}`
 
@@ -128,7 +128,7 @@ export default class extends BaseSeeder {
     )
   }
 
-  /** De 16 a 22 alunos por turma, com nome e sobrenome comuns na região. */
+  /** From 16 to 22 students per classroom, with first and last names common in the region. */
   private async students(classrooms: Classroom[]): Promise<void> {
     const first = [
       'Ana',
@@ -204,9 +204,9 @@ export default class extends BaseSeeder {
   }
 
   /**
-   * Inscrições: quase toda turma inscreve o máximo da modalidade. Algumas
-   * ficam abaixo do mínimo de propósito, para a demonstração mostrar turma
-   * fora do sorteio.
+   * Enrollments: almost every classroom enrolls the sport's maximum. Some
+   * stay below the minimum on purpose, so the demonstration shows a classroom
+   * left out of the draw.
    */
   private async enrollments(classrooms: Classroom[]): Promise<void> {
     const sports = await Sport.query().orderBy('name')
@@ -258,8 +258,8 @@ export default class extends BaseSeeder {
   }
 
   /**
-   * As chaves, cada uma num estágio diferente: uma com campeão, uma esperando
-   * a final, uma no meio da primeira fase e uma recém-sorteada.
+   * The brackets, each at a different stage: one with a champion, one waiting for
+   * the final, one in the middle of the first phase and one just drawn.
    */
   private async championship(): Promise<void> {
     const draw = await app.container.make(AdministratorBracketCreateUseCase)
@@ -279,7 +279,7 @@ export default class extends BaseSeeder {
       const target = await sport(item.slug)
       const created = await draw.execute({ sportId: target.id, category: item.category })
       if (created.isLeft()) throw created.value
-      // Chave que já existia (seed rodado de novo): o jogo dela já foi montado.
+      // A bracket that already existed (seed run again): its match was already built.
       if (!created.value.created) continue
 
       const { bracket } = created.value
@@ -288,7 +288,7 @@ export default class extends BaseSeeder {
     }
   }
 
-  /** Placar plausível e variado, com empates decididos nos pênaltis. */
+  /** Plausible, varied score, with ties decided on penalties. */
   private result(index: number): { homeScore: number; awayScore: number } {
     const scores: ReadonlyArray<readonly [number, number]> = [
       [3, 1],
@@ -301,15 +301,15 @@ export default class extends BaseSeeder {
       [5, 1],
     ]
     const score = scores[index % scores.length]
-    if (!score) throw new Error('[demo] lista de placares vazia')
+    if (!score) throw new Error('[demo] empty score list')
     const [homeScore, awayScore] = score
 
     return { homeScore, awayScore }
   }
 
   /**
-   * Joga a chave fase a fase até o estágio pedido: `first` para no meio da
-   * primeira fase, `semi` para antes da final, `final` vai até o campeão.
+   * Plays the bracket phase by phase up to the requested stage: `first` stops in the middle of the
+   * first phase, `semi` stops before the final, `final` goes to the champion.
    */
   private async play(
     bracketId: string,
@@ -341,7 +341,7 @@ export default class extends BaseSeeder {
       if (first && stage === 'first') played = matches.slice(0, Math.ceil(matches.length / 2))
 
       for (const [index, match] of played.entries()) {
-        // Um a cada três jogos empata e vai para os pênaltis.
+        // One in every three matches ties and goes to penalties.
         let payload: { homeScore: number; awayScore: number; winnerTeamId?: string } =
           this.result(index)
         if (payload.homeScore === payload.awayScore)
@@ -357,8 +357,8 @@ export default class extends BaseSeeder {
   }
 
   /**
-   * Marca as partidas sem horário: três por manhã, a partir de 1º de dezembro,
-   * nos três locais da escola. Devolve o próximo dia livre.
+   * Schedules the matches without a time: three per morning, starting on December 1st,
+   * in the school's three venues. Returns the next free day.
    */
   private async schedule(bracketId: string, startDay: number): Promise<number> {
     const places = ['Quadra principal', 'Ginásio', 'Quadra coberta']

@@ -1,26 +1,26 @@
 import { type SchemaRules } from '@adonisjs/lucid/types/schema_generator'
 
 /**
- * O que o gerador de `database/schema.ts` precisa saber e não consegue ler do
- * banco.
+ * What the `database/schema.ts` generator needs to know and cannot read from the
+ * database.
  *
- * Hoje só uma coisa: quais colunas **não** saem na resposta. O default do Lucid
- * é serializar toda coluna, e `database/schema.ts` é gerado — declarar
- * `serializeAs: null` no model não sobrevive à próxima geração. Aqui sobrevive.
+ * Today only one thing: which columns are **not** in the response. Lucid's default
+ * is to serialize every column, and `database/schema.ts` is generated — declaring
+ * `serializeAs: null` on the model does not survive the next generation. Here it survives.
  *
- * O corte é estreito de propósito: entra o que é **equivalente a credencial**,
- * e não todo dado sensível. `cpf`, `email` e `phone` são mostrados pelas telas
- * autenticadas por desenho, e a vitrine já os filtra em
- * `storefront-shape.service.ts` — escondê-los aqui quebraria a tela do painel
- * sem fechar buraco nenhum.
+ * The cut is narrow on purpose: what is **equivalent to a credential** goes in,
+ * not every sensitive datum. `cpf`, `email` and `phone` are shown by the authenticated
+ * screens by design, and the storefront already filters them in
+ * `storefront-shape.service.ts` — hiding them here would break the panel screen
+ * without closing any hole.
  */
 export default {
   tables: {
     auth_access_tokens: {
       columns: {
-        // O valor que prova a sessão. Nenhuma rota serializa este model hoje, e
-        // é justamente por isso que a proteção precisa estar aqui: quem
-        // adicionar um `preload` amanhã não vai lembrar.
+        // The value that proves the session. No route serializes this model today, and
+        // that is exactly why the protection needs to be here: whoever
+        // adds a `preload` tomorrow will not remember.
         hash: {
           tsType: 'string',
           decorators: [{ name: '@column', args: { serializeAs: null } }],

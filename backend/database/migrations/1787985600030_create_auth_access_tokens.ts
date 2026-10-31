@@ -6,9 +6,9 @@ export default class extends BaseSchema {
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
-      // `CASCADE`, e de propósito: o token não é dado de negócio, é credencial
-      // viva. Apagada a conta, deixar a linha para trás
-      // seria manter uma sessão que ninguém mais consegue revogar.
+      // `CASCADE`, and on purpose: the token is not business data, it is a live
+      // credential. Once the account is deleted, leaving the row behind
+      // would keep a session nobody can revoke anymore.
       table.uuid('tokenable_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
       table.string('type').notNullable()
       table.string('name').nullable()

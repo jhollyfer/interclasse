@@ -1,13 +1,13 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 /**
- * Um conselheiro, uma turma: o professor só enxerga a turma dele, no singular,
- * como o representante já enxergava.
+ * One advisor, one classroom: the teacher only sees their own classroom, in the singular,
+ * as the representative already did.
  *
- * Antes do índice, quem já aconselhava mais de uma turma fica só com a mais
- * antiga; as outras perdem o conselheiro e voltam a "Sem conselheiro", para o
- * administrador indicar outro. Sem isso o `unique` não entra num banco que já
- * tinha o vínculo repetido.
+ * Before the index, whoever already advised more than one classroom keeps only the oldest;
+ * the others lose the advisor and go back to "No advisor", for the
+ * administrator to name another. Without this the `unique` cannot be added to a database that
+ * already had the repeated link.
  */
 export default class extends BaseSchema {
   protected tableName = 'classrooms'

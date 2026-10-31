@@ -10,15 +10,15 @@ export default class extends BaseSchema {
       table.string('name', 120).notNullable()
       table.string('email', 254).notNullable().unique()
       table.string('password', 255).notNullable()
-      // Sem `defaultTo`: o papel é sempre explícito no servidor. `backend-old`
-      // caía em `ADMINISTRATOR` por omissão, e um caminho de criação esquecido
-      // gravava o papel mais poderoso em silêncio.
+      // No `defaultTo`: the role is always explicit on the server. `backend-old`
+      // fell back to `ADMINISTRATOR` by omission, and a forgotten creation path
+      // silently wrote the most powerful role.
       table.enum('role', USER_ROLES).notNullable()
       table.enum('status', ACTIVE_STATUSES).notNullable().defaultTo(ACTIVE_STATUS.ACTIVE)
-      // Quem anexa guarda a referência, nunca o contrário - é o que permite uma
-      // tabela de arquivos só, sem coluna de "tipo de dono". `SET NULL` e não
-      // `CASCADE` como em `backend-old`: lá, apagar a imagem do avatar apagava
-      // a conta inteira junto.
+      // Whoever attaches keeps the reference, never the other way around - it is what allows a
+      // single files table, with no "owner type" column. `SET NULL` and not
+      // `CASCADE` as in `backend-old`: there, deleting the avatar image deleted
+      // the whole account along with it.
       table.uuid('avatar_id').nullable().references('id').inTable('storages').onDelete('SET NULL')
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

@@ -7,10 +7,10 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table.string('name', 60).notNullable().unique()
-      // O identificador da modalidade na URL pública (`/classificacao/futsal`).
+      // The sport identifier in the public URL (`/standings/futsal`).
       table.string('slug', 255).notNullable().unique()
-      // Turma com menos inscritos que o mínimo não entra no sorteio: não teria
-      // time para entrar em quadra.
+      // A classroom with fewer enrolled than the minimum does not enter the draw: it would not have a
+      // team to take the court.
       table.smallint('min_athletes').notNullable()
       table.smallint('max_athletes').notNullable()
       table.timestamp('created_at').notNullable()
