@@ -35,8 +35,8 @@ try {
       app.booting(async function () {
         await import('#start/env')
       })
-      // O emissor de sinal não aguarda o retorno: `void` diz que o encerramento
-      // corre por conta própria, e a falha dele cai no handler do processo.
+      // The signal emitter does not await the return: `void` says shutdown runs on its
+      // own, and its failure falls to the process handler.
       app.listen('SIGTERM', function () {
         void app.terminate()
       })
