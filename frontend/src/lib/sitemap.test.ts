@@ -13,7 +13,7 @@ describe('bracketEntries', () => {
       bracketEntries([{ id: 'abc', updatedAt: '2026-10-01T10:00:00-04:00' }]),
     ).toEqual([
       {
-        pathname: '/classificacao/abc',
+        pathname: '/standings/abc',
         lastModified: '2026-10-01T10:00:00-04:00',
       },
     ])
@@ -22,8 +22,8 @@ describe('bracketEntries', () => {
 
 describe('sitemapXml', () => {
   const xml = sitemapXml([
-    { pathname: '/jogos' },
-    { pathname: '/classificacao/abc', lastModified: '2026-10-01T10:00:00Z' },
+    { pathname: '/matches' },
+    { pathname: '/standings/abc', lastModified: '2026-10-01T10:00:00Z' },
   ])
 
   it('traz uma url por idioma de cada página', () => {
@@ -31,15 +31,17 @@ describe('sitemapXml', () => {
   })
 
   it('escreve o pt-BR sem prefixo e os outros com prefixo', () => {
-    expect(xml).toContain('<loc>http://localhost:3001/jogos</loc>')
-    expect(xml).toContain('<loc>http://localhost:3001/es/jogos</loc>')
-    expect(xml).toContain('<loc>http://localhost:3001/en/jogos</loc>')
+    expect(xml).toContain('<loc>http://localhost:3001/matches</loc>')
+    expect(xml).toContain('<loc>http://localhost:3001/es/matches</loc>')
+    expect(xml).toContain('<loc>http://localhost:3001/en/matches</loc>')
   })
 
   it('liga cada url aos hreflang das irmãs e ao x-default', () => {
-    expect(xml).toContain('hreflang="es" href="http://localhost:3001/es/jogos"')
     expect(xml).toContain(
-      'hreflang="x-default" href="http://localhost:3001/jogos"',
+      'hreflang="es" href="http://localhost:3001/es/matches"',
+    )
+    expect(xml).toContain(
+      'hreflang="x-default" href="http://localhost:3001/matches"',
     )
   })
 
@@ -52,10 +54,10 @@ describe('SITEMAP_STATIC_ENTRIES', () => {
   it('cobre a home e as páginas públicas', () => {
     expect(SITEMAP_STATIC_ENTRIES.map((entry) => entry.pathname)).toEqual([
       '/',
-      '/jogos',
-      '/classificacao',
-      '/avisos',
-      '/sobre',
+      '/matches',
+      '/standings',
+      '/announcements',
+      '/about',
     ])
   })
 })

@@ -18,10 +18,10 @@ export type SitemapEntry = Readonly<{
 /** As páginas públicas que não dependem de dado. */
 export const SITEMAP_STATIC_ENTRIES = [
   { pathname: '/' },
-  { pathname: '/jogos' },
-  { pathname: '/classificacao' },
-  { pathname: '/avisos' },
-  { pathname: '/sobre' },
+  { pathname: '/matches' },
+  { pathname: '/standings' },
+  { pathname: '/announcements' },
+  { pathname: '/about' },
 ] as const satisfies ReadonlyArray<SitemapEntry>
 
 /** A chave de cada modalidade: uma página por chave, com o `updatedAt` dela. */
@@ -29,7 +29,7 @@ export function bracketEntries(
   brackets: ReadonlyArray<{ id: string; updatedAt: string | null }>,
 ): Array<SitemapEntry> {
   return brackets.map((bracket) => ({
-    pathname: `/classificacao/${bracket.id}`,
+    pathname: `/standings/${bracket.id}`,
     lastModified: bracket.updatedAt,
   }))
 }

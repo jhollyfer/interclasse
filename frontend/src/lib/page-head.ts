@@ -20,7 +20,7 @@ type PageHeadInput = Readonly<{
   title?: string
   /** Ausente, vale a descrição do site. */
   description?: string
-  /** O caminho sem prefixo de idioma e sem query, como o router o enxerga (`/jogos`). */
+  /** O caminho sem prefixo de idioma e sem query, como o router o enxerga (`/matches`). */
   pathname: string
   /** Página fora do índice dos buscadores (404). */
   noindex?: boolean

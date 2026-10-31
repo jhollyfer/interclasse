@@ -11,19 +11,19 @@ import { m } from '#/paraglide/messages'
  */
 const HOME = linkOptions({ to: '/', label: m.public_nav_home })
 
-const GAMES = linkOptions({ to: '/jogos', label: m.public_nav_games })
+const GAMES = linkOptions({ to: '/matches', label: m.public_nav_games })
 
 const STANDINGS = linkOptions({
-  to: '/classificacao',
+  to: '/standings',
   label: m.public_nav_standings,
 })
 
 const ANNOUNCEMENTS = linkOptions({
-  to: '/avisos',
+  to: '/announcements',
   label: m.public_nav_announcements,
 })
 
-const ABOUT = linkOptions({ to: '/sobre', label: m.public_nav_about })
+const ABOUT = linkOptions({ to: '/about', label: m.public_nav_about })
 
 const SIGN_IN = linkOptions({
   to: '/sign-in',

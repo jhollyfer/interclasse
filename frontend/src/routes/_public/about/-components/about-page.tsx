@@ -17,7 +17,7 @@ import {
   SectionTitle,
 } from '../../-components/section'
 
-const route = getRouteApi('/_public/sobre/')
+const route = getRouteApi('/_public/about/')
 
 /** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
 function sinceLabel(firstEditionYear: number, currentYear: number): string {

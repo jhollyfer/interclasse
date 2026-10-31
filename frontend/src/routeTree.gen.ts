@@ -25,13 +25,13 @@ import { Route as PublicSplatRouteImport } from './routes/_public/$'
 import { Route as AuthenticationSignInIndexRouteImport } from './routes/_authentication/sign-in/index'
 import { Route as PrivateAdministratorIndexRouteImport } from './routes/_private/administrator/index'
 import { Route as PrivateAdvisorIndexRouteImport } from './routes/_private/advisor/index'
-import { Route as PrivatePainelIndexRouteImport } from './routes/_private/painel/index'
+import { Route as PrivateDashboardIndexRouteImport } from './routes/_private/dashboard/index'
 import { Route as PrivateProfileIndexRouteImport } from './routes/_private/profile/index'
 import { Route as PrivateRepresentativeIndexRouteImport } from './routes/_private/representative/index'
-import { Route as PublicAvisosIndexRouteImport } from './routes/_public/avisos/index'
-import { Route as PublicClassificacaoIndexRouteImport } from './routes/_public/classificacao/index'
-import { Route as PublicJogosIndexRouteImport } from './routes/_public/jogos/index'
-import { Route as PublicSobreIndexRouteImport } from './routes/_public/sobre/index'
+import { Route as PublicAboutIndexRouteImport } from './routes/_public/about/index'
+import { Route as PublicAnnouncementsIndexRouteImport } from './routes/_public/announcements/index'
+import { Route as PublicMatchesIndexRouteImport } from './routes/_public/matches/index'
+import { Route as PublicStandingsIndexRouteImport } from './routes/_public/standings/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
 import { Route as PrivateAdministratorCardsIndexRouteImport } from './routes/_private/administrator/cards/index'
@@ -47,7 +47,7 @@ import { Route as PrivateAdministratorUsersIndexRouteImport } from './routes/_pr
 import { Route as PrivateAdvisorClassroomIdIndexRouteImport } from './routes/_private/advisor/$classroomId/index'
 import { Route as PrivateAdvisorPhotosIndexRouteImport } from './routes/_private/advisor/photos/index'
 import { Route as PrivateProfileEditIndexRouteImport } from './routes/_private/profile/edit/index'
-import { Route as PublicClassificacaoIdIndexRouteImport } from './routes/_public/classificacao/$id/index'
+import { Route as PublicStandingsIdIndexRouteImport } from './routes/_public/standings/$id/index'
 import { Route as PrivateAdministratorAnnouncementsIdEditRouteImport } from './routes/_private/administrator/announcements/$id/edit'
 import { Route as PrivateAdministratorBracketsIdIndexRouteImport } from './routes/_private/administrator/brackets/$id/index'
 import { Route as PrivateAdministratorClassroomsIdIndexRouteImport } from './routes/_private/administrator/classrooms/$id/index'
@@ -146,9 +146,9 @@ const PrivateAdvisorIndexRoute = PrivateAdvisorIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_private/advisor/index.lazy').then((d) => d.Route),
 )
-const PrivatePainelIndexRoute = PrivatePainelIndexRouteImport.update({
-  id: '/painel/',
-  path: '/painel/',
+const PrivateDashboardIndexRoute = PrivateDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => PrivateLayoutRoute,
 } as any)
 const PrivateProfileIndexRoute = PrivateProfileIndexRouteImport.update({
@@ -166,34 +166,34 @@ const PrivateRepresentativeIndexRoute =
   } as any).lazy(() =>
     import('./routes/_private/representative/index.lazy').then((d) => d.Route),
   )
-const PublicAvisosIndexRoute = PublicAvisosIndexRouteImport.update({
-  id: '/avisos/',
-  path: '/avisos/',
+const PublicAboutIndexRoute = PublicAboutIndexRouteImport.update({
+  id: '/about/',
+  path: '/about/',
   getParentRoute: () => PublicLayoutRoute,
 } as any).lazy(() =>
-  import('./routes/_public/avisos/index.lazy').then((d) => d.Route),
+  import('./routes/_public/about/index.lazy').then((d) => d.Route),
 )
-const PublicClassificacaoIndexRoute =
-  PublicClassificacaoIndexRouteImport.update({
-    id: '/classificacao/',
-    path: '/classificacao/',
+const PublicAnnouncementsIndexRoute =
+  PublicAnnouncementsIndexRouteImport.update({
+    id: '/announcements/',
+    path: '/announcements/',
     getParentRoute: () => PublicLayoutRoute,
   } as any).lazy(() =>
-    import('./routes/_public/classificacao/index.lazy').then((d) => d.Route),
+    import('./routes/_public/announcements/index.lazy').then((d) => d.Route),
   )
-const PublicJogosIndexRoute = PublicJogosIndexRouteImport.update({
-  id: '/jogos/',
-  path: '/jogos/',
+const PublicMatchesIndexRoute = PublicMatchesIndexRouteImport.update({
+  id: '/matches/',
+  path: '/matches/',
   getParentRoute: () => PublicLayoutRoute,
 } as any).lazy(() =>
-  import('./routes/_public/jogos/index.lazy').then((d) => d.Route),
+  import('./routes/_public/matches/index.lazy').then((d) => d.Route),
 )
-const PublicSobreIndexRoute = PublicSobreIndexRouteImport.update({
-  id: '/sobre/',
-  path: '/sobre/',
+const PublicStandingsIndexRoute = PublicStandingsIndexRouteImport.update({
+  id: '/standings/',
+  path: '/standings/',
   getParentRoute: () => PublicLayoutRoute,
 } as any).lazy(() =>
-  import('./routes/_public/sobre/index.lazy').then((d) => d.Route),
+  import('./routes/_public/standings/index.lazy').then((d) => d.Route),
 )
 const PrivateAdministratorAnnouncementsIndexRoute =
   PrivateAdministratorAnnouncementsIndexRouteImport.update({
@@ -376,16 +376,13 @@ const PrivateProfileEditIndexRoute = PrivateProfileEditIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_private/profile/edit/index.lazy').then((d) => d.Route),
 )
-const PublicClassificacaoIdIndexRoute =
-  PublicClassificacaoIdIndexRouteImport.update({
-    id: '/classificacao/$id/',
-    path: '/classificacao/$id/',
-    getParentRoute: () => PublicLayoutRoute,
-  } as any).lazy(() =>
-    import('./routes/_public/classificacao/$id/index.lazy').then(
-      (d) => d.Route,
-    ),
-  )
+const PublicStandingsIdIndexRoute = PublicStandingsIdIndexRouteImport.update({
+  id: '/standings/$id/',
+  path: '/standings/$id/',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/standings/$id/index.lazy').then((d) => d.Route),
+)
 const PrivateAdministratorAnnouncementsIdEditRoute =
   PrivateAdministratorAnnouncementsIdEditRouteImport.update({
     id: '/announcements/$id/edit',
@@ -469,13 +466,13 @@ export interface FileRoutesByFullPath {
   '/sign-in/': typeof AuthenticationSignInIndexRoute
   '/administrator/': typeof PrivateAdministratorIndexRoute
   '/advisor/': typeof PrivateAdvisorIndexRoute
-  '/painel/': typeof PrivatePainelIndexRoute
+  '/dashboard/': typeof PrivateDashboardIndexRoute
   '/profile/': typeof PrivateProfileIndexRoute
   '/representative/': typeof PrivateRepresentativeIndexRoute
-  '/avisos/': typeof PublicAvisosIndexRoute
-  '/classificacao/': typeof PublicClassificacaoIndexRoute
-  '/jogos/': typeof PublicJogosIndexRoute
-  '/sobre/': typeof PublicSobreIndexRoute
+  '/about/': typeof PublicAboutIndexRoute
+  '/announcements/': typeof PublicAnnouncementsIndexRoute
+  '/matches/': typeof PublicMatchesIndexRoute
+  '/standings/': typeof PublicStandingsIndexRoute
   '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
   '/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
@@ -495,7 +492,7 @@ export interface FileRoutesByFullPath {
   '/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
   '/advisor/photos/': typeof PrivateAdvisorPhotosIndexRoute
   '/profile/edit/': typeof PrivateProfileEditIndexRoute
-  '/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
+  '/standings/$id/': typeof PublicStandingsIdIndexRoute
   '/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
   '/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
   '/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
@@ -513,13 +510,13 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthenticationSignInIndexRoute
   '/administrator': typeof PrivateAdministratorIndexRoute
   '/advisor': typeof PrivateAdvisorIndexRoute
-  '/painel': typeof PrivatePainelIndexRoute
+  '/dashboard': typeof PrivateDashboardIndexRoute
   '/profile': typeof PrivateProfileIndexRoute
   '/representative': typeof PrivateRepresentativeIndexRoute
-  '/avisos': typeof PublicAvisosIndexRoute
-  '/classificacao': typeof PublicClassificacaoIndexRoute
-  '/jogos': typeof PublicJogosIndexRoute
-  '/sobre': typeof PublicSobreIndexRoute
+  '/about': typeof PublicAboutIndexRoute
+  '/announcements': typeof PublicAnnouncementsIndexRoute
+  '/matches': typeof PublicMatchesIndexRoute
+  '/standings': typeof PublicStandingsIndexRoute
   '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
   '/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
@@ -539,7 +536,7 @@ export interface FileRoutesByTo {
   '/advisor/$classroomId': typeof PrivateAdvisorClassroomIdIndexRoute
   '/advisor/photos': typeof PrivateAdvisorPhotosIndexRoute
   '/profile/edit': typeof PrivateProfileEditIndexRoute
-  '/classificacao/$id': typeof PublicClassificacaoIdIndexRoute
+  '/standings/$id': typeof PublicStandingsIdIndexRoute
   '/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
   '/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
   '/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
@@ -564,13 +561,13 @@ export interface FileRoutesById {
   '/_authentication/sign-in/': typeof AuthenticationSignInIndexRoute
   '/_private/administrator/': typeof PrivateAdministratorIndexRoute
   '/_private/advisor/': typeof PrivateAdvisorIndexRoute
-  '/_private/painel/': typeof PrivatePainelIndexRoute
+  '/_private/dashboard/': typeof PrivateDashboardIndexRoute
   '/_private/profile/': typeof PrivateProfileIndexRoute
   '/_private/representative/': typeof PrivateRepresentativeIndexRoute
-  '/_public/avisos/': typeof PublicAvisosIndexRoute
-  '/_public/classificacao/': typeof PublicClassificacaoIndexRoute
-  '/_public/jogos/': typeof PublicJogosIndexRoute
-  '/_public/sobre/': typeof PublicSobreIndexRoute
+  '/_public/about/': typeof PublicAboutIndexRoute
+  '/_public/announcements/': typeof PublicAnnouncementsIndexRoute
+  '/_public/matches/': typeof PublicMatchesIndexRoute
+  '/_public/standings/': typeof PublicStandingsIndexRoute
   '/_private/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/_private/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
   '/_private/administrator/sports/new': typeof PrivateAdministratorSportsNewLazyRoute
@@ -590,7 +587,7 @@ export interface FileRoutesById {
   '/_private/advisor/$classroomId/': typeof PrivateAdvisorClassroomIdIndexRoute
   '/_private/advisor/photos/': typeof PrivateAdvisorPhotosIndexRoute
   '/_private/profile/edit/': typeof PrivateProfileEditIndexRoute
-  '/_public/classificacao/$id/': typeof PublicClassificacaoIdIndexRoute
+  '/_public/standings/$id/': typeof PublicStandingsIdIndexRoute
   '/_private/administrator/announcements/$id/edit': typeof PrivateAdministratorAnnouncementsIdEditRoute
   '/_private/administrator/classrooms/$id/edit': typeof PrivateAdministratorClassroomsIdEditRoute
   '/_private/administrator/sports/$id/edit': typeof PrivateAdministratorSportsIdEditRoute
@@ -613,13 +610,13 @@ export interface FileRouteTypes {
     | '/sign-in/'
     | '/administrator/'
     | '/advisor/'
-    | '/painel/'
+    | '/dashboard/'
     | '/profile/'
     | '/representative/'
-    | '/avisos/'
-    | '/classificacao/'
-    | '/jogos/'
-    | '/sobre/'
+    | '/about/'
+    | '/announcements/'
+    | '/matches/'
+    | '/standings/'
     | '/administrator/announcements/new'
     | '/administrator/classrooms/new'
     | '/administrator/sports/new'
@@ -639,7 +636,7 @@ export interface FileRouteTypes {
     | '/advisor/$classroomId/'
     | '/advisor/photos/'
     | '/profile/edit/'
-    | '/classificacao/$id/'
+    | '/standings/$id/'
     | '/administrator/announcements/$id/edit'
     | '/administrator/classrooms/$id/edit'
     | '/administrator/sports/$id/edit'
@@ -657,13 +654,13 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/administrator'
     | '/advisor'
-    | '/painel'
+    | '/dashboard'
     | '/profile'
     | '/representative'
-    | '/avisos'
-    | '/classificacao'
-    | '/jogos'
-    | '/sobre'
+    | '/about'
+    | '/announcements'
+    | '/matches'
+    | '/standings'
     | '/administrator/announcements/new'
     | '/administrator/classrooms/new'
     | '/administrator/sports/new'
@@ -683,7 +680,7 @@ export interface FileRouteTypes {
     | '/advisor/$classroomId'
     | '/advisor/photos'
     | '/profile/edit'
-    | '/classificacao/$id'
+    | '/standings/$id'
     | '/administrator/announcements/$id/edit'
     | '/administrator/classrooms/$id/edit'
     | '/administrator/sports/$id/edit'
@@ -707,13 +704,13 @@ export interface FileRouteTypes {
     | '/_authentication/sign-in/'
     | '/_private/administrator/'
     | '/_private/advisor/'
-    | '/_private/painel/'
+    | '/_private/dashboard/'
     | '/_private/profile/'
     | '/_private/representative/'
-    | '/_public/avisos/'
-    | '/_public/classificacao/'
-    | '/_public/jogos/'
-    | '/_public/sobre/'
+    | '/_public/about/'
+    | '/_public/announcements/'
+    | '/_public/matches/'
+    | '/_public/standings/'
     | '/_private/administrator/announcements/new'
     | '/_private/administrator/classrooms/new'
     | '/_private/administrator/sports/new'
@@ -733,7 +730,7 @@ export interface FileRouteTypes {
     | '/_private/advisor/$classroomId/'
     | '/_private/advisor/photos/'
     | '/_private/profile/edit/'
-    | '/_public/classificacao/$id/'
+    | '/_public/standings/$id/'
     | '/_private/administrator/announcements/$id/edit'
     | '/_private/administrator/classrooms/$id/edit'
     | '/_private/administrator/sports/$id/edit'
@@ -852,11 +849,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAdvisorIndexRouteImport
       parentRoute: typeof PrivateAdvisorLayoutRoute
     }
-    '/_private/painel/': {
-      id: '/_private/painel/'
-      path: '/painel'
-      fullPath: '/painel/'
-      preLoaderRoute: typeof PrivatePainelIndexRouteImport
+    '/_private/dashboard/': {
+      id: '/_private/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof PrivateDashboardIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
     '/_private/profile/': {
@@ -873,32 +870,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateRepresentativeIndexRouteImport
       parentRoute: typeof PrivateRepresentativeLayoutRoute
     }
-    '/_public/avisos/': {
-      id: '/_public/avisos/'
-      path: '/avisos'
-      fullPath: '/avisos/'
-      preLoaderRoute: typeof PublicAvisosIndexRouteImport
+    '/_public/about/': {
+      id: '/_public/about/'
+      path: '/about'
+      fullPath: '/about/'
+      preLoaderRoute: typeof PublicAboutIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/_public/classificacao/': {
-      id: '/_public/classificacao/'
-      path: '/classificacao'
-      fullPath: '/classificacao/'
-      preLoaderRoute: typeof PublicClassificacaoIndexRouteImport
+    '/_public/announcements/': {
+      id: '/_public/announcements/'
+      path: '/announcements'
+      fullPath: '/announcements/'
+      preLoaderRoute: typeof PublicAnnouncementsIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/_public/jogos/': {
-      id: '/_public/jogos/'
-      path: '/jogos'
-      fullPath: '/jogos/'
-      preLoaderRoute: typeof PublicJogosIndexRouteImport
+    '/_public/matches/': {
+      id: '/_public/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof PublicMatchesIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/_public/sobre/': {
-      id: '/_public/sobre/'
-      path: '/sobre'
-      fullPath: '/sobre/'
-      preLoaderRoute: typeof PublicSobreIndexRouteImport
+    '/_public/standings/': {
+      id: '/_public/standings/'
+      path: '/standings'
+      fullPath: '/standings/'
+      preLoaderRoute: typeof PublicStandingsIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
     '/_private/administrator/announcements/': {
@@ -1034,11 +1031,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateProfileEditIndexRouteImport
       parentRoute: typeof PrivateLayoutRoute
     }
-    '/_public/classificacao/$id/': {
-      id: '/_public/classificacao/$id/'
-      path: '/classificacao/$id'
-      fullPath: '/classificacao/$id/'
-      preLoaderRoute: typeof PublicClassificacaoIdIndexRouteImport
+    '/_public/standings/$id/': {
+      id: '/_public/standings/$id/'
+      path: '/standings/$id'
+      fullPath: '/standings/$id/'
+      preLoaderRoute: typeof PublicStandingsIdIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
     '/_private/administrator/announcements/$id/edit': {
@@ -1214,7 +1211,7 @@ interface PrivateLayoutRouteChildren {
   PrivateAdministratorLayoutRoute: typeof PrivateAdministratorLayoutRouteWithChildren
   PrivateAdvisorLayoutRoute: typeof PrivateAdvisorLayoutRouteWithChildren
   PrivateRepresentativeLayoutRoute: typeof PrivateRepresentativeLayoutRouteWithChildren
-  PrivatePainelIndexRoute: typeof PrivatePainelIndexRoute
+  PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
   PrivateProfileIndexRoute: typeof PrivateProfileIndexRoute
   PrivateProfileEditIndexRoute: typeof PrivateProfileEditIndexRoute
 }
@@ -1224,7 +1221,7 @@ const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
   PrivateAdvisorLayoutRoute: PrivateAdvisorLayoutRouteWithChildren,
   PrivateRepresentativeLayoutRoute:
     PrivateRepresentativeLayoutRouteWithChildren,
-  PrivatePainelIndexRoute: PrivatePainelIndexRoute,
+  PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
   PrivateProfileIndexRoute: PrivateProfileIndexRoute,
   PrivateProfileEditIndexRoute: PrivateProfileEditIndexRoute,
 }
@@ -1236,21 +1233,21 @@ const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(
 interface PublicLayoutRouteChildren {
   PublicSplatRoute: typeof PublicSplatRoute
   PublicIndexRoute: typeof PublicIndexRoute
-  PublicAvisosIndexRoute: typeof PublicAvisosIndexRoute
-  PublicClassificacaoIndexRoute: typeof PublicClassificacaoIndexRoute
-  PublicJogosIndexRoute: typeof PublicJogosIndexRoute
-  PublicSobreIndexRoute: typeof PublicSobreIndexRoute
-  PublicClassificacaoIdIndexRoute: typeof PublicClassificacaoIdIndexRoute
+  PublicAboutIndexRoute: typeof PublicAboutIndexRoute
+  PublicAnnouncementsIndexRoute: typeof PublicAnnouncementsIndexRoute
+  PublicMatchesIndexRoute: typeof PublicMatchesIndexRoute
+  PublicStandingsIndexRoute: typeof PublicStandingsIndexRoute
+  PublicStandingsIdIndexRoute: typeof PublicStandingsIdIndexRoute
 }
 
 const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
   PublicSplatRoute: PublicSplatRoute,
   PublicIndexRoute: PublicIndexRoute,
-  PublicAvisosIndexRoute: PublicAvisosIndexRoute,
-  PublicClassificacaoIndexRoute: PublicClassificacaoIndexRoute,
-  PublicJogosIndexRoute: PublicJogosIndexRoute,
-  PublicSobreIndexRoute: PublicSobreIndexRoute,
-  PublicClassificacaoIdIndexRoute: PublicClassificacaoIdIndexRoute,
+  PublicAboutIndexRoute: PublicAboutIndexRoute,
+  PublicAnnouncementsIndexRoute: PublicAnnouncementsIndexRoute,
+  PublicMatchesIndexRoute: PublicMatchesIndexRoute,
+  PublicStandingsIndexRoute: PublicStandingsIndexRoute,
+  PublicStandingsIdIndexRoute: PublicStandingsIdIndexRoute,
 }
 
 const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(

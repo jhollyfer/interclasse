@@ -15,9 +15,15 @@ import {
 
 describe('localizedUrl', () => {
   it('pt-BR fica sem prefixo e es/en levam o idioma', () => {
-    expect(localizedUrl('/jogos', 'pt-BR')).toBe(`${env.VITE_SITE_URL}/jogos`)
-    expect(localizedUrl('/jogos', 'es')).toBe(`${env.VITE_SITE_URL}/es/jogos`)
-    expect(localizedUrl('/jogos', 'en')).toBe(`${env.VITE_SITE_URL}/en/jogos`)
+    expect(localizedUrl('/matches', 'pt-BR')).toBe(
+      `${env.VITE_SITE_URL}/matches`,
+    )
+    expect(localizedUrl('/matches', 'es')).toBe(
+      `${env.VITE_SITE_URL}/es/matches`,
+    )
+    expect(localizedUrl('/matches', 'en')).toBe(
+      `${env.VITE_SITE_URL}/en/matches`,
+    )
   })
 
   it('tira a barra do fim, menos na raiz', () => {
@@ -26,7 +32,7 @@ describe('localizedUrl', () => {
 })
 
 describe('pageHead', () => {
-  const head = pageHead({ title: 'Jogos', pathname: '/jogos' })
+  const head = pageHead({ title: 'Jogos', pathname: '/matches' })
 
   it('põe o sufixo do site no título', () => {
     expect(head.meta).toContainEqual({
@@ -43,7 +49,7 @@ describe('pageHead', () => {
   it('declara o canonical e o hreflang recíproco das três versões', () => {
     expect(head.links).toContainEqual({
       rel: 'canonical',
-      href: `${env.VITE_SITE_URL}/jogos`,
+      href: `${env.VITE_SITE_URL}/matches`,
     })
 
     for (const hrefLang of ['pt-BR', 'es', 'en', 'x-default']) {
@@ -54,7 +60,7 @@ describe('pageHead', () => {
   it('x-default aponta para a versão pt-BR', () => {
     const fallback = head.links.find((link) => link.hrefLang === 'x-default')
 
-    expect(fallback?.href).toBe(`${env.VITE_SITE_URL}/jogos`)
+    expect(fallback?.href).toBe(`${env.VITE_SITE_URL}/matches`)
   })
 
   it('leva o Open Graph', () => {
@@ -129,7 +135,7 @@ describe('breadcrumbJsonLd', () => {
     const data: unknown = JSON.parse(
       breadcrumbJsonLd([
         { name: 'Início', pathname: '/' },
-        { name: 'Classificação', pathname: '/classificacao' },
+        { name: 'Classificação', pathname: '/standings' },
       ]),
     )
 
@@ -140,7 +146,7 @@ describe('breadcrumbJsonLd', () => {
         {
           position: 2,
           name: 'Classificação',
-          item: `${env.VITE_SITE_URL}/classificacao`,
+          item: `${env.VITE_SITE_URL}/standings`,
         },
       ],
     })
@@ -152,7 +158,7 @@ describe('sportsEventJsonLd', () => {
     name: 'Futsal Sub-15',
     description: 'Chave de futsal',
     sport: 'Futsal',
-    pathname: '/classificacao/1',
+    pathname: '/standings/1',
   }
 
   it('usa o jogo mais cedo como startDate', () => {
@@ -170,7 +176,7 @@ describe('sportsEventJsonLd', () => {
     expect(data).toMatchObject({
       '@type': 'SportsEvent',
       sport: 'Futsal',
-      url: `${env.VITE_SITE_URL}/classificacao/1`,
+      url: `${env.VITE_SITE_URL}/standings/1`,
       startDate: '2026-05-01T09:00:00.000-04:00',
     })
   })

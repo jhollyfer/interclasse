@@ -14,7 +14,7 @@ import {
 import { StandingsExplorer } from '../../../-components/standings-explorer'
 import { BRACKETS_INDEX } from '../../index'
 
-const route = getRouteApi('/_public/classificacao/$id/')
+const route = getRouteApi('/_public/standings/$id/')
 
 /**
  * A chave pelo link compartilhado. A escolha mora na URL: trocar de modalidade
@@ -37,7 +37,7 @@ export function BracketPage(): React.JSX.Element {
         selected={id}
         onSelect={(next) =>
           void navigate({
-            to: '/classificacao/$id',
+            to: '/standings/$id',
             params: { id: next },
             replace: true,
             resetScroll: false,

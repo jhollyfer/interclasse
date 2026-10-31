@@ -38,7 +38,7 @@ function renderForm(
   onSubmit: React.ComponentProps<'form'>['onSubmit'] = undefined,
 ) {
   render(
-    <FormShell formId="turma" backTo="/sobre" isPending={isPending}>
+    <FormShell formId="turma" backTo="/about" isPending={isPending}>
       <FormShellHeader>
         <FormShellBack />
         <FormShellTitle>Nova turma</FormShellTitle>
@@ -65,12 +65,12 @@ describe('FormShell', () => {
 
     expect(
       screen.getByRole('link', { name: m.common_back() }).getAttribute('href'),
-    ).toBe('/sobre')
+    ).toBe('/about')
     expect(
       screen
         .getByRole('link', { name: m.common_discard() })
         .getAttribute('href'),
-    ).toBe('/sobre')
+    ).toBe('/about')
   })
 
   it('o título é o h1 e o Salvar aponta para o formulário da casca', () => {

@@ -37,7 +37,7 @@ export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
     context,
-    // A árvore de rotas é uma só: `/es/jogos` entra como `/jogos` e sai com o
+    // A árvore de rotas é uma só: `/es/matches` entra como `/matches` e sai com o
     // prefixo do idioma atual (_doc-lib/tanstack-router.md#guide/url-rewrites).
     rewrite: {
       input: ({ url }) => deLocalizeUrl(url),

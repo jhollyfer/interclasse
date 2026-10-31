@@ -72,7 +72,7 @@ export function SignInForm(): React.JSX.Element {
         return
       }
 
-      await router.navigate({ to: '/painel' })
+      await router.navigate({ to: '/dashboard' })
     },
   })
 

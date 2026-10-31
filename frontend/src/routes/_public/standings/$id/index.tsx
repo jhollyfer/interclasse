@@ -12,7 +12,7 @@ import { m } from '#/paraglide/messages'
 
 import { BRACKETS_INDEX } from '../index'
 
-export const Route = createFileRoute('/_public/classificacao/$id/')({
+export const Route = createFileRoute('/_public/standings/$id/')({
   notFoundComponent: () => <NotFoundPage />,
   loader: async ({ context, params }) => {
     // A lista é a barra de abas da página; falha nela não esconde a chave.
@@ -49,7 +49,7 @@ export const Route = createFileRoute('/_public/classificacao/$id/')({
       structuredData: [
         breadcrumbJsonLd([
           { name: m.public_nav_home(), pathname: '/' },
-          { name: m.public_nav_standings(), pathname: '/classificacao' },
+          { name: m.public_nav_standings(), pathname: '/standings' },
           { name: title, pathname: match.pathname },
         ]),
         sportsEventJsonLd({

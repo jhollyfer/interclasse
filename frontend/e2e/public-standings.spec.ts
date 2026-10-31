@@ -67,7 +67,7 @@ test.describe('classificação pública', () => {
   }) => {
     const id = await firstBracketId(request)
 
-    await page.goto(`/classificacao/${id}`)
+    await page.goto(`/standings/${id}`)
     await waitForHydration(page)
 
     await expect(

@@ -35,7 +35,7 @@ type StandingsExplorerProps = Readonly<{
  * lugar, sem sair da página.
  *
  * Controlado por fora (`selected`/`onSelect`): a home guarda a escolha em
- * estado, e `/classificacao/$id` na URL, para o link poder ser compartilhado.
+ * estado, e `/standings/$id` na URL, para o link poder ser compartilhado.
  */
 export function StandingsExplorer({
   brackets,

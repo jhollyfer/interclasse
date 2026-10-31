@@ -53,7 +53,7 @@ test('troca para en e es pelo seletor, e volta ao pt-BR', async ({ page }) => {
 })
 
 test('a troca mantém a mesma página no outro idioma', async ({ page }) => {
-  await page.goto('/sobre')
+  await page.goto('/about')
   await waitForHydration(page)
   await expect(
     page.getByRole('heading', { level: 1, name: 'Sobre os jogos' }),
@@ -62,7 +62,7 @@ test('a troca mantém a mesma página no outro idioma', async ({ page }) => {
   await page.getByRole('button', { name: 'Idioma' }).click()
   await page.getByRole('menuitemradio', { name: 'Espanhol' }).click()
 
-  await expect(page).toHaveURL(/\/es\/sobre\/?$/)
+  await expect(page).toHaveURL(/\/es\/about\/?$/)
   await expect(
     page.getByRole('heading', { level: 1, name: 'Acerca de los juegos' }),
   ).toBeVisible()

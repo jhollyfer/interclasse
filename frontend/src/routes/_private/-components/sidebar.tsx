@@ -148,7 +148,7 @@ export function Sidebar(): React.JSX.Element {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              render={<Link to="/painel" />}
+              render={<Link to="/dashboard" />}
               onClick={() => setOpenMobile(false)}
               className="hover:bg-transparent"
             >

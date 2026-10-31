@@ -31,7 +31,7 @@ export const Route = createFileRoute('/_authentication')({
     // Um destino só, e não um por papel como na referência: aqui os dois papéis
     // - `EDITOR` e `ADMINISTRATOR` - entram no mesmo painel, e a diferença
     // entre eles é o `403` do backend em `/administrator/users`.
-    throw redirect({ to: '/painel' })
+    throw redirect({ to: '/dashboard' })
   },
   head: () => ({
     meta: [

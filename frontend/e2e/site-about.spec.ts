@@ -9,7 +9,7 @@ function textOf(value: unknown): string {
 }
 
 // docs/USER-FLOWS.md, "Editar o site", passos 1 e 3.
-test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta no fim', async ({
+test('a organização muda o texto do Sobre, o /about mostra, e o original volta no fim', async ({
   administrator: { page, context },
   browser,
   baseURL,
@@ -45,7 +45,7 @@ test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta
     const visitor = await browser.newContext({ baseURL })
     try {
       const site = await visitor.newPage()
-      await site.goto('/sobre')
+      await site.goto('/about')
       await expect(
         site.getByRole('heading', { level: 1, name: 'Sobre os jogos' }),
       ).toBeVisible()
