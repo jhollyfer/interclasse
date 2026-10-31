@@ -16,8 +16,8 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, AdministratorMatchAthletesResponse>
 
 /**
- * Quem pode levar cartão na partida: os alunos das duas turmas, os inscritos na
- * modalidade primeiro.
+ * Who can take a card in the match: the students of the two classrooms, the ones enrolled in the
+ * sport first.
  */
 @inject()
 export default class AdministratorMatchAthletesUseCase {

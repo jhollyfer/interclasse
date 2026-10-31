@@ -10,12 +10,12 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorMatchScoreController {
   static docs = defineDocs({
-    summary: 'Lançar placar',
+    summary: 'Record score',
     description:
-      'Grava o placar e encerra a partida. Pode ser repetido para corrigir.\n\n' +
-      'O vencedor vai sozinho para a partida seguinte, e a final encerra a chave. Empate ' +
-      'exige `winnerTeamId` - quem venceu nos pênaltis. Corrigir o vencedor depois que a ' +
-      'partida seguinte já tem placar responde `409`.',
+      'Saves the score and ends the match. It can be repeated to correct.\n\n' +
+      'The winner goes on its own to the next match, and the final ends the bracket. A draw ' +
+      'requires `winnerTeamId` - who won on penalties. Correcting the winner after the ' +
+      'next match already has a score responds `409`.',
   })
 
   constructor(private readonly useCase: AdministratorMatchScoreUseCase) {}

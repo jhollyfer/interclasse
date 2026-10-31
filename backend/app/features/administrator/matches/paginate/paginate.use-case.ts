@@ -17,7 +17,7 @@ import type { AdministratorMatchPaginatePayload } from '#validators/administrato
 type Payload = AdministratorMatchPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorMatchPaginateResponse>>
 
-/** A tabela de jogos: as marcadas por horário primeiro, depois as sem horário por rodada. */
+/** The match table: the scheduled ones by time first, then those without a time by round. */
 @inject()
 export default class AdministratorMatchPaginateUseCase {
   constructor(

@@ -16,7 +16,10 @@ import {
 test.group('matches > score', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o placar encerra a partida e sai com os times e a chave', async ({ client, assert }) => {
+  test('the score ends the match and comes out with the teams and the bracket', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket, home, match } = await scheduledMatch()
 
@@ -32,55 +35,58 @@ test.group('matches > score', (group) => {
     assert.equal(body(response).winnerTeamId, home.id)
     assert.isString(body(response).homeTeam.classroom.name)
     assert.equal(body(response).bracket.sport.id, bracket.sportId)
-    // A partida é a final: a chave encerra junto.
+    // The match is the final: the bracket ends along with it.
     await bracket.refresh()
     assert.equal(bracket.status, BRACKET_STATUS.FINISHED)
   })
 
-  test('do sorteio ao campeão: o vencedor avança sozinho', async ({ client, assert }) => {
+  test('from the draw to the champion: the winner advances on its own', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
 
-    const antes = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
-    const final = body(antes).matches.find(
+    const before = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const final = body(before).matches.find(
       (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
     assert.isString(final.homeTeamId)
     assert.isString(final.awayTeamId)
 
-    // Empate exige quem venceu nos pênaltis.
-    const semVencedor = await client
+    // A draw requires who won on penalties.
+    const noWinner = await client
       .put(`/administrator/matches/${final.id}/score`)
       .cookies(admin)
       .json({ homeScore: 1, awayScore: 1 })
-    semVencedor.assertStatus(422)
-    assert.equal(body(semVencedor).code, 'MATCH_WINNER_REQUIRED')
+    noWinner.assertStatus(422)
+    assert.equal(body(noWinner).code, 'MATCH_WINNER_REQUIRED')
 
-    const penaltis = await client
+    const penalties = await client
       .put(`/administrator/matches/${final.id}/score`)
       .cookies(admin)
       .json({ homeScore: 1, awayScore: 1, winnerTeamId: final.awayTeamId })
-    penaltis.assertStatus(200)
+    penalties.assertStatus(200)
 
-    const depois = await client.get(`/storefront/brackets/${bracket.id}`)
-    assert.equal(body(depois).status, 'FINISHED')
-    assert.equal(body(depois).championTeamId, final.awayTeamId)
+    const after = await client.get(`/storefront/brackets/${bracket.id}`)
+    assert.equal(body(after).status, 'FINISHED')
+    assert.equal(body(after).championTeamId, final.awayTeamId)
 
-    // Trocar o vencedor de uma semifinal depois da final jogada reescreveria a final.
-    const semi = body(depois).matches.find(
+    // Changing the winner of a semifinal after the final was played would rewrite the final.
+    const semi = body(after).matches.find(
       (match: { phase: string; winnerTeamId: string; homeTeamId: string }) =>
         match.phase === MATCH_PHASE.SEMI && match.winnerTeamId === match.homeTeamId,
     )
-    const virada = await client
+    const comeback = await client
       .put(`/administrator/matches/${semi.id}/score`)
       .cookies(admin)
       .json({ homeScore: 0, awayScore: 5 })
-    virada.assertStatus(409)
-    assert.equal(body(virada).code, 'NEXT_MATCH_PLAYED')
+    comeback.assertStatus(409)
+    assert.equal(body(comeback).code, 'NEXT_MATCH_PLAYED')
   })
 
-  test('corrigir o placar sem trocar o vencedor passa mesmo com a seguinte jogada', async ({
+  test('correcting the score without changing the winner passes even with the next one played', async ({
     client,
     assert,
   }) => {
@@ -88,10 +94,10 @@ test.group('matches > score', (group) => {
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.FINAL)
-    const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
-    const semi = jogada.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
+    const played = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
+    const semi = played.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
 
-    // 2 x 1 vira 4 x 0: o mandante segue vencedor, a final não muda.
+    // 2 x 1 becomes 4 x 0: the home team remains the winner, the final does not change.
     const response = await client
       .put(`/administrator/matches/${semi.id}/score`)
       .cookies(admin)
@@ -102,7 +108,7 @@ test.group('matches > score', (group) => {
     assert.equal(body(response).winnerTeamId, semi.homeTeamId)
   })
 
-  test('empate com vencedor de fora da partida responde 422', async ({ client, assert }) => {
+  test('draw with a winner from outside the match responds 422', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -116,16 +122,16 @@ test.group('matches > score', (group) => {
     assert.property(body(response).errors, 'winnerTeamId')
   })
 
-  test('partida sem os dois times responde 409', async ({ client, assert }) => {
+  test('match without both teams responds 409', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket } = await scheduledMatch()
-    const pendente = await MatchFactory.merge({
+    const pending = await MatchFactory.merge({
       bracketId: bracket.id,
       phase: MATCH_PHASE.SEMI,
     }).create()
 
     const response = await client
-      .put(`/administrator/matches/${pendente.id}/score`)
+      .put(`/administrator/matches/${pending.id}/score`)
       .cookies(admin)
       .json({ homeScore: 1, awayScore: 0 })
 
@@ -133,7 +139,7 @@ test.group('matches > score', (group) => {
     assert.equal(body(response).code, 'MATCH_TEAMS_PENDING')
   })
 
-  test('partida que não existe responde 404', async ({ client, assert }) => {
+  test('match that does not exist responds 404', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -145,7 +151,10 @@ test.group('matches > score', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
   })
 
-  test('placar negativo ou fracionado responde 422 e não grava', async ({ client, assert }) => {
+  test('negative or fractional score responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -163,16 +172,16 @@ test.group('matches > score', (group) => {
     assert.equal(bracket.status, BRACKET_STATUS.KNOCKOUT)
   })
 
-  test('sem sessão é 401, e o conselheiro recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/matches/${randomUUID()}/score`
-    const placar = { homeScore: 1, awayScore: 0 }
+    const score = { homeScore: 1, awayScore: 0 }
 
-    const anonimo = await client.put(url).json(placar)
-    const conselheiro = await client.put(url).cookies(advisor).json(placar)
+    const anonymous = await client.put(url).json(score)
+    const advisorSession = await client.put(url).cookies(advisor).json(score)
 
-    anonimo.assertStatus(401)
-    conselheiro.assertStatus(403)
-    assert.equal(body(conselheiro).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    advisorSession.assertStatus(403)
+    assert.equal(body(advisorSession).code, 'ACCESS_DENIED')
   })
 })

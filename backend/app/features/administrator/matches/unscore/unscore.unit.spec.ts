@@ -19,7 +19,7 @@ async function setup(total = 4) {
   return { brackets, useCase, bracket }
 }
 
-/** Lança o placar direto na entidade e grava: o arranjo do que o desfazer desfaz. */
+/** Records the score directly on the entity and saves: the arrangement of what undo undoes. */
 async function scored(
   brackets: BracketRepository,
   bracketId: string,
@@ -31,14 +31,14 @@ async function scored(
 }
 
 test.group('administrator/matches > unscore (unit)', () => {
-  test('tira o placar e o vencedor da vaga da seguinte', async ({ assert }) => {
+  test('removes the score and the winner from the next slot', async ({ assert }) => {
     const { brackets, useCase, bracket } = await setup()
     const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)
     await scored(brackets, bracket.id, semi?.id ?? '')
 
     const result = await useCase.execute({ id: semi?.id ?? '' })
 
-    if (result.isLeft()) throw new Error('desfazer deveria ser aceito')
+    if (result.isLeft()) throw new Error('undo should be accepted')
     assert.deepInclude(result.value, {
       status: MATCH_STATUS.SCHEDULED,
       homeScore: null,
@@ -50,7 +50,7 @@ test.group('administrator/matches > unscore (unit)', () => {
     assert.isNull(final?.homeTeamId)
   })
 
-  test('desfazer a final reabre a chave', async ({ assert }) => {
+  test('undoing the final reopens the bracket', async ({ assert }) => {
     const { brackets, useCase, bracket } = await setup(2)
     const final = bracket.snapshot().matches[0]
     await scored(brackets, bracket.id, final?.id ?? '')
@@ -61,7 +61,7 @@ test.group('administrator/matches > unscore (unit)', () => {
     assert.equal(saved?.snapshot().status, BRACKET_STATUS.KNOCKOUT)
   })
 
-  test('partida inexistente é 404 MATCH_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent match is 404 MATCH_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })
@@ -69,7 +69,7 @@ test.group('administrator/matches > unscore (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'MATCH_NOT_FOUND' })
   })
 
-  test('partida sem placar é 409 MATCH_NOT_PLAYED', async ({ assert }) => {
+  test('match without a score is 409 MATCH_NOT_PLAYED', async ({ assert }) => {
     const { useCase, bracket } = await setup()
     const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)
 
@@ -78,7 +78,9 @@ test.group('administrator/matches > unscore (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'MATCH_NOT_PLAYED' })
   })
 
-  test('com a seguinte já jogada é 409 NEXT_MATCH_PLAYED e o placar fica', async ({ assert }) => {
+  test('with the next one already played is 409 NEXT_MATCH_PLAYED and the score stays', async ({
+    assert,
+  }) => {
     const { brackets, useCase, bracket } = await setup()
     const matches = bracket.snapshot().matches
     const first = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)

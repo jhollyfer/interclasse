@@ -10,8 +10,8 @@ import { AdministratorMatchPaginateValidator } from '#validators/administrator/m
 export default class AdministratorMatchPaginateController {
   static docs = defineDocs({
     description:
-      'A tabela de jogos: partidas com os dois times definidos, as marcadas por horário ' +
-      'primeiro. Filtra por chave, modalidade, categoria, fase e status.',
+      'The match table: matches with both teams defined, the scheduled ones by time ' +
+      'first. Filters by bracket, sport, category, phase and status.',
   })
 
   constructor(private readonly useCase: AdministratorMatchPaginateUseCase) {}

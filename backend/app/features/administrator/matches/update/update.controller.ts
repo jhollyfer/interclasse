@@ -10,10 +10,10 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorMatchUpdateController {
   static docs = defineDocs({
-    summary: 'Agendar partida',
+    summary: 'Schedule match',
     description:
-      'Data, hora e local. `scheduledAt` em ISO 8601 com fuso. `null` desmarca. O placar ' +
-      'não entra aqui: é `PUT /administrator/matches/:id/score`.',
+      'Date, time and place. `scheduledAt` in ISO 8601 with a time zone. `null` unschedules. The score ' +
+      'does not go in here: it is `PUT /administrator/matches/:id/score`.',
   })
 
   constructor(private readonly useCase: AdministratorMatchUpdateUseCase) {}

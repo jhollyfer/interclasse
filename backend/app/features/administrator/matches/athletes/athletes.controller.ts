@@ -9,10 +9,10 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorMatchAthletesController {
   static docs = defineDocs({
-    summary: 'Listar atletas da partida',
+    summary: 'List match athletes',
     description:
-      'Os alunos das duas turmas da partida, com os inscritos na modalidade marcados. É de ' +
-      'onde sai o atleta de um cartão.',
+      'The students of the two classrooms of the match, with those enrolled in the sport marked. It is where ' +
+      'the athlete of a card comes from.',
   })
 
   constructor(private readonly useCase: AdministratorMatchAthletesUseCase) {}
