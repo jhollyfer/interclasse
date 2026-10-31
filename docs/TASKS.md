@@ -125,6 +125,16 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 7.9 | Lições do adacaibs conferidas contra o código | Média | Feita | #255. Conferido: hook de fiação sem teste próprio (`use-mutation-form`, agora com teste); sem schema local em `lib/`; renomeios desta fase com `grep` do nome antigo. Cobertura de “spec reimplementa a função” e “comentário muda com a condição” não é verificável por varredura e fica para a revisão de cada diff |
 | 7.10 | Estreitar o left dos métodos de domínio por operação (`Extract<BracketError, …>`) para o `openapi.json` não listar código de outra operação | Baixa | A fazer | efeito da 7.5 |
 
+## Fase 8 · Idioma inglês no código (0/3)
+
+`_standards/typescript.md` §12: identificador, comentário, JSDoc, justificativa de `eslint-disable`, título de teste e rota em inglês; Markdown segue em pt-BR. Rotas públicas trocam sem redirect (decisão do dono, 31/10).
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 8.1 | Backend `app/features/` em inglês | Média | Em andamento | |
+| 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Em andamento | |
+| 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Em andamento | sem redirect |
+
 ## Fase N · Ideias (fora do escopo atual)
 
 - Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10
