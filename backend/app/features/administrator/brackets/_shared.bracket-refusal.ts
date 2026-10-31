@@ -5,9 +5,9 @@ import HTTPException from '#exceptions/http.exception'
 import type { BracketError } from '#domain/bracket/bracket.errors'
 
 /**
- * Cada recusa da chave como resposta HTTP, a mesma no sorteio e no apagar
- * (`_standards/domain.md` §2). Tabela por `code`: o fato que carrega dado chega
- * estreitado, e fato novo sem entrada não compila.
+ * Each refusal of the bracket as an HTTP response, the same in the draw and in the delete
+ * (`_standards/domain.md` §2). Table by `code`: the fact that carries data arrives
+ * narrowed, and a new fact without an entry does not compile.
  */
 export class BracketRefusal extends RefusalBase {
   private static readonly TABLE = {

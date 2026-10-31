@@ -18,13 +18,13 @@ async function setup() {
 }
 
 test.group('administrator/brackets > preview (unit)', () => {
-  test('conta os atletas de cada turma e marca quem entra', async ({ assert }) => {
+  test('counts the athletes of each classroom and marks who enters', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport, classrooms } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B'])
 
     const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
 
-    if (result.isLeft()) throw new Error('prévia deveria existir')
+    if (result.isLeft()) throw new Error('preview should exist')
     assert.deepInclude(result.value, { minAthletes: 1, maxTeams: 16, drawn: false })
     assert.sameMembers(
       result.value.classrooms.map((classroom) => classroom.id),
@@ -32,7 +32,7 @@ test.group('administrator/brackets > preview (unit)', () => {
     )
   })
 
-  test('avisa quando a chave já foi sorteada', async ({ assert }) => {
+  test('warns when the bracket was already drawn', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.drawn(brackets)
 
@@ -41,7 +41,7 @@ test.group('administrator/brackets > preview (unit)', () => {
     assert.isTrue(result.isRight() && result.value.drawn)
   })
 
-  test('modalidade inexistente é 422 SPORT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent sport is 422 SPORT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
