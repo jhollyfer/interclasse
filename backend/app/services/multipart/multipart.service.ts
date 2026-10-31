@@ -37,6 +37,15 @@ const URL_EXPIRES_IN = 60 * 60
 const SIGNABLE_HEADERS = new Set(['content-type', 'content-length'])
 
 /**
+ * A parte do multipart não tem tipo: o `UploadPart` não leva `ContentType`, e o
+ * `Blob.slice` do navegador sobe sem `Content-Type`. Assinar `content-type` aqui
+ * declara um header que a requisição não manda, e o S3 de verdade (MinIO, AWS)
+ * recusa com "headers present in the request which were not signed". A parte
+ * prende só o tamanho.
+ */
+const PART_SIGNABLE_HEADERS = new Set(['content-length'])
+
+/**
  * O multipart do S3, que o FlyDrive não expõe.
  *
  * O FlyDrive cobre o arquivo inteiro - `put`, `get`, `delete`, `getUrl`,
@@ -107,7 +116,7 @@ export default class MultipartService extends MultipartContract {
             PartNumber: partNumber,
             ContentLength: size,
           }),
-          { expiresIn, signableHeaders: SIGNABLE_HEADERS },
+          { expiresIn, signableHeaders: PART_SIGNABLE_HEADERS },
         )
 
         return { partNumber, url }
