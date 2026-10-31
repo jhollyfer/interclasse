@@ -28,6 +28,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - A tela de entrada do painel passa de `/authentication` para `/sign-in`.
 - `robots.txt` e `sitemap.xml` passam a ser gerados pelo servidor: o mapa do site lista as páginas públicas e as chaves, uma entrada por idioma, e fora de produção o `robots.txt` proíbe a indexação.
 - O layout salvo das tabelas (colunas escondidas, ordem, largura) volta ao padrão uma vez, porque a chave de armazenamento mudou.
+- Os endereços do site passam para inglês, sem redirecionamento: `/classificacao` vira `/standings`, `/jogos` vira `/matches`, `/avisos` vira `/announcements`, `/sobre` vira `/about` (com os prefixos `/es` e `/en`), e a entrada do painel `/painel` vira `/dashboard`. Link salvo com o endereço antigo deixa de abrir.
 
 ## [0.1.0] - 2026-10-29
 
