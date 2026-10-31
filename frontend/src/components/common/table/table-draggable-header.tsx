@@ -17,15 +17,15 @@ type TableDraggableHeaderProps<TRow extends RowData> = Readonly<{
 }>
 
 /**
- * A alça de arrastar coluna, à esquerda do título.
+ * The column drag handle, to the left of the title.
  *
- * Coluna **fixada não arrasta**: ela saiu do fluxo horizontal para ficar parada
- * na borda, e reordená-la moveria uma coluna que a pessoa não está vendo se
- * mexer. Coluna que não pode ser escondida (seleção, ações) também não arrasta -
- * são âncoras da tabela, não conteúdo.
+ * A **pinned column does not drag**: it left the horizontal flow to stay still
+ * on the edge, and reordering it would move a column the person does not see
+ * moving. A column that cannot be hidden (selection, actions) does not drag either -
+ * they are table anchors, not content.
  *
- * A alça aparece no hover da célula de cabeçalho (`group/th`), e não sempre:
- * seis pontinhos em toda coluna competem com o título pela atenção.
+ * The handle appears on hover of the header cell (`group/th`), and not always:
+ * six little dots on every column compete with the title for attention.
  */
 export function TableDraggableHeader<TRow extends RowData>({
   header,
@@ -67,9 +67,9 @@ export function TableDraggableHeader<TRow extends RowData>({
           className={cn(
             '-ml-1 size-5 cursor-grab opacity-0 transition-opacity',
             'group-hover/th:opacity-100 active:cursor-grabbing',
-            // Sem isto o punho é invisível para quem navega por teclado: ele
-            // está na ordem de tabulação, tem `aria-label`, e só aparecia no
-            // hover do mouse - o foco parava num botão que não existia na tela.
+            // Without this the handle is invisible to keyboard users: it
+            // is in the tab order, has `aria-label`, and only showed up on
+            // mouse hover - focus landed on a button that did not exist on screen.
             'focus-visible:opacity-100',
             'motion-reduce:transition-none',
           )}

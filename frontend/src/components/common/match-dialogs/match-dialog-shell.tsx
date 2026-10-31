@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Dialog, DialogContent } from '#/components/ui/dialog'
 import type { DialogHandle } from '#/lib/dialog-handle'
 
-/** O mínimo de uma partida que os diálogos precisam. */
+/** The minimum of a match that the dialogs need. */
 export type MatchRef = Readonly<{
   id: string
   phase: string
@@ -19,18 +19,18 @@ export type MatchRef = Readonly<{
 }>
 
 type MatchDialogShellProps = Readonly<{
-  /** Um handle por diálogo; a tabela abre com `handle.openWithPayload(partida)`. */
+  /** One handle per dialog; the table opens with `handle.openWithPayload(match)`. */
   handle: DialogHandle<MatchRef>
   className?: string
-  /** O conteúdo, montado só aberto e com a partida do clique. */
+  /** The content, mounted only when open and with the clicked match. */
   children: (match: MatchRef) => React.ReactNode
 }>
 
 /**
- * O casco dos diálogos de partida: uncontrolled, aberto por `handle` com a
- * partida como payload (`frontend.md` §6.2). O conteúdo só monta aberto, então
- * o formulário nasce com a partida do clique e some ao fechar - sem `key`, sem
- * estado de "qual partida" na tela.
+ * The match dialogs' shell: uncontrolled, opened by `handle` with the
+ * match as payload (`frontend.md` §6.2). The content only mounts open, so
+ * the form is born with the clicked match and vanishes on close - no `key`, no
+ * "which match" state on the screen.
  * _doc-lib/base-ui.md#react/components/dialog.
  */
 export function MatchDialogShell({

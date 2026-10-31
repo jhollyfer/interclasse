@@ -10,7 +10,7 @@ import { m } from '#/paraglide/messages'
 
 import { useImageFieldContext } from './image-field-context'
 
-/** A coluna à direita do preview: os botões e a descrição. */
+/** The column to the right of the preview: the buttons and the description. */
 export function ImageFieldContent(
   props: React.ComponentProps<typeof FieldContent>,
 ): React.JSX.Element {
@@ -18,11 +18,11 @@ export function ImageFieldContent(
 }
 
 /**
- * A linha de botões.
+ * The row of buttons.
  *
- * Cada botão entra num `ButtonGroup` próprio, como em `PageHeaderActions`: o
- * `ButtonGroup` cola os filhos diretos, e "Enviar" e "Remover" são ações
- * independentes, não um controle segmentado.
+ * Each button goes in its own `ButtonGroup`, as in `PageHeaderActions`: the
+ * `ButtonGroup` glues its direct children together, and "Enviar" and "Remover" are
+ * independent actions, not a segmented control.
  */
 export function ImageFieldActions({
   children,
@@ -43,8 +43,8 @@ type ImageFieldUploadProps = Readonly<
 >
 
 /**
- * O botão que abre o seletor de arquivo. Os children são o rótulo - "Enviar
- * avatar", "Foto do depoimento" -, que antes era a prop `label`.
+ * The button that opens the file picker. The children are the label - "Enviar
+ * avatar", "Foto do depoimento" -, which used to be the `label` prop.
  */
 export function ImageFieldUpload({
   children,
@@ -74,10 +74,10 @@ export function ImageFieldUpload({
 }
 
 /**
- * O botão que tira a imagem. Some quando não há o que tirar - e some sozinho,
- * para a tela não precisar repetir a condição.
+ * The button that removes the image. It disappears when there is nothing to remove - and does so
+ * on its own, so the screen does not need to repeat the condition.
  *
- * Sem children escreve "Remover", que é o que todos os campos dizem.
+ * Without children it writes "Remover", which is what all the fields say.
  */
 export function ImageFieldRemove({
   children = m.common_remove(),
@@ -107,8 +107,8 @@ export function ImageFieldRemove({
 }
 
 /**
- * A linha que diz o que o seletor aceita. Sem children escreve os formatos
- * padrão do `ImageField`; a tela que aceitar outro conjunto escreve o dela.
+ * The line that says what the picker accepts. Without children it writes the
+ * `ImageField` default formats; a screen that accepts another set writes its own.
  */
 export function ImageFieldDescription({
   children = m.common_image_formats(),

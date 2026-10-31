@@ -26,27 +26,27 @@ import { useTableContext } from './table-context'
 import type { TableFeatures } from './use-table'
 
 type TableColumnHeaderProps<TRow extends RowData> = Readonly<{
-  /** O rótulo da coluna. */
+  /** The column's label. */
   children: React.ReactNode
   /**
-   * A coluna do backend por trás desta. Ausente, o cabeçalho é só o título -
-   * nem toda coluna da tela existe como coluna no banco.
+   * The backend column behind this one. When absent, the header is just the title -
+   * not every screen column exists as a column in the database.
    */
   sortKey?: string
   column?: Column<TableFeatures, TRow, unknown>
 }>
 
 /**
- * O cabeçalho de uma coluna: título, ordenação e fixação.
+ * A column header: title, sorting and pinning.
  *
- * **A ordem vai para a URL, não para a tabela.** Registrar `rowSortingFeature`
- * ordenaria as 20 linhas da página em mãos - a linha 21, que está na página
- * seguinte, apareceria fora de lugar. O menu escreve `?sort` e `?direction`, o
- * loader refaz a consulta, e o backend devolve a página certa já ordenada.
+ * **The order goes to the URL, not to the table.** Registering `rowSortingFeature`
+ * would sort the 20 rows of the page in hand - row 21, which is on the next
+ * page, would show up out of place. The menu writes `?sort` and `?direction`, the
+ * loader redoes the query, and the backend returns the right page already sorted.
  *
- * A fixação, ao contrário, é decisão de tela e mora na tabela: qual coluna
- * continua visível ao rolar na horizontal não é pergunta que o servidor
- * responde.
+ * Pinning, on the other hand, is a screen decision and lives in the table: which
+ * column stays visible when scrolling horizontally is not a question the server
+ * answers.
  */
 export function TableColumnHeader<TRow extends RowData>({
   children,
@@ -59,7 +59,7 @@ export function TableColumnHeader<TRow extends RowData>({
   const pinned = column?.getIsPinned()
   const canPin = Boolean(column)
 
-  // Sem coluna do banco nem coluna da tabela não há menu nenhum a oferecer.
+  // With neither a database column nor a table column there is no menu to offer.
   if (!sortKey && !canPin)
     return <span className="font-medium">{children}</span>
 
@@ -69,8 +69,8 @@ export function TableColumnHeader<TRow extends RowData>({
   function sort(next: SortDirection): void {
     void navigate({
       to,
-      // A ordem muda a página 1 tanto quanto o filtro: manter `page` levaria a
-      // uma página que não existe mais na ordem nova.
+      // The order changes page 1 as much as the filter does: keeping `page` would lead to
+      // a page that no longer exists in the new order.
       search: { ...search, sort: sortKey, direction: next, page: undefined },
     })
   }
@@ -92,8 +92,8 @@ export function TableColumnHeader<TRow extends RowData>({
               variant="ghost"
               size="icon"
               className="size-6"
-              // O rótulo em texto puro sai de `meta.label` - o que o slot recebe
-              // é markup, e `String(elemento)` daria `[object Object]`.
+              // The plain-text label comes from `meta.label` - what the slot receives
+              // is markup, and `String(element)` would give `[object Object]`.
               aria-label={m.table_column_options({
                 column:
                   column?.columnDef.meta?.label ?? m.table_column_fallback(),
@@ -128,8 +128,8 @@ export function TableColumnHeader<TRow extends RowData>({
           {sortKey && canPin && <DropdownMenuSeparator />}
 
           {/*
-            `start`/`end` e não `left`/`right`: na v9 a fixação é lógica, então
-            ela acompanha a direção do texto em vez de cravar um lado da tela.
+            `start`/`end` and not `left`/`right`: in v9 pinning is logical, so
+            it follows the text direction instead of nailing one side of the screen.
           */}
           {canPin && pinned !== 'start' && (
             <DropdownMenuItem onClick={() => column?.pin('start')}>

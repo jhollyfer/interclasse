@@ -16,17 +16,17 @@ import { m } from '#/paraglide/messages'
 import { useTableContext } from './table-context'
 
 /**
- * A área que rola: a tabela, o estado vazio e a barra de seleção.
+ * The scrolling area: the table, the empty state and the selection bar.
  *
- * A barra fica aqui dentro de propósito - `sticky bottom-4` só acompanha a
- * lista se estiver no mesmo contêiner que rola.
+ * The bar sits in here on purpose - `sticky bottom-4` only follows the
+ * list if it is in the same container that scrolls.
  *
- * **Erro antes de vazio, e num lugar só.** Nenhuma listagem do painel anterior
- * tinha estado de erro: a consulta falhava, devolvia zero linha, e o
- * `TableEmpty` anunciava "nenhum registro ainda" - que é o convite a cadastrar
- * de novo o que já existe, para alguém cujo único problema era a rede. Ficar
- * aqui e não em cada tela é o que garante que a próxima listagem nasça
- * coberta.
+ * **Error before empty, and in one place.** No listing on the previous dashboard
+ * had an error state: the query failed, returned zero rows, and
+ * `TableEmpty` announced "nenhum registro ainda" - which is the invitation to register
+ * again what already exists, to someone whose only problem was the network. Staying
+ * here and not on each screen is what guarantees the next listing is born
+ * covered.
  */
 export function TableContent({
   children,
@@ -49,8 +49,8 @@ export function TableContent({
             </EmptyDescription>
           </EmptyHeader>
 
-          {/* Sem `onRetry` o botão não aparece: um "tentar de novo" que não
-              refaz nada é pior que nenhum botão. */}
+          {/* Without `onRetry` the button does not appear: a "tentar de novo" that redoes
+              nothing is worse than no button. */}
           {onRetry && (
             <EmptyContent>
               <Button variant="outline" onClick={onRetry}>

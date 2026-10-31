@@ -7,21 +7,21 @@ import {
 } from '#/integrations/tanstack-query/queries/advisor'
 import { loadOrNotFound } from '#/lib/load-or-not-found'
 
-/** A lista de alunos inteira: uma turma não passa de 40. */
+/** The whole student list: a classroom never exceeds 40. */
 export function studentsOf(classroomId: string) {
   return { classroomId, perPage: 100 }
 }
 
 /**
- * As turmas visíveis a quem está no painel, para o quadro lateral do detalhe:
- * o conselheiro vê a dele, o administrador todas. A escola tem 24.
+ * The classrooms visible to whoever is on the dashboard, for the detail's side panel:
+ * the advisor sees their own, the administrator all. The school has 24.
  */
 export const VISIBLE_CLASSROOMS = { perPage: 100 }
 
 /**
- * O que o detalhe da turma lê antes de desenhar, igual no administrador e no
- * conselheiro. Turma alheia também é 404: o servidor não confirma que ela
- * existe.
+ * What the classroom detail reads before drawing, the same for the administrator and
+ * the advisor. Someone else's classroom is also a 404: the server does not confirm it
+ * exists.
  */
 export async function loadClassroomDetail(
   queryClient: QueryClient,

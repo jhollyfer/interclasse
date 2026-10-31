@@ -42,7 +42,7 @@ describe('groupByDay', () => {
   })
 
   it('a virada do dia usa o relógio da escola, e não o UTC', () => {
-    // 02:00 UTC de 17/10 ainda é 22:00 de 16/10 em Manaus.
+    // 02:00 UTC on 10/17 is still 22:00 on 10/16 in Manaus.
     const days = groupByDay([
       match({ id: 'a', scheduledAt: '2026-10-17T02:00:00.000Z' }),
     ])

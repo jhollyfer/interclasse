@@ -43,7 +43,7 @@ import type { MatchRef } from './match-dialog-shell'
 
 const FIELDS = ['studentId', 'color', 'note'] as const
 
-/** Quem não está na lista da modalidade aparece, mas avisado. */
+/** Someone who is not on the sport's list appears, but flagged. */
 function athleteLabel(student: { name: string; enrolled: boolean }): string {
   if (student.enrolled) return student.name
 
@@ -55,8 +55,8 @@ type MatchCardsDialogProps = Readonly<{
 }>
 
 /**
- * Os cartões da partida: os já lançados, com o apagar, e o formulário do novo.
- * O atleta sai das duas turmas da partida, os inscritos na modalidade primeiro.
+ * The match's cards: the ones already recorded, with delete, and the form for a new one.
+ * The athlete comes from the match's two classrooms, those enrolled in the sport first.
  */
 export function MatchCardsDialog({
   handle,
@@ -97,8 +97,8 @@ function MatchCardsContent({
       form.reset({ matchId: match.id, studentId: '', note: '' }),
   })
 
-  // Uma lista só, com a turma no rótulo: o combobox busca por texto, e quem
-  // não está inscrito na modalidade segue avisado em `athleteLabel`.
+  // A single list, with the classroom in the label: the combobox searches by text, and whoever
+  // is not enrolled in the sport is still flagged in `athleteLabel`.
   const athleteOptions = (athletes?.teams ?? []).flatMap((team) =>
     team.students.map((student) => ({
       value: student.id,

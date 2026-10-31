@@ -7,9 +7,9 @@ import { RICH_TEXT_EXTENSIONS } from '#/components/common/rich-text'
 import { RichEditorProvider } from './rich-editor-context'
 
 type RichEditorProps = Readonly<{
-  /** O JSON gravado (`editor.getJSON()`), ou `null` num cadastro novo. */
+  /** The saved JSON (`editor.getJSON()`), or `null` on a new record. */
   value: JSONContent | null
-  /** Recebe o JSON a cada edição: é o que vai no payload, nunca HTML. */
+  /** Receives the JSON on every edit: it is what goes in the payload, never HTML. */
   onValueChange: (value: JSONContent) => void
   disabled?: boolean
   /** `RichEditorToolbar` e `RichEditorContent`. */
@@ -17,16 +17,16 @@ type RichEditorProps = Readonly<{
 }>
 
 /**
- * O editor de texto rico, sobre o Tiptap, que grava o JSON do documento.
+ * The rich text editor, on top of Tiptap, which saves the document's JSON.
  *
- * Carregado sob demanda (`frontend.md` §9.4): quem usa importa este módulo por
- * `React.lazy`, para o Tiptap não entrar no bundle das telas que só leem
+ * Loaded on demand (`frontend.md` §9.4): whoever uses it imports this module through
+ * `React.lazy`, so Tiptap does not enter the bundle of screens that only read
  * (`RichText`).
  *
- * `immediatelyRender: false`, que a doc pede em qualquer framework com SSR
- * (_doc-lib/tiptap.md#getting-started/install/react). O `content` entra só na
- * criação: depois dela o editor é a fonte do texto, e reescrevê-lo a cada
- * render devolveria o cursor ao início.
+ * `immediatelyRender: false`, which the docs ask for in any framework with SSR
+ * (_doc-lib/tiptap.md#getting-started/install/react). The `content` enters only on
+ * creation: after that the editor is the source of the text, and rewriting it on every
+ * render would send the cursor back to the start.
  */
 export function RichEditor({
   value,
@@ -46,8 +46,8 @@ export function RichEditor({
     editor?.setEditable(!disabled)
   }, [editor, disabled])
 
-  // Antes do primeiro quadro no cliente o editor ainda não existe: nada a
-  // compartilhar, e as partes não renderizam.
+  // Before the first frame on the client the editor does not exist yet: nothing to
+  // share, and the parts do not render.
   if (!editor) return null
 
   const context = { editor }

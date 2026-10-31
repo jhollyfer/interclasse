@@ -9,7 +9,7 @@ type SubmitButtonProps = Readonly<
   Merge<
     Omit<React.ComponentProps<typeof Button>, 'isPending' | 'children'>,
     {
-      /** A mutation está em voo? Mostra o spinner e trava o botão. */
+      /** Is the mutation in flight? Shows the spinner and locks the button. */
       isPending?: boolean
       children: React.ReactNode
     }
@@ -17,16 +17,16 @@ type SubmitButtonProps = Readonly<
 >
 
 /**
- * O botão de salvar de todo formulário do painel.
+ * The save button for every dashboard form.
  *
- * Existe por um motivo só: ele trava sozinho enquanto há **upload** em
- * andamento. O anexo é enviado na escolha do arquivo, e o formulário só conhece
- * o `id` depois que o arquivo existe - salvar no meio manda um payload sem o
- * anexo, e o registro nasce sem imagem, sem erro nenhum que denuncie.
+ * It exists for a single reason: it locks itself while an **upload** is in
+ * progress. The attachment is uploaded when the file is chosen, and the form only knows
+ * the `id` after the file exists - saving in the middle sends a payload without the
+ * attachment, and the record is born without an image, with no error to give it away.
  *
- * Um componente e não duas linhas em cada tela porque é um formulário por
- * recurso - notícia, evento, podcast, vídeo, álbum, depoimento, usuário -, e
- * duas linhas repetidas sete vezes são sete chances de esquecer numa oitava.
+ * A component and not two lines on each screen because there is one form per
+ * resource - news, event, podcast, video, album, testimonial, user -, and
+ * two lines repeated seven times are seven chances to forget on an eighth.
  */
 export function SubmitButton({
   isPending,

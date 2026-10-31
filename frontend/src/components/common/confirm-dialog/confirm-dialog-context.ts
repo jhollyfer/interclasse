@@ -1,17 +1,17 @@
 import * as React from 'react'
 
 /**
- * O que a confirmação inteira compartilha - e nada além.
+ * What the whole confirmation shares - and nothing else.
  *
- * A ação e o peso dela ficam aqui porque quem os declara é a tela, no topo, e
- * quem os usa é o botão de confirmar, três níveis abaixo. Passá-los por prop
- * até lá seria repetir os dois em todo `ConfirmDialogConfirm` de toda tela.
+ * The action and its weight live here because the screen declares them, at the top, and
+ * the confirm button uses them, three levels down. Passing them by prop
+ * down there would repeat both in every `ConfirmDialogConfirm` of every screen.
  *
- * O texto **não** está aqui: ele é markup, e markup vai por slot.
+ * The text is **not** here: it is markup, and markup goes by slot.
  */
 export type ConfirmDialogContextValue = {
   onConfirm: () => void
-  /** Ação sem volta pinta o botão de vermelho. */
+  /** An irreversible action paints the button red. */
   destructive: boolean
 }
 
@@ -21,11 +21,11 @@ const ConfirmDialogContext =
 export const ConfirmDialogProvider = ConfirmDialogContext.Provider
 
 /**
- * A ação confirmada, para quem está dentro de `ConfirmDialog`.
+ * The confirmed action, for whoever is inside `ConfirmDialog`.
  *
- * O `consumer` entra na mensagem para o erro dizer **qual** parte ficou fora do
- * provider - sem isso o `throw` reporta "faltou provider" e deixa a busca por
- * conta de quem lê a stack.
+ * The `consumer` goes into the message so the error says **which** part was left outside the
+ * provider - without it the `throw` reports "missing provider" and leaves the search to
+ * whoever reads the stack.
  */
 export function useConfirmDialogContext(
   consumer: string,

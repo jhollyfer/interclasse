@@ -14,7 +14,7 @@ import { MultiFileUploadProvider } from './multi-file-upload-context'
 import type { UploadItem } from './multi-file-upload-context'
 
 type MultiFileUploadProps = Readonly<{
-  /** Recebe os `id` dos anexos já enviados a cada mudança: é o que vai no payload. */
+  /** Receives the `id`s of the already uploaded attachments on every change: it is what goes in the payload. */
   onValueChange: (storageIds: ReadonlyArray<string>) => void
   accept?: ReadonlyArray<StorageMimetype>
   id?: string
@@ -23,13 +23,13 @@ type MultiFileUploadProps = Readonly<{
 }>
 
 /**
- * Campo que sobe vários arquivos na escolha, cada um com a própria barra e
- * cancelável (`frontend.md` §8). É o par de `ImageField` para a lista: o envio
- * é do `useMultipartUpload`, o campo registra o voo no `uploading-context` (o
- * submit espera) e o arquivo trocado ou tirado, que nunca teve dono, é apagado.
+ * A field that uploads several files on choice, each with its own bar and
+ * cancellable (`frontend.md` §8). It is `ImageField`'s counterpart for lists: the upload
+ * belongs to `useMultipartUpload`, the field registers the flight in the `uploading-context` (the
+ * submit waits) and a replaced or removed file, which never had an owner, is deleted.
  *
- * Os envios correm em paralelo, e o sinal de cada um é abortado quando o campo
- * sai de cena (`useAbortOnUnmount`).
+ * The uploads run in parallel, and each one's signal is aborted when the field
+ * leaves the stage (`useAbortOnUnmount`).
  */
 export function MultiFileUpload({
   onValueChange,
@@ -38,13 +38,13 @@ export function MultiFileUpload({
   children,
 }: MultiFileUploadProps): React.JSX.Element {
   const inputRef = React.useRef<HTMLInputElement>(null)
-  // Um controller por arquivo: cancelar um envio não pode abortar os outros.
+  // One controller per file: cancelling one upload must not abort the others.
   const controllers = React.useRef(new Map<string, AbortController>())
   const [items, setItems] = React.useState<ReadonlyArray<UploadItem>>([])
   const { upload } = useMultipartUpload()
   const nextSignal = useAbortOnUnmount()
   const discard = useStorageDeleteMutation({
-    // Faxina, e não uma ação pedida: falhar deixa um órfão, como antes.
+    // Cleanup, not a requested action: failing leaves an orphan, as before.
     onError: () => undefined,
   })
 
@@ -82,7 +82,7 @@ export function MultiFileUpload({
       controllers.current.delete(key)
       change(key, { status: 'done', percent: 100, storageId: storage.id })
     } catch (error) {
-      // Cancelado pela pessoa: o item já saiu da fila, e não há falha a contar.
+      // Cancelled by the person: the item already left the queue, and there is no failure to count.
       if (controller.signal.aborted) return
 
       change(key, { status: 'failed' })
@@ -98,8 +98,8 @@ export function MultiFileUpload({
   function onSelect(event: React.ChangeEvent<HTMLInputElement>): void {
     for (const file of event.target.files ?? []) void start(file)
 
-    // Sem isto, escolher o mesmo arquivo duas vezes seguidas não dispara o
-    // `change` de novo.
+    // Without this, choosing the same file twice in a row does not fire
+    // `change` again.
     event.target.value = ''
   }
 
@@ -120,12 +120,12 @@ export function MultiFileUpload({
 
   const isUploading = items.some((item) => item.status === 'uploading')
 
-  // Trava o submit enquanto algum arquivo sobe: sem isso o payload sai sem o
-  // `id` do anexo.
+  // Locks the submit while any file uploads: without it the payload leaves without the
+  // attachment's `id`.
   useRegisterUpload(isUploading)
 
-  // A lista de `id` vira primitiva para a dependência do efeito, e o aviso ao
-  // pai fica fora das deps (`useEffectEvent`): trocar o callback não reenvia.
+  // The `id` list becomes a primitive for the effect's dependency, and the notice to the
+  // parent stays out of the deps (`useEffectEvent`): swapping the callback does not resend.
   const doneIds = items.flatMap((item) => item.storageId ?? [])
   const doneKey = doneIds.join(',')
   const notify = React.useEffectEvent(() => onValueChange(doneIds))
@@ -142,8 +142,8 @@ export function MultiFileUpload({
         {children}
       </MultiFileUploadProvider>
 
-      {/* O `<input type="file">` nativo não é estilizável: fica escondido atrás
-          do botão visível (`MultiFileUploadTrigger`), como no `ImageField`. */}
+      {/* The native `<input type="file">` cannot be styled: it stays hidden behind
+          the visible button (`MultiFileUploadTrigger`), as in `ImageField`. */}
       <input
         ref={inputRef}
         type="file"

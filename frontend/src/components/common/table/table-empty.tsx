@@ -14,16 +14,16 @@ import type { TableInstance } from './use-table'
 
 type TableEmptyProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
-  /** O texto e a ação do vazio de verdade - o filtro e a lixeira têm os seus. */
+  /** The text and action of a true empty - the filter and the trash have their own. */
   children?: React.ReactNode
 }>
 
 /**
- * O que aparece no lugar da tabela quando não há linha nenhuma: o
- * `EmptyState` do kit, com o motivo lido do `search` da URL.
+ * What appears in place of the table when there is no row at all: the kit's
+ * `EmptyState`, with the reason read from the URL's `search`.
  *
- * Decide sozinho se renderiza, lendo a contagem de linhas da instância - uma
- * prop `isEmpty` seria segunda fonte de verdade ao lado da tabela.
+ * It decides on its own whether to render, reading the row count from the instance - an
+ * `isEmpty` prop would be a second source of truth next to the table.
  */
 export function TableEmpty<TRow extends RowData>({
   table,
@@ -32,8 +32,8 @@ export function TableEmpty<TRow extends RowData>({
   const { to, search } = useTableContext('TableEmpty')
   const navigate = useNavigate()
 
-  // O filtro vence a lixeira: buscar dentro dela e não achar nada é problema do
-  // termo, não da lixeira estar vazia.
+  // The filter beats the trash: searching inside it and finding nothing is a problem with the
+  // term, not with the trash being empty.
   let reason: EmptyStateReason = 'empty'
   if (search.trashed === TRASHED_MODE.ONLY) reason = 'trash'
   if (search.search) reason = 'filtered'

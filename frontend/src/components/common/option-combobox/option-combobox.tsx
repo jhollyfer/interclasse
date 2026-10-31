@@ -16,58 +16,57 @@ import { m } from '#/paraglide/messages'
 export type OptionComboboxItem = {
   value: string
   label: string
-  /** A classe de cor da bolinha do estado, quando o campo tem uma. */
+  /** The color class of the state dot, when the field has one. */
   dot?: string
 }
 
 type OptionComboboxProps = Readonly<{
   options: ReadonlyArray<OptionComboboxItem>
-  /** O valor escolhido. `''` é "nada escolhido", como no resto dos formulários. */
+  /** The chosen value. `''` means "nothing chosen", as in the rest of the forms. */
   value: string | null | undefined
   onValueChange: (value: string) => void
-  /** Vai no campo de busca: os formulários daqui validam em `onTouched`. */
+  /** Goes on the search field: the forms here validate on `onTouched`. */
   onBlur?: () => void
   id?: string
   placeholder?: string
   disabled?: boolean
-  /** Mostra o × que limpa. Ligado no filtro, desligado no campo obrigatório. */
+  /** Shows the clearing ×. On in the filter, off in the required field. */
   clearable?: boolean
-  /** Um ícone antes do valor, no mesmo lugar da bolinha de estado. */
+  /** An icon before the value, in the same place as the state dot. */
   icon?: React.ReactNode
   'aria-invalid'?: boolean
   'aria-label'?: string
   className?: string
   /**
-   * Liga a busca no servidor: o que se digita sobe por aqui e a lista de
-   * `options` já vem filtrada, então o filtro do cliente é desligado.
+   * Turns on server search: what is typed goes up through here and the `options`
+   * list already comes filtered, so the client filter is turned off.
    */
   onSearch?: (term: string) => void
-  /** Há mais páginas no servidor: mostra "Carregar mais" no fim da lista. */
+  /** There are more pages on the server: shows "Carregar mais" at the end of the list. */
   hasMore?: boolean
   onLoadMore?: () => void
 }>
 
 /**
- * O campo de escolher um valor de uma lista fechada.
+ * The field for choosing a value from a closed list.
  *
- * Uma peça só para as duas formas que existem no painel - o enum com mapa de
- * rótulos (status, categoria, papel) e a lista de entidade já carregada (álbum,
- * arquivo) -, porque as duas viram o mesmo `{ value, label }` e as duas
- * tropeçam nas mesmas duas coisas:
+ * One piece for the two forms that exist on the dashboard - the enum with a label
+ * map (status, category, role) and the already loaded entity list (album,
+ * file) -, because both become the same `{ value, label }` and both
+ * trip over the same two things:
  *
- * **O `onBlur` não fica na raiz.** `{...field}` do React Hook Form não serve
- * aqui: o `onBlur` precisa ir no campo de busca, e é dele que o
- * `mode: 'onTouched'` depende para marcar o campo como tocado. Espalhar `field`
- * na raiz do `Combobox` perderia o evento em silêncio, e o erro do campo só
- * apareceria no submit.
+ * **`onBlur` does not go on the root.** React Hook Form's `{...field}` does not work
+ * here: `onBlur` has to go on the search field, and `mode: 'onTouched'` depends on it
+ * to mark the field as touched. Spreading `field` on the `Combobox` root would lose the
+ * event silently, and the field's error would only show up on submit.
  *
- * **`null` não é `''`.** O Base UI usa `null` para "nada escolhido"; os
- * formulários e os filtros guardam `''`. A conversão nas duas pontas mora aqui,
- * e não repetida em cada tela.
+ * **`null` is not `''`.** Base UI uses `null` for "nothing chosen"; the forms
+ * and filters store `''`. The conversion at both ends lives here, and is not
+ * repeated on every screen.
  *
- * A bolinha de cor é `InputGroupAddon`, e não um `span` posicionado por cima:
- * era assim no `NativeSelect` que esta peça substituiu, e junto com ela ia um
- * `[&>select]:pl-6` para abrir espaço no lugar certo.
+ * The color dot is an `InputGroupAddon`, and not a `span` positioned on top:
+ * that is how it was in the `NativeSelect` this piece replaced, and with it went
+ * a `[&>select]:pl-6` to make room in the right place.
  */
 export function OptionCombobox({
   options,
@@ -86,9 +85,9 @@ export function OptionCombobox({
   hasMore = false,
   onLoadMore,
 }: OptionComboboxProps): React.JSX.Element {
-  // Sem `useMemo`: o React Compiler está ligado (`vite.config.ts`), e um
-  // `find` sobre a lista de opções de um enum não é o tipo de custo que
-  // justifica escrever a dependência à mão.
+  // No `useMemo`: the React Compiler is on (`vite.config.ts`), and a
+  // `find` over an enum's option list is not the kind of cost that
+  // justifies writing the dependency by hand.
   const selected = options.find((option) => option.value === value) ?? null
 
   let filter: null | undefined = undefined
@@ -102,12 +101,12 @@ export function OptionCombobox({
         onValueChange(option?.value ?? '')
       }
       itemToStringLabel={(option: OptionComboboxItem) => option.label}
-      // Busca no servidor: a lista já chega filtrada, e filtrar de novo no
-      // cliente esconderia o que o servidor achou por outro campo.
+      // Server search: the list already arrives filtered, and filtering again on the
+      // client would hide what the server found by another field.
       filter={filter}
       onInputValueChange={(term, details) => {
-        // Só o que a pessoa digita: escolher um item reescreve o campo com o
-        // rótulo dele, e isso não é uma busca nova.
+        // Only what the person types: choosing an item rewrites the field with its
+        // label, and that is not a new search.
         if (onSearch && details.reason === 'input-change') onSearch(term)
       }}
       isItemEqualToValue={(
@@ -171,8 +170,8 @@ export function OptionCombobox({
 }
 
 /**
- * O atalho para o caso mais comum: um enum e o mapa de rótulos que já existe em
- * `lib/labels`. Sem ele cada tela escreveria o mesmo `map` de três linhas.
+ * The shortcut for the most common case: an enum and the label map that already exists in
+ * `lib/labels`. Without it every screen would write the same three-line `map`.
  */
 export function toOptions(
   values: ReadonlyArray<string>,

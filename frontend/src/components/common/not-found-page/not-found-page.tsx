@@ -12,9 +12,9 @@ type NotFoundPageProps = Readonly<
     Omit<React.ComponentProps<'div'>, 'code'>,
     {
       /**
-       * O número gigante do painel escuro. `404` por padrão porque é para isso
-       * que a página nasceu; a fronteira de erro do router passa `500`, e sem
-       * este parâmetro ela anunciaria "404" para uma falha de servidor.
+       * The giant number on the dark panel. `404` by default because that is what the
+       * page was born for; the router's error boundary passes `500`, and without
+       * this parameter it would announce "404" for a server failure.
        */
       code?: React.ReactNode
     }
@@ -22,16 +22,16 @@ type NotFoundPageProps = Readonly<
 >
 
 /**
- * A página de saída: rota não encontrada, e também erro não tratado.
+ * The exit page: route not found, and also unhandled error.
  *
- * Sem children, escreve o 404 genérico. A tela que sabe **o que** não foi
- * encontrado troca as partes que quiser e deixa o resto - o passaporte diz que
- * o código tem dez caracteres, e isso não cabia numa prop de texto sem virar
- * mais uma prop de texto para as outras quatro.
+ * Without children, it writes the generic 404. A screen that knows **what** was not
+ * found swaps the parts it wants and leaves the rest - the passport says the
+ * code has ten characters, and that did not fit in a text prop without becoming
+ * one more text prop for the other four.
  *
- * O título padrão era "Ops!". Além de ser o clichê que a direção bane por
- * nome, ele gastava a linha de maior peso da tela para não dizer nada: quem
- * chega aqui já sabe que algo deu errado, e o que precisa saber é **o quê**.
+ * The default title used to be "Ops!". Besides being the cliché that the art direction bans
+ * by name, it spent the screen's heaviest line saying nothing: whoever
+ * lands here already knows something went wrong, and what they need to know is **what**.
  */
 export function NotFoundPage({
   className,
@@ -62,8 +62,8 @@ export function NotFoundPage({
         )}
       </div>
 
-      {/* O placar do site, e não um painel preto genérico: o troféu em cima,
-          o código embaixo, sem um cobrir o outro. */}
+      {/* The site's scoreboard, not a generic black panel: the trophy on top,
+          the code below, neither covering the other. */}
       <div className="hero relative flex h-stage-half flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
         <TrophyIcon className="text-brand size-16 md:size-20" weight="fill" />
         <span className="font-display text-brand text-error-code leading-none font-extrabold italic select-none md:text-error-code-lg">
@@ -130,9 +130,9 @@ export function NotFoundPageActions({
   if (!children) return null
 
   return (
-    // `div` com `gap`, e não `ButtonGroup`: o grupo cola os filhos diretos, e
-    // estas são saídas independentes - "voltar ao início" e "tentar de novo" não
-    // formam um controle segmentado.
+    // `div` with `gap`, and not `ButtonGroup`: the group glues its direct children, and
+    // these are independent exits - "voltar ao início" and "tentar de novo" do not
+    // form a segmented control.
     <div
       data-slot="not-found-page-actions"
       className={cn('mt-8 flex flex-wrap items-center gap-2', className)}
@@ -144,10 +144,10 @@ export function NotFoundPageActions({
 }
 
 /**
- * A saída padrão: voltar ao início.
+ * The default exit: back to the start.
  *
- * `to` segue prop - é destino de navegação, não markup - e como `Link` o botão
- * responde a abrir em nova aba, ao clique do meio e ao menu de contexto.
+ * `to` stays a prop - it is a navigation destination, not markup - and as a `Link` the button
+ * responds to open in a new tab, to middle click and to the context menu.
  */
 export function NotFoundPageHomeButton({
   to = '/',

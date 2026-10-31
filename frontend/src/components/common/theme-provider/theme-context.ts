@@ -9,7 +9,7 @@ export type ThemeContextValue = {
 
 export const ThemeContext = React.createContext<ThemeContextValue | null>(null)
 
-/** A preferência de tema, para quem está dentro de `ThemeProvider`. */
+/** The theme preference, for whoever is inside `ThemeProvider`. */
 export function useTheme(consumer: string): ThemeContextValue {
   const context = React.use(ThemeContext)
 

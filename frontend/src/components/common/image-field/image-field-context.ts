@@ -1,31 +1,31 @@
 import * as React from 'react'
 
 /**
- * O que o campo inteiro compartilha - e nada além.
+ * What the whole field shares - and nothing else.
  *
- * O envio é uma máquina de estado pequena mas real: sobe na escolha, guarda o
- * órfão para apagar na troca, e trava o submit enquanto está em voo. As partes
- * visíveis só leem o resultado dela. Passar isso por prop obrigaria cada peça a
- * receber cinco props que nenhuma delas decide.
+ * The upload is a small but real state machine: it uploads on choice, keeps the
+ * orphan to delete on replacement, and locks the submit while in flight. The visible
+ * parts only read its result. Passing that by prop would force each piece to
+ * receive five props that none of them decides.
  *
- * Os textos **não** estão aqui: rótulo, sigla de fallback e descrição são
- * markup, e markup vai por slot.
+ * The texts are **not** here: label, fallback initials and description are
+ * markup, and markup goes by slot.
  */
 export type ImageFieldContextValue = {
-  /** A imagem a mostrar: a recém-enviada, ou a que já estava gravada. */
+  /** The image to show: the freshly uploaded one, or the one already saved. */
   shown: string | null | undefined
-  /** Tem o que remover? Governa se o botão de remover aparece. */
+  /** Is there anything to remove? Governs whether the remove button appears. */
   hasImage: boolean
-  /** O arquivo está subindo? Trava os dois botões e troca o ícone por spinner. */
+  /** Is the file uploading? Locks both buttons and swaps the icon for a spinner. */
   isPending: boolean
-  /** Abre o seletor de arquivo nativo, que fica escondido no `ImageField`. */
+  /** Opens the native file picker, which is hidden inside `ImageField`. */
   openPicker: () => void
-  /** Aponta o campo para `null` e apaga o órfão, se houver. */
+  /** Points the field at `null` and deletes the orphan, if any. */
   clear: () => void
   /**
-   * Vai no botão que abre o seletor, para o `FieldLabel` de quem consome poder
-   * apontar um `htmlFor` para algo focável - o `<input type="file">` está
-   * escondido, e rótulo apontando para elemento oculto não leva foco nenhum.
+   * Goes on the button that opens the picker, so the consumer's `FieldLabel` can
+   * point an `htmlFor` at something focusable - the `<input type="file">` is
+   * hidden, and a label pointing at a hidden element brings no focus at all.
    */
   controlId: string | undefined
 }
@@ -37,11 +37,11 @@ const ImageFieldContext = React.createContext<ImageFieldContextValue | null>(
 export const ImageFieldProvider = ImageFieldContext.Provider
 
 /**
- * O campo, para quem está dentro de `ImageField`.
+ * The field, for whoever is inside `ImageField`.
  *
- * O `consumer` entra na mensagem para o erro dizer **qual** parte ficou fora do
- * provider - sem isso o `throw` reporta "faltou provider" e deixa a busca por
- * conta de quem lê a stack.
+ * The `consumer` goes into the message so the error says **which** part was left outside the
+ * provider - without it the `throw` reports "missing provider" and leaves the search to
+ * whoever reads the stack.
  */
 export function useImageFieldContext(consumer: string): ImageFieldContextValue {
   const context = React.use(ImageFieldContext)

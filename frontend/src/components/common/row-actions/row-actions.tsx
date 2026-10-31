@@ -19,9 +19,9 @@ type RowActionsProps = Readonly<
     React.ComponentProps<typeof DropdownMenuContent>,
     {
       /**
-       * Os alertas que os itens abrem (`RowActionsConfirm`). Ficam **irmãos**
-       * do menu, e não dentro do `DropdownMenuContent`: o conteúdo desmonta
-       * quando o menu fecha e levaria o alerta junto (`frontend.md` §6.2).
+       * The alerts the items open (`RowActionsConfirm`). They are **siblings**
+       * of the menu, and not inside `DropdownMenuContent`: the content unmounts
+       * when the menu closes and would take the alert with it (`frontend.md` §6.2).
        */
       dialogs?: React.ReactNode
     }
@@ -29,16 +29,16 @@ type RowActionsProps = Readonly<
 >
 
 /**
- * O menu de uma linha da tabela.
+ * A table row's menu.
  *
- * O casco é o mesmo em toda listagem do painel - o mesmo gatilho de três
- * pontos, o mesmo grupo, o mesmo rótulo "Ações", o mesmo separador. Só a
- * largura varia, e por isso ela é a única coisa que continua chegando de
- * fora.
+ * The shell is the same on every dashboard listing - the same three-dot trigger,
+ * the same group, the same "Ações" label, the same separator. Only the
+ * width varies, and that is why it is the only thing that still arrives from
+ * outside.
  *
- * Não há contexto: os itens não leem estado nenhum do casco. O item que pede
- * confirmação chama `handle.open(null)` no clique, o menu fecha sozinho e o
- * alerta, irmão do menu, abre pelo mesmo handle.
+ * There is no context: the items read no state from the shell. The item that asks for
+ * confirmation calls `handle.open(null)` on click, the menu closes on its own and the
+ * alert, a sibling of the menu, opens through the same handle.
  */
 export function RowActions({
   className,

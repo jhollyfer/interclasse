@@ -7,11 +7,11 @@ import { useTableContext } from './table-context'
 import { Pagination } from './table-pagination-nav'
 
 /**
- * O rodapé fixo com a paginação.
+ * The fixed footer with the pagination.
  *
- * `meta` vem por prop, e não do contexto, porque é a resposta da consulta e não
- * estado da tabela: enquanto a primeira página não chega ela não existe, e o
- * rodapé simplesmente não aparece.
+ * `meta` comes by prop, and not from the context, because it is the query's response and not
+ * table state: until the first page arrives it does not exist, and the
+ * footer simply does not appear.
  */
 export function TablePagination({
   meta,

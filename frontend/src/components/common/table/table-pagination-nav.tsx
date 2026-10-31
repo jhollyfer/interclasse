@@ -20,36 +20,36 @@ import {
 import type { ListSearch } from '#/lib/list-search'
 import { m } from '#/paraglide/messages'
 
-/** As opções de itens por página. O teto do backend é 100 (`perPage.max(100)`). */
+/** The items-per-page options. The backend cap is 100 (`perPage.max(100)`). */
 const PER_PAGE_OPTIONS = ['10', '20', '30', '40', '50']
 
 type PaginationProps<TSearch extends ListSearch> = Readonly<{
   meta: PaginationMeta
-  /** A rota desta listagem, para onde os links apontam. */
+  /** This listing's route, where the links point. */
   to: string
   /**
-   * Os filtros atuais. Genérico para preservar os campos próprios de cada
-   * listagem (`?status`, `?category`) ao trocar de página - tipar como
-   * `ListSearch` os apagaria do objeto espalhado.
+   * The current filters. Generic to preserve each listing's own fields
+   * (`?status`, `?category`) when changing page - typing them as
+   * `ListSearch` would erase them from the spread object.
    */
   search: TSearch
 }>
 
 /**
- * A paginação das listagens: itens por página à esquerda, saltos à direita.
+ * The listings' pagination: items per page on the left, jumps on the right.
  *
- * **Quatro saltos e não a régua de páginas.** A lista numerada era um `<li>` por
- * página: com 200 páginas, 200 links. Primeira/anterior/próxima/última tem
- * tamanho fixo, e a contagem "3 / 47" diz onde se está.
+ * **Four jumps and not a page ruler.** The numbered list was an `<li>` per
+ * page: with 200 pages, 200 links. First/previous/next/last has a fixed
+ * size, and the "3 / 47" count says where one is.
  *
- * Os quatro são `Link` e não `onClick`, o que se manteve da versão anterior: é
- * o que faz o botão do meio abrir a página em outra aba e o F5 voltar no mesmo
- * lugar. Nas pontas eles ficam desabilitados em vez de sumirem - botão que
- * some move os outros de lugar debaixo do cursor.
+ * The four are `Link` and not `onClick`, which was kept from the previous version: it is
+ * what makes the middle button open the page in another tab and F5 return to the same
+ * place. At the ends they are disabled instead of disappearing - a button that
+ * disappears moves the others from under the cursor.
  *
- * Trocar de tamanho de página volta para a primeira: a página 7 de uma lista de
- * 10 em 10 quase nunca existe na de 50 em 50, e a tela abriria vazia sem dizer
- * por quê.
+ * Changing the page size goes back to the first page: page 7 of a list of
+ * 10 per page almost never exists in the 50 per page one, and the screen would open empty without saying
+ * why.
  */
 export function Pagination<TSearch extends ListSearch>({
   meta,
@@ -64,7 +64,7 @@ export function Pagination<TSearch extends ListSearch>({
   const isFirst = currentPage <= 1
   const isLast = currentPage >= lastPage
 
-  /** `undefined` na primeira página, para não sujar a URL com `?page=1`. */
+  /** `undefined` on the first page, to avoid dirtying the URL with `?page=1`. */
   function pageParam(page: number): number | undefined {
     if (page <= 1) return undefined
 

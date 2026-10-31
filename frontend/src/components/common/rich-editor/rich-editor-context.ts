@@ -2,8 +2,8 @@ import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 
 /**
- * O editor que a toolbar e a área de texto compartilham. Passá-lo por prop
- * obrigaria as duas a receber o que nenhuma decide
+ * The editor that the toolbar and the text area share. Passing it by prop
+ * would force both to receive what neither decides
  * (_doc-lib/tiptap.md#guides/react-composable-api).
  */
 export type RichEditorContextValue = {
@@ -17,9 +17,9 @@ const RichEditorContext = React.createContext<RichEditorContextValue | null>(
 export const RichEditorProvider = RichEditorContext.Provider
 
 /**
- * O editor, para quem está dentro de `RichEditor`.
+ * The editor, for whoever is inside `RichEditor`.
  *
- * O `consumer` entra na mensagem para o erro dizer **qual** parte ficou fora do
+ * The `consumer` goes into the message so the error says **which** part was left outside the
  * provider.
  */
 export function useRichEditorContext(consumer: string): RichEditorContextValue {

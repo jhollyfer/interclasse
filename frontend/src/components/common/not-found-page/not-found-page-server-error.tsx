@@ -13,10 +13,10 @@ import {
 } from './not-found-page'
 
 /**
- * A falha que é nossa: o 500, num lugar só. A fronteira de erro do router e a
- * do painel (`QueryErrorResetBoundary`) desenham a mesma tela e só diferem no
- * que "Tentar de novo" refaz - o `reset` de uma, o `resetErrorBoundary` da
- * outra.
+ * The failure that is ours: the 500, in one place. The router's error boundary and the
+ * dashboard's (`QueryErrorResetBoundary`) draw the same screen and only differ in
+ * what "Tentar de novo" redoes - the `reset` of one, the `resetErrorBoundary` of the
+ * other.
  */
 export function NotFoundPageServerError({
   onRetry,

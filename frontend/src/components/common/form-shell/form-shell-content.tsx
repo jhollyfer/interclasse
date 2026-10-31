@@ -15,10 +15,10 @@ type FormShellContentProps = Readonly<
 >
 
 /**
- * O conteúdo que rola, e o `<form>` de verdade.
+ * The scrolling content, and the real `<form>`.
  *
- * O `id` vem do contexto porque o `Salvar` mora no cabeçalho fixo, fora desta
- * árvore, e é por ele que o clique alcança o formulário.
+ * The `id` comes from the context because `Salvar` lives in the fixed header, outside this
+ * tree, and it is through it that the click reaches the form.
  */
 export function FormShellContent({
   children,
@@ -29,10 +29,10 @@ export function FormShellContent({
 
   return (
     <PageShellContent>
-      {/* `method="post"`: clique antes da hidratação vira envio nativo, e GET
-          poria os campos - senha inclusive - na URL e no histórico. */}
-      {/* `max-w-3xl`: campo de texto esticado a 1200px faz o olho atravessar a
-          tela inteira para ler um nome. */}
+      {/* `method="post"`: a click before hydration becomes a native submit, and GET
+          would put the fields - password included - in the URL and in the history. */}
+      {/* `max-w-3xl`: a text field stretched to 1200px makes the eye cross the
+          whole screen to read a name. */}
       <form
         data-slot="form-shell-content"
         method="post"
@@ -57,13 +57,13 @@ type FormShellCardProps = Readonly<
 >
 
 /**
- * Um bloco de campos.
+ * A block of fields.
  *
- * `Card` + `CardContent` + a coluna com `gap-4` que todo formulário do painel
- * escrevia à mão. Peça separada e não embutida no `FormShellContent` porque a
- * quantidade varia: a tela de depoimento tem um, a de notícia tem três, e a que
- * precisar de layout próprio não usa nenhum. Uma prop booleana de escape seria
- * a mesma coisa com um nome pior.
+ * `Card` + `CardContent` + the `gap-4` column that every dashboard form
+ * wrote by hand. A separate piece and not embedded in `FormShellContent` because the
+ * quantity varies: the testimonial screen has one, the news screen has three, and one that
+ * needs its own layout uses none. A boolean escape prop would be
+ * the same thing with a worse name.
  */
 export function FormShellCard({
   className,
