@@ -11,13 +11,13 @@
 | Nível | Ferramenta | Onde | Roda em |
 |---|---|---|---|
 | Unitário do backend | Japa, suíte `unit` (sem banco nem HTTP) | `backend/app/**/*.unit.spec.ts` e `backend/scripts/**/*.unit.spec.ts`: entidades do domínio, use-cases, `Knockout`, `ReportCsv`, `CookieService` | todo pull request e todo push em `main` |
-| E2E do backend | Japa, suíte `functional`, Postgres e MinIO reais | `backend/app/**/*.e2e.spec.ts`: rota, policy, middleware, repository | todo pull request e todo push em `main` (job com MinIO) |
+| E2E do backend | Japa, suíte `functional`, Postgres e MinIO reais | `backend/app/**/*.e2e.spec.ts`: rota, policy, middleware, repository | a suíte inteira em todo pull request e todo push em `main`, em 3 shards (`--shard=i/3`), cada um com o próprio Postgres e MinIO; na sessão do agente só os specs afetados (`--files`) (`tooling.md` §10.6) |
 | Injeção de dependência | `node ace di:check` | constrói todo service e policy pelo container | todo pull request e todo push em `main` |
 | `shared/` | Vitest | `shared/src/**/*.test.ts` | todo pull request e todo push em `main` |
 | Unitário do frontend | Vitest | `frontend/src/**/*.test.ts` e `frontend/scripts/**/*.test.ts` (só `.ts`: componente React não é testável hoje) | todo pull request e todo push em `main` |
 | Mensagens | `pnpm i18n:check` (inlang) | `frontend/messages/` | pull request |
 | Guardas do padrão | `pnpm pattern:check`, `pnpm authz:check`, `pnpm openapi:generate --check --strict`, `pnpm depcruise` | `backend/scripts/` | `pnpm check` e CI |
-| E2E do frontend | Playwright, `pnpm test:e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; job `e2e` do `main-check-frontend.yml` em todo PR |
+| E2E do frontend | Playwright, `pnpm test:e2e` em `frontend/`: o app local contra a API e o banco semeados | `frontend/e2e/<fluxo>.spec.ts`: classificação pública, troca de idioma, menu da conta, turmas, sorteio de chave, fotos, texto do Sobre e relatório em CSV; as credenciais vêm de `frontend/.env.e2e` (modelo em `.env.e2e.example`) | fase final de cada plano e antes do PR; job `e2e` do `main-check-frontend.yml` em todo PR, num job só (14 jornadas em ~2 min: shard só quando passar do tempo aceitável, `_doc-lib/playwright.md#docs/test-sharding`) |
 
 ## 2. Fluxos críticos
 

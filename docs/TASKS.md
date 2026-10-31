@@ -89,6 +89,8 @@ Nada vira exceção local: a régua muda e volta pelo sync.
 | `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |
 | Passo de autor do CI até o head do PR | Na régua (decisão #250, maiyu-pattern#5); aqui desde o #18 |
 | Parte do multipart assina só o tamanho; arquivo inteiro sobe com `Content-Type` | Na régua (decisão #251, maiyu-pattern#5); aqui no #20 |
+| Japa sem worker e sem `merge-reports`: `tooling.md` §10.6 pede banco clonado por worker (template do Postgres) e relatório juntado de shards, e o Japa roda em série num processo e não junta relatório (`_doc-lib/japa.md#docs/test-suites`, `#docs/filtering-tests`, https://japa.dev/docs/filtering-tests) | Proposta ao upstream (#253): dizer na régua que, no Japa, o paralelismo é o shard com banco por job e não há relatório juntado. Aqui, sem exceção local: shards com banco por job |
+| `tooling.md` §10.6 manda shard sempre e `playwright.md#docs/test-sharding` só quando o job passa do tempo aceitável | Proposta ao upstream (#253): alinhar as duas frases. Aqui, o Playwright fica num job |
 
 Resolvidos aqui: arquivar e restaurar respondem 409 de estado (`USER_ALREADY_ARCHIVED`, `USER_NOT_ARCHIVED`); `account/profile/show` não tem 404 alcançável pela rota (o guard responde 401 antes), coberto no unitário.
 
@@ -119,8 +121,8 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | Feita | #259; o gerador usa o tipo do fato (`Refusal.http(fato)`), então o que o tipo de domínio declara largo aparece largo no `openapi.json` (ex.: `ensureDeletable(): Either<BracketError, …>`). Estreitar o left por operação fica como 7.10 |
 | 7.6 | `.env.example` e `.env.test` em inglês | Baixa | Feita | #260 |
 | 7.7 | Frontend: `new.tsx` com `head` em toda tela e escala de z-index | Alta | Feita | #257; z-index na escala nova. `new.tsx` só existe em tela com `head` por rota (`frontend.md` §1.2): aqui o título das telas privadas vem do `head` do `_private/layout.tsx` pela trilha, então nenhuma `new.lazy.tsx` precisa do par |
-| 7.8 | Suíte rápida: banco clonado por worker, shards no CI, merge de relatórios | Alta | Em andamento | #253 |
-| 7.9 | Lições do adacaibs conferidas contra o código | Média | A fazer | #255 |
+| 7.8 | Suíte rápida: banco clonado por worker, shards no CI, merge de relatórios | Alta | Feita | #253. Backend: o Japa roda em série num processo (migration e kernel uma vez, `_doc-lib/japa.md#docs/test-suites`), então o que a régua chama de worker é o shard: job `e2e` do `main-check-backend.yml` em matriz `--shard=i/3`, banco e MinIO por job (692 = 209+253+230 conferido); `disallowPinnedTests` no CI. Frontend: Vitest em dois projetos, `shared` com `isolate: false` e `isolated` para o que usa `vi.mock`, global ou DOM. Playwright segue num job (14 jornadas, ~2 min; a doc só manda shard quando passa do tempo aceitável) |
+| 7.9 | Lições do adacaibs conferidas contra o código | Média | Em andamento | #255 |
 | 7.10 | Estreitar o left dos métodos de domínio por operação (`Extract<BracketError, …>`) para o `openapi.json` não listar código de outra operação | Baixa | A fazer | efeito da 7.5 |
 
 ## Fase N · Ideias (fora do escopo atual)
