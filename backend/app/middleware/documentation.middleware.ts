@@ -4,21 +4,21 @@ import { USER_ROLE } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 
-/** Quem opera o painel. */
+/** Who operates the panel. */
 const STAFF: ReadonlyArray<string> = [USER_ROLE.ADMINISTRATOR]
 
 /**
- * A referência da API só existe para quem opera a instalação.
+ * The API reference only exists for whoever operates the installation.
  *
- * O documento descreve **toda** a superfície: cada rota, cada parâmetro, cada
- * forma de corpo e cada código de erro. Publicá-lo sem sessão entrega o mapa
- * completo a quem ainda não entrou.
+ * The document describes the **whole** surface: every route, every parameter, every
+ * body shape and every error code. Publishing it without a session hands the complete
+ * map to whoever has not signed in yet.
  *
- * **404 e não 403**: um 403 confirmaria que a rota existe e que há um papel que a alcança. Para
- * quem não pode ver, ela simplesmente não está lá.
+ * **404 and not 403**: a 403 would confirm that the route exists and that a role reaches it. For
+ * whoever cannot see it, it simply is not there.
  *
- * Depende de `silent-auth.middleware`, que já roda antes na pilha do router e
- * popula `auth.user` quando há cookie válido sem recusar quem não tem.
+ * It depends on `silent-auth.middleware`, which already runs earlier in the router stack and
+ * populates `auth.user` when there is a valid cookie without refusing whoever has none.
  */
 export default class DocumentationMiddleware {
   async handle(context: HttpContext, next: NextFn) {

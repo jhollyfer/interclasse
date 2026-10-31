@@ -26,13 +26,13 @@ declare module '@japa/api-client/types' {
  */
 
 /**
- * O cliente de teste não é um navegador e não manda `Origin`; a barreira de
- * origem (`origin.middleware.ts`) recusaria toda escrita. Todo pedido sai como
- * se viesse do frontend da allowlist de `.env.test`; o teste que mede a recusa
- * põe a própria `Origin`.
+ * The test client is not a browser and does not send `Origin`; the origin barrier
+ * (`origin.middleware.ts`) would refuse every write. Every request goes out as if it
+ * came from the allowlisted frontend of `.env.test`; the test that measures the
+ * refusal sets its own `Origin`.
  */
 ApiClient.setup((request) => {
-  // O hook roda no envio, depois do `.header()` do teste: só preenche quando falta.
+  // The hook runs at send time, after the test's `.header()`: it only fills in when missing.
   if (request.request.get('origin')) return
 
   request.header('origin', 'http://localhost:5173')
@@ -43,8 +43,8 @@ ApiClient.setup((request) => {
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
 export const plugins: Config['plugins'] = [
-  // `.pin()` esquecido faz o CI rodar só o teste fixado e ficar verde
-  // (_doc-lib/japa.md#docs/filtering-tests): no CI a execução reprova.
+  // A forgotten `.pin()` makes CI run only the pinned test and stay green
+  // (_doc-lib/japa.md#docs/filtering-tests): in CI the run fails.
   disallowPinnedTests({ disallow: process.env.CI === 'true' }),
   assert(),
   pluginAdonisJS(app),
@@ -54,12 +54,12 @@ export const plugins: Config['plugins'] = [
 ]
 
 /**
- * Reporters. Japa não traz um reporter TAP, e o motor de auditoria da
- * especificação lê exatamente `ok N - título` / `not ok N - título` para saber
- * quais critérios de aceite passaram.
+ * Reporters. Japa ships no TAP reporter, and the specification audit engine reads
+ * exactly `ok N - title` / `not ok N - title` to know which acceptance criteria
+ * passed.
  *
- * Ativado por `ONP_TAP=1` em vez de `--reporter=tap`: variável de ambiente
- * atravessa o `node ace test` sem depender de repasse de flag.
+ * Enabled by `ONP_TAP=1` instead of `--reporter=tap`: an environment variable crosses
+ * `node ace test` without depending on flag forwarding.
  */
 const REPORTERS = {
   spec: { activated: ['spec'], list: [spec()] },
@@ -77,8 +77,8 @@ const REPORTERS = {
             count += 1
             const title = test.title.expanded
 
-            // Pulado não é prova: sai como `ok ... # SKIP`, que o motor
-            // reconhece e recusa como evidência.
+            // Skipped is not proof: it comes out as `ok ... # SKIP`, which the engine
+            // recognizes and refuses as evidence.
             if (test.isTodo) {
               console.log(`ok ${count} - ${title} # TODO`)
               return
@@ -122,7 +122,7 @@ export const reporters: Config['reporters'] = REPORTERS[reporterMode]
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  // Antes de qualquer suíte e da primeira migration: banco sem `_test` derruba o runner.
+  // Before any suite and the first migration: a database without `_test` brings the runner down.
   setup: [() => DatabaseGuard.assertTestDatabase(env.get('DATABASE_URL'))],
   teardown: [],
 }
@@ -132,11 +132,11 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
-  // Só a suíte que fala com banco e HTTP os sobe: a `unit` roda sem nenhum dos
-  // dois (_standards/architecture.md §8). As migrations rodam uma vez, antes da
-  // suíte: sem isso o esquema só nasceria como efeito colateral do `truncate()`
-  // de `resetDatabase()`, e as specs que não o chamam não teriam tabela num
-  // banco recém-criado.
+  // Only the suite that talks to the database and HTTP starts them: `unit` runs
+  // without either (_standards/architecture.md §8). Migrations run once, before the
+  // suite: without that the schema would only appear as a side effect of the
+  // `truncate()` in `resetDatabase()`, and specs that do not call it would have no
+  // table in a freshly created database.
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
     suite.setup(() => testUtils.db().migrate())
     suite.setup(() => testUtils.httpServer().start())

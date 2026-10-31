@@ -19,49 +19,49 @@ import {
 } from '#services/multipart/multipart.contract'
 
 /**
- * Por quanto tempo uma URL assinada vale, em segundos.
+ * How long a signed URL is valid, in seconds.
  *
- * Uma hora, e não o dia inteiro: URL que vaza continua utilizável até expirar,
- * e o custo de expirar cedo é baixo porque a retomada já sabe pedir URL nova
- * para as partes que faltam.
+ * One hour, and not the whole day: a leaked URL stays usable until it expires,
+ * and the cost of expiring early is low because resuming already knows how to ask for a new URL
+ * for the missing parts.
  */
 const URL_EXPIRES_IN = 60 * 60
 
 /**
- * Os headers que a assinatura prende. Sem isto o presigner do SDK não assina
- * `content-type` nem `content-length`, e o bucket aceita qualquer tipo e
- * qualquer tamanho na URL (_standards/backend.md §5.4; _doc-lib/adonisjs.md#guides/basics/file-uploads,
- * https://docs.adonisjs.com/guides/basics/file-uploads). Com ele, `PUT` com tipo
- * ou tamanho diferente do assinado recebe 403 do storage.
+ * The headers the signature pins. Without this the SDK presigner does not sign
+ * `content-type` or `content-length`, and the bucket accepts any type and
+ * any size on the URL (_standards/backend.md §5.4; _doc-lib/adonisjs.md#guides/basics/file-uploads,
+ * https://docs.adonisjs.com/guides/basics/file-uploads). With it, a `PUT` with a type
+ * or size different from the signed one gets 403 from the storage.
  */
 const SIGNABLE_HEADERS = new Set(['content-type', 'content-length'])
 
 /**
- * A parte do multipart não tem tipo: o `UploadPart` não leva `ContentType`, e o
- * `Blob.slice` do navegador sobe sem `Content-Type`. Assinar `content-type` aqui
- * declara um header que a requisição não manda, e o S3 de verdade (MinIO, AWS)
- * recusa com "headers present in the request which were not signed". A parte
- * prende só o tamanho.
+ * A multipart part has no type: `UploadPart` carries no `ContentType`, and the
+ * browser's `Blob.slice` uploads without `Content-Type`. Signing `content-type` here
+ * declares a header the request does not send, and a real S3 (MinIO, AWS)
+ * refuses with "headers present in the request which were not signed". The part
+ * pins only the size.
  */
 const PART_SIGNABLE_HEADERS = new Set(['content-length'])
 
 /**
- * O multipart do S3, que o FlyDrive não expõe.
+ * The S3 multipart, which FlyDrive does not expose.
  *
- * O FlyDrive cobre o arquivo inteiro - `put`, `get`, `delete`, `getUrl`,
- * `getSignedUrl` - e é o que `StorageService` usa. O que não existe lá é a
- * conversa em partes (`CreateMultipartUpload`, `UploadPart`, `ListParts`,
- * `CompleteMultipartUpload`, `AbortMultipartUpload`), e é ela que torna um
- * upload retomável. Por isso este serviço fala com o SDK direto, com a mesma
- * conexão que o FlyDrive usa (`config/drive.ts`).
+ * FlyDrive covers the whole file - `put`, `get`, `delete`, `getUrl`,
+ * `getSignedUrl` - and is what `StorageService` uses. What does not exist there is the
+ * conversation in parts (`CreateMultipartUpload`, `UploadPart`, `ListParts`,
+ * `CompleteMultipartUpload`, `AbortMultipartUpload`), and it is what makes an
+ * upload resumable. That is why this service talks to the SDK directly, with the same
+ * connection FlyDrive uses (`config/drive.ts`).
  *
- * Nada aqui conhece `storages`, `Either` nem HTTP: é a camada que traduz
- * "quero subir isto em pedaços" para o protocolo. Quem decide quando iniciar,
- * confirmar ou abortar é o use-case.
+ * Nothing here knows `storages`, `Either` or HTTP: it is the layer that translates
+ * "I want to upload this in pieces" into the protocol. Whoever decides when to start,
+ * confirm or abort is the use case.
  *
- * O cliente vem do container (`providers/storage.provider.ts`), e não de um
- * `new` aqui dentro: é o que permite a um teste apontar para outro bucket ou
- * simular uma falha do storage sem mexer no ambiente do processo.
+ * The client comes from the container (`providers/storage.provider.ts`), and not from a
+ * `new` in here: it is what lets a test point at another bucket or
+ * simulate a storage failure without touching the process environment.
  */
 @inject()
 export default class MultipartService extends MultipartContract {
@@ -70,34 +70,34 @@ export default class MultipartService extends MultipartContract {
   }
 
   /**
-   * Abre um upload em partes e devolve o `UploadId` que identifica a conversa.
+   * Opens a multipart upload and returns the `UploadId` that identifies the conversation.
    *
-   * A partir daqui o bucket guarda as partes recebidas sob esse identificador,
-   * e nada aparece na chave final até o `complete`. É o que permite ao cliente
-   * sumir no meio e voltar depois.
+   * From here on the bucket keeps the received parts under that identifier,
+   * and nothing shows at the final key until `complete`. It is what lets the client
+   * vanish midway and come back later.
    */
   async initiate(key: string, contentType: string): Promise<string> {
     const response = await this.client.send(
       new CreateMultipartUploadCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
     )
 
-    // O S3 sempre devolve `UploadId` num `CreateMultipartUpload` bem-sucedido; o
-    // tipo do SDK o marca opcional porque a resposta é compartilhada com outras
-    // operações. Sem ele não há upload para retomar nem para confirmar.
+    // S3 always returns `UploadId` on a successful `CreateMultipartUpload`; the
+    // SDK type marks it optional because the response is shared with other
+    // operations. Without it there is no upload to resume or to confirm.
     if (!response.UploadId) {
-      throw new Error(`Storage não devolveu UploadId para a chave ${key}`)
+      throw new Error(`Storage did not return an UploadId for key ${key}`)
     }
 
     return response.UploadId
   }
 
   /**
-   * As URLs para enviar as partes indicadas, uma por parte.
+   * The URLs to send the indicated parts, one per part.
    *
-   * Recebe **quais** partes assinar, e não quantas, porque a retomada precisa
-   * assinar só o que falta. Um upload novo pede as partes `1, 2, 3, ...`; um
-   * retomado pede o buraco que sobrou. Cada parte leva o próprio tamanho, preso
-   * em `Content-Length` na assinatura.
+   * It receives **which** parts to sign, not how many, because resuming needs to
+   * sign only what is missing. A new upload asks for parts `1, 2, 3, ...`; a
+   * resumed one asks for the gap that remains. Each part carries its own size, pinned
+   * in `Content-Length` in the signature.
    */
   async signParts(
     key: string,
@@ -125,11 +125,11 @@ export default class MultipartService extends MultipartContract {
   }
 
   /**
-   * A URL de um upload de arquivo inteiro, sem partes.
+   * The URL of a whole-file upload, without parts.
    *
-   * Existe porque multipart só compensa quando há mais de uma parte: um avatar
-   * de 40 KB não precisa de `UploadId`, de `ETag` coletado nem de confirmação
-   * em duas etapas - precisa de um `PUT`.
+   * It exists because multipart only pays off when there is more than one part: a 40 KB
+   * avatar needs no `UploadId`, no collected `ETag` and no two-step
+   * confirmation - it needs a `PUT`.
    */
   async signSingle(
     key: string,
@@ -150,14 +150,14 @@ export default class MultipartService extends MultipartContract {
   }
 
   /**
-   * As partes que o bucket já recebeu, em ordem.
+   * The parts the bucket has already received, in order.
    *
-   * É o que responde "de onde eu continuo": o cliente compara com o que
-   * pretendia enviar e reenvia só o buraco.
+   * It is what answers "where do I continue from": the client compares with what it
+   * intended to send and resends only the gap.
    *
-   * Pagina de propósito. O `ListParts` devolve no máximo mil partes por
-   * chamada, e um arquivo no teto tem mais que isso - sem o laço, a retomada de
-   * um arquivo grande reenviaria tudo a partir da milésima primeira parte.
+   * It paginates on purpose. `ListParts` returns at most a thousand parts per
+   * call, and a file at the ceiling has more than that - without the loop, resuming
+   * a large file would resend everything from the 1,001st part.
    */
   async listParts(key: string, uploadId: string): Promise<Array<UploadedPart>> {
     const parts: Array<UploadedPart> = []
@@ -191,11 +191,11 @@ export default class MultipartService extends MultipartContract {
   }
 
   /**
-   * Fecha o upload: o bucket remonta as partes na chave final.
+   * Closes the upload: the bucket reassembles the parts at the final key.
    *
-   * A lista tem de vir ordenada por `partNumber` e com o `ETag` que cada parte
-   * devolveu - é assim que o storage confere que nenhuma se perdeu ou chegou
-   * pela metade.
+   * The list must come ordered by `partNumber` and with the `ETag` each part
+   * returned - that is how the storage checks that none was lost or arrived
+   * half-done.
    */
   async complete(
     key: string,
@@ -218,11 +218,11 @@ export default class MultipartService extends MultipartContract {
   }
 
   /**
-   * Descarta o upload e as partes já recebidas.
+   * Discards the upload and the parts already received.
    *
-   * Sem isto, um upload cancelado deixa as partes ocupando o bucket para
-   * sempre: elas não aparecem na listagem de objetos e continuam sendo
-   * cobradas.
+   * Without this, a cancelled upload leaves the parts occupying the bucket
+   * forever: they do not appear in the object listing and keep being
+   * billed.
    */
   async abort(key: string, uploadId: string): Promise<void> {
     await this.client.send(

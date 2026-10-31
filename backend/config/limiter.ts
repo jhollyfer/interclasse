@@ -2,16 +2,16 @@ import { defineConfig, stores } from '@adonisjs/limiter'
 import type { InferLimiters } from '@adonisjs/limiter/types'
 
 /**
- * O limitador de tentativas.
+ * The attempt limiter.
  *
- * Existe pelo motivo clássico: `sign-in` e `sign-up` são as portas onde tentar
- * muitas vezes é o ataque, e o upload entrega URL assinada de bucket — sem teto,
- * um laço de shell enche o bucket sem passar por tela nenhuma.
+ * It exists for the classic reason: `sign-in` and `sign-up` are the doors where trying
+ * many times is the attack, and the upload hands out signed bucket URLs - without a ceiling,
+ * a shell loop fills the bucket without going through any screen.
  *
- * Só o store `database`: este projeto não tem Redis - nem a dependência, nem
- * `REDIS_URL`, nem serviço no compose. Declarar o store `redis` aqui faria o
- * container tentar resolver um binding que não existe e derrubar o boot. Quando
- * o projeto ganhar Redis, ele entra aqui e vira o padrão: contar tentativa é escrita quente e não vale ocupar a conexão do banco.
+ * Only the `database` store: this project has no Redis - neither the dependency, nor
+ * `REDIS_URL`, nor a compose service. Declaring the `redis` store here would make the
+ * container try to resolve a binding that does not exist and bring down the boot. When
+ * the project gets Redis, it goes in here and becomes the default: counting attempts is a hot write and is not worth occupying the database connection.
  */
 const limiterConfig = defineConfig({
   default: 'database',
@@ -19,8 +19,8 @@ const limiterConfig = defineConfig({
   stores: {
     database: stores.database({
       tableName: 'rate_limits',
-      // A linha do contador não é dado do domínio: deixá-la para trás encheria
-      // a tabela de chaves que já expiraram.
+      // The counter row is not domain data: leaving it behind would fill
+      // the table with keys that have already expired.
       clearExpiredByTimeout: true,
     }),
   },

@@ -19,10 +19,10 @@ const dbConfig = defineConfig({
         connectionString: env.get('DATABASE_URL'),
 
         /**
-         * Ligado por `DATABASE_SSL`, e não por `NODE_ENV`: quem decide é onde o
-         * banco está, não em que ambiente a aplicação roda. Banco na mesma rede
-         * privada da aplicação costuma não falar TLS - e exigir TLS ali derruba
-         * a conexão no boot.
+         * Turned on by `DATABASE_SSL`, not by `NODE_ENV`: what decides is where the
+         * database is, not in which environment the application runs. A database on the same
+         * private network as the application usually does not speak TLS - and requiring TLS there brings down
+         * the connection at boot.
          */
         ssl: (function () {
           if (env.get('DATABASE_SSL')) return { rejectUnauthorized: true }
@@ -32,9 +32,9 @@ const dbConfig = defineConfig({
       },
       migrations: {
         /**
-         * Ordena os arquivos de migration pelo nome. O timestamp no início do
-         * nome é o que decide a ordem, e sem isto a ordenação lexicográfica
-         * embaralha arquivos de dígitos diferentes.
+         * Sorts the migration files by name. The timestamp at the start of the
+         * name is what decides the order, and without this the lexicographic sort
+         * scrambles files with different digit counts.
          */
         naturalSort: true,
         paths: ['database/migrations'],
@@ -42,8 +42,8 @@ const dbConfig = defineConfig({
 
       schemaGeneration: {
         /**
-         * `database/schema.ts` é regerado a cada `migration:run` a partir da
-         * conexão viva, e é dele que os models Lucid herdam as colunas.
+         * `database/schema.ts` is regenerated on every `migration:run` from the
+         * live connection, and it is from it that the Lucid models inherit the columns.
          */
         enabled: true,
         rulesPaths: ['./database/schema_rules.js'],

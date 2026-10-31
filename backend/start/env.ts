@@ -12,13 +12,13 @@
 import { Env } from '@adonisjs/core/env'
 
 /**
- * O único leitor de ambiente (_standards/backend.md §6), em blocos na ordem da
- * casa. Toda chave declarada aqui é lida por algum `env.get()`, e vice-versa -
- * `pattern:check` cobra os dois sentidos; chave que perdeu o leitor sai.
+ * The single environment reader (_standards/backend.md §6), in blocks in the house
+ * order. Every key declared here is read by some `env.get()`, and vice versa -
+ * `pattern:check` enforces both directions; a key that lost its reader goes away.
  *
- * Obrigatória é a que derruba o boot quando falta - e derrubar o boot é o
- * comportamento desejado: melhor a aplicação não subir do que subir com um
- * default escondido no código.
+ * Required is the one that brings the boot down when missing - and bringing the boot down is the
+ * desired behavior: better that the application does not start than starts with a
+ * default hidden in the code.
  */
 export default await Env.create(new URL('../', import.meta.url), {
   /*
@@ -26,11 +26,11 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Node
   |----------------------------------------------------------------------------
   |
-  | `TZ` é lida pelo próprio Node, não por `env.get()`, e por isso passava
-  | despercebida: estava no `.env.example` e em schema nenhum. Ausente, o
-  | processo herda o fuso do host, e a mesma consulta responde datas diferentes
-  | conforme a máquina. `UTC` em todo ambiente; quem converte para o fuso de quem
-  | lê é a camada de apresentação.
+  | `TZ` is read by Node itself, not by `env.get()`, and so went
+  | unnoticed: it was in `.env.example` and in no schema. Absent, the
+  | process inherits the host timezone, and the same query answers different dates
+  | depending on the machine. `UTC` in every environment; whoever converts to the reader's timezone
+  | is the presentation layer.
   */
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
   PORT: Env.schema.number(),
@@ -43,103 +43,103 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_SERVER_URL: Env.schema.string({ format: 'url', tld: false }),
 
   /**
-   * Quem o Adonis trata como proxy confiável, para `request.ip()` ler o
-   * `X-Forwarded-For` só de quem o proxy de fato escreveu. Um valor só, no
-   * formato do `proxy-addr`: IP, sub-rede (`10.0.0.0/8`) ou apelido
+   * Whom Adonis treats as a trusted proxy, so `request.ip()` reads
+   * `X-Forwarded-For` only from whoever the proxy actually wrote. A single value, in the
+   * `proxy-addr` format: IP, subnet (`10.0.0.0/8`) or alias
    * (`loopback`, `linklocal`, `uniquelocal`).
    *
-   * Opcional, e o default é seguro: ausente vale `loopback`, o do Adonis. Atrás
-   * do Traefik do Coolify (outro container) ela é **necessária**: sem ela
-   * `request.ip()` é o IP do proxy e todo limite por IP vira global. Nunca
-   * `true`: o cliente passa a forjar o `X-Forwarded-For`.
+   * Optional, and the default is safe: absent means `loopback`, Adonis'. Behind
+   * Coolify's Traefik (another container) it is **necessary**: without it
+   * `request.ip()` is the proxy IP and every per-IP limit becomes global. Never
+   * `true`: the client would then forge `X-Forwarded-For`.
    */
   TRUSTED_PROXIES: Env.schema.string.optional(),
 
   /**
-   * Origens que o navegador pode usar para chamar esta API, separadas por
-   * vírgula. Obrigatória em produção (`config/cors.ts` derruba o boot sem ela) e
-   * opcional fora dela, onde o CORS libera qualquer origem;
-   * fora dele, ausente significa lista vazia, e lista vazia recusa todo pedido
-   * cross-origin - que é o default certo para um valor que ninguém configurou.
+   * Origins the browser may use to call this API, separated by
+   * comma. Required in production (`config/cors.ts` brings the boot down without it) and
+   * optional outside it, where CORS allows any origin;
+   * outside it, absent means an empty list, and an empty list refuses every
+   * cross-origin request - which is the right default for a value nobody configured.
    */
   CORS_ORIGINS: Env.schema.string.optional(),
 
   /**
-   * O domínio do cookie de sessão, quando o app e a API ficam em hosts
-   * diferentes do mesmo domínio-pai.
+   * The session cookie domain, when the app and the API are on different
+   * hosts of the same parent domain.
    *
-   * Sem ela o cookie nasce host-only e o SSR do frontend nunca o recebe: todo
-   * F5 em rota privada vira 401 e volta para a tela de entrada. Em
-   * desenvolvimento não aparece porque cookie ignora porta - `localhost:3333` e
-   * `localhost:3000` são o mesmo domínio.
+   * Without it the cookie is born host-only and the frontend SSR never receives it: every
+   * F5 on a private route becomes 401 and goes back to the sign-in screen. In
+   * development it does not show up because cookies ignore the port - `localhost:3333` and
+   * `localhost:3000` are the same domain.
    *
-   * O valor é o menor domínio que cobre os dois hosts. Opcional de propósito:
-   * ausente é o comportamento que este arquivo sempre teve.
+   * The value is the smallest domain that covers both hosts. Optional on purpose:
+   * absent is the behavior this file always had.
    */
   COOKIE_DOMAIN: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------
-  | Banco de dados
+  | Database
   |----------------------------------------------------------
   */
   DATABASE_URL: Env.schema.string(),
 
   /**
-   * TLS na conexão com o Postgres. É decisão de infraestrutura, não de ambiente:
-   * um banco na mesma rede privada da aplicação normalmente não fala TLS, e um
-   * banco gerenciado normalmente exige. Amarrar isso a `NODE_ENV` obrigava um
-   * dos dois arranjos a não subir.
+   * TLS on the Postgres connection. It is an infrastructure decision, not an environment one:
+   * a database on the same private network as the application normally does not speak TLS, and a
+   * managed database normally requires it. Tying this to `NODE_ENV` forced one
+   * of the two setups not to start.
    */
   DATABASE_SSL: Env.schema.boolean.optional(),
 
   /*
   |----------------------------------------------------------
-  | Armazenamento de arquivos
+  | File storage
   |----------------------------------------------------------
   |
-  | Um bucket S3-compatível, o mesmo em todo ambiente: MinIO em dev e nos testes,
-  | e em produção o que `STORAGE_ENDPOINT` apontar. Não há escolha de destino por
-  | ambiente porque o upload é presigned multipart, e multipart é API do S3 - um
-  | disco local não a tem.
+  | One S3-compatible bucket, the same in every environment: MinIO in dev and tests,
+  | and in production whatever `STORAGE_ENDPOINT` points to. There is no per-environment
+  | destination choice because the upload is presigned multipart, and multipart is S3 API - a
+  | local disk does not have it.
   |
-  | O prefixo é `STORAGE_`, e não o nome de um fornecedor: o que o código depende
-  | é do protocolo. R2, S3, Spaces, Linode e MinIO trocam de lugar mudando o
+  | The prefix is `STORAGE_`, not a vendor name: what the code depends on
+  | is the protocol. R2, S3, Spaces, Linode and MinIO swap places by changing the
   | endpoint.
   |
-  | `UPLOAD_MAX_SIZE` é o teto por arquivo, em bytes, e é **exigida**: o quanto
-  | cabe num upload é decisão de quem opera, e um default escondido no código é
-  | um teto que ninguém escolheu e ninguém vê. Faltando, a aplicação não sobe -
-  | que é melhor do que subir recusando arquivo por um limite invisível.
+  | `UPLOAD_MAX_SIZE` is the per-file ceiling, in bytes, and is **required**: how much
+  | fits in an upload is the operator's decision, and a default hidden in the code is
+  | a ceiling nobody chose and nobody sees. When missing, the application does not start -
+  | which is better than starting and refusing files over an invisible limit.
   */
   UPLOAD_MAX_SIZE: Env.schema.number(),
 
-  // Credencial e destino do bucket: obrigatórios e sem default. O storage é
-  // funcionalidade de base, e subir sem ele é subir com upload quebrado.
+  // Bucket credential and destination: required and with no default. Storage is a
+  // base feature, and starting without it is starting with a broken upload.
   STORAGE_KEY: Env.schema.string(),
   STORAGE_SECRET: Env.schema.string(),
   STORAGE_BUCKET: Env.schema.string(),
   STORAGE_ENDPOINT: Env.schema.string(),
 
   /**
-   * O MinIO só atende no estilo `endpoint/bucket/chave`; os buckets gerenciados
-   * atendem também no estilo `bucket.endpoint`. Ligar isto em dev e desligar em
-   * produção é a única diferença de configuração entre os dois.
+   * MinIO only serves the `endpoint/bucket/key` style; managed buckets
+   * also serve the `bucket.endpoint` style. Turning this on in dev and off in
+   * production is the only configuration difference between the two.
    */
   STORAGE_FORCE_PATH_STYLE: Env.schema.boolean.optional(),
 
   /*
   |----------------------------------------------------------------------------
-  | Semeadura
+  | Seeding
   |----------------------------------------------------------------------------
   |
-  | Lidas pelos seeders, e opcionais porque a aplicação sobe sem elas - só quem
-  | semeia precisa. Sem a senha o seeder para em vez de criar uma conta com
-  | credencial conhecida: ela era literal no arquivo, e qualquer pessoa que o
-  | lesse tinha o dono de todo ambiente já semeado.
+  | Read by the seeders, and optional because the application starts without them - only whoever
+  | seeds needs them. Without the password the seeder stops instead of creating an account with a
+  | known credential: it used to be a literal in the file, and anyone who
+  | read it owned every environment already seeded.
   |
-  | `SEED_DEMO_PASSWORD` é a senha das contas do catálogo de demonstração, onde
-  | houver esse catálogo. Mesma regra: sem default, e o seeder para sem ela.
+  | `SEED_DEMO_PASSWORD` is the password of the demo catalog accounts, where
+  | there is such a catalog. Same rule: no default, and the seeder stops without it.
   */
   SEED_ADMINISTRATOR_EMAIL: Env.schema.string.optional(),
   SEED_ADMINISTRATOR_PASSWORD: Env.schema.string.optional(),

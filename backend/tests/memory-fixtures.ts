@@ -7,9 +7,9 @@ import { SportMemoryRepository } from '#repositories/sport/sport.memory.reposito
 import { StudentMemoryRepository } from '#repositories/student/student.memory.repository'
 
 /**
- * Os repositórios em memória do unitário (`_standards/domain.md` §5.3). A spec de
- * `features/` não importa implementação concreta (`architecture.md` §2): pega a
- * instância daqui e a passa ao container pelo contrato (`makeWithMemory`).
+ * The unit in-memory repositories (`_standards/domain.md` §5.3). A `features/` spec
+ * does not import a concrete implementation (`architecture.md` §2): it takes the
+ * instance from here and passes it to the container by the contract (`makeWithMemory`).
  */
 export class MemoryRepositories {
   static announcements(): AnnouncementMemoryRepository {

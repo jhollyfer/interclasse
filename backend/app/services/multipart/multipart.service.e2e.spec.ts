@@ -7,48 +7,50 @@ import drive from '@adonisjs/drive/services/main'
 import { MultipartContract } from '#services/multipart/multipart.contract'
 
 /**
- * O multipart contra o bucket de verdade (o MinIO do `docker-compose.yml`).
+ * Multipart against the real bucket (the `docker-compose.yml` MinIO).
  *
- * Contra o storage real e não contra um dublê porque é justamente o protocolo
- * que está sob teste: o mínimo de 5 MB por parte, o `ETag` que só vem no header
- * da resposta, a URL que expira e o `ListParts` que enxerga o que subiu. Um
- * dublê responderia o que eu programasse e não provaria nada disso.
+ * Against the real storage and not against a double because the protocol is precisely
+ * what is under test: the 5 MB minimum per part, the `ETag` that only comes in the
+ * response header, the URL that expires and the `ListParts` that sees what went up. A
+ * double would answer whatever I programmed and would prove none of that.
  */
 
 /**
- * O S3 recusa parte não-final com menos de 5 MB (`EntityTooSmall`), então a
- * primeira tem exatamente o mínimo. A segunda é minúscula de propósito: é a
- * última, e para ela não há mínimo.
+ * S3 refuses a non-final part under 5 MB (`EntityTooSmall`), so the
+ * first has exactly the minimum. The second is tiny on purpose: it is the
+ * last, and it has no minimum.
  */
 const FIRST_PART = new Uint8Array(5 * 1024 * 1024).fill(65)
 const LAST_PART = new Uint8Array(1024).fill(66)
 
-/** Envia uma parte para a URL assinada e devolve o `ETag` que o bucket deu. */
+/** Sends a part to the signed URL and returns the `ETag` the bucket gave. */
 async function put(url: string, body: Uint8Array): Promise<string> {
   const response = await fetch(url, { method: 'PUT', body })
 
   if (!response.ok) {
-    throw new Error(`PUT da parte respondeu ${response.status}`)
+    throw new Error(`PUT of the part answered ${response.status}`)
   }
 
   const etag = response.headers.get('etag')
 
   if (!etag) {
-    throw new Error('bucket não devolveu ETag - o complete seria impossível')
+    throw new Error('bucket did not return an ETag - complete would be impossible')
   }
 
   return etag
 }
 
-/** O item na posição, ou falha o teste: lista mais curta que o esperado é o defeito. */
+/** The item at the position, or fails the test: a list shorter than expected is the defect. */
 function item<T>(list: ReadonlyArray<T>, index: number): T {
   const found = list[index]
-  if (found === undefined) throw new Error(`lista sem a posição ${index}`)
+  if (found === undefined) throw new Error(`list without position ${index}`)
   return found
 }
 
 test.group('multipart', () => {
-  test('sobe em partes, remonta, e o objeto final tem a soma dos tamanhos', async ({ assert }) => {
+  test('uploads in parts, reassembles, and the final object has the sum of the sizes', async ({
+    assert,
+  }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
@@ -69,8 +71,8 @@ test.group('multipart', () => {
       { partNumber: 2, etag: await put(item(urls, 1).url, LAST_PART) },
     ]
 
-    // Antes do complete, nada existe na chave final: o que o bucket tem são as
-    // partes, e é isso que a retomada enxerga.
+    // Before complete, nothing exists at the final key: what the bucket has is the
+    // parts, and that is what resuming sees.
     assert.isFalse(await drive.use().exists(key))
 
     const received = await multipart.listParts(key, uploadId)
@@ -88,7 +90,7 @@ test.group('multipart', () => {
     await drive.use().delete(key)
   })
 
-  test('listParts enxerga só o que subiu, e é isso que a retomada usa', async ({ assert }) => {
+  test('listParts sees only what went up, and that is what resuming uses', async ({ assert }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
@@ -110,7 +112,7 @@ test.group('multipart', () => {
     await multipart.abort(key, uploadId)
   })
 
-  test('abort descarta as partes, e nada fica ocupando o bucket', async ({ assert }) => {
+  test('abort discards the parts, and nothing is left occupying the bucket', async ({ assert }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
@@ -123,13 +125,13 @@ test.group('multipart', () => {
     await put(first.url, FIRST_PART)
     await multipart.abort(key, uploadId)
 
-    // O upload deixou de existir: listar as partes dele agora é erro, e não
-    // lista vazia. É a diferença entre "abortado" e "aberto e sem partes".
+    // The upload no longer exists: listing its parts now is an error, not an
+    // empty list. It is the difference between "aborted" and "open with no parts".
     await assert.rejects(() => multipart.listParts(key, uploadId))
     assert.isFalse(await drive.use().exists(key))
   })
 
-  test('URL assinada para de valer depois de expirar', async ({ assert }) => {
+  test('a signed URL stops being valid after it expires', async ({ assert }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
@@ -145,8 +147,8 @@ test.group('multipart', () => {
 
     assert.equal(refused.status, 403)
 
-    // E o upload continua aberto: uma URL nova sobe a mesma parte. É o que
-    // `GET /storages/:id/parts` faz por quem ficou horas fora do ar.
+    // And the upload is still open: a new URL uploads the same part. It is what
+    // `GET /storages/:id/parts` does for whoever was offline for hours.
     const renewed = item(
       await multipart.signParts(key, uploadId, [{ partNumber: 1, size: LAST_PART.byteLength }]),
       0,

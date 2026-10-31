@@ -7,16 +7,16 @@ import { policies } from '#generated/policies'
 import * as abilities from '#abilities/main'
 
 /**
- * Monta o `ctx.bouncer` que os controllers usam para checar policy
- * (_standards/backend.md §4.6). Sem Edge neste projeto, então sem helpers de view.
+ * Builds the `ctx.bouncer` the controllers use to check policies
+ * (_standards/backend.md §4.6). No Edge in this project, so no view helpers.
  */
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     /**
-     * Uma instância por requisição, inicializada com o `actor` que o
-     * `auth.middleware.ts` valida - lido na hora da checagem, e não aqui, porque
-     * este middleware roda antes do auth. É o composition root do Bouncer - o
-     * único `new Bouncer` do projeto (_standards/backend.md §2.1).
+     * One instance per request, initialized with the `actor` that
+     * `auth.middleware.ts` validates - read at check time, and not here, because
+     * this middleware runs before auth. It is Bouncer's composition root - the
+     * only `new Bouncer` in the project (_standards/backend.md §2.1).
      */
     ctx.bouncer = new Bouncer(() => ctx.actor, abilities, policies).setContainerResolver(
       ctx.containerResolver,

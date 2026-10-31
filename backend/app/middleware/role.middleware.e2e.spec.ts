@@ -11,21 +11,21 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * A matriz de papéis inteira, uma célula por caso.
+ * The whole role matrix, one cell per case.
  *
- * Existe separada dos specs de recurso porque a regra que ela afirma **não** é
- * de recurso nenhum: é o desenho de `start/routes.ts`, e quebra quando alguém
- * move uma rota de grupo.
+ * It lives apart from the resource specs because the rule it asserts is **not**
+ * any resource's: it is the design of `start/routes.ts`, and it breaks when someone
+ * moves a route between groups.
  *
- * A distinção que ela protege acima de tudo é `401` contra `403`: sem sessão o
- * papel do requisitante é desconhecido, e responder "você não pode" no lugar de
- * "não sei quem é você" contaria a quem nem entrou que o recurso existe.
+ * The distinction it protects above all is `401` versus `403`: without a session the
+ * requester's role is unknown, and answering "you cannot" instead of
+ * "I don't know who you are" would tell someone who has not even signed in that the resource exists.
  */
 
-/** Uma rota de leitura de cada recurso do painel administrativo. */
-const PAINEL = ['classrooms', 'sports', 'announcements', 'brackets', 'matches', 'users']
+/** One read route of each administrative panel resource. */
+const PANEL = ['classrooms', 'sports', 'announcements', 'brackets', 'matches', 'users']
 
-const USUARIO = {
+const NEW_USER = {
   name: 'Pessoa da matriz',
   email: 'matriz@mail.com',
   password: 'Demo1234!',
@@ -33,63 +33,63 @@ const USUARIO = {
   role: USER_ROLE.ADVISOR,
 }
 
-test.group('papéis > sem sessão', (group) => {
+test.group('roles > without a session', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a conta responde 401, e não 403', async ({ client }) => {
+  test('the account answers 401, and not 403', async ({ client }) => {
     const response = await client.get('/account')
 
     response.assertStatus(401)
   })
 
-  for (const recurso of PAINEL) {
-    test(`/administrator/${recurso} responde 401, e não 403`, async ({ client }) => {
-      const response = await client.get(`/administrator/${recurso}`)
+  for (const resource of PANEL) {
+    test(`/administrator/${resource} answers 401, and not 403`, async ({ client }) => {
+      const response = await client.get(`/administrator/${resource}`)
 
       response.assertStatus(401)
     })
   }
 
-  test('a área do conselheiro e a do representante respondem 401', async ({ client }) => {
-    const conselheiro = await client.get('/advisor/classrooms')
-    const representante = await client.get('/representative/enrollments')
+  test('the advisor area and the representative area answer 401', async ({ client }) => {
+    const advisor = await client.get('/advisor/classrooms')
+    const representative = await client.get('/representative/enrollments')
 
-    conselheiro.assertStatus(401)
-    representante.assertStatus(401)
+    advisor.assertStatus(401)
+    representative.assertStatus(401)
   })
 
-  test('o site responde sem sessão', async ({ client }) => {
-    for (const caminho of ['sports', 'announcements', 'matches', 'brackets']) {
-      const response = await client.get(`/storefront/${caminho}`)
+  test('the site answers without a session', async ({ client }) => {
+    for (const path of ['sports', 'announcements', 'matches', 'brackets']) {
+      const response = await client.get(`/storefront/${path}`)
 
       response.assertStatus(200)
     }
   })
 })
 
-test.group('papéis > o conselheiro não alcança o painel', (group) => {
+test.group('roles > the advisor does not reach the panel', (group) => {
   group.each.setup(() => resetDatabase())
 
-  for (const recurso of PAINEL) {
-    test(`/administrator/${recurso} responde 403 ao conselheiro`, async ({ client, assert }) => {
+  for (const resource of PANEL) {
+    test(`/administrator/${resource} answers 403 to the advisor`, async ({ client, assert }) => {
       const session = await authenticateAsAdvisor(client)
 
-      const response = await client.get(`/administrator/${recurso}`).cookies(session)
+      const response = await client.get(`/administrator/${resource}`).cookies(session)
 
       response.assertStatus(403)
       assert.equal(body(response).code, 'ACCESS_DENIED')
     })
   }
 
-  test('nem cria conta', async ({ client }) => {
+  test('nor does it create an account', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
-    const response = await client.post('/administrator/users').cookies(session).json(USUARIO)
+    const response = await client.post('/administrator/users').cookies(session).json(NEW_USER)
 
     response.assertStatus(403)
   })
 
-  test('e não entra na área do representante', async ({ client }) => {
+  test('and does not enter the representative area', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
     const response = await client.get('/representative/enrollments').cookies(session)
@@ -98,20 +98,20 @@ test.group('papéis > o conselheiro não alcança o painel', (group) => {
   })
 })
 
-test.group('papéis > o representante só alcança as próprias inscrições', (group) => {
+test.group('roles > the representative only reaches their own enrollments', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('painel e área do conselheiro respondem 403', async ({ client }) => {
+  test('panel and advisor area answer 403', async ({ client }) => {
     const { session } = await signInWithFactory(client, 'representative')
 
-    const painel = await client.get('/administrator/classrooms').cookies(session)
-    const conselheiro = await client.get('/advisor/students').cookies(session)
+    const panel = await client.get('/administrator/classrooms').cookies(session)
+    const advisor = await client.get('/advisor/students').cookies(session)
 
-    painel.assertStatus(403)
-    conselheiro.assertStatus(403)
+    panel.assertStatus(403)
+    advisor.assertStatus(403)
   })
 
-  test('sem turma vinculada, as inscrições respondem 404', async ({ client, assert }) => {
+  test('without a linked classroom, the enrollments answer 404', async ({ client, assert }) => {
     const { session } = await signInWithFactory(client, 'representative')
 
     const response = await client.get('/representative/enrollments').cookies(session)
@@ -121,20 +121,20 @@ test.group('papéis > o representante só alcança as próprias inscrições', (
   })
 })
 
-test.group('papéis > o administrador passa em tudo', (group) => {
+test.group('roles > the administrator passes everywhere', (group) => {
   group.each.setup(() => resetDatabase())
 
-  for (const recurso of PAINEL) {
-    test(`/administrator/${recurso} responde 200 ao administrador`, async ({ client }) => {
+  for (const resource of PANEL) {
+    test(`/administrator/${resource} answers 200 to the administrator`, async ({ client }) => {
       const session = await authenticateAsAdministrator(client)
 
-      const response = await client.get(`/administrator/${recurso}`).cookies(session)
+      const response = await client.get(`/administrator/${resource}`).cookies(session)
 
       response.assertStatus(200)
     })
   }
 
-  test('e cobre a falta do conselheiro na área dele', async ({ client }) => {
+  test('and covers for the missing advisor in their area', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/advisor/classrooms').cookies(session)
@@ -142,26 +142,26 @@ test.group('papéis > o administrador passa em tudo', (group) => {
     response.assertStatus(200)
   })
 
-  test('o administrador percorre usuários do início ao fim', async ({ client }) => {
+  test('the administrator goes through users from start to end', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const criado = await client.post('/administrator/users').cookies(session).json(USUARIO)
-    criado.assertStatus(201)
+    const created = await client.post('/administrator/users').cookies(session).json(NEW_USER)
+    created.assertStatus(201)
 
-    const id = body(criado).id
+    const id = body(created).id
 
-    const arquivado = await client.patch(`/administrator/users/${id}/archive`).cookies(session)
-    arquivado.assertStatus(204)
+    const archived = await client.patch(`/administrator/users/${id}/archive`).cookies(session)
+    archived.assertStatus(204)
 
-    const apagado = await client.delete(`/administrator/users/${id}`).cookies(session)
-    apagado.assertStatus(204)
+    const deleted = await client.delete(`/administrator/users/${id}`).cookies(session)
+    deleted.assertStatus(204)
   })
 
-  test('e arquiva outro administrador, que não é a própria conta', async ({ client }) => {
+  test('and archives another administrator, who is not their own account', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
-    const outro = await UserFactory.apply('administrator').create()
+    const other = await UserFactory.apply('administrator').create()
 
-    const response = await client.patch(`/administrator/users/${outro.id}/archive`).cookies(session)
+    const response = await client.patch(`/administrator/users/${other.id}/archive`).cookies(session)
 
     response.assertStatus(204)
   })

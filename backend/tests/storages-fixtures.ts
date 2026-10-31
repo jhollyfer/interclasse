@@ -7,9 +7,9 @@ import Storage from '#models/storage'
 import { PNG_HEAD } from '#tests/storages-unit-fixtures'
 
 /**
- * Um corpo de PNG com o tamanho pedido, para os specs que sobem arquivo de
- * verdade: o `complete` confere o conteúdo contra o tipo declarado, e bytes
- * soltos seriam recusados.
+ * A PNG body of the requested size, for the specs that really upload a file: the
+ * `complete` checks the content against the declared type, and loose bytes would be
+ * refused.
  */
 export function pngBytes(size: number, fill = 66): Uint8Array {
   const bytes = new Uint8Array(size).fill(fill)
@@ -19,12 +19,12 @@ export function pngBytes(size: number, fill = 66): Uint8Array {
 }
 
 /**
- * Uma linha com os metadados escolhidos, para os testes de listagem.
+ * A row with the chosen metadata, for the listing tests.
  *
- * Separada do `record(status)` acima porque aquele fixa `originalName` e
- * `mimetype`, que são justamente as colunas que a busca e os filtros recortam.
- * `filename` sai aleatório para não repetir a mesma chave de bucket em duas
- * linhas.
+ * Separate from the `record(status)` above because that one fixes `originalName` and
+ * `mimetype`, which are precisely the columns the search and filters cut by.
+ * `filename` comes out random so the same bucket key does not repeat on two
+ * rows.
  */
 export function storageRow(attributes: Partial<Storage> = {}) {
   const filename = `${randomUUID()}.png`
@@ -40,12 +40,12 @@ export function storageRow(attributes: Partial<Storage> = {}) {
   })
 }
 
-/** Se a linha de `storages` ainda existe, para o spec conferir o efeito sem importar o model. */
+/** Whether the `storages` row still exists, so the spec checks the effect without importing the model. */
 export async function storageExists(id: string): Promise<boolean> {
   return (await Storage.find(id)) !== null
 }
 
-/** Envelhece a linha no banco: é a idade que o comando de limpeza usa para decidir. */
+/** Ages the row in the database: it is the age the cleanup command uses to decide. */
 export async function ageStorage(id: string, hours: number): Promise<void> {
   await Storage.query()
     .where('id', id)

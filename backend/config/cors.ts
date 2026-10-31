@@ -11,12 +11,12 @@ import env from '#start/env'
  */
 
 /**
- * A allowlist vem de `CORS_ORIGINS`, separada por vírgula, lida uma vez aqui e
- * exportada: o middleware de origem lê a mesma lista em vez de refazer o parse.
+ * The allowlist comes from `CORS_ORIGINS`, comma-separated, read once here and
+ * exported: the origin middleware reads the same list instead of parsing again.
  *
- * Ela precisa ser explícita: com `credentials: true` abaixo, o protocolo recusa
- * `*` - o navegador não envia cookie para uma origem curinga. Então ou a origem
- * do frontend está listada, ou não existe sessão entre os dois.
+ * It must be explicit: with `credentials: true` below, the protocol refuses
+ * `*` - the browser does not send a cookie to a wildcard origin. So either the
+ * frontend origin is listed, or there is no session between the two.
  */
 export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGINS') ?? '')
   .split(',')
@@ -24,17 +24,17 @@ export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGINS') ?? ''
   .filter(Boolean)
 
 /**
- * Em produção a lista é obrigatória: vazia, a barreira de origem recusa toda
- * escrita e o frontend não entra. Subir assim é erro de configuração, e o boot
- * para em vez de esperar o primeiro usuário (_standards/backend.md §4.10).
+ * In production the list is required: empty, the origin barrier refuses every
+ * write and the frontend does not get in. Starting like that is a configuration error, and the boot
+ * stops instead of waiting for the first user (_standards/backend.md §4.10).
  */
 if (app.inProduction && corsOrigins.length === 0) {
-  throw new Error('CORS_ORIGINS é obrigatória em produção: liste as origens do frontend')
+  throw new Error('CORS_ORIGINS is required in production: list the frontend origins')
 }
 
 /**
- * Em desenvolvimento libera qualquer origem, para não exigir configuração de
- * quem só quer subir front e back na própria máquina.
+ * In development it allows any origin, so as not to require configuration from
+ * whoever just wants to run front and back on their own machine.
  */
 let origin: boolean | string[] = [...corsOrigins]
 if (app.inDev) origin = true
@@ -53,23 +53,23 @@ const corsConfig = defineConfig({
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
 
   /**
-   * Os headers que o preflight libera, e não `true`.
+   * The headers the preflight allows, not `true`.
    *
-   * `true` reflete de volta o que o navegador pediu, seja o que for. A lista
-   * explícita é o que faz um header novo entrar por decisão e não por acidente.
+   * `true` reflects back whatever the browser asked for. The
+   * explicit list is what makes a new header enter by decision and not by accident.
    *
-   * `content-type` e `accept` são o mínimo de qualquer requisição JSON;
-   * `x-request-id` é o que o log correlaciona.
+   * `content-type` and `accept` are the minimum of any JSON request;
+   * `x-request-id` is what the log correlates.
    */
   headers: ['content-type', 'accept', 'x-request-id'],
 
   /**
    * Response headers exposed to the browser.
    *
-   * `content-disposition` não está entre os headers de resposta simples, então
-   * sem esta linha o JavaScript da página lê `null` ao procurá-lo - mesmo com a
-   * API mandando o header, e mesmo em desenvolvimento. É por ele que a
-   * exportação em CSV descobre o nome do arquivo a salvar.
+   * `content-disposition` is not among the simple response headers, so
+   * without this line the page JavaScript reads `null` when looking for it - even with the
+   * API sending the header, and even in development. It is how the
+   * CSV export finds out the file name to save.
    */
   exposeHeaders: ['content-disposition'],
 

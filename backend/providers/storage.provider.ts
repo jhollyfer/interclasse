@@ -8,13 +8,13 @@ import { StorageContract } from '#services/storage/storage.contract'
 import StorageService from '#services/storage/storage.service'
 
 /**
- * O composition root do storage: o cliente S3 e os contratos de I/O externo
- * ligados aos concretos (_standards/solid.md §2). A URL assinada de leitura não
- * nasce aqui: o repository a assina pelo `StorageContract` (_standards/backend.md §4.7).
+ * The storage composition root: the S3 client and the external I/O contracts bound to
+ * the concrete ones (_standards/solid.md §2). The signed read URL is not born here:
+ * the repository signs it through the `StorageContract` (_standards/backend.md §4.7).
  *
- * `singleton` para o cliente: ele carrega o pool de conexões HTTP, e um por
- * requisição jogaria fora o keep-alive a cada upload. Os services são `bind`:
- * sem estado, o container os monta por requisição.
+ * `singleton` for the client: it holds the HTTP connection pool, and one per request
+ * would throw away keep-alive on every upload. The services are `bind`: stateless,
+ * the container builds them per request.
  */
 export default class StorageProvider {
   constructor(protected app: ApplicationService) {}

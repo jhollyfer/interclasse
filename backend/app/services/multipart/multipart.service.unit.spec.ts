@@ -8,12 +8,12 @@ async function service(): Promise<MultipartContract> {
 }
 
 /**
- * A assinatura é calculada localmente (SigV4), sem rede: o que se confere aqui é
- * o que a URL prende, e não o bucket (`_standards/backend.md` §5.4). O protocolo
- * contra o bucket real fica no `multipart.service.e2e.spec.ts`.
+ * The signature is computed locally (SigV4), without network: what is checked here is
+ * what the URL pins, not the bucket (`_standards/backend.md` §5.4). The protocol
+ * against the real bucket lives in `multipart.service.e2e.spec.ts`.
  */
 test.group('services > multipart (unit)', () => {
-  test('cada parte ganha a própria URL, com tipo e tamanho presos na assinatura', async ({
+  test('each part gets its own URL, with type and size pinned in the signature', async ({
     assert,
   }) => {
     const multipart = await service()
@@ -34,7 +34,7 @@ test.group('services > multipart (unit)', () => {
     }
   })
 
-  test('o envio de parte única prende content-type e content-length', async ({ assert }) => {
+  test('the single-part upload pins content-type and content-length', async ({ assert }) => {
     const multipart = await service()
 
     const url = new URL(await multipart.signSingle('abc.png', 'image/png', 1024))
@@ -44,7 +44,7 @@ test.group('services > multipart (unit)', () => {
     assert.include(signed, 'content-length')
   })
 
-  test('a expiração pedida entra na URL', async ({ assert }) => {
+  test('the requested expiry goes into the URL', async ({ assert }) => {
     const multipart = await service()
 
     const url = new URL(await multipart.signSingle('abc.png', 'image/png', 1024, 120))

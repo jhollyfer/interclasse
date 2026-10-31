@@ -14,10 +14,10 @@ import {
 import type { BracketRepository } from '#repositories/bracket/bracket.repository'
 
 /**
- * O arranjo do teste de contrato da chave e do cartão (`_standards/domain.md`
- * §5.4). Modalidade, turma, aluno e inscrição são o que a chave só lê: cada
- * implementação os arranja do seu jeito (linhas no banco, ou o mapa da memória),
- * e o mesmo teste roda nas duas.
+ * The arrangement of the bracket and card contract test (`_standards/domain.md`
+ * §5.4). Sport, classroom, student and enrollment are what the bracket only reads: each
+ * implementation arranges them its own way (database rows, or the in-memory map),
+ * and the same test runs on both.
  */
 export type BracketHarness = {
   readonly repository: BracketRepository
@@ -118,7 +118,7 @@ export class BracketArrangements {
     }
   }
 
-  /** A modalidade, `names.length` turmas com um atleta inscrito cada, e o sorteio gravado. */
+  /** The sport, `names.length` classrooms with one enrolled athlete each, and the saved draw. */
   static async drawn(harness: BracketHarness, names: string[], sportName = 'Futsal') {
     const sport = BracketArrangements.sport(sportName)
     await harness.sport(sport)
@@ -146,7 +146,7 @@ export class BracketArrangements {
       random: () => 0,
       now: BracketArrangements.NOW,
     })
-    if (result.isLeft()) throw new Error('sorteio inválido no arranjo')
+    if (result.isLeft()) throw new Error('invalid draw in the arrangement')
 
     await harness.repository.save(result.value)
 

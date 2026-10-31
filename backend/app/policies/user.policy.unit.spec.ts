@@ -34,7 +34,9 @@ const OTHER = accountOf(OTHER_ID)
 
 test.group('policies > user (unit)', () => {
   for (const role of USER_ROLES) {
-    test(`${role}: conta alheia passa em update, archive e delete`, async ({ assert }) => {
+    test(`${role}: an account owned by someone else passes on update, archive and delete`, async ({
+      assert,
+    }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
 
@@ -43,7 +45,7 @@ test.group('policies > user (unit)', () => {
       assert.isTrue(policy.delete(actor, OTHER))
     })
 
-    test(`${role}: a própria conta responde 403 em archive e delete`, async ({ assert }) => {
+    test(`${role}: the account itself answers 403 on archive and delete`, async ({ assert }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
 
@@ -57,7 +59,9 @@ test.group('policies > user (unit)', () => {
       })
     })
 
-    test(`${role}: na própria conta, papel e status são 403 e o nome passa`, async ({ assert }) => {
+    test(`${role}: on their own account, role and status are 403 and the name passes`, async ({
+      assert,
+    }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
 
@@ -72,7 +76,7 @@ test.group('policies > user (unit)', () => {
       assert.isTrue(policy.update(actor, OWN, {}))
     })
 
-    test(`${role}: conta inexistente é 404 USER_NOT_FOUND`, async ({ assert }) => {
+    test(`${role}: a nonexistent account is 404 USER_NOT_FOUND`, async ({ assert }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
       const expected = { status: 404, code: 'USER_NOT_FOUND' }

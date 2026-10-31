@@ -6,10 +6,10 @@ import { ActorSchema } from '@interclasse/shared'
 import HTTPException from '#exceptions/http.exception'
 
 /**
- * Autentica a requisição, nega quem não tem sessão e deixa em `ctx.actor` quem
- * age (_standards/backend.md §4.3). A conta do guard é validada contra o
- * `ActorSchema` do `shared/`: o use-case, a policy e o Bouncer só conhecem esse
- * tipo, nunca o model.
+ * Authenticates the request, denies whoever has no session and leaves in `ctx.actor` whoever
+ * acts (_standards/backend.md §4.3). The guard's account is validated against the
+ * `shared/` `ActorSchema`: the use case, the policy and Bouncer only know that
+ * type, never the model.
  */
 export default class AuthMiddleware {
   async handle(

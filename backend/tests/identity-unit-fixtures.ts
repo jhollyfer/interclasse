@@ -9,7 +9,7 @@ export const USER_ID = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d'
 export const OTHER_ID = '2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e'
 export const PASSWORD = 'Senha@123'
 
-/** Os colaboradores de conta e sessão, todos em memória. */
+/** The account and session collaborators, all in memory. */
 export function identityDoubles() {
   const storages = new StorageMemoryRepository()
 
@@ -31,7 +31,7 @@ type Seed = {
   readonly inactive?: boolean
 }
 
-/** Grava uma conta no repositório de memória; a senha é `PASSWORD`, cifrada no `save`. */
+/** Saves an account in the in-memory repository; the password is `PASSWORD`, hashed on `save`. */
 export async function seedUser(users: UserMemoryRepository, seed: Seed = {}): Promise<User> {
   const user = User.create({
     id: seed.id ?? USER_ID,
