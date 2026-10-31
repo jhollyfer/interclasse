@@ -132,7 +132,7 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 8.1 | Backend `app/features/` em inglês | Média | Em andamento | |
-| 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Em andamento | |
+| 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, saídas de scripts e identificadores em inglês; `pnpm check`, `depcruise`, shared e E2E (692) verdes |
 | 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Em andamento | sem redirect |
 
 ## Fase N · Ideias (fora do escopo atual)
