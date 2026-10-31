@@ -22,7 +22,7 @@ async function setup() {
 }
 
 test.group('administrator/announcements > update (unit)', () => {
-  test('muda só o que veio no payload', async ({ assert }) => {
+  test('changes only what came in the payload', async ({ assert }) => {
     const { announcements, useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, pinned: true })
@@ -32,7 +32,7 @@ test.group('administrator/announcements > update (unit)', () => {
     assert.isTrue(stored?.snapshot().pinned)
   })
 
-  test('inexistente é 404 ANNOUNCEMENT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent is 404 ANNOUNCEMENT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000', title: 'X' })

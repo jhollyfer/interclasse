@@ -13,7 +13,7 @@ import {
 test.group('announcements > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('devolve o aviso inteiro', async ({ client, assert }) => {
+  test('returns the whole announcement', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.apply('pinned').create()
 
@@ -28,7 +28,7 @@ test.group('announcements > show', (group) => {
     assert.isTrue(body(response).pinned)
   })
 
-  test('aviso inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent announcement responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -39,7 +39,7 @@ test.group('announcements > show', (group) => {
     assert.equal(body(response).code, 'ANNOUNCEMENT_NOT_FOUND')
   })
 
-  test('id que não é uuid responde 422', async ({ client, assert }) => {
+  test('id that is not a uuid responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/announcements/123').cookies(session)
@@ -48,7 +48,7 @@ test.group('announcements > show', (group) => {
     assert.property(body(response).errors, 'id')
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const announcement = await AnnouncementFactory.create()
 
     const anonymous = await client.get(`/administrator/announcements/${announcement.id}`)

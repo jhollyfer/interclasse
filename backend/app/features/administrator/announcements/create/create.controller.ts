@@ -9,7 +9,8 @@ import { AdministratorAnnouncementCreateValidator } from '#validators/administra
 @inject()
 export default class AdministratorAnnouncementCreateController {
   static docs = defineDocs({
-    description: 'Publica na hora: o aviso aparece no site assim que é criado.',
+    description:
+      'Publishes right away: the announcement shows on the site as soon as it is created.',
   })
 
   constructor(private readonly useCase: AdministratorAnnouncementCreateUseCase) {}

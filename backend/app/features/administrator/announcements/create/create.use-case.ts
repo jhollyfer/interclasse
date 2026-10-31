@@ -20,7 +20,7 @@ import type { AdministratorAnnouncementCreatePayload } from '#validators/adminis
 type Payload = AdministratorAnnouncementCreatePayload
 type Response = Either<HTTPException, AdministratorAnnouncementShowResponse>
 
-/** Publica na hora: o aviso aparece no site assim que é criado. */
+/** Publishes right away: the announcement shows on the site as soon as it is created. */
 @inject()
 export default class AdministratorAnnouncementCreateUseCase {
   constructor(
