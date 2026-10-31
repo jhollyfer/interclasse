@@ -16,7 +16,7 @@ import {
 test.group('sports > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('modalidade sem uso é apagada e responde 204', async ({ client, assert }) => {
+  test('unused sport is deleted and responds 204', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
 
@@ -26,7 +26,7 @@ test.group('sports > delete', (group) => {
     assert.isNull(await Stored.sport(sport.id))
   })
 
-  test('modalidade inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent sport responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.delete(`/administrator/sports/${randomUUID()}`).cookies(session)
@@ -35,7 +35,7 @@ test.group('sports > delete', (group) => {
     assert.equal(body(response).code, 'SPORT_NOT_FOUND')
   })
 
-  test('modalidade com atleta inscrito responde 409 e fica', async ({ client, assert }) => {
+  test('sport with an enrolled athlete responds 409 and stays', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
     await enrollRoster(sport, 1)
@@ -47,7 +47,7 @@ test.group('sports > delete', (group) => {
     assert.isNotNull(await Stored.sport(sport.id))
   })
 
-  test('modalidade com chave sorteada responde 409', async ({ client, assert }) => {
+  test('sport with a drawn bracket responds 409', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
     await BracketFactory.merge({ sportId: sport.id }).create()
@@ -59,7 +59,7 @@ test.group('sports > delete', (group) => {
     assert.isNotNull(await Stored.sport(sport.id))
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const sport = await SportFactory.create()
 
     const anonymous = await client.delete(`/administrator/sports/${sport.id}`)
@@ -73,10 +73,10 @@ test.group('sports > delete', (group) => {
   })
 })
 
-test.group('administrator/sports/delete > acesso e validação', (group) => {
+test.group('administrator/sports/delete > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/administrator/sports/nao-e-uuid').cookies(admin)

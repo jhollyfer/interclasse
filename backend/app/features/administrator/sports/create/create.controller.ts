@@ -10,8 +10,8 @@ import { AdministratorSportCreateValidator } from '#validators/administrator/spo
 export default class AdministratorSportCreateController {
   static docs = defineDocs({
     description:
-      'O `slug` sai do nome. `minAthletes` é o corte do sorteio: turma com menos inscritos ' +
-      'não entra na chave.',
+      'The `slug` comes from the name. `minAthletes` is the draw cutoff: a classroom with fewer enrolled ' +
+      'does not enter the bracket.',
   })
 
   constructor(private readonly useCase: AdministratorSportCreateUseCase) {}

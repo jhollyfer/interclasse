@@ -12,7 +12,7 @@ import {
 @inject()
 export default class AdministratorSportPaginateController {
   static docs = defineDocs({
-    description: `\`?sort\` aceita ${SPORT_SORT_COLUMNS.join(', ')}. Padrão: ordenada por nome.`,
+    description: `\`?sort\` accepts ${SPORT_SORT_COLUMNS.join(', ')}. Default: ordered by name.`,
   })
 
   constructor(private readonly useCase: AdministratorSportPaginateUseCase) {}

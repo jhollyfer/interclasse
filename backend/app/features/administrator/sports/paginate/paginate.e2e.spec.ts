@@ -11,7 +11,10 @@ import {
 test.group('sports > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem ?sort a lista sai em ordem alfabética, com meta', async ({ client, assert }) => {
+  test('without ?sort the list comes out in alphabetical order, with meta', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     await SportFactory.merge([
       { name: 'Vôlei' },
@@ -45,7 +48,7 @@ test.group('sports > paginate', (group) => {
     assert.equal(body(response).data[1].name, 'Futsal')
   })
 
-  test('?search recorta pelo nome, sem caixa', async ({ client, assert }) => {
+  test('?search narrows by name, case-insensitive', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const futsal = await SportFactory.merge({ name: 'Futsal' }).create()
     await SportFactory.merge({ name: 'Vôlei' }).create()
@@ -60,7 +63,7 @@ test.group('sports > paginate', (group) => {
     assert.equal(body(response).data[0].id, futsal.id)
   })
 
-  test('?perPage pagina a lista', async ({ client, assert }) => {
+  test('?perPage paginates the list', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     await SportFactory.createMany(3)
 
@@ -75,18 +78,18 @@ test.group('sports > paginate', (group) => {
     assert.equal(body(response).meta.lastPage, 2)
   })
 
-  test('?sort fora da tupla fechada responde 422', async ({ client, assert }) => {
+  test('?sort outside the closed tuple responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // Na URL, e não em `.qs()`: o registry do Tuyau não deixaria o valor
-    // inválido compilar.
+    // In the URL, not in `.qs()`: the Tuyau registry would not let the invalid
+    // value compile.
     const response = await client.get('/administrator/sports?sort=slug').cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'sort')
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const anonymous = await client.get('/administrator/sports')
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client.get('/administrator/sports').cookies(advisor)

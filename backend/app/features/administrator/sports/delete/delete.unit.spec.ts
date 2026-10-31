@@ -11,22 +11,22 @@ const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 
 async function setup() {
   const sports = MemoryRepositories.sports()
-  const queimada = Sport.create({
+  const dodgeball = Sport.create({
     id: ID,
     name: 'Queimada',
     minAthletes: 6,
     maxAthletes: 15,
     now: new Date(),
   })
-  if (queimada.isLeft()) throw new Error('arranjo inválido')
-  await sports.save(queimada.value)
+  if (dodgeball.isLeft()) throw new Error('invalid arrangement')
+  await sports.save(dodgeball.value)
   const useCase = await makeWithMemory(AdministratorSportDeleteUseCase, [[SportRepository, sports]])
 
   return { sports, useCase }
 }
 
 test.group('administrator/sports > delete (unit)', () => {
-  test('apaga a modalidade sem uso', async ({ assert }) => {
+  test('deletes the unused sport', async ({ assert }) => {
     const { sports, useCase } = await setup()
 
     const result = await useCase.execute({ id: ID })
@@ -35,7 +35,7 @@ test.group('administrator/sports > delete (unit)', () => {
     assert.isNull(await sports.findById(ID))
   })
 
-  test('com inscrição ou chave é 409 SPORT_IN_USE e fica', async ({ assert }) => {
+  test('with an enrollment or bracket is 409 SPORT_IN_USE and stays', async ({ assert }) => {
     const { sports, useCase } = await setup()
     sports.markInUse(ID)
 
@@ -45,7 +45,7 @@ test.group('administrator/sports > delete (unit)', () => {
     assert.isNotNull(await sports.findById(ID))
   })
 
-  test('inexistente é 404', async ({ assert }) => {
+  test('nonexistent is 404', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })
