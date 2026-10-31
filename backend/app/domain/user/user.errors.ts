@@ -1,14 +1,14 @@
 /**
- * O que a conta recusa, como fato (`_standards/domain.md` §2): sem status HTTP
- * nem texto de tela. O use-case traduz cada um. Os códigos são os do contrato
- * da API, e por isso não levam o prefixo da entidade.
+ * What the account refuses, as a fact (`_standards/domain.md` §2): no HTTP status
+ * or screen text. The use case translates each one. The codes are those of the API
+ * contract, and so do not carry the entity prefix.
  */
 export type UserError =
-  /** O e-mail é de uma conta viva. */
+  /** The e-mail belongs to a live account. */
   | { readonly code: 'USER_ALREADY_EXISTS' }
   | { readonly code: 'USER_ALREADY_ARCHIVED' }
-  /** Restaurar e apagar de vez só valem para conta arquivada. */
+  /** Restoring and deleting for good only hold for an archived account. */
   | { readonly code: 'USER_NOT_ARCHIVED' }
-  /** A senha atual informada não confere com a guardada. */
+  /** The current password given does not match the stored one. */
   | { readonly code: 'CURRENT_PASSWORD_INVALID' }
   | { readonly code: 'PASSWORD_SAME_AS_CURRENT' }

@@ -1,6 +1,6 @@
 /**
- * O que a foto recusa, como fato (`_standards/domain.md` §2): sem status HTTP
- * nem texto de tela. Arquivo que não existe não é fato da foto: quem o procura
- * é o repository, e o use-case responde.
+ * What the photo refuses, as a fact (`_standards/domain.md` §2): no HTTP status
+ * or screen text. A file that does not exist is not a photo fact: whoever looks it
+ * up is the repository, and the use case answers.
  */
 export type PhotoError = { readonly code: 'PHOTO_NOT_IMAGE' }

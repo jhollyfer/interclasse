@@ -13,7 +13,7 @@ export type ClassroomProps = {
   updatedAt: Date | null
 }
 
-/** Os vínculos de pessoa de uma turma. */
+/** The person links of a classroom. */
 export type ClassroomLinks = {
   readonly advisorId?: string | null
   readonly representativeId?: string | null
@@ -25,9 +25,9 @@ type ClassroomChanges = ClassroomLinks & {
 }
 
 /**
- * O que o banco sabe de uma conta indicada: `exists` é conta viva com o papel do
- * vínculo (sem isso, um representante indicado como conselheiro ganharia o
- * cadastro de alunos da turma inteira); `taken` é conta já ligada a outra turma.
+ * What the database knows about a given account: `exists` is a live account with the role of
+ * the link (without it, a representative named as advisor would gain the
+ * student registry of the whole classroom); `taken` is an account already linked to another classroom.
  */
 export type ClassroomLinkFacts = { readonly exists: boolean; readonly taken: boolean }
 
@@ -36,20 +36,20 @@ export type ClassroomPeopleFacts = {
   readonly representative?: ClassroomLinkFacts
 }
 
-/** Fato que falta é conta que não existe: a recusa é a saída segura. */
+/** A missing fact is an account that does not exist: refusal is the safe exit. */
 const MISSING = { exists: false, taken: false } satisfies ClassroomLinkFacts
 
 /**
- * A turma: a unidade que compete. Guarda a categoria derivada do ano, o travamento
- * depois do sorteio e as regras dos vínculos de conselheiro e representante
+ * The classroom: the unit that competes. It holds the category derived from the grade, the lock
+ * after the draw and the rules of the advisor and representative links
  * (`_standards/domain.md` §1).
  */
 export class Classroom {
   private constructor(private readonly props: ClassroomProps) {}
 
   /**
-   * A categoria que o ano determina. Derivada, nunca enviada pelo cliente: um 9º
-   * ano gravado como `F1` jogaria contra crianças de 8 anos.
+   * The category the grade determines. Derived, never sent by the client: a 9th
+   * grade stored as `F1` would play against 8-year-old children.
    */
   static categoryOf(grade: number): Category {
     if (grade <= 5) return CATEGORY.F1
@@ -57,7 +57,7 @@ export class Classroom {
     return CATEGORY.F2
   }
 
-  /** Nascimento. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Birth. The id and the clock come from outside: the domain does no I/O. */
   static create(
     input: {
       readonly id: string
@@ -85,21 +85,21 @@ export class Classroom {
         advisorId,
         representativeId,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce.
+        // Born with the edit stamped, the way the database row is born.
         updatedAt: input.now,
       }),
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: ClassroomProps): Classroom {
     return new Classroom({ ...props })
   }
 
   /**
-   * Renomeia, muda o ano e os vínculos. Na edição só se confere o vínculo que
-   * mudou: o que já estava gravado foi aceito quando entrou, e recusá-lo agora
-   * travaria até renomear a turma. Nada muda quando devolve `left`.
+   * Renames, changes the grade and the links. On edit only the link that
+   * changed is checked: what was already stored was accepted when it came in, and refusing it now
+   * would block even renaming the classroom. Nothing changes when it returns `left`.
    */
   update(
     changes: ClassroomChanges,
@@ -115,8 +115,8 @@ export class Classroom {
     const refused = Classroom.refusePeople(this.changedLinks(changes), context.facts)
     if (refused) return left(refused)
 
-    // Mudar de categoria com a turma numa chave a deixaria jogando contra a
-    // categoria errada.
+    // Changing category with the classroom in a bracket would leave it playing against the
+    // wrong category.
     const category = Classroom.categoryOf(grade)
     if (category !== this.props.category && context.inCompetition)
       return left({ code: 'CLASSROOM_CATEGORY_LOCKED' })
@@ -132,26 +132,26 @@ export class Classroom {
     return right(this)
   }
 
-  /** Apagar com a turma numa chave sorteada recusa; sem time, libera. */
+  /** Deleting with the classroom in a drawn bracket refuses; without a team, it allows. */
   remove(context: { readonly inCompetition: boolean }): Either<ClassroomError, Classroom> {
     if (context.inCompetition) return left({ code: 'CLASSROOM_IN_COMPETITION' })
 
     return right(this)
   }
 
-  /** Se o nome muda com estas mudanças: só aí vale conferir duplicidade. */
+  /** Whether the name changes with these changes: only then is it worth checking for duplicates. */
   renamesTo(name: string | undefined): name is string {
     return name !== undefined && name !== this.props.name
   }
 
-  /** Se o ano levaria a turma a outra categoria: só aí vale perguntar do sorteio. */
+  /** Whether the grade would take the classroom to another category: only then is it worth asking about the draw. */
   changesCategoryWith(grade: number | undefined): boolean {
     if (grade === undefined) return false
 
     return Classroom.categoryOf(grade) !== this.props.category
   }
 
-  /** Os vínculos novos a conferir: os que mudam para uma conta, e não para `null`. */
+  /** The new links to check: the ones that change to an account, and not to `null`. */
   changedLinks(changes: ClassroomLinks): { advisorId?: string; representativeId?: string } {
     const links: { advisorId?: string; representativeId?: string } = {}
 
@@ -175,7 +175,7 @@ export class Classroom {
     return grade >= GRADES.MIN && grade <= GRADES.MAX
   }
 
-  /** A primeira recusa dos vínculos, na ordem em que a tela os pergunta. */
+  /** The first refusal of the links, in the order the screen asks for them. */
   private static refusePeople(
     links: ClassroomLinks,
     facts: ClassroomPeopleFacts,

@@ -21,7 +21,7 @@ function recordedBy(actorRole: 'ADMINISTRATOR' | 'ADVISOR'): EnrollmentRemoval {
 }
 
 test.group('EnrollmentRemoval', () => {
-  test('a remoção do conselheiro nasce pendente', ({ assert }) => {
+  test("the advisor's removal is born pending", ({ assert }) => {
     const removal = recordedBy(USER_ROLE.ADVISOR)
 
     assert.deepInclude(removal.snapshot(), {
@@ -31,11 +31,11 @@ test.group('EnrollmentRemoval', () => {
     })
   })
 
-  test('a remoção do administrador já nasce lida', ({ assert }) => {
+  test("the administrator's removal is born already read", ({ assert }) => {
     assert.equal(recordedBy(USER_ROLE.ADMINISTRATOR).snapshot().acknowledgedAt, NOW)
   })
 
-  test('dar ciência carimba a data', ({ assert }) => {
+  test('acknowledging stamps the date', ({ assert }) => {
     const removal = recordedBy(USER_ROLE.ADVISOR)
 
     const result = removal.acknowledge(LATER)
@@ -44,7 +44,7 @@ test.group('EnrollmentRemoval', () => {
     assert.deepInclude(removal.snapshot(), { acknowledgedAt: LATER, updatedAt: LATER })
   })
 
-  test('repetir a ciência mantém a data da primeira', ({ assert }) => {
+  test('repeating the acknowledgement keeps the first date', ({ assert }) => {
     const removal = recordedBy(USER_ROLE.ADVISOR)
     removal.acknowledge(LATER)
 

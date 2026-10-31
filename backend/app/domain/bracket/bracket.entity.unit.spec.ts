@@ -6,7 +6,7 @@ import { Bracket } from './bracket.entity.ts'
 const NOW = new Date('2026-10-29T12:00:00.000Z')
 const LATER = new Date('2026-10-29T15:00:00.000Z')
 
-/** Ids sequenciais e sorteio sem embaralhar: o resultado é sempre o mesmo. */
+/** Sequential ids and a draw without shuffling: the result is always the same. */
 function draw(total: number) {
   let count = 0
   const classroomIds = Array.from({ length: total }, (_, index) => `C${index + 1}`)
@@ -21,14 +21,14 @@ function draw(total: number) {
     random: () => 0,
     now: NOW,
   })
-  if (drawn.isLeft()) throw new Error('sorteio inválido no arranjo')
+  if (drawn.isLeft()) throw new Error('invalid draw in the arrangement')
 
   return drawn.value
 }
 
 function teamOfClassroom(bracket: Bracket, classroomId: string): string {
   const team = bracket.snapshot().teams.find((candidate) => candidate.classroomId === classroomId)
-  if (!team) throw new Error('time ausente no arranjo')
+  if (!team) throw new Error('team missing from the arrangement')
 
   return team.id
 }
@@ -37,13 +37,13 @@ function matchAt(bracket: Bracket, phase: string, position: number) {
   const match = bracket
     .snapshot()
     .matches.find((candidate) => candidate.phase === phase && candidate.position === position)
-  if (!match) throw new Error('partida ausente no arranjo')
+  if (!match) throw new Error('match missing from the arrangement')
 
   return match
 }
 
-test.group('Bracket > sorteio', () => {
-  test('com 4 turmas nascem 2 semifinais e a final vazia', ({ assert }) => {
+test.group('Bracket > draw', () => {
+  test('with 4 classrooms, 2 semifinals and the empty final are born', ({ assert }) => {
     const { matches, teams, status } = draw(4).snapshot()
 
     assert.equal(status, BRACKET_STATUS.KNOCKOUT)
@@ -57,7 +57,7 @@ test.group('Bracket > sorteio', () => {
     assert.deepInclude(final, { homeTeamId: null, awayTeamId: null, round: 2 })
   })
 
-  test('com 3 turmas a de folga entra direto na final', ({ assert }) => {
+  test('with 3 classrooms the bye one goes straight to the final', ({ assert }) => {
     const { matches, teams } = draw(3).snapshot()
     const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
 
@@ -66,7 +66,7 @@ test.group('Bracket > sorteio', () => {
     assert.isString(final?.homeTeamId ?? final?.awayTeamId)
   })
 
-  test('com 13 turmas há 3 folgas, 12 partidas e todas as partidas nascem a jogar', ({
+  test('with 13 classrooms there are 3 byes, 12 matches and all matches are born to be played', ({
     assert,
   }) => {
     const { matches } = draw(13).snapshot()
@@ -79,7 +79,7 @@ test.group('Bracket > sorteio', () => {
     )
   })
 
-  test('menos de duas turmas é NOT_ENOUGH_TEAMS com o mínimo de atletas', ({ assert }) => {
+  test('fewer than two classrooms is NOT_ENOUGH_TEAMS with the minimum athletes', ({ assert }) => {
     const drawn = Bracket.draw({
       id: 'b',
       sportId: 's',
@@ -94,7 +94,7 @@ test.group('Bracket > sorteio', () => {
     assert.deepEqual(drawn.value, { code: 'NOT_ENOUGH_TEAMS', minTeams: 2, minAthletes: 5 })
   })
 
-  test('mais de 16 turmas é TOO_MANY_TEAMS', ({ assert }) => {
+  test('more than 16 classrooms is TOO_MANY_TEAMS', ({ assert }) => {
     const drawn = Bracket.draw({
       id: 'b',
       sportId: 's',
@@ -110,8 +110,8 @@ test.group('Bracket > sorteio', () => {
   })
 })
 
-test.group('Bracket > placar', () => {
-  test('o vencedor avança para a vaga da partida seguinte', ({ assert }) => {
+test.group('Bracket > score', () => {
+  test('the winner advances to the next match slot', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
 
@@ -126,7 +126,7 @@ test.group('Bracket > placar', () => {
     assert.equal(matchAt(bracket, MATCH_PHASE.FINAL, 0).homeTeamId, semi.homeTeamId)
   })
 
-  test('o vencedor da posição ímpar entra como visitante da final', ({ assert }) => {
+  test('the winner of the odd position enters as the away team of the final', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 1)
 
@@ -135,7 +135,7 @@ test.group('Bracket > placar', () => {
     assert.equal(matchAt(bracket, MATCH_PHASE.FINAL, 0).awayTeamId, semi.awayTeamId)
   })
 
-  test('partida sem os dois times é MATCH_TEAMS_PENDING', ({ assert }) => {
+  test('a match without both teams is MATCH_TEAMS_PENDING', ({ assert }) => {
     const bracket = draw(4)
     const final = matchAt(bracket, MATCH_PHASE.FINAL, 0)
 
@@ -144,7 +144,7 @@ test.group('Bracket > placar', () => {
     assert.deepEqual(scored.value, { code: 'MATCH_TEAMS_PENDING' })
   })
 
-  test('empate sem vencedor é MATCH_WINNER_REQUIRED, e com vencedor de fora também', ({
+  test('a tie without a winner is MATCH_WINNER_REQUIRED, and so is one with an outside winner', ({
     assert,
   }) => {
     const bracket = draw(4)
@@ -161,7 +161,7 @@ test.group('Bracket > placar', () => {
     assert.deepEqual(stranger.value, { code: 'MATCH_WINNER_REQUIRED' })
   })
 
-  test('empate com o vencedor dos pênaltis avança esse time', ({ assert }) => {
+  test('a tie with the penalty winner advances that team', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
 
@@ -174,13 +174,13 @@ test.group('Bracket > placar', () => {
     assert.equal(matchAt(bracket, MATCH_PHASE.FINAL, 0).homeTeamId, semi.awayTeamId)
   })
 
-  test('partida de outra chave é MATCH_NOT_FOUND', ({ assert }) => {
+  test('a match from another bracket is MATCH_NOT_FOUND', ({ assert }) => {
     const scored = draw(4).score('nao-existe', { homeScore: 1, awayScore: 0 }, LATER)
 
     assert.deepEqual(scored.value, { code: 'MATCH_NOT_FOUND' })
   })
 
-  test('corrigir o vencedor depois que a seguinte foi jogada é recusado', ({ assert }) => {
+  test('correcting the winner after the next one was played is refused', ({ assert }) => {
     const bracket = draw(4)
     const first = matchAt(bracket, MATCH_PHASE.SEMI, 0)
     const second = matchAt(bracket, MATCH_PHASE.SEMI, 1)
@@ -196,7 +196,7 @@ test.group('Bracket > placar', () => {
     assert.isTrue(sameWinner.isRight())
   })
 
-  test('a final com placar encerra a chave com a campeã', ({ assert }) => {
+  test('the final with a score closes the bracket with the champion', ({ assert }) => {
     const bracket = draw(2)
     const final = matchAt(bracket, MATCH_PHASE.FINAL, 0)
     assert.isNull(bracket.champion())
@@ -208,8 +208,8 @@ test.group('Bracket > placar', () => {
   })
 })
 
-test.group('Bracket > desfazer placar', () => {
-  test('tira o vencedor da vaga da seguinte e devolve a partida a jogar', ({ assert }) => {
+test.group('Bracket > undo score', () => {
+  test('removes the winner from the next slot and returns the match to be played', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
     bracket.score(semi.id, { homeScore: 2, awayScore: 1 }, LATER)
@@ -226,14 +226,14 @@ test.group('Bracket > desfazer placar', () => {
     assert.isNull(matchAt(bracket, MATCH_PHASE.FINAL, 0).homeTeamId)
   })
 
-  test('partida sem placar é MATCH_NOT_PLAYED', ({ assert }) => {
+  test('a match without a score is MATCH_NOT_PLAYED', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
 
     assert.deepEqual(bracket.unscore(semi.id, LATER).value, { code: 'MATCH_NOT_PLAYED' })
   })
 
-  test('com a seguinte já jogada é recusado', ({ assert }) => {
+  test('with the next one already played it is refused', ({ assert }) => {
     const bracket = draw(4)
     const first = matchAt(bracket, MATCH_PHASE.SEMI, 0)
     const second = matchAt(bracket, MATCH_PHASE.SEMI, 1)
@@ -246,7 +246,7 @@ test.group('Bracket > desfazer placar', () => {
     })
   })
 
-  test('desfazer a final reabre a chave', ({ assert }) => {
+  test('undoing the final reopens the bracket', ({ assert }) => {
     const bracket = draw(2)
     const final = matchAt(bracket, MATCH_PHASE.FINAL, 0)
     bracket.score(final.id, { homeScore: 1, awayScore: 0 }, LATER)
@@ -257,13 +257,13 @@ test.group('Bracket > desfazer placar', () => {
     assert.isNull(bracket.champion())
   })
 
-  test('partida de outra chave é MATCH_NOT_FOUND', ({ assert }) => {
+  test('a match from another bracket is MATCH_NOT_FOUND', ({ assert }) => {
     assert.deepEqual(draw(4).unscore('nao-existe', LATER).value, { code: 'MATCH_NOT_FOUND' })
   })
 })
 
-test.group('Bracket > escalação', () => {
-  test('diz os dois times da partida e o time da turma entre eles', ({ assert }) => {
+test.group('Bracket > lineup', () => {
+  test('says the two teams of the match and the classroom team among them', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
     const home = bracket.snapshot().teams.find((team) => team.id === semi.homeTeamId)
@@ -277,7 +277,9 @@ test.group('Bracket > escalação', () => {
     })
   })
 
-  test('turma que não joga a partida fica sem time, e partida alheia é null', ({ assert }) => {
+  test('a classroom that does not play the match has no team, and a foreign match is null', ({
+    assert,
+  }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
     const outsider = bracket
@@ -290,8 +292,8 @@ test.group('Bracket > escalação', () => {
   })
 })
 
-test.group('Bracket > agenda e exclusão', () => {
-  test('agenda data e local, e null desmarca', ({ assert }) => {
+test.group('Bracket > schedule and deletion', () => {
+  test('schedules date and place, and null unschedules', ({ assert }) => {
     const bracket = draw(4)
     const semi = matchAt(bracket, MATCH_PHASE.SEMI, 0)
 
@@ -308,13 +310,15 @@ test.group('Bracket > agenda e exclusão', () => {
     })
   })
 
-  test('agendar partida de outra chave é MATCH_NOT_FOUND', ({ assert }) => {
+  test('scheduling a match from another bracket is MATCH_NOT_FOUND', ({ assert }) => {
     assert.deepEqual(draw(4).schedule('nao-existe', {}, LATER).value, {
       code: 'MATCH_NOT_FOUND',
     })
   })
 
-  test('chave sem placar pode ser apagada; com placar, BRACKET_HAS_RESULTS', ({ assert }) => {
+  test('a bracket without a score can be deleted; with a score, BRACKET_HAS_RESULTS', ({
+    assert,
+  }) => {
     const bracket = draw(4)
     assert.isTrue(bracket.ensureDeletable().isRight())
 
@@ -323,7 +327,7 @@ test.group('Bracket > agenda e exclusão', () => {
     assert.deepEqual(bracket.ensureDeletable().value, { code: 'BRACKET_HAS_RESULTS' })
   })
 
-  test('restore devolve a mesma chave que o snapshot guardou', ({ assert }) => {
+  test('restore returns the same bracket the snapshot kept', ({ assert }) => {
     const bracket = draw(5)
 
     assert.deepEqual(Bracket.restore(bracket.snapshot()).snapshot(), bracket.snapshot())

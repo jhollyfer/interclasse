@@ -9,38 +9,38 @@ export type EnrollmentProps = {
 }
 
 /**
- * Quem escreve a lista, e o que isso permite.
+ * Who writes the list, and what that allows.
  *
- * O representante só acrescenta, e só antes do sorteio. O conselheiro (e o
- * administrador, que cobre a falta dele) mexe a qualquer momento, inclusive
- * depois do sorteio, porque o time sorteado é a turma e trocar quem joga por ela
- * não muda a chave. Tirar atleta exige o motivo.
+ * The representative only adds, and only before the draw. The advisor (and the
+ * administrator, who covers for their absence) changes it at any time, including
+ * after the draw, because the drawn team is the classroom and swapping who plays for it
+ * does not change the bracket. Removing an athlete requires the reason.
  */
 export type EnrollmentWriter =
   { readonly role: 'representative' } | { readonly role: 'advisor'; readonly reason?: string }
 
-/** O que a troca da lista deixou para trás: quem saiu dela. */
+/** What the list swap left behind: who left it. */
 export type EnrollmentReplaced = { readonly removedStudentIds: string[] }
 
 /**
- * A lista de atletas de uma turma numa modalidade. A identidade é o par turma e
- * modalidade; cada aluno entra por id (`_standards/domain.md` §4).
+ * The athlete list of a classroom in a sport. The identity is the classroom and sport
+ * pair; each student enters by id (`_standards/domain.md` §4).
  */
 export class Enrollment {
   private constructor(private readonly props: EnrollmentProps) {}
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: EnrollmentProps): Enrollment {
     return new Enrollment({ ...props, studentIds: [...props.studentIds] })
   }
 
   /**
-   * Troca a lista inteira pela recebida. A lista é inteira, e não um aluno por
-   * vez: a tela é uma coluna de caixas marcadas, e o que ela tem para mandar é o
-   * estado final. Nada muda quando devolve `left`.
+   * Replaces the whole list with the received one. The list is whole, not one student at a
+   * time: the screen is a column of checked boxes, and what it has to send is the
+   * final state. Nothing changes when it returns `left`.
    *
-   * A ordem das recusas é a da tela: limite, aluno alheio, depois o que depende
-   * de quem escreve.
+   * The order of refusals is the screen's: limit, foreign student, then what depends
+   * on who writes.
    */
   replace(
     input: { readonly studentIds: readonly string[]; readonly writer: EnrollmentWriter },

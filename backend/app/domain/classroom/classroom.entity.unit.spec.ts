@@ -20,17 +20,17 @@ function sevenA(): Classroom {
 }
 
 test.group('Classroom', () => {
-  test('a categoria sai do ano: até o 5º é F1, depois F2', ({ assert }) => {
+  test('the category comes from the grade: up to the 5th is F1, after that F2', ({ assert }) => {
     assert.equal(Classroom.categoryOf(3), 'F1')
     assert.equal(Classroom.categoryOf(5), 'F1')
     assert.equal(Classroom.categoryOf(6), 'F2')
     assert.equal(Classroom.categoryOf(9), 'F2')
   })
 
-  test('nasce com a categoria derivada e a edição carimbada', ({ assert }) => {
+  test('is born with the derived category and the edit stamped', ({ assert }) => {
     const created = Classroom.create({ id: 'id', name: '4º B', grade: 4, now: NOW }, {})
 
-    if (created.isLeft()) throw new Error('turma recusada')
+    if (created.isLeft()) throw new Error('classroom refused')
     assert.deepInclude(created.value.snapshot(), {
       category: 'F1',
       advisorId: null,
@@ -39,7 +39,7 @@ test.group('Classroom', () => {
     })
   })
 
-  test('recusa ano fora do 3º ao 9º ao nascer e ao mudar', ({ assert }) => {
+  test('refuses a grade outside 3rd to 9th on birth and on change', ({ assert }) => {
     const born = Classroom.create({ id: 'id', name: '2º A', grade: 2, now: NOW }, {})
     const changed = sevenA().update({ grade: 10 }, { facts: {}, inCompetition: false, now: LATER })
 
@@ -47,7 +47,9 @@ test.group('Classroom', () => {
     assert.deepEqual(changed.value, { code: 'CLASSROOM_INVALID_GRADE' })
   })
 
-  test('conselheiro: conta inexistente ou sem o papel é ADVISOR_NOT_FOUND', ({ assert }) => {
+  test('advisor: a nonexistent account or one without the role is ADVISOR_NOT_FOUND', ({
+    assert,
+  }) => {
     const missing = Classroom.create(
       { id: 'id', name: '4º B', grade: 4, advisorId: 'x', now: NOW },
       {},
@@ -61,7 +63,9 @@ test.group('Classroom', () => {
     assert.deepEqual(wrongRole.value, { code: 'ADVISOR_NOT_FOUND' })
   })
 
-  test('conselheiro e representante já ligados a outra turma são recusados', ({ assert }) => {
+  test('an advisor and a representative already linked to another classroom are refused', ({
+    assert,
+  }) => {
     const advisor = Classroom.create(
       { id: 'id', name: '4º B', grade: 4, advisorId: 'x', now: NOW },
       { advisor: { exists: true, taken: true } },
@@ -80,7 +84,7 @@ test.group('Classroom', () => {
     assert.deepEqual(missingRepresentative.value, { code: 'REPRESENTATIVE_NOT_FOUND' })
   })
 
-  test('na edição só o vínculo que mudou é conferido', ({ assert }) => {
+  test('on edit only the link that changed is checked', ({ assert }) => {
     const classroom = sevenA()
 
     assert.deepEqual(classroom.changedLinks({ advisorId: 'advisor-1' }), {})
@@ -97,7 +101,7 @@ test.group('Classroom', () => {
     assert.isTrue(kept.isRight())
   })
 
-  test('troca de conselheiro confere a conta nova; null desfaz o vínculo', ({ assert }) => {
+  test('changing advisor checks the new account; null undoes the link', ({ assert }) => {
     const refused = sevenA().update(
       { advisorId: 'advisor-2' },
       { facts: { advisor: { exists: true, taken: true } }, inCompetition: false, now: LATER },
@@ -117,7 +121,7 @@ test.group('Classroom', () => {
     assert.deepInclude(classroom.snapshot(), { advisorId: null, representativeId: 'rep' })
   })
 
-  test('mudar o ano para outra categoria recalcula a categoria', ({ assert }) => {
+  test('changing the year to another category recalculates the category', ({ assert }) => {
     const classroom = sevenA()
     const result = classroom.update({ grade: 5 }, { facts: {}, inCompetition: false, now: LATER })
 
@@ -125,7 +129,7 @@ test.group('Classroom', () => {
     assert.deepInclude(classroom.snapshot(), { grade: 5, category: 'F1', updatedAt: LATER })
   })
 
-  test('turma sorteada não muda de categoria, mas muda de ano dentro dela', ({ assert }) => {
+  test('a drawn classroom does not change category, but changes grade within it', ({ assert }) => {
     const classroom = sevenA()
     const refused = classroom.update({ grade: 5 }, { facts: {}, inCompetition: true, now: LATER })
     const same = classroom.update({ grade: 8 }, { facts: {}, inCompetition: true, now: LATER })
@@ -135,21 +139,21 @@ test.group('Classroom', () => {
     assert.isTrue(same.isRight())
   })
 
-  test('left não muda nada', ({ assert }) => {
+  test('left changes nothing', ({ assert }) => {
     const classroom = sevenA()
     classroom.update({ name: 'outra', grade: 5 }, { facts: {}, inCompetition: true, now: LATER })
 
     assert.deepInclude(classroom.snapshot(), { name: '7º A', grade: 7, updatedAt: null })
   })
 
-  test('só apaga sem time numa chave', ({ assert }) => {
+  test('only deletes without a team in a bracket', ({ assert }) => {
     assert.isTrue(sevenA().remove({ inCompetition: false }).isRight())
     assert.deepEqual(sevenA().remove({ inCompetition: true }).value, {
       code: 'CLASSROOM_IN_COMPETITION',
     })
   })
 
-  test('renamesTo e changesCategoryWith dizem se vale conferir', ({ assert }) => {
+  test('renamesTo and changesCategoryWith say whether it is worth checking', ({ assert }) => {
     const classroom = sevenA()
 
     assert.isFalse(classroom.renamesTo(undefined))

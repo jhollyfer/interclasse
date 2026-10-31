@@ -15,7 +15,7 @@ import type { BracketError, MatchError } from './bracket.errors.ts'
 
 import { Knockout, type Pairing, type Random } from '#domain/shared/knockout.value-object'
 
-/** O time é a turma dentro da competição. */
+/** The team is the classroom inside the competition. */
 export type TeamProps = {
   readonly id: string
   readonly classroomId: string
@@ -23,7 +23,7 @@ export type TeamProps = {
   updatedAt: Date | null
 }
 
-/** A partida da chave: só muda pela raiz (`Bracket`), e não tem repository próprio. */
+/** The bracket match: it only changes through the root (`Bracket`), and has no repository of its own. */
 export type MatchProps = {
   readonly id: string
   readonly phase: MatchPhase
@@ -52,7 +52,7 @@ export type BracketProps = {
   readonly matches: MatchProps[]
 }
 
-/** Quem joga a partida: os dois times e, se perguntado, o time de uma turma. */
+/** Who plays the match: the two teams and, when asked, the team of a classroom. */
 export type Lineup = {
   readonly homeTeamId: string | null
   readonly awayTeamId: string | null
@@ -63,9 +63,9 @@ type DrawInput = {
   readonly id: string
   readonly sportId: string
   readonly category: Category
-  /** O mínimo de atletas da modalidade: só entra no fato, quando faltam turmas. */
+  /** The sport's minimum athletes: it only enters the fact, when classrooms are lacking. */
   readonly minAthletes: number
-  /** As turmas da categoria com inscritos suficientes para formar time. */
+  /** The category's classrooms with enough enrolled to form a team. */
   readonly classroomIds: ReadonlyArray<string>
   readonly newId: () => string
   readonly random: Random
@@ -84,16 +84,16 @@ type ScheduleChanges = {
 }
 
 /**
- * A competição de uma modalidade numa categoria: o agregado com os times e as
- * partidas (`_standards/domain.md` §4). Guarda o sorteio, o avanço do vencedor
- * pela chave e o encerramento com campeã; time e partida só mudam por aqui.
+ * The competition of a sport in a category: the aggregate with the teams and the
+ * matches (`_standards/domain.md` §4). It holds the draw, the winner's advance
+ * through the bracket and the closing with a champion; team and match only change through here.
  */
 export class Bracket {
   private constructor(private readonly props: BracketProps) {}
 
   /**
-   * O sorteio: monta a chave de mata-mata inteira, da primeira fase à final. O
-   * id, o relógio e o sorteio chegam de fora: o domínio não faz I/O.
+   * The draw: builds the whole knockout bracket, from the first phase to the final. The
+   * id, the clock and the draw come from outside: the domain does no I/O.
    */
   static draw(input: DrawInput): Either<BracketError, Bracket> {
     if (input.classroomIds.length < Knockout.MIN_TEAMS)
@@ -116,7 +116,7 @@ export class Bracket {
         category: input.category,
         status: BRACKET_STATUS.KNOCKOUT,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce.
+        // Born with the edit stamped, the way the database row is born.
         updatedAt: input.now,
         teams,
         matches: Bracket.matchesOf(pairings, teams, input),
@@ -124,14 +124,14 @@ export class Bracket {
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: BracketProps): Bracket {
     return new Bracket(structuredClone(props))
   }
 
   /**
-   * Só sai a chave sem resultado: com placar lançado, apagar levaria embora o
-   * que aconteceu em quadra, sem volta.
+   * Only a bracket without results can go: with a score entered, deleting would take away
+   * what happened on the court, irreversibly.
    */
   ensureDeletable(): Either<BracketError, Bracket> {
     if (this.props.matches.some((match) => match.status === MATCH_STATUS.FINISHED))
@@ -140,7 +140,7 @@ export class Bracket {
     return right(this)
   }
 
-  /** Data, hora e local. Ausente é "não mexer"; `null` desmarca. */
+  /** Date, time and venue. Absent means "leave alone"; `null` unschedules. */
   schedule(matchId: string, changes: ScheduleChanges, now: Date): Either<MatchError, Bracket> {
     const match = this.matchOf(matchId)
     if (!match) return left({ code: 'MATCH_NOT_FOUND' })
@@ -153,8 +153,8 @@ export class Bracket {
   }
 
   /**
-   * O placar, e o que ele move: o vencedor avança para a partida seguinte, e a
-   * final encerra a chave. Empate só com o vencedor dos pênaltis.
+   * The score, and what it moves: the winner advances to the next match, and the
+   * final closes the bracket. A tie only with the penalty winner.
    */
   score(matchId: string, input: ScoreInput, now: Date): Either<MatchError, Bracket> {
     const match = this.matchOf(matchId)
@@ -166,8 +166,8 @@ export class Bracket {
     if (!winner) return left({ code: 'MATCH_WINNER_REQUIRED' })
 
     const next = this.nextOf(match)
-    // Trocar o vencedor depois que ele já jogou a próxima reescreveria um
-    // resultado que aconteceu em quadra.
+    // Changing the winner after they have already played the next one would rewrite a
+    // result that happened on the court.
     if (
       next &&
       next.status === MATCH_STATUS.FINISHED &&
@@ -198,8 +198,8 @@ export class Bracket {
   }
 
   /**
-   * O caminho de volta do placar: lançado errado, ele sai, e o vencedor sai
-   * junto da partida seguinte. Só desfaz o que ainda não andou.
+   * The way back of the score: entered wrongly, it comes out, and the winner comes out
+   * of the next match with it. It only undoes what has not moved on yet.
    */
   unscore(matchId: string, now: Date): Either<MatchError, Bracket> {
     const match = this.matchOf(matchId)
@@ -224,7 +224,7 @@ export class Bracket {
     match.status = MATCH_STATUS.SCHEDULED
     match.updatedAt = now
 
-    // Sem final jogada, não há campeã: a chave volta a estar em disputa.
+    // Without a played final, there is no champion: the bracket goes back to being in progress.
     if (this.props.status === BRACKET_STATUS.FINISHED) {
       this.props.status = BRACKET_STATUS.KNOCKOUT
       this.props.updatedAt = now
@@ -234,8 +234,8 @@ export class Bracket {
   }
 
   /**
-   * Os dois times da partida e, entre eles, o da turma dada: de onde o cartão
-   * tira o time do atleta. `null` se a partida não é desta chave.
+   * The two teams of the match and, among them, the one of the given classroom: where the card
+   * gets the athlete's team from. `null` if the match is not from this bracket.
    */
   lineupOf(matchId: string, classroomId: string | null): Lineup | null {
     const match = this.matchOf(matchId)
@@ -252,7 +252,7 @@ export class Bracket {
     }
   }
 
-  /** A campeã de uma chave terminada: a vencedora da final. */
+  /** The champion of a finished bracket: the winner of the final. */
   champion(): string | null {
     if (this.props.status !== BRACKET_STATUS.FINISHED) return null
 
@@ -277,7 +277,7 @@ export class Bracket {
     return this.props.matches.find((match) => match.id === matchId)
   }
 
-  /** A partida onde o vencedor entra: a posição `position / 2` da fase seguinte. */
+  /** The match where the winner enters: position `position / 2` of the next phase. */
   private nextOf(match: MatchProps): MatchProps | undefined {
     const phase = Knockout.nextPhase(match.phase)
     if (!phase) return undefined
@@ -287,7 +287,7 @@ export class Bracket {
     return this.props.matches.find((other) => other.phase === phase && other.position === position)
   }
 
-  /** Placar decide; empate só com o vencedor dos pênaltis, e ele tem que ser um dos dois. */
+  /** The score decides; a tie only with the penalty winner, and it must be one of the two. */
   private static winnerOf(match: MatchProps, input: ScoreInput): string | null {
     if (input.homeScore > input.awayScore) return match.homeTeamId
     if (input.awayScore > input.homeScore) return match.awayTeamId
@@ -313,9 +313,9 @@ export class Bracket {
   }
 
   /**
-   * As partidas da chave inteira. As fases seguintes nascem vazias e vão sendo
-   * preenchidas pelos vencedores; o time de folga já entra na fase seguinte, no
-   * lugar onde o vencedor do confronto dele entraria.
+   * The matches of the whole bracket. The following phases are born empty and are
+   * filled by the winners; the bye team already enters the next phase, in the
+   * place where the winner of its match would enter.
    */
   private static matchesOf(
     pairings: ReadonlyArray<Pairing<string>>,
@@ -329,7 +329,7 @@ export class Bracket {
     let round = 1
     let size = pairings.length
 
-    // Primeira fase: só os confrontos de verdade; a folga sobe direto.
+    // First phase: only the real matchups; the bye goes straight up.
     for (const [position, pairing] of pairings.entries()) {
       const home = teamOf.get(pairing.home) ?? null
 

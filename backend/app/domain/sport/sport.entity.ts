@@ -19,13 +19,13 @@ type SportChanges = {
 }
 
 /**
- * A modalidade: futsal, vôlei, queimada. Guarda os limites de atletas por time
- * e a regra que os protege (`_standards/domain.md` §1).
+ * The sport: futsal, volleyball, dodgeball. It holds the athlete limits per team
+ * and the rule that protects them (`_standards/domain.md` §1).
  */
 export class Sport {
   private constructor(private readonly props: SportProps) {}
 
-  /** Nascimento. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Birth. The id and the clock come from outside: the domain does no I/O. */
   static create(input: {
     readonly id: string
     readonly name: string
@@ -43,21 +43,21 @@ export class Sport {
         minAthletes: input.minAthletes,
         maxAthletes: input.maxAthletes,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce: a coluna
-        // `updated_at` é preenchida no insert.
+        // Born with the edit stamped, the way the database row is born: the column
+        // `updated_at` is filled in on insert.
         updatedAt: input.now,
       }),
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: SportProps): Sport {
     return new Sport({ ...props })
   }
 
   /**
-   * Renomeia e muda os limites. O máximo não desce abaixo do maior elenco já
-   * inscrito numa turma: a lista dela passaria a ser inválida sem ninguém mexer.
+   * Renames and changes the limits. The maximum does not go below the largest roster already
+   * enrolled in a classroom: its list would become invalid without anyone touching it.
    */
   update(
     changes: SportChanges,
@@ -81,7 +81,7 @@ export class Sport {
     return right(this)
   }
 
-  /** Se o nome muda com estas mudanças: só aí vale conferir duplicidade. */
+  /** Whether the name changes with these changes: only then is it worth checking for duplicates. */
   renamesTo(name: string | undefined): name is string {
     return name !== undefined && name !== this.props.name
   }
