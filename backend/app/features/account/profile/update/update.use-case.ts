@@ -25,8 +25,8 @@ type Payload = Merge<AccountProfileUpdatePayload, { actor: Actor }>
 type Response = Either<HTTPException, AccountProfileShowResponse>
 
 /**
- * Edita a própria conta. A conta é o `actor` da sessão (_standards/backend.md
- * §4.3), e por isso não há id no caminho.
+ * Edits the own account. The account is the session `actor` (_standards/backend.md
+ * §4.3), and so there is no id in the path.
  */
 @inject()
 export default class AccountProfileUpdateUseCase {
@@ -39,8 +39,8 @@ export default class AccountProfileUpdateUseCase {
     private readonly i18n: I18n,
   ) {}
 
-  // `currentPassword` sai do payload aqui: ele é prova de identidade, não
-  // coluna, e deixá-lo passar faria a edição tentar gravá-lo.
+  // `currentPassword` leaves the payload here: it is proof of identity, not a
+  // column, and letting it through would make the edit try to save it.
   async execute({ actor, currentPassword, ...changes }: Payload): Promise<Response> {
     try {
       const user = await this.users.findById(actor.id)
@@ -48,9 +48,9 @@ export default class AccountProfileUpdateUseCase {
       if (!user)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
 
-      // Sem filtrar arquivados: o `unique` do e-mail vale para a tabela
-      // inteira, então sem esta checagem o save estouraria a constraint e
-      // viraria 500.
+      // Without filtering archived: the email `unique` holds for the whole
+      // table, so without this check the save would blow the constraint and
+      // become a 500.
       if (
         changes.email &&
         changes.email !== user.snapshot().email &&
@@ -58,17 +58,17 @@ export default class AccountProfileUpdateUseCase {
       )
         return left(UserRefusal.http({ code: 'USER_ALREADY_EXISTS' }, this.i18n))
 
-      // Antes da edição: `avatar_id` é chave estrangeira, e sem esta checagem um
-      // uuid inexistente estouraria a constraint e viraria 500. Também recusa o
-      // que ainda está `PENDING` - o binário sobe direto para o bucket, e anexar
-      // antes da confirmação publicaria uma foto pela metade.
+      // Before the edit: `avatar_id` is a foreign key, and without this check a nonexistent
+      // uuid would blow the constraint and become a 500. It also refuses what is
+      // still `PENDING` - the binary goes straight to the bucket, and attaching
+      // before confirmation would publish a half-uploaded photo.
       if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
         return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
-      // A prova de identidade da troca de senha: a sessão prova posse do cookie,
-      // e um cookie sequestrado trocaria a senha sem que o dono dissesse nada.
-      // Que `currentPassword` exista quando `password` existe é o validator que
-      // garante (`requiredIfExists`).
+      // The proof of identity for a password change: the session proves possession of the cookie,
+      // and a hijacked cookie would change the password without the owner saying anything.
+      // That `currentPassword` exists when `password` exists is the validator's job; this
+      // guarantees (`requiredIfExists`).
       const stored = user.snapshot().password
       const currentConfirmed =
         Boolean(changes.password) &&
@@ -82,10 +82,10 @@ export default class AccountProfileUpdateUseCase {
       const updated = user.updateOwn(changes, { currentConfirmed, sameAsCurrent }, new Date())
       if (updated.isLeft()) return left(UserRefusal.http(updated.value, this.i18n))
 
-      // Trocar e-mail ou senha derruba todas as sessões, inclusive a desta
-      // requisição: gravar e revogar caem juntos.
-      // A checagem de e-mail acima não fecha a corrida: o `save` devolve o
-      // mesmo fato quando o `unique` do banco a perde (_standards/backend.md §4.4).
+      // Changing email or password drops every session, including this request's:
+      // saving and revoking land together.
+      // The email check above does not close the race: `save` returns the
+      // same fact when the database `unique` loses it (_standards/backend.md §4.4).
       const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
         const saved = await this.users.save(user)
         if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
@@ -96,8 +96,8 @@ export default class AccountProfileUpdateUseCase {
       })
       if (written.isLeft()) return left(written.value)
 
-      // Recarrega depois de gravar: quem acabou de trocar a foto tem de receber
-      // a `url` nova na mesma resposta, sem uma leitura a mais.
+      // Reload after saving: whoever just changed the photo must receive
+      // the new `url` in the same response, without an extra read.
       const profile = await this.users.detail(actor.id)
       if (!profile)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))

@@ -10,18 +10,18 @@ import {
 import { Stored } from '#tests/stored-fixtures'
 
 /**
- * A leitura da própria conta, e o que acontece com quem foi arquivado enquanto
- * ainda tinha token na mão.
+ * Reading the own account, and what happens to someone archived while
+ * still holding a token.
  *
- * O guard confere assinatura e validade do token, e nada mais: ele não sabe que
- * a linha em `users` foi arquivada. Sem o scope `notDeleted` no use-case,
- * arquivar um usuário não teria efeito nenhum até o token vencer - até um dia
- * depois, pela validade do cookie de acesso.
+ * The guard checks the token signature and validity, and nothing else: it does not know that
+ * the `users` row was archived. Without the `notDeleted` scope in the use case,
+ * archiving a user would have no effect until the token expired - up to a day
+ * later, by the access cookie validity.
  */
-test.group('conta > leitura', (group) => {
+test.group('account > read', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sessão válida responde 200 com o próprio usuário', async ({ client, assert }) => {
+  test('valid session responds 200 with the own user', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/account').cookies(session)
@@ -29,11 +29,11 @@ test.group('conta > leitura', (group) => {
     response.assertStatus(200)
     assert.equal(body(response).email, ADMINISTRATOR.email)
     assert.equal(body(response).role, 'ADMINISTRATOR')
-    // A senha nunca sai na resposta: a coluna é `serializeAs: null`.
+    // The password never leaves in the response: the column is `serializeAs: null`.
     assert.notProperty(body(response), 'password')
   })
 
-  test('usuário arquivado com token ainda válido responde 401', async ({ client }) => {
+  test('archived user with a still valid token responds 401', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
 
@@ -41,26 +41,26 @@ test.group('conta > leitura', (group) => {
 
     const response = await client.get('/account').cookies(session)
 
-    // 401 e não 404: o guard relê `deletedAt` e `status` a cada requisição,
-    // então arquivar a conta encerra a sessão em vez de deixá-la autenticada
-    // até o token vencer. O 404 anterior dizia "você está autenticado, mas a
-    // sua própria conta não existe", que descrevia o buraco em vez da regra.
+    // 401 and not 404: the guard rereads `deletedAt` and `status` on every request,
+    // so archiving the account ends the session instead of leaving it authenticated
+    // until the token expires. The previous 404 said "you are authenticated, but your
+    // own account does not exist", which described the hole instead of the rule.
     response.assertStatus(401)
   })
 })
 
 /**
- * O `middleware.auth()` está no grupo `/account`, e não em cada rota. Este
- * teste é o que prova que ele está de fato ligado: sem ele, `context.auth.user!`
- * seria `undefined` e a leitura responderia 500 - ou pior, o `id` viria de
- * outro lugar.
+ * `middleware.auth()` is on the `/account` group, not on each route. This
+ * test proves it is actually wired: without it, `context.auth.user!`
+ * would be `undefined` and the read would respond 500 - or worse, the `id` would come from
+ * somewhere else.
  */
-test.group('conta > sem sessão', () => {
-  test('requisição sem cookie responde 401', async ({ client }) => {
-    const leitura = await client.get('/account')
-    const escrita = await client.put('/account').json({ name: 'Qualquer' })
+test.group('account > without a session', () => {
+  test('request without a cookie responds 401', async ({ client }) => {
+    const read = await client.get('/account')
+    const write = await client.put('/account').json({ name: 'Qualquer' })
 
-    leitura.assertStatus(401)
-    escrita.assertStatus(401)
+    read.assertStatus(401)
+    write.assertStatus(401)
   })
 })

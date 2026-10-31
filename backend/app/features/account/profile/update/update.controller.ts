@@ -9,18 +9,18 @@ import { AccountProfileUpdateValidator } from '#validators/account/profile.valid
 @inject()
 export default class AccountProfileUpdateController {
   static docs = defineDocs({
-    summary: 'Atualizar a própria conta',
+    summary: 'Update own account',
     description:
-      'Todo campo é opcional: só o que vier no payload muda. Campo ausente significa ' +
-      '"não mexer", não "apagar" - a exceção é `avatarId`, onde `null` é como se tira a foto ' +
-      'sem trocá-la.\n\n' +
-      'Trocar a senha exige `currentPassword`, a senha atual: a sessão prova posse do cookie, ' +
-      'não identidade, e sem isso um cookie sequestrado trocaria a senha do dono da conta. A ' +
-      'senha nova ainda precisa ser diferente da atual.\n\n' +
-      'Trocar e-mail ou senha **revoga todas as sessões**, inclusive a que fez esta ' +
-      'requisição.\n\n' +
-      'O papel não entra: ele é definido na criação, pelo administrador, e ninguém muda o ' +
-      'próprio.',
+      'Every field is optional: only what comes in the payload changes. A missing field means ' +
+      '"leave alone", not "erase" - the exception is `avatarId`, where `null` is how the photo is removed ' +
+      'without replacing it.\n\n' +
+      'Changing the password requires `currentPassword`, the current password: the session proves possession of the cookie, ' +
+      "not identity, and without it a hijacked cookie would change the account owner's password. The " +
+      'new password must still differ from the current one.\n\n' +
+      'Changing email or password **revokes all sessions**, including the one that made this ' +
+      'request.\n\n' +
+      'The role is not accepted: it is set at creation, by the administrator, and nobody changes their ' +
+      'own.',
   })
 
   constructor(private readonly useCase: AccountProfileUpdateUseCase) {}
