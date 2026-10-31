@@ -1,6 +1,6 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 
-import * as server from './theme.server'
+import { getThemeCookie } from '#/integrations/theme/get-theme'
 
 /**
  * Tema claro/escuro (`frontend.md` §3.2, §6): a preferência mora num cookie
@@ -41,7 +41,7 @@ function readCookie(): string | undefined {
  */
 export const readTheme = createIsomorphicFn()
   .client((): Theme => parseTheme(readCookie()))
-  .server((): Theme => parseTheme(server.themeCookie(THEME_COOKIE)))
+  .server((): Theme => parseTheme(getThemeCookie(THEME_COOKIE)))
 
 /** Grava a preferência. Só no navegador, a partir de um clique. */
 export function writeTheme(theme: Theme): void {
