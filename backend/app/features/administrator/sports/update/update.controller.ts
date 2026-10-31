@@ -13,9 +13,6 @@ export default class AdministratorSportUpdateController {
     description:
       'Campo ausente é "não mexer". Trocar o nome troca o `slug`, e com ele o endereço da ' +
       'modalidade no site.',
-    // Nascem na entidade e são traduzidos em `_shared.sport-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: { 409: ['SPORT_ROSTER_ABOVE_LIMIT'], 422: ['SPORT_INVALID_LIMITS'] },
   })
 
   constructor(private readonly useCase: AdministratorSportUpdateUseCase) {}

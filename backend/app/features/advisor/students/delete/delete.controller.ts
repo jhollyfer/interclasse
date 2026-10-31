@@ -13,8 +13,6 @@ export default class AdvisorStudentDeleteController {
       'Tira o aluno da turma, com as inscrições dele. Aluno inscrito numa modalidade já ' +
       'sorteada responde `409`: o time sorteado perderia um atleta. Aluno de turma alheia ' +
       'responde `404`.',
-    // Nasce na entidade e é traduzido em `_shared.student-refusal.ts`, fora da pasta da ação.
-    errors: { 409: ['STUDENT_IN_COMPETITION'] },
   })
 
   constructor(private readonly useCase: AdvisorStudentDeleteUseCase) {}

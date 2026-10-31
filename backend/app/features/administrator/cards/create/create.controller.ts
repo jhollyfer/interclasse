@@ -12,9 +12,6 @@ export default class AdministratorCardCreateController {
     description:
       'Lança um cartão amarelo ou vermelho para um atleta numa partida. O atleta tem que ser ' +
       'de uma das duas turmas da partida.',
-    // Nascem na entidade e são traduzidos em `_shared.card-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: { 409: ['MATCH_TEAMS_PENDING'], 422: ['STUDENT_NOT_IN_MATCH'] },
   })
 
   constructor(private readonly useCase: AdministratorCardCreateUseCase) {}

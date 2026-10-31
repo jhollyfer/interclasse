@@ -13,12 +13,6 @@ export default class AdministratorClassroomUpdateController {
     description:
       'Campo ausente é "não mexer"; `null` em conselheiro ou representante desfaz o vínculo. ' +
       'Trocar o ano para outra categoria responde `409` se a turma já está numa chave sorteada.',
-    // Nascem na entidade e são traduzidos em `_shared.classroom-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: {
-      409: ['ADVISOR_TAKEN', 'REPRESENTATIVE_TAKEN'],
-      422: ['ADVISOR_NOT_FOUND', 'REPRESENTATIVE_NOT_FOUND', 'CLASSROOM_INVALID_GRADE'],
-    },
   })
 
   constructor(private readonly useCase: AdministratorClassroomUpdateUseCase) {}

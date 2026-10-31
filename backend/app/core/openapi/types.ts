@@ -73,7 +73,10 @@ export type ResponseBody = DocumentedValidator | PaginatedResponse | z.ZodType |
  * `errors` mapeia status para o(s) `code` que aquela operação pode devolver
  * naquele status, e é o que torna a lista de falhas exaustiva para quem gera
  * cliente a partir do documento. Os automáticos - 401 com `auth`, 403 com
- * `role`, 422 com qualquer validator, 500 sempre - não precisam ser declarados.
+ * `role`, 422 com qualquer validator, 500 sempre - e os que o gerador lê (o
+ * use-case, a tabela de fatos e o `_shared.<recurso>-refusal.ts` que ele
+ * importa) não se declaram: só o que nasce em outra camada da cadeia, como o
+ * 403 da policy (`_standards/openapi.md`, "erros-do-use-case").
  *
  * `overrides` é a saída de emergência para o que o VineJS não expressa. É feito
  * merge por último, sobre o schema derivado.

@@ -12,12 +12,6 @@ export default class AdministratorClassroomCreateController {
     description:
       'A categoria (`F1` ou `F2`) sai do ano e não é enviada. Conselheiro e representante são ' +
       'opcionais e precisam ter o papel do vínculo; um representante só tem uma turma.',
-    // Nascem na entidade e são traduzidos em `_shared.classroom-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: {
-      409: ['ADVISOR_TAKEN', 'REPRESENTATIVE_TAKEN'],
-      422: ['ADVISOR_NOT_FOUND', 'REPRESENTATIVE_NOT_FOUND', 'CLASSROOM_INVALID_GRADE'],
-    },
   })
 
   constructor(private readonly useCase: AdministratorClassroomCreateUseCase) {}
