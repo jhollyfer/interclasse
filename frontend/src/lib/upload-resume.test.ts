@@ -9,9 +9,9 @@ import {
 } from './upload-resume'
 
 /**
- * O `localStorage` não existe no ambiente de teste (roda em node), que é o
- * mesmo caso do SSR - e é justamente o caso que o módulo tem de sobreviver.
- * Cada teste monta o seu.
+ * `localStorage` does not exist in the test environment (it runs in node), which is the
+ * same case as SSR - and it is precisely the case the module has to survive.
+ * Each test builds its own.
  */
 function withStorage() {
   const data = new Map<string, string>()
@@ -35,7 +35,7 @@ function fileOf(name: string, size: number, lastModified: number): File {
 
 const FILE = fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)
 
-/** A chave completa no storage: `interclasse:upload:<nome>:<tamanho>:<data>:v1`. */
+/** The full key in storage: `interclasse:upload:<name>:<size>:<date>:v1`. */
 function keyOf(file: File): string {
   return localStoreKey(resumeTheme(file))
 }
@@ -47,13 +47,13 @@ beforeEach(() => {
 })
 
 describe('resumeTheme', () => {
-  it('é estável para o mesmo arquivo', () => {
+  it('is stable for the same file', () => {
     expect(resumeTheme(FILE)).toBe(
       resumeTheme(fileOf('catalogo.pdf', 5_000, 1_700_000_000_000)),
     )
   })
 
-  it('muda quando qualquer um dos três campos muda', () => {
+  it('changes when any of the three fields changes', () => {
     const base = resumeTheme(FILE)
 
     expect(resumeTheme(fileOf('outro.pdf', 5_000, 1_700_000_000_000))).not.toBe(
@@ -69,20 +69,20 @@ describe('resumeTheme', () => {
 })
 
 describe('readResume', () => {
-  it('devolve o que foi gravado', () => {
+  it('returns what was saved', () => {
     withStorage()
     writeResume(FILE, ENTRY)
 
     expect(readResume(FILE)).toEqual(ENTRY)
   })
 
-  it('é nulo quando não há nada gravado', () => {
+  it('is null when nothing is saved', () => {
     withStorage()
 
     expect(readResume(FILE)).toBeNull()
   })
 
-  it('é nulo depois de limpar', () => {
+  it('is null after clearing', () => {
     withStorage()
     writeResume(FILE, ENTRY)
     clearResume(FILE)
@@ -90,21 +90,21 @@ describe('readResume', () => {
     expect(readResume(FILE)).toBeNull()
   })
 
-  it('é nulo para lixo, e não estoura', () => {
+  it('is null for garbage, and does not blow up', () => {
     const data = withStorage()
     data.set(keyOf(FILE), 'isto não é json')
 
     expect(readResume(FILE)).toBeNull()
   })
 
-  it('é nulo para json com a forma errada', () => {
+  it('is null for json with the wrong shape', () => {
     const data = withStorage()
     data.set(keyOf(FILE), JSON.stringify({ storageId: 42 }))
 
     expect(readResume(FILE)).toBeNull()
   })
 
-  it('aceita uploadId nulo, que é o upload de parte única', () => {
+  it('accepts a null uploadId, which is the single-part upload', () => {
     withStorage()
     writeResume(FILE, { ...ENTRY, uploadId: null })
 
@@ -113,12 +113,12 @@ describe('readResume', () => {
 })
 
 /**
- * A entrada tem prazo porque o servidor também tem: passadas 24h o
- * `storages:prune` já apagou o upload abandonado, e a retomada aponta para um
- * `storageId` que não existe mais.
+ * The entry has a deadline because the server does too: after 24h
+ * `storages:prune` has already deleted the abandoned upload, and resuming points to a
+ * `storageId` that no longer exists.
  */
 describe('validade', () => {
-  it('é nulo depois de vencer', () => {
+  it('is null after expiring', () => {
     withStorage()
     writeResume(FILE, ENTRY)
 
@@ -129,7 +129,7 @@ describe('validade', () => {
     vi.useRealTimers()
   })
 
-  it('continua valendo antes de vencer', () => {
+  it('stays valid before expiring', () => {
     withStorage()
     writeResume(FILE, ENTRY)
 
@@ -140,25 +140,25 @@ describe('validade', () => {
     vi.useRealTimers()
   })
 
-  it('gravar varre as entradas vencidas dos outros arquivos', () => {
+  it('when saving, sweeps the expired entries of other files', () => {
     const data = withStorage()
-    const velho = fileOf('velho.pdf', 1, 1)
+    const stale = fileOf('stale.pdf', 1, 1)
 
-    writeResume(velho, ENTRY)
+    writeResume(stale, ENTRY)
 
     vi.setSystemTime(Date.now() + 25 * 60 * 60 * 1000)
 
-    // Ninguém vai tentar `velho.pdf` de novo: se a varredura não o alcançar na
-    // escrita de outro arquivo, ele fica no disco para sempre.
+    // Nobody will try `stale.pdf` again: if the sweep does not reach it when
+    // another file is written, it stays on disk forever.
     writeResume(FILE, ENTRY)
 
-    expect(data.has(keyOf(velho))).toBe(false)
+    expect(data.has(keyOf(stale))).toBe(false)
     expect(data.has(keyOf(FILE))).toBe(true)
 
     vi.useRealTimers()
   })
 
-  it('a varredura leva junto o que não dá para ler', () => {
+  it('takes the unreadable along in the sweep', () => {
     const data = withStorage()
     data.set('interclasse:upload:lixo.pdf:1:1:v1', 'isto não é json')
 
@@ -167,7 +167,7 @@ describe('validade', () => {
     expect(data.has('interclasse:upload:lixo.pdf:1:1:v1')).toBe(false)
   })
 
-  it('a varredura não toca no que não é retomada', () => {
+  it('does not touch in the sweep what is not a resume', () => {
     const data = withStorage()
     data.set('tema', 'escuro')
 
@@ -177,8 +177,8 @@ describe('validade', () => {
   })
 })
 
-describe('sem localStorage', () => {
-  it('lê nulo e grava sem estourar - é o caso do SSR', () => {
+describe('without localStorage', () => {
+  it('reads null and saves without blowing up - it is the SSR case', () => {
     expect(() => writeResume(FILE, ENTRY)).not.toThrow()
     expect(readResume(FILE)).toBeNull()
     expect(() => clearResume(FILE)).not.toThrow()

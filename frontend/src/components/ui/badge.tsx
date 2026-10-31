@@ -21,14 +21,14 @@ const badgeVariants = cva(
           'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
         link: 'text-primary underline-offset-4 hover:underline',
 
-        // A escala semântica do domínio. Os pares vivem no `@theme` como
-        // `--color-badge-*`, e sem a variante cada consumidor os aplicaria como
-        // duas classes soltas - `bg-badge-neutral text-badge-neutral-foreground`
-        // - ou desenharia um `<span>` com a mesma cara. Como variante, o estado
-        // do registro vira um nome, e o par de cores não tem como se separar.
+        // The domain's semantic scale. The pairs live in `@theme` as
+        // `--color-badge-*`, and without the variant every consumer would apply
+        // them as two loose classes - `bg-badge-neutral text-badge-neutral-foreground`
+        // - or draw a `<span>` that looks the same. As a variant, the record's
+        // state becomes a name, and the color pair cannot be pulled apart.
         //
-        // São quatro, e não os seis do simple-hub: `commercial` e `rating` são
-        // do catálogo de produto de lá, e aqui não existe preço nem nota.
+        // There are four, not simple-hub's six: `commercial` and `rating` belong
+        // to its product catalog, and here there is neither price nor rating.
         neutral: 'bg-badge-neutral text-badge-neutral-foreground',
         info: 'bg-badge-info text-badge-info-foreground',
         success: 'bg-badge-success text-badge-success-foreground',

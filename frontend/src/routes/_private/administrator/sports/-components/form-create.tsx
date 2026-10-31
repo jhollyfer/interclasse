@@ -43,7 +43,7 @@ export function SportFormCreate(): React.JSX.Element {
     alsoInvalidate: DEPENDENTS.sports,
     backTo: '/administrator/sports',
     success: (sport) => m.admin_sports_created({ name: sport.name }),
-    // Nome repetido é `409 SPORT_ALREADY_EXISTS`: reenviar é seguro.
+    // A repeated name is `409 SPORT_ALREADY_EXISTS`: resending is safe.
     retry: 'sport-create-error',
     payload: (values) => values,
   })

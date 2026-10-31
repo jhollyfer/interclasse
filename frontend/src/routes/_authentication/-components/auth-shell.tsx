@@ -8,17 +8,17 @@ import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
- * A moldura das telas de autenticação: lateral de marca à esquerda e o
- * formulário à direita. Abaixo de `lg` a lateral some inteira e sobra só o logo
- * no topo.
+ * The authentication screens' frame: brand side panel on the left and the
+ * form on the right. Below `lg` the side panel disappears entirely and only the logo
+ * is left at the top.
  *
- * **Só a moldura.** O que aparece na lateral e a largura da coluna de conteúdo
- * são partes, e cada tela escreve as que tem.
+ * **Only the frame.** What appears in the side panel and the width of the content column
+ * are parts, and each screen writes the ones it has.
  *
- * **Sem contexto:** não há estado a compartilhar entre as partes - cada uma se
- * basta, e a skill manda não inventar provider sem ele. Pelo mesmo motivo elas
- * cabem num arquivo só: a regra da pasta existe para o contexto e o hook-guard
- * morarem separados, e aqui não há nem um nem outro.
+ * **No context:** there is no state to share between the parts - each one
+ * is self-sufficient, and the skill says not to invent a provider without it. For the same reason they
+ * fit in a single file: the folder rule exists so that the context and the hook-guard
+ * live apart, and here there is neither.
  */
 function AuthShell({
   className,
@@ -34,16 +34,16 @@ function AuthShell({
 }
 
 /**
- * A coluna de marca. Some abaixo de `lg`, e some sem children.
+ * The brand column. It disappears below `lg`, and disappears without children.
  *
- * O escuro é o `--brand-ink` da associação, e não o `bg-muted` do esqueleto:
- * este painel é o único lugar do produto em que a marca aparece do tamanho
- * dela, e o creme do tema claro apagava o selo âmbar contra o fundo. Ele não
- * inverte com o tema - o institucional é escuro nos dois -, então a coluna
- * declara a própria tinta clara e a marca a herda.
+ * The dark is the association's `--brand-ink`, and not the skeleton's `bg-muted`:
+ * this panel is the only place in the product where the brand appears at its full
+ * size, and the light theme's cream washed the amber seal out against the background. It does not
+ * invert with the theme - the institutional color is dark in both -, so the column
+ * declares its own light ink and the brand inherits it.
  *
- * Os dois cantos em L vêm do frontend anterior: são o que dá moldura ao painel
- * sem desenhar borda em volta dele.
+ * The two L-shaped corners come from the previous frontend: they are what frames the panel
+ * without drawing a border around it.
  */
 function AuthShellAside({
   className,
@@ -74,13 +74,13 @@ function AuthShellAside({
   )
 }
 
-/** A marca. Aparece na lateral e, abaixo de `lg`, no topo do conteúdo. */
+/** The brand. Appears in the side panel and, below `lg`, at the top of the content. */
 function AuthShellBrand({
   className,
   ...props
 }: React.ComponentProps<'span'>): React.JSX.Element {
   return (
-    // Link para o site: quem caiu na entrada por engano volta sem digitar URL.
+    // Link to the site: whoever landed on the sign-in by mistake goes back without typing a URL.
     <Link to="/" aria-label={m.auth_back_to_site()}>
       <BrandMark
         data-slot="auth-shell-brand"
@@ -92,10 +92,10 @@ function AuthShellBrand({
 }
 
 /**
- * O título da tela e a linha que o explica.
+ * The screen's title and the line that explains it.
  *
- * Era `<header>` com `h1` e `p` escritos à mão em cada tela. Uma tela sem `h1` é
- * uma tela sem nome para quem navega por cabeçalhos.
+ * It used to be a `<header>` with `h1` and `p` written by hand on every screen. A screen without `h1` is
+ * a screen without a name for whoever navigates by headings.
  */
 function AuthShellHeader({
   className,
@@ -119,13 +119,13 @@ function AuthShellHeader({
 }
 
 /**
- * O miolo centrado da lateral: a marca no tamanho dela e a frase sob ela.
+ * The centered core of the side panel: the brand at its size and the phrase under it.
  *
- * Centrado nos dois eixos, como no frontend anterior
+ * Centered on both axes, as in the previous frontend
  * (`frontend-old/components/composition/auth-shell/index.tsx`, `AuthShell.Brand`):
- * a lateral não é um cabeçalho com conteúdo embaixo, é uma peça só - marca e
- * nome por extenso - no meio de um retângulo escuro. Com a marca pendurada no
- * topo ela ficava encostada na quina esquerda, longe da frase que a explica.
+ * the side panel is not a header with content below, it is a single piece - brand and
+ * full name - in the middle of a dark rectangle. With the brand hanging from the
+ * top it sat against the left corner, far from the phrase that explains it.
  */
 function AuthShellAsideBody({
   className,
@@ -143,7 +143,7 @@ function AuthShellAsideBody({
   )
 }
 
-/** A frase sob a marca: o nome da associação por extenso. */
+/** The phrase under the brand: the association's full name. */
 function AuthShellTagline({
   className,
   children,
@@ -155,9 +155,9 @@ function AuthShellTagline({
     <p
       data-slot="auth-shell-tagline"
       className={cn(
-        // A mesma largura da marca acima (`max-w-aside` na tela de entrada):
-        // as duas peças formam um bloco só, e uma frase mais estreita que o
-        // desenho leria como desalinhada em vez de centrada.
+        // The same width as the brand above (`max-w-aside` on the sign-in screen):
+        // the two pieces form a single block, and a phrase narrower than the
+        // drawing would read as misaligned instead of centered.
         'max-w-aside text-center text-sm leading-relaxed font-light tracking-wide text-primary-foreground/60',
         className,
       )}
@@ -169,12 +169,12 @@ function AuthShellTagline({
 }
 
 /**
- * A coluna do formulário.
+ * The form column.
  *
- * O `className` mira a largura do conteúdo, e não o `<main>`: é o que cada tela
- * ajusta. O cabeçalho com o logo abaixo de `lg` fica aqui dentro - é
- * responsividade da moldura, não escolha da tela -, e sobre o escuro
- * institucional, que é onde o selo âmbar se lê melhor.
+ * `className` targets the content's width, and not `<main>`: it is what each screen
+ * adjusts. The header with the logo below `lg` stays inside here - it is
+ * the frame's responsiveness, not the screen's choice -, and over the institutional
+ * dark, which is where the amber seal reads best.
  */
 function AuthShellContent({
   className,
@@ -184,8 +184,8 @@ function AuthShellContent({
   return (
     <main
       data-slot="auth-shell-content"
-      // `min-h-dvh` também abaixo de `lg`: sem altura, o `justify-center` não
-      // tinha o que centralizar e o formulário grudava no topo.
+      // `min-h-dvh` below `lg` too: without a height, `justify-center` had
+      // nothing to center and the form stuck to the top.
       className="flex min-h-dvh flex-col lg:col-span-7"
       {...props}
     >

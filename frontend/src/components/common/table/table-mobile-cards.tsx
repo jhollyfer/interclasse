@@ -12,17 +12,17 @@ type TableMobileCardsProps<TRow extends RowData> = Readonly<{
 }>
 
 /**
- * A mesma tabela, empilhada em `rótulo: valor`, para telas estreitas.
+ * The same table, stacked as `label: value`, for narrow screens.
  *
- * Uma tabela de sete colunas num celular vira ou rolagem horizontal infinita ou
- * texto de 8px. Empilhar resolve, e sem duplicar nada: os mesmos `cell` das
- * colunas são reaproveitados, então uma coluna nova aparece aqui sozinha.
+ * A seven-column table on a phone becomes either endless horizontal scrolling or
+ * 8px text. Stacking solves it, without duplicating anything: the columns' own `cell`s
+ * are reused, so a new column shows up here on its own.
  *
- * As colunas **de exibição** - seleção, ações, tudo que não tem `accessorFn` -
- * vão no topo do card, e não na lista de pares: elas não têm rótulo, e um `: `
- * sem nada antes fica órfão. Ao lado delas vai o título: a célula da coluna
- * `meta.primary`, ou da primeira de dados, desenhada pelo próprio `cell` - o
- * card sem ele começava por um "..." solto.
+ * The **display** columns - selection, actions, everything without an `accessorFn` -
+ * go at the top of the card, and not in the list of pairs: they have no label, and a `: `
+ * with nothing before it is orphaned. Next to them goes the title: the cell of the
+ * `meta.primary` column, or of the first data one, drawn by its own `cell` - a
+ * card without it started with a stray "...".
  */
 export function TableMobileCards<TRow extends RowData>({
   table,
@@ -52,7 +52,7 @@ export function TableMobileCards<TRow extends RowData>({
         if (row.getIsSelected()) state = 'selected'
 
         return (
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- atalho de mouse: o menu da linha dá a mesma ação ao teclado
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- mouse shortcut: the row menu gives the keyboard the same action
           <div
             key={row.id}
             data-test-id={`table-card-${index}`}
@@ -74,11 +74,11 @@ export function TableMobileCards<TRow extends RowData>({
                 </div>
               )}
               {controls.length > 0 && (
-                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- only contains the click: the keyboard does not cross the border
                 <div
                   className="flex shrink-0 flex-wrap items-center justify-end gap-2"
-                  // Clicar na caixa de seleção ou no menu não deve também abrir
-                  // o registro.
+                  // Clicking the selection checkbox or the menu must not also open
+                  // the record.
                   onClick={(event) => event.stopPropagation()}
                 >
                   {controls.map((cell) => (

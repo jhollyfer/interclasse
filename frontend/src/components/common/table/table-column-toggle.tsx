@@ -17,11 +17,11 @@ import { m } from '#/paraglide/messages'
 import type { TableInstance } from './use-table'
 
 /**
- * Quais colunas aparecem.
+ * Which columns appear.
  *
- * O rótulo sai de `columnDef.meta.label` quando existe, e do id quando não -
- * `header` deixou de servir como rótulo quando virou um componente de
- * cabeçalho: `String(<TableColumnHeader/>)` imprime `[object Object]`.
+ * The label comes from `columnDef.meta.label` when it exists, and from the id when it does not -
+ * `header` stopped working as a label when it became a header
+ * component: `String(<TableColumnHeader/>)` prints `[object Object]`.
  */
 export function TableColumnToggle<TRow extends RowData>({
   table,
@@ -44,10 +44,10 @@ export function TableColumnToggle<TRow extends RowData>({
         }
       />
       <DropdownMenuContent align="end" className="w-48">
-        {/* O grupo não é enfeite: `DropdownMenuLabel` é o `Menu.GroupLabel` do
-            Base UI, e ele registra o próprio id como `aria-labelledby` do
-            `Menu.Group` acima. Sem grupo, `useMenuGroupRootContext()` lança
-            "MenuGroupContext is missing" ao abrir o menu. */}
+        {/* The group is not decoration: `DropdownMenuLabel` is Base UI's `Menu.GroupLabel`,
+            and it registers its own id as the `aria-labelledby` of the `Menu.Group`
+            above. Without a group, `useMenuGroupRootContext()` throws
+            "MenuGroupContext is missing" when the menu opens. */}
         <DropdownMenuGroup>
           <DropdownMenuLabel>{m.table_columns_visible()}</DropdownMenuLabel>
           <DropdownMenuSeparator />

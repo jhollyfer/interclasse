@@ -7,7 +7,7 @@ import * as React from 'react'
 import { Button } from '#/components/ui/button.tsx'
 import { cn } from '#/lib/cn'
 
-// casa: genérico no payload, para o `handle` tipado e os children em função
+// house: generic on the payload, for the typed `handle` and function children
 function Dialog<TPayload = unknown>({
   ...props
 }: DialogPrimitive.Root.Props<TPayload>) {

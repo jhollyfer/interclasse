@@ -2,17 +2,17 @@ import { QueryClient } from '@tanstack/react-query'
 
 import { HTTPError } from './http'
 
-/** Quantas vezes uma query que falhou por servidor ou rede é repetida. */
+/** How many times a query that failed because of server or network is retried. */
 const MAX_QUERY_RETRIES = 3
 
 /**
- * O `retry` padrão das queries: repete 5xx e falha de rede, e nunca 4xx.
+ * The queries' default `retry`: retries 5xx and network failure, and never 4xx.
  *
- * 401, 403, 404 e 422 não mudam de resposta na terceira tentativa - só atrasam
- * a mensagem de erro na tela. O `instanceof` fica mesmo com
- * `Register.defaultError` declarado em `register.d.ts`: aquilo é promessa de
- * compilação, e um throw que não venha de `request` (um bug, um `TypeError`)
- * chega mesmo assim.
+ * 401, 403, 404 and 422 do not change their answer on the third attempt - they only delay
+ * the error message on screen. The `instanceof` stays even with
+ * `Register.defaultError` declared in `register.d.ts`: that is a compile-time
+ * promise, and a throw that does not come from `request` (a bug, a `TypeError`)
+ * arrives anyway.
  */
 export function shouldRetryQuery(failures: number, error: unknown): boolean {
   if (error instanceof HTTPError && !error.isServerError) return false
@@ -21,36 +21,36 @@ export function shouldRetryQuery(failures: number, error: unknown): boolean {
 }
 
 /**
- * O `QueryClient` que vai para o contexto do router.
+ * The `QueryClient` that goes into the router context.
  *
- * Este arquivo **não** provê nada - quem monta o `QueryClientProvider` é o
- * `setupRouterSsrQueryIntegration` de `src/router.tsx`, que embrulha o `Wrap`
- * do próprio router. Acrescentar um provider à mão aqui criaria um segundo
- * client, ou seja, dois caches, e o `useQuery` da sidebar leria o que o
- * `beforeLoad` não encheu.
+ * This file does **not** provide anything - whoever mounts the `QueryClientProvider` is
+ * `src/router.tsx`'s `setupRouterSsrQueryIntegration`, which wraps the router's own
+ * `Wrap`. Adding a provider by hand here would create a second
+ * client, that is two caches, and the sidebar's `useQuery` would read what the
+ * `beforeLoad` did not fill.
  *
- * Um `QueryClient` por requisição, e nunca um singleton de módulo: no servidor
- * de SSR o módulo é compartilhado por todos os visitantes, e um cache de módulo
- * entregaria o `/account` de um usuário renderizado para o próximo.
- * `getContext` roda dentro de `getRouter`, que o Start chama a cada
- * requisição, então o isolamento vem daí.
+ * One `QueryClient` per request, and never a module singleton: on the SSR server
+ * the module is shared by every visitor, and a module cache would hand one
+ * user's `/account` rendered to the next.
+ * `getContext` runs inside `getRouter`, which Start calls on every
+ * request, so the isolation comes from there.
  */
 export function getContext() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        // Com o default `0` todo dado que veio pronto do servidor nasce velho e
-        // é refeito assim que a página hidrata - a primeira carga paga a
-        // requisição duas vezes. Um minuto é curto o bastante para não segurar
-        // dado obsoleto e longo o bastante para cobrir a hidratação.
+        // With the default `0` all data that came ready from the server is born stale and
+        // is redone as soon as the page hydrates - the first load pays for the
+        // request twice. One minute is short enough not to hold obsolete
+        // data and long enough to cover hydration.
         //
-        // Quem precisa de outro valor declara o seu: `accountQueryOptions` usa
-        // cinco minutos.
+        // Whoever needs another value declares its own: `accountQueryOptions` uses
+        // five minutes.
         //
-        // **O teto não é arbitrário: é o `URL_TTL` do backend**, hoje quinze
-        // minutos (`config/drive.ts`). A resposta carrega `url` assinada, e o
-        // cache a guarda junto - `staleTime` acima daquele prazo serve imagem
-        // com URL vencida, e a falha aparece como imagem quebrada, sem erro.
+        // **The cap is not arbitrary: it is the backend's `URL_TTL`**, today fifteen
+        // minutes (`config/drive.ts`). The response carries a signed `url`, and the
+        // cache keeps it along - a `staleTime` above that deadline serves an image
+        // with an expired URL, and the failure shows up as a broken image, with no error.
         staleTime: 60 * 1000,
         retry: shouldRetryQuery,
       },

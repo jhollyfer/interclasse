@@ -16,13 +16,13 @@ type PhotoGridProps = Readonly<{
   photos: ReadonlyArray<AdministratorPhotoShowResponse>
   isPending: boolean
   empty: string
-  /** Mostra quem enviou: a organização revisa fotos de vários conselheiros. */
+  /** Shows who uploaded: the organization reviews photos from several advisors. */
   showAuthor?: boolean
-  /** Os botões de cada foto - aprovar e recusar, ou só apagar. */
+  /** Each photo's buttons - approve and reject, or just delete. */
   actions: (photo: AdministratorPhotoShowResponse) => React.ReactNode
 }>
 
-/** As fotos enviadas, com a situação de cada uma e as ações de quem vê. */
+/** The uploaded photos, with each one's status and the viewer's actions. */
 export function PhotoGrid({
   photos,
   isPending,

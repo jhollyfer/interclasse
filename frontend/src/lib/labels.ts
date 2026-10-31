@@ -25,21 +25,21 @@ import {
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>
 
 /**
- * Os rótulos (no idioma da tela, lidos a cada acesso) e as cores de cada enum do
- * domínio. Cada rótulo é um `get` que chama `m.*()`: `LABELS[valor]` continua
- * sendo a forma de uso e devolve o texto do idioma atual.
+ * The labels (in the screen's language, read on each access) and the colors of each
+ * domain enum. Each label is a `get` that calls `m.*()`: `LABELS[value]` remains
+ * the way to use it and returns the text in the current language.
  *
- * Separado de `validator.ts` de propósito: lá é o contrato com a API, e o valor
- * do enum é identificador, não texto de interface. Aqui é apresentação.
+ * Separate from `validator.ts` on purpose: there it is the contract with the API, and the enum
+ * value is an identifier, not interface text. Here it is presentation.
  *
- * Lookup object e não `if` espalhado por tela - e o mesmo objeto alimenta três
- * coisas: as `<option>` do formulário, o texto da tabela e a variante do
- * `Badge`.
+ * A lookup object and not an `if` scattered across screens - and the same object feeds three
+ * things: the form's `<option>`s, the table text and the `Badge`
+ * variant.
  *
- * A chave é `string` e o valor pode faltar porque o status chega da API como
- * `string` larga. O `satisfies` é o que mantém a cobrança de ter todos: valor
- * novo no enum sem rótulo aqui não compila. O acesso é sempre
- * `LABELS[valor] ?? valor`, que mostra o identificador cru em vez de quebrar.
+ * The key is `string` and the value may be missing because the status arrives from the API as a
+ * wide `string`. `satisfies` is what keeps the demand to have them all: a new
+ * enum value without a label here does not compile. Access is always
+ * `LABELS[value] ?? value`, which shows the raw identifier instead of breaking.
  */
 export const ACTIVE_STATUS_LABELS: Record<string, string | undefined> = {
   get ACTIVE() {
@@ -56,9 +56,9 @@ export const ACTIVE_STATUS_VARIANTS: Record<string, BadgeVariant> = {
 } satisfies Record<ActiveStatus, BadgeVariant>
 
 /**
- * O mesmo enum, na concordância de quem fala de pessoa: a conta é "Ativo", a
- * categoria é "Ativa". São dois rótulos que diferem só pela vogal, e é por isso
- * que o backend guarda o valor em inglês.
+ * The same enum, in the agreement of someone speaking of a person: the account is "Ativo", the
+ * category is "Ativa". They are two labels that differ only by the vowel, and that is why
+ * the backend stores the value in English.
  */
 export const ACCOUNT_STATUS_LABELS: Record<string, string | undefined> = {
   get ACTIVE() {
@@ -70,18 +70,18 @@ export const ACCOUNT_STATUS_LABELS: Record<string, string | undefined> = {
 } satisfies Record<ActiveStatus, string>
 
 /**
- * A cor sólida do status, para a bolinha do formulário.
+ * The status's solid color, for the form dot.
  *
- * Separada de `*_VARIANTS`, que é o par fundo-pálido/tinta-escura do `Badge`: o
- * fundo pálido em 8px no meio de um campo branco não se enxerga. A bolinha usa a
- * **tinta** do mesmo par, que é sólida e sobrevive ao tamanho.
+ * Separate from `*_VARIANTS`, which is the `Badge`'s pale-background/dark-ink pair: the
+ * pale background at 8px in the middle of a white field cannot be seen. The dot uses the
+ * **ink** of the same pair, which is solid and survives the size.
  */
 export const ACTIVE_STATUS_DOTS: Record<string, string | undefined> = {
   ACTIVE: 'bg-badge-success-foreground',
   INACTIVE: 'bg-muted-foreground',
 } satisfies Record<ActiveStatus, string>
 
-/** Um papel por responsabilidade nos jogos. */
+/** One role per responsibility in the games. */
 export const USER_ROLE_LABELS: Record<string, string | undefined> = {
   get ADMINISTRATOR() {
     return m.label_role_administrator()
@@ -109,7 +109,7 @@ export const CATEGORY_LABELS: Record<string, string | undefined> = {
   },
 } satisfies Record<Category, string>
 
-/** A forma curta, para coluna de tabela e aba. */
+/** The short form, for a table column and a tab. */
 export const CATEGORY_SHORT_LABELS: Record<string, string | undefined> = {
   get F1() {
     return m.label_category_short_f1()
@@ -189,18 +189,18 @@ export const CARD_COLOR_LABELS: Record<string, string | undefined> = {
   },
 } satisfies Record<CardColor, string>
 
-/** A cor do próprio cartão, para o retângulo que o representa na tela. */
+/** The card's own color, for the rectangle that represents it on screen. */
 export const CARD_COLOR_CLASSES: Record<string, string | undefined> = {
   YELLOW: 'bg-yellow-400',
   RED: 'bg-red-600',
 } satisfies Record<CardColor, string>
 
 /**
- * O estado de um arquivo na biblioteca.
+ * A file's state in the library.
  *
- * `PENDING` não é "aguardando aprovação": é upload que abriu e não confirmou, e
- * o arquivo não pode ser anexado a nada nesse estado. O rótulo diz isso, senão a
- * tela promete um arquivo que o backend recusa.
+ * `PENDING` is not "aguardando aprovação": it is an upload that opened and did not confirm, and
+ * the file cannot be attached to anything in that state. The label says so, otherwise the
+ * screen promises a file that the backend refuses.
  */
 export const UPLOAD_STATUS_LABELS: Record<string, string | undefined> = {
   get PENDING() {
@@ -222,11 +222,11 @@ export const UPLOAD_STATUS_DOTS: Record<string, string | undefined> = {
 } satisfies Record<UploadStatus, string>
 
 /**
- * O tipo de um arquivo, na forma como se fala dele.
+ * A file's type, in the way it is spoken of.
  *
- * "JPEG" e não "image/jpeg": o mimetype é identificador de protocolo, e quem
- * escolhe um filtro procura o formato, não o cabeçalho HTTP. O valor cru
- * continua sendo o que viaja na URL e no corpo.
+ * "JPEG" and not "image/jpeg": the mimetype is a protocol identifier, and whoever
+ * picks a filter looks for the format, not the HTTP header. The raw value
+ * remains what travels in the URL and in the body.
  */
 export const STORAGE_MIMETYPE_LABELS: Record<string, string | undefined> = {
   get 'image/jpeg'() {
@@ -259,14 +259,14 @@ export const STORAGE_MIMETYPE_LABELS: Record<string, string | undefined> = {
 } satisfies Record<StorageMimetype, string>
 
 /**
- * As iniciais de um nome, para o avatar sem imagem.
+ * A name's initials, for the avatar without an image.
  *
- * Primeira letra do primeiro nome e do último. **Nome de uma palavra só devolve
- * uma inicial**: repetir a primeira como sobrenome sairia "MM" para "Matheus".
+ * First letter of the first name and of the last. **A one-word name returns
+ * one initial**: repeating the first as a surname would give "MM" for "Matheus".
  *
- * Nome ausente devolve string vazia, e não um "?": quem quiser um marcador
- * escreve `initials(nome) || '?'` - o fallback é decisão da tela, e o
- * `AvatarFallback` já sabe ficar vazio.
+ * An absent name returns an empty string, and not a "?": whoever wants a marker
+ * writes `initials(name) || '?'` - the fallback is the screen's decision, and
+ * `AvatarFallback` already knows how to stay empty.
  */
 export function initials(name: string | undefined | null): string {
   if (!name?.trim()) return ''
@@ -281,9 +281,9 @@ export function initials(name: string | undefined | null): string {
 }
 
 /**
- * Data no fuso da escola, e não com `toLocaleString()` do navegador: o painel
- * renderiza no SSR, e a mesma data formatada em dois fusos é divergência de
- * hidratação na primeira renderização. Luxon com `setZone`/`setLocale` em
+ * A date in the school's time zone, and not with the browser's `toLocaleString()`: the dashboard
+ * renders on SSR, and the same date formatted in two time zones is a hydration
+ * divergence on the first render. Luxon with `setZone`/`setLocale` in
  * `lib/i18n.ts`.
  */
 export function formatDate(value: string | null): string {
@@ -292,14 +292,14 @@ export function formatDate(value: string | null): string {
   return formatSchoolDate(value, { dateStyle: 'short', timeStyle: 'short' })
 }
 
-/** "08:30", ou o relógio vazio de quem ainda não tem horário. */
+/** "08:30", or the empty clock of someone who has no time yet. */
 export function formatTime(value: string | null): string {
   if (!value) return '--:--'
 
   return formatSchoolDate(value, { hour: '2-digit', minute: '2-digit' })
 }
 
-/** "sexta-feira, 16 de outubro": o título de um dia da agenda. */
+/** "sexta-feira, 16 de outubro": a day's title in the agenda. */
 export function formatDay(value: string): string {
   return formatSchoolDate(value, {
     weekday: 'long',
@@ -308,12 +308,12 @@ export function formatDay(value: string): string {
   })
 }
 
-/** O dia no relógio da escola, `AAAA-MM-DD`: agrupa jogos do mesmo dia. */
+/** The day on the school's clock, `YYYY-MM-DD`: groups matches of the same day. */
 export function formatDayKey(value: string): string {
   return schoolDateTime(value).toFormat('yyyy-MM-dd')
 }
 
-/** "sex., 16/10, 08:30", ou o aviso de que o horário ainda não saiu. */
+/** "sex., 16/10, 08:30", or the notice that the time is not out yet. */
 export function formatWhen(value: string | null): string {
   if (!value) return m.label_when_undefined()
 
@@ -327,11 +327,11 @@ export function formatWhen(value: string | null): string {
 }
 
 /**
- * ISO da API para o valor de um `datetime-local`, no relógio da ESCOLA.
+ * API ISO to the value of a `datetime-local`, on the SCHOOL's clock.
  *
- * Não no do navegador: quem agenda de outro fuso (o Acre, o interior do
- * Amazonas) digitava 08:30 e a tabela mostrava 09:30, porque a exibição já era
- * no fuso da escola e a entrada não.
+ * Not on the browser's: whoever scheduled from another time zone (Acre, the interior of
+ * Amazonas) typed 08:30 and the table showed 09:30, because the display was already
+ * in the school's time zone and the input was not.
  */
 export function toSchoolInput(value: string | null): string {
   if (!value) return ''
@@ -339,24 +339,24 @@ export function toSchoolInput(value: string | null): string {
   return schoolDateTime(value).toFormat("yyyy-MM-dd'T'HH:mm")
 }
 
-/** O inverso: `2026-12-14T08:30` no relógio da escola para ISO. */
+/** The inverse: `2026-12-14T08:30` on the school's clock to ISO. */
 export function fromSchoolInput(value: string): string {
   return schoolInputToIso(value)
 }
 
 /**
- * O tamanho de um arquivo em unidade legível.
+ * A file's size in a readable unit.
  *
- * Base 1024 e uma casa decimal, que é o que o `backend` conta em
- * `UPLOAD_MAX_SIZE` e o que os gerenciadores de arquivo mostram. Para de subir
- * em MB de propósito: o teto por arquivo do projeto está longe do gigabyte, e
- * uma unidade que nunca aparece é um ramo que nunca é exercido.
+ * Base 1024 and one decimal place, which is what the `backend` counts in
+ * `UPLOAD_MAX_SIZE` and what file managers show. It stops climbing at
+ * MB on purpose: the project's per-file cap is far from a gigabyte, and
+ * a unit that never shows up is a branch that is never exercised.
  *
- * Mora aqui, e não na fila de upload que a estreou: a biblioteca de arquivos
- * mostra o mesmo número na coluna e no detalhe, e duas implementações
- * divergiriam na primeira mudança de arredondamento.
+ * It lives here, and not in the upload queue that debuted it: the file library
+ * shows the same number in the column and in the detail, and two implementations
+ * would diverge at the first rounding change.
  */
-/** Uma casa decimal fixa: "1,5 MB", e não "1,5 MB" num tamanho e "2 MB" no outro. */
+/** One fixed decimal place: "1,5 MB", and not "1,5 MB" at one size and "2 MB" at another. */
 const ONE_DECIMAL = { minimumFractionDigits: 1, maximumFractionDigits: 1 }
 
 export function formatBytes(bytes: number): string {
@@ -369,17 +369,17 @@ export function formatBytes(bytes: number): string {
 }
 
 /**
- * Concorda o substantivo com a contagem, e devolve os dois juntos.
+ * Agrees the noun with the count, and returns both together.
  *
- * Existe porque a mesma condição estava escrita como ternário em sete telas -
- * `total === 1 ? '1 foto' : `${total} fotos`` - e a regra `no-ternary` do
- * `eslint.config.js` a proíbe. Escrever `if` em cada uma delas seria a mesma
- * duplicação com mais linhas.
+ * It exists because the same condition was written as a ternary on seven screens -
+ * `total === 1 ? '1 foto' : `${total} fotos`` - and the `no-ternary` rule in
+ * `eslint.config.js` forbids it. Writing an `if` in each of them would be the same
+ * duplication with more lines.
  *
- * Plural irregular não se deriva do singular, então as duas formas entram, já
- * traduzidas pelo chamador: `plural(3, m.photo_one(), m.photo_other())`. Frase
- * inteira com contagem é uma mensagem com variante de plural, não esta função.
- * Quem precisa só do substantivo, sem o número na frente, passa `withCount: false`.
+ * An irregular plural is not derived from the singular, so both forms go in, already
+ * translated by the caller: `plural(3, m.photo_one(), m.photo_other())`. A whole
+ * sentence with a count is a message with a plural variant, not this function.
+ * Whoever needs only the noun, without the number in front, passes `withCount: false`.
  */
 export function plural(
   count: number,
@@ -395,7 +395,7 @@ export function plural(
   return `${formatNumber(count)} ${word}`
 }
 
-/** A turma campeã: quem venceu a final. Nula enquanto a final não acontece. */
+/** The champion classroom: whoever won the final. Null until the final happens. */
 export function championName(bracket: {
   championTeamId: string | null
   matches: ReadonlyArray<{
@@ -407,7 +407,7 @@ export function championName(bracket: {
 }): string | null {
   if (!bracket.championTeamId) return null
 
-  // Qualquer jogo da campeã serve: o nome é o mesmo em todos.
+  // Any of the champion's matches will do: the name is the same in all of them.
   const match = bracket.matches.find(
     (item) =>
       item.homeTeamId === bracket.championTeamId ||

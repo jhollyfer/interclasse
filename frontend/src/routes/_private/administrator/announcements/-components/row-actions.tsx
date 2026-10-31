@@ -24,7 +24,7 @@ import { createConfirmHandle } from '#/lib/dialog-handle'
 import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
-/** Editar e apagar. O aviso some do site na hora. */
+/** Edit and delete. The announcement leaves the site at once. */
 export function AnnouncementRowActions({
   announcement,
 }: Readonly<{

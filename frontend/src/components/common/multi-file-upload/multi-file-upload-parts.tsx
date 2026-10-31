@@ -17,7 +17,7 @@ type MultiFileUploadTriggerProps = Readonly<
   >
 >
 
-/** O botão que abre o seletor. Sem children escreve "Adicionar arquivos". */
+/** The button that opens the picker. Without children it writes "Adicionar arquivos". */
 export function MultiFileUploadTrigger({
   children,
   ...rest
@@ -43,7 +43,7 @@ export function MultiFileUploadTrigger({
   )
 }
 
-/** O texto de estado de cada item: a barra diz quanto, o texto diz o que houve. */
+/** Each item's status text: the bar says how much, the text says what happened. */
 const STATUS_TEXTS = {
   uploading: (name: string, percent: number) =>
     m.multi_file_upload_progress({ name, percent }),
@@ -51,14 +51,14 @@ const STATUS_TEXTS = {
   failed: (name: string) => m.multi_file_upload_failed({ name }),
 } satisfies Record<UploadItemStatus, (name: string, percent: number) => string>
 
-/** O rótulo do botão de cada item: enquanto sobe ele cancela, depois ele tira. */
+/** Each item's button label: while uploading it cancels, afterwards it removes. */
 const REMOVE_LABELS = {
   uploading: (name: string) => m.multi_file_upload_cancel({ name }),
   done: (name: string) => m.multi_file_upload_remove({ name }),
   failed: (name: string) => m.multi_file_upload_remove({ name }),
 } satisfies Record<UploadItemStatus, (name: string) => string>
 
-/** A fila: nome, barra de progresso e a ação de tirar/cancelar de cada arquivo. */
+/** The queue: name, progress bar and the remove/cancel action of each file. */
 export function MultiFileUploadList({
   className,
   ...props

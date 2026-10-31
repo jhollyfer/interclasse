@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 /**
- * O valor depois de `delay` ms sem mudar. O combobox com busca no servidor
- * debounça aqui, no valor que entra na chave da query, e não dentro da
+ * The value after `delay` ms without changing. The combobox with server search
+ * debounces here, on the value that enters the query key, and not inside the
  * `queryFn` (`frontend.md` §2.1).
  */
 export function useDebouncedValue<TValue>(value: TValue, delay = 300): TValue {

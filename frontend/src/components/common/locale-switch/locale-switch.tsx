@@ -15,7 +15,7 @@ import { m } from '#/paraglide/messages'
 import { getLocale, isLocale, locales, setLocale } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
 
-/** O nome de cada idioma, no idioma da tela. */
+/** Each language's name, in the screen's language. */
 const LOCALE_NAMES = {
   'pt-BR': () => m.locale_pt_br(),
   es: () => m.locale_es(),
@@ -23,9 +23,9 @@ const LOCALE_NAMES = {
 } satisfies Record<Locale, () => string>
 
 /**
- * A troca de idioma (_standards/i18n.md §2). `setLocale` do Paraglide leva para
- * a mesma página no outro idioma - a URL é a fonte da verdade -, e o resto
- * (mensagem da API, validação, `<html lang>`) segue por ela.
+ * The language switch (_standards/i18n.md §2). Paraglide's `setLocale` leads to
+ * the same page in the other language - the URL is the source of truth -, and the rest
+ * (API message, validation, `<html lang>`) follows from it.
  */
 export function LocaleSwitch({
   className,
@@ -38,7 +38,7 @@ export function LocaleSwitch({
           className,
         )}
       >
-        {/* Nome acessível pelo conteúdo, com o texto visível dentro: WCAG 2.5.3. */}
+        {/* Accessible name from the content, with the visible text inside: WCAG 2.5.3. */}
         <span className="sr-only">{m.locale_switch_label()}</span>
         <TranslateIcon aria-hidden="true" className="size-4" />
         {getLocale()}

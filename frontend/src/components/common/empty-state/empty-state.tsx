@@ -13,15 +13,15 @@ type EmptyStateProps = Readonly<
 >
 
 /**
- * O estado vazio de uma lista, por motivo (`frontend.md` §10.1), sobre o
+ * A list's empty state, by reason (`frontend.md` §10.1), on top of
  * `ui/empty` (_doc-lib/shadcn.md#empty).
  *
- * O motivo vai pelo contexto: as partes escolhem o texto dele, e a tela só
- * escreve o que vale para o vazio de verdade (`empty`). Filtro e lixeira têm o
- * texto do componente.
+ * The reason goes through the context: the parts pick its text, and the screen only
+ * writes what holds for a true empty (`empty`). Filter and trash use the
+ * component's text.
  *
- * `gap-1` e não o `gap-4` do `Empty`: título e descrição andam colados, e é
- * `EmptyStateActions` quem abre o respiro antes do botão.
+ * `gap-1` and not `Empty`'s `gap-4`: title and description stay together, and it is
+ * `EmptyStateActions` that opens the breathing room before the button.
  */
 export function EmptyState({
   reason,

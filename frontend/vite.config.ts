@@ -10,13 +10,13 @@ import { defineConfig, loadEnv } from 'vite'
 const config = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
 
-  // Os cabeçalhos de segurança do servidor do frontend (`frontend.md` §3.3):
-  // o Nitro não manda nenhum por padrão, e sem `frame-ancestors` a tela de
-  // login pode ser embutida em `iframe` por outro site. `connect-src` e
-  // `img-src` abrem só a API e, com upload pré-assinado, a origem pública do
-  // storage (`VITE_STORAGE_URL`). `unsafe-inline` em script e estilo porque o
-  // Start escreve os scripts de hidratação inline e não emite nonce.
-  // Só em build de produção: o dev server precisa de websocket e eval do HMR.
+  // The frontend server's security headers (`frontend.md` §3.3):
+  // Nitro sends none by default, and without `frame-ancestors` the sign-in
+  // screen can be embedded in an `iframe` by another site. `connect-src` and
+  // `img-src` open only the API and, with presigned upload, the storage's
+  // public origin (`VITE_STORAGE_URL`). `unsafe-inline` in script and style because
+  // Start writes the hydration scripts inline and emits no nonce.
+  // Production build only: the dev server needs the HMR websocket and eval.
   // _doc-lib/nitro.md#config; https://nitro.build/docs/routing (route rules).
   const origins = ["'self'", env.VITE_API_URL, env.VITE_STORAGE_URL]
     .filter(Boolean)
@@ -42,7 +42,7 @@ const config = defineConfig(({ mode }) => {
           'Content-Security-Policy': csp,
           'X-Content-Type-Options': 'nosniff',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
-          // Sem `preload`: entrar na lista é compromisso que não se desfaz.
+          // No `preload`: joining the list is a commitment that cannot be undone.
           'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
         },
       },
@@ -53,24 +53,24 @@ const config = defineConfig(({ mode }) => {
     resolve: { tsconfigPaths: true },
     plugins: [
       devtools(),
-      // Os três idiomas (_standards/i18n.md §2). As opções do compilador moram em
-      // `project.inlang/paraglide.config.ts`, lido por este plugin e pela CLI
+      // The three languages (_standards/i18n.md §2). The compiler options live in
+      // `project.inlang/paraglide.config.ts`, read by this plugin and by the CLI
       // (_doc-lib/paraglide.md#/vite).
       paraglideVitePlugin({ project: './project.inlang' }),
-      // As opções vão direto no plugin, que é a forma que o tipo declara:
-      // `nitro(pluginConfig?: NitroPluginConfig)` com `NitroPluginConfig extends
+      // The options go straight into the plugin, which is the form the type declares:
+      // `nitro(pluginConfig?: NitroPluginConfig)` with `NitroPluginConfig extends
       // NitroConfig` (nitro/dist/vite.d.mts).
       //
-      // A forma antiga daqui, `nitro({ config: { preset } })`, aplicava o preset
-      // igual - `dist/vite.mjs` monta a config com
-      // `defu(pluginConfig, pluginConfig.config, userConfig.nitro)`, então a
-      // chave `config` é lida em runtime. Ela só não consta no tipo, e era isso
-      // que deixava o `tsc` vermelho com TS2353.
+      // The old form here, `nitro({ config: { preset } })`, applied the preset
+      // all the same - `dist/vite.mjs` builds the config with
+      // `defu(pluginConfig, pluginConfig.config, userConfig.nitro)`, so the
+      // `config` key is read at runtime. It just is not in the type, and that is what
+      // left `tsc` red with TS2353.
       //
-      // Cravar o preset segue valendo: sem ele o Nitro detecta a plataforma pelas
-      // variáveis de ambiente do CI - Vercel, Netlify, Cloudflare e mais cinco se
-      // identificam sozinhas - e só cai em `node-server` quando nenhuma responde.
-      // É o que o `Dockerfile-production` espera.
+      // Pinning the preset still holds: without it Nitro detects the platform from the
+      // CI environment variables - Vercel, Netlify, Cloudflare and five more identify
+      // themselves - and only falls back to `node-server` when none answers.
+      // It is what `Dockerfile-production` expects.
       nitro({ preset: 'node-server', routeRules: securityHeaders }),
       tailwindcss(),
       tanstackStart({

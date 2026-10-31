@@ -9,7 +9,7 @@ import { AnnouncementList } from '../../-components/announcement-list'
 import { Pager } from '../../-components/pager'
 import { Section, SectionHeader, SectionTitle } from '../../-components/section'
 
-const route = getRouteApi('/_public/avisos/')
+const route = getRouteApi('/_public/announcements/')
 
 export function AnnouncementsPage(): React.JSX.Element {
   const search = route.useSearch()

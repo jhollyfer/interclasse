@@ -18,14 +18,14 @@ import { useRichEditorContext } from './rich-editor-context'
 type ToolbarAction = {
   label: () => string
   icon: React.ReactElement
-  /** O nome do nó ou marca que o Tiptap usa para dizer "está ativo aqui". */
+  /** The name of the node or mark Tiptap uses to say "it is active here". */
   active: (editor: Editor) => boolean
   run: (editor: Editor) => void
 }
 
 /**
- * As ações da barra, por nome. Lookup, e não um `if` por botão: acrescentar uma
- * ação é acrescentar uma entrada.
+ * The bar's actions, by name. A lookup, and not an `if` per button: adding an
+ * action means adding an entry.
  */
 const TOOLBAR_ACTIONS = {
   bold: {
@@ -62,7 +62,7 @@ const TOOLBAR_ACTIONS = {
 
 type ToolbarActionName = keyof typeof TOOLBAR_ACTIONS
 
-/** A ordem dos botões. */
+/** The order of the buttons. */
 const ACTION_NAMES = [
   'bold',
   'italic',
@@ -71,15 +71,15 @@ const ACTION_NAMES = [
   'orderedList',
 ] as const satisfies ReadonlyArray<ToolbarActionName>
 
-/** A barra de formatação. Cada botão diz o estado por `aria-pressed`. */
+/** The formatting bar. Each button reports its state through `aria-pressed`. */
 export function RichEditorToolbar({
   className,
   ...props
 }: React.ComponentProps<'div'>): React.JSX.Element {
   const { editor } = useRichEditorContext('RichEditorToolbar')
 
-  // Sem isto a barra não acompanha o cursor: o Tiptap 3 não re-renderiza o
-  // React a cada transação (_doc-lib/tiptap.md#guides/performance).
+  // Without this the bar does not follow the cursor: Tiptap 3 does not re-render
+  // React on every transaction (_doc-lib/tiptap.md#guides/performance).
   const pressed = useEditorState({
     editor,
     selector: ({ editor: current }) =>

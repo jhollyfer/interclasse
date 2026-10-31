@@ -22,11 +22,11 @@ import { linkOptions } from '@tanstack/react-router'
 import { m } from '#/paraglide/messages'
 
 /**
- * Os destinos do menu, tipados contra a árvore de rotas.
+ * The menu destinations, typed against the route tree.
  *
- * `linkOptions` e não um array solto: ele preserva o tipo de `to`, então rota
- * removida ou renomeada vira erro de compilação aqui, em vez de um item de menu
- * que leva a lugar nenhum.
+ * `linkOptions` and not a loose array: it preserves the type of `to`, so a removed or
+ * renamed route becomes a compile error here, instead of a menu item that
+ * leads nowhere.
  */
 const ORGANIZATION = linkOptions([
   {
@@ -161,15 +161,15 @@ export type MenuItem =
 export type MenuGroup = {
   label: string
   items: ReadonlyArray<MenuItem>
-  /** Quem vê o grupo. Ausente, todo papel. */
+  /** Who sees the group. When absent, every role. */
   roles?: ReadonlyArray<UserRole>
 }
 
 /**
- * Os grupos da barra lateral.
+ * The sidebar groups.
  *
- * Esconder o grupo de quem não tem o papel é conveniência de tela, e só: quem
- * autoriza é o backend, que responde `403` a quem chegar pela URL.
+ * Hiding the group from whoever lacks the role is a screen convenience, and only that: whoever
+ * authorizes is the backend, which answers `403` to whoever arrives by the URL.
  */
 export const MENU: ReadonlyArray<MenuGroup> = [
   {
@@ -184,8 +184,8 @@ export const MENU: ReadonlyArray<MenuGroup> = [
       return m.panel_menu_group_advisor()
     },
     items: ADVISOR,
-    // Só o conselheiro: o administrador vê todas as turmas em "Turmas", e o
-    // item repetido aqui era a mesma tela em dobro.
+    // Advisor only: the administrator sees all classrooms in "Turmas", and the
+    // item repeated here was the same screen twice.
     roles: [USER_ROLE.ADVISOR],
   },
   {
@@ -203,18 +203,18 @@ export const MENU: ReadonlyArray<MenuGroup> = [
   },
 ]
 
-/** Os grupos que o papel vê. */
+/** The groups the role sees. */
 export function menuFor(role: UserRole): ReadonlyArray<MenuGroup> {
   return MENU.filter((group) => !group.roles || group.roles.includes(role))
 }
 
 /**
- * O contador de avisos de remoção sem ciência: só `meta.total` importa. A mesma
- * chave no menu e no painel, para os dois lerem do mesmo cache.
+ * The counter of removal notices not yet acknowledged: only `meta.total` matters. The same
+ * key in the menu and on the dashboard, so both read from the same cache.
  */
 export const PENDING_REMOVALS = { pending: true, perPage: 1 } as const
 
-/** A primeira tela de cada papel, para onde o login e o logotipo levam. */
+/** Each role's first screen, where the login and the logo lead. */
 export const HOME_BY_ROLE = {
   ADMINISTRATOR: '/administrator',
   ADVISOR: '/advisor',

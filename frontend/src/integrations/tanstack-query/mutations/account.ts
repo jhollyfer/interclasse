@@ -8,17 +8,17 @@ import type { HTTPError } from '../http'
 import { request } from '../http'
 
 /**
- * A própria conta. Sem `id` no payload nem no caminho: o usuário vem sempre da
- * sessão, e é a mesma razão pela qual não existe `status` nem `role` aqui -
- * ninguém se inativa nem se promove.
+ * The account itself. No `id` in the payload or the path: the user always comes from the
+ * session, and that is the same reason there is no `status` or `role` here -
+ * nobody deactivates or promotes themselves.
  *
- * Trocar a senha derruba a sessão em curso, inclusive a que fez esta
- * requisição. Quem chama decide o que fazer com isso.
+ * Changing the password takes down the current session, including the one that made this
+ * request. Whoever calls decides what to do with that.
  *
- * `currentPassword` só é exigido quando `password` **existe como chave** - o
- * `requiredIfExists` do backend olha a chave, não o valor. Um `password: ''`
- * vira `null` e ainda conta como presente, então o campo tem de ser **omitido**
- * do payload, e não enviado vazio.
+ * `currentPassword` is only required when `password` **exists as a key** - the
+ * backend's `requiredIfExists` looks at the key, not the value. A `password: ''`
+ * becomes `null` and still counts as present, so the field must be **omitted**
+ * from the payload, and not sent empty.
  */
 export function useAccountUpdateMutation(
   options?: MutationProps<

@@ -1,4 +1,4 @@
 import { validateRedirectSearch } from '#/lib/redirect-search'
 
-/** `?redirect=` só aceita caminho interno; a regra mora em `lib/redirect-search.ts`. */
+/** `?redirect=` only accepts an internal path; the rule lives in `lib/redirect-search.ts`. */
 export const validateSearch = validateRedirectSearch

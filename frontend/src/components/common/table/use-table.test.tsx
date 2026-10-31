@@ -30,7 +30,7 @@ function columnIds(table: { getAllColumns: () => Array<{ id: string }> }) {
 }
 
 describe('useTable', () => {
-  it('sem ações nem seleção só tem as colunas da tela', () => {
+  it('without actions or selection, has only the screen columns', () => {
     const { result } = renderHook(() =>
       useTable({ rows: ROWS, columns: COLUMNS, getRowId: (row) => row.id }),
     )
@@ -38,7 +38,7 @@ describe('useTable', () => {
     expect(columnIds(result.current)).toEqual(['name'])
   })
 
-  it('soma a caixa de seleção no começo e o menu de ações no fim', () => {
+  it('adds the selection checkbox at the start and the actions menu at the end', () => {
     const { result } = renderHook(() =>
       useTable({
         rows: ROWS,
@@ -52,7 +52,7 @@ describe('useTable', () => {
     expect(columnIds(result.current)).toEqual(['_select', 'name', '_actions'])
   })
 
-  it('o predicado de selectable decide linha a linha', () => {
+  it('decides row by row through the selectable predicate', () => {
     const { result } = renderHook(() =>
       useTable({
         rows: ROWS,
@@ -68,7 +68,7 @@ describe('useTable', () => {
     expect(bia?.getCanSelect()).toBe(false)
   })
 
-  it('seleciona uma linha e a devolve selecionada', () => {
+  it('when a row is selected, returns it selected', () => {
     const { result } = renderHook(() =>
       useTable({
         rows: ROWS,
@@ -84,7 +84,7 @@ describe('useTable', () => {
     expect(result.current.getRowModel().rows[1]?.getIsSelected()).toBe(false)
   })
 
-  it('devolve uma linha por registro, na ordem recebida', () => {
+  it('returns one row per record, in the order received', () => {
     const { result } = renderHook(() =>
       useTable({ rows: ROWS, columns: COLUMNS, getRowId: (row) => row.id }),
     )

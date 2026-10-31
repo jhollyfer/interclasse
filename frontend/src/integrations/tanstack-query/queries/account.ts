@@ -6,26 +6,26 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { request } from '../http'
 
 /**
- * A sessão. Não há store, contexto nem hook de auth neste repositório de
- * propósito: quem está logado é dado do servidor, e dado do servidor mora no
- * cache do TanStack Query.
+ * The session. There is no store, context or auth hook in this repository on
+ * purpose: who is logged in is server data, and server data lives in the
+ * TanStack Query cache.
  *
- * `queryOptions` e não um objeto solto para que o `beforeLoad` do layout e o
- * `useQuery` do cabeçalho usem literalmente a mesma chave - é o que faz o
- * segundo aproveitar o cache que o primeiro encheu, em vez de repetir a
- * requisição.
+ * `queryOptions` and not a loose object so that the layout's `beforeLoad` and the
+ * header's `useQuery` literally use the same key - that is what makes the
+ * second one reuse the cache the first one filled, instead of repeating the
+ * request.
  */
 export const accountQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.account.profile.all,
-    // O `signal` vem da própria biblioteca e é repassado ao `fetch`: sem ele,
-    // query que desmonta antes de resolver não cancela nada, e a resposta
-    // atrasada de uma sessão anterior chega depois da atual.
+    // The `signal` comes from the library itself and is forwarded to `fetch`: without it,
+    // a query that unmounts before resolving cancels nothing, and the late
+    // response of a previous session arrives after the current one.
     queryFn: ({ signal }) =>
       request('/account', AccountProfileShowResponse, { signal }),
-    // O 401 já foi tratado dentro de `request`, que tentou renovar a sessão e
-    // não conseguiu. Repetir a chamada não muda a resposta, só atrasa o
-    // redirecionamento para o login.
+    // The 401 was already handled inside `request`, which tried to renew the session and
+    // could not. Repeating the call does not change the answer, it only delays the
+    // redirect to the sign-in.
     retry: false,
     staleTime: 5 * 60 * 1000,
   })

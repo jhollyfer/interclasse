@@ -79,8 +79,8 @@ export function ClassroomFormFields({
           <>
             <OptionCombobox
               {...control}
-              // Na criação o ano nasce ausente: `String(undefined)` não casa
-              // com opção nenhuma, e o combobox mostra o vazio.
+              // On creation the year is born absent: `String(undefined)` matches
+              // no option, and the combobox shows the empty state.
               value={String(field.value)}
               onValueChange={(value) => field.onChange(Number(value))}
               onBlur={field.onBlur}

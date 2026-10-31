@@ -38,11 +38,11 @@ import { ThemeToggle } from './theme-toggle'
 const route = getRouteApi('/_private')
 
 /**
- * A trilha da tela atual.
+ * The current screen's trail.
  *
- * `useMatches()` e não `location.pathname`: a lista de rotas que casaram é o que
- * diz quais prefixos existem de verdade. A regra inteira mora em
- * `lib/breadcrumbs.ts`, testada lá.
+ * `useMatches()` and not `location.pathname`: the list of routes that matched is what
+ * says which prefixes really exist. The whole rule lives in
+ * `lib/breadcrumbs.ts`, tested there.
  */
 function Trail(): React.JSX.Element {
   const matches = useMatches()
@@ -70,11 +70,11 @@ function Trail(): React.JSX.Element {
 }
 
 /**
- * O menu da conta: quem está logado, o caminho para a própria conta e a saída.
+ * The account menu: who is logged in, the path to the account itself and the sign-out.
  *
- * O nome e o avatar vêm do **contexto da rota**, que o `beforeLoad` de
- * `_private/layout.tsx` encheu com `queryClient.query()`. Aqui não sai requisição
- * nova, e o cabeçalho nunca renderiza um instante sem nome.
+ * The name and avatar come from the **route context**, which the `beforeLoad` of
+ * `_private/layout.tsx` filled with `queryClient.query()`. No new request goes out
+ * here, and the header never renders a moment without a name.
  */
 function AccountMenu(): React.JSX.Element {
   const { account } = route.useRouteContext()
@@ -84,8 +84,8 @@ function AccountMenu(): React.JSX.Element {
     <React.Fragment>
       <DropdownMenu>
         {/*
-        `render`, e não aninhamento: o gatilho já é um `<button>`, e outro botão
-        por dentro dele seria um botão dentro de outro - erro de hidratação.
+        `render`, and not nesting: the trigger is already a `<button>`, and another button
+        inside it would be a button inside a button - a hydration error.
       */}
         <DropdownMenuTrigger className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted">
           <Avatar className="size-7">
@@ -97,7 +97,7 @@ function AccountMenu(): React.JSX.Element {
               {initials(account.name)}
             </AvatarFallback>
           </Avatar>
-          {/* Nome acessível pelo conteúdo, com o nome visível dentro: WCAG 2.5.3. */}
+          {/* Accessible name from the content, with the visible name inside: WCAG 2.5.3. */}
           <span className="sr-only">{m.panel_account_label()}</span>
           <span className="sr-only text-xs leading-none font-semibold lg:not-sr-only">
             {account.name}
@@ -106,9 +106,9 @@ function AccountMenu(): React.JSX.Element {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-56" align="end">
-          {/* `DropdownMenuLabel` é o `Menu.GroupLabel` do Base UI e exige o
-            `Menu.Group` em volta: sem ele, abrir o menu lança "MenuGroupContext
-            is missing" e o ErrorBoundary do layout mostra a página de erro. */}
+          {/* `DropdownMenuLabel` is Base UI's `Menu.GroupLabel` and requires the surrounding
+            `Menu.Group`: without it, opening the menu throws "MenuGroupContext
+            is missing" and the layout's ErrorBoundary shows the error page. */}
           <DropdownMenuGroup>
             <DropdownMenuLabel className="flex flex-col gap-0.5">
               <span className="truncate font-medium">{account.name}</span>
@@ -127,8 +127,8 @@ function AccountMenu(): React.JSX.Element {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* Irmão do menu, e não dentro do conteúdo: o conteúdo desmonta ao fechar
-        e levaria o alerta junto (`frontend.md` §6.2). */}
+      {/* A sibling of the menu, and not inside the content: the content unmounts on close
+        and would take the alert with it (`frontend.md` §6.2). */}
       <SignOutConfirm handle={signOutHandle}>
         <SignOutConfirmHeader />
         <SignOutConfirmFooter />
@@ -138,11 +138,11 @@ function AccountMenu(): React.JSX.Element {
 }
 
 /**
- * O cabeçalho do painel: o gatilho da barra lateral, a trilha, o tema e a conta.
+ * The dashboard header: the sidebar trigger, the trail, the theme and the account.
  *
- * Componente próprio, e não markup solto no layout como na referência: aqui ele
- * carrega o menu da conta, que é estado e mutation - e o layout é o lugar do
- * guard, não da tela.
+ * A component of its own, and not loose markup in the layout as in the reference: here it
+ * carries the account menu, which is state and mutation - and the layout is the place of the
+ * guard, not of the screen.
  */
 export function Header(): React.JSX.Element {
   return (

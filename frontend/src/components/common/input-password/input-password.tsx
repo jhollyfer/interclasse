@@ -17,12 +17,12 @@ type PasswordInputProps = Readonly<
 >
 
 /**
- * O campo de senha, com o olho que revela o que foi digitado.
+ * The password field, with the eye that reveals what was typed.
  *
- * O olho é `InputGroupAddon align="inline-end"`, e não um botão posicionado por
- * cima com `absolute`: o grupo reserva a faixa da direita, então o texto nunca
- * passa por baixo do ícone e não é preciso adivinhar um `pr-` que combine com o
- * tamanho do botão.
+ * The eye is `InputGroupAddon align="inline-end"`, and not a button positioned on
+ * top with `absolute`: the group reserves the right-hand strip, so the text never
+ * goes under the icon and there is no need to guess a `pr-` that matches the
+ * button's size.
  */
 export function InputPassword({
   className,

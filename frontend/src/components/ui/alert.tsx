@@ -13,11 +13,11 @@ const alertVariants = cva(
         destructive:
           'bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current',
 
-        // O aviso que não é erro: pendência, prazo, coisa a conferir. Não
-        // existia, e por isso o painel escrevia âmbar cru - `border-amber-300
-        // bg-amber-50 text-amber-900` mais o trio `dark:` na mão. Sai do mesmo
-        // par semântico do `Badge`, então o aviso da tabela e o do topo da
-        // página passam a ser o mesmo âmbar.
+        // The warning that is not an error: pending item, deadline, something to
+        // check. It did not exist, so the panel wrote raw amber - `border-amber-300
+        // bg-amber-50 text-amber-900` plus the `dark:` trio by hand. It now comes
+        // from the same semantic pair as `Badge`, so the table's warning and the
+        // one at the top of the page are the same amber.
         warning:
           'border-badge-warning bg-badge-warning text-badge-warning-foreground *:data-[slot=alert-description]:text-badge-warning-foreground/90 *:[svg]:text-current',
       },

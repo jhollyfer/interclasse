@@ -2,8 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-// `.env.e2e` é opcional: em CI as variáveis vêm do ambiente. Carrega antes do
-// resto da config, porque `webServer` e `baseURL` leem `process.env`.
+// `.env.e2e` is optional: in CI the variables come from the environment. It loads before
+// the rest of the config, because `webServer` and `baseURL` read `process.env`.
 const envFile = resolve(import.meta.dirname, '..', '.env.e2e')
 if (existsSync(envFile)) process.loadEnvFile(envFile)
 
@@ -16,13 +16,13 @@ export default defineConfig({
   testDir: '.',
   outputDir: '../test-results',
   forbidOnly: Boolean(process.env.CI),
-  // Retry sem condição transforma teste quebrado em intermitente
+  // Unconditional retry turns a broken test into a flaky one
   // (_doc-lib/playwright.md#docs/test-retries).
   retries: 0,
-  // Os fluxos mexem nos mesmos dados (modalidade, fotos, texto do Sobre): um
-  // worker por vez mantém cada spec dono do que criou.
+  // The flows touch the same data (sport, photos, About text): one worker at
+  // a time keeps each spec the owner of what it created.
   workers: 1,
-  // Sem teto global, o job morto pelo provedor não gera relatório
+  // Without a global cap, a job killed by the provider produces no report
   // (_doc-lib/playwright.md#docs/test-timeouts).
   globalTimeout: 15 * 60 * 1000,
   timeout: 60 * 1000,
@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   use: {
     baseURL,
-    // A API responde no idioma da requisição (CSV, mensagens): pt-BR fixo.
+    // The API answers in the request's language (CSV, messages): pt-BR is fixed.
     locale: 'pt-BR',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -41,7 +41,7 @@ export default defineConfig({
     },
   },
   projects: [
-    // Entra uma vez por papel; os specs dependem dele (`docs/auth`).
+    // Signs in once per role; the specs depend on it (`docs/auth`).
     { name: 'setup', testMatch: /auth\.setup\.ts/ },
     {
       name: 'chromium',

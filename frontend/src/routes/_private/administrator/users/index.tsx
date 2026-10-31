@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_private/administrator/users/')({
   validateSearch,
   search: { middlewares: [stripSearchParams(LIST_SEARCH_DEFAULTS)] },
   pendingComponent: () => <TableSkeleton />,
-  // `query()` sem `.catch`: devolve o dado e propaga o erro, como o guard em
+  // `query()` without `.catch`: returns the data and propagates the error, like the guard in
   // `_private/layout.tsx`.
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>

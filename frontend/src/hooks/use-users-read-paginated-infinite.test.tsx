@@ -33,7 +33,7 @@ afterEach(() => {
 })
 
 describe('useUsersReadPaginatedInfinite', () => {
-  it('pede 20 por página do papel, ordenado por nome, sem busca', async () => {
+  it('asks for 20 per page of the role, sorted by name, without search', async () => {
     request.mockResolvedValue(page(1, 1, ['Ana']))
 
     const { result } = renderHook(
@@ -51,7 +51,7 @@ describe('useUsersReadPaginatedInfinite', () => {
     expect(url).not.toContain('search=')
   })
 
-  it('a lista cresce por fetchNextPage e para na última página', async () => {
+  it('grows through fetchNextPage and stops on the last page', async () => {
     request
       .mockResolvedValueOnce(page(1, 2, ['Ana']))
       .mockResolvedValueOnce(page(2, 2, ['Bia']))
@@ -74,7 +74,7 @@ describe('useUsersReadPaginatedInfinite', () => {
     expect(result.current.hasNextPage).toBe(false)
   })
 
-  it('o termo digitado só vai ao servidor depois do debounce', async () => {
+  it('sends the typed term to the server only after the debounce', async () => {
     request.mockResolvedValue(page(1, 1, ['Ana']))
 
     const { result, rerender } = renderHook(

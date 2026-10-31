@@ -1,17 +1,17 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 /**
- * O endereço que o frontend anterior servia, apontado para onde a tela mora
- * hoje.
+ * The address the previous frontend served, pointed at where the screen lives
+ * today.
  *
- * No `frontend-old` a própria conta era `/administrator/profile`; aqui ela é
- * `/profile`, como na referência. Quem tem o endereço antigo salvo, no
- * favorito ou num link colado em algum lugar, chegaria a um 404 - e um 404
- * numa rota que existia é indistinguível de painel quebrado.
+ * In `frontend-old` the account itself was `/administrator/profile`; here it is
+ * `/profile`, as in the reference. Whoever has the old address saved, in a
+ * bookmark or in a link pasted somewhere, would land on a 404 - and a 404
+ * on a route that existed is indistinguishable from a broken dashboard.
  *
- * `beforeLoad` e não `component`: o redirecionamento acontece antes de montar
- * qualquer coisa, então não pisca uma tela vazia no caminho. Sem `component`
- * porque nada chega a renderizar.
+ * `beforeLoad` and not `component`: the redirect happens before mounting
+ * anything, so no empty screen flashes on the way. No `component`
+ * because nothing gets rendered.
  */
 export const Route = createFileRoute('/_private/administrator/profile/')({
   beforeLoad: () => {

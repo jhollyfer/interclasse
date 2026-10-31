@@ -19,7 +19,7 @@ type FormValues = { name: string; position: string }
 
 const FIELDS = ['name', 'position'] as const
 
-/** Só `setError` é usado; o resto do formulário não entra nesta conta. */
+/** Only `setError` is used; the rest of the form does not enter this calculation. */
 function formStub() {
   const setError = vi.fn()
 
@@ -29,7 +29,7 @@ function formStub() {
   }
 }
 
-/** O texto de 5xx: a mensagem do servidor é para o log, não para a tela. */
+/** The 5xx text: the server's message is for the log, not for the screen. */
 const SERVER_MESSAGE = 'O servidor não conseguiu concluir. Tente de novo.'
 
 function httpError(errors?: Record<string, string>, status = 422) {
@@ -42,7 +42,7 @@ function httpError(errors?: Record<string, string>, status = 422) {
 }
 
 describe('applyHTTPErrorToForm', () => {
-  it('marca o campo que o backend acusou', () => {
+  it('marks the field the backend flagged', () => {
     const { form, setError } = formStub()
 
     const handled = applyHTTPErrorToForm({
@@ -57,7 +57,7 @@ describe('applyHTTPErrorToForm', () => {
     })
   })
 
-  it('leva `root` para o formulário, e não para um campo', () => {
+  it('carries `root` to the form, not to a field', () => {
     const { form, setError } = formStub()
 
     applyHTTPErrorToForm({
@@ -71,7 +71,7 @@ describe('applyHTTPErrorToForm', () => {
     })
   })
 
-  it('não engole chave desconhecida: ela vira mensagem do formulário', () => {
+  it('does not swallow an unknown key: it becomes a form message', () => {
     const { form, setError } = formStub()
 
     const handled = applyHTTPErrorToForm({
@@ -86,7 +86,7 @@ describe('applyHTTPErrorToForm', () => {
     })
   })
 
-  it('marca o campo conhecido e manda o desconhecido para o rodapé', () => {
+  it('marks the known field and sends the unknown one to the footer', () => {
     const { form, setError } = formStub()
 
     const handled = applyHTTPErrorToForm({
@@ -107,7 +107,7 @@ describe('applyHTTPErrorToForm', () => {
     })
   })
 
-  it('devolve false quando não há nada atribuível - aí a tela decide', () => {
+  it('returns false when nothing is assignable - then the screen decides', () => {
     const { form, setError } = formStub()
 
     const handled = applyHTTPErrorToForm({
@@ -126,7 +126,7 @@ describe('applyMutationError', () => {
     vi.mocked(toast.error).mockClear()
   })
 
-  it('erro de campo para aqui: nem aviso, nem mensagem de rodapé', () => {
+  it('when it is a field error, stops there: neither notice nor footer message', () => {
     const { form, setError } = formStub()
 
     applyMutationError({
@@ -143,7 +143,7 @@ describe('applyMutationError', () => {
     expect(toast.error).not.toHaveBeenCalled()
   })
 
-  it('edição sempre pode reenviar: 5xx com `retry` vira aviso com a ação', () => {
+  it('when editing, can always resend: 5xx with `retry` becomes a notice with the action', () => {
     const { form, setError } = formStub()
     const onClick = vi.fn()
 
@@ -161,12 +161,12 @@ describe('applyMutationError', () => {
     })
   })
 
-  it('criação que insere direto não passa `retry`: o 5xx cai no rodapé', () => {
+  it('when creating directly inserts, does not pass `retry`: the 5xx falls to the footer', () => {
     const { form, setError } = formStub()
 
-    // `POST /administrator/testimonials` insere sem checar duplicata, então um
-    // 500 pode ter vindo depois da escrita e o reenvio criaria o segundo
-    // depoimento. Quem chama simplesmente não passa `retry`.
+    // `POST /administrator/testimonials` inserts without checking for duplicates, so a
+    // 500 may have come after the write and the resend would create a second
+    // testimonial. The caller simply does not pass `retry`.
     applyMutationError({
       form,
       error: httpError(undefined, 500),
@@ -177,7 +177,7 @@ describe('applyMutationError', () => {
     expect(setError).toHaveBeenCalledWith('root', { message: SERVER_MESSAGE })
   })
 
-  it('`retry` não vale para erro que não é do servidor', () => {
+  it("does not apply `retry` to an error that is not the server's", () => {
     const { form, setError } = formStub()
 
     applyMutationError({
@@ -193,7 +193,7 @@ describe('applyMutationError', () => {
     })
   })
 
-  it('falha de rede também é do servidor: oferece o reenvio', () => {
+  it("when the network fails, is also the server's: offers the resend", () => {
     const { form } = formStub()
     const onClick = vi.fn()
 
@@ -218,15 +218,15 @@ describe('applyMutationError', () => {
 })
 
 describe('httpErrorMessage', () => {
-  it('passa o texto do 4xx, que o backend escreve para a tela', () => {
+  it('passes the 4xx text, which the backend writes for the screen', () => {
     expect(httpErrorMessage(httpError(undefined, 409))).toBe('Dados inválidos')
   })
 
-  it('troca o texto do 5xx pelo genérico', () => {
+  it('swaps the 5xx text for the generic one', () => {
     expect(httpErrorMessage(httpError(undefined, 500))).toBe(SERVER_MESSAGE)
   })
 
-  it('erro que não veio da API mantém o próprio texto', () => {
+  it('when the error did not come from the API, keeps its own text', () => {
     expect(httpErrorMessage(new Error('arquivo.zip não é aceito'))).toBe(
       'arquivo.zip não é aceito',
     )
@@ -234,13 +234,13 @@ describe('httpErrorMessage', () => {
 })
 
 describe('isRetrySafe', () => {
-  it('409, 5xx e rede podem ser reenviados', () => {
+  it('allows 409, 5xx and network to be resent', () => {
     expect(isRetrySafe(httpError(undefined, 409))).toBe(true)
     expect(isRetrySafe(httpError(undefined, 503))).toBe(true)
     expect(isRetrySafe(httpError(undefined, 0))).toBe(true)
   })
 
-  it('422, 403 e erro fora da API não', () => {
+  it('does not allow 422, 403 and errors outside the API', () => {
     expect(isRetrySafe(httpError(undefined, 422))).toBe(false)
     expect(isRetrySafe(httpError(undefined, 403))).toBe(false)
     expect(isRetrySafe(new Error('x'))).toBe(false)
@@ -252,7 +252,7 @@ describe('notifyError', () => {
     vi.mocked(toast.error).mockClear()
   })
 
-  it('oferece "Tentar de novo" só quando o erro é retry-seguro', () => {
+  it('offers "Tentar de novo" only when the error is retry-safe', () => {
     const retry = vi.fn()
 
     notifyError(httpError(undefined, 409), { id: 'a', retry })

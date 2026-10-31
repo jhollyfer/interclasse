@@ -13,29 +13,29 @@ type TableProps = Readonly<
       'to' | 'search' | 'isPlaceholderData' | 'isError' | 'onRetry'
     >,
     {
-      /** A rota desta listagem, para busca, ordenação e paginação. */
+      /** This listing's route, for search, sorting and pagination. */
       to: string
       search: ListSearch
-      /** A consulta está servindo a página anterior enquanto refaz a nova. */
+      /** The query is serving the previous page while it redoes the new one. */
       isPlaceholderData?: boolean
-      /** A consulta falhou. Troca a área de conteúdo pelo estado de erro. */
+      /** The query failed. Swaps the content area for the error state. */
       isError?: boolean
-      /** Refaz a consulta, no botão do estado de erro. */
+      /** Redoes the query, on the error state's button. */
       onRetry?: () => void
     }
   >
 >
 
 /**
- * A raiz de uma listagem do painel: guarda a rota e os filtros, e desenha a
- * casca com cabeçalho fixo, conteúdo que rola e rodapé fixo.
+ * The root of a dashboard listing: holds the route and the filters, and draws the
+ * shell with fixed header, scrolling content and fixed footer.
  *
- * O consumidor monta as partes na ordem que quiser - `TableHeader`,
- * `TableToolbar`, `TableContent`, `TablePagination` - e nenhuma delas recebe
- * `to` nem `search`: todas leem daqui.
+ * The consumer assembles the parts in whatever order it wants - `TableHeader`,
+ * `TableToolbar`, `TableContent`, `TablePagination` - and none of them receives
+ * `to` or `search`: all read from here.
  *
- * A instância da tabela **não** passa por este contexto; ela vai por prop nos
- * três subcomponentes que a leem, pelo motivo escrito em `table-context.ts`.
+ * The table instance does **not** go through this context; it goes by prop to the
+ * three subcomponents that read it, for the reason written in `table-context.ts`.
  */
 export function Table({
   to,
@@ -46,7 +46,7 @@ export function Table({
   children,
   ...rest
 }: TableProps): React.JSX.Element {
-  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  // No `useMemo`: the React Compiler memoizes the object by what it reads.
   const value = { to, search, isPlaceholderData, isError, onRetry }
 
   return (

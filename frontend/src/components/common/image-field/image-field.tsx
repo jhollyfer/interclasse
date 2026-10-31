@@ -16,14 +16,14 @@ import { m } from '#/paraglide/messages'
 import { ImageFieldProvider } from './image-field-context'
 
 type ImageFieldProps = Readonly<{
-  /** O `id` do anexo atual, ou `null`. É o que vai no payload. */
+  /** The current attachment's `id`, or `null`. It is what goes in the payload. */
   value: string | null
   onValueChange: (storageId: string | null) => void
-  /** O arquivo já gravado, para o preview antes de qualquer troca. */
+  /** The already saved file, for the preview before any replacement. */
   previewUrl?: string | null
   /**
-   * Os tipos que **este** campo aceita, de `STORAGE_MIMETYPES`. Padrão são os
-   * de imagem; o áudio do episódio passa `AUDIO_MIMETYPES`.
+   * The types that **this** field accepts, from `STORAGE_MIMETYPES`. The default is
+   * images; the episode's audio passes `AUDIO_MIMETYPES`.
    */
   accept?: ReadonlyArray<StorageMimetype>
   id?: string
@@ -31,29 +31,29 @@ type ImageFieldProps = Readonly<{
 }>
 
 /**
- * O campo de **um** arquivo: o avatar do usuário, a foto do depoimento e o
- * áudio do episódio de podcast.
+ * The field for **one** file: the user's avatar, the testimonial's photo and the
+ * podcast episode's audio.
  *
- * O nome é de imagem por herança - era o único uso quando nasceu -, mas de
- * imagem só sobrou o padrão do `accept` e o `ImageFieldPreview`, que é uma
- * parte opcional como qualquer outra. O campo de áudio é este mesmo, com
- * `accept={AUDIO_MIMETYPES}` e sem o preview; copiá-lo para um `file-field`
- * gêmeo duplicaria o envio, o órfão e a trava do submit por um nome.
+ * The name is about images by inheritance - it was the only use when it was born -, but
+ * of images only the `accept` default and `ImageFieldPreview` are left, which is an
+ * optional part like any other. The audio field is this very one, with
+ * `accept={AUDIO_MIMETYPES}` and without the preview; copying it into a twin
+ * `file-field` would duplicate the upload, the orphan and the submit lock for a name.
  *
- * Guarda o `id` do anexo, nunca o arquivo: quem anexa aponta para o registro, e
- * nunca o contrário. Tirar a imagem é apontar para `null`, e o binário já
- * gravado fica - trocar de avatar não apaga o anterior de propósito, e quem
- * varre o que sobrou é o `node ace storages:prune` do backend.
+ * It stores the attachment's `id`, never the file: whoever attaches points to the record, and
+ * never the other way round. Removing the image means pointing at `null`, and the binary already
+ * saved stays - replacing an avatar does not delete the previous one on purpose, and whoever
+ * sweeps what is left is the backend's `node ace storages:prune`.
  *
- * O envio acontece **na hora da escolha**, e não no submit do formulário: o
- * `POST /storages` é uma operação própria, e o formulário só passa a conhecer o
- * `id` depois que o arquivo existe. É o que evita um payload que referencia um
- * arquivo que falhou ao subir.
+ * The upload happens **on choice**, and not on the form's submit: the
+ * `POST /storages` is an operation of its own, and the form only comes to know the
+ * `id` after the file exists. That is what avoids a payload that references a
+ * file that failed to upload.
  *
- * Compound porque rótulo, sigla do fallback e descrição eram markup viajando
- * como prop - `label="Enviar avatar"`, `fallback="JR"`. A tela que quiser um
- * `<Alert>` na descrição ou nenhuma descrição escreve isso; com prop, cada
- * variação dessas vira mais uma prop opcional aqui dentro.
+ * Compound because label, fallback initials and description were markup travelling
+ * as props - `label="Enviar avatar"`, `fallback="JR"`. A screen that wants an
+ * `<Alert>` in the description or no description writes that; with props, each
+ * such variation becomes one more optional prop in here.
  */
 export function ImageField({
   value,
@@ -67,19 +67,19 @@ export function ImageField({
   const [preview, setPreview] = React.useState<string | null>(null)
 
   /**
-   * O arquivo que **este campo** subiu e ainda não foi salvo em nada.
+   * The file that **this field** uploaded and that has not yet been saved anywhere.
    *
-   * Só ele pode ser apagado. O `value` que chegou por prop é o anexo já
-   * gravado na entidade: apagá-lo ao trocar a imagem furaria o cadastro antes
-   * de o formulário ser submetido, e o backend recusaria com
-   * `409 STORAGE_IN_USE` de qualquer forma - pedir para receber um erro é pior
-   * do que não pedir.
+   * Only it can be deleted. The `value` that arrived by prop is the attachment already
+   * saved on the entity: deleting it when replacing the image would break the record before
+   * the form is submitted, and the backend would refuse with
+   * `409 STORAGE_IN_USE` anyway - asking to receive an error is worse
+   * than not asking.
    */
   const [orphan, setOrphan] = React.useState<string | null>(null)
 
   const remove = useStorageDeleteMutation({
-    // Silencioso de propósito: é faxina, não uma ação que a pessoa pediu.
-    // Falhar aqui deixa um arquivo órfão, que é exatamente o estado de antes.
+    // Silent on purpose: it is cleanup, not an action the person asked for.
+    // Failing here leaves an orphan file, which is exactly the state from before.
     onError: () => undefined,
   })
 
@@ -87,8 +87,8 @@ export function ImageField({
 
   const upload = useStorageCreateMutation({
     onSuccess(storage) {
-      // Trocar a imagem duas vezes seguidas não pode deixar a primeira para
-      // trás: a que sai daqui nunca chegou a ser referenciada por ninguém.
+      // Replacing the image twice in a row must not leave the first one
+      // behind: the one leaving here was never referenced by anyone.
       if (orphan) remove.mutate(orphan)
 
       setOrphan(storage.id)
@@ -96,10 +96,10 @@ export function ImageField({
       setPreview(storage.url)
     },
     onError(error) {
-      // Tipo e tamanho são recusados pelo servidor **antes** de gravar - o
-      // teto é o `UPLOAD_MAX_SIZE` dele -, então a mensagem que vem é a que diz
-      // o limite real; repetir o número aqui seria garantir que os dois
-      // divergissem.
+      // Type and size are refused by the server **before** saving - the
+      // cap is its `UPLOAD_MAX_SIZE` -, so the message that comes back is the one that says
+      // the real limit; repeating the number here would guarantee that the two
+      // diverge.
       notifyError(error, { id: 'storage-create-error' })
     },
   })
@@ -108,10 +108,10 @@ export function ImageField({
     const file = event.target.files?.item(0)
     if (!file) return
 
-    // O `accept` do input é só uma dica para o seletor nativo: o diálogo do
-    // sistema deixa trocar o filtro por "todos os arquivos", e arrastar não
-    // passa por filtro nenhum. Recusar aqui poupa o `POST /storages` e diz
-    // *qual* arquivo não serve - o servidor diria só que o tipo é inválido.
+    // The input's `accept` is only a hint for the native picker: the system
+    // dialog lets one switch the filter to "all files", and dragging goes
+    // through no filter at all. Refusing here spares the `POST /storages` and says
+    // *which* file does not fit - the server would only say the type is invalid.
     if (!isStorageMimetype(file.type) || !accept.includes(file.type)) {
       toast.error(m.common_file_type_not_accepted({ name: file.name }), {
         id: 'storage-create-error',
@@ -121,8 +121,8 @@ export function ImageField({
     }
 
     upload.mutate({ file, signal: nextSignal() })
-    // Sem isto, escolher o mesmo arquivo duas vezes seguidas não dispara o
-    // `change` de novo, e a segunda tentativa depois de um erro não acontece.
+    // Without this, choosing the same file twice in a row does not fire
+    // `change` again, and the second attempt after an error does not happen.
     event.target.value = ''
   }
 
@@ -140,14 +140,14 @@ export function ImageField({
     inputRef.current?.click()
   }
 
-  // Trava o submit enquanto o arquivo sobe: sem isso o payload sai sem o `id`
-  // do anexo, e o registro nasce sem imagem.
+  // Locks the submit while the file uploads: without it the payload leaves without the attachment's
+  // `id`, and the record is born without an image.
   useRegisterUpload(upload.isPending)
 
   const shown = preview ?? previewUrl
   const hasImage = Boolean(value ?? shown)
 
-  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  // No `useMemo`: the React Compiler memoizes the object by what it reads.
   const context = {
     shown,
     hasImage,
@@ -161,16 +161,16 @@ export function ImageField({
     <Field data-slot="image-field" orientation="horizontal" className="gap-4">
       <ImageFieldProvider value={context}>{children}</ImageFieldProvider>
 
-      {/* O `<input type="file">` nativo não é estilizável, e escondê-lo atrás de
-          um botão visível é a única forma de ter um seletor com a aparência do
-          resto. Não confunde com a regra "zero botão escondido" do
-          [[dialog-pattern]]: lá o alvo é gatilho de overlay segurando um `ref`,
-          e aqui quem abre o seletor é o botão que o usuário vê. O shadcn não tem
-          peça de arquivo - `AttachmentTrigger` é um `<button>`, não um input -,
-          então este elemento nativo fica.
+      {/* The native `<input type="file">` cannot be styled, and hiding it behind
+          a visible button is the only way to have a picker that looks like the
+          rest. Not to be confused with the "zero hidden button" rule of
+          [[dialog-pattern]]: there the target is an overlay trigger holding a `ref`,
+          and here what opens the picker is the button the user sees. shadcn has no
+          file piece - `AttachmentTrigger` is a `<button>`, not an input -,
+          so this native element stays.
 
-          Fica no `ImageField` e não numa parte própria: é encanamento, não
-          markup, e nenhuma tela tem motivo para omiti-lo ou reposicioná-lo. */}
+          It stays in `ImageField` and not in a part of its own: it is plumbing, not
+          markup, and no screen has a reason to omit or reposition it. */}
       <input
         ref={inputRef}
         type="file"

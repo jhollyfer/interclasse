@@ -39,15 +39,15 @@ export function UsersTable(): React.JSX.Element {
   const { account } = route.useRouteContext()
   const search = route.useSearch()
 
-  // `/administrator/users` inteiro é de `ADMINISTRATOR`: quem chega aqui sem o
-  // papel recebe `403` da própria listagem. A checagem fica porque o papel
-  // pode mudar debaixo da sessão aberta; quem autoriza de verdade é o backend.
+  // The whole `/administrator/users` belongs to `ADMINISTRATOR`: whoever gets here without the
+  // role receives `403` from the listing itself. The check stays because the role
+  // can change under the open session; whoever really authorizes is the backend.
   const canDelete = account.role === USER_ROLE.ADMINISTRATOR
 
-  // `useQuery` e não `useSuspenseQuery`: a listagem precisa de
-  // `isPlaceholderData` e de `isError` para manter as linhas antigas na troca
-  // de página e para trocar o vazio pelo estado de erro. O `loader` já encheu o
-  // cache, então não há requisição a mais.
+  // `useQuery` and not `useSuspenseQuery`: the listing needs
+  // `isPlaceholderData` and `isError` to keep the old rows when changing
+  // page and to swap the empty state for the error state. The `loader` already filled the
+  // cache, so there is no extra request.
   const { data, isPlaceholderData, isError, refetch } = useQuery(
     usersQueryOptions(search),
   )
@@ -59,17 +59,17 @@ export function UsersTable(): React.JSX.Element {
     columns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:users',
-    // A própria conta não entra na seleção: arquivá-la é
-    // `403 SELF_ARCHIVE_FORBIDDEN`, e a barra não deve oferecer o que a API
-    // nega. O id vem do contexto da rota, que é quem tem a conta autenticada.
+    // The account itself does not enter the selection: archiving it is
+    // `403 SELF_ARCHIVE_FORBIDDEN`, and the bar must not offer what the API
+    // denies. The id comes from the route context, which is who has the authenticated account.
     selectable: (user) => user.id !== account.id,
     actions: (user) => (
       <UserRowActions
         user={user}
         canDelete={canDelete}
-        // Arquivar e apagar a própria conta é `403 SELF_ARCHIVE_FORBIDDEN` e
-        // `403 SELF_DELETE_FORBIDDEN`. O id vem do contexto da rota, que é
-        // quem já tem a conta autenticada.
+        // Archiving and deleting one's own account is `403 SELF_ARCHIVE_FORBIDDEN` and
+        // `403 SELF_DELETE_FORBIDDEN`. The id comes from the route context, which is
+        // who already has the authenticated account.
         isSelf={user.id === account.id}
       />
     ),

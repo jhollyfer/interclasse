@@ -15,34 +15,34 @@ import {
 import { m } from '#/paraglide/messages'
 
 type InputSearchProps = Readonly<{
-  /** O termo **aplicado**, que mora na URL. */
+  /** The **applied** term, which lives in the URL. */
   value: string | undefined
-  /** Chamado quando a busca é aplicada ou limpa. `undefined` limpa. */
+  /** Called when the search is applied or cleared. `undefined` clears. */
   onSearch: (term: string | undefined) => void
   placeholder?: string
-  /** O texto do balão de ajuda. Ausente, o botão de ajuda não aparece. */
+  /** The help balloon's text. When absent, the help button does not appear. */
   help?: string
 }>
 
 /**
- * A caixa de busca das listagens.
+ * The listings' search box.
  *
- * **Busca por ação, não por intervalo.** Antes o campo disparava sozinho 300ms
- * depois da última tecla; agora quem aplica é o Enter ou a lupa. A diferença
- * prática é uma requisição por busca em vez de uma por pausa de digitação, e
- * uma entrada no histórico por busca em vez de uma por pausa - o botão voltar
- * do navegador volta uma busca, não meia palavra.
+ * **Search by action, not by interval.** The field used to fire on its own 300ms
+ * after the last key; now what applies it is Enter or the magnifier. The practical
+ * difference is one request per search instead of one per typing pause, and
+ * one history entry per search instead of one per pause - the browser's back button
+ * goes back one search, not half a word.
  *
- * O que está digitado é rascunho de campo e mora aqui; o que está aplicado mora
- * na URL. As duas coisas se reencontram no render: quando o termo da URL muda
- * por fora - um "limpar filtros", o botão voltar -, a caixa acompanha.
+ * What is typed is field draft and lives here; what is applied lives
+ * in the URL. The two meet again on render: when the URL's term changes
+ * from outside - a "limpar filtros", the back button -, the box follows.
  *
- * A exceção é esvaziar o campo à mão, que limpa na hora. Sem isso a pessoa
- * apagaria o texto, não apertaria nada, e continuaria vendo a lista filtrada
- * por um termo que não está mais escrito em lugar nenhum.
+ * The exception is emptying the field by hand, which clears at once. Without that the person
+ * would erase the text, press nothing, and keep seeing the list filtered
+ * by a term that is no longer written anywhere.
  *
- * Quem navega é o chamador, e não este componente: as rotas são tipadas, e um
- * `useSearch({ strict: false })` com `@ts-ignore` jogaria isso fora.
+ * Whoever navigates is the caller, and not this component: the routes are typed, and a
+ * `useSearch({ strict: false })` with `@ts-ignore` would throw that away.
  */
 export function InputSearch({
   value,
@@ -53,9 +53,9 @@ export function InputSearch({
   const [term, setTerm] = React.useState(value ?? '')
   const [applied, setApplied] = React.useState(value)
 
-  // O termo aplicado semeia o campo, e o ajuste acontece **durante o render**
-  // em vez de num efeito. O efeito rodava um render depois da navegação, e o
-  // que fosse digitado nesse intervalo era apagado quando ele chegasse.
+  // The applied term seeds the field, and the adjustment happens **during render**
+  // instead of in an effect. The effect ran one render after the navigation, and whatever
+  // was typed in that interval was erased when it arrived.
   if (applied !== value) {
     setApplied(value)
     setTerm(value ?? '')
@@ -64,7 +64,7 @@ export function InputSearch({
   function change(next: string): void {
     setTerm(next)
 
-    // Campo esvaziado com um termo aplicado: limpa sem esperar ação.
+    // Field emptied with an applied term: clears without waiting for an action.
     if (next.trim().length === 0 && value) onSearch(undefined)
   }
 
@@ -107,7 +107,7 @@ export function InputSearch({
 
       <InputGroupInput
         data-test-id="search-input"
-        // O placeholder some ao digitar e não nomeia o campo.
+        // The placeholder disappears on typing and does not name the field.
         aria-label={m.table_search_label()}
         value={term}
         placeholder={placeholder}

@@ -4,15 +4,15 @@ import { useDebouncedValue } from '#/hooks/use-debounced-value'
 import { usersInfiniteQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 type UsersInfiniteInput = Readonly<{
-  /** O papel das contas buscadas. */
+  /** The role of the accounts searched. */
   role: string
-  /** O que a pessoa digitou no combobox; o debounce é daqui. */
+  /** What the person typed in the combobox; the debounce happens here. */
   search: string
 }>
 
 /**
- * As contas de um papel para um combobox com busca no servidor: 20 por página,
- * o termo debounçado entra na chave e a lista cresce por `fetchNextPage`
+ * The accounts of a role for a combobox with server search: 20 per page,
+ * the debounced term enters the key and the list grows through `fetchNextPage`
  * (`frontend.md` §2.1). _doc-lib/tanstack-query.md#guides/infinite-queries.
  */
 export function useUsersReadPaginatedInfinite({

@@ -11,30 +11,30 @@ import { m } from '#/paraglide/messages'
 type EnrollmentBoardProps = Readonly<{
   board: AdvisorEnrollmentShowResponse
   /**
-   * Grava a lista inteira da modalidade. `removed` são os nomes de quem estava
-   * salvo e saiu: o conselheiro precisa justificar a saída.
+   * Saves the sport's whole list. `removed` are the names of those who were
+   * saved and left: the advisor must justify the removal.
    */
   onSave: (
     sportId: string,
     studentIds: Array<string>,
     removed: ReadonlyArray<string>,
   ) => void
-  /** A modalidade sendo salva agora. Só o cartão dela trava. */
+  /** The sport being saved right now. Only its card locks. */
   savingSportId?: string
   /**
-   * Se dá para tirar atleta já salvo. O representante só acrescenta; quem
-   * tira é o professor conselheiro - e o servidor recusa com `403`.
+   * Whether an already saved athlete can be removed. The representative only adds; the one who
+   * removes is the advisor teacher - and the server refuses with `403`.
    */
   canRemove?: boolean
 }>
 
 /**
- * A lista de atletas por modalidade: um cartão por modalidade, uma caixa por
- * aluno. Salvar manda a lista inteira daquela modalidade - é o contrato de
- * `PUT /advisor/enrollments` e `PUT /representative/enrollments`.
+ * The athlete list per sport: one card per sport, one checkbox per
+ * student. Saving sends the whole list for that sport - it is the contract of
+ * `PUT /advisor/enrollments` and `PUT /representative/enrollments`.
  *
- * Mora em `common` porque o conselheiro e o representante usam a mesma tela.
- * O estado é local por modalidade: marcar caixas não chama a API até salvar.
+ * Lives in `common` because the advisor and the representative use the same screen.
+ * State is local per sport: ticking boxes does not call the API until saved.
  */
 export function EnrollmentBoard({
   board,
@@ -74,7 +74,7 @@ export function EnrollmentBoard({
   )
 }
 
-/** A contagem fora dos limites pede atenção. */
+/** A count outside the limits calls for attention. */
 const COUNT_VARIANT: Record<string, 'warning' | 'neutral'> = {
   true: 'warning',
   false: 'neutral',
@@ -96,14 +96,14 @@ function SportCard({
   const enrolled = students
     .filter((student) => student.sportIds.includes(sport.id))
     .map((student) => student.id)
-  // Chave estável da lista gravada: o cartão só volta ao estado do servidor
-  // quando a lista DESTA modalidade mudou, e não a cada refetch - que
-  // apagaria o que foi marcado e ainda não salvo nos outros cartões.
+  // Stable key of the saved list: the card only returns to the server state
+  // when THIS sport's list changed, and not on every refetch - which would
+  // erase what was ticked and not yet saved in the other cards.
   const savedKey = [...enrolled].sort().join(',')
   const initial = new Set(savedKey.split(',').filter(Boolean))
   const [selected, setSelected] = React.useState(initial)
-  // Reset no render, e não `useEffect` espelhando a prop (`frontend.md` §2): a
-  // lista gravada mudou, o rascunho volta a ela antes de desenhar.
+  // Reset during render, and not a `useEffect` mirroring the prop (`frontend.md` §2): the
+  // saved list changed, the draft goes back to it before drawing.
   const [seenKey, setSeenKey] = React.useState(savedKey)
   if (seenKey !== savedKey) {
     setSeenKey(savedKey)
@@ -133,8 +133,8 @@ function SportCard({
             {m.common_enrollment_drawn()}
           </Badge>
         )}
-        {/* Sorteada e ainda editável: só o conselheiro chega aqui, e o time
-            sorteado é a turma, não a lista. */}
+        {/* Drawn and still editable: only the advisor gets here, and the drawn
+            team is the classroom, not the list. */}
         {sport.drawn && !sport.locked && (
           <Badge variant="info">{m.common_enrollment_drawn()}</Badge>
         )}
@@ -150,8 +150,8 @@ function SportCard({
         <ul className="grid gap-2 sm:grid-cols-2">
           {students.map((student) => (
             <li key={student.id}>
-              {/* Travado, quem não foi inscrito fica apagado: com a mesma cor de
-                  tudo, a lista sorteada parecia editável. */}
+              {/* Locked, whoever was not enrolled looks faded: with the same color as
+                  everything else, the drawn list looked editable. */}
               <label className="flex items-center gap-2 text-sm has-data-disabled:cursor-not-allowed has-data-disabled:not-has-data-checked:text-muted-foreground">
                 <Checkbox
                   checked={selected.has(student.id)}

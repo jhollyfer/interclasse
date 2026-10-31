@@ -15,7 +15,7 @@ import {
 afterEach(cleanup)
 
 describe('PageShell', () => {
-  it('o título é o h1 da tela e leva o texto que a tela passou', () => {
+  it('renders the title as the screen h1 with the text the screen passed', () => {
     render(
       <PageShell>
         <PageHeader>
@@ -29,7 +29,7 @@ describe('PageShell', () => {
     ).toBeTruthy()
   })
 
-  it('a descrição aparece ao lado do título', () => {
+  it('shows the description beside the title', () => {
     render(
       <PageShell>
         <PageHeader>
@@ -42,7 +42,7 @@ describe('PageShell', () => {
     expect(screen.getByText('24 turmas')).toBeTruthy()
   })
 
-  it('as ações entram soltas, sem grupo que cole os botões', () => {
+  it('renders the actions loose, without a group gluing the buttons', () => {
     const { container } = render(
       <PageHeaderActions>
         <button type="button">Criar</button>
@@ -57,7 +57,7 @@ describe('PageShell', () => {
     expect(screen.getAllByRole('button').length).toBe(2)
   })
 
-  it('sem ação nenhuma o grupo de ações nem aparece', () => {
+  it('when there is no action, the action group does not even appear', () => {
     const { container } = render(<PageHeaderActions>{null}</PageHeaderActions>)
 
     expect(
@@ -65,7 +65,7 @@ describe('PageShell', () => {
     ).toBeNull()
   })
 
-  it('o conteúdo entra no corpo da página', () => {
+  it('renders the content in the page body', () => {
     render(
       <PageShell>
         <PageShellContent>

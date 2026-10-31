@@ -133,7 +133,7 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 |---|---|---|---|---|
 | 8.1 | Backend `app/features/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, `defineDocs` (`openapi.json` regerado) e identificadores em português (`semTeto`, `alvo`, `conselheiro`...). Ficam em português só dados de teste e a mensagem de `HTTPException.InternalServerError` (texto ao usuário) |
 | 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Em andamento | |
-| 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Em andamento | sem redirect |
+| 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Feita | sem redirect; `/painel` virou `/dashboard`. Comentários, títulos de teste, identificadores, configs e mensagens de erro de desenvolvedor em inglês; Playwright 14/14 |
 
 ## Fase N · Ideias (fora do escopo atual)
 

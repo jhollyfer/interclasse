@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-/** Onde cada arquivo da fila está. */
+/** Where each file in the queue stands. */
 export type UploadItemStatus = 'uploading' | 'done' | 'failed'
 
 export type UploadItem = {
@@ -9,23 +9,23 @@ export type UploadItem = {
   /** 0 a 100. */
   percent: number
   status: UploadItemStatus
-  /** O `id` do anexo, depois de enviado. É o que vai no payload. */
+  /** The attachment's `id`, once uploaded. It is what goes in the payload. */
   storageId: string | null
 }
 
 /**
- * O que o campo inteiro compartilha: a fila e as duas ações. As partes visíveis
- * só leem o resultado; os textos são markup e ficam fora (slot).
+ * What the whole field shares: the queue and the two actions. The visible parts
+ * only read the result; the texts are markup and stay outside (slot).
  */
 export type MultiFileUploadContextValue = {
   items: ReadonlyArray<UploadItem>
-  /** Abre o seletor nativo, que fica escondido no `MultiFileUpload`. */
+  /** Opens the native picker, which is hidden inside `MultiFileUpload`. */
   openPicker: () => void
-  /** Tira da fila; o arquivo já enviado e sem dono é apagado do storage. */
+  /** Removes from the queue; a file already uploaded and unowned is deleted from storage. */
   remove: (key: string) => void
-  /** Algum arquivo está subindo? Trava o botão de adicionar. */
+  /** Is any file uploading? Locks the add button. */
   isUploading: boolean
-  /** Vai no botão que abre o seletor, para o `<label>` apontar algo focável. */
+  /** Goes on the button that opens the picker, so the `<label>` points at something focusable. */
   controlId: string | undefined
 }
 
@@ -35,9 +35,9 @@ const MultiFileUploadContext =
 export const MultiFileUploadProvider = MultiFileUploadContext.Provider
 
 /**
- * O campo, para quem está dentro de `MultiFileUpload`.
+ * The field, for whoever is inside `MultiFileUpload`.
  *
- * O `consumer` entra na mensagem para o erro dizer **qual** parte ficou fora do
+ * The `consumer` goes into the message so the error says **which** part was left outside the
  * provider.
  */
 export function useMultiFileUploadContext(
@@ -46,9 +46,7 @@ export function useMultiFileUploadContext(
   const context = React.use(MultiFileUploadContext)
 
   if (!context) {
-    throw new Error(
-      `\`${consumer}\` precisa estar dentro de \`MultiFileUpload\``,
-    )
+    throw new Error(`\`${consumer}\` must be used within \`MultiFileUpload\``)
   }
 
   return context

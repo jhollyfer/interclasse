@@ -5,8 +5,8 @@ import { userQueryOptions } from '#/integrations/tanstack-query/queries/administ
 import { loadOrNotFound } from '#/lib/load-or-not-found'
 
 /**
- * A mesma `queryOptions` do detalhe, com a mesma chave: quem abre a edição a
- * partir do detalhe não dispara requisição nova, o cache já está cheio.
+ * The same `queryOptions` as the detail, with the same key: whoever opens the edit from
+ * the detail triggers no new request, the cache is already full.
  */
 export const Route = createFileRoute('/_private/administrator/users/$id/edit')({
   notFoundComponent: () => <NotFoundPage />,

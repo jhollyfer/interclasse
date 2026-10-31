@@ -5,46 +5,46 @@ import { m } from '#/paraglide/messages'
 import { getLocale, locales, localizeUrl } from '#/paraglide/runtime'
 import type { Locale } from '#/paraglide/runtime'
 
-/** O `og:locale` de cada idioma da casa (`language_TERRITORY`). */
+/** The `og:locale` of each house language (`language_TERRITORY`). */
 const OG_LOCALES = {
   'pt-BR': 'pt_BR',
   es: 'es_ES',
   en: 'en_US',
 } satisfies Record<Locale, string>
 
-/** A imagem do cartão do link: a logo dos jogos. */
+/** The link card image: the games logo. */
 const OG_IMAGE = new URL(logo512, env.VITE_SITE_URL).href
 
 type PageHeadInput = Readonly<{
-  /** O assunto da página; o sufixo do site é somado aqui. Ausente, vale só o nome do site. */
+  /** The page's subject; the site suffix is added here. When absent, only the site name applies. */
   title?: string
-  /** Ausente, vale a descrição do site. */
+  /** When absent, the site description applies. */
   description?: string
-  /** O caminho sem prefixo de idioma e sem query, como o router o enxerga (`/jogos`). */
+  /** The path without language prefix and without query, as the router sees it (`/matches`). */
   pathname: string
-  /** Página fora do índice dos buscadores (404). */
+  /** A page outside the search engines' index (404). */
   noindex?: boolean
-  /** Blocos JSON-LD já serializados por `jsonLd()` (`BreadcrumbList`, tipo do domínio). */
+  /** JSON-LD blocks already serialized by `jsonLd()` (`BreadcrumbList`, domain type). */
   structuredData?: ReadonlyArray<string>
 }>
 
-/** Um degrau da trilha estruturada: o nome traduzido e o caminho sem idioma. */
+/** A step of the structured trail: the translated name and the path without language. */
 export type BreadcrumbItem = Readonly<{ name: string; pathname: string }>
 
-/** O evento esportivo de uma chave, a partir do que a rota já carregou. */
+/** A bracket's sports event, from what the route already loaded. */
 export type SportsEventInput = Readonly<{
   name: string
   description: string
   sport: string
   pathname: string
-  /** O horário de cada jogo, ISO 8601; o mais cedo vira `startDate`, e sem nenhum o campo não sai. */
+  /** Each match's time, ISO 8601; the earliest becomes `startDate`, and without any the field is omitted. */
   scheduledAt: ReadonlyArray<string | null>
 }>
 
-/** A URL absoluta da página no idioma pedido (`localizeUrl` devolve `URL`). */
+/** The page's absolute URL in the requested language (`localizeUrl` returns `URL`). */
 export function localizedUrl(pathname: string, locale: Locale): string {
   const url = localizeUrl(new URL(pathname, env.VITE_SITE_URL), { locale })
-  // `/es/` e `/es` são o mesmo endereço, e o site responde na forma sem barra.
+  // `/es/` and `/es` are the same address, and the site answers in the form without a slash.
   if (url.pathname.length > 1 && url.pathname.endsWith('/'))
     url.pathname = url.pathname.slice(0, -1)
 
@@ -52,12 +52,12 @@ export function localizedUrl(pathname: string, locale: Locale): string {
 }
 
 /**
- * O `head` de uma página pública (`_standards/frontend.md` §9.7): título com o
- * sufixo do site, descrição, canonical do idioma atual, `hreflang` recíproco
- * das três versões mais `x-default` (a de `pt-BR`) e Open Graph.
+ * A public page's `head` (`_standards/frontend.md` §9.7): title with the site
+ * suffix, description, canonical of the current language, reciprocal `hreflang`
+ * of the three versions plus `x-default` (the `pt-BR` one) and Open Graph.
  *
- * Título e descrição já chegam traduzidos pela rota (`m.*()`), e o idioma é o
- * da requisição: o `head` roda no SSR dentro do contexto do `paraglideMiddleware`.
+ * Title and description already arrive translated from the route (`m.*()`), and the language is
+ * the request's: `head` runs on SSR inside the `paraglideMiddleware` context.
  *
  * _doc-lib/paraglide.md#/runtime (`localizeUrl`),
  * _doc-lib/tanstack-router.md#guide/document-head-management.
@@ -109,7 +109,7 @@ export function pageHead({
   return { meta, links, scripts }
 }
 
-/** O meta `robots` de página fora do índice. `indexable` ausente ou `true` não gera nada. */
+/** The `robots` meta of a page outside the index. `indexable` absent or `true` generates nothing. */
 export function noindexMeta(
   indexable: boolean | undefined,
 ): Array<{ name: string; content: string }> {
@@ -118,12 +118,12 @@ export function noindexMeta(
   return [{ name: 'robots', content: 'noindex, nofollow' }]
 }
 
-/** JSON-LD escrito para `<script>`: o `<` escapado impede fechar a tag por dentro. */
+/** JSON-LD written for `<script>`: the escaped `<` prevents closing the tag from the inside. */
 export function jsonLd(data: Readonly<Record<string, unknown>>): string {
   return JSON.stringify(data).replaceAll('<', '\\u003c')
 }
 
-/** A `Organization` da raiz (`frontend.md` §9.7). */
+/** The root's `Organization` (`frontend.md` §9.7). */
 export function organizationJsonLd(): string {
   return jsonLd({
     '@context': 'https://schema.org',
@@ -150,7 +150,7 @@ export function breadcrumbJsonLd(items: ReadonlyArray<BreadcrumbItem>): string {
   })
 }
 
-/** O `SportsEvent` de uma chave (`frontend.md` §9.7, tipo do domínio). */
+/** A bracket's `SportsEvent` (`frontend.md` §9.7, domain type). */
 export function sportsEventJsonLd({
   name,
   description,

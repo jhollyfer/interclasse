@@ -7,9 +7,9 @@ import { m } from '#/paraglide/messages'
 import { validateSearch } from './-search'
 
 /**
- * O guard inverso: quem já tem sessão não vê o formulário de login. Fica no
- * layout pelo mesmo motivo do `_private` - tela de autenticação nova nasce
- * coberta por estar no lugar certo.
+ * The inverse guard: whoever already has a session does not see the sign-in form. It stays in the
+ * layout for the same reason as `_private` - a new authentication screen is born
+ * covered by being in the right place.
  */
 export const Route = createFileRoute('/_authentication')({
   validateSearch,
@@ -20,23 +20,23 @@ export const Route = createFileRoute('/_authentication')({
         staleTime: 'static',
       })
     } catch {
-      // Sem sessão é o caso normal desta área: segue para o formulário.
+      // Having no session is this area's normal case: carry on to the form.
       return
     }
 
-    // Fora do `try`: um `redirect` é lançado, e lançado de dentro dele seria
-    // capturado pelo próprio `catch` que existe para o caso oposto - e o
-    // sintoma seria um login que aceita a senha e não sai do lugar.
+    // Outside the `try`: a `redirect` is thrown, and thrown from inside it would be
+    // caught by the very `catch` that exists for the opposite case - and the
+    // symptom would be a login that accepts the password and does not move.
     //
-    // Um destino só, e não um por papel como na referência: aqui os dois papéis
-    // - `EDITOR` e `ADMINISTRATOR` - entram no mesmo painel, e a diferença
-    // entre eles é o `403` do backend em `/administrator/users`.
-    throw redirect({ to: '/painel' })
+    // A single destination, and not one per role as in the reference: here the roles
+    // all enter the same dashboard, and the difference
+    // between them is the backend's `403` on `/administrator/users`.
+    throw redirect({ to: '/dashboard' })
   },
   head: () => ({
     meta: [
       { title: `${m.auth_page_title()} | ${m.common_site_title()}` },
-      // Tela de autenticação fora do índice (`frontend.md` §9.7).
+      // Authentication screen outside the index (`frontend.md` §9.7).
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

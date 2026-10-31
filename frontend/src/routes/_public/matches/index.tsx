@@ -8,7 +8,7 @@ import { m } from '#/paraglide/messages'
 import { validateSearch } from './-search'
 import { ListSkeleton } from '../-components/list-skeleton'
 
-export const Route = createFileRoute('/_public/jogos/')({
+export const Route = createFileRoute('/_public/matches/')({
   validateSearch,
   search: { middlewares: [stripSearchParams(LIST_SEARCH_DEFAULTS)] },
   pendingComponent: () => <ListSkeleton />,
@@ -21,6 +21,6 @@ export const Route = createFileRoute('/_public/jogos/')({
     pageHead({
       title: m.public_nav_games(),
       description: m.public_games_head_description(),
-      pathname: '/jogos',
+      pathname: '/matches',
     }),
 })

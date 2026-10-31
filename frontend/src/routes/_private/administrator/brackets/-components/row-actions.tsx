@@ -26,8 +26,8 @@ import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /**
- * Abrir e apagar a chave pela lista. Chave com placar lançado é recusada pelo
- * servidor com `409 BRACKET_HAS_RESULTS`, que vira toast - a linha fica.
+ * Open and delete the bracket from the list. A bracket with a recorded score is refused by the
+ * server with `409 BRACKET_HAS_RESULTS`, which becomes a toast - the row stays.
  */
 export function BracketRowActions({
   bracket,

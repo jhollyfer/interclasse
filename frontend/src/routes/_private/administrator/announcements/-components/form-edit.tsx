@@ -30,7 +30,7 @@ import { ANNOUNCEMENT_FIELDS, AnnouncementFormFields } from './form-fields'
 
 const route = getRouteApi('/_private/administrator/announcements/$id/edit')
 
-/** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
+/** Validates with the create schema: a required field cannot be erased. */
 export function AnnouncementFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: announcement } = useSuspenseQuery(announcementQueryOptions(id))

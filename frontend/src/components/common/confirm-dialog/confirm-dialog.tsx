@@ -11,53 +11,53 @@ import { ConfirmDialogProvider } from './confirm-dialog-context'
 
 type ConfirmDialogProps<TPayload> = Readonly<{
   /**
-   * O elemento visível que abre o alerta - em geral um `Button`.
+   * The visible element that opens the alert - usually a `Button`.
    *
-   * Segue prop e não slot: é o elemento de **fora** do dialog, e a primitiva
-   * precisa dele na posição de `render` para herdar os handlers de abertura.
-   * Sem ele, o alerta abre por `handle` (item de menu, linha de tabela).
+   * It stays a prop and not a slot: it is the element **outside** the dialog, and the primitive
+   * needs it in the `render` position to inherit the opening handlers.
+   * Without it, the alert opens by `handle` (menu item, table row).
    */
   render?: React.ReactElement
   /**
-   * `false` quando o gatilho não é `<button>` (item de menu é `<div>`): a
-   * primitiva tira a semântica de botão nativo em vez de avisar no console
+   * `false` when the trigger is not a `<button>` (a menu item is a `<div>`): the
+   * primitive drops the native button semantics instead of warning in the console
    * (`_doc-lib/base-ui.md#react/components/alert-dialog`, prop `nativeButton`).
    */
   nativeButton?: boolean
   /**
-   * Abre o alerta de fora, sem gatilho: `handle.open(null)` no clique do item
-   * de menu. Um handle por alerta, criado com `createConfirmHandle`.
+   * Opens the alert from outside, with no trigger: `handle.open(null)` on the menu
+   * item's click. One handle per alert, created with `createConfirmHandle`.
    */
   handle?: ConfirmHandle<TPayload>
-  /** O elemento que recebe o foco ao fechar, quando não há gatilho. */
+  /** The element that receives focus on close, when there is no trigger. */
   finalFocus?: React.RefObject<HTMLElement | null>
-  /** Recebe o payload do `openWithPayload`, quando o alerta foi aberto com um. */
+  /** Receives the `openWithPayload` payload, when the alert was opened with one. */
   onConfirm: (payload: TPayload | undefined) => void
-  /** Ação sem volta pinta o botão de confirmar de vermelho. */
+  /** An irreversible action paints the confirm button red. */
   destructive?: boolean
   /**
-   * O conteúdo do alerta. Em função, recebe o payload de
-   * `handle.openWithPayload(dado)`: um alerta só para a tabela inteira, e o
-   * texto sai do registro clicado.
+   * The alert's content. As a function, it receives the payload of
+   * `handle.openWithPayload(data)`: one alert for the whole table, and the
+   * text comes from the clicked record.
    */
   children: React.ReactNode | ((payload: TPayload) => React.ReactNode)
 }>
 
 /**
- * A confirmação de toda ação que remove ou arquiva.
+ * The confirmation for every action that removes or archives.
  *
- * `AlertDialog` e não `Dialog`: o alerta não fecha ao clicar fora nem no Esc, e
- * é essa a diferença que importa aqui - um clique distraído fora do dialog não
- * pode ser a resposta a "apagar de vez?".
+ * `AlertDialog` and not `Dialog`: the alert does not close on an outside click or Esc, and
+ * that is the difference that matters here - a distracted click outside the dialog cannot
+ * be the answer to "apagar de vez?".
  *
- * Uncontrolled (`frontend.md` §6.2): abre pelo gatilho ou pelo `handle` e
- * fecha pelo Cancelar ou pelo Confirmar, que são `Close` da primitiva. O
- * resultado da ação chega por toast.
+ * Uncontrolled (`frontend.md` §6.2): opens by the trigger or by the `handle` and
+ * closes by Cancelar or Confirmar, which are the primitive's `Close`. The
+ * action's result arrives by toast.
  *
- * As partes são finas de propósito. Foco, Esc, portal e ARIA continuam sendo do
- * `ui/alert-dialog`, que já é compound; o que se acrescenta aqui é só o texto
- * virar slot, para a tela fora da curva pôr um `<Alert>` ou um `<Checkbox>` na
- * descrição sem que isso vire mais uma prop opcional para todas as outras.
+ * The parts are thin on purpose. Focus, Esc, portal and ARIA remain the job of
+ * `ui/alert-dialog`, which is already a compound; what is added here is only the text
+ * becoming a slot, so the off-curve screen can put an `<Alert>` or a `<Checkbox>` in the
+ * description without that turning into one more optional prop for all the others.
  */
 export function ConfirmDialog<TPayload = undefined>({
   render,
@@ -71,13 +71,13 @@ export function ConfirmDialog<TPayload = undefined>({
   return (
     <AlertDialog handle={handle}>
       {({ payload }) => {
-        // Texto fixo passa direto; em função, só depois de haver payload.
+        // Fixed text passes straight through; as a function, only once there is a payload.
         let body: React.ReactNode = null
         if (typeof children !== 'function') body = children
         if (typeof children === 'function' && payload !== undefined)
           body = children(payload)
 
-        // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+        // No `useMemo`: the React Compiler memoizes the object by what it reads.
         const value = { onConfirm: () => onConfirm(payload), destructive }
 
         return (

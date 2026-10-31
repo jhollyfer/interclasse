@@ -1,29 +1,29 @@
 /**
- * A aritmética do fatiamento, isolada do DOM e da rede.
+ * The slicing arithmetic, isolated from the DOM and the network.
  *
- * Fica aqui, e não dentro do hook, porque é a parte que erra em silêncio: uma
- * fronteira de byte trocada não estoura exceção nenhuma - ela grava um arquivo
- * corrompido que só aparece quando alguém tenta abrir. Isolada, ela é testável
- * com números, sem subir arquivo nenhum.
+ * It lives here, and not inside the hook, because it is the part that fails silently: a
+ * swapped byte boundary throws no exception - it saves a corrupted file that only
+ * shows up when someone tries to open it. Isolated, it is testable
+ * with numbers, without uploading any file.
  */
 
-/** Uma parte, e onde ela começa e termina dentro do arquivo. */
+/** A part, and where it starts and ends inside the file. */
 export type PartPlan = {
   partNumber: number
   start: number
-  /** Exclusivo, como o `end` de `Blob.slice`. */
+  /** Exclusive, like `Blob.slice`'s `end`. */
   end: number
 }
 
 /**
- * O plano de fatiamento de um arquivo.
+ * A file's slicing plan.
  *
- * As partes são numeradas a partir de **1**, e não de zero, porque é o que o S3
- * exige - `PartNumber` zero é erro. A última parte é a sobra, e pode ser
- * qualquer tamanho.
+ * The parts are numbered from **1**, and not from zero, because that is what S3
+ * requires - `PartNumber` zero is an error. The last part is the remainder, and can be
+ * any size.
  *
- * Arquivo vazio ainda dá uma parte: um `PUT` de zero byte é um arquivo válido, e
- * devolver plano vazio faria o upload "terminar" sem nunca ter enviado nada.
+ * An empty file still yields one part: a zero-byte `PUT` is a valid file, and
+ * returning an empty plan would make the upload "finish" without ever having sent anything.
  */
 export function planParts(size: number, partSize: number): Array<PartPlan> {
   const total = Math.max(1, Math.ceil(size / partSize))
@@ -35,8 +35,8 @@ export function planParts(size: number, partSize: number): Array<PartPlan> {
     parts.push({
       partNumber: index + 1,
       start,
-      // A última parte termina no fim do arquivo, e não no múltiplo do tamanho
-      // da parte - sem o `min`, `Blob.slice` pediria além do fim.
+      // The last part ends at the end of the file, and not at the multiple of the part
+      // size - without the `min`, `Blob.slice` would ask beyond the end.
       end: Math.min(start + partSize, size),
     })
   }
@@ -45,10 +45,10 @@ export function planParts(size: number, partSize: number): Array<PartPlan> {
 }
 
 /**
- * O que ainda falta enviar: o plano menos o que o servidor disse já ter.
+ * What is still missing to send: the plan minus what the server said it already has.
  *
- * É o coração da retomada. Se 1499 partes subiram, isto devolve a 1500 em
- * diante - nunca a primeira.
+ * It is the heart of resuming. If 1499 parts went up, this returns 1500
+ * onward - never the first.
  */
 export function missingParts(
   plan: ReadonlyArray<PartPlan>,

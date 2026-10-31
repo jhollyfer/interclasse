@@ -32,16 +32,16 @@ import { m } from '#/paraglide/messages'
 export type UserFormType = AdministratorUserUpdatePayload
 
 /**
- * O formulário vazio.
+ * The empty form.
  *
- * `DefaultValues<>` e não o tipo inteiro porque **`role` não tem partida
- * honesta**: a coluna não tem `DEFAULT`, o papel é sempre explícito no
- * servidor, e escolher um aqui faria o formulário inventar uma partida que o
- * banco não daria ao mesmo payload sem o campo. O combobox nasce vazio e
- * mostra o `placeholder`; quem não escolher leva o 422 apontando o campo.
+ * `DefaultValues<>` and not the whole type because **`role` has no honest
+ * starting value**: the column has no `DEFAULT`, the role is always explicit on the
+ * server, and picking one here would make the form invent a starting value that the
+ * database would not give the same payload without the field. The combobox is born empty and
+ * shows the `placeholder`; whoever does not choose gets the 422 pointing at the field.
  *
- * `status` nasce `ACTIVE` porque é o `DEFAULT` da coluna - a conta nasce
- * podendo entrar, e desativar é edição.
+ * `status` is born `ACTIVE` because it is the column's `DEFAULT` - the account is born
+ * able to sign in, and deactivating is an edit.
  */
 export const USER_FORM_DEFAULTS: DefaultValues<UserFormType> = {
   name: '',
@@ -51,11 +51,11 @@ export const USER_FORM_DEFAULTS: DefaultValues<UserFormType> = {
 }
 
 /**
- * Os campos que a API sabe acusar. Fora desta lista, o erro vira `root`.
+ * The fields the API knows how to flag. Outside this list, the error becomes `root`.
  *
- * `passwordConfirmation` está aqui porque é dele que vem o erro da regra
- * `confirmed()`: o VineJS reporta a divergência **na confirmação**, e sem a
- * chave a mensagem cairia no rodapé em vez de apontar o campo.
+ * `passwordConfirmation` is here because the error of the `confirmed()` rule comes
+ * from it: VineJS reports the mismatch **on the confirmation**, and without the
+ * key the message would fall to the footer instead of pointing at the field.
  */
 export const USER_FIELDS = [
   'name',
@@ -69,35 +69,35 @@ export const USER_FIELDS = [
 
 type UserFormFieldsProps = Readonly<{
   form: UseFormReturn<UserFormType>
-  /** Prefixo dos `id`, para o mesmo formulário poder aparecer duas vezes na página. */
+  /** `id` prefix, so the same form can appear twice on the page. */
   idPrefix: string
   /**
-   * A URL da foto já gravada. Prop e não slot - é dado do registro, não
-   * marcação, e só a edição tem o que passar aqui.
+   * The already saved photo's URL. A prop and not a slot - it is record data, not
+   * markup, and only editing has something to pass here.
    */
   previewUrl?: string | null
   /**
-   * O rótulo do campo de senha.
+   * The password field's label.
    *
-   * Na criação a senha é obrigatória; na edição, em branco significa "não
-   * trocar". É a única frase que difere entre as duas telas, e um slot inteiro
-   * para ela seria mais peça do que texto.
+   * On creation the password is required; on editing, blank means "do not
+   * change". It is the only sentence that differs between the two screens, and a whole slot
+   * for it would be more part than text.
    */
   passwordLabel?: string
 }>
 
 /**
- * Os campos da conta, compartilhados pela criação e pela edição. Cada tela é
- * dona da própria mutation e do próprio `onSuccess` - o que se repete é a
- * marcação, e é só ela que mora aqui, um nível acima das duas.
+ * The account fields, shared by creation and editing. Each screen
+ * owns its own mutation and its own `onSuccess` - what repeats is the
+ * markup, and only it lives here, one level above the two.
  *
- * Campo a campo é `AppField` (um `Controller`), nunca `register`: os componentes vêm do Base UI
- * e não expõem o `<input>` para receber `ref`.
+ * Field by field it is `AppField` (a `Controller`), never `register`: the components come from Base UI
+ * and do not expose the `<input>` to receive a `ref`.
  *
- * A senha atual não aparece: `currentPassword` é exigência de `PUT /account`,
- * onde quem troca é o dono da conta e precisa provar identidade. Aqui quem
- * troca é o administrador, sobre a conta de outra pessoa - a senha atual dela
- * ele não sabe, e exigi-la travaria a redefinição de quem perdeu o acesso.
+ * The current password does not appear: `currentPassword` is a requirement of `PUT /account`,
+ * where whoever changes it is the account owner and must prove identity. Here whoever
+ * changes it is the administrator, on someone else's account - they do not know the
+ * current password, and demanding it would block the reset for someone who lost access.
  */
 export function UserFormFields({
   form,
@@ -124,9 +124,9 @@ export function UserFormFields({
             onValueChange={field.onChange}
             previewUrl={previewUrl}
           >
-            {/* Sem foto e sem nome, o espaço reservado fica vazio, e é o que
-                se quer: `initials('')` é `''` e o `AvatarFallback` sabe ficar
-                em branco. */}
+            {/* Without a photo and without a name, the reserved space stays empty, and that is what
+                is wanted: `initials('')` is `''` and `AvatarFallback` knows how to stay
+                blank. */}
             <ImageFieldPreview alt={m.admin_users_photo_alt()}>
               {initials(name)}
             </ImageFieldPreview>
@@ -173,8 +173,8 @@ export function UserFormFields({
               autoComplete="email"
               placeholder={m.admin_users_field_email_placeholder()}
             />
-            {/* O e-mail é `UNIQUE` global, e o use-case responde `409` quando
-                já existe uma conta viva com ele. */}
+            {/* The e-mail is globally `UNIQUE`, and the use-case answers `409` when
+                a live account with it already exists. */}
             <FieldDescription>
               {m.admin_users_field_email_description()}
             </FieldDescription>
@@ -190,10 +190,10 @@ export function UserFormFields({
       >
         {({ field, control }) => (
           <>
-            {/* A senha e a confirmação em branco são **ausentes**, e não `''`:
-                o schema do `shared/` recusaria `''` por tamanho. O tipo do
-                formulário é o da atualização (tudo opcional); na criação é o
-                validator de criação que cobra os dois campos. */}
+            {/* A blank password and confirmation are **absent**, and not `''`:
+                the `shared/` schema would refuse `''` for its length. The form's type
+                is the update one (everything optional); on creation it is the create
+                validator that demands both fields. */}
             <InputPassword
               {...control}
               value={field.value ?? ''}
@@ -239,8 +239,8 @@ export function UserFormFields({
           <>
             <OptionCombobox
               {...control}
-              // Sem `?? algum papel`: o campo não tem partida, e forçar uma
-              // aqui gravaria em silêncio um papel que ninguém escolheu.
+              // No `?? some role`: the field has no starting value, and forcing one
+              // here would silently save a role nobody chose.
               value={field.value}
               onValueChange={field.onChange}
               onBlur={field.onBlur}
@@ -272,8 +272,8 @@ export function UserFormFields({
                 ACTIVE_STATUS_DOTS,
               )}
             />
-            {/* Inativa não é arquivada: a linha continua na listagem e o
-                registro continua vivo, só o acesso é que fecha. */}
+            {/* Inactive is not archived: the row stays in the listing and the
+                record stays alive, only the access closes. */}
             <FieldDescription>
               {m.admin_users_field_status_description()}
             </FieldDescription>

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Button } from '#/components/ui/button.tsx'
 import { cn } from '#/lib/cn'
 
-// casa: genérico no payload, para o `handle` tipado e os children em função
+// house: generic on the payload, for the typed `handle` and function children
 function AlertDialog<TPayload = unknown>({
   ...props
 }: AlertDialogPrimitive.Root.Props<TPayload>) {
@@ -142,8 +142,8 @@ function AlertDialogDescription({
   )
 }
 
-// casa: a ação fecha o alerta sozinha (Close do Base UI), para o
-// `ConfirmDialog` ser uncontrolled
+// house: the action closes the alert on its own (Base UI's Close), so
+// `ConfirmDialog` can be uncontrolled
 function AlertDialogAction({
   className,
   variant = 'default',

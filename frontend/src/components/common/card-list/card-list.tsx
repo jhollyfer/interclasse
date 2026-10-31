@@ -17,19 +17,19 @@ import { m } from '#/paraglide/messages'
 type CardListProps = Readonly<{
   cards: ReadonlyArray<AdministratorCardPaginateResponse>
   isPending?: boolean
-  /** O que dizer quando não há cartão. */
+  /** What to say when there is no card. */
   empty: string
-  /** Mostra a partida de cada cartão. Fora, quando a lista já é de uma partida só. */
+  /** Shows each card's match. Off, when the list already belongs to a single match. */
   showMatch?: boolean
-  /** Presente, cada linha ganha o botão de apagar. */
+  /** When present, each row gets the delete button. */
   onDelete?: (card: AdministratorCardPaginateResponse) => void
 }>
 
 /**
- * A lista de cartões: a cor, o atleta, a turma e a partida.
+ * The card list: the color, the athlete, the classroom and the match.
  *
- * Mora em `common` porque três telas a usam - os cartões do painel, a turma do
- * conselheiro e o diálogo de cartões da partida.
+ * Lives in `common` because three screens use it - the dashboard's cards, the
+ * advisor's classroom and the match's cards dialog.
  */
 export function CardList({
   cards,
@@ -92,7 +92,7 @@ export function CardList({
   )
 }
 
-/** A partida do cartão em uma linha: modalidade, fase, confronto e data. */
+/** The card's match on one line: sport, round, fixture and date. */
 function MatchLine({
   card,
 }: Readonly<{ card: AdministratorCardPaginateResponse }>): React.JSX.Element {

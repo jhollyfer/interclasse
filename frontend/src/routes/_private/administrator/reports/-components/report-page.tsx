@@ -24,15 +24,15 @@ import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /**
- * O CSV sai direto da API: o navegador segue o link com o cookie de mesmo site,
- * como no download de arquivo (`http.ts`, `BASE_URL`).
+ * The CSV comes straight from the API: the browser follows the link with the same-site cookie,
+ * as in the file download (`http.ts`, `BASE_URL`).
  */
 const CSV_URL = BASE_URL.concat('/administrator/reports/csv')
 
 /**
- * Os números dos jogos: quantas turmas, alunos e atletas participaram, por
- * categoria, por modalidade e por turma. Para fechar a edição e prestar
- * contas, na tela ou no Excel.
+ * The games' numbers: how many classrooms, students and athletes took part, by
+ * category, by sport and by classroom. For closing the edition and accounting
+ * for it, on screen or in Excel.
  */
 export function ReportPage(): React.JSX.Element {
   const { data: report } = useSuspenseQuery(reportQueryOptions())

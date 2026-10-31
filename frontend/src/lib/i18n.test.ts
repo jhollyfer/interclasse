@@ -16,7 +16,7 @@ afterEach(() => {
 const TEXT = { 'pt-BR': 'Olá', es: 'Hola', en: 'Hello' }
 
 describe('localized', () => {
-  it('lê o texto do idioma atual', () => {
+  it('reads the text of the current language', () => {
     overwriteGetLocale(() => 'es')
     expect(localized(TEXT)).toBe('Hola')
 
@@ -36,14 +36,14 @@ describe('formatNumber', () => {
 })
 
 describe('formatCurrency', () => {
-  it('escreve em reais', () => {
+  it('writes in reais', () => {
     overwriteGetLocale(() => 'pt-BR')
     expect(formatCurrency(10)).toContain('R$')
   })
 })
 
 describe('SCHOOL_TIME_ZONE', () => {
-  it('é o fuso de Manaus', () => {
+  it('is the Manaus time zone', () => {
     expect(SCHOOL_TIME_ZONE).toBe('America/Manaus')
   })
 })

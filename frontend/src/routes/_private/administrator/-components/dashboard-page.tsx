@@ -44,7 +44,7 @@ import {
   DASHBOARD_REMOVALS,
 } from '../index'
 
-/** A partida no formato que os diálogos esperam: nomes já resolvidos. */
+/** The match in the format the dialogs expect: names already resolved. */
 function toRef(match: AdministratorMatchPaginateResponse): MatchRef {
   return {
     ...match,

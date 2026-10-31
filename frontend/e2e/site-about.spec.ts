@@ -2,21 +2,21 @@ import { apiUrl, writeHeaders } from './support/credentials'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
-/** O campo vazio da API é `null`; o textarea o mostra como texto vazio. */
+/** The API's empty field is `null`; the textarea shows it as empty text. */
 function textOf(value: unknown): string {
   if (typeof value === 'string') return value
   return ''
 }
 
 // docs/USER-FLOWS.md, "Editar o site", passos 1 e 3.
-test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta no fim', async ({
+test('when the organization changes the About text, /about shows it and the original returns at the end', async ({
   administrator: { page, context },
   browser,
   baseURL,
 }) => {
   const endpoint = `${apiUrl()}/administrator/site`
 
-  // O que existe hoje: é isto que o `finally` devolve, mesmo se o teste falhar.
+  // What exists today: this is what `finally` restores, even if the test fails.
   const before = await context.request.get(endpoint)
   expect(before.ok()).toBe(true)
   const original: Record<string, unknown> = await before.json()
@@ -41,11 +41,11 @@ test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta
     expect((await saved).ok()).toBe(true)
     await expect(page.getByText('Site atualizado.')).toBeVisible()
 
-    // O visitante sem conta vê o texto novo.
+    // The visitor without an account sees the new text.
     const visitor = await browser.newContext({ baseURL })
     try {
       const site = await visitor.newPage()
-      await site.goto('/sobre')
+      await site.goto('/about')
       await expect(
         site.getByRole('heading', { level: 1, name: 'Sobre os jogos' }),
       ).toBeVisible()
@@ -69,7 +69,7 @@ test('a organização muda o texto do Sobre, o /sobre mostra, e o original volta
     expect(restore.ok()).toBe(true)
   }
 
-  // Restaurado: a tela volta a mostrar o valor de antes.
+  // Restored: the screen goes back to the previous value.
   await page.reload()
   await waitForHydration(page)
   await expect(page.getByLabel('O que são os jogos')).toHaveValue(

@@ -21,12 +21,12 @@ import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
 import { applyMutationError } from '#/lib/form-errors'
 
 /**
- * O hook de mutation do recurso, como o formulário o recebe.
+ * The resource's mutation hook, as the form receives it.
  *
- * Todos os de `integrations/tanstack-query/mutations/` têm esta forma: aceitam
- * as opções do `useMutation` menos a `mutationFn`, que é o que eles próprios
- * fornecem. É o que permite passar o hook como argumento em vez de chamá-lo no
- * arquivo do formulário.
+ * All the ones in `integrations/tanstack-query/mutations/` have this shape: they
+ * accept `useMutation`'s options minus `mutationFn`, which they supply
+ * themselves. That is what allows passing the hook as an argument instead of
+ * calling it in the form's file.
  */
 export type ResourceMutation<TRecord, TPayload> = (
   options?: Omit<
@@ -40,36 +40,36 @@ export type UseMutationFormOptions<
   TRecord,
   TPayload,
 > = Readonly<{
-  /** O validator Zod de `@interclasse/shared`, o mesmo que o backend usa. */
+  /** The Zod validator from `@interclasse/shared`, the same one the backend uses. */
   validator: z.ZodType<TValues, TValues>
-  /** O formulário vazio. */
+  /** The empty form. */
   defaults?: DefaultValues<TValues>
   /**
-   * O registro carregado, na edição. `values` e não `defaultValues`: o
-   * registro chega depois do primeiro render, e `defaultValues` só é lido uma
-   * vez.
+   * The loaded record, when editing. `values` and not `defaultValues`: the
+   * record arrives after the first render, and `defaultValues` is only read
+   * once.
    */
   values?: TValues
-  /** Os campos que o backend pode acusar, para o erro cair no lugar certo. */
+  /** The fields the backend may flag, so the error lands in the right place. */
   fields: ReadonlyArray<FieldPath<TValues>>
   mutation: ResourceMutation<TRecord, TPayload>
-  /** As chaves invalidadas no sucesso, antes do aviso e do `onSuccess`. */
+  /** The keys invalidated on success, before the notice and `onSuccess`. */
   invalidate?: ReadonlyArray<QueryKey>
-  /** O texto do toast de sucesso. Função quando cita o registro salvo. */
+  /** The success toast text. A function when it cites the saved record. */
   success?: string | ((record: TRecord) => string)
   /**
-   * O id do aviso de "Tentar de novo", quando o reenvio é seguro. O critério
-   * está em `applyMutationError`: edição sempre pode, cadastro só onde o
-   * use-case recusa a duplicata com 409.
+   * The id of the "Tentar de novo" notice, when resending is safe. The criterion
+   * is in `applyMutationError`: an edit always can, a create only where the
+   * use-case refuses the duplicate with 409.
    */
   retry?: string
   /**
-   * O que vai para a API. O cadastro cujo campo bate um a um com o corpo passa
-   * `(values) => values`: é a identidade que faz o compilador conferir que o
-   * formulário **é** o payload.
+   * What goes to the API. A create whose fields match the body one to one passes
+   * `(values) => values`: it is the identity that makes the compiler check that
+   * the form **is** the payload.
    */
   payload: (values: TValues) => TPayload
-  /** O que a tela faz depois de salvar: fechar o diálogo, navegar. */
+  /** What the screen does after saving: close the dialog, navigate. */
   onSuccess?: (record: TRecord, payload: TPayload) => Promise<void> | void
 }>
 
@@ -82,21 +82,21 @@ export type UseMutationFormReturn<
   mutation: UseMutationResult<TRecord, HTTPError, TPayload>
   onValid: (values: TValues) => void
   /**
-   * O `onSubmit` do `<form>`, pronto: `handleSubmit(onValid)` devolve promessa,
-   * e o atributo do JSX espera `void`.
+   * The `<form>`'s `onSubmit`, ready: `handleSubmit(onValid)` returns a promise,
+   * and the JSX attribute expects `void`.
    */
   onSubmit: (event?: React.BaseSyntheticEvent) => void
 }>
 
 /**
- * Formulário que dispara uma mutation: `useForm` com o resolver do validator
- * do `shared/`, a mutation com o erro levado aos campos (`applyMutationError`), a
- * invalidação, o aviso de sucesso e um `onValid` que limpa o `root` antes de
- * reenviar.
+ * A form that fires a mutation: `useForm` with the resolver of the `shared/`
+ * validator, the mutation with the error carried to the fields
+ * (`applyMutationError`), the invalidation, the success notice and an `onValid`
+ * that clears the `root` before resending.
  *
- * É a base de `useResourceForm` (a tela de criar/editar, que ainda navega de
- * volta) e serve sozinho a quem não é tela: diálogo de placar, sorteio,
- * cadastro em linha, login.
+ * It is the base of `useResourceForm` (the create/edit screen, which still
+ * navigates back) and serves on its own anyone who is not a screen: score dialog,
+ * draw, inline creation, login.
  */
 export function useMutationForm<
   TValues extends FieldValues,
@@ -147,15 +147,15 @@ export function useMutationForm<
     },
   })
 
-  // Alteração digitada e ainda não enviada: sair da tela pergunta antes. Depois
-  // de enviar, a navegação de sucesso passa livre.
+  // Typed change not yet sent: leaving the screen asks first. After
+  // sending, the success navigation passes freely.
   useUnsavedChangesBlocker(
     form.formState.isDirty && !mutation.isPending && !mutation.isSuccess,
   )
 
   function onValid(submitted: TValues): void {
-    // O `root` guarda o erro da tentativa anterior. Sem limpar, um 409 já
-    // resolvido continua no rodapé enquanto a segunda tentativa está em voo.
+    // The `root` holds the previous attempt's error. Without clearing it, an already
+    // resolved 409 stays in the footer while the second attempt is in flight.
     form.clearErrors('root')
 
     mutation.mutate(toPayload(submitted))

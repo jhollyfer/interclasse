@@ -11,7 +11,7 @@ import {
 } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-/** Sem `sortKey`: a listagem de chaves não aceita `?sort`. */
+/** Without `sortKey`: the brackets listing does not accept `?sort`. */
 export function bracketColumns(): TableColumns<AdministratorBracketPaginateResponse> {
   return [
     {

@@ -29,28 +29,28 @@ import {
 import { m } from '#/paraglide/messages'
 
 /**
- * A ficha da própria conta.
+ * The account's own record.
  *
- * Ler e editar são telas separadas, como na referência
- * (`simple-hub/.../_private/profile/`): esta é a única tela do painel que a
- * pessoa abre para **conferir** quem ela é - o papel que tem, se a conta está
- * ativa, desde quando existe -, e um formulário não responde nada disso sem
- * ser preenchido. Juntas, abrir o perfil significava entrar em modo de edição
- * de senha para descobrir o próprio e-mail.
+ * Reading and editing are separate screens, as in the reference
+ * (`simple-hub/.../_private/profile/`): this is the only dashboard screen that the
+ * person opens to **check** who they are - the role they have, whether the account is
+ * active, since when it exists -, and a form answers none of that without
+ * being filled in. Together, opening the profile meant entering password
+ * edit mode to find out one's own e-mail.
  *
- * Papel e situação aparecem aqui e **não** no formulário, e é a mesma razão de
- * o `PUT /account` não aceitá-los: o papel é decisão de quem cria a conta, e
- * ninguém se inativa. São dados a ler, não campos a preencher.
+ * Role and status appear here and **not** in the form, and it is the same reason
+ * `PUT /account` does not accept them: the role is the decision of whoever creates the account, and
+ * nobody deactivates themselves. They are data to read, not fields to fill in.
  */
 export function Profile(): React.JSX.Element {
-  // O `loader` da rota já garantiu o dado; aqui é leitura de cache.
+  // The route's `loader` already guaranteed the data; here it is a cache read.
   const { data: account } = useSuspenseQuery(accountQueryOptions())
 
   return (
     <PageShell>
-      {/* `PageShellHeader` cru, e não `PageHeader`: o cabeçalho do perfil abre
-          com o avatar, e não com um título - é o caso para o qual o slot existe
-          separado do componente de título. */}
+      {/* Raw `PageShellHeader`, and not `PageHeader`: the profile header opens
+          with the avatar, and not with a title - it is the case the slot exists for,
+          separate from the title component. */}
       <PageShellHeader>
         <div className="flex items-center gap-4">
           <Avatar className="size-14 ring-1 ring-brand/40 ring-offset-2 ring-offset-background">
@@ -63,9 +63,9 @@ export function Profile(): React.JSX.Element {
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold">{account.name}</h1>
             <div className="flex flex-wrap items-center gap-2">
-              {/* O `??` cobre um papel ou uma situação nova do backend
-                  chegando aqui antes de esta tela saber dela: melhor imprimir
-                  `EDITOR` cru do que um badge vazio. */}
+              {/* The `??` covers a new backend role or status
+                  arriving here before this screen knows about it: better to print a raw
+                  `EDITOR` than an empty badge. */}
               <Badge variant={USER_ROLE_VARIANTS[account.role]}>
                 {USER_ROLE_LABELS[account.role] ?? account.role}
               </Badge>
@@ -106,9 +106,9 @@ export function Profile(): React.JSX.Element {
             <Detail icon={<EnvelopeSimpleIcon />} label={m.common_email()}>
               {account.email}
             </Detail>
-            {/* A senha não se mostra, nem mascarada: um "••••••••" sugere que o
-                painel a conhece, e ele não conhece - o backend guarda o hash.
-                O que dá para dizer é onde trocá-la. */}
+            {/* The password is not shown, not even masked: a "••••••••" suggests that the
+                dashboard knows it, and it does not - the backend stores the hash.
+                What can be said is where to change it. */}
             <Detail icon={<ShieldCheckIcon />} label={m.common_password()}>
               <Link
                 to="/profile/edit"

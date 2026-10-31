@@ -32,7 +32,7 @@ afterEach(() => {
 })
 
 describe('useSignOut', () => {
-  it('ao fim, esvazia o cache e só depois vai para a entrada', async () => {
+  it('when finished, empties the cache and only then goes to the sign-in', async () => {
     clear.mockImplementation(() => order.push('clear'))
     navigate.mockImplementation(() => {
       order.push('navigate')

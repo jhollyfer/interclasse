@@ -70,10 +70,10 @@ function SidebarProvider({
   open?: boolean
   onOpenChange?: (open: boolean) => void
   /**
-   * Recolhe sem tocar na preferência: é a largura de tablet, onde a barra
-   * expandida (256px) deixava a tabela sem espaço. Enquanto vale, o toggle abre
-   * e fecha só nesta visita, sem cookie; quando deixa de valer, volta a
-   * preferência.
+   * Collapses without touching the preference: it is the tablet width, where the
+   * expanded bar (256px) left the table without room. While it holds, the toggle
+   * opens and closes only for this visit, with no cookie; when it stops
+   * holding, the preference comes back.
    */
   collapsed?: boolean
 }) {
@@ -84,9 +84,9 @@ function SidebarProvider({
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
 
-  // Aberta à mão enquanto `collapsed` vale. Zera quando o pedido muda (cruzar a
-  // largura de tablet): o ajuste é no render, e não num efeito, para não pintar
-  // um quadro com o valor velho.
+  // Opened by hand while `collapsed` holds. Resets when the request changes (crossing
+  // the tablet width): the adjustment is made during render, not in an effect, to avoid
+  // painting a frame with the old value.
   const [peek, setPeek] = React.useState(false)
   const [lastCollapsed, setLastCollapsed] = React.useState(collapsed)
   if (lastCollapsed !== collapsed) {
@@ -102,7 +102,7 @@ function SidebarProvider({
     if (typeof value === 'function') openState = value(open)
     else openState = value
 
-    // Estado efetivo, e não preferência: o cookie fica como estava.
+    // Effective state, not the preference: the cookie stays as it was.
     if (collapsed) {
       setPeek(openState)
       return
@@ -229,7 +229,7 @@ function Sidebar({
         >
           <SheetHeader className="sr-only">
             <SheetTitle>{m.common_ui_sidebar_title()}</SheetTitle>
-            {/* casa: rótulo traduzido (_standards/i18n.md) */}
+            {/* house: translated label (_standards/i18n.md) */}
             <SheetDescription>{m.common_ui_sidebar_mobile()}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
@@ -327,7 +327,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      // casa: rótulo traduzido (_standards/i18n.md)
+      // house: translated label (_standards/i18n.md)
       aria-label={m.common_ui_sidebar_toggle()}
       tabIndex={-1}
       onClick={toggleSidebar}

@@ -67,11 +67,14 @@ export function HomePage(): React.JSX.Element {
               {m.public_home_lead()}
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/jogos" className="skew-button bg-brand text-brand-ink">
+              <Link
+                to="/matches"
+                className="skew-button bg-brand text-brand-ink"
+              >
                 {m.public_home_see_games()}
               </Link>
               <Link
-                to="/classificacao"
+                to="/standings"
                 className="skew-button border border-brand-ink-foreground/30 text-brand-ink-foreground"
               >
                 {m.public_nav_standings()}
@@ -89,7 +92,9 @@ export function HomePage(): React.JSX.Element {
       <Section>
         <SectionHeader>
           <SectionTitle>{m.public_home_upcoming_title()}</SectionTitle>
-          <SectionMore to="/jogos">{m.public_home_full_schedule()}</SectionMore>
+          <SectionMore to="/matches">
+            {m.public_home_full_schedule()}
+          </SectionMore>
         </SectionHeader>
         {upcoming.length === 0 && (
           <Empty>{m.public_home_upcoming_empty()}</Empty>
@@ -113,7 +118,7 @@ export function HomePage(): React.JSX.Element {
       <Section>
         <SectionHeader>
           <SectionTitle>{m.public_nav_announcements()}</SectionTitle>
-          <SectionMore to="/avisos">
+          <SectionMore to="/announcements">
             {m.public_home_all_announcements()}
           </SectionMore>
         </SectionHeader>

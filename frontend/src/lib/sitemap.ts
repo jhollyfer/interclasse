@@ -3,33 +3,33 @@ import { localizedUrl } from '#/lib/page-head'
 import { locales } from '#/paraglide/runtime'
 
 /**
- * A lógica pura do `sitemap.xml` e do `robots.txt` (`frontend.md` §9.7). As
- * rotas de servidor (`routes/sitemap[.]xml.ts`, `routes/robots[.]txt.ts`) só
- * buscam os dados e devolvem o texto montado aqui.
+ * The pure logic of `sitemap.xml` and `robots.txt` (`frontend.md` §9.7). The
+ * server routes (`routes/sitemap[.]xml.ts`, `routes/robots[.]txt.ts`) only
+ * fetch the data and return the text assembled here.
  * _doc-lib/tanstack-start.md#guide/server-routes.
  */
 
-/** Uma página indexável: o caminho sem prefixo de idioma e o `updatedAt` do dado. */
+/** An indexable page: the path without language prefix and the data's `updatedAt`. */
 export type SitemapEntry = Readonly<{
   pathname: string
   lastModified?: string | null
 }>
 
-/** As páginas públicas que não dependem de dado. */
+/** The public pages that do not depend on data. */
 export const SITEMAP_STATIC_ENTRIES = [
   { pathname: '/' },
-  { pathname: '/jogos' },
-  { pathname: '/classificacao' },
-  { pathname: '/avisos' },
-  { pathname: '/sobre' },
+  { pathname: '/matches' },
+  { pathname: '/standings' },
+  { pathname: '/announcements' },
+  { pathname: '/about' },
 ] as const satisfies ReadonlyArray<SitemapEntry>
 
-/** A chave de cada modalidade: uma página por chave, com o `updatedAt` dela. */
+/** Each sport's bracket: one page per bracket, with its `updatedAt`. */
 export function bracketEntries(
   brackets: ReadonlyArray<{ id: string; updatedAt: string | null }>,
 ): Array<SitemapEntry> {
   return brackets.map((bracket) => ({
-    pathname: `/classificacao/${bracket.id}`,
+    pathname: `/standings/${bracket.id}`,
     lastModified: bracket.updatedAt,
   }))
 }
@@ -46,7 +46,7 @@ function escapeXml(value: string): string {
   return value.replaceAll(/[&<>"']/g, (char) => ESCAPES[char] ?? char)
 }
 
-/** Os `xhtml:link` recíprocos das três versões, mais o `x-default` (pt-BR). */
+/** The reciprocal `xhtml:link`s of the three versions, plus the `x-default` (pt-BR). */
 function alternates(pathname: string): string {
   const links = locales.map(
     (locale) =>
@@ -59,7 +59,7 @@ function alternates(pathname: string): string {
   return links.join('')
 }
 
-/** Uma entrada por idioma, cada uma com os `hreflang` das irmãs. */
+/** One entry per language, each with its siblings' `hreflang`. */
 function urls(entry: SitemapEntry): Array<string> {
   return locales.map((locale) => {
     let lastmod = ''
@@ -71,7 +71,7 @@ function urls(entry: SitemapEntry): Array<string> {
   })
 }
 
-/** O `sitemap.xml`: só URL canônica e indexável, uma entrada por idioma. */
+/** The `sitemap.xml`: canonical and indexable URLs only, one entry per language. */
 export function sitemapXml(entries: ReadonlyArray<SitemapEntry>): string {
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -82,11 +82,11 @@ export function sitemapXml(entries: ReadonlyArray<SitemapEntry>): string {
 }
 
 type RobotsInput = Readonly<{
-  /** Só produção é indexável: o resto responde `Disallow: /`. */
+  /** Only production is indexable: the rest answers `Disallow: /`. */
   indexable: boolean
 }>
 
-/** O `robots.txt`: a URL absoluta do sitemap depende do ambiente, por isso é rota. */
+/** The `robots.txt`: the sitemap's absolute URL depends on the environment, which is why it is a route. */
 export function robotsTxt({ indexable }: RobotsInput): string {
   if (!indexable) return 'User-agent: *\nDisallow: /\n'
 

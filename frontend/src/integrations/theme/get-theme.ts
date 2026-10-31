@@ -1,18 +1,18 @@
 /**
- * A parte de `lib/theme.ts` que só existe no servidor: ler o cookie da
- * requisição. Importa `@tanstack/react-start/server` e por isso nunca entra no
- * bundle do navegador; o consumidor é o `.server()` de um
- * `createIsomorphicFn` (mesmo desenho de `http.server.ts`).
+ * The part of `lib/theme.ts` that only exists on the server: reading the request's
+ * cookie. It imports `@tanstack/react-start/server` and therefore never enters the
+ * browser bundle; the consumer is the `.server()` of a
+ * `createIsomorphicFn` (same design as `http.server.ts`).
  */
 
 import { getCookie } from '@tanstack/react-start/server'
 
-/** O valor cru do cookie de tema; `undefined` fora de uma requisição. */
+/** The raw value of the theme cookie; `undefined` outside a request. */
 export function getThemeCookie(name: string): string | undefined {
   try {
     return getCookie(name)
   } catch {
-    // Fora de um ciclo de requisição - teste, script - não há cookie.
+    // Outside a request cycle - test, script - there is no cookie.
     return undefined
   }
 }

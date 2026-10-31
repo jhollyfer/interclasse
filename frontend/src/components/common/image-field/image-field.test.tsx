@@ -91,7 +91,7 @@ function fileInput(container: HTMLElement): HTMLInputElement {
 const PHOTO = new File(['x'], 'foto.png', { type: 'image/png' })
 
 describe('ImageField', () => {
-  it('sem imagem mostra a sigla, a descrição e nenhum Remover', () => {
+  it('when there is no image, shows the initials, the description and no Remover', () => {
     render(<Harness onValueChange={() => undefined} />)
 
     expect(screen.getByText('JR')).toBeTruthy()
@@ -99,7 +99,7 @@ describe('ImageField', () => {
     expect(screen.queryByRole('button', { name: m.common_remove() })).toBeNull()
   })
 
-  it('a escolha sobe o arquivo e entrega o id do anexo ao pai', async () => {
+  it('when a file is chosen, uploads it and hands the attachment id to the parent', async () => {
     upload.mockResolvedValue({ id: 'storage-1', url: 'https://x/foto.png' })
     const onValueChange = vi.fn()
     const { container } = render(<Harness onValueChange={onValueChange} />)
@@ -112,7 +112,7 @@ describe('ImageField', () => {
     ).toBeTruthy()
   })
 
-  it('tipo fora do aceito é recusado antes de qualquer requisição', async () => {
+  it('when the type is not accepted, refuses before any request', async () => {
     const onValueChange = vi.fn()
     const { container } = render(<Harness onValueChange={onValueChange} />)
     const pdf = new File(['x'], 'ficha.pdf', { type: 'application/pdf' })
@@ -127,7 +127,7 @@ describe('ImageField', () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  it('Remover limpa o valor e apaga só o arquivo que o campo subiu', async () => {
+  it('when Remover is clicked, clears the value and deletes only the file the field uploaded', async () => {
     upload.mockResolvedValue({ id: 'storage-1', url: 'https://x/foto.png' })
     const onValueChange = vi.fn()
     const { container } = render(<Harness onValueChange={onValueChange} />)
@@ -144,7 +144,7 @@ describe('ImageField', () => {
     })
   })
 
-  it('o anexo já salvo some da tela sem ser apagado no servidor', async () => {
+  it('when the attachment is already saved, drops it from the screen without deleting it on the server', async () => {
     render(
       <Harness
         onValueChange={() => undefined}
@@ -159,7 +159,7 @@ describe('ImageField', () => {
     expect(send).not.toHaveBeenCalled()
   })
 
-  it('uma parte fora do ImageField diz qual ficou sem provider', () => {
+  it('when a part is outside ImageField, says which one is without a provider', () => {
     expect(() => render(<ImageFieldRemove />)).toThrow('ImageFieldRemove')
   })
 })

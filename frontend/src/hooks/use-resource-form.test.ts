@@ -17,16 +17,16 @@ import { applyMutationError } from '#/lib/form-errors'
 import { useResourceForm } from './use-resource-form'
 
 /**
- * O que este teste cobra é a **fiação**, que é tudo o que o hook faz.
+ * What this test checks is the **wiring**, which is everything the hook does.
  *
- * Os formulários de criar e editar dos sete recursos do painel escreveriam essas
- * ligações à mão, e cada uma tem um jeito silencioso de quebrar: o
- * `invalidateQueries` esquecido deixa a listagem com o dado velho, o `navigate`
- * esquecido deixa a pessoa parada num formulário já salvo, o `retry` oferecido
- * num cadastro que insere direto duplica o registro, e o `payload` sem o id
- * manda um `PUT` que a API recusa. Nenhuma delas aparece no `typecheck`.
+ * The create and edit forms of the seven dashboard resources would write these
+ * connections by hand, and each has a silent way to break: a forgotten
+ * `invalidateQueries` leaves the listing with stale data, a forgotten `navigate`
+ * leaves the person stuck on an already saved form, a `retry` offered on a
+ * create that inserts directly duplicates the record, and a `payload` without
+ * the id sends a `PUT` the API refuses. None of them shows up in `typecheck`.
  *
- * É o único teste do repositório que precisa de DOM, por causa do `renderHook`.
+ * It is the only test in the repository that needs a DOM, because of `renderHook`.
  */
 
 const navigate = vi.fn()
@@ -36,14 +36,14 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('#/lib/form-errors', () => ({ applyMutationError: vi.fn() }))
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate }),
-  // O bloqueio de navegação não é o assunto: precisa de router montado.
+  // Navigation blocking is not the subject: it needs a mounted router.
   useBlocker: vi.fn(),
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),
 }))
 vi.mock('@hookform/resolvers/zod', () => ({
-  // O resolver não é o assunto: aceita o que vier e devolve sem erro.
+  // The resolver is not the subject: it accepts whatever comes and returns no error.
   zodResolver: () => (values: unknown) => ({ values, errors: {} }),
 }))
 
@@ -55,10 +55,10 @@ const FIELDS = ['name'] as const
 
 const NameValidator = z.object({ name: z.string() })
 
-/** O quarto argumento dos callbacks; o hook não o lê. */
+/** The callbacks' fourth argument; the hook does not read it. */
 const CONTEXT = fromPartial<MutationFunctionContext>({})
 
-/** A mutation do recurso, reduzida ao que o hook usa dela. */
+/** The resource's mutation, reduced to what the hook uses of it. */
 function mutationStub() {
   const mutate = vi.fn()
   type Options = Omit<
@@ -118,7 +118,7 @@ beforeEach(() => {
 })
 
 describe('useResourceForm', () => {
-  it('espalha as quatro props do FormShell, com o destino escrito uma vez só', () => {
+  it('spreads the four FormShell props, with the destination written once', () => {
     const { result } = setup({ backParams: { id: '7' } })
 
     expect(result.current.shell).toEqual({
@@ -129,7 +129,7 @@ describe('useResourceForm', () => {
     })
   })
 
-  it('limpa o erro de rodapé da tentativa anterior antes de reenviar', () => {
+  it('clears the previous attempt footer error before resending', () => {
     const { result, stub } = setup()
 
     result.current.form.setError('root', { message: 'já existe' })
@@ -139,7 +139,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith({ name: 'Ana' })
   })
 
-  it('manda o payload transformado quando a edição acrescenta o id', () => {
+  it('sends the transformed payload when the edit adds the id', () => {
     const { result, stub } = setup({
       payload: (values: Values) => ({ ...values, id: '7' }),
     })
@@ -149,7 +149,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith({ name: 'Ana', id: '7' })
   })
 
-  it('invalida, avisa e volta, nessa ordem, no sucesso', async () => {
+  it('on success, invalidates, notifies and goes back, in that order', async () => {
     const { result, stub } = setup()
 
     await stub
@@ -172,7 +172,7 @@ describe('useResourceForm', () => {
     expect(result.current.mutation.isPending).toBe(false)
   })
 
-  it('aceita o texto de sucesso fixo, para quem não cita o registro', async () => {
+  it('accepts the fixed success text, for those that do not cite the record', async () => {
     const { stub } = setup({ success: 'Depoimento salvo.' })
 
     await stub
@@ -187,7 +187,7 @@ describe('useResourceForm', () => {
     expect(toast.success).toHaveBeenCalledWith('Depoimento salvo.')
   })
 
-  it('onSuccess próprio substitui a volta para backTo', async () => {
+  it('when a custom onSuccess is given, it replaces the return to backTo', async () => {
     const onSuccess = vi.fn()
     const { stub } = setup({ onSuccess })
 
@@ -210,7 +210,7 @@ describe('useResourceForm', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('oferece "Tentar de novo" reenviando o mesmo payload, quando há id de aviso', () => {
+  it('offers "Tentar de novo" resending the same payload, when there is a notice id', () => {
     const { stub } = setup({ retry: 'testimonial-update-error' })
     const sent = { name: 'Ana' }
 
@@ -223,7 +223,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith(sent)
   })
 
-  it('não oferece reenvio quando o cadastro insere direto', () => {
+  it('does not offer a resend when the create inserts directly', () => {
     const { stub } = setup()
 
     stub

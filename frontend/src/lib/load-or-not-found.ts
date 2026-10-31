@@ -3,13 +3,13 @@ import { notFound } from '@tanstack/react-router'
 import { HTTPError, HTTPStatus } from '#/integrations/tanstack-query/http'
 
 /**
- * Roda a leitura de um `loader` e converte só o 404 em "não encontrado"
- * (`frontend.md` §5). Quem desenha é o `defaultNotFoundComponent` do
- * `router.tsx`.
+ * Runs a `loader`'s read and converts only the 404 into "not found"
+ * (`frontend.md` §5). Whoever draws it is `router.tsx`'s
+ * `defaultNotFoundComponent`.
  *
- * Rede fora, 403 e 500 sobem como estão: um backend indisponível não pode
- * parecer registro apagado, e quem não tem a permissão não errou de endereço,
- * errou de papel - dizer "não existe" esconderia isso.
+ * Network down, 403 and 500 bubble up as they are: an unavailable backend must not
+ * look like a deleted record, and whoever lacks the permission did not get the address wrong,
+ * they got the role wrong - saying "it does not exist" would hide that.
  * _doc-lib/tanstack-router.md#guide/not-found-errors.
  */
 export async function loadOrNotFound<TData>(

@@ -17,26 +17,26 @@ import type { BulkOutcome } from '#/lib/bulk'
 import { m } from '#/paraglide/messages'
 
 type BulkArchiveProps<TItem> = Readonly<{
-  /** As linhas selecionadas na barra de seleção. */
+  /** The rows selected in the selection bar. */
   items: ReadonlyArray<TItem>
-  /** O que arquivar um item. Quase sempre `(item) => archive.mutateAsync(item.id)`. */
+  /** What archiving one item does. Almost always `(item) => archive.mutateAsync(item.id)`. */
   action: (item: TItem) => Promise<unknown>
   /**
-   * O prefixo do recurso no cache - `queryKeys.administrator.users.all`.
+   * The resource's cache prefix - `queryKeys.administrator.users.all`.
    *
-   * A invalidação é **uma**, depois do laço inteiro, e não uma por item: com N
-   * itens o `onSuccess` da mutation dispararia N refetches da mesma listagem,
-   * e o último é o único que conta.
+   * The invalidation happens **once**, after the whole loop, and not once per item: with N
+   * items the mutation's `onSuccess` would fire N refetches of the same listing,
+   * and only the last one counts.
    */
   queryKey: QueryKey
-  /** `ConfirmDialogTitle` e `ConfirmDialogDescription`: o texto é markup. */
+  /** `ConfirmDialogTitle` and `ConfirmDialogDescription`: the text is markup. */
   children: React.ReactNode
 }>
 
 /**
- * O aviso do fim do lote. O relato parcial é o ponto: "7 de 9 arquivados" é
- * acionável, "erro ao arquivar" depois de sete sucessos é mentira. Cada caso é
- * uma mensagem inteira, com a flexão de número dentro dela e não montada aqui.
+ * The notice at the end of the batch. The partial report is the point: "7 de 9 arquivados" is
+ * actionable, "erro ao arquivar" after seven successes is a lie. Each case is
+ * a whole message, with the number inflection inside it and not assembled here.
  */
 function bulkArchiveMessage(outcome: BulkOutcome): string {
   const total = outcome.done + outcome.failed
@@ -54,20 +54,20 @@ function bulkArchiveMessage(outcome: BulkOutcome): string {
 }
 
 /**
- * Arquivar as linhas selecionadas.
+ * Archive the selected rows.
  *
- * A ação em massa é a mesma nas sete listagens do painel - o mesmo gatilho, o
- * mesmo `runBulk`, o mesmo relato parcial, o mesmo rodapé. O que muda é o
- * recurso e as duas frases, e por isso o recurso vem por prop e as frases por
+ * The bulk action is the same on the dashboard's seven listings - the same trigger, the
+ * same `runBulk`, the same partial report, the same footer. What changes is the
+ * resource and the two sentences, so the resource comes by prop and the sentences by
  * slot.
  *
- * Não há contexto aqui: título e descrição não leem estado nenhum, são o
- * cabeçalho do `ConfirmDialog` de baixo escrito pela tela. Provider sem estado
- * a compartilhar é sobrecarga, e a própria `compound-pattern` diz isso.
+ * There is no context here: title and description read no state at all, they are the
+ * header of the `ConfirmDialog` below, written by the screen. A stateless provider
+ * with nothing to share is overhead, and `compound-pattern` itself says so.
  *
- * Remoção em massa não existe de propósito: arquivar e restaurar é do editor,
- * apagar de vez é só do administrador e só alcança o que já está arquivado.
- * Daqui só se arquiva, e o que foi para a lixeira volta pela linha.
+ * Bulk removal does not exist on purpose: archiving and restoring belongs to the editor,
+ * deleting for good belongs only to the administrator and only reaches what is already archived.
+ * From here we only archive, and what went to the trash comes back through the row.
  */
 export function BulkArchive<TItem>({
   items,
@@ -80,9 +80,9 @@ export function BulkArchive<TItem>({
   async function confirm(): Promise<void> {
     const outcome = await runBulk(items, action)
 
-    // O aviso primeiro: `invalidateQueries` só resolve quando o refetch
-    // volta, e esperá-lo aqui atrasaria o "7 de 9 arquivados" por uma ida
-    // ao servidor que ninguém está olhando.
+    // The notice first: `invalidateQueries` only resolves when the refetch
+    // comes back, and waiting for it here would delay the "7 de 9 arquivados" by a trip
+    // to the server that nobody is watching.
     toast.success(bulkArchiveMessage(outcome), { id: 'bulk-archive' })
 
     await queryClient.invalidateQueries({ queryKey })

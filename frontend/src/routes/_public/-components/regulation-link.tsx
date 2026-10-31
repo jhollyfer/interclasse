@@ -7,8 +7,8 @@ import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
- * O "Baixar regulamento", onde quer que apareça: no topo da home, no "Sobre" e
- * no rodapé. Some enquanto a organização não enviar o PDF.
+ * The "Baixar regulamento", wherever it appears: at the top of the home, in "Sobre" and
+ * in the footer. It disappears until the organization uploads the PDF.
  */
 export function RegulationLink({
   className,

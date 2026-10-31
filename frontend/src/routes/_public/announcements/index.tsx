@@ -8,7 +8,7 @@ import { m } from '#/paraglide/messages'
 import { validateSearch } from './-search'
 import { ListSkeleton } from '../-components/list-skeleton'
 
-export const Route = createFileRoute('/_public/avisos/')({
+export const Route = createFileRoute('/_public/announcements/')({
   validateSearch,
   search: { middlewares: [stripSearchParams(LIST_SEARCH_DEFAULTS)] },
   pendingComponent: () => <ListSkeleton />,
@@ -21,6 +21,6 @@ export const Route = createFileRoute('/_public/avisos/')({
     pageHead({
       title: m.public_nav_announcements(),
       description: m.public_announcements_head_description(),
-      pathname: '/avisos',
+      pathname: '/announcements',
     }),
 })

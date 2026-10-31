@@ -7,33 +7,33 @@ import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import type { HTTPError } from '../http'
 import { send } from '../http'
 
-/** O arquivo e o sinal que cancela o envio: quem sabe quando cancelar é a tela. */
+/** The file and the signal that cancels the upload: the screen knows when to cancel. */
 export type StorageCreateVariables = {
   readonly file: File
   readonly signal: AbortSignal
 }
 
 /**
- * Envia um arquivo e devolve o registro com a `url` derivada.
+ * Uploads a file and returns the record with the derived `url`.
  *
- * O envio inteiro é do `useMultipartUpload`: o binário não passa pela API, e o
- * que acontece aqui dentro são três chamadas - abrir, subir direto ao bucket,
- * confirmar. Esta mutation existe por cima dele para dar o `isPending` e os
- * callbacks a quem só quer "subiu ou não", que é o caso do campo de imagem
- * única. Quem precisa da barra de progresso e do cancelamento usa o hook
- * direto, porque `useMutation` não tem por onde entregar progresso.
+ * The whole upload belongs to `useMultipartUpload`: the binary does not go through the API, and
+ * what happens in here is three calls - open, upload straight to the bucket,
+ * confirm. This mutation exists on top of it to give `isPending` and the
+ * callbacks to whoever only wants "uploaded or not", which is the single image field's
+ * case. Whoever needs the progress bar and cancellation uses the hook
+ * directly, because `useMutation` has no way to deliver progress.
  *
- * O `AbortSignal` vem de quem chama (`useAbortOnUnmount`): o hook de mutation é
- * fino (`frontend.md` §2.3) e não guarda controller. Sair da tela no meio do
- * envio aborta as partes em vez de deixá-las subir até o fim.
+ * The `AbortSignal` comes from the caller (`useAbortOnUnmount`): the mutation hook is
+ * thin (`frontend.md` §2.3) and holds no controller. Leaving the screen mid-upload
+ * aborts the parts instead of letting them upload to the end.
  *
- * O erro é `Error` e não `HTTPError`: o hook recusa localmente o tipo de
- * arquivo antes de gastar requisição, e essa recusa não tem status HTTP.
+ * The error is `Error` and not `HTTPError`: the hook locally refuses the file type
+ * before spending a request, and that refusal has no HTTP status.
  *
- * O arquivo nasce **sem dono**: quem anexa é que guarda a referência, passando
- * o `id` devolvido aqui em `avatarId`, `coverId` ou equivalente da entidade que
- * recebe o anexo. Por isso a mutation não invalida nada - não há listagem de
- * anexos para atualizar.
+ * The file is born **without an owner**: whoever attaches it keeps the reference, passing
+ * the `id` returned here in `avatarId`, `coverId` or the equivalent of the entity that
+ * receives the attachment. That is why the mutation invalidates nothing - there is no
+ * attachment listing to update.
  */
 export function useStorageCreateMutation(
   options?: MutationProps<
@@ -53,15 +53,15 @@ export function useStorageCreateMutation(
 }
 
 /**
- * Apaga um arquivo órfão: o binário e a linha em `storages`.
+ * Deletes an orphan file: the binary and the row in `storages`.
  *
- * É o par do `useStorageCreateMutation`, e fecha o buraco que ele abre: o upload
- * acontece na hora da escolha, **antes** de o formulário ser salvo, então todo
- * anexo trocado ou removido da tela ficava em disco para sempre.
+ * It is the pair of `useStorageCreateMutation`, and closes the hole it opens: the upload
+ * happens when the file is chosen, **before** the form is saved, so every
+ * attachment replaced or removed on screen stayed on disk forever.
  *
- * O backend recusa com `409 STORAGE_IN_USE` o arquivo que alguém referencia,
- * então chamar esta mutation sobre um anexo já salvo é seguro: a resposta é um
- * erro, não uma imagem furada em outro cadastro.
+ * The backend refuses with `409 STORAGE_IN_USE` a file that someone references,
+ * so calling this mutation on an already saved attachment is safe: the response is an
+ * error, not a broken image in another record.
  */
 export function useStorageDeleteMutation(
   options?: MutationProps<void, string>,

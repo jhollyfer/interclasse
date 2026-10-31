@@ -5,11 +5,11 @@ import type * as React from 'react'
 import { m } from '#/paraglide/messages'
 
 /**
- * Anterior e próxima, para as listas do site. Sem número de página clicável:
- * ninguém pula para a página 7 de avisos.
+ * Previous and next, for the site's lists. No clickable page number:
+ * nobody jumps to page 7 of announcements.
  *
- * `to="."` com `search` em função: mantém os filtros da URL e troca só a
- * página, sem precisar saber em que rota está.
+ * `to="."` with `search` as a function: keeps the URL's filters and swaps only the
+ * page, without needing to know which route it is on.
  */
 export function Pager({
   meta,

@@ -9,25 +9,25 @@ import {
 import { m } from '#/paraglide/messages'
 
 /**
- * Leva o erro da API para os campos do formulário.
+ * Carries the API error to the form fields.
  *
- * O 422 do backend traz `errors` com **uma** mensagem por campo - o handler
- * guarda a primeira, não a lista -, e o 409 traz o campo em conflito do mesmo
- * jeito (`{ email: 'Usuário já existe' }`). Sem isto, o formulário aceita o
- * payload, a API o recusa e a tela não mostra onde - o erro fica só no
- * `error.message` de um toast que some em 4 segundos.
+ * The backend's 422 brings `errors` with **one** message per field - the handler
+ * keeps the first, not the list -, and the 409 brings the conflicting field the same
+ * way (`{ email: 'Usuário já existe' }`). Without this, the form accepts the
+ * payload, the API refuses it and the screen does not show where - the error stays only in the
+ * `error.message` of a toast that vanishes in 4 seconds.
  *
- * `root` é o canal do backend para "a mensagem é do formulário, não de um
- * campo": é o que o 401 do sign-in usa para não revelar se falhou o email ou a
- * senha.
+ * `root` is the backend's channel for "the message belongs to the form, not to a
+ * field": it is what the sign-in 401 uses so as not to reveal whether the email or the
+ * password failed.
  *
- * Chave que o formulário não conhece - o backend ganhou um campo, ou o nome
- * mudou - não some em silêncio: vira mensagem de `root`. É a diferença entre
- * "o formulário não valida mais" e "ninguém percebeu por três semanas".
+ * A key the form does not know - the backend gained a field, or the name
+ * changed - does not vanish silently: it becomes a `root` message. It is the difference between
+ * "the form no longer validates" and "nobody noticed for three weeks".
  *
- * Devolve `true` quando algo foi marcado na tela. `false` significa erro sem
- * campo atribuível (5xx, rede), e aí a decisão é de quem chamou: normalmente um
- * toast com ação de tentar de novo.
+ * Returns `true` when something was marked on screen. `false` means an error with no
+ * assignable field (5xx, network), and then the decision is the caller's: usually a
+ * toast with a retry action.
  */
 export function applyHTTPErrorToForm<TValues extends FieldValues>({
   form,
@@ -43,8 +43,8 @@ export function applyHTTPErrorToForm<TValues extends FieldValues>({
   const orphans: Array<string> = []
 
   for (const [field, message] of Object.entries(rest)) {
-    // `find` e não `includes`: a chave vem do backend como `string` larga, e o
-    // predicado prova o estreitamento em vez de afirmá-lo com uma asserção.
+    // `find` and not `includes`: the key comes from the backend as a wide `string`, and the
+    // predicate proves the narrowing instead of asserting it.
     const known = fields.find((candidate) => candidate === field)
 
     if (known) {
@@ -63,27 +63,27 @@ export function applyHTTPErrorToForm<TValues extends FieldValues>({
 }
 
 /**
- * O `onError` de um formulário, inteiro.
+ * A form's whole `onError`.
  *
- * É o que cada `form-create.tsx` e `form-edit.tsx` do painel escreveria à mão,
- * sempre na mesma ordem: tenta marcar os campos, e o que não couber em campo
- * nenhum vira mensagem de rodapé.
+ * It is what every dashboard `form-create.tsx` and `form-edit.tsx` would write by hand,
+ * always in the same order: try to mark the fields, and whatever does not fit in any field
+ * becomes a footer message.
  *
- * `retry` é a única variação real: um aviso com "Tentar de novo" que reenvia o
- * mesmo payload, porque erro de servidor não é culpa de quem preencheu e
- * redigitar um formulário longo por causa de um 500 é castigo. Ausente, o 5xx
- * cai no rodapé como qualquer outro.
+ * `retry` is the only real variation: a notice with "Tentar de novo" that resends the
+ * same payload, because a server error is not the fault of whoever filled it in and
+ * retyping a long form because of a 500 is punishment. When absent, the 5xx
+ * falls to the footer like any other.
  *
- * **Quando passar `retry`, e é regra, não gosto:**
+ * **When to pass `retry`, and it is a rule, not a taste:**
  *
- * - **Edição sempre pode.** O `PUT` leva o id e escreve o mesmo estado final;
- *   reenviar não cria nada.
- * - **Criação só quando o use-case recusa a duplicata com 409.** O 5xx pode
- *   ter vindo *depois* da escrita, e aí o reenvio grava o registro de novo. Os
- *   que checam antes de inserir devolvem `*_ALREADY_EXISTS` e são seguros -
- *   notícia e evento pelo `slug`, usuário pelo e-mail. Depoimento, podcast,
- *   vídeo e álbum inserem direto e ficam **sem** `retry` por isso: dois
- *   depoimentos iguais são um depoimento duplicado, não um conflito.
+ * - **Editing always can.** The `PUT` carries the id and writes the same final state;
+ *   resending creates nothing.
+ * - **Creating only when the use-case refuses the duplicate with 409.** The 5xx may
+ *   have come *after* the write, and then the resend saves the record again. The ones
+ *   that check before inserting return `*_ALREADY_EXISTS` and are safe -
+ *   news and events by `slug`, users by e-mail. Testimonial, podcast,
+ *   video and album insert directly and are left **without** `retry` for that reason: two
+ *   equal testimonials are a duplicated testimonial, not a conflict.
  */
 export function applyMutationError<TValues extends FieldValues>({
   form,
@@ -95,7 +95,7 @@ export function applyMutationError<TValues extends FieldValues>({
   error: HTTPError
   fields: ReadonlyArray<FieldPath<TValues>>
   retry?: {
-    /** O id do aviso, para o sonner não empilhar um por tentativa. */
+    /** The notice id, so sonner does not stack one per attempt. */
     id: string
     onClick: () => void
   }
@@ -111,11 +111,11 @@ export function applyMutationError<TValues extends FieldValues>({
 }
 
 /**
- * O texto que a tela mostra para um erro da API, escolhido pelo `code`.
+ * The text the screen shows for an API error, chosen by `code`.
  *
- * O `message` de um 4xx é escrito pelo backend para quem lê a tela ("Turma
- * já existe") e passa como veio. O de um 5xx é do servidor para o log: a tela
- * mostra o texto daqui, sem detalhe de implementação.
+ * A 4xx's `message` is written by the backend for whoever reads the screen ("Turma
+ * já existe") and passes through as it came. A 5xx's is from the server to the log: the screen
+ * shows the text from here, with no implementation detail.
  */
 const HTTP_ERROR_MESSAGES: Record<string, (() => string) | undefined> = {
   [HTTPErrorCode.NETWORK_ERROR]: () => m.common_error_network(),
@@ -123,8 +123,8 @@ const HTTP_ERROR_MESSAGES: Record<string, (() => string) | undefined> = {
 }
 
 export function httpErrorMessage(error: Error): string {
-  // Erro que não veio de `request` (o upload recusando o tipo do arquivo, por
-  // exemplo) já traz o texto da tela.
+  // An error that did not come from `request` (the upload refusing the file type, for
+  // example) already carries the screen's text.
   if (!(error instanceof HTTPError)) return error.message
 
   const known = HTTP_ERROR_MESSAGES[error.code]
@@ -135,9 +135,9 @@ export function httpErrorMessage(error: Error): string {
 }
 
 /**
- * Se reenviar o mesmo pedido pode dar certo: conflito (409), servidor ou
- * rede. Um 422 de validação ou um 403 de autorização voltam iguais, e o botão
- * de "Tentar de novo" só confundiria quem clica (`frontend.md` §4).
+ * Whether resending the same request can work: conflict (409), server or
+ * network. A validation 422 or an authorization 403 come back the same, and the
+ * "Tentar de novo" button would only confuse whoever clicks (`frontend.md` §4).
  */
 export function isRetrySafe(error: Error): boolean {
   if (!(error instanceof HTTPError)) return false
@@ -146,11 +146,11 @@ export function isRetrySafe(error: Error): boolean {
 }
 
 /**
- * O aviso de erro de uma ação fora de formulário, para todo `onError` de
- * mutation que não cai num campo (remover, arquivar, salvar
- * inscrições). `id` fixo para tentativas seguidas substituírem o aviso em vez
- * de empilharem; `retry` vira a ação "Tentar de novo" só quando o erro é
- * retry-seguro.
+ * The error notice of an action outside a form, for every mutation `onError`
+ * that does not land on a field (remove, archive, save
+ * enrollments). A fixed `id` so consecutive attempts replace the notice instead of
+ * stacking; `retry` becomes the "Tentar de novo" action only when the error is
+ * retry-safe.
  */
 export function notifyError(
   error: Error,

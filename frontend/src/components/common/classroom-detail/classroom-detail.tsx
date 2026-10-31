@@ -67,21 +67,21 @@ import type { PendingRemoval } from './removal-reason-dialog'
 
 type ClassroomDetailProps = Readonly<{
   classroomId: string
-  /** Para onde o "voltar" leva. Ausente no conselheiro, que só tem esta turma. */
+  /** Where "back" leads. Absent for the advisor, who only has this classroom. */
   back?: LinkProps['to']
-  /** Ações do cabeçalho - o "Editar turma" do administrador. */
+  /** Header actions - the administrator's "Editar turma". */
   actions?: React.ReactNode
 }>
 
 /**
- * A turma inteira numa tela: quem aconselha e representa, os totais, quem
- * joga o quê, os alunos, os cartões e os jogos.
+ * The whole classroom on one screen: who advises and represents, the totals, who
+ * plays what, the students, the cards and the matches.
  *
- * A mesma tela no painel do administrador e no do conselheiro: os dois leem a
- * mesma turma, e o servidor recorta o que cada um pode ver.
+ * The same screen on the administrator's and the advisor's dashboard: both read the
+ * same classroom, and the server trims what each may see.
  *
- * Abas e não rotas: todas leem a mesma turma, e quem cadastra um aluno quase
- * sempre vai inscrevê-lo logo em seguida.
+ * Tabs and not routes: all read the same classroom, and whoever registers a student almost
+ * always goes on to enroll them right after.
  */
 export function ClassroomDetail({
   classroomId,
@@ -145,7 +145,7 @@ export function ClassroomDetail({
                 (save.isPending && save.variables.sportId) || undefined
               }
               onSave={(sportId, studentIds, removed) => {
-                // Tirar atleta pede o motivo antes de gravar.
+                // Removing an athlete asks for the reason before saving.
                 if (removed.length > 0) {
                   const sportName =
                     board.sports.find((sport) => sport.id === sportId)?.name ??
@@ -182,7 +182,7 @@ export function ClassroomDetail({
   )
 }
 
-/** Aluno novo, renomeado ou removido muda a matriz de inscrições também. */
+/** A new, renamed or removed student changes the enrollment matrix too. */
 const STUDENT_CHANGE = [
   queryKeys.advisor.students.all,
   queryKeys.advisor.enrollments.all,
@@ -190,10 +190,10 @@ const STUDENT_CHANGE = [
 
 const STUDENT_FIELDS = ['name'] as const
 
-/** O rótulo do campo de nome: só para leitor de tela, a linha já diz o que é. */
+/** The name field's label: for the screen reader only, the row already says what it is. */
 const NAME_LABEL = <span className="sr-only">{m.common_student_name()}</span>
 
-/** O cadastro de alunos: um campo para adicionar, e editar e tirar por linha. */
+/** The student registry: one field to add, and edit and remove per row. */
 function Students({
   classroomId,
 }: Readonly<{ classroomId: string }>): React.JSX.Element {
@@ -283,14 +283,14 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
     fields: STUDENT_FIELDS,
     mutation: useStudentUpdateMutation,
     invalidate: STUDENT_CHANGE,
-    // Renomear é escrita idempotente: reenviar grava o mesmo nome.
+    // Renaming is an idempotent write: resending saves the same name.
     retry: 'student-update',
     payload: (values) => ({ ...values, id: student.id }),
     onSuccess: () => setEditing(false),
   })
   const remove = useStudentDeleteMutation({
     onSuccess: onChange,
-    // Aluno inscrito numa modalidade já sorteada: `409 STUDENT_IN_COMPETITION`.
+    // A student enrolled in an already drawn sport: `409 STUDENT_IN_COMPETITION`.
     onError: (error) => notifyError(error, { id: 'student-delete' }),
   })
 
@@ -309,7 +309,7 @@ function StudentRow({ student, onChange }: StudentRowProps): React.JSX.Element {
             label={NAME_LABEL}
           >
             {({ field, control }) => (
-              // eslint-disable-next-line jsx-a11y/no-autofocus -- o campo nasce de um clique em Editar: o foco vai para onde a pessoa acabou de pedir
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- the field is born from a click on Editar: focus goes where the person just asked
               <Input {...field} {...control} autoFocus maxLength={120} />
             )}
           </AppField>

@@ -2,8 +2,8 @@ import type { Merge } from '@interclasse/shared'
 import type * as React from 'react'
 
 /**
- * A posição decide o carregamento (`frontend.md` §9.6): imagem de LCP nunca é
- * `lazy`, e abaixo da dobra é sempre. Lookup, e não condição na tela.
+ * The position decides the loading (`frontend.md` §9.6): an LCP image is never
+ * `lazy`, and below the fold it always is. A lookup, and not a condition on the screen.
  */
 const IMAGE_LOADING = {
   lcp: { loading: 'eager', fetchPriority: 'high' },
@@ -20,20 +20,20 @@ type PictureProps = Readonly<
     >,
     {
       src: string
-      /** Vazio só para imagem decorativa; a que informa leva texto (§10.4). */
+      /** Empty only for a decorative image; one that informs carries text (§10.4). */
       alt: string
-      /** A dimensão intrínseca, que reserva o espaço e evita salto de layout. */
+      /** The intrinsic dimension, which reserves the space and avoids layout shift. */
       width: number
       height: number
-      /** `lcp` é a de maior área acima da dobra; `fold`, o que fica abaixo. */
+      /** `lcp` is the largest area above the fold; `fold`, what stays below. */
       placement: PicturePlacement
     }
   >
 >
 
 /**
- * A `<img>` da casa: toda imagem tem `width`/`height` e `alt`, e a posição
- * escolhe `loading` e `fetchPriority`. Nenhuma tela escreve `<img>` crua.
+ * The house `<img>`: every image has `width`/`height` and `alt`, and the position
+ * chooses `loading` and `fetchPriority`. No screen writes a raw `<img>`.
  * _doc-lib/vitejs.md#assets.
  */
 export function Picture({

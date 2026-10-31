@@ -15,7 +15,7 @@ import { m } from '#/paraglide/messages'
 
 import { useFormShellContext } from './form-shell-context'
 
-/** O cabeçalho que não rola: voltar, título e ações. */
+/** The header that does not scroll: back, title and actions. */
 export function FormShellHeader({
   children,
 }: Readonly<{
@@ -23,8 +23,8 @@ export function FormShellHeader({
 }>): React.JSX.Element {
   return (
     <PageShellHeader>
-      {/* Mesma largura e mesmo centro do formulário: o "Salvar" fica sobre o
-          campo, e não a 1000px dele numa tela larga. */}
+      {/* Same width and same center as the form: "Salvar" sits over the
+          field, and not 1000px away from it on a wide screen. */}
       <PageHeader data-slot="form-shell-header" className="mx-auto max-w-3xl">
         {children}
       </PageHeader>
@@ -32,7 +32,7 @@ export function FormShellHeader({
   )
 }
 
-/** A seta de voltar. O destino vem do contexto, não de prop. */
+/** The back arrow. The destination comes from the context, not from a prop. */
 export function FormShellBack(): React.JSX.Element {
   const { backTo, backParams } = useFormShellContext('FormShellBack')
 
@@ -52,8 +52,8 @@ export function FormShellTitle(
 }
 
 /**
- * As ações da direita. Em geral `FormShellDiscard` + `FormShellSubmit`, mas a
- * tela que precisar de mais um botão escreve o botão aqui dentro.
+ * The actions on the right. Usually `FormShellDiscard` + `FormShellSubmit`, but a
+ * screen that needs one more button writes the button in here.
  */
 export function FormShellActions(
   props: React.ComponentProps<typeof PageHeaderActions>,
@@ -62,12 +62,12 @@ export function FormShellActions(
 }
 
 /**
- * A saída sem salvar.
+ * The exit without saving.
  *
- * `Link` e não `onClick` com `navigate()`: descartar é navegação, e como link
- * ele responde a abrir em nova aba, ao clique do meio e ao menu de contexto.
+ * `Link` and not `onClick` with `navigate()`: discarding is navigation, and as a link
+ * it responds to open in a new tab, to middle click and to the context menu.
  *
- * Sem children escreve "Descartar", que é o que todo formulário do painel diz.
+ * Without children it writes "Descartar", which is what every dashboard form says.
  */
 export function FormShellDiscard({
   children = m.common_discard(),
@@ -90,8 +90,8 @@ export function FormShellDiscard({
   )
 }
 
-// O `children` do `SubmitButton` é obrigatório; aqui ele é opcional, e o
-// `Merge` substitui a chave em vez de intersectar.
+// `SubmitButton`'s `children` is required; here it is optional, and
+// `Merge` replaces the key instead of intersecting.
 type FormShellSubmitProps = Readonly<
   Merge<
     Omit<React.ComponentProps<typeof SubmitButton>, 'children'>,
@@ -100,11 +100,11 @@ type FormShellSubmitProps = Readonly<
 >
 
 /**
- * O botão que salva.
+ * The button that saves.
  *
- * O `form` e o `isPending` vêm do contexto: quem os declara é a tela, no
- * `FormShell`, e repeti-los aqui daria duas fontes de verdade para a mesma
- * decisão. Sem children escreve "Salvar".
+ * `form` and `isPending` come from the context: the screen declares them, in
+ * `FormShell`, and repeating them here would give two sources of truth for the same
+ * decision. Without children it writes "Salvar".
  */
 export function FormShellSubmit({
   children = m.common_save(),

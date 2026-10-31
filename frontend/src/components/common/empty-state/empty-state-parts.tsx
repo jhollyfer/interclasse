@@ -10,13 +10,13 @@ import { m } from '#/paraglide/messages'
 
 import { useEmptyStateContext } from './empty-state-context'
 
-/** O título que o componente escreve quando o motivo não é o vazio de verdade. */
+/** The title the component writes when the reason is not a true empty list. */
 const OWN_TITLES = {
   filtered: () => m.table_empty_filtered_title(),
   trash: () => m.table_empty_trash_title(),
 }
 
-/** O título do vazio. O filtro e a lixeira têm o seu e ignoram o da tela. */
+/** The empty title. Filter and trash have their own and ignore the screen's. */
 export function EmptyStateTitle({
   children,
   ...props
@@ -32,11 +32,11 @@ export function EmptyStateTitle({
 }
 
 /**
- * A descrição do vazio.
+ * The empty description.
  *
- * A lixeira mantém a da tela - ela explica o recurso, e isso vale igual com a
- * lixeira vazia. Só o filtro troca, porque ali o texto tem de dizer o que fazer
- * a seguir.
+ * The trash keeps the screen's - it explains the resource, and that holds the same with
+ * an empty trash. Only the filter swaps, because there the text must say what to do
+ * next.
  */
 export function EmptyStateDescription({
   children,
@@ -53,10 +53,10 @@ export function EmptyStateDescription({
 }
 
 /**
- * A ação oferecida na lista vazia - em geral o botão de criar.
+ * The action offered in the empty list - usually the create button.
  *
- * Só no vazio de verdade: mandar cadastrar quem está olhando a lixeira ou um
- * filtro sem resultado é oferecer a saída errada.
+ * Only on a true empty: telling someone looking at the trash or at a filter with no
+ * results to register something is offering the wrong exit.
  */
 export function EmptyStateActions({
   className,

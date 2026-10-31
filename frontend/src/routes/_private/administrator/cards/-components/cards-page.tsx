@@ -18,8 +18,8 @@ import { m } from '#/paraglide/messages'
 import { ADMINISTRATOR_CARDS } from '../index'
 
 /**
- * Os cartões de todo o campeonato. Lança-se pela partida (na chave ou na lista
- * de partidas); aqui se consulta e se apaga o lançado por engano.
+ * The whole championship's cards. They are recorded through the match (in the bracket or in the
+ * match list); here one consults and deletes what was recorded by mistake.
  */
 export function CardsPage(): React.JSX.Element {
   const invalidate = useInvalidate()

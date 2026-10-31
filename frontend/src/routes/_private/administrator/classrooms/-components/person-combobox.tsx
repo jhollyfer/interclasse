@@ -8,7 +8,7 @@ import { userQueryOptions } from '#/integrations/tanstack-query/queries/administ
 import { m } from '#/paraglide/messages'
 
 type PersonComboboxProps = Readonly<{
-  /** O papel das contas oferecidas. */
+  /** The role of the accounts offered. */
   role: UserRole
   id: string
   'aria-invalid': boolean
@@ -18,10 +18,10 @@ type PersonComboboxProps = Readonly<{
 }>
 
 /**
- * As contas de um papel como opções, com busca no servidor (`frontend.md`
- * §2.1): 20 por página, "Carregar mais" no fim e o termo digitado filtrando na
- * API. A conta já escolhida entra na lista mesmo fora da página carregada, lida
- * pelo detalhe, para o campo não esvaziar ao buscar outra.
+ * The accounts of a role as options, with server search (`frontend.md`
+ * §2.1): 20 per page, "Carregar mais" at the end and the typed term filtering on
+ * the API. The already chosen account enters the list even outside the loaded page, read
+ * through the detail, so the field does not empty when searching for another.
  */
 export function PersonCombobox({
   role,

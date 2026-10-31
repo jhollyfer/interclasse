@@ -48,12 +48,12 @@ type DrawDialogProps = Readonly<
 >
 
 /**
- * O sorteio. Escolhe modalidade e categoria; o resto - quem entra, os confrontos,
- * as partidas - o servidor decide com o que as turmas inscreveram.
+ * The draw. Chooses sport and category; the rest - who enters, the fixtures,
+ * the matches - the server decides from what the classrooms enrolled.
  *
- * Uncontrolled e trigger-forward (`frontend.md` §6.2): quem chama passa o botão
- * visível em `render`. O formulário só monta aberto e fecha pelo `handle` ao
- * sortear.
+ * Uncontrolled and trigger-forward (`frontend.md` §6.2): the caller passes the visible
+ * button in `render`. The form only mounts open and closes through the `handle` on
+ * draw.
  */
 export function DrawDialog({
   ref,
@@ -131,8 +131,8 @@ function DrawForm({
         {({ field, control }) => (
           <OptionCombobox
             {...control}
-            // A categoria nasce ausente: `String(undefined)` não casa com
-            // opção nenhuma, e o campo mostra o "Selecione".
+            // The category is born absent: `String(undefined)` matches no
+            // option, and the field shows the "Selecione".
             value={String(field.value)}
             onValueChange={(value) =>
               field.onChange(CATEGORIES.find((category) => category === value))
@@ -160,8 +160,8 @@ function DrawForm({
 }
 
 /**
- * Quem entraria no sorteio agora. Sem ela, a turma abaixo do mínimo ficava de
- * fora sem aviso, e "não há turmas suficientes" parecia defeito do sorteio.
+ * Who would enter the draw right now. Without it, a classroom below the minimum was left
+ * out without notice, and "não há turmas suficientes" looked like a draw defect.
  */
 function DrawPreview({
   sportId,

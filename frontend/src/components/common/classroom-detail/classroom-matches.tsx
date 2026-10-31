@@ -7,8 +7,8 @@ import { storefrontMatchesQueryOptions } from '#/integrations/tanstack-query/que
 import { m } from '#/paraglide/messages'
 
 /**
- * Os jogos da turma, marcados e já jogados, na ordem da agenda. Da rota do
- * site: a tabela de jogos é pública, e a mesma consulta serve aos dois papéis.
+ * The classroom's matches, scheduled and already played, in schedule order. From the
+ * site's route: the match table is public, and the same query serves both roles.
  */
 export function ClassroomMatches({
   classroomId,

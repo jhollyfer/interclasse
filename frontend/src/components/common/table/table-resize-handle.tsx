@@ -6,14 +6,14 @@ import { cn } from '#/lib/cn'
 import type { TableFeatures } from './use-table'
 
 /**
- * A alça de redimensionar, na borda direita do cabeçalho.
+ * The resize handle, on the header's right edge.
  *
- * `touch-none` e `select-none` não são estética: sem o primeiro, arrastar no
- * celular rola a página em vez de mover a alça; sem o segundo, o arrasto
- * seleciona o texto do cabeçalho ao lado.
+ * `touch-none` and `select-none` are not aesthetics: without the first, dragging on a
+ * phone scrolls the page instead of moving the handle; without the second, dragging
+ * selects the neighboring header's text.
  *
- * Duplo clique devolve a coluna ao tamanho declarado - é a saída de quem
- * arrastou demais e não sabe mais qual era a largura original.
+ * A double click returns the column to its declared size - it is the way out for whoever
+ * dragged too far and no longer knows what the original width was.
  */
 export function TableResizeHandle<TRow extends RowData>({
   header,
@@ -23,7 +23,7 @@ export function TableResizeHandle<TRow extends RowData>({
   const isResizing = header.column.getIsResizing()
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- redimensionar é ajuste de mouse e toque; a largura tem padrão por coluna
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- resizing is a mouse and touch adjustment; the width has a default per column
     <div
       data-slot="table-resize-handle"
       data-test-id={`resize-${header.column.id}`}

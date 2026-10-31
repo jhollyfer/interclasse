@@ -22,7 +22,7 @@ const PHOTO = fromPartial<AdministratorPhotoShowResponse>({
 })
 
 describe('PhotoGrid', () => {
-  it('carregando mostra o esqueleto, e não a lista nem o vazio', () => {
+  it('when loading, shows the skeleton and not the list or the empty state', () => {
     const { container } = render(
       <PhotoGrid
         photos={[]}
@@ -36,7 +36,7 @@ describe('PhotoGrid', () => {
     expect(screen.queryByText('Sem fotos')).toBeNull()
   })
 
-  it('sem foto diz o motivo do vazio', () => {
+  it('when there is no photo, says the reason for the empty state', () => {
     render(
       <PhotoGrid
         photos={[]}
@@ -49,7 +49,7 @@ describe('PhotoGrid', () => {
     expect(screen.getByText('Sem fotos')).toBeTruthy()
   })
 
-  it('cada foto leva legenda, situação, imagem com alt e as ações', () => {
+  it('gives each photo a caption, status, image with alt and the actions', () => {
     render(
       <PhotoGrid
         photos={[PHOTO]}
@@ -64,7 +64,7 @@ describe('PhotoGrid', () => {
     expect(screen.getByRole('button', { name: 'Aprovar p1' })).toBeTruthy()
   })
 
-  it('sem legenda o alt é o padrão da casa', () => {
+  it('when there is no caption, the alt is the house default', () => {
     render(
       <PhotoGrid
         photos={[{ ...PHOTO, caption: null }]}
@@ -79,7 +79,7 @@ describe('PhotoGrid', () => {
     ).toBeTruthy()
   })
 
-  it('o autor só aparece quando a tela pede', () => {
+  it('shows the author only when the screen asks for it', () => {
     const { unmount } = render(
       <PhotoGrid
         photos={[PHOTO]}

@@ -82,7 +82,7 @@ function bracket(
 }
 
 describe('BracketTree', () => {
-  it('desenha uma coluna por fase mais a da campeã', () => {
+  it('draws one column per round plus the champion column', () => {
     render(<BracketTree bracket={bracket([SEMI_A, SEMI_B, FINAL])} />)
 
     expect(screen.getAllByRole('heading', { level: 3 }).length).toBe(3)
@@ -91,7 +91,7 @@ describe('BracketTree', () => {
     ).toBeTruthy()
   })
 
-  it('numera os jogos em ordem de fase e posição', () => {
+  it('numbers the games in round and position order', () => {
     render(<BracketTree bracket={bracket([FINAL, SEMI_B, SEMI_A])} />)
 
     expect(
@@ -102,14 +102,14 @@ describe('BracketTree', () => {
     ).toBeTruthy()
   })
 
-  it('quem venceu leva o avançou e quem perdeu fica fora', () => {
+  it('when a team wins, it gets the check mark and the loser is struck out', () => {
     render(<BracketTree bracket={bracket([SEMI_A, SEMI_B, FINAL])} />)
 
     expect(screen.getAllByText(m.common_bracket_advanced()).length).toBe(1)
     expect(screen.getAllByText(m.common_bracket_out()).length).toBe(1)
   })
 
-  it('a vaga vazia diz de qual jogo sai o time', () => {
+  it('when a slot is empty, says which game its team comes from', () => {
     render(<BracketTree bracket={bracket([SEMI_A, SEMI_B, FINAL])} />)
 
     expect(
@@ -117,7 +117,7 @@ describe('BracketTree', () => {
     ).toBeTruthy()
   })
 
-  it('sem campeã a coluna final diz a definir; com campeã, o nome', () => {
+  it('when there is no champion, the final column says to be defined; with one, the name', () => {
     const { unmount } = render(
       <BracketTree bracket={bracket([SEMI_A, SEMI_B, FINAL])} />,
     )
@@ -138,7 +138,7 @@ describe('BracketTree', () => {
     expect(within(won).getByText('6A')).toBeTruthy()
   })
 
-  it('renderActions entra embaixo de cada partida', () => {
+  it('renders renderActions under each match', () => {
     render(
       <BracketTree
         bracket={bracket([SEMI_A, SEMI_B, FINAL])}
@@ -150,7 +150,7 @@ describe('BracketTree', () => {
     expect(screen.getByText('ação f')).toBeTruthy()
   })
 
-  it('vaga sem partida é folga e mostra quem subiu', () => {
+  it('when a slot has no match, it is a bye and shows who advanced', () => {
     render(<BracketTree bracket={bracket([SEMI_A, FINAL])} />)
 
     expect(

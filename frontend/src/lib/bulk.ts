@@ -1,20 +1,20 @@
-/** O resultado de uma ação em massa: quantos passaram e quantos não. */
+/** The result of a bulk action: how many passed and how many did not. */
 export type BulkOutcome = {
   done: number
   failed: number
 }
 
 /**
- * Roda uma ação sobre vários itens e conta o que passou.
+ * Runs an action over several items and counts what passed.
  *
- * **Um laço sobre os endpoints por id, e não um endpoint em massa.** A API não
- * tem `bulk-archive` nem `bulk-delete`, e inventar um só para a barra de seleção
- * seria escrever contrato novo para um botão. O custo é N requisições, com N
- * limitado pelo `perPage` - no máximo 100.
+ * **A loop over the by-id endpoints, and not a bulk endpoint.** The API has
+ * no `bulk-archive` or `bulk-delete`, and inventing one just for the selection bar
+ * would be writing a new contract for a button. The cost is N requests, with N
+ * bounded by `perPage` - at most 100.
  *
- * `allSettled` e não `all`: com `all` a primeira falha aborta o resto, e a
- * pessoa ficaria com metade arquivada sem saber qual metade. Aqui todas
- * terminam e a contagem é exata.
+ * `allSettled` and not `all`: with `all` the first failure aborts the rest, and the
+ * person would be left with half archived without knowing which half. Here all of them
+ * finish and the count is exact.
  */
 export async function runBulk<TItem>(
   items: ReadonlyArray<TItem>,

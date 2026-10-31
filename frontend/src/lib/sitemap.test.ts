@@ -8,12 +8,12 @@ import {
 } from './sitemap'
 
 describe('bracketEntries', () => {
-  it('monta o caminho e leva o updatedAt como lastmod', () => {
+  it('builds the path and carries updatedAt as lastmod', () => {
     expect(
       bracketEntries([{ id: 'abc', updatedAt: '2026-10-01T10:00:00-04:00' }]),
     ).toEqual([
       {
-        pathname: '/classificacao/abc',
+        pathname: '/standings/abc',
         lastModified: '2026-10-01T10:00:00-04:00',
       },
     ])
@@ -22,53 +22,55 @@ describe('bracketEntries', () => {
 
 describe('sitemapXml', () => {
   const xml = sitemapXml([
-    { pathname: '/jogos' },
-    { pathname: '/classificacao/abc', lastModified: '2026-10-01T10:00:00Z' },
+    { pathname: '/matches' },
+    { pathname: '/standings/abc', lastModified: '2026-10-01T10:00:00Z' },
   ])
 
-  it('traz uma url por idioma de cada página', () => {
+  it('brings one url per language for each page', () => {
     expect(xml.match(/<url>/g)).toHaveLength(6)
   })
 
-  it('escreve o pt-BR sem prefixo e os outros com prefixo', () => {
-    expect(xml).toContain('<loc>http://localhost:3001/jogos</loc>')
-    expect(xml).toContain('<loc>http://localhost:3001/es/jogos</loc>')
-    expect(xml).toContain('<loc>http://localhost:3001/en/jogos</loc>')
+  it('writes pt-BR without a prefix and the others with a prefix', () => {
+    expect(xml).toContain('<loc>http://localhost:3001/matches</loc>')
+    expect(xml).toContain('<loc>http://localhost:3001/es/matches</loc>')
+    expect(xml).toContain('<loc>http://localhost:3001/en/matches</loc>')
   })
 
-  it('liga cada url aos hreflang das irmãs e ao x-default', () => {
-    expect(xml).toContain('hreflang="es" href="http://localhost:3001/es/jogos"')
+  it('links each url to the sibling hreflangs and to x-default', () => {
     expect(xml).toContain(
-      'hreflang="x-default" href="http://localhost:3001/jogos"',
+      'hreflang="es" href="http://localhost:3001/es/matches"',
+    )
+    expect(xml).toContain(
+      'hreflang="x-default" href="http://localhost:3001/matches"',
     )
   })
 
-  it('só escreve lastmod quando o dado tem updatedAt', () => {
+  it('writes lastmod only when the data has updatedAt', () => {
     expect(xml.match(/<lastmod>/g)).toHaveLength(3)
   })
 })
 
 describe('SITEMAP_STATIC_ENTRIES', () => {
-  it('cobre a home e as páginas públicas', () => {
+  it('covers the home and the public pages', () => {
     expect(SITEMAP_STATIC_ENTRIES.map((entry) => entry.pathname)).toEqual([
       '/',
-      '/jogos',
-      '/classificacao',
-      '/avisos',
-      '/sobre',
+      '/matches',
+      '/standings',
+      '/announcements',
+      '/about',
     ])
   })
 })
 
 describe('robotsTxt', () => {
-  it('em produção libera tudo e aponta o sitemap absoluto', () => {
+  it('in production, allows everything and points at the absolute sitemap', () => {
     const text = robotsTxt({ indexable: true })
 
     expect(text).toContain('Disallow:\n')
     expect(text).toContain('Sitemap: http://localhost:3001/sitemap.xml')
   })
 
-  it('fora de produção proíbe tudo', () => {
+  it('outside production, forbids everything', () => {
     expect(robotsTxt({ indexable: false })).toBe('User-agent: *\nDisallow: /\n')
   })
 })

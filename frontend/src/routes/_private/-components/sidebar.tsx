@@ -32,15 +32,15 @@ import {
 const privateRoute = getRouteApi('/_private')
 
 /**
- * O destino do item que deve aparecer marcado, ou `undefined`.
+ * The destination of the item that must appear marked, or `undefined`.
  *
- * A regra é "o mais específico ganha", e aqui ela não é preparação para o
- * futuro: `/administrator` é prefixo de toda tela do painel, então com
- * casamento difuso sozinho o item Início ficaria aceso na listagem de
- * depoimentos, na de notícias e em todas as outras ao mesmo tempo.
+ * The rule is "the most specific wins", and here it is not preparation for the
+ * future: `/administrator` is a prefix of every dashboard screen, so with fuzzy
+ * matching alone the "Início" item would light up on the testimonials listing,
+ * the news one and every other at the same time.
  *
- * Difuso é o que se quer para o resto: em `/administrator/testimonials/123/edit`
- * quem deve estar marcado é Depoimentos.
+ * Fuzzy is what is wanted for the rest: on `/administrator/testimonials/123/edit`
+ * whoever should be marked is Depoimentos.
  */
 function useActiveTo(items: ReadonlyArray<MenuItem>): string | undefined {
   const matchRoute = useMatchRoute()
@@ -48,7 +48,7 @@ function useActiveTo(items: ReadonlyArray<MenuItem>): string | undefined {
   let active: string | undefined
 
   for (const item of items) {
-    // `label` e `icon` saem porque não são opções de rota.
+    // `label` and `icon` leave because they are not route options.
     const { label: _label, icon: _icon, ...link } = item
 
     if (!matchRoute({ ...link, fuzzy: true })) continue
@@ -61,22 +61,22 @@ function useActiveTo(items: ReadonlyArray<MenuItem>): string | undefined {
 }
 
 /**
- * Um item de menu: o botão renderiza COMO o link, e não em volta dele.
+ * A menu item: the button renders AS the link, and not around it.
  *
- * A ordem importa. Com o `<Link>` aninhado dentro do `SidebarMenuButton`, quem
- * recebia o clique era o botão, e o `<a>` ficava por dentro - sem preload no
- * hover, sem abrir em nova aba, sem clique do meio. Com `render`, o elemento
- * final é um `<a>` de verdade com as classes do botão.
+ * The order matters. With the `<Link>` nested inside `SidebarMenuButton`, whoever
+ * received the click was the button, and the `<a>` stayed inside - with no preload on
+ * hover, no opening in a new tab, no middle click. With `render`, the final
+ * element is a real `<a>` with the button's classes.
  *
- * `label` e `icon` saem do spread de propósito: eles não são props do `<Link>`,
- * e chegariam ao `<a>` do DOM como atributo desconhecido - um deles sendo uma
- * função de componente.
+ * `label` and `icon` leave the spread on purpose: they are not `<Link>` props,
+ * and would reach the DOM's `<a>` as an unknown attribute - one of them being
+ * a component function.
  *
- * No mobile a barra lateral é um Sheet, e navegar sem fechá-lo deixava o drawer
- * por cima da tela nova. Aqui não dá para usar `SheetClose`: quem monta o Sheet
- * é `components/ui/sidebar.tsx`, que o mantém controlado por `openMobile` e
- * esconde o close embutido. `setOpenMobile(false)` é a API que ele expõe para
- * isso, e no desktop `openMobile` não pinta nada.
+ * On mobile the sidebar is a Sheet, and navigating without closing it left the drawer
+ * on top of the new screen. `SheetClose` cannot be used here: whoever builds the Sheet
+ * is `components/ui/sidebar.tsx`, which keeps it controlled by `openMobile` and
+ * hides the built-in close. `setOpenMobile(false)` is the API it exposes for
+ * that, and on desktop `openMobile` paints nothing.
  */
 function NavigationItem({
   item,
@@ -85,7 +85,7 @@ function NavigationItem({
 }: Readonly<{
   item: MenuItem
   isActive: boolean
-  /** Um número ao lado do rótulo: o que espera a atenção de quem lê. */
+  /** A number beside the label: what awaits the reader's attention. */
   badge?: number
 }>): React.JSX.Element {
   const { icon: Icon, label, ...link } = item
@@ -95,8 +95,8 @@ function NavigationItem({
     <SidebarMenuItem>
       <SidebarMenuButton
         isActive={isActive}
-        // Com a barra recolhida sobra só o ícone; o tooltip é o que devolve o
-        // nome do destino, e o componente já o esconde quando ela está aberta.
+        // With the sidebar collapsed only the icon is left; the tooltip is what gives back the
+        // destination's name, and the component already hides it when the bar is open.
         tooltip={label}
         render={<Link {...link} />}
         onClick={() => setOpenMobile(false)}
@@ -114,25 +114,25 @@ function NavigationItem({
 }
 
 /**
- * A navegação do painel.
+ * The dashboard navigation.
  *
- * **A identidade fica no cabeçalho; a saída fica nos dois lugares.** A
- * referência põe nome, avatar e "Sair" juntos no pé da barra lateral, e a
- * migração levou o conjunto para o cabeçalho. Só que sair virou uma ação
- * escondida atrás do avatar: o `frontend-old` tinha o botão no pé da barra
- * **e** o item no menu do perfil, e quem usava o painel procurava o botão.
- * Aqui o pé volta com a saída sozinha - o nome e o avatar continuam no
- * cabeçalho, sem duas fontes para a mesma identidade.
+ * **Identity stays in the header; sign-out stays in both places.** The
+ * reference puts name, avatar and "Sair" together at the sidebar's foot, and the
+ * migration moved the set to the header. But signing out became an action
+ * hidden behind the avatar: `frontend-old` had the button at the foot of the bar
+ * **and** the item in the profile menu, and whoever used the dashboard looked for the button.
+ * Here the foot comes back with sign-out alone - the name and avatar stay in
+ * the header, without two sources for the same identity.
  */
 export function Sidebar(): React.JSX.Element {
   const { setOpenMobile } = useSidebar()
   const { account } = privateRoute.useRouteContext()
   const menu = menuFor(account.role)
-  // A união de todos os grupos: o item mais específico ganha, e ele pode estar
-  // num grupo diferente do que casou primeiro.
+  // The union of all the groups: the most specific item wins, and it may be
+  // in a different group from the one that matched first.
   const active = useActiveTo(menu.flatMap((group) => group.items))
-  // O aviso de atleta tirado chega ao administrador pelo menu, onde quer que
-  // ele esteja no painel.
+  // The notice of a removed athlete reaches the administrator through the menu, wherever
+  // they are on the dashboard.
   const { data: removals } = useQuery({
     ...enrollmentRemovalsQueryOptions(PENDING_REMOVALS),
     enabled: account.role === USER_ROLE.ADMINISTRATOR,
@@ -148,7 +148,7 @@ export function Sidebar(): React.JSX.Element {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              render={<Link to="/painel" />}
+              render={<Link to="/dashboard" />}
               onClick={() => setOpenMobile(false)}
               className="hover:bg-transparent"
             >
@@ -180,13 +180,13 @@ export function Sidebar(): React.JSX.Element {
         <SidebarMenu>
           <SidebarMenuItem>
             {/*
-              `tooltip` porque com a barra recolhida sobra só o ícone, e um
-              ícone de saída sem rótulo é o botão que ninguém arrisca clicar.
+              `tooltip` because with the sidebar collapsed only the icon is left, and an
+              exit icon without a label is the button nobody risks clicking.
 
-              O botão não desloga: ele abre a confirmação, e quem desloga é o
-              `SignOutConfirm`. Sem `disabled` de pendência porque não há mais
-              janela para o duplo clique - o alerta fecha ao confirmar, e a
-              navegação para fora do `_private` desmonta o drawer no mobile.
+              The button does not sign out: it opens the confirmation, and whoever signs out is
+              `SignOutConfirm`. No pending `disabled` because there is no longer
+              a window for the double click - the alert closes on confirm, and the
+              navigation out of `_private` unmounts the drawer on mobile.
             */}
             <SignOutConfirm
               render={

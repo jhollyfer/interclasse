@@ -7,16 +7,16 @@ import type { Theme } from '#/lib/theme'
 import { ThemeContext } from './theme-context'
 
 type ThemeProviderProps = Readonly<{
-  /** O tema que o `loader` da raiz leu do cookie. */
+  /** The theme that the root `loader` read from the cookie. */
   theme: Theme
   children: React.ReactNode
 }>
 
 /**
- * O tema da página. A preferência vem do cookie (lido no servidor, sem flash)
- * e muda por `setTheme`, que grava o cookie e troca a classe do `<html>` no
- * mesmo clique. Só `system` precisa de script antes da hidratação, porque só
- * o navegador sabe a preferência do sistema.
+ * The page's theme. The preference comes from the cookie (read on the server, with no flash)
+ * and changes through `setTheme`, which saves the cookie and swaps the `<html>` class in
+ * the same click. Only `system` needs a script before hydration, because only
+ * the browser knows the system preference.
  * _doc-lib/shadcn.md#docs/dark-mode/tanstack-start.
  */
 export function ThemeProvider({
@@ -25,7 +25,7 @@ export function ThemeProvider({
 }: ThemeProviderProps): React.JSX.Element {
   const [theme, setThemeState] = React.useState(initial)
 
-  // `system` acompanha o sistema operacional enquanto a página está aberta.
+  // `system` follows the operating system while the page is open.
   React.useEffect(() => {
     if (theme !== 'system') return
 

@@ -1,22 +1,22 @@
 /**
- * O par que liga o erro ao campo (`frontend.md` §10.3): o `id` da mensagem e os
- * atributos do controle. Erro só na cor não existe; a leitora de tela anuncia o
- * texto pelo `aria-describedby`.
+ * The pair that links the error to the field (`frontend.md` §10.3): the message's `id` and the
+ * control's attributes. An error in color alone does not exist; the screen reader announces the
+ * text through `aria-describedby`.
  * _doc-lib/react-hook-form.md#advanced-usage#AccessibilityA11y.
  */
 
-/** O `id` da mensagem de erro do campo de `id`. */
+/** The `id` of the error message for the field with the given `id`. */
 export function errorId(id: string): string {
   return `${id}-error`
 }
 
 type InvalidProps = Readonly<{
   'aria-invalid': boolean
-  /** Presente só com erro: apontar para uma mensagem que não existe confunde a leitora. */
+  /** Present only with an error: pointing at a message that does not exist confuses the screen reader. */
   'aria-describedby'?: string
 }>
 
-/** O que o controle espalha para se declarar inválido e apontar para o erro. */
+/** What the control spreads to declare itself invalid and point at the error. */
 export function invalidProps(invalid: boolean, id: string): InvalidProps {
   if (!invalid) return { 'aria-invalid': false }
 

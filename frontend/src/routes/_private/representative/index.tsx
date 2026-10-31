@@ -3,8 +3,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-query/queries/representative'
 
 /**
- * Erro engolido (`.catch`): representante sem turma vinculada leva `404`, e a tela
- * explica isso em vez de cair na página de erro.
+ * Swallowed error (`.catch`): a representative with no linked classroom gets a `404`, and the screen
+ * explains that instead of falling into the error page.
  */
 export const Route = createFileRoute('/_private/representative/')({
   loader: ({ context }) =>
