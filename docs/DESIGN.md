@@ -65,7 +65,7 @@ Recursos de fonte: `font-feature-settings: 'ss01', 'cv01', 'cv11'`, `font-synthe
 ## 5. Elevação e camadas
 
 - Sombra por papel: `shadow-card` (cartão em repouso), `shadow-card-hover` e `shadow-card-elevated`. Cada uma soma um anel de 1 px, que dá contorno sem segunda borda. Os tokens `--elevation-*` viram `--shadow-card*` no `@theme inline` por causa de colisão de nome.
-- Escala de z-index nomeada no `@theme` de `styles.css`: `dropdown` (10) < `sticky` (20) < `overlay` (30) < `modal` (40) < `toast` (50) < `tooltip` (60), usada por `z-dropdown`, `z-sticky`, `z-overlay`, `z-modal`, `z-toast` e `z-tooltip`. Os popups do Base UI (menu, combobox) usam `z-modal`, para abrir por cima do dialog em que moram.
+- Escala de z-index nomeada no `@theme` de `styles.css`: `sticky` (10) < `overlay` (20) < `modal` (30) < `dropdown` (40) < `toast` (50) < `tooltip` (60), usada por `z-sticky`, `z-overlay`, `z-modal`, `z-dropdown`, `z-toast` e `z-tooltip`. Os popups do Base UI (menu, combobox) usam `z-dropdown`, acima do `modal`, porque abrem de dentro de dialog e sheet. Camada local de um componente (`z-1`) fica fora da escala.
 - Valores de layout sem escala do Tailwind viram `@utility` ou token com nome de papel (`min-h-stage`, `max-w-aside`, `aspect-photo`, `scale-press`, `gap-menu-bar`, as grades por papel `grid-cols-versus`, `grid-cols-term-value`, `grid-cols-main-aside`, e `transition-reveal`); valor arbitrário em classe só dentro de `components/ui/`.
 
 ## 6. Formas

@@ -46,7 +46,7 @@ type TableGridProps<TRow extends RowData> = Readonly<{
  */
 const PIN_LAYERS = {
   header: 'var(--z-sticky)',
-  cell: 'var(--z-dropdown)',
+  cell: '1',
 } as const
 
 type PinLayer = keyof typeof PIN_LAYERS

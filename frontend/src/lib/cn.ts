@@ -12,7 +12,7 @@ const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       z: [
-        { z: ['dropdown', 'sticky', 'overlay', 'modal', 'toast', 'tooltip'] },
+        { z: ['sticky', 'overlay', 'modal', 'dropdown', 'toast', 'tooltip'] },
       ],
       'font-size': [{ text: ['error-code', 'error-code-lg'] }],
       leading: [{ leading: ['display'] }],

@@ -221,10 +221,10 @@
 
   /* A escala de camadas, da mais baixa à mais alta. Tailwind não tem
      namespace de z-index: o token vira variável e o `@utility` dá o nome. */
-  --z-dropdown: 10;
-  --z-sticky: 20;
-  --z-overlay: 30;
-  --z-modal: 40;
+  --z-sticky: 10;
+  --z-overlay: 20;
+  --z-modal: 30;
+  --z-dropdown: 40;
   --z-toast: 50;
   --z-tooltip: 60;
   --color-background: var(--background);
@@ -319,10 +319,11 @@
 }
 
 /*
- * Camadas: da mais baixa à mais alta, `dropdown < sticky < overlay < modal <
- * toast < tooltip`. Os popups do Base UI (menu, combobox) usam `z-modal`: eles
- * precisam abrir por cima do dialog em que moram, e no mesmo nível o portal
- * montado depois fica por cima.
+ * Camadas: da mais baixa à mais alta, `sticky < overlay < modal < dropdown <
+ * toast < tooltip` (`frontend.md` §6, `DECISIONS.md` #257). Os popups do Base UI
+ * (select, menu, popover, combobox) usam `z-dropdown`, acima do `modal`: eles
+ * abrem de dentro de dialog e sheet, e popup abaixo do modal que o abriu é
+ * inalcançável. Camada local de um componente (`z-1`) fica fora da escala.
  */
 @utility z-dropdown {
   z-index: var(--z-dropdown);
