@@ -17,7 +17,7 @@ import {
 test.group('users > unarchive', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('tira da lixeira sem recriar sessão, e a conta volta a entrar', async ({
+  test('takes out of the trash without recreating a session, and the account can sign in again', async ({
     client,
     assert,
   }) => {
@@ -32,7 +32,7 @@ test.group('users > unarchive', (group) => {
     const restored = await Stored.userOrFail(user.id)
     assert.isNull(restored.deletedAt)
 
-    // Nenhum token nasce da restauração: quem volta entra pelo sign-in.
+    // No token is born from the restoration: whoever returns signs in through sign-in.
     const [{ count }] = await db
       .from('auth_access_tokens')
       .where('tokenable_id', user.id)
@@ -41,11 +41,11 @@ test.group('users > unarchive', (group) => {
 
     await authenticate(client, user.email, FACTORY_PASSWORD)
 
-    const ver = await client.get(`/administrator/users/${user.id}`).cookies(session)
-    ver.assertStatus(200)
+    const view = await client.get(`/administrator/users/${user.id}`).cookies(session)
+    view.assertStatus(200)
   })
 
-  test('restaurar usuário vivo responde 409 USER_NOT_ARCHIVED', async ({ client, assert }) => {
+  test('restoring a live user responds 409 USER_NOT_ARCHIVED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -57,7 +57,7 @@ test.group('users > unarchive', (group) => {
     assert.equal(body(response).code, 'USER_NOT_ARCHIVED')
   })
 
-  test('usuário inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent user responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -68,7 +68,7 @@ test.group('users > unarchive', (group) => {
     assert.equal(body(response).code, 'USER_NOT_FOUND')
   })
 
-  test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
     const user = await UserFactory.merge({ deletedAt: DateTime.now() }).create()
 
     const anonymous = await client.patch(`/administrator/users/${user.id}/unarchive`)
@@ -86,10 +86,10 @@ test.group('users > unarchive', (group) => {
   })
 })
 
-test.group('administrator/users/unarchive > acesso e validação', (group) => {
+test.group('administrator/users/unarchive > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.patch('/administrator/users/nao-e-uuid/unarchive').cookies(admin)

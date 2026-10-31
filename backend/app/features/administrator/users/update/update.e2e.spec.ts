@@ -12,12 +12,12 @@ import {
   authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
-/** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
+/** An already confirmed file, which is the only state `assertExist` accepts. */
 
-test.group('administrador > users > atualização', (group) => {
+test.group('administrator > users > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('payload parcial não apaga o campo ausente', async ({ client, assert }) => {
+  test('partial payload does not erase the missing field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ name: 'Original' }).create()
 
@@ -46,7 +46,7 @@ test.group('administrador > users > atualização', (group) => {
     assert.equal(body(response).role, USER_ROLE.ADMINISTRATOR)
   })
 
-  test('e-mail de outra conta responde 409', async ({ client, assert }) => {
+  test('email of another account responds 409', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -59,15 +59,18 @@ test.group('administrador > users > atualização', (group) => {
     assert.equal(body(response).code, 'USER_ALREADY_EXISTS')
   })
 
-  test('trocar a senha derruba as sessões da conta alterada', async ({ client, assert }) => {
+  test('changing the password drops the sessions of the changed account', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
-    // Uma sessão viva do alvo, criada antes da troca.
-    const antes = await client
+    // A live session of the target, created before the change.
+    const before = await client
       .post('/authentication/sign-in')
       .json({ email: user.email, password: 'Demo1234!' })
-    antes.assertStatus(204)
+    before.assertStatus(204)
 
     const response = await client
       .put(`/administrator/users/${user.id}`)
@@ -75,8 +78,8 @@ test.group('administrador > users > atualização', (group) => {
       .json({ password: 'Outra1234!', passwordConfirmation: 'Outra1234!' })
 
     response.assertStatus(200)
-    // Sem a revogação, desligar o acesso de alguém não desligaria nada: o token
-    // anterior à troca continuaria valendo até vencer.
+    // Without the revocation, switching someone\'s access off would switch nothing off: the token
+    // issued before the change would remain valid until it expired.
     const [{ count }] = await db
       .from('auth_access_tokens')
       .where('tokenable_id', user.id)
@@ -84,7 +87,7 @@ test.group('administrador > users > atualização', (group) => {
     assert.equal(Number(count), 0)
   })
 
-  test('usuário arquivado não é editável', async ({ client }) => {
+  test('archived user is not editable', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ deletedAt: DateTime.now() }).create()
 
@@ -96,7 +99,7 @@ test.group('administrador > users > atualização', (group) => {
     response.assertStatus(404)
   })
 
-  test('papel nulo ou nome vazio responde 422 e não grava', async ({ client, assert }) => {
+  test('null role or empty name responds 422 and does not save', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ name: 'Original' }).create()
 
@@ -114,16 +117,16 @@ test.group('administrador > users > atualização', (group) => {
   })
 })
 
-test.group('administrator/users/update > acesso e validação', (group) => {
+test.group('administrator/users/update > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.put('/administrator/users/00000000-0000-4000-8000-000000000000')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client

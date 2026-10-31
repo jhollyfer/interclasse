@@ -5,10 +5,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { UserError } from '#domain/user/user.errors'
 
 /**
- * Cada recusa da conta como resposta HTTP, a mesma no painel de contas e na
- * edição da própria conta (`_standards/domain.md` §2). Tabela por `code`: fato
- * novo sem entrada não compila. O 409 do e-mail repetido é o da checagem antes
- * de gravar e o da corrida no `unique`, que o repository devolve como fato.
+ * Each refusal of the account as an HTTP response, the same in the accounts panel and in
+ * editing the own account (`_standards/domain.md` §2). Table by `code`: a new
+ * fact without an entry does not compile. The 409 of the repeated email is the one of the check
+ * before saving and the one of the race on the `unique`, which the repository returns as a fact.
  */
 export class UserRefusal extends RefusalBase {
   private static readonly TABLE = {

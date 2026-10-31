@@ -11,12 +11,12 @@ import {
   resetDatabase,
 } from '#tests/http-fixtures'
 
-/** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
+/** An already confirmed file, which is the only state `assertExist` accepts. */
 
 /**
- * O payload de criação. `passwordConfirmation` acompanha a senha porque a regra
- * de força compartilhada exige `confirmed` - o campo é lido do input cru e não
- * chega ao banco.
+ * The creation payload. `passwordConfirmation` accompanies the password because the shared
+ * strength rule requires `confirmed` - the field is read from the raw input and does not
+ * reach the database.
  */
 const payload = {
   name: 'Nova Pessoa',
@@ -29,7 +29,7 @@ const payload = {
 test.group('administrador > users > listagem', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem ?trashed a listagem esconde os arquivados', async ({ client, assert }) => {
+  test('without ?trashed the listing hides the archived ones', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     await UserFactory.merge({ name: 'Arquivado', deletedAt: DateTime.now() }).create()
@@ -37,13 +37,13 @@ test.group('administrador > users > listagem', (group) => {
     const response = await client.get('/administrator/users').cookies(session)
 
     response.assertStatus(200)
-    // Só o administrador do seeder: o arquivado fica de fora.
+    // Only the seeder administrator: the archived one stays out.
     assert.lengthOf(body(response).data, 1)
     assert.equal(body(response).data[0].email, ADMINISTRATOR.email)
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('?role recorta a lista pelo papel', async ({ client, assert }) => {
+  test('?role narrows the list by role', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const editor = await UserFactory.create()
@@ -54,15 +54,15 @@ test.group('administrador > users > listagem', (group) => {
       .cookies(session)
 
     response.assertStatus(200)
-    // O administrador do seeder não entra no recorte.
+    // The seeder administrator does not enter the cut.
     assert.lengthOf(body(response).data, 1)
     assert.equal(body(response).data[0].id, editor.id)
   })
 
-  test('?status recorta a lista pelo acesso', async ({ client, assert }) => {
+  test('?status narrows the list by access', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const inativo = await UserFactory.apply('inactive').create()
+    const inactive = await UserFactory.apply('inactive').create()
 
     const response = await client
       .get('/administrator/users')
@@ -71,10 +71,10 @@ test.group('administrador > users > listagem', (group) => {
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)
-    assert.equal(body(response).data[0].id, inativo.id)
+    assert.equal(body(response).data[0].id, inactive.id)
   })
 
-  test('a senha não sai na listagem', async ({ client, assert }) => {
+  test('the password does not come out in the listing', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     await UserFactory.create()
@@ -85,29 +85,32 @@ test.group('administrador > users > listagem', (group) => {
     for (const user of body(response).data) assert.notProperty(user, 'password')
   })
 
-  test('?sort fora da tupla fechada responde 422 apontando o campo', async ({ client, assert }) => {
+  test('?sort outside the closed tuple responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // `password` é coluna de `users`, mas não é coluna de ordenação: o valor
-    // iria direto para o `orderBy` e comporia SQL.
+    // `password` is a `users` column, but not a sort column: the value
+    // would go straight into `orderBy` and compose SQL.
     //
-    // A query vai na própria URL, e não em `.qs()`: o registry do Tuyau tipa o
-    // objeto pela tupla fechada, e o valor inválido que este teste existe para
-    // mandar não compilaria.
+    // The query goes in the URL itself, not in `.qs()`: the Tuyau registry types the
+    // object by the closed tuple, and the invalid value this test exists to
+    // send would not compile.
     const response = await client.get('/administrator/users?sort=password').cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'sort')
   })
 
-  test('?search não escapa do filtro de lixeira', async ({ client, assert }) => {
+  test('?search does not escape the trash filter', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const vivo = await UserFactory.merge({ name: 'Joana Ribeiro' }).create()
-    // Casa a busca pelo **e-mail**, e não pelo nome, e está arquivada: com o
-    // `OR` solto ela apareceria na listagem padrão, porque o `OR` anula o `AND`
-    // anterior. O termo tem de cair na segunda coluna da busca; na primeira, o
-    // `OR` solto daria a mesma resposta do agrupado.
+    const alive = await UserFactory.merge({ name: 'Joana Ribeiro' }).create()
+    // Matches the search by **email**, not by name, and is archived: with the
+    // loose `OR` it would show up in the default listing, because the `OR` cancels the
+    // previous `AND`. The term has to land on the second search column; on the first, the
+    // loose `OR` would give the same answer as the grouped one.
     await UserFactory.merge({
       name: 'Arquivada sem o termo no nome',
       email: 'joana.arquivada@mail.com',
@@ -121,46 +124,46 @@ test.group('administrador > users > listagem', (group) => {
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)
-    assert.equal(body(response).data[0].id, vivo.id)
+    assert.equal(body(response).data[0].id, alive.id)
   })
 })
 
 /**
- * O módulo inteiro é do administrador, e não só o `DELETE` como nos recursos de
- * conteúdo: quem edita conteúdo não alcança quem entra no painel - inclusive a
- * leitura, que expõe o e-mail de todo mundo.
+ * The whole module belongs to the administrator, not only `DELETE` as in the content
+ * resources: whoever edits content does not reach who enters the panel - including the
+ * read, which exposes everyone's email.
  *
- * Um caso por rota do grupo, e não um só: o middleware está no subgrupo, e uma
- * rota nova que nascer fora dele não seria pega por uma asserção única.
+ * One case per route of the group, not a single one: the middleware is on the subgroup, and a
+ * new route born outside it would not be caught by a single assertion.
  */
-test.group('administrador > users > o conselheiro não alcança o módulo', (group) => {
+test.group('administrator > users > the advisor does not reach the module', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('conselheiro recebe 403 em toda rota de usuários', async ({ client, assert }) => {
+  test('advisor gets 403 on every users route', async ({ client, assert }) => {
     const session = await authenticateAsAdvisor(client)
-    const alvo = await UserFactory.create()
+    const target = await UserFactory.create()
 
-    const respostas = [
+    const responses = [
       await client.get('/administrator/users').cookies(session),
       await client.post('/administrator/users').cookies(session).json(payload),
-      await client.get(`/administrator/users/${alvo.id}`).cookies(session),
-      await client.put(`/administrator/users/${alvo.id}`).cookies(session).json({ name: 'X' }),
-      await client.patch(`/administrator/users/${alvo.id}/archive`).cookies(session),
-      await client.patch(`/administrator/users/${alvo.id}/unarchive`).cookies(session),
-      await client.delete(`/administrator/users/${alvo.id}`).cookies(session),
+      await client.get(`/administrator/users/${target.id}`).cookies(session),
+      await client.put(`/administrator/users/${target.id}`).cookies(session).json({ name: 'X' }),
+      await client.patch(`/administrator/users/${target.id}/archive`).cookies(session),
+      await client.patch(`/administrator/users/${target.id}/unarchive`).cookies(session),
+      await client.delete(`/administrator/users/${target.id}`).cookies(session),
     ]
 
-    for (const response of respostas) {
+    for (const response of responses) {
       response.assertStatus(403)
       assert.equal(body(response).code, 'ACCESS_DENIED')
     }
   })
 })
 
-test.group('administrator/users/paginate > acesso e validação', (group) => {
+test.group('administrator/users/paginate > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/users')
 
     response.assertStatus(401)

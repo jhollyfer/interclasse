@@ -11,15 +11,15 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorUserDeleteController {
   static docs = defineDocs({
-    summary: 'Apagar usuário',
+    summary: 'Delete user',
     description:
-      '**Irreversível**: apaga a linha do banco, e com ela os tokens da conta em ' +
-      '`auth_access_tokens` por `CASCADE` - token é credencial viva, e deixá-lo para trás ' +
-      'manteria uma sessão que ninguém mais consegue revogar. O avatar em `storages` fica.\n\n' +
-      'Só aceita usuário já arquivado: sem isso um clique perderia a conta sem escala ' +
-      'intermediária.\n\n' +
-      'A **própria** conta responde `403`, antes da exigência de arquivamento.',
-    // Declarado à mão porque nasce em outra camada da cadeia: quem nega é a `UserPolicy`.
+      '**Irreversible**: deletes the database row, and with it the account tokens in ' +
+      '`auth_access_tokens` by `CASCADE` - a token is a live credential, and leaving it behind ' +
+      'would keep a session that nobody can revoke anymore. The avatar in `storages` stays.\n\n' +
+      'Only accepts an already archived user: without that a single click would lose the account without an ' +
+      'intermediate step.\n\n' +
+      'The **own** account responds `403`, before the archiving requirement.',
+    // Declared by hand because it is born in another layer of the chain: it is `UserPolicy` that denies.
     errors: { 403: 'SELF_DELETE_FORBIDDEN' },
   })
 

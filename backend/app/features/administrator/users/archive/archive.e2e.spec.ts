@@ -10,35 +10,37 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * Arquivar a conta. Diferente dos recursos de conteúdo, arquivar aqui também
- * revoga as sessões, porque o guard não conhece `deleted_at` e sem isso
- * arquivar não desligaria ninguém.
+ * Archiving the account. Unlike the content resources, archiving here also
+ * revokes the sessions, because the guard does not know `deleted_at` and without it
+ * archiving would not switch anyone off.
  *
- * Restaurar e apagar têm a spec da própria ação (`unarchive`, `delete`).
+ * Restoring and deleting have a spec of their own action (`unarchive`, `delete`).
  */
 test.group('users > archive', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('arquivar duas vezes responde 409 USER_ALREADY_ARCHIVED na segunda', async ({ client }) => {
+  test('archiving twice responds 409 USER_ALREADY_ARCHIVED on the second', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
-    const primeira = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
-    primeira.assertStatus(204)
+    const first = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
+    first.assertStatus(204)
 
-    const segunda = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
-    segunda.assertStatus(409)
-    segunda.assertBodyContains({ code: 'USER_ALREADY_ARCHIVED' })
+    const second = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
+    second.assertStatus(409)
+    second.assertBodyContains({ code: 'USER_ALREADY_ARCHIVED' })
   })
 
-  test('arquivar revoga as sessões da conta', async ({ client, assert }) => {
+  test('archiving revokes the account sessions', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
-    const alvo = await authenticate(client, user.email, FACTORY_PASSWORD)
+    const target = await authenticate(client, user.email, FACTORY_PASSWORD)
 
-    const arquivar = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
-    arquivar.assertStatus(204)
+    const archiveResponse = await client
+      .patch(`/administrator/users/${user.id}/archive`)
+      .cookies(session)
+    archiveResponse.assertStatus(204)
 
     const [{ count }] = await db
       .from('auth_access_tokens')
@@ -46,17 +48,17 @@ test.group('users > archive', (group) => {
       .count('* as count')
     assert.equal(Number(count), 0)
 
-    // Sem sessão, e não sem permissão: o token deixou de existir, então quem
-    // chega não é ninguém - 401, nunca 403.
-    const depois = await client.get('/account').cookies(alvo)
-    depois.assertStatus(401)
+    // Without a session, not without permission: the token ceased to exist, so whoever
+    // arrives is nobody - 401, never 403.
+    const after = await client.get('/account').cookies(target)
+    after.assertStatus(401)
   })
 })
 
-test.group('administrator/users/archive > acesso e validação', (group) => {
+test.group('administrator/users/archive > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -66,7 +68,7 @@ test.group('administrator/users/archive > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.patch('/administrator/users/nao-e-uuid/archive').cookies(admin)
