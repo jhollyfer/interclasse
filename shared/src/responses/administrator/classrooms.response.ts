@@ -6,8 +6,8 @@ import { z } from '../../validator.js'
 const datetime = () => z.iso.datetime({ offset: true })
 
 /**
- * A conta como vínculo de uma turma: conselheiro ou representante, sem o avatar.
- * Nunca carrega a senha (`_standards/architecture.md` §10).
+ * The account as a classroom link: advisor or representative, without the avatar.
+ * Never carries the password (`_standards/architecture.md` §10).
  */
 export const AdministratorClassroomPersonResponse = z.object({
   id: z.uuid(),
@@ -21,7 +21,7 @@ export const AdministratorClassroomPersonResponse = z.object({
   deletedAt: datetime().nullable(),
 })
 
-/** A turma com quem a aconselha e quem a representa, como o painel a lê. */
+/** The classroom with who advises and who represents it, as the panel reads it. */
 export const AdministratorClassroomShowResponse = z.object({
   id: z.uuid(),
   name: z.string(),
@@ -35,7 +35,7 @@ export const AdministratorClassroomShowResponse = z.object({
   representative: AdministratorClassroomPersonResponse.nullable(),
 })
 
-/** Cada item da lista do painel: a turma e os totais do cartão. */
+/** Each item of the panel list: the classroom and the card totals. */
 export const AdministratorClassroomPaginateResponse =
   AdministratorClassroomShowResponse.extend({
     studentsCount: z.number().int(),

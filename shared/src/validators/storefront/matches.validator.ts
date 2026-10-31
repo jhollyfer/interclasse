@@ -2,8 +2,8 @@ import { pageFields, z } from '../../validator.js'
 import { matchFilterFields } from '../administrator/matches.validator.js'
 
 /**
- * O que o site aceita na query. **Sem `trashed`**: nada daqui tem lixeira, e o
- * parâmetro seria aceito e ignorado em silêncio.
+ * What the site accepts in the query. **No `trashed`**: nothing here has a trash, and
+ * the parameter would be accepted and silently ignored.
  */
 export const StorefrontMatchPaginateValidator = z.object({
   ...pageFields(),

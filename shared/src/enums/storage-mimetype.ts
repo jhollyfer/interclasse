@@ -1,11 +1,11 @@
 /**
- * Os tipos de arquivo que o upload aceita, e a extensão que cada um ganha na
- * chave do objeto.
+ * The file types the upload accepts, and the extension each one gets in the object
+ * key.
  *
- * A extensão sai do `mimetype` declarado, e não do nome enviado: o nome é
- * rótulo de terceiro, e `foto.png` pode ser um pdf. `image/svg+xml` fica de
- * fora de propósito: SVG carrega `<script>`, e o navegador o executaria na
- * origem do storage.
+ * The extension comes from the declared `mimetype`, not from the sent name: the name is
+ * a third-party label, and `foto.png` can be a pdf. `image/svg+xml` is left out on
+ * purpose: SVG carries `<script>`, and the browser would run it in the storage
+ * origin.
  */
 export const STORAGE_EXTENSIONS = {
   'image/jpeg': 'jpg',
@@ -34,7 +34,7 @@ export const STORAGE_MIMETYPES = [
 ] as const satisfies ReadonlyArray<StorageMimetype>
 
 /**
- * Quantos bytes do início do objeto bastam para conferir o tipo: a maior
- * assinatura (WebP e WAV, `RIFF....WEBP`) acaba no byte 12.
+ * How many bytes at the start of the object are enough to check the type: the
+ * longest signature (WebP and WAV, `RIFF....WEBP`) ends at byte 12.
  */
 export const STORAGE_SIGNATURE_BYTES = 12

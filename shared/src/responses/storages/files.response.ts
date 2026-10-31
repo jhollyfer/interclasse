@@ -3,7 +3,7 @@ import { z } from '../../validator.js'
 
 const date = () => z.iso.datetime({ offset: true })
 
-/** O registro do arquivo, sem a URL: o que as duas respostas abaixo dividem. */
+/** The file record, without the URL: what the two responses below share. */
 const fileShape = {
   id: z.uuid(),
   filename: z.string(),
@@ -19,15 +19,15 @@ const fileShape = {
   deletedAt: date().nullable(),
 }
 
-/** O arquivo como a API devolve: com a URL assinada de leitura. */
+/** The file as the API returns it: with the signed read URL. */
 export const StoragesFileShowResponse = z.object({
   ...fileShape,
   url: z.string(),
 })
 
 /**
- * O plano de upload de `POST /storages` e `GET /storages/:id/parts`: por onde
- * subir o arquivo. A `url` do registro só existe quando ele foi lido.
+ * The upload plan of `POST /storages` and `GET /storages/:id/parts`: where to upload
+ * the file. The record's `url` only exists once it has been read.
  */
 export const StoragesFileUploadResponse = z.object({
   storage: z.object({ ...fileShape, url: z.string().optional() }),

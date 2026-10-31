@@ -1,6 +1,6 @@
 /**
- * O sentido da ordenação de uma listagem. Ausente é `asc`, que é a ordem que
- * as listagens já tinham antes de aceitarem o parâmetro.
+ * The direction of a listing's sort. Absent means `asc`, the order the listings
+ * already had before they accepted the parameter.
  */
 export const SORT_DIRECTION = {
   ASC: 'asc',

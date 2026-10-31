@@ -1,13 +1,13 @@
 import { z } from '../validator.js'
 
 /**
- * O que o upload lembra para sobreviver a um recarregamento
- * (`lib/upload-resume.ts`): a entrada de retomada mais a hora em que foi
- * gravada, que é a contabilidade do prazo.
+ * What the upload remembers to survive a reload
+ * (`lib/upload-resume.ts`): the resume entry plus the time it was stored, which is
+ * the deadline bookkeeping.
  */
 export const UploadResume = z.object({
   storageId: z.string(),
-  /** Nulo em upload de parte única. */
+  /** Null for a single-part upload. */
   uploadId: z.string().nullable(),
   partSize: z.number(),
   savedAt: z.number(),

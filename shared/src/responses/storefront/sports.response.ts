@@ -2,8 +2,8 @@ import type { z } from '../../validator.js'
 import { AdministratorSportShowResponse } from '../administrator/sports.response.js'
 
 /**
- * A modalidade no site: a mesma forma do painel. Nada nela é privado - nome e
- * limites de atletas são públicos por natureza.
+ * The sport on the site: the same shape as the panel. Nothing in it is private -
+ * name and athlete limits are public by nature.
  */
 export const StorefrontSportShowResponse = AdministratorSportShowResponse
 

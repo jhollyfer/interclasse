@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { LOCALES, type Locale } from './enums/locale.js'
 import { VALIDATION_MESSAGES, useValidatorLocale, z } from './validator.js'
 
-/** Cada mensagem da casa de um idioma, as com parâmetro já preenchidas. */
+/** Each house message of a language, the parameterized ones already filled in. */
 function validationTexts(locale: Locale): string[] {
   const messages = VALIDATION_MESSAGES[locale]
 
@@ -22,7 +22,7 @@ function validationTexts(locale: Locale): string[] {
 }
 
 describe('validator', () => {
-  it('toda mensagem da casa existe nos três idiomas e sem travessão', () => {
+  it('every house message exists in the three languages and has no em dash', () => {
     for (const locale of LOCALES) {
       for (const message of validationTexts(locale)) {
         expect(message.trim()).not.toBe('')
@@ -31,7 +31,7 @@ describe('validator', () => {
     }
   })
 
-  it('texto obrigatório vazio usa a mensagem da casa no idioma escolhido', () => {
+  it('empty required text uses the house message in the chosen language', () => {
     const schema = z.object({ name: z.string().trim().min(1) })
 
     for (const locale of LOCALES) {
@@ -46,9 +46,9 @@ describe('validator', () => {
     useValidatorLocale('pt-BR')
   })
 
-  it('as outras regras saem do locale do Zod no idioma escolhido', () => {
-    // A mensagem é lida antes de trocar de novo: o Zod a resolve no idioma
-    // configurado na hora da validação.
+  it('the other rules come from the Zod locale in the chosen language', () => {
+    // The message is read before switching again: Zod resolves it in the language
+    // configured at validation time.
     useValidatorLocale('en')
     const english = z.string().max(2).safeParse('abc').error?.issues[0]?.message
     useValidatorLocale('pt-BR')
@@ -58,7 +58,7 @@ describe('validator', () => {
     expect(english).not.toBe(portuguese)
   })
 
-  it('campo sem valor, número apagado, id e enum inválidos têm mensagem da casa', () => {
+  it('missing field, erased number, invalid id and enum have a house message', () => {
     const schema = z.object({
       name: z.string(),
       amount: z.number(),
@@ -86,7 +86,7 @@ describe('validator', () => {
     })
   })
 
-  it('limites de texto, número e lista usam a frase da casa nos três idiomas', () => {
+  it('text, number and list limits use the house phrase in the three languages', () => {
     const schema = z.object({
       short: z.string().min(3),
       long: z.string().max(2),
@@ -128,7 +128,7 @@ describe('validator', () => {
     useValidatorLocale('pt-BR')
   })
 
-  it('o pt-BR mantém os textos que o app já usava', () => {
+  it('pt-BR keeps the texts the app already used', () => {
     const texts = VALIDATION_MESSAGES['pt-BR']
 
     expect(texts.minLength(3)).toBe('Informe ao menos 3 caracteres')

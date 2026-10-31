@@ -1,9 +1,8 @@
 import { z } from '../../validator.js'
 
 /**
- * A modalidade como a API devolve: no detalhe, no cadastro, na edição e em cada
- * item da lista (`_standards/architecture.md` §10). Datas em ISO 8601, o tipo de
- * transporte.
+ * The sport as the API returns it: in detail, create, update and each list item
+ * (`_standards/architecture.md` §10). Dates in ISO 8601, the transport type.
  */
 export const AdministratorSportShowResponse = z.object({
   id: z.uuid(),

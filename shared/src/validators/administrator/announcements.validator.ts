@@ -1,7 +1,7 @@
 import { paginationFields, sortFields, z } from '../../validator.js'
 
 /**
- * O aviso, como o painel o publica. Par de caminho e nome do VineJS de
+ * The announcement, as the panel publishes it. Mirror (path and name) of the VineJS one in
  * `backend/app/validators/administrator/announcements.validator.ts`
  * (`_standards/architecture.md` §10).
  */

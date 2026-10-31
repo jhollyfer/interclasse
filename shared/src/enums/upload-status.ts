@@ -1,12 +1,12 @@
 /**
- * O estado de um arquivo enquanto ele sobe. Existe porque o binário não passa
- * mais por esta aplicação: `POST /storages` grava a linha e devolve URLs
- * assinadas, o navegador sobe as partes direto no bucket, e só depois
- * `POST /storages/:id/complete` confirma. Entre uma coisa e outra a linha
- * existe sem binário íntegro, e é isso que `PENDING` nomeia.
+ * The state of a file while it uploads. It exists because the binary no longer goes
+ * through this application: `POST /storages` writes the row and returns signed URLs,
+ * the browser uploads the parts straight to the bucket, and only then
+ * `POST /storages/:id/complete` confirms. Between the two the row exists without a
+ * sound binary, and that is what `PENDING` names.
  *
- * Só `UPLOADED` pode ser anexado a alguma coisa - o backend
- * recusa o resto, para nada apontar para um arquivo pela metade.
+ * Only `UPLOADED` can be attached to anything - the backend refuses the rest, so
+ * nothing points to a half-uploaded file.
  */
 export const UPLOAD_STATUS = {
   PENDING: 'PENDING',

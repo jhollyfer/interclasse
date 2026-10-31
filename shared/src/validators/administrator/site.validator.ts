@@ -1,17 +1,17 @@
 import { z } from '../../validator.js'
 
 /**
- * A configuração do site, como o painel a grava. Par de caminho e nome do
- * VineJS de `backend/app/validators/administrator/site.validator.ts`
+ * The site configuration, as the panel writes it. Mirror (path and name) of the
+ * VineJS one in `backend/app/validators/administrator/site.validator.ts`
  * (`_standards/architecture.md` §10).
  */
 
-/** `@usuario` do Instagram: letras, números, ponto e sublinhado, até 30. */
+/** Instagram `@handle`: letters, digits, dot and underscore, up to 30. */
 const INSTAGRAM = /^[A-Za-z0-9._]{1,30}$/
 
 /**
- * Tudo opcional e anulável: ausente é "não mexer", `null` apaga. O site esconde
- * o que estiver vazio.
+ * All optional and nullable: absent means "leave alone", `null` erases. The site hides
+ * whatever is empty.
  */
 export const AdministratorSiteUpdateValidator = z.object({
   about: z.string().trim().max(4000).nullable().optional(),

@@ -1,6 +1,6 @@
 /**
- * O que o pacote exporta, e só isto (`_standards/architecture.md` §9): o que
- * roda igual no backend e no frontend.
+ * What the package exports, and only this (`_standards/architecture.md` §9): what
+ * runs the same in the backend and the frontend.
  */
 export * from './either.js'
 export * from './validator.js'

@@ -1,7 +1,7 @@
 import type { z } from '../../validator.js'
 import { AdvisorEnrollmentShowResponse } from '../advisor/enrollments.response.js'
 
-/** A matriz da turma do representante: a mesma forma da do conselheiro. */
+/** The matrix of the representative's classroom: the same shape as the advisor's. */
 export const RepresentativeEnrollmentShowResponse =
   AdvisorEnrollmentShowResponse
 

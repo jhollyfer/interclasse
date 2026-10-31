@@ -4,23 +4,23 @@ import { BASE_LOCALE, type Locale } from './enums/locale.js'
 import { SORT_DIRECTIONS } from './enums/sort-direction.js'
 
 /**
- * O `z` configurado da casa: todo validator do `shared/` e todo schema local do
- * frontend saem daqui, nunca de `import { z } from 'zod'` direto
+ * The house-configured `z`: every `shared/` validator and every local frontend schema
+ * comes from here, never from a direct `import { z } from 'zod'`
  * (`_standards/architecture.md` §3, `i18n.md` §3).
  *
- * As mensagens das regras vêm do locale do próprio Zod no idioma da tela
- * (_doc-lib/zod.md#error-customization). O que o locale não diz bem - texto
- * obrigatório vazio - é a mensagem da casa, nos três idiomas.
+ * Rule messages come from Zod's own locale in the screen language
+ * (_doc-lib/zod.md#error-customization). What the locale does not say well - empty
+ * required text - is the house message, in the three languages.
  */
 
-/** O locale do Zod de cada idioma do produto. */
+/** The Zod locale of each product language. */
 const ZOD_LOCALES = {
   'pt-BR': z.locales.ptBR,
   es: z.locales.es,
   en: z.locales.en,
 } satisfies Record<Locale, () => { localeError: z.core.$ZodErrorMap }>
 
-/** As mensagens que a casa escreve por cima do locale, no formato de cada idioma. */
+/** The messages the house writes over the locale, in each language's format. */
 type ValidationMessages = {
   readonly required: string
   readonly option: string
@@ -34,7 +34,7 @@ type ValidationMessages = {
   readonly maxItems: (max: number) => string
 }
 
-/** As mensagens que a casa escreve por cima do locale, por idioma. */
+/** The messages the house writes over the locale, per language. */
 export const VALIDATION_MESSAGES = {
   'pt-BR': {
     required: 'Preencha este campo',
@@ -74,12 +74,12 @@ export const VALIDATION_MESSAGES = {
   },
 } satisfies Record<Locale, ValidationMessages>
 
-/** O idioma em vigor, para as regras da casa que escrevem a própria mensagem. */
+/** The language in force, for house rules that write their own message. */
 let activeLocale: Locale = BASE_LOCALE
 
 /**
- * Troca o idioma das mensagens de validação. O frontend chama ao trocar de
- * idioma; sem chamada, vale o idioma base.
+ * Switches the language of validation messages. The frontend calls it when the
+ * language changes; without a call, the base language applies.
  */
 export function useValidatorLocale(locale: Locale): void {
   activeLocale = locale
@@ -87,8 +87,8 @@ export function useValidatorLocale(locale: Locale): void {
   const messages = VALIDATION_MESSAGES[locale]
   z.config({
     customError: (issue) => {
-      // Texto obrigatório vazio chega como `too_small` com mínimo 1: "Preencha
-      // este campo" diz o que fazer, "Muito pequeno: esperado 1 caractere" não.
+      // Empty required text arrives as `too_small` with minimum 1: "Fill in this field"
+      // says what to do, "Too small: expected 1 character" does not.
       if (issue.code === 'too_small' && issue.origin === 'string') {
         if (issue.minimum === 1) return messages.required
         return messages.minLength(Number(issue.minimum))
@@ -96,7 +96,7 @@ export function useValidatorLocale(locale: Locale): void {
       if (issue.code === 'too_big' && issue.origin === 'string')
         return messages.maxLength(Number(issue.maximum))
 
-      // Limites de número: só o inclusivo (`min`/`max`) tem a frase da casa.
+      // Number limits: only the inclusive one (`min`/`max`) has the house phrase.
       if (
         issue.code === 'too_small' &&
         issue.origin === 'number' &&
@@ -113,8 +113,8 @@ export function useValidatorLocale(locale: Locale): void {
       if (issue.code === 'too_big' && issue.origin === 'array')
         return messages.maxItems(Number(issue.maximum))
 
-      // Campo sem valor (`undefined`) é "preencha", não "esperava texto,
-      // recebeu undefined"; número apagado no input chega como `NaN`.
+      // A missing field (`undefined`) is "fill in", not "expected text, received
+      // undefined"; a number erased in the input arrives as `NaN`.
       if (issue.code === 'invalid_type') {
         if (issue.input === undefined || issue.input === null)
           return messages.required
@@ -123,12 +123,12 @@ export function useValidatorLocale(locale: Locale): void {
         if (issue.expected === 'int') return messages.integer
       }
 
-      // Lista fechada (enum) e id: o que o usuário faz é escolher, não digitar.
+      // Closed list (enum) and id: what the user does is choose, not type.
       if (issue.code === 'invalid_value') return messages.option
 
       if (issue.code === 'invalid_format') {
         if (issue.format === 'uuid') return messages.option
-        // E-mail (ou outro formato) em branco é campo vazio, não formato errado.
+        // A blank e-mail (or other format) is an empty field, not a wrong format.
         if (issue.input === '') return messages.required
         if (issue.format === 'email') return messages.email
       }
@@ -140,15 +140,15 @@ export function useValidatorLocale(locale: Locale): void {
 
 useValidatorLocale(BASE_LOCALE)
 
-/** Tetos de lista que os dois lados cobram igual. */
+/** List ceilings that both sides enforce the same. */
 export const LIST_LIMITS = {
-  /** Atletas por time numa modalidade: o maior elenco que uma turma inscreve. */
+  /** Athletes per team in a sport: the largest squad a classroom enrolls. */
   ATHLETES: 40,
 } as const
 
 /**
- * Os campos de listagem, iguais em toda rota que pagina. Da query string chegam
- * como texto: `coerce` converte antes da regra (_doc-lib/zod.md#api).
+ * The listing fields, the same on every paginated route. From the query string they
+ * arrive as text: `coerce` converts before the rule (_doc-lib/zod.md#api).
  */
 export function pageFields() {
   return {
@@ -157,7 +157,7 @@ export function pageFields() {
   }
 }
 
-/** Paginação com busca por texto. */
+/** Pagination with text search. */
 export function paginationFields() {
   return {
     ...pageFields(),
@@ -165,7 +165,7 @@ export function paginationFields() {
   }
 }
 
-/** A ordenação de uma listagem: as colunas que ela aceita, e o sentido. */
+/** A listing's sort: the columns it accepts, and the direction. */
 export function sortFields<
   const TColumns extends readonly [string, ...string[]],
 >(columns: TColumns) {
@@ -176,8 +176,8 @@ export function sortFields<
 }
 
 /**
- * A lista de atletas de uma modalidade, inteira: substitui a anterior. Sem
- * aluno repetido e com o teto de `LIST_LIMITS.ATHLETES`.
+ * The athlete list of a sport, whole: it replaces the previous one. No repeated
+ * student and capped at `LIST_LIMITS.ATHLETES`.
  */
 export function athleteListFields() {
   return {
@@ -189,7 +189,7 @@ export function athleteListFields() {
   }
 }
 
-/** As mensagens das regras de identidade (senha e e-mail), por idioma. */
+/** The identity rule messages (password and e-mail), per language. */
 export const IDENTITY_MESSAGES = {
   'pt-BR': {
     weakPassword:
@@ -211,14 +211,14 @@ export const IDENTITY_MESSAGES = {
   { readonly weakPassword: string; readonly passwordMismatch: string }
 >
 
-/** E-mail: formato e o teto do `unique` do banco. */
+/** E-mail: format and the database `unique` ceiling. */
 export function emailField() {
   return z.email().max(254)
 }
 
 /**
- * Força da senha: tamanho e uma classe de caractere por regra. A mensagem sai
- * no idioma em vigor, lida na hora da validação.
+ * Password strength: length and one character class per rule. The message comes out
+ * in the language in force, read at validation time.
  */
 export function passwordField() {
   const weak = { error: () => IDENTITY_MESSAGES[activeLocale].weakPassword }
@@ -234,8 +234,8 @@ export function passwordField() {
 }
 
 /**
- * Acusa `passwordConfirmation` diferente de `password`. Recebe os dois valores
- * já lidos: o `refine` do objeto os passa, e a regra fica num lugar só.
+ * Flags a `passwordConfirmation` different from `password`. It receives both values
+ * already read: the object's `refine` passes them, and the rule lives in one place.
  */
 export function passwordsMatch(
   password: string | undefined,
@@ -244,7 +244,7 @@ export function passwordsMatch(
   return password === undefined || password === confirmation
 }
 
-/** Opções do `refine` que cobra um campo preenchido, na mensagem da casa. */
+/** Options of the `refine` that demands a filled field, with the house message. */
 export function requiredIssue(path: ReadonlyArray<string>) {
   return {
     path: [...path],
@@ -252,7 +252,7 @@ export function requiredIssue(path: ReadonlyArray<string>) {
   }
 }
 
-/** Opções do `refine` de objeto que cobra a confirmação da senha. */
+/** Options of the object `refine` that demands the password confirmation. */
 export function passwordMismatchIssue() {
   return {
     path: ['passwordConfirmation'],

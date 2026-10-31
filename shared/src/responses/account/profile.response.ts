@@ -1,8 +1,8 @@
 import { AdministratorUserShowResponse } from '../administrator/users.response.js'
 
 /**
- * `GET /account` e `PUT /account` respondem a mesma conta que o painel vê: uma
- * forma só, para a resposta do `PUT` não apagar do cache o que o `GET` entregou.
+ * `GET /account` and `PUT /account` answer with the same account the panel sees: a
+ * single shape, so the `PUT` response does not erase from the cache what `GET` delivered.
  */
 export const AccountProfileShowResponse = AdministratorUserShowResponse
 

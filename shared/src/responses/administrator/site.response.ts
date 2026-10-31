@@ -4,9 +4,9 @@ import { z } from '../../validator.js'
 const date = () => z.iso.datetime({ offset: true })
 
 /**
- * O regulamento como arquivo registrado, com o caminho no bucket: o painel vê
- * o registro inteiro. A `url` é assinada na leitura e some do registro recém
- * gravado, por isso é opcional.
+ * The regulation as a registered file, with the path in the bucket: the panel sees the
+ * whole record. The `url` is signed on read and absent from a just-written record,
+ * hence optional.
  */
 export const AdministratorSiteRegulationResponse = z.object({
   id: z.uuid(),
@@ -25,9 +25,8 @@ export const AdministratorSiteRegulationResponse = z.object({
 })
 
 /**
- * A configuração do site como a API devolve no painel: na leitura e na
- * edição (`_standards/architecture.md` §10). `regulation` é nulo enquanto não
- * houver PDF.
+ * The site configuration as the API returns it in the panel: on read and on update
+ * (`_standards/architecture.md` §10). `regulation` is null while there is no PDF.
  */
 export const AdministratorSiteShowResponse = z.object({
   id: z.uuid(),

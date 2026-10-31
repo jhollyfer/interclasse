@@ -1,11 +1,11 @@
 /**
- * A categoria de uma turma. Turmas de categorias diferentes nunca se enfrentam:
- * cada modalidade tem uma chave por categoria.
+ * The category of a classroom. Classrooms of different categories never face each
+ * other: each sport has one bracket per category.
  */
 export const CATEGORY = {
-  /** Fundamental 1: do 3º ao 5º ano. */
+  /** Fundamental 1: 3rd to 5th grade. */
   F1: 'F1',
-  /** Fundamental 2: do 6º ao 9º ano. */
+  /** Fundamental 2: 6th to 9th grade. */
   F2: 'F2',
 } as const
 

@@ -1,6 +1,6 @@
 import { z } from '../../validator.js'
 
-/** O aluno de uma turma, no cadastro, na edição e em cada item da lista. */
+/** A classroom student, in create, update and each list item. */
 export const AdvisorStudentShowResponse = z.object({
   id: z.uuid(),
   classroomId: z.uuid(),

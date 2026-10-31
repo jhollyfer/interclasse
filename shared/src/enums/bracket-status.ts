@@ -1,9 +1,9 @@
 /**
- * Onde a competição de uma modalidade numa categoria está: em disputa ou
- * encerrada, com campeão.
+ * Where the competition of a sport in a category stands: in progress or finished,
+ * with a champion.
  *
- * Não existe chave "aberta": antes do sorteio a linha simplesmente não existe,
- * e é a ausência dela que deixa as inscrições abertas.
+ * There is no "open" key: before the draw the row simply does not exist, and it is
+ * its absence that keeps enrollments open.
  */
 export const BRACKET_STATUS = {
   KNOCKOUT: 'KNOCKOUT',

@@ -1,6 +1,6 @@
 /**
- * O identificador de URL derivado de um nome: "Tênis de mesa" vira
- * `tenis-de-mesa`. Puro, e por isso no `shared/`: os dois lados derivam igual
+ * The URL identifier derived from a name: "Tênis de mesa" becomes
+ * `tenis-de-mesa`. Pure, and therefore in `shared/`: both sides derive it the same
  * (`_standards/domain.md` §3).
  */
 export class Slug {

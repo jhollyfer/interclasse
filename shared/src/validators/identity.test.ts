@@ -14,11 +14,11 @@ const VALID = {
 } as const
 
 describe('validators de identidade', () => {
-  it('aceita a conta válida', () => {
+  it('accepts the valid account', () => {
     expect(AdministratorUserCreateValidator.safeParse(VALID).success).toBe(true)
   })
 
-  it('senha fraca e confirmação diferente usam a mensagem do idioma em vigor', () => {
+  it('weak password and mismatched confirmation use the message of the language in force', () => {
     for (const locale of LOCALES) {
       useValidatorLocale(locale)
 

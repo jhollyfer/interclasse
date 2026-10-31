@@ -1,8 +1,8 @@
 import { pageFields, z } from '../../validator.js'
 
 /**
- * Os avisos de atleta tirado da lista. `pending` recorta os que o administrador
- * ainda não leu: é o contador do menu. Par do VineJS de
+ * The notices of athletes removed from the list. `pending` keeps the ones the
+ * administrator has not read yet: it is the menu counter. Mirror of the VineJS one in
  * `backend/app/validators/administrator/enrollment-removals.validator.ts`.
  */
 export const AdministratorEnrollmentRemovalPaginateValidator = z.object({

@@ -3,17 +3,17 @@ import { CATEGORIES } from '../../enums/category.js'
 import { pageFields, z } from '../../validator.js'
 
 /**
- * A chave, como o painel a sorteia e a lista. Par de caminho e nome do VineJS de
+ * The bracket, as the panel draws and lists it. Mirror (path and name) of the VineJS one in
  * `backend/app/validators/administrator/brackets.validator.ts`
- * (`_standards/architecture.md` §10). O resto da chave - times, grupos e
- * partidas - sai das inscrições e do sorteio.
+ * (`_standards/architecture.md` §10). The rest of the bracket - teams, groups and
+ * matches - comes from the enrollments and the draw.
  */
 export const AdministratorBracketCreateValidator = z.object({
   sportId: z.uuid(),
   category: z.enum(CATEGORIES),
 })
 
-/** A prévia do sorteio pergunta o mesmo que o sorteio. */
+/** The draw preview asks the same as the draw. */
 export const AdministratorBracketPreviewValidator = z.object({
   sportId: z.uuid(),
   category: z.enum(CATEGORIES),
