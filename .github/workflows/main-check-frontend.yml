@@ -175,19 +175,22 @@ jobs:
 
       # Migrations, seed do administrador e demonstração (conselheiras do E2E),
       # depois a API de pé. Valores só de teste; nenhum serve fora deste job.
+      # A imagem roda em `production`, como no deploy: em `development` o logger
+      # do Adonis carrega o `pino-pretty`, que é dependência de dev e não está
+      # na imagem. Os seeders de demonstração só rodam em `development`, então
+      # vão pelo workspace, que tem as dependências de dev.
       - name: Sobe a API
         env:
           SEED_ADMINISTRATOR_PASSWORD: Ci-Owner-1!
           SEED_DEMO_PASSWORD: Ci-Demo-1!
         run: |
           cat > "$RUNNER_TEMP/api.env" <<ENV
-          NODE_ENV=development
+          NODE_ENV=production
           PORT=3333
           HOST=0.0.0.0
           LOG_LEVEL=info
           APP_KEY=ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL=http://localhost:3333
-          SESSION_DRIVER=cookie
           CORS_ORIGINS=http://localhost:3010
           DATABASE_URL=postgres://interclasse:interclasse@localhost:5434/interclasse
           UPLOAD_MAX_SIZE=1073741824
@@ -201,8 +204,15 @@ jobs:
           SEED_DEMO_PASSWORD=${SEED_DEMO_PASSWORD}
           ENV
           docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace migration:run --force
-          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace db:seed
-          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace db:seed --files database/seeders/dev/demo.js
+          (
+            cd backend
+            set -a
+            . "$RUNNER_TEMP/api.env"
+            set +a
+            export NODE_ENV=development
+            node ace db:seed
+            node ace db:seed --files database/seeders/dev/demo.ts
+          )
           docker run -d --name api --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e
           for _ in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:3333/health-check; then
