@@ -10,9 +10,9 @@ import {
 } from '#tests/bracket-harness-fixtures'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente. O arranjo do que a chave só lê está em
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double. The arrangement of what the bracket only reads is in
  * `tests/bracket-harness-fixtures.ts`.
  */
 const IMPLEMENTATIONS = {
@@ -26,7 +26,7 @@ const NOW = BracketArrangements.NOW
 const sportView = BracketArrangements.sport.bind(BracketArrangements)
 const classroomView = BracketArrangements.classroom.bind(BracketArrangements)
 
-/** A chave gravada, como a entidade a vê; `undefined` se não há. */
+/** The saved bracket, as the entity sees it; `undefined` if there is none. */
 async function savedOf(harness: Harness, id: string) {
   const bracket = await harness.repository.findById(id)
 
@@ -39,7 +39,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`BracketRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem a mesma chave, com times e partidas', async ({ assert }) => {
+    test('save and findById return the same bracket, with teams and matches', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B', '8º C'])
 
@@ -47,7 +49,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const byId = <T extends { id: string }>(items: T[] | undefined) =>
         [...(items ?? [])].sort((a, b) => a.id.localeCompare(b.id))
 
-      // Os times não têm ordem natural: o contrato é o conjunto.
+      // The teams have no natural order: the contract is the set.
       assert.deepEqual(byId(found?.teams), byId(bracket.snapshot().teams))
       assert.deepEqual(found?.matches, bracket.snapshot().matches)
       assert.deepEqual(
@@ -56,13 +58,15 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('findById de id inexistente é null', async ({ assert }) => {
+    test('findById of a nonexistent id is null', async ({ assert }) => {
       const harness = await make()
 
       assert.isNull(await harness.repository.findById(randomUUID()))
     })
 
-    test('acha a chave pela partida e pela modalidade com a categoria', async ({ assert }) => {
+    test('finds the bracket by the match and by the sport with the category', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { bracket, sport } = await drawn(harness, ['8º A', '8º B'])
       const [match] = bracket.snapshot().matches
@@ -76,7 +80,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.findByMatchId(randomUUID()))
     })
 
-    test('save do placar grava o vencedor na seguinte e só toca o que mudou', async ({
+    test('save of the score writes the winner into the next one and only touches what changed', async ({
       assert,
     }) => {
       const harness = await make()
@@ -84,7 +88,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const matches = bracket.snapshot().matches
       const semi = matches.find((m) => m.phase === MATCH_PHASE.SEMI && m.position === 0)
       const other = matches.find((m) => m.phase === MATCH_PHASE.SEMI && m.position === 1)
-      if (!semi || !other) throw new Error('semifinais ausentes no arranjo')
+      if (!semi || !other) throw new Error('semifinals missing from the arrangement')
 
       bracket.score(semi.id, { homeScore: 3, awayScore: 1 }, LATER)
       await harness.repository.save(bracket)
@@ -103,11 +107,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(untouched?.updatedAt, NOW)
     })
 
-    test('save da final grava a chave encerrada, e desfazer a reabre', async ({ assert }) => {
+    test('save of the final writes the finished bracket, and undoing reopens it', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B'])
       const final = bracket.snapshot().matches[0]
-      if (!final) throw new Error('final ausente no arranjo')
+      if (!final) throw new Error('final missing from the arrangement')
 
       bracket.score(final.id, { homeScore: 1, awayScore: 0 }, LATER)
       await harness.repository.save(bracket)
@@ -121,11 +127,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(reopened?.matches[0]?.status, MATCH_STATUS.SCHEDULED)
     })
 
-    test('save da agenda grava data e local', async ({ assert }) => {
+    test('saving the schedule stores date and place', async ({ assert }) => {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B'])
       const match = bracket.snapshot().matches[0]
-      if (!match) throw new Error('partida ausente no arranjo')
+      if (!match) throw new Error('match missing from the arrangement')
 
       bracket.schedule(match.id, { scheduledAt: LATER, location: 'Quadra 1' }, LATER)
       await harness.repository.save(bracket)
@@ -136,7 +142,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(saved?.location, 'Quadra 1')
     })
 
-    test('delete leva a chave com times e partidas', async ({ assert }) => {
+    test('delete takes the bracket with teams and matches', async ({ assert }) => {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B'])
 
@@ -145,7 +151,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.findById(bracket.id))
     })
 
-    test('eligibleClassroomIds só traz a turma com atletas no mínimo', async ({ assert }) => {
+    test('eligibleClassroomIds only brings a classroom with the minimum athletes', async ({
+      assert,
+    }) => {
       const harness = await make()
       const sport = sportView('Vôlei', 2)
       await harness.sport(sport)
@@ -162,7 +170,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(ids, [full.id])
     })
 
-    test('preview conta os atletas de cada turma e avisa se já sorteou', async ({ assert }) => {
+    test('preview counts the athletes of each classroom and warns if it was already drawn', async ({
+      assert,
+    }) => {
       const harness = await make()
       const sport = sportView('Handebol', 2)
       await harness.sport(sport)
@@ -188,11 +198,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.preview(randomUUID(), CATEGORY.F2))
     })
 
-    test('detail traz as partidas com o nome das turmas e a campeã', async ({ assert }) => {
+    test('detail brings the matches with the classroom names and the champion', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { bracket, sport } = await drawn(harness, ['8º A', '8º B'])
       const final = bracket.snapshot().matches[0]
-      if (!final) throw new Error('final ausente no arranjo')
+      if (!final) throw new Error('final missing from the arrangement')
       bracket.score(final.id, { homeScore: 2, awayScore: 0 }, LATER)
       await harness.repository.save(bracket)
 
@@ -208,9 +220,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.detail(randomUUID()))
     })
 
-    test('paginate filtra e ordena pela mais nova ou pelo nome da modalidade', async ({
-      assert,
-    }) => {
+    test('paginate filters and sorts by newest or by sport name', async ({ assert }) => {
       const harness = await make()
       await drawn(harness, ['8º A', '8º B'], 'Vôlei')
       await drawn(harness, ['9º A', '9º B'], 'Basquete')
@@ -235,7 +245,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(finished.meta.total, 0)
     })
 
-    test('paginateMatches filtra por turma e ignora a partida sem os dois times', async ({
+    test('paginateMatches filters by classroom and ignores a match without both teams', async ({
       assert,
     }) => {
       const harness = await make()
@@ -253,7 +263,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         order: 'schedule',
       })
 
-      // Duas semifinais com os dois times; a final ainda não tem adversário.
+      // Two semifinals with both teams; the final does not have an opponent yet.
       assert.equal(all.meta.total, 2)
       assert.equal(ofClassroom.meta.total, 1)
       assert.deepEqual(Object.keys(all.data[0]?.homeTeam.classroom ?? {}).sort(), [
@@ -263,7 +273,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       ])
     })
 
-    test('findMatchResponse traz a partida com as turmas inteiras e a chave', async ({
+    test('findMatchResponse brings the match with the whole classrooms and the bracket', async ({
       assert,
     }) => {
       const harness = await make()
@@ -281,13 +291,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.findMatchResponse(randomUUID()))
     })
 
-    test('matchAthletes lista os alunos das duas turmas, os inscritos primeiro', async ({
+    test('matchAthletes lists the students of both classrooms, the enrolled first', async ({
       assert,
     }) => {
       const harness = await make()
       const { bracket, sport, classrooms } = await drawn(harness, ['8º A', '8º B'])
       const home = classrooms[0]
-      if (!home) throw new Error('turma ausente no arranjo')
+      if (!home) throw new Error('classroom missing from the arrangement')
       await harness.student(
         { id: randomUUID(), name: 'Aaa fora da lista', classroomId: home.id },
         [],
@@ -312,7 +322,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.matchAthletes(randomUUID()))
     })
 
-    test('findSport e lockSport leem a modalidade', async ({ assert }) => {
+    test('findSport and lockSport read the sport', async ({ assert }) => {
       const harness = await make()
       const { sport } = await drawn(harness, ['8º A', '8º B'])
 

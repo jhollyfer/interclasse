@@ -13,14 +13,14 @@ import { BracketArrangements, type BracketHarness } from '#tests/bracket-harness
 import { resetDatabase } from '#tests/http-fixtures'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4). O
- * cartão lê a partida pelo repositório da chave, então cada implementação
- * recebe o dela: o de memória, o repositório em memória; o Lucid, o do banco.
+ * The same contract in both implementations (`_standards/domain.md` §5.4). The
+ * card reads the match through the bracket repository, so each implementation
+ * receives its own: the in-memory one gets the in-memory repository; Lucid, the database one.
  */
 type Harness = {
   readonly bracket: BracketHarness
   readonly cards: MatchCardRepository
-  /** Os alunos que o cartão só lê, arranjados do jeito de cada implementação. */
+  /** The students the card only reads, arranged the way each implementation does. */
   arrangeStudent(student: { id: string; name: string; classroomId: string }): void
 }
 
@@ -44,7 +44,7 @@ const IMPLEMENTATIONS = {
   },
 } satisfies Record<string, () => Promise<Harness>>
 
-/** Uma chave de 4 turmas sorteada, e um cartão do aluno da turma mandante da primeira semifinal. */
+/** A drawn bracket of 4 classrooms, and a card of the student of the home classroom of the first semifinal. */
 async function launched(harness: Harness, createdAt = BracketArrangements.NOW) {
   const drawn = await BracketArrangements.drawn(harness.bracket, ['8º A', '8º B', '8º C', '8º D'])
   for (const student of drawn.students) harness.arrangeStudent(student)
@@ -57,7 +57,7 @@ async function launched(harness: Harness, createdAt = BracketArrangements.NOW) {
       candidate.classroomId ===
       drawn.bracket.snapshot().teams.find((team) => team.id === semi?.homeTeamId)?.classroomId,
   )
-  if (!semi || !student) throw new Error('arranjo incompleto')
+  if (!semi || !student) throw new Error('incomplete arrangement')
 
   const created = MatchCard.launch({
     id: randomUUID(),
@@ -70,7 +70,7 @@ async function launched(harness: Harness, createdAt = BracketArrangements.NOW) {
     awayTeamId: semi.awayTeamId,
     studentTeamId: semi.homeTeamId,
   })
-  if (created.isLeft()) throw new Error('cartão inválido no arranjo')
+  if (created.isLeft()) throw new Error('invalid card in the arrangement')
 
   await harness.cards.save(created.value)
 
@@ -81,7 +81,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`MatchCardRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem o mesmo cartão', async ({ assert }) => {
+    test('save and findById return the same card', async ({ assert }) => {
       const harness = await make()
       const { card } = await launched(harness)
 
@@ -91,7 +91,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.cards.findById(randomUUID()))
     })
 
-    test('findStudentClassroom acha a turma do aluno', async ({ assert }) => {
+    test("findStudentClassroom finds the student's classroom", async ({ assert }) => {
       const harness = await make()
       const { student } = await launched(harness)
 
@@ -99,7 +99,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.cards.findStudentClassroom(randomUUID()))
     })
 
-    test('findResponse traz o aluno, o time e a partida', async ({ assert }) => {
+    test('findResponse brings the student, the team and the match', async ({ assert }) => {
       const harness = await make()
       const { card, student, semi } = await launched(harness)
 
@@ -113,7 +113,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.cards.findResponse(randomUUID()))
     })
 
-    test('paginate filtra por partida, atleta e turma, do mais novo ao mais antigo', async ({
+    test('paginate filters by match, athlete and classroom, newest to oldest', async ({
       assert,
     }) => {
       const harness = await make()
@@ -148,7 +148,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(otherMatch.meta.total, 0)
     })
 
-    test('paginate ordena pelo mais novo primeiro', async ({ assert }) => {
+    test('paginate sorts newest first', async ({ assert }) => {
       const harness = await make()
       const { semi, student } = await launched(harness, new Date('2026-10-29T12:00:00Z'))
       const newer = MatchCard.launch({
@@ -162,7 +162,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         awayTeamId: semi.awayTeamId,
         studentTeamId: semi.homeTeamId,
       })
-      if (newer.isLeft()) throw new Error('cartão inválido no arranjo')
+      if (newer.isLeft()) throw new Error('invalid card in the arrangement')
       await harness.cards.save(newer.value)
 
       const page = await harness.cards.paginate({ page: 1, perPage: 10 })
@@ -173,7 +173,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('delete tira o cartão', async ({ assert }) => {
+    test('delete removes the card', async ({ assert }) => {
       const harness = await make()
       const { card } = await launched(harness)
 

@@ -125,7 +125,7 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
     }
   }
 
-  /** Os alunos da turma como subconsulta, para recortar a lista dela. */
+  /** The classroom's students as a subquery, to cut its list. */
   private studentIdsOf(classroomId: string) {
     return StudentModel.query({ client: this.transaction.client() })
       .where('classroomId', classroomId)

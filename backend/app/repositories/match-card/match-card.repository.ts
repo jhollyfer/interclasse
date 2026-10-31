@@ -10,12 +10,12 @@ export type CardListCriteria = {
   readonly page: number
   readonly perPage: number
   readonly matchId?: string
-  /** Os cartões dos atletas desta turma. */
+  /** The cards of this classroom's athletes. */
   readonly classroomId?: string
   readonly studentId?: string
 }
 
-/** O aluno como o cartão o mostra. */
+/** The student as the card shows it. */
 export type CardStudent = {
   readonly id: string
   readonly name: string
@@ -25,27 +25,27 @@ export type CardStudent = {
 }
 
 /**
- * A persistência do cartão, por intenção (`_standards/domain.md` §5.1). O
- * escritor único da tabela `match_cards`; lê o aluno só para responder em que
- * turma ele está, e a partida pelo contrato da chave, que é quem a conhece.
+ * The card persistence, by intent (`_standards/domain.md` §5.1). The
+ * single writer of the `match_cards` table; it reads the student only to answer which
+ * classroom they are in, and the match through the bracket contract, which is who knows it.
  */
 export abstract class MatchCardRepository {
   abstract findById(id: string): Promise<MatchCard | null>
-  /** A turma do aluno, ou `null` se o aluno não existe. */
+  /** The student's classroom, or `null` if the student does not exist. */
   abstract findStudentClassroom(studentId: string): Promise<string | null>
   abstract save(card: MatchCard): Promise<void>
   abstract delete(card: MatchCard): Promise<void>
-  /** Leitura leve: a forma da resposta direto da query, do mais novo ao mais antigo. */
+  /** Lightweight read: the response shape straight from the query, newest to oldest. */
   abstract paginate(
     criteria: CardListCriteria,
   ): Promise<Paginated<AdministratorCardPaginateResponse>>
-  /** O cartão lido como a lista o mostra, ou `null` se não existe. */
+  /** The card read as the list shows it, or `null` if it does not exist. */
   abstract findResponse(id: string): Promise<AdministratorCardPaginateResponse | null>
 
   /**
-   * Monta a resposta do cartão com o aluno e a partida já lidos. O time por que
-   * o atleta jogava é um dos dois da partida; existir uma vez aqui é o que faz as
-   * duas implementações responderem igual. `null` se o time não é da partida.
+   * Builds the card response with the student and the match already read. The team the
+   * athlete played for is one of the match's two; existing once here is what makes both
+   * implementations answer the same. `null` if the team is not in the match.
    */
   protected assemble(
     card: MatchCardProps,

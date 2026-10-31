@@ -9,17 +9,17 @@ import type { UserError } from '#domain/user/user.errors'
 import type { StorageRepository } from '#repositories/storage/storage.repository'
 import { MemoryPagination } from '#core/memory-pagination'
 
-/** O sinal da comparação por sentido de ordenação. */
+/** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  *
- * Cifra a senha no `save` quando ela mudou, como o hook do model faz: sem isso
- * o use-case que confere a senha atual passaria contra um dublê que mente. O
- * avatar vem do repository de arquivos que o teste passa.
+ * It hashes the password on `save` when it changed, as the model hook does: without that
+ * the use case that checks the current password would pass against a lying double. The
+ * avatar comes from the files repository the test passes.
  */
 export class UserMemoryRepository extends UserRepository {
   private readonly rows = new Map<string, UserProps>()
@@ -62,7 +62,7 @@ export class UserMemoryRepository extends UserRepository {
 
   async save(user: User): Promise<Either<UserError, void>> {
     const snapshot = structuredClone(user.snapshot())
-    // O `unique` do e-mail, como o banco o garante.
+    // The e-mail `unique`, as the database guarantees it.
     if (await this.existsByEmail(snapshot.email, snapshot.id))
       return left({ code: 'USER_ALREADY_EXISTS' })
 

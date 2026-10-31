@@ -13,9 +13,9 @@ import { resetDatabase } from '#tests/http-fixtures'
 type Pair = { readonly sessions: SessionRepository; readonly userId: string }
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double.
  */
 const IMPLEMENTATIONS = {
   lucid: async (): Promise<Pair> => {
@@ -33,7 +33,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`SessionRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('o token de refresh emitido é lido de volta com o dono', async ({ assert }) => {
+    test('the issued refresh token is read back with its owner', async ({ assert }) => {
       const { sessions, userId } = await make()
 
       const issued = await sessions.issue(userId)
@@ -43,13 +43,13 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(grant?.userId, userId)
     })
 
-    test('token ilegível ou inexistente é null', async ({ assert }) => {
+    test('an unreadable or nonexistent token is null', async ({ assert }) => {
       const { sessions } = await make()
 
       assert.isNull(await sessions.readRefresh('lixo'))
     })
 
-    test('revoke apaga o token uma vez; a segunda devolve false', async ({ assert }) => {
+    test('revoke deletes the token once; the second returns false', async ({ assert }) => {
       const { sessions, userId } = await make()
       const issued = await sessions.issue(userId)
       const refreshToken = issued?.refreshToken ?? ''
@@ -60,7 +60,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await sessions.readRefresh(refreshToken))
     })
 
-    test('revokeAll derruba todas as sessões da conta e só dela', async ({ assert }) => {
+    test("revokeAll drops all the account's sessions and only its own", async ({ assert }) => {
       const { sessions, userId } = await make()
       const stranger = await UserFactory.create()
       const mine = await sessions.issue(userId)

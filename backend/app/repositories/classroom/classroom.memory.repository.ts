@@ -27,43 +27,43 @@ import {
 import type { ClassroomError } from '#domain/classroom/classroom.errors'
 import { MemoryPagination } from '#core/memory-pagination'
 
-/** O sinal da comparação por sentido de ordenação. */
+/** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
 type Totals = { readonly students: number; readonly athletes: number; readonly sports: number }
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class ClassroomMemoryRepository extends ClassroomRepository {
   private readonly rows = new Map<string, ClassroomProps>()
-  /** As contas que o teste arranja: o que a tabela `users` teria. */
+  /** The accounts the test arranges: what the `users` table would have. */
   private readonly accounts = new Map<string, AdministratorClassroomPersonResponse>()
   private readonly totals = new Map<string, Totals>()
   private readonly competing = new Set<string>()
 
-  /** Arranjo do teste: uma conta existente (viva, com o papel que ela traz). */
+  /** Test arrangement: an existing account (live, with the role it brings). */
   withAccount(account: AdministratorClassroomPersonResponse): this {
     this.accounts.set(account.id, account)
     return this
   }
 
-  /** Arranjo do teste: a conta foi arquivada. */
+  /** Test arrangement: the account was archived. */
   withArchivedAccount(accountId: string): this {
     const account = this.accounts.get(accountId)
     if (account) this.accounts.set(accountId, { ...account, deletedAt: '2026-10-29T12:00:00.000Z' })
     return this
   }
 
-  /** Arranjo do teste: os totais do cartão da turma. */
+  /** Test arrangement: the classroom card totals. */
   withTotals(classroomId: string, totals: Totals): this {
     this.totals.set(classroomId, totals)
     return this
   }
 
-  /** Arranjo do teste: a turma tem time numa chave. */
+  /** Test arrangement: the classroom has a team in a bracket. */
   markInCompetition(classroomId: string): this {
     this.competing.add(classroomId)
     return this
@@ -136,7 +136,7 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     const snapshot = structuredClone(classroom.snapshot())
     const others = [...this.rows.values()].filter((row) => row.id !== snapshot.id)
 
-    // Os três `unique` do banco: conselheiro, representante e nome.
+    // The three database `unique`s: advisor, representative and name.
     if (snapshot.advisorId && others.some((row) => row.advisorId === snapshot.advisorId))
       return left({ code: 'ADVISOR_TAKEN' })
     if (
@@ -156,7 +156,7 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     this.rows.delete(classroom.id)
   }
 
-  /** As contas que o teste viu serem soltas das turmas, em ordem. */
+  /** The accounts the test saw being released from classrooms, in order. */
   readonly detachedAccounts: string[] = []
 
   async detachAccount(accountId: string): Promise<void> {
@@ -201,7 +201,7 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     return this.page(all, criteria, (props) => this.toResponse(props))
   }
 
-  /** O administrador alcança todas; os outros, a turma que aconselham. */
+  /** The administrator reaches all; the others, the classroom they advise. */
   private reaches(actor: Actor, props: ClassroomProps): boolean {
     return actor.role === USER_ROLE.ADMINISTRATOR || props.advisorId === actor.id
   }

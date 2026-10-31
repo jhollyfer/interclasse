@@ -34,7 +34,7 @@ import {
 } from '#domain/classroom/classroom.entity'
 import { TransactionContext } from '#core/transaction-context'
 
-/** Os totais do cartão de cada turma, por id. */
+/** The card totals of each classroom, by id. */
 type ClassroomTotals = {
   readonly students: ReadonlyMap<string, number>
   readonly athletes: ReadonlyMap<string, number>
@@ -64,8 +64,8 @@ export class ClassroomLucidRepository extends ClassroomRepository {
       'id',
       criteria.id,
     )
-    // Quem não é administrador alcança só a turma que aconselha: papel novo sem
-    // vínculo não vê nada (fail-closed, `backend.md` §4.6).
+    // Whoever is not an administrator reaches only the classroom they advise: a new role without a
+    // link sees nothing (fail-closed, `backend.md` §4.6).
     if (criteria.actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', criteria.actor.id)
 
     const row = await query.first()
@@ -156,8 +156,8 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   }
 
   /**
-   * O fato do campo que colidiu: cada `unique` vira o 409 do campo dele, e o nome da
-   * turma é o que sobra. O nome do `unique` é o que a migration deu a ele.
+   * The fact of the field that collided: each `unique` becomes the 409 of its field, and the classroom
+   * name is what is left. The `unique` name is the one the migration gave it.
    */
   private collision(error: unknown): ClassroomError {
     switch (PostgresError.violatedConstraint(error)) {
@@ -214,9 +214,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   }
 
   /**
-   * Os totais do cartão da turma, contados no banco sem carregar alunos nem
-   * inscrições: o Lucid só calcula agregado por relação, e a turma não declara a
-   * inversa para o model não importar o do aluno (`domain.md` §8, `no-circular`).
+   * The card totals of the classroom, counted in the database without loading students or
+   * enrollments: Lucid only computes aggregates by relation, and the classroom does not declare the
+   * inverse so the model does not import the student's (`domain.md` §8, `no-circular`).
    */
   private async totalsOf(classroomIds: ReadonlyArray<string>): Promise<ClassroomTotals> {
     const client = this.transaction.client()
@@ -247,8 +247,8 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   async paginateOwned(
     criteria: ClassroomOwnedListCriteria,
   ): Promise<Paginated<AdministratorClassroomShowResponse>> {
-    // Quem cuida da turma vem junto: o cartão mostra o conselheiro e o
-    // representante de cada uma.
+    // Whoever looks after the classroom comes along: the card shows the advisor and the
+    // representative of each one.
     const query = ClassroomModel.query({ client: this.transaction.client() })
       .preload('advisor')
       .preload('representative')
@@ -261,7 +261,7 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
   }
 
-  /** Conta viva com o papel do vínculo, e se outra turma já a tem. */
+  /** A live account with the link's role, and whether another classroom already has it. */
   private async linkFacts(
     column: 'advisorId' | 'representativeId',
     accountId: string,

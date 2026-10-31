@@ -13,7 +13,7 @@ import { TransactionContext } from '#core/transaction-context'
 type ClassroomRow = AdministratorReportShowResponse['classrooms'][number]
 type SportRow = AdministratorReportShowResponse['bySport'][number]
 
-/** Tudo contado no banco, em consultas agregadas. */
+/** Everything counted in the database, in aggregate queries. */
 @inject()
 export class ReportLucidRepository extends ReportRepository {
   constructor(private readonly transaction: TransactionContext) {
@@ -62,7 +62,7 @@ export class ReportLucidRepository extends ReportRepository {
     return rows.reduce((total, row) => total + row[key], 0)
   }
 
-  /** Cada turma com as pessoas e os totais dela, em ordem de ano e nome. */
+  /** Each classroom with its people and totals, in grade and name order. */
   private async classrooms(): Promise<ClassroomRow[]> {
     const client = this.transaction.client()
     const rows: Array<{
@@ -106,7 +106,7 @@ export class ReportLucidRepository extends ReportRepository {
     }))
   }
 
-  /** Cada modalidade com quantos atletas e quantas turmas têm inscritos nela. */
+  /** Each sport with how many athletes and how many classrooms have enrolled in it. */
   private async sports(): Promise<SportRow[]> {
     const client = this.transaction.client()
     const rows: Array<{

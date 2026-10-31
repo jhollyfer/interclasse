@@ -9,13 +9,13 @@ import { AnnouncementRepository, type AnnouncementListCriteria } from './announc
 import { Announcement, type AnnouncementProps } from '#domain/announcement/announcement.entity'
 import { MemoryPagination } from '#core/memory-pagination'
 
-/** O sinal da comparação por sentido de ordenação. */
+/** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class AnnouncementMemoryRepository extends AnnouncementRepository {
   private readonly rows = new Map<string, AnnouncementProps>()

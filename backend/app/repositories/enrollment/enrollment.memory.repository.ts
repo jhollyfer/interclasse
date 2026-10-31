@@ -13,12 +13,12 @@ type SportRow = AdvisorEnrollmentShowResponse['sports'][number]
 type ClassroomRow = AdvisorEnrollmentShowResponse['classroom']
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class EnrollmentMemoryRepository extends EnrollmentRepository {
-  /** A lista de cada turma por modalidade, pela chave `turma:modalidade`. */
+  /** The list of each classroom per sport, by the key `classroom:sport`. */
   private readonly lists = new Map<string, string[]>()
   private readonly sports = new Map<
     string,
@@ -26,34 +26,34 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
   >()
   private readonly classrooms = new Map<string, ClassroomRow>()
   private readonly students = new Map<string, EnrollmentStudent[]>()
-  /** As modalidades sorteadas por categoria. */
+  /** The sports drawn per category. */
   private readonly drawn = new Map<Category, Set<string>>()
 
-  /** Arranjo do teste: a modalidade existe. */
+  /** Test arrangement: the sport exists. */
   withSport(sport: Pick<SportRow, 'id' | 'name' | 'minAthletes' | 'maxAthletes'>): this {
     this.sports.set(sport.id, sport)
     return this
   }
 
-  /** Arranjo do teste: a turma existe. */
+  /** Test arrangement: the classroom exists. */
   withClassroom(classroom: ClassroomRow): this {
     this.classrooms.set(classroom.id, classroom)
     return this
   }
 
-  /** Arranjo do teste: o aluno é da turma. */
+  /** Test arrangement: the student belongs to the classroom. */
   withStudent(classroomId: string, student: EnrollmentStudent): this {
     this.students.set(classroomId, [...(this.students.get(classroomId) ?? []), student])
     return this
   }
 
-  /** Arranjo do teste: a modalidade já foi sorteada nesta categoria. */
+  /** Test arrangement: the sport was already drawn in this category. */
   markDrawn(category: Category, sportId: string): this {
     this.drawn.set(category, (this.drawn.get(category) ?? new Set()).add(sportId))
     return this
   }
 
-  /** Arranjo do teste: a lista que já estava gravada. */
+  /** Test arrangement: the list that was already saved. */
   withList(key: EnrollmentKey, studentIds: string[]): this {
     this.lists.set(this.keyOf(key), studentIds)
     return this

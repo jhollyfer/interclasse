@@ -87,9 +87,9 @@ export class StudentLucidRepository extends StudentRepository {
   }
 
   /**
-   * O recorte de alcance é uma subconsulta, e não uma checagem antes: turma
-   * alheia responde vazio em vez de confirmar que existe. Quem não é
-   * administrador alcança só a turma que aconselha (fail-closed, `backend.md` §4.6).
+   * The scope cut is a subquery, and not a prior check: a foreign
+   * classroom answers empty instead of confirming it exists. Whoever is not an
+   * administrator reaches only the classroom they advise (fail-closed, `backend.md` §4.6).
    */
   private scope(query: ReturnType<typeof StudentModel.query>, actor: Actor): void {
     if (actor.role === USER_ROLE.ADMINISTRATOR) return

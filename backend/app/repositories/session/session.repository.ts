@@ -1,37 +1,37 @@
-/** O par de tokens em claro, como sai da emissão - o único momento em que existe. */
+/** The plain token pair, as it comes out of issuance - the only moment it exists. */
 export type SessionTokens = {
   readonly accessToken: string
   readonly refreshToken: string
 }
 
-/** O que um token de refresh válido diz: de quem é e qual linha o guarda. */
+/** What a valid refresh token says: whose it is and which row keeps it. */
 export type RefreshGrant = {
   readonly userId: string
   readonly identifier: string
 }
 
 /**
- * A persistência dos tokens da sessão, por intenção (`_standards/domain.md`
- * §5.1): emitir, ler o de refresh e revogar. É o escritor único de
- * `auth_access_tokens`. Quem escreve a resposta HTTP é o controller, com `config/cookie.ts`; quem
- * decide quando emitir ou revogar é o use-case.
+ * The persistence of the session tokens, by intent (`_standards/domain.md`
+ * §5.1): issue, read the refresh one and revoke. It is the single writer of
+ * `auth_access_tokens`. Whoever writes the HTTP response is the controller, with `config/cookie.ts`; whoever
+ * decides when to issue or revoke is the use case.
  *
- * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
- * tempo. O concreto é `SessionLucidRepository`, ligado em `providers/repository.provider.ts`.
+ * `abstract class` and not `type`: it serves as a container token and as a type at the same
+ * time. The concrete one is `SessionLucidRepository`, bound in `providers/repository.provider.ts`.
  */
 export abstract class SessionRepository {
-  /** O par de tokens da conta; `null` quando o provider não devolveu o valor em claro. */
+  /** The account's token pair; `null` when the provider did not return the plain value. */
   abstract issue(userId: string): Promise<SessionTokens | null>
   /**
-   * Derruba todas as sessões da conta, dentro da transação em curso quando há
-   * uma: a revogação precisa cair junto com a escrita que a motiva.
+   * Drops all the account's sessions, inside the transaction in progress when there is
+   * one: the revocation must land together with the write that motivates it.
    */
   abstract revokeAll(userId: string): Promise<void>
-  /** Apaga um token da conta; `false` quando ele já não existia. */
+  /** Deletes an account's token; `false` when it no longer existed. */
   abstract revoke(userId: string, identifier: string): Promise<boolean>
   /**
-   * Lê um token de refresh. `null` para o ilegível, o inexistente, o vencido e
-   * o que não é de refresh: para quem chama são a mesma coisa.
+   * Reads a refresh token. `null` for the unreadable, the nonexistent, the expired and
+   * the one that is not a refresh: to the caller they are the same thing.
    */
   abstract readRefresh(value: string): Promise<RefreshGrant | null>
 }
