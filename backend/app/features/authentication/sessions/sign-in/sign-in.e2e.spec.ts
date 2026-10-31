@@ -4,53 +4,53 @@ import { COOKIE_TOKEN } from '#config/cookie'
 import { ADMINISTRATOR, body, resetDatabase } from '#tests/http-fixtures'
 
 /**
- * A sessão inteira pelo caminho real: o sign-in é o único jeito de obter um
- * cookie válido, e todo outro teste da suíte depende dele.
+ * The whole session through the real path: sign-in is the only way to get a
+ * valid cookie, and every other test in the suite depends on it.
  *
- * O que se afirma aqui é o contrato que `backend-old` não tinha: o token sai em
- * cookie `httpOnly` e não no corpo, e a recusa não conta se o e-mail
- * existe - senão o formulário de login vira um verificador de cadastro.
+ * What is asserted here is the contract `backend-old` did not have: the token leaves in an
+ * `httpOnly` cookie and not in the body, and the refusal does not tell whether the email
+ * exists - otherwise the login form becomes a registration checker.
  */
-test.group('autenticação > sign-in', (group) => {
+test.group('authentication > sign-in', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('credencial correta responde 204 com os dois cookies', async ({ client, assert }) => {
+  test('correct credential responds 204 with both cookies', async ({ client, assert }) => {
     const response = await client.post('/authentication/sign-in').json(ADMINISTRATOR)
 
     response.assertStatus(204)
 
-    // Sem corpo: o par de tokens viaja só no `Set-Cookie`, e o JavaScript da
-    // página nunca o alcança.
+    // No body: the token pair travels only in `Set-Cookie`, and the page's JavaScript
+    // never reaches it.
     assert.isEmpty(response.text())
     assert.isDefined(response.cookie(COOKIE_TOKEN.ACCESS)?.value)
     assert.isDefined(response.cookie(COOKIE_TOKEN.REFRESH)?.value)
   })
 
-  test('credencial errada responde 401 sem revelar se o e-mail existe', async ({
+  test('wrong credential responds 401 without revealing whether the email exists', async ({
     client,
     assert,
   }) => {
-    const existente = await client
+    const existing = await client
       .post('/authentication/sign-in')
       .json({ email: ADMINISTRATOR.email, password: 'Errada1234!' })
 
-    const inexistente = await client
+    const nonexistent = await client
       .post('/authentication/sign-in')
       .json({ email: 'ninguem@mail.com', password: 'Errada1234!' })
 
-    existente.assertStatus(401)
-    inexistente.assertStatus(401)
+    existing.assertStatus(401)
+    nonexistent.assertStatus(401)
 
-    // Mesma resposta nos dois casos: qualquer diferença - código, mensagem ou
-    // campo apontado - transformaria o login num verificador de cadastro.
-    assert.deepEqual(body(existente), body(inexistente))
-    assert.equal(body(existente).code, 'INVALID_CREDENTIALS')
+    // Same response in both cases: any difference - code, message or
+    // pointed field - would turn the login into a registration checker.
+    assert.deepEqual(body(existing), body(nonexistent))
+    assert.equal(body(existing).code, 'INVALID_CREDENTIALS')
 
-    // E nenhum cookie é escrito na recusa.
-    assert.isUndefined(existente.cookie(COOKIE_TOKEN.ACCESS))
+    // And no cookie is written on refusal.
+    assert.isUndefined(existing.cookie(COOKIE_TOKEN.ACCESS))
   })
 
-  test('429 na sexta tentativa do mesmo IP no minuto, mesmo com a senha certa', async ({
+  test('429 on the sixth attempt from the same IP in a minute, even with the right password', async ({
     client,
     assert,
   }) => {

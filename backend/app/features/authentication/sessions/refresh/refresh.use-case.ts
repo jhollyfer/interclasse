@@ -28,22 +28,22 @@ export default class AuthenticationSessionRefreshUseCase {
       )
     }
 
-    // O `try` global começa antes da primeira ida ao banco (_standards/backend.md §4.2).
+    // The global `try` starts before the first trip to the database (_standards/backend.md §4.2).
     try {
       const grant = await this.sessions.readRefresh(payload.refreshToken)
 
       if (!grant) return left(this.invalid())
 
-      // A mesma pergunta do guard, e não só a leitura da conta: renovar sem o
-      // filtro prorrogaria por escrito uma sessão que já foi encerrada.
+      // The same question as the guard, not just reading the account: refreshing without the
+      // filter would extend in writing a session that was already ended.
       const user = await this.users.findById(grant.userId)
 
       if (!user || !user.canSignIn()) return left(this.invalid())
 
-      // O `DELETE` é a seção crítica, e por isso vem antes de emitir: só quem
-      // apagou a linha ganha o direito ao par novo. Sem contar as linhas
-      // apagadas, duas renovações simultâneas emitiriam dois pares válidos a
-      // partir do mesmo token - rotação que não rotaciona.
+      // The `DELETE` is the critical section, and so it comes before issuing: only whoever
+      // deleted the row earns the right to the new pair. Without counting the deleted
+      // rows, two simultaneous refreshes would issue two valid pairs from
+      // the same token - rotation that does not rotate.
       if (!(await this.sessions.revoke(user.id, grant.identifier))) return left(this.invalid())
 
       const tokens = await this.sessions.issue(user.id)
