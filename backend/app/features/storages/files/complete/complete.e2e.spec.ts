@@ -123,15 +123,24 @@ test.group('storages > complete', (group) => {
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // Declara mil bytes e sobe dez: é a mentira que o `complete` existe para
-    // pegar, já que os bytes não passam pela aplicação.
+    // Declara mil bytes e tenta subir dez. A primeira barreira é do bucket: a
+    // URL prende `content-length`, e o PUT com outro tamanho leva 403.
     const opened = await open(client, session, {
       fileName: 'capa.png',
       mimetype: 'image/png',
       size: 1000,
     })
 
-    await put(opened.parts[0].url, new Uint8Array(10))
+    const refused = await fetch(opened.parts[0].url, {
+      method: 'PUT',
+      body: new Uint8Array(10),
+      headers: { 'Content-Type': 'image/png' },
+    })
+    assert.equal(refused.status, 403)
+
+    // A segunda é o `complete`, para o objeto que chegou ao bucket por outro
+    // caminho (storage sem a assinatura do tamanho): grava direto, sem a URL.
+    await drive.use().put(opened.storage.path, Buffer.from(new Uint8Array(10)))
 
     const response = await client
       .post(`/storages/${opened.storage.id}/complete`)
