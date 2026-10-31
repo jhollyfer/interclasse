@@ -4,8 +4,8 @@ import { VISIBLE_CLASSROOMS } from '#/components/common/classroom-detail'
 import { advisorClassroomsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 
 /**
- * O conselheiro tem uma turma só (índice único em `classrooms.advisor_id`):
- * a entrada da área leva direto a ela. Sem turma, fica o aviso desta rota.
+ * The advisor has a single classroom (unique index on `classrooms.advisor_id`):
+ * the area's entry leads straight to it. Without a classroom, this route's notice remains.
  */
 export const Route = createFileRoute('/_private/advisor/')({
   loader: async ({ context }) => {

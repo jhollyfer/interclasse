@@ -12,10 +12,10 @@ import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /**
- * As ações da barra de seleção. Só arquivar: remover em massa não existe.
+ * The selection bar's actions. Archive only: bulk removal does not exist.
  *
- * A própria conta não chega aqui: a caixa dela nasce desabilitada, pelo
- * predicado de `selectable` em `table.tsx`.
+ * The account itself does not get here: its checkbox is born disabled, through the
+ * `selectable` predicate in `table.tsx`.
  */
 export function UserBulkActions({
   users,

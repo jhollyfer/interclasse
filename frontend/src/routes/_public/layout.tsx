@@ -11,24 +11,24 @@ import { Header } from './-components/header'
 const MAIN_ID = 'conteudo'
 
 /**
- * A casca de toda tela pública: cabeçalho fixo, conteúdo e rodapé.
+ * The shell of every public screen: fixed header, content and footer.
  *
- * **Sem `beforeLoad`, e é decisão.** A vitrine é a única superfície que responde
- * sem sessão, e o `_private/layout.tsx` ao lado é o oposto exato dela. Um guard
- * aqui não protegeria nada - o `/storefront` do backend não exige sessão - e
- * ainda transformaria o visitante anônimo, que é o público desta área, num
- * redirecionamento para o login.
+ * **No `beforeLoad`, and it is a decision.** The storefront is the only surface that answers
+ * without a session, and the neighboring `_private/layout.tsx` is its exact opposite. A guard
+ * here would protect nothing - the backend's `/storefront` does not require a session - and
+ * would also turn the anonymous visitor, who is this area's audience, into a
+ * redirect to the login.
  *
- * Pelo mesmo motivo nenhuma tela daqui trata `401` como sessão expirada: o
- * visitante nunca teve uma.
+ * For the same reason no screen here treats `401` as an expired session: the
+ * visitor never had one.
  *
- * Grupo pathless: `_public` não entra no endereço. `/noticias` é `/noticias`, e
- * não `/public/noticias` - a casca é organização de código, e não um nível a
- * mais na URL.
+ * Pathless group: `_public` does not enter the address. `/matches` is `/matches`, and
+ * not `/public/matches` - the shell is code organization, and not an extra level
+ * in the URL.
  */
 export const Route = createFileRoute('/_public')({
-  // O "Sobre" e o regulamento aparecem no rodapé de toda página. Falha engolida:
-  // a API fora do ar tira o botão, não a página.
+  // The "Sobre" and the regulation appear in the footer of every page. Swallowed failure:
+  // the API being down removes the button, not the page.
   loader: ({ context }) =>
     context.queryClient
       .query(storefrontSiteQueryOptions())
@@ -40,15 +40,15 @@ function RouteComponent(): React.JSX.Element {
   return (
     <div className="flex min-h-svh flex-col">
       {/*
-        O primeiro tabulador da página, e invisível até receber foco.
+        The page's first tab stop, and invisible until it receives focus.
 
-        O cabeçalho tem a marca, quatro destinos e a porta do painel, repetidos
-        a cada navegação. Sem este link, quem usa teclado ou leitor de tela
-        atravessa a faixa inteira em toda página.
+        The header has the brand, four destinations and the dashboard door, repeated
+        on every navigation. Without this link, whoever uses a keyboard or screen reader
+        crosses the whole strip on every page.
 
-        `sr-only` com `focus:not-sr-only` e não `display: none`: escondido de
-        verdade ele não receberia foco, e o link deixaria de existir para quem
-        ele serve.
+        `sr-only` with `focus:not-sr-only` and not `display: none`: truly hidden
+        it would not receive focus, and the link would cease to exist for whoever
+        it serves.
       */}
       <a
         href={'#'.concat(MAIN_ID)}
@@ -60,11 +60,11 @@ function RouteComponent(): React.JSX.Element {
       <Header />
 
       {/*
-        `pt-16` é a altura da faixa fixa: sem ela o cabeçalho cobriria o começo
-        de toda tela. `flex-1` empurra o rodapé para o fim mesmo com pouco
-        conteúdo, e `tabIndex={-1}` deixa o alvo do salto receber foco - sem ele
-        o navegador rola até aqui e deixa o foco no link, e a tabulação seguinte
-        volta para o topo.
+        `pt-16` is the fixed strip's height: without it the header would cover the start
+        of every screen. `flex-1` pushes the footer to the end even with little
+        content, and `tabIndex={-1}` lets the jump target receive focus - without it
+        the browser scrolls here and leaves focus on the link, and the next tab
+        goes back to the top.
       */}
       <main id={MAIN_ID} tabIndex={-1} className="flex-1 pt-16">
         <Outlet />

@@ -1,4 +1,4 @@
 import { validateStorefrontSearch } from '#/lib/list-search'
 
-/** A vitrine pública não tem `trashed`; o resto é o conjunto padrão de listagem. */
+/** The public storefront has no `trashed`; the rest is the standard listing set. */
 export const validateSearch = validateStorefrontSearch

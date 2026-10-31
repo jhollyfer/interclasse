@@ -54,7 +54,7 @@ import { m } from '#/paraglide/messages'
 
 const route = getRouteApi('/_private/administrator/brackets/$id/')
 
-/** Partida sem placar pede o botão cheio; com placar, só a correção. */
+/** A match without a score asks for the full button; with a score, only the correction. */
 const SCORE_BUTTON: Record<string, 'default' | 'outline'> = {
   SCHEDULED: 'default',
   FINISHED: 'outline',
@@ -66,9 +66,9 @@ const UNSCORE_TITLE: Record<string, (() => string) | undefined> = {
 }
 
 /**
- * A partida que recebe o vencedor desta. Desfazer o placar só vale enquanto
- * ela não foi jogada: o servidor recusa com `NEXT_MATCH_PLAYED`, e o botão já
- * diz isso antes, em vez de dar erro.
+ * The match that receives this one's winner. Undoing the score only holds while
+ * it has not been played: the server refuses with `NEXT_MATCH_PLAYED`, and the button
+ * already says so beforehand, instead of giving an error.
  */
 function nextOf(
   matches: ReadonlyArray<BracketMatch>,
@@ -103,8 +103,8 @@ export function BracketDetailView(): React.JSX.Element {
   })
 
   const champion = championName(bracket)
-  // O servidor recusa apagar chave com placar (`BRACKET_HAS_RESULTS`): o alerta
-  // já diz isso, em vez de oferecer um "Apagar" que vai dar erro.
+  // The server refuses to delete a bracket with a score (`BRACKET_HAS_RESULTS`): the alert
+  // already says so, instead of offering an "Apagar" that will give an error.
   const hasResults = bracket.matches.some(
     (match) => match.status === 'FINISHED',
   )

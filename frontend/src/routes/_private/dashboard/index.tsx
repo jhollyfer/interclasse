@@ -3,11 +3,11 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { HOME_BY_ROLE } from '../-components/menu'
 
 /**
- * A porta de entrada do painel: manda cada papel para a própria primeira tela.
+ * The dashboard's front door: sends each role to its own first screen.
  *
- * Existe porque os três papéis não compartilham tela inicial - o administrador
- * cai nas chaves, o conselheiro nas turmas dele, o representante na lista de
- * atletas. O login e o logotipo apontam para cá, e não para um deles.
+ * It exists because the three roles do not share a home screen - the administrator
+ * lands on the brackets, the advisor on their classroom, the representative on the athlete
+ * list. The login and the logo point here, and not to any one of them.
  */
 export const Route = createFileRoute('/_private/dashboard/')({
   beforeLoad: ({ context }) => {

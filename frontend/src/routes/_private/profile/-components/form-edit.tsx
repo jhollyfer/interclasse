@@ -44,12 +44,12 @@ import { initials } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /**
- * Os campos que o backend pode acusar.
+ * The fields the backend may flag.
  *
- * `currentPassword` está na lista porque é dele que vem o
- * `422 CURRENT_PASSWORD_INVALID`: o use-case devolve
- * `errors: { currentPassword: 'Senha atual inválida' }`, e sem a chave aqui a
- * mensagem cairia no rodapé do formulário em vez de apontar o campo.
+ * `currentPassword` is on the list because the
+ * `422 CURRENT_PASSWORD_INVALID` comes from it: the use-case returns
+ * `errors: { currentPassword: 'Senha atual inválida' }`, and without the key here the
+ * message would fall to the form footer instead of pointing at the field.
  */
 const FIELDS = [
   'name',
@@ -61,10 +61,10 @@ const FIELDS = [
 ] as const
 
 /**
- * As três chaves de senha **saem** do corpo quando não há troca, e é a
- * armadilha desta tela: o `requiredIfExists` do backend olha a **chave**, não
- * o valor. `password: ''` vira `null` e ainda conta como presente, e a API
- * passaria a exigir `currentPassword` de quem não quis trocar senha.
+ * The three password keys **leave** the body when there is no change, and that is this
+ * screen's trap: the backend's `requiredIfExists` looks at the **key**, not
+ * the value. `password: ''` becomes `null` and still counts as present, and the API
+ * would start demanding `currentPassword` from someone who did not want to change the password.
  */
 function toPayload(
   values: AccountProfileUpdatePayload,
@@ -77,17 +77,17 @@ function toPayload(
 }
 
 /**
- * A edição da própria conta. Quem só quer conferir os dados fica na ficha, em
+ * Editing the account itself. Whoever only wants to check the data stays on the record, in
  * `-components/profile.tsx`.
  *
- * O `onSuccess` é próprio: trocar e-mail ou senha derruba **todas** as sessões
- * no servidor, inclusive esta, e o lugar certo depois disso é o login, não a
- * ficha.
+ * The `onSuccess` is its own: changing e-mail or password takes down **all** sessions
+ * on the server, including this one, and the right place after that is the login, not the
+ * record.
  */
 export function ProfileFormEdit(): React.JSX.Element {
   const router = useRouter()
 
-  // O `loader` da rota já garantiu o dado; aqui é leitura de cache.
+  // The route's `loader` already guaranteed the data; here it is a cache read.
   const { data: account } = useSuspenseQuery(accountQueryOptions())
 
   const { form, onSubmit, shell } = useResourceForm<
@@ -97,8 +97,8 @@ export function ProfileFormEdit(): React.JSX.Element {
   >({
     formId: 'profile',
     validator: AccountProfileUpdateValidator,
-    // Sem isto os campos nascem `undefined`, e o input monta não controlado
-    // para virar controlado na primeira tecla.
+    // Without this the fields are born `undefined`, and the input mounts uncontrolled
+    // only to become controlled on the first keystroke.
     defaults: {
       name: '',
       email: '',
@@ -111,23 +111,23 @@ export function ProfileFormEdit(): React.JSX.Element {
     },
     fields: FIELDS,
     mutation: useAccountUpdateMutation,
-    // Por prefixo: o guard do layout e o cabeçalho leem a mesma chave.
+    // By prefix: the layout's guard and the header read the same key.
     invalidate: queryKeys.account.profile.all,
     backTo: '/profile',
-    // Edição sempre pode reenviar: o `PUT` escreve o mesmo estado final.
+    // Editing can always resend: the `PUT` writes the same final state.
     retry: 'account-update-error',
     payload: toPayload,
     async onSuccess(updated, payload) {
-      // O redirecionamento para o login não é efeito colateral a evitar: é o
-      // que já aconteceu do lado do servidor.
+      // The redirect to the login is not a side effect to avoid: it is what
+      // has already happened on the server side.
       if (payload.email !== account.email || payload.password) {
         toast.success(m.profile_access_updated())
         await router.navigate({ to: '/sign-in' })
         return
       }
 
-      // Volta para a ficha: é lá que o nome e o e-mail novos aparecem para
-      // conferência.
+      // Back to the record: that is where the new name and e-mail show up to be
+      // checked.
       toast.success(m.profile_saved({ name: updated.name }))
       await router.navigate({ to: '/profile' })
     },
@@ -269,8 +269,8 @@ export function ProfileFormEdit(): React.JSX.Element {
                     }
                     autoComplete="current-password"
                   />
-                  {/* A regra é do validator - `requiredIfExists('password')` -,
-                      e o texto está aqui para quem lê antes de digitar. */}
+                  {/* The rule belongs to the validator - `requiredIfExists('password')` -,
+                      and the text is here for whoever reads before typing. */}
                   <FieldDescription>
                     {m.profile_current_password_help()}
                   </FieldDescription>

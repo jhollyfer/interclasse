@@ -19,7 +19,7 @@ import {
 
 const route = getRouteApi('/_public/about/')
 
-/** "Desde 2025 · há 1 ano": o tempo dos jogos, quando a organização informou. */
+/** "Desde 2025 · há 1 ano": the games' age, when the organization provided it. */
 function sinceLabel(firstEditionYear: number, currentYear: number): string {
   const years = currentYear - firstEditionYear
   if (years < 1) return m.public_about_since({ year: firstEditionYear })
@@ -28,9 +28,9 @@ function sinceLabel(firstEditionYear: number, currentYear: number): string {
 }
 
 /**
- * O "Sobre os jogos": o que são, quem organiza, a edição, desde quando, e o
- * regulamento. Tudo vem do que a organização preencheu no painel; o que
- * ficou vazio não aparece.
+ * The "Sobre os jogos": what they are, who organizes, the edition, since when, and the
+ * regulation. Everything comes from what the organization filled in on the dashboard; whatever
+ * was left empty does not appear.
  */
 export function AboutPage(): React.JSX.Element {
   const { data: site } = useQuery(storefrontSiteQueryOptions())

@@ -11,24 +11,24 @@ import {
 import { m } from '#/paraglide/messages'
 
 /**
- * Alterna entre claro e escuro.
+ * Toggles between light and dark.
  *
- * Os dois ícones ficam **sempre montados**, empilhados, e a troca é `rotate` +
- * `scale` de um para o outro. Montar e desmontar conforme o tema daria o mesmo
- * resultado estático e nenhuma transição - e, no primeiro render do servidor,
- * ainda escolheria o ícone errado.
+ * Both icons stay **always mounted**, stacked, and the switch is `rotate` +
+ * `scale` from one to the other. Mounting and unmounting according to the theme would give the same
+ * static result and no transition - and, on the server's first render, would
+ * still pick the wrong icon.
  *
- * Por isso também não há `if (!mounted) return null`: o tema resolvido só
- * existe no cliente, mas aqui nada depende dele para renderizar. Quem decide
- * qual ícone aparece é a classe `dark` no `<html>`, que o script do
- * `ThemeProvider` resolve antes da hidratação.
+ * That is also why there is no `if (!mounted) return null`: the resolved theme only
+ * exists on the client, but nothing here depends on it to render. Whoever decides
+ * which icon appears is the `dark` class on `<html>`, which the `ThemeProvider`
+ * script resolves before hydration.
  */
 export function ThemeToggle(): React.JSX.Element {
   const { setTheme } = useTheme('ThemeToggle')
 
   function toggle(): void {
-    // O tema resolvido é o que a página mostra agora (a classe do `<html>`):
-    // com `system` a preferência salva não diz se está claro ou escuro.
+    // The resolved theme is what the page shows now (the `<html>` class):
+    // with `system` the saved preference does not say whether it is light or dark.
     let next: 'light' | 'dark' = 'dark'
     if (document.documentElement.classList.contains('dark')) next = 'light'
 

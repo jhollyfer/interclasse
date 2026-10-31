@@ -34,28 +34,28 @@ import { CopyIdMenuItem } from './copy-id-menu-item'
 
 type UserRowActionsProps = Readonly<{
   user: AdministratorUserShowResponse
-  /** Só administrador apaga de vez. Vem da rota, que tem a conta em contexto. */
+  /** Only the administrator deletes for good. Comes from the route, which has the account in context. */
   canDelete: boolean
   /**
-   * A linha é a conta de quem está olhando.
+   * The row is the account of whoever is looking.
    *
-   * O backend recusa arquivar e apagar a própria conta com
-   * `403 SELF_ARCHIVE_FORBIDDEN` e `403 SELF_DELETE_FORBIDDEN`: sem essa
-   * recusa, um administrador se trancaria para fora sozinho. A tela não oferece
-   * as duas ações para não prometer o que a API nega.
+   * The backend refuses to archive and delete one's own account with
+   * `403 SELF_ARCHIVE_FORBIDDEN` and `403 SELF_DELETE_FORBIDDEN`: without that
+   * refusal, an administrator would lock themselves out. The screen does not offer
+   * the two actions so as not to promise what the API denies.
    */
   isSelf: boolean
 }>
 
 /**
- * O menu da linha: ver, editar, arquivar, restaurar e apagar.
+ * The row menu: view, edit, archive, restore and delete.
  *
- * As mutations moram aqui, e não na rota: quem as dispara é este menu, e
- * mantê-las junto dele evita a rota carregar três hooks só para repassá-los.
+ * The mutations live here, and not in the route: it is this menu that fires them, and
+ * keeping them next to it spares the route from loading three hooks just to pass them along.
  *
- * O erro vira toast e a linha permanece - `409 USER_NOT_ARCHIVED` e os dois
- * `403` da própria conta são as recusas prováveis, e nenhuma delas é motivo
- * para a tela sumir com o registro nem para deslogar quem está olhando.
+ * The error becomes a toast and the row stays - `409 USER_NOT_ARCHIVED` and the two
+ * `403`s of one's own account are the likely refusals, and none of them is a reason
+ * for the screen to remove the record nor to sign out whoever is looking.
  */
 export function UserRowActions({
   user,
@@ -67,8 +67,8 @@ export function UserRowActions({
   const [unarchiveHandle] = React.useState(createConfirmHandle)
   const [deleteHandle] = React.useState(createConfirmHandle)
 
-  // A chave é a raiz do recurso, e não a página corrente: arquivar muda a
-  // contagem de toda página e de todo recorte, não só do que está na tela.
+  // The key is the resource root, and not the current page: archiving changes the
+  // count of every page and every subset, not just what is on screen.
   async function invalidate(): Promise<void> {
     await queryClient.invalidateQueries({
       queryKey: queryKeys.administrator.users.all,
@@ -141,8 +141,8 @@ export function UserRowActions({
         </React.Fragment>
       }
     >
-      {/* Detalhe e edição não alcançam conta arquivada: o backend responde 404
-          fora da lixeira. Na lixeira, só restaurar ou apagar. */}
+      {/* Detail and edit do not reach an archived account: the backend answers 404
+          outside the trash. In the trash, only restore or delete. */}
       {!user.deletedAt && (
         <React.Fragment>
           <DropdownMenuItem
@@ -169,9 +169,9 @@ export function UserRowActions({
         <RowActionsArchive handle={archiveHandle} />
       )}
       {user.deletedAt && <RowActionsUnarchive handle={unarchiveHandle} />}
-      {/* Apagar só aparece no que já está arquivado: o `delete.use-case.ts`
-          recusa conta viva com `409 USER_NOT_ARCHIVED`. Oferecer o botão fora
-          daí é oferecer um erro. */}
+      {/* Delete only appears on what is already archived: `delete.use-case.ts`
+          refuses a live account with `409 USER_NOT_ARCHIVED`. Offering the button outside
+          that is offering an error. */}
       {user.deletedAt && canDelete && !isSelf && (
         <RowActionsDelete handle={deleteHandle} />
       )}

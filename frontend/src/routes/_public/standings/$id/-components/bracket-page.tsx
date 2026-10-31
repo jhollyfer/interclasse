@@ -17,9 +17,9 @@ import { BRACKETS_INDEX } from '../../index'
 const route = getRouteApi('/_public/standings/$id/')
 
 /**
- * A chave pelo link compartilhado. A escolha mora na URL: trocar de modalidade
- * ou de categoria substitui o histórico em vez de empilhar, e o "voltar" do
- * navegador sai da classificação em vez de passar por cada chave vista.
+ * The bracket through the shared link. The choice lives in the URL: switching sport
+ * or category replaces the history instead of stacking, and the browser's "back" leaves the
+ * standings instead of going through each bracket viewed.
  */
 export function BracketPage(): React.JSX.Element {
   const { id } = route.useParams()

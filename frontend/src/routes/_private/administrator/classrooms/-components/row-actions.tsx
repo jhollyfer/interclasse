@@ -25,8 +25,8 @@ import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /**
- * Editar e apagar. Turma já sorteada numa chave é recusada pelo servidor com
- * `409 CLASSROOM_IN_COMPETITION`, que vira toast - a linha fica.
+ * Edit and delete. A classroom already drawn into a bracket is refused by the server with
+ * `409 CLASSROOM_IN_COMPETITION`, which becomes a toast - the row stays.
  */
 export function ClassroomRowActions({
   classroom,

@@ -5,7 +5,7 @@ import { requireRole } from '../-components/require-role'
 
 const ROLES = [USER_ROLE.REPRESENTATIVE]
 
-/** Só o papel da área entra; os outros voltam à própria tela inicial. */
+/** Only the area's role gets in; the others go back to their own home screen. */
 export const Route = createFileRoute('/_private/representative')({
   beforeLoad: ({ context }) => requireRole(context.account.role, ROLES),
   component: Outlet,

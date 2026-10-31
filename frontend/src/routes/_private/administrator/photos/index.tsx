@@ -6,7 +6,7 @@ import { LIST_SEARCH_DEFAULTS } from '#/lib/list-search'
 
 import { validateSearch } from './-search'
 
-/** A fila inteira numa tela: fotos de jogos escolares não passam de algumas dezenas. */
+/** The whole queue on one screen: school-match photos do not exceed a few dozen. */
 export const PHOTO_PAGE = { perPage: 100 }
 
 export const Route = createFileRoute('/_private/administrator/photos/')({

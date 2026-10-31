@@ -4,7 +4,7 @@ import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/qu
 import { pageHead } from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
 
-/** Todas as chaves de uma vez: cinco modalidades x duas categorias cabem em 100. */
+/** All brackets at once: five sports x two categories fit in 100. */
 export const BRACKETS_INDEX = { perPage: 100 }
 
 export const Route = createFileRoute('/_public/standings/')({

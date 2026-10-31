@@ -3,10 +3,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { accountQueryOptions } from '#/integrations/tanstack-query/queries/account'
 
 /**
- * A edição da própria conta: nome, e-mail, avatar e a troca de senha.
+ * Editing the account itself: name, e-mail, avatar and the password change.
  *
- * Mesma `queryOptions` da ficha e do guard do layout, com a mesma chave: chegar
- * aqui pelo botão "Editar perfil" não dispara requisição nova.
+ * The same `queryOptions` as the record and the layout's guard, with the same key: arriving
+ * here through the "Editar perfil" button triggers no new request.
  */
 export const Route = createFileRoute('/_private/profile/edit/')({
   loader: ({ context }) =>

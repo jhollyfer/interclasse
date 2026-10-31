@@ -24,18 +24,18 @@ import { Empty } from './section'
 
 type StandingsExplorerProps = Readonly<{
   brackets: ReadonlyArray<AdministratorBracketPaginateResponse>
-  /** A chave aberta. Ausente, abre a primeira da primeira categoria sorteada. */
+  /** The open bracket. When absent, opens the first of the first drawn category. */
   selected?: string
   onSelect: (id: string) => void
 }>
 
 /**
- * A classificação navegável: abas por categoria (Fundamental 1 e 2), uma
- * modalidade por botão, e a chave escolhida desenhada logo abaixo - tudo no
- * lugar, sem sair da página.
+ * The navigable standings: tabs by category (Fundamental 1 and 2), one
+ * sport per button, and the chosen bracket drawn right below - all
+ * in place, without leaving the page.
  *
- * Controlado por fora (`selected`/`onSelect`): a home guarda a escolha em
- * estado, e `/standings/$id` na URL, para o link poder ser compartilhado.
+ * Controlled from outside (`selected`/`onSelect`): the home keeps the choice in
+ * state, and `/standings/$id` in the URL, so the link can be shared.
  */
 export function StandingsExplorer({
   brackets,
@@ -107,7 +107,7 @@ export function StandingsExplorer({
   )
 }
 
-/** A chave aberta. Troca de chave mostra o esqueleto, não a chave anterior. */
+/** The open bracket. Changing bracket shows the skeleton, not the previous bracket. */
 function StandingsBracket({ id }: Readonly<{ id: string }>): React.JSX.Element {
   const {
     data: bracket,

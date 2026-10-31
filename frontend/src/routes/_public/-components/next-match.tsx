@@ -6,9 +6,9 @@ import { CATEGORY_LABELS, formatWhen } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
 /**
- * O placar do herói: o próximo jogo, ou o último resultado quando não há jogo
- * marcado. É dado real da API, e não ilustração - o herói mostra o que o site
- * é, uma tabela de jogos.
+ * The hero scoreboard: the next match, or the latest result when there is no
+ * scheduled match. It is real API data, and not illustration - the hero shows what the site
+ * is, a match table.
  */
 export function NextMatch({
   next,

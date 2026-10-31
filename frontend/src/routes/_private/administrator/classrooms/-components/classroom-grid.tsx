@@ -30,13 +30,13 @@ import { ClassroomRowActions } from './row-actions'
 
 const route = getRouteApi('/_private/administrator/classrooms/')
 
-/** "Todas" é a aba sem `?category`. */
+/** "Todas" is the tab without `?category`. */
 const ALL = 'ALL'
 
 /**
- * As turmas em cartões, por categoria. Cartão e não tabela: são duas dúzias,
- * e o que se procura é a turma - "o 3º A" -, não uma coluna para ordenar.
- * Cada cartão abre a turma inteira; o menu do canto edita e remove.
+ * The classrooms as cards, by category. Card and not table: there are two dozen,
+ * and what one looks for is the classroom - "o 3º A" -, not a column to sort.
+ * Each card opens the whole classroom; the corner menu edits and removes.
  */
 export function ClassroomGrid(): React.JSX.Element {
   const search = route.useSearch()
@@ -116,7 +116,7 @@ export function ClassroomGrid(): React.JSX.Element {
   )
 }
 
-/** O cartão da turma: o link cobre o cartão, e o menu fica por cima, no canto. */
+/** The classroom card: the link covers the card, and the menu sits on top, in the corner. */
 function ClassroomCard({
   classroom,
 }: Readonly<{

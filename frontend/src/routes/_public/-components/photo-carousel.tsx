@@ -9,17 +9,17 @@ import { m } from '#/paraglide/messages'
 import { HOME_PHOTOS } from '../index'
 import { Section, SectionHeader, SectionTitle } from './section'
 
-/** Quanto cada foto fica na tela antes de passar sozinha. */
+/** How long each photo stays on screen before moving on by itself. */
 const AUTOPLAY_MS = 5000
 
 /**
- * As fotos dos jogos, passando sozinhas. Rolagem nativa com `scroll-snap`, e
- * não uma biblioteca: arrastar com o dedo, rolar com o trackpad e as setas do
- * teclado já funcionam de graça.
+ * The match photos, moving on by themselves. Native scrolling with `scroll-snap`, and
+ * not a library: dragging with a finger, scrolling with the trackpad and the keyboard
+ * arrows already work for free.
  *
- * A passagem automática para quando o mouse ou o foco estão no carrossel e não
- * existe para quem pediu menos movimento no sistema. Some inteiro enquanto não
- * houver foto aprovada.
+ * The automatic advance stops when the mouse or focus is on the carousel and does not
+ * exist for whoever asked for less motion in the system. It vanishes entirely while there is no
+ * approved photo.
  */
 export function PhotoCarousel(): React.JSX.Element | null {
   const { data } = useQuery(storefrontPhotosQueryOptions(HOME_PHOTOS))

@@ -14,9 +14,9 @@ type SportComboboxProps = Readonly<{
 }>
 
 /**
- * As modalidades como opções, com busca no servidor (`frontend.md` §2.1): 20
- * por página e "Carregar mais" no fim. A modalidade já escolhida entra na
- * lista mesmo fora da página carregada, lida pelo detalhe.
+ * The sports as options, with server search (`frontend.md` §2.1): 20
+ * per page and "Carregar mais" at the end. The already chosen sport enters the
+ * list even outside the loaded page, read through the detail.
  */
 export function SportCombobox({
   value,

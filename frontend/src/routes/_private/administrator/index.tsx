@@ -7,20 +7,20 @@ import {
 
 import { PENDING_REMOVALS } from '../-components/menu'
 
-/** As partidas prontas para jogar: os dois times definidos, sem placar. */
+/** The matches ready to play: both teams defined, no score. */
 export const DASHBOARD_MATCHES = { status: 'SCHEDULED', perPage: 50 }
 
 export const DASHBOARD_BRACKETS = { perPage: 50 }
 
-/** Só a contagem importa no painel: `meta.total` dos avisos sem ciência. */
+/** Only the count matters on the dashboard: the `meta.total` of unacknowledged notices. */
 export const DASHBOARD_REMOVALS = PENDING_REMOVALS
 
 /**
- * O painel da organização: o que tem para fazer hoje - lançar resultado,
- * ler aviso de remoção - e a situação de cada chave.
+ * The organization's dashboard: what there is to do today - record a result,
+ * read a removal notice - and the state of each bracket.
  *
- * O contador de avisos fica fora do loader de propósito: é um extra da tela, e
- * uma falha nele derrubava o painel inteiro num 500. A tela o pede sozinha.
+ * The notice counter stays out of the loader on purpose: it is an extra of the screen, and
+ * a failure in it brought the whole dashboard down with a 500. The screen asks for it on its own.
  */
 export const Route = createFileRoute('/_private/administrator/')({
   loader: ({ context }) =>

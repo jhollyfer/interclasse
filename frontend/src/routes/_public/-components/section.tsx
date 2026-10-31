@@ -8,9 +8,9 @@ import type * as React from 'react'
 import { cn } from '#/lib/cn'
 
 /**
- * Uma seção do site. Compound sem contexto (`frontend.md` §6.1): as partes não
- * compartilham estado, só se compõem - título, o "ver tudo" opcional e o
- * conteúdo.
+ * A site section. A compound without context (`frontend.md` §6.1): the parts do not
+ * share state, they only compose - title, the optional "ver tudo" and the
+ * content.
  */
 export function Section({
   className,
@@ -42,9 +42,9 @@ export function SectionHeader({
 }
 
 /**
- * O título, em itálico esportivo. `h2` por padrão; a seção que é a página
- * inteira troca a tag pela prop `render` do Base UI (`render={<h1 />}`) - na
- * home o `h1` é o do herói.
+ * The title, in sporty italics. `h2` by default; a section that is the whole page
+ * swaps the tag with Base UI's `render` prop (`render={<h1 />}`) - on the
+ * home the `h1` is the hero's.
  */
 export function SectionTitle({
   level = 'h2',
@@ -66,7 +66,7 @@ export function SectionTitle({
   })
 }
 
-/** O "ver tudo" da seção: navegação, então `Link`. */
+/** The section's "ver tudo": navigation, so `Link`. */
 export function SectionMore({
   to,
   children,
@@ -85,7 +85,7 @@ export function SectionMore({
   )
 }
 
-/** O estado vazio de uma seção: o que ainda não aconteceu, dito sem drama. */
+/** A section's empty state: what has not happened yet, said without drama. */
 export function Empty({
   children,
 }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {

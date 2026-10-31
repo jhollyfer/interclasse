@@ -55,7 +55,7 @@ import { m } from '#/paraglide/messages'
 
 const route = getRouteApi('/_private/administrator/matches/')
 
-/** A partida no formato que os diálogos esperam: nomes já resolvidos. */
+/** The match in the format the dialogs expect: names already resolved. */
 function toRef(match: AdministratorMatchPaginateResponse): MatchRef {
   return {
     ...match,
@@ -70,8 +70,8 @@ function phaseOf(match: AdministratorMatchPaginateResponse): string {
 
 function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
   return [
-    // O jogo primeiro: é o que se procura na lista, e é o que a tabela estreita
-    // não pode cortar.
+    // The match first: it is what one looks for in the list, and what the narrow table
+    // must not cut off.
     {
       id: 'game',
       accessorFn: (row) => row.id,
@@ -138,8 +138,8 @@ function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
 }
 
 /**
- * A agenda de todas as chaves numa lista só: é por aqui que se marca horário e
- * se lança placar no dia, sem abrir chave por chave.
+ * The agenda of all brackets in a single list: this is where one schedules a time and
+ * records the score on the day, without opening bracket after bracket.
  */
 export function MatchesTable(): React.JSX.Element {
   const search = route.useSearch()
@@ -159,8 +159,8 @@ export function MatchesTable(): React.JSX.Element {
     columns,
     getRowId: (row) => row.id,
     persistKey: 'administrator:matches',
-    // Menu de linha, como nas outras listas: dois botões não cabem na coluna
-    // de ações e o segundo ficava fora da tela.
+    // Row menu, as in the other lists: two buttons do not fit in the actions
+    // column and the second one fell off the screen.
     actions: (match) => (
       <RowActions>
         <DropdownMenuItem
@@ -214,8 +214,8 @@ export function MatchesTable(): React.JSX.Element {
       <TableHeader>
         <TableTitle>{m.admin_matches_title()}</TableTitle>
         <TableActions>
-          {/* Jogo novo não se cria aqui: nasce do sorteio da chave, e as fases
-              seguintes se preenchem sozinhas com os vencedores. */}
+          {/* A new match is not created here: it is born from the bracket's draw, and the following
+              rounds fill themselves in with the winners. */}
           <Link
             to="/administrator/brackets"
             className={buttonVariants({ variant: 'outline' })}

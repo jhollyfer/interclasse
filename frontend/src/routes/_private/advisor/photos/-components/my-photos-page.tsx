@@ -29,7 +29,7 @@ import { m } from '#/paraglide/messages'
 
 import { MY_PHOTOS } from '../index'
 
-/** O conselheiro envia fotos dos jogos e acompanha a aprovação de cada uma. */
+/** The advisor uploads match photos and follows the approval of each one. */
 export function MyPhotosPage(): React.JSX.Element {
   const { data, isPending } = useQuery(advisorPhotosQueryOptions(MY_PHOTOS))
 

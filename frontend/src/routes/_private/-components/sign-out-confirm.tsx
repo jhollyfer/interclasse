@@ -17,43 +17,43 @@ import { m } from '#/paraglide/messages'
 
 type SignOutConfirmProps = Readonly<{
   /**
-   * O "Sair" visível - o botão do pé da barra lateral. Vai na posição de
-   * `render` da primitiva.
+   * The visible "Sair" - the button at the sidebar's foot. It goes in the primitive's
+   * `render` position.
    *
-   * Segue prop e não parte, pelo mesmo motivo do `ConfirmDialog`: é o elemento
-   * de **fora** do alerta. O item do menu da conta não é gatilho: abre o alerta
-   * pelo `handle`, e o alerta fica irmão do menu.
+   * It stays a prop and not a part, for the same reason as `ConfirmDialog`: it is the element
+   * **outside** the alert. The account menu item is not a trigger: it opens the alert
+   * through the `handle`, and the alert sits as a sibling of the menu.
    */
   render?: React.ReactElement
-  /** O alerta aberto de fora, sem gatilho (`createConfirmHandle`). */
+  /** The alert opened from outside, without a trigger (`createConfirmHandle`). */
   handle?: ConfirmHandle
   children: React.ReactNode
 }>
 
 /**
- * A confirmação antes de encerrar a sessão.
+ * The confirmation before ending the session.
  *
- * Existe porque sair não tem desfazer pela tela: quem clica sem querer volta
- * para o login e refaz a autenticação. É `AlertDialog` (via `ConfirmDialog`), e
- * não `Dialog`, então nem `Esc` nem clique fora respondem por quem clicou - a
- * escolha é explícita.
+ * It exists because signing out has no undo on screen: whoever clicks by accident goes back
+ * to the login and redoes the authentication. It is an `AlertDialog` (via `ConfirmDialog`), and
+ * not `Dialog`, so neither `Esc` nor an outside click answers for whoever clicked - the
+ * choice is explicit.
  *
- * Sem `destructive`: sair não apaga nada, e o vermelho fica valendo o que vale
- * em arquivar e remover.
+ * No `destructive`: signing out deletes nothing, and the red stays worth what it is worth
+ * in archive and remove.
  *
- * Composto, e não uma prop de texto para cada pedaço: o pé da barra lateral e o
- * menu da conta disparam a mesma saída, e as partes abaixo são o texto dela -
- * quem precisar acrescentar um aviso põe um `<Alert>` ao lado delas sem que
- * isso vire mais uma prop opcional aqui.
+ * Composite, and not a text prop for each piece: the sidebar foot and the
+ * account menu trigger the same sign-out, and the parts below are its text -
+ * whoever needs to add a notice puts an `<Alert>` beside them without that
+ * becoming one more optional prop here.
  */
 export function SignOutConfirm({
   render,
   handle,
   children,
 }: SignOutConfirmProps): React.JSX.Element {
-  // `mutate` e não `mutateAsync`: ninguém espera o resultado aqui, e a promise
-  // de `mutateAsync` rejeitaria sem handler. Quem trata o fim é o `onSettled`
-  // do hook, que limpa o cache e navega para fora do `_private`.
+  // `mutate` and not `mutateAsync`: nobody waits for the result here, and `mutateAsync`'s
+  // promise would reject without a handler. Whoever handles the end is the hook's
+  // `onSettled`, which clears the cache and navigates out of `_private`.
   const signOut = useSignOut()
 
   return (
@@ -67,7 +67,7 @@ export function SignOutConfirm({
   )
 }
 
-/** O ícone, o título e o que acontece ao confirmar. */
+/** The icon, the title and what happens on confirm. */
 export function SignOutConfirmHeader(): React.JSX.Element {
   return (
     <ConfirmDialogHeader>
@@ -82,7 +82,7 @@ export function SignOutConfirmHeader(): React.JSX.Element {
   )
 }
 
-/** Cancelar e Sair, nessa ordem - a saída fica à direita, como em todo alerta. */
+/** Cancel and Sair, in that order - the exit sits on the right, as in every alert. */
 export function SignOutConfirmFooter(): React.JSX.Element {
   return (
     <ConfirmDialogFooter>

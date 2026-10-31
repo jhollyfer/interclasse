@@ -12,13 +12,13 @@ import type { UserListSearch } from '#/lib/list-search'
 import { m } from '#/paraglide/messages'
 
 /**
- * Os dois recortes da tela, como o `UserPaginateValidator`
- * aceita: `?role=` separa quem administra de quem edita, `?status=` separa quem
- * entra de quem foi desativado sem ser arquivado.
+ * The screen's two filters, as `UserPaginateValidator`
+ * accepts them: `?role=` separates who administers from who edits, `?status=` separates who
+ * gets in from who was deactivated without being archived.
  *
- * `page: undefined` junto: quem estava na página 3 de tudo e filtra por "Conselheiro"
- * quase nunca tem página 3 do recorte novo, e a tela abriria vazia sobre um
- * resultado que existe.
+ * `page: undefined` along with them: whoever was on page 3 of everything and filters by "Conselheiro"
+ * almost never has a page 3 of the new subset, and the screen would open empty over a
+ * result that exists.
  */
 export function UserFilters({
   search,
@@ -40,9 +40,9 @@ export function UserFilters({
             search: { ...search, role: value || undefined, page: undefined },
           })
         }
-        // Sem bolinha: papel não é estado, é atribuição, e não há um par
-        // `*_DOTS` para ele - a cor do `Badge` da coluna já diz o que precisa
-        // ser dito.
+        // No dot: a role is not a state, it is an assignment, and there is no `*_DOTS`
+        // pair for it - the column `Badge`'s color already says what needs
+        // to be said.
         options={toOptions(['', ...USER_ROLES], {
           ...USER_ROLE_LABELS,
           '': m.admin_users_all_roles(),

@@ -15,7 +15,7 @@ import { BRACKETS_INDEX } from '../index'
 export const Route = createFileRoute('/_public/standings/$id/')({
   notFoundComponent: () => <NotFoundPage />,
   loader: async ({ context, params }) => {
-    // A lista é a barra de abas da página; falha nela não esconde a chave.
+    // The list is the page's tab bar; a failure in it does not hide the bracket.
     void context.queryClient
       .query(storefrontBracketsQueryOptions(BRACKETS_INDEX))
       .catch(() => undefined)

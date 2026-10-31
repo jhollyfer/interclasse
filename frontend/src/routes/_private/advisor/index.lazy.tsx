@@ -7,7 +7,7 @@ export const Route = createLazyFileRoute('/_private/advisor/')({
   component: NoClassroom,
 })
 
-/** Conselheiro ainda sem turma: quem indica é a organização. */
+/** An advisor still without a classroom: the organization assigns it. */
 function NoClassroom(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-4">

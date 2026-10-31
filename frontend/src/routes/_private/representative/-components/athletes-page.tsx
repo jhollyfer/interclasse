@@ -17,7 +17,7 @@ import { representativeEnrollmentsQueryOptions } from '#/integrations/tanstack-q
 import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
-/** A lista de atletas da turma do representante. A turma sai da sessão. */
+/** The athlete list of the representative's classroom. The classroom comes from the session. */
 export function AthletesPage(): React.JSX.Element {
   const {
     data: board,
@@ -53,7 +53,7 @@ export function AthletesPage(): React.JSX.Element {
 
       {isPending && <Skeleton className="h-64 w-full" />}
 
-      {/* Só o 404 quer dizer "sem turma"; o resto é falha de rede ou de servidor. */}
+      {/* Only the 404 means "no classroom"; the rest is a network or server failure. */}
       {error?.status === HTTPStatus.NOT_FOUND && (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
           {m.representative_no_class()}

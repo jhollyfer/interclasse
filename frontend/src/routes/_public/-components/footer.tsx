@@ -11,7 +11,7 @@ import { m } from '#/paraglide/messages'
 import { NAVIGATION } from './menu'
 import { RegulationLink } from './regulation-link'
 
-/** O link de um perfil do Instagram, com o `@` à mostra. */
+/** A link to an Instagram profile, with the `@` on display. */
 function InstagramLink({
   handle,
   ariaLabel,
@@ -30,8 +30,8 @@ function InstagramLink({
 }
 
 /**
- * Os Instagrams vêm da configuração do site, que a organização edita: o da
- * escola e o de quem desenvolveu. Vazio, o link some.
+ * The Instagram handles come from the site configuration, which the organization edits: the
+ * school's and the developer's. When empty, the link disappears.
  */
 export function Footer(): React.JSX.Element {
   const { data: site } = useQuery(storefrontSiteQueryOptions())
