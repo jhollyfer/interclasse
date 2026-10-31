@@ -12,24 +12,24 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, string>
 
 /**
- * Para onde mandar quem clicou em "salvar arquivo".
+ * Where to send whoever clicked "save file".
  *
- * Existe por uma limitação do navegador, não do storage: o atributo `download`
- * de um `<a>` é **ignorado entre origens**, e a API responde numa origem
- * diferente da do app. Sem esta rota, o clique abriria a imagem numa aba e o
- * arquivo chegaria com o uuid no nome.
+ * It exists because of a browser limitation, not a storage one: the `download` attribute
+ * of an `<a>` is **ignored across origins**, and the API answers on an origin
+ * different from the app. Without this route, the click would open the image in a tab and the
+ * file would arrive with the uuid as its name.
  *
- * Devolve uma URL assinada em vez de servir o binário. O `Content-Disposition`
- * com o nome original viaja assinado dentro dela, e é o bucket que o devolve -
- * a aplicação entrega um endereço e sai do caminho, em vez de ficar ocupada
- * pelo tempo da transferência de cada download.
+ * Returns a signed URL instead of serving the binary. The `Content-Disposition`
+ * with the original name travels signed inside it, and it is the bucket that returns it -
+ * the application hands out an address and gets out of the way, instead of being busy
+ * for the duration of each download transfer.
  *
- * Abre por `id` e não por `path` porque o nome original mora na linha de
- * `storages` - é ele que o header carrega.
+ * Opens by `id` and not by `path` because the original name lives in the `storages`
+ * row - it is what the header carries.
  *
- * Exige sessão. Era anônima, e com o bucket já privado isso significava que
- * qualquer pessoa com o uuid de um objeto recebia uma URL assinada dele.
- * Fechar o bucket sem fechar esta rota não fechou nada.
+ * Requires a session. It used to be anonymous, and with the bucket already private that meant
+ * anyone with an object's uuid received a signed URL for it.
+ * Closing the bucket without closing this route closed nothing.
  */
 @inject()
 export default class StoragesFileDownloadUseCase {

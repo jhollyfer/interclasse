@@ -11,21 +11,21 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 @inject()
 export default class StoragesFileDownloadController {
   static docs = defineDocs({
-    summary: 'Baixar arquivo com o nome original',
+    summary: 'Download file with the original name',
     description:
-      'Redireciona para uma URL temporária do bucket que entrega o arquivo com ' +
-      '`Content-Disposition: attachment` e o nome original.\n\n' +
-      'Existe por uma limitação do navegador, não do storage: o atributo `download` de um ' +
-      '`<a>` é ignorado entre origens, e a API responde numa origem diferente da do app. Sem ' +
-      'esta rota, "salvar arquivo" abriria a imagem numa aba, e o arquivo chegaria nomeado ' +
-      'com o uuid em vez do nome que a pessoa enviou.\n\n' +
-      'Redireciona em vez de servir o binário: o header viaja assinado dentro da URL, então a ' +
-      'aplicação entrega um endereço e sai do caminho, em vez de ficar ocupada pelo tempo da ' +
-      'transferência de cada download.\n\n' +
-      '**Exige sessão**: o bucket é `visibility: private`, e enquanto esta rota ficou aberta ' +
-      'ela emitia URL assinada para qualquer uuid sem sessão - a porta dos fundos que o ' +
-      'fechamento do bucket deixou aberta. Arquivo que a pessoa não alcança responde `404` e ' +
-      'não `403`, para não confirmar a quem sonda que aquele uuid existe.',
+      'Redirects to a temporary bucket URL that delivers the file with ' +
+      '`Content-Disposition: attachment` and the original name.\n\n' +
+      'It exists because of a browser limitation, not a storage one: the `download` attribute of an ' +
+      '`<a>` is ignored across origins, and the API answers on an origin different from the app. Without ' +
+      'this route, "save file" would open the image in a tab, and the file would arrive named ' +
+      'with the uuid instead of the name the person uploaded.\n\n' +
+      'It redirects instead of serving the binary: the header travels signed inside the URL, so the ' +
+      'application hands out an address and gets out of the way, instead of being busy for the duration of ' +
+      'each download transfer.\n\n' +
+      '**Requires a session**: the bucket is `visibility: private`, and while this route was open ' +
+      'it issued a signed URL for any uuid without a session - the back door the ' +
+      'closing of the bucket left open. A file the person cannot reach responds `404` and ' +
+      'not `403`, so as not to confirm to a prober that the uuid exists.',
     responses: { 302: 'no-content' },
   })
 

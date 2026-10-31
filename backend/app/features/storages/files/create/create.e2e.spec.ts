@@ -15,12 +15,12 @@ import { Stored } from '#tests/stored-fixtures'
 import type { Session } from '#tests/http-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the
+ * form that submitted it, and ownership authorizes nothing. What rules is the state
+ * (`PENDING` or `UPLOADED`) and the live reference.
  */
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -33,21 +33,21 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 /**
- * O que é recusado **antes** de qualquer assinatura.
+ * What is refused **before** any signature.
  *
- * Direto no validator, e não pelo HTTP, porque é aí que a recusa acontece: o
- * controller valida antes de chamar o use-case, e o use-case é o único que fala
- * com o bucket. Arquivo proibido não ganha URL, então não chega ao bucket.
+ * Directly on the validator, not over HTTP, because that is where the refusal happens: the
+ * controller validates before calling the use case, and the use case is the only one that talks
+ * to the bucket. A forbidden file gets no URL, so it never reaches the bucket.
  */
 test.group('storages > validator', () => {
-  test('recusa mimetype fora da lista', async ({ assert }) => {
+  test('refuses mimetype outside the list', async ({ assert }) => {
     await assert.rejects(() =>
       StoragesFileCreateValidator.validate({
         fileName: 'script.sh',
@@ -58,11 +58,11 @@ test.group('storages > validator', () => {
   })
 
   /**
-   * Contra o teto do ambiente, e não contra um número escrito aqui: desde que
-   * `UPLOAD_MAX_SIZE` é exigida, este teste continua valendo qualquer
-   * que seja o valor configurado.
+   * Against the environment cap, not against a number written here: since
+   * `UPLOAD_MAX_SIZE` is required, this test remains valid whatever
+   * the configured value is.
    */
-  test('recusa tamanho acima do teto do ambiente', async ({ assert }) => {
+  test('refuses size above the environment cap', async ({ assert }) => {
     await assert.rejects(() =>
       StoragesFileCreateValidator.validate({
         fileName: 'gigante.pdf',
@@ -72,7 +72,7 @@ test.group('storages > validator', () => {
     )
   })
 
-  test('aceita o tamanho no teto', async ({ assert }) => {
+  test('accepts the size at the cap', async ({ assert }) => {
     const payload = await StoragesFileCreateValidator.validate({
       fileName: 'grande.pdf',
       mimetype: 'application/pdf',
@@ -86,7 +86,10 @@ test.group('storages > validator', () => {
 test.group('storages > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('arquivo que cabe numa parte ganha uma URL só, sem uploadId', async ({ client, assert }) => {
+  test('a file that fits in one part gets a single URL, without uploadId', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -99,17 +102,20 @@ test.group('storages > create', (group) => {
     assert.equal(opened.totalParts, 1)
     assert.lengthOf(opened.parts, 1)
     assert.equal(opened.storage.status, 'PENDING')
-    // O nome enviado é rótulo, nunca caminho: a chave é uuid + extensão
-    // derivada do mimetype.
+    // The sent name is a label, never a path: the key is a uuid + extension
+    // derived from the mimetype.
     assert.equal(opened.storage.originalName, 'capa.png')
     assert.notInclude(opened.storage.path, 'capa')
     assert.match(opened.storage.path, /\.png$/)
   })
 
-  test('arquivo maior é fatiado, e o número de URLs sai do tamanho', async ({ client, assert }) => {
+  test('a larger file is sliced, and the number of URLs comes from the size', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // Duas partes cheias e uma sobra: o `ceil` tem de contar a sobra.
+    // Two full parts and a remainder: `ceil` must count the remainder.
     const opened = await open(client, session, {
       fileName: 'edital.pdf',
       mimetype: 'application/pdf',
@@ -126,15 +132,15 @@ test.group('storages > create', (group) => {
   })
 
   /**
-   * O `size` é `bigint` no banco. Com `integer`, este `POST` passaria na
-   * validação - o teto do ambiente permite - e estouraria no `INSERT`, porque
-   * `int4` para em 2,1 GB. O teste declara 4 GiB e não transfere nada: só o
-   * metadado viaja, e a linha nasce `PENDING`.
+   * `size` is `bigint` in the database. With `integer`, this `POST` would pass
+   * validation - the environment cap allows it - and blow up on the `INSERT`, because
+   * `int4` stops at 2.1 GB. The test declares 4 GiB and transfers nothing: only the
+   * metadata travels, and the row is born `PENDING`.
    *
-   * A asserção sobre o envelope é o fio: o driver devolve `int8` como string, e
-   * sem o `consume` do model o `size` sairia entre aspas.
+   * The assertion on the envelope is the wire: the driver returns `int8` as a string, and
+   * without the model `consume` the `size` would come out in quotes.
    */
-  test('aceita tamanho acima do teto de int4', async ({ client, assert }) => {
+  test('accepts a size above the int4 cap', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const size = 4 * 1024 ** 3
 
@@ -150,7 +156,7 @@ test.group('storages > create', (group) => {
     assert.strictEqual(stored.size, size)
   })
 
-  test('exige sessão', async ({ client }) => {
+  test('requires a session', async ({ client }) => {
     const response = await client
       .post('/storages')
       .json({ fileName: 'a.png', mimetype: 'image/png', size: 1 })
@@ -162,7 +168,7 @@ test.group('storages > create', (group) => {
 test.group('storages > create > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('tipo fora da lista responde 422 apontando o campo, e nenhuma linha nasce', async ({
+  test('type outside the list responds 422 pointing at the field, and no row is born', async ({
     client,
     assert,
   }) => {

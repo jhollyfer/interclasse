@@ -26,7 +26,7 @@ async function setup() {
 }
 
 test.group('storages/files > parts (unit)', () => {
-  test('arquivo confirmado responde com as listas vazias', async ({ assert }) => {
+  test('a confirmed file responds with empty lists', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())
 
@@ -38,7 +38,9 @@ test.group('storages/files > parts (unit)', () => {
     assert.isString(plan.storage.url)
   })
 
-  test('parte única sem objeto no bucket pede a URL da parte 1', async ({ assert }) => {
+  test('single part without an object in the bucket asks for the URL of part 1', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
     await storages.save(pendingFile())
 
@@ -52,7 +54,9 @@ test.group('storages/files > parts (unit)', () => {
     )
   })
 
-  test('parte única já no bucket volta como enviada e sem URL a assinar', async ({ assert }) => {
+  test('single part already in the bucket comes back as sent and with no URL to sign', async ({
+    assert,
+  }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(pendingFile())
     bucket.put('capa.png', { contentLength: 1024, etag: 'e1' })
@@ -64,7 +68,7 @@ test.group('storages/files > parts (unit)', () => {
     assert.deepEqual(plan.parts, [])
   })
 
-  test('multipart reassina só as partes que faltam', async ({ assert }) => {
+  test('multipart re-signs only the parts that are missing', async ({ assert }) => {
     const { storages, multipart, useCase } = await setup()
     await storages.save(pendingFile({ uploadId: 'up' }))
     multipart.withUploaded('up', [{ partNumber: 1, size: 10, etag: 'a' }])
@@ -76,7 +80,7 @@ test.group('storages/files > parts (unit)', () => {
     assert.deepEqual(plan.parts, [])
   })
 
-  test('arquivo inexistente é 404 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 404 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: FILE_ID })

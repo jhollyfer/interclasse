@@ -3,10 +3,10 @@ import type { StoragesFileUploadResponse } from '@interclasse/shared'
 import type { Storage } from '#domain/storage/storage.entity'
 import type { PresignedPart, UploadedPart } from '#services/multipart/multipart.contract'
 
-/** O que o cliente precisa para subir o arquivo, antes de virar resposta. */
+/** What the client needs to upload the file, before becoming a response. */
 export type FileUploadPlan = {
   readonly storage: Storage
-  /** A URL de leitura; ausente quando o registro acabou de nascer. */
+  /** The read URL; absent when the record has just been born. */
   readonly url?: string
   readonly uploadId: string | null
   readonly partSize: number
@@ -16,10 +16,10 @@ export type FileUploadPlan = {
 }
 
 /**
- * O plano de upload na forma da resposta do `shared/` (`_standards/architecture.md`
- * §10): o presenter é tipado pelo mesmo schema que o OpenAPI e o frontend leem.
- * É a mesma forma em `POST /storages` e em `GET /storages/:id/parts`: começar e
- * retomar um upload são a mesma pergunta.
+ * The upload plan in the shape of the `shared/` response (`_standards/architecture.md`
+ * §10): the presenter is typed by the same schema that OpenAPI and the frontend read.
+ * It is the same shape in `POST /storages` and in `GET /storages/:id/parts`: starting and
+ * resuming an upload are the same question.
  */
 export class FilePresenter {
   static upload(plan: FileUploadPlan): StoragesFileUploadResponse {

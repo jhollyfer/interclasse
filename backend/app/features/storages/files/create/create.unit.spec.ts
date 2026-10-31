@@ -20,7 +20,7 @@ async function setup() {
 }
 
 test.group('storages/files > create (unit)', () => {
-  test('arquivo de uma parte nasce PENDING com uma URL e sem uploadId', async ({ assert }) => {
+  test('a single-part file is born PENDING with one URL and no uploadId', async ({ assert }) => {
     const { storages, useCase } = await setup()
 
     const result = await useCase.execute({
@@ -38,7 +38,7 @@ test.group('storages/files > create (unit)', () => {
     assert.equal(saved?.status, 'PENDING')
   })
 
-  test('arquivo maior que uma parte abre o multipart e assina o primeiro lote', async ({
+  test('a file larger than one part opens the multipart and signs the first batch', async ({
     assert,
   }) => {
     const { multipart, useCase } = await setup()
@@ -55,12 +55,12 @@ test.group('storages/files > create (unit)', () => {
     assert.lengthOf(multipart.initiated, 1)
   })
 
-  test('falha ao gravar aborta o multipart e responde 500 STORAGES_FILE_CREATE_ERROR', async ({
+  test('failure to save aborts the multipart and responds 500 STORAGES_FILE_CREATE_ERROR', async ({
     assert,
   }) => {
     const { storages, multipart, useCase } = await setup()
     storages.save = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({

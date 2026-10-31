@@ -21,8 +21,8 @@ export default class StoragesFileShowUseCase {
 
   async execute({ id }: Payload): Promise<Response> {
     try {
-      // Só o arquivo vivo, o mesmo predicado de quem anexa: divergir aqui
-      // mostraria na tela de detalhe um arquivo que o anexo recusa.
+      // Only the live file, the same predicate as whoever attaches: diverging here
+      // would show on the detail screen a file that the attachment refuses.
       const storage = await this.storages.detail(id)
 
       if (!storage)

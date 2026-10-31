@@ -15,20 +15,20 @@ import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the
+ * form that submitted it, and ownership authorizes nothing. What rules is the state
+ * (`PENDING` or `UPLOADED`) and the live reference.
  */
 
 /**
- * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
- * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
+ * Content of a non-final part. S3 refuses less than 5 MB
+ * (`EntityTooSmall`), and `PART_SIZE` is what the server promises per part.
  */
 const FULL_PART = pngBytes(PART_SIZE, 65)
 
 const SMALL = pngBytes(1024)
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -41,7 +41,7 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 async function put(url: string, content: Uint8Array): Promise<string> {
   const response = await fetch(url, {
     method: 'PUT',
@@ -54,7 +54,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
   return response.headers.get('etag') ?? ''
 }
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
@@ -74,12 +74,12 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
   return body(completed)
 }
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 test.group('storages > complete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('confirma o upload e o arquivo passa a UPLOADED', async ({ client, assert }) => {
+  test('confirms the upload and the file becomes UPLOADED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -87,7 +87,7 @@ test.group('storages > complete', (group) => {
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
-  test('remonta as partes de um multipart', async ({ client, assert }) => {
+  test('reassembles the parts of a multipart', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const size = PART_SIZE + SMALL.byteLength
 
@@ -112,19 +112,19 @@ test.group('storages > complete', (group) => {
     const metadata = await drive.use().getMetaData(opened.storage.path)
 
     assert.equal(metadata.contentLength, size)
-    // O `uploadId` é zerado: a conversa com o bucket acabou, e guardar o
-    // ponteiro dela só manteria vivo um endereço que não leva a lugar nenhum.
+    // The `uploadId` is zeroed: the conversation with the bucket is over, and keeping its
+    // pointer would only keep alive an address that leads nowhere.
     assert.isNull(body(response).uploadId)
   })
 
-  test('recusa com 422 quando o que subiu não tem o tamanho declarado', async ({
+  test('refuses with 422 when what was uploaded does not have the declared size', async ({
     client,
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // Declara mil bytes e tenta subir dez. A primeira barreira é do bucket: a
-    // URL prende `content-length`, e o PUT com outro tamanho leva 403.
+    // Declares a thousand bytes and tries to upload ten. The first barrier is the bucket's:
+    // the URL pins `content-length`, and a PUT with another size gets 403.
     const opened = await open(client, session, {
       fileName: 'capa.png',
       mimetype: 'image/png',
@@ -138,8 +138,8 @@ test.group('storages > complete', (group) => {
     })
     assert.equal(refused.status, 403)
 
-    // A segunda é o `complete`, para o objeto que chegou ao bucket por outro
-    // caminho (storage sem a assinatura do tamanho): grava direto, sem a URL.
+    // The second is `complete`, for the object that reached the bucket another
+    // way (storage without the size signature): it writes directly, without the URL.
     await drive.use().put(opened.storage.path, Buffer.from(new Uint8Array(10)))
 
     const response = await client
@@ -150,13 +150,13 @@ test.group('storages > complete', (group) => {
     response.assertStatus(422)
     assert.equal(body(response).code, 'STORAGE_SIZE_MISMATCH')
 
-    // Recusado é recusado: nem a linha nem o binário sobrevivem, e o registro
-    // nunca chega a `UPLOADED`.
+    // Refused is refused: neither the row nor the binary survive, and the record
+    // never reaches `UPLOADED`.
     assert.isNull(await Stored.storage(opened.storage.id))
     assert.isFalse(await drive.use().exists(opened.storage.path))
   })
 
-  test('confirmar duas vezes devolve o mesmo registro', async ({ client, assert }) => {
+  test('confirming twice returns the same record', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -171,7 +171,7 @@ test.group('storages > complete', (group) => {
 test.group('storages > complete > acesso e identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem sessão responde 401', async ({ client }) => {
+  test('without a session responds 401', async ({ client }) => {
     const response = await client
       .post(`/storages/00000000-0000-4000-8000-000000000000/complete`)
       .json({})
@@ -179,7 +179,7 @@ test.group('storages > complete > acesso e identificador', (group) => {
     response.assertStatus(401)
   })
 
-  test('id inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent id responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -191,7 +191,7 @@ test.group('storages > complete > acesso e identificador', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.post('/storages/x/complete').cookies(session).json({})

@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('storages/files > download (unit)', () => {
-  test('devolve a URL assinada com o nome original', async ({ assert }) => {
+  test('returns the signed URL with the original name', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())
 
@@ -27,7 +27,7 @@ test.group('storages/files > download (unit)', () => {
     assert.include(url, 'capa.png')
   })
 
-  test('arquivo inexistente é 404 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 404 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: FILE_ID })
@@ -35,11 +35,11 @@ test.group('storages/files > download (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do bucket é 500 STORAGES_FILE_DOWNLOAD_ERROR', async ({ assert }) => {
+  test('bucket failure is 500 STORAGES_FILE_DOWNLOAD_ERROR', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
     bucket.signedDownload = async () => {
-      throw new Error('bucket fora')
+      throw new Error('bucket down')
     }
 
     const result = await useCase.execute({ id: FILE_ID })

@@ -24,24 +24,24 @@ type Payload = StoragesFileCreatePayload
 type Response = Either<HTTPException, StoragesFileUploadResponse>
 
 /**
- * Abre um upload: registra o arquivo como `PENDING` e devolve por onde subi-lo.
+ * Opens an upload: registers the file as `PENDING` and returns where to upload it.
  *
- * **Não recebe bytes**. O binário vai do navegador direto ao bucket,
- * por URL assinada, e nunca atravessa esta aplicação. Não é preferência de
- * estilo: um arquivo grande num corpo HTTP esbarra no limite do proxy antes de
- * chegar aqui, ocupa a aplicação inteira pelo tempo do upload, e não tem como
- * ser retomado quando a conexão cai no meio.
+ * **Does not receive bytes**. The binary goes from the browser straight to the bucket,
+ * by signed URL, and never crosses this application. It is not a style
+ * preference: a large file in an HTTP body hits the proxy limit before
+ * getting here, occupies the whole application for the duration of the upload, and cannot
+ * be resumed when the connection drops midway.
  *
- * Tipo e tamanho são **declarados** pelo cliente e recusados no validator antes
- * de qualquer assinatura - arquivo proibido não ganha URL, então não chega ao
- * bucket. Que o declarado seja verdade é o que `POST /storages/:id/complete`
- * confere, contra o objeto real.
+ * Type and size are **declared** by the client and refused in the validator before
+ * any signature - a forbidden file gets no URL, so it never reaches the
+ * bucket. That the declared is true is what `POST /storages/:id/complete`
+ * checks, against the real object.
  *
- * Arquivo menor que uma parte não vira multipart: ganha uma URL só, `uploadId`
- * nulo e um `PUT` direto. `UploadId`, coleta de `ETag` e confirmação em duas
- * etapas para um avatar de 40 KB seriam cerimônia sem função.
+ * A file smaller than one part does not become a multipart: it gets a single URL, a null `uploadId`
+ * and a direct `PUT`. `UploadId`, `ETag` collection and two-step
+ * confirmation for a 40 KB avatar would be ceremony with no function.
  *
- * O arquivo nasce sem dono: quem anexa é que guarda o id.
+ * The file is born without an owner: whoever attaches keeps the id.
  */
 @inject()
 export default class StoragesFileCreateUseCase {
@@ -108,9 +108,9 @@ export default class StoragesFileCreateUseCase {
     } catch (error) {
       logger.error({ err: error }, '[storages/files > create][error]')
 
-      // O multipart pode ter sido aberto antes de a linha falhar. Sem este
-      // aborto ele fica pendurado no bucket para sempre: partes órfãs não
-      // aparecem na listagem de objetos e continuam sendo cobradas.
+      // The multipart may have been opened before the row failed. Without this
+      // abort it hangs in the bucket forever: orphan parts do not
+      // show up in the object listing and keep being billed.
       if (uploadId) await this.abortQuietly(key, uploadId)
 
       return left(
@@ -123,8 +123,8 @@ export default class StoragesFileCreateUseCase {
   }
 
   /**
-   * Aborta sem deixar a falha do aborto encobrir a falha original - quem chama
-   * já está no caminho do erro, e o que interessa reportar é o primeiro.
+   * Aborts without letting the abort failure mask the original failure - the caller
+   * is already on the error path, and what matters to report is the first one.
    */
   private async abortQuietly(key: string, uploadId: string): Promise<void> {
     try {

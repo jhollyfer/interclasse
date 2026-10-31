@@ -10,18 +10,18 @@ import { StoragesFileCompleteValidator } from '#validators/storages/files.valida
 @inject()
 export default class StoragesFileCompleteController {
   static docs = defineDocs({
-    summary: 'Confirmar upload de arquivo',
+    summary: 'Confirm file upload',
     description:
-      'Fecha o upload aberto por `POST /storages`: o bucket remonta as partes e a linha passa ' +
-      'a `UPLOADED`, que é o único estado que pode ser anexado a alguma coisa.\n\n' +
-      'O corpo traz o `ETag` que cada `PUT` de parte devolveu - é assim que o storage confere ' +
-      'que nenhuma parte se perdeu ou chegou pela metade. Upload de parte única não tem parte ' +
-      'para confirmar, e `parts` vem ausente.\n\n' +
-      'É aqui que o tamanho **declarado** no `POST /storages` é comparado com o do objeto que ' +
-      'de fato subiu. Divergiu, o objeto é apagado, a linha morre junto e a resposta é `422`. ' +
-      'O `mimetype` não é conferido porque não tem como divergir: ele entra na assinatura da ' +
-      'URL, e o bucket recusa um `PUT` que não bata com ela.\n\n' +
-      'Chamar duas vezes é seguro: a segunda devolve o mesmo registro.',
+      'Closes the upload opened by `POST /storages`: the bucket reassembles the parts and the row becomes ' +
+      '`UPLOADED`, the only state that can be attached to anything.\n\n' +
+      'The body carries the `ETag` each part `PUT` returned - that is how the storage verifies ' +
+      'that no part was lost or arrived half-written. A single-part upload has no part ' +
+      'to confirm, and `parts` is absent.\n\n' +
+      'This is where the size **declared** in `POST /storages` is compared with that of the object that ' +
+      'actually arrived. If it diverges, the object is deleted, the row dies with it and the response is `422`. ' +
+      'The `mimetype` is not checked because it cannot diverge: it goes into the signature of the ' +
+      'URL, and the bucket refuses a `PUT` that does not match it.\n\n' +
+      'Calling twice is safe: the second returns the same record.',
   })
 
   constructor(private readonly useCase: StoragesFileCompleteUseCase) {}

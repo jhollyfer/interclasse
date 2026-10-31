@@ -24,21 +24,21 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, StoragesFileUploadResponse>
 
 /**
- * De onde continuar: o que o bucket já recebeu, e URL nova para o que falta.
+ * Where to continue from: what the bucket has already received, and a new URL for what is missing.
  *
- * Um endpoint só para dois casos que são o mesmo problema:
+ * One endpoint for two cases that are the same problem:
  *
- * - **retomada.** A conexão caiu na parte 900 de mil. Sem isto, a única saída
- *   seria recomeçar do zero - e recomeçar do zero num arquivo grande é o que
- *   torna a rede ruim intransponível em vez de só lenta.
- * - **próximo lote.** As URLs saem em lotes (`PRESIGNED_BATCH`), porque assinar
- *   mil de uma vez seria meio megabyte de JSON antes do primeiro byte subir.
- *   Quem terminou o lote pede o seguinte aqui.
+ * - **resume.** The connection dropped at part 900 of a thousand. Without this, the only way out
+ *   would be to start over - and starting over on a large file is what
+ *   makes a bad network impassable instead of merely slow.
+ * - **next batch.** The URLs come out in batches (`PRESIGNED_BATCH`), because signing
+ *   a thousand at once would be half a megabyte of JSON before the first byte goes up.
+ *   Whoever finished the batch asks for the next one here.
  *
- * Assinar de novo é o ponto, e não um efeito colateral: URL assinada expira, e
- * um upload que durou mais que a validade encontra aqui um endereço novo para a
- * mesma parte. É por isso que a resposta reassina em vez de devolver as URLs
- * originais.
+ * Signing again is the point, not a side effect: a signed URL expires, and
+ * an upload that lasted longer than the validity finds here a new address for the
+ * same part. That is why the response re-signs instead of returning the URLs
+ * originals.
  */
 @inject()
 export default class StoragesFilePartsUseCase {
@@ -61,9 +61,9 @@ export default class StoragesFilePartsUseCase {
       const totalParts = countParts(file.size, partSize)
       const url = await this.bucket.signedUrl(file.path)
 
-      // Já confirmado: nada a subir. Devolver a mesma forma com as listas
-      // vazias, e não um erro, porque quem pergunta é um cliente retomando -
-      // ele lê o `status` e para, que é o desfecho certo.
+      // Already confirmed: nothing to upload. Return the same shape with empty
+      // lists, not an error, because whoever asks is a resuming client -
+      // it reads the `status` and stops, which is the right outcome.
       if (storage.isUploaded()) {
         return right(
           FilePresenter.upload({
@@ -110,11 +110,11 @@ export default class StoragesFilePartsUseCase {
   }
 
   /**
-   * O que o bucket já tem.
+   * What the bucket already has.
    *
-   * No multipart é o `ListParts`. No upload de parte única não há partes para
-   * listar, e o que responde a mesma pergunta é o próprio objeto existir: se o
-   * `PUT` chegou a completar, o arquivo está lá e só falta confirmar.
+   * In a multipart it is `ListParts`. In a single-part upload there are no parts to
+   * list, and what answers the same question is the object itself existing: if the
+   * `PUT` managed to complete, the file is there and only the confirmation is missing.
    */
   private async uploaded(storage: Storage): Promise<Array<UploadedPart>> {
     const { path, uploadId } = storage.snapshot()
@@ -126,12 +126,12 @@ export default class StoragesFilePartsUseCase {
 
       return [{ partNumber: 1, size: metadata.contentLength, etag: metadata.etag ?? '' }]
     } catch {
-      // Objeto ainda não existe no bucket: nada enviado, nada a retomar.
+      // The object does not yet exist in the bucket: nothing sent, nothing to resume.
       return []
     }
   }
 
-  /** URL nova para cada parte que falta - as antigas podem ter expirado. */
+  /** A new URL for each missing part - the old ones may have expired. */
   private async sign(
     storage: Storage,
     missing: ReadonlyArray<PartToSign>,
