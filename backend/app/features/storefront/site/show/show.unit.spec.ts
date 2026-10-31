@@ -12,7 +12,9 @@ import { makeWithMemory } from '#tests/container-fixtures'
 const PDF_ID = '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91'
 
 test.group('storefront/site > show (unit)', () => {
-  test('sem nada preenchido, o site recebe tudo vazio e sem regulamento', async ({ assert }) => {
+  test('with nothing filled in, the site receives everything empty and no regulation', async ({
+    assert,
+  }) => {
     const useCase = await makeWithMemory(StorefrontSiteShowUseCase, [
       [SiteSettingRepository, MemoryRepositories.siteSettings()],
       [StorageContract, new StorageFake()],
@@ -31,7 +33,7 @@ test.group('storefront/site > show (unit)', () => {
     })
   })
 
-  test('o regulamento sai só com URL, nome e tamanho', async ({ assert }) => {
+  test('the regulation leaves with only URL, name and size', async ({ assert }) => {
     const settings = MemoryRepositories.siteSettings().withFile({
       id: PDF_ID,
       filename: 'f.pdf',

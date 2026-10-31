@@ -15,7 +15,7 @@ async function setup() {
   const photos = memoryPhotos(storage, author)
   for (const sender of [PHOTO_SENDER.ADVISOR, PHOTO_SENDER.ADMINISTRATOR] satisfies PhotoSender[]) {
     const created = Photo.create({ id: randomUUID(), storage, author, sender, now: new Date() })
-    if (created.isLeft()) throw new Error('arranjo inválido')
+    if (created.isLeft()) throw new Error('invalid arrangement')
     await photos.save(created.value)
   }
   const useCase = await makeWithMemory(StorefrontPhotoPaginateUseCase, [[PhotoRepository, photos]])
@@ -24,12 +24,12 @@ async function setup() {
 }
 
 test.group('storefront/photos > paginate (unit)', () => {
-  test('lista só as aprovadas, sem autor', async ({ assert }) => {
+  test('lists only the approved ones, without author', async ({ assert }) => {
     const { storage, useCase } = await setup()
 
     const result = await useCase.execute({})
 
-    if (result.isLeft()) throw new Error('esperava lista')
+    if (result.isLeft()) throw new Error('expected a list')
     const [item] = result.value.data
     assert.lengthOf(result.value.data, 1)
     assert.equal(item?.url, `https://bucket.test/${storage.path}?signed`)

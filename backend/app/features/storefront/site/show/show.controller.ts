@@ -8,10 +8,10 @@ import { defineDocs } from '#core/openapi/types'
 @inject()
 export default class StorefrontSiteShowController {
   static docs = defineDocs({
-    summary: 'Sobre os jogos',
+    summary: 'About the games',
     description:
-      'O "Sobre" dos jogos e o regulamento para baixar. `regulation` é nulo enquanto ' +
-      'a organização não enviar o PDF; a `url` é assinada e vence em minutos.',
+      'The "About" of the games and the regulation to download. `regulation` is null while ' +
+      'the organization has not uploaded the PDF; the `url` is signed and expires in minutes.',
   })
 
   constructor(private readonly useCase: StorefrontSiteShowUseCase) {}

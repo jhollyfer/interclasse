@@ -9,7 +9,7 @@ import { PaginationValidator } from '#core/validator'
 @inject()
 export default class StorefrontAnnouncementPaginateController {
   static docs = defineDocs({
-    description: 'Os avisos dos jogos: fixados primeiro, depois do mais novo ao mais antigo.',
+    description: 'The games announcements: pinned first, then newest to oldest.',
   })
 
   constructor(private readonly useCase: StorefrontAnnouncementPaginateUseCase) {}

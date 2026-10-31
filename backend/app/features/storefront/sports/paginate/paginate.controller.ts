@@ -9,7 +9,7 @@ import { PaginationValidator } from '#core/validator'
 @inject()
 export default class StorefrontSportPaginateController {
   static docs = defineDocs({
-    description: 'As modalidades dos jogos, em ordem alfabética. Sem sessão.',
+    description: 'The games sports, in alphabetical order. No session.',
   })
 
   constructor(private readonly useCase: StorefrontSportPaginateUseCase) {}

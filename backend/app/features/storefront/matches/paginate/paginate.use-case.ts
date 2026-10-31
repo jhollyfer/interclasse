@@ -47,7 +47,7 @@ export default class StorefrontMatchPaginateUseCase {
     }
   }
 
-  /** Resultado se lê do mais recente para trás; o resto, na ordem da agenda. */
+  /** A result is read from the most recent backwards; the rest, in schedule order. */
   private orderFor(payload: Payload): MatchListOrder {
     if (payload.status === MATCH_STATUS.FINISHED) return 'recent-results'
 

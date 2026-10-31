@@ -11,7 +11,10 @@ import {
 test.group('storefront/photos > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: anônimo vê só as aprovadas, sem autor nem status', async ({ client, assert }) => {
+  test('200: anonymous sees only the approved ones, without author or status', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const approved = await StorageFactory.create()
@@ -32,7 +35,7 @@ test.group('storefront/photos > paginate', (group) => {
     assert.notProperty(body(response).data[0], 'status')
   })
 
-  test('422: página inválida', async ({ client }) => {
+  test('422: invalid page', async ({ client }) => {
     const response = await client.get('/storefront/photos').qs({ page: 0 })
 
     response.assertStatus(422)

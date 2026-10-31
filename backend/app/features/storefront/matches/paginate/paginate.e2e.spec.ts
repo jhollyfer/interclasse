@@ -9,82 +9,85 @@ import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fi
 test.group('storefront matches > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o site lista os jogos sem sessão', async ({ client, assert }) => {
+  test('the site lists the matches without a session', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     await drawnBracket(client, admin, 3)
 
     const response = await client.get('/storefront/matches').qs({ status: 'SCHEDULED' })
 
     response.assertStatus(200)
-    // 3 turmas: uma semifinal de verdade e a final, que já tem o time de folga
-    // mas não o adversário - por isso não entra na tabela de jogos.
+    // 3 classrooms: a real semifinal and the final, which already has the bye team
+    // but not the opponent - so it does not enter the match table.
     assert.lengthOf(body(response).data, 1)
     assert.isString(body(response).data[0].homeTeam.classroom.name)
-    // Conta de conselheiro e de representante não sai no site anônimo.
+    // Advisor and representative accounts do not show on the anonymous site.
     assert.notProperty(body(response).data[0].homeTeam.classroom, 'advisorId')
     assert.notProperty(body(response).data[0].homeTeam.classroom, 'representativeId')
   })
 
-  test('?classroomId lista só os jogos da turma, como mandante ou visitante', async ({
+  test('?classroomId lists only the classroom matches, as home or away', async ({
     client,
     assert,
   }) => {
     const admin = await authenticateAsAdministrator(client)
     const { classroomIds } = await drawnBracket(client, admin, 4)
     const [classroomId] = classroomIds
-    if (!classroomId) throw new Error('fixture sem turma')
+    if (!classroomId) throw new Error('fixture without a classroom')
 
     const response = await client.get('/storefront/matches').qs({ classroomId })
 
     response.assertStatus(200)
-    // Chave de 4: a turma joga só a semifinal dela; a final ainda não tem times.
+    // Bracket of 4: the classroom plays only its semifinal; the final has no teams yet.
     assert.lengthOf(body(response).data, 1)
     const [match] = body(response).data
     assert.include([match.homeTeam.classroom.id, match.awayTeam.classroom.id], classroomId)
   })
 
-  test('?status=FINISHED lista o resultado mais recente primeiro', async ({ client, assert }) => {
-    const antigo = await scheduledMatch()
-    const recente = await scheduledMatch()
-    // A agenda poria o marcado antes; resultado se lê pela última atualização.
-    antigo.match.merge({
+  test('?status=FINISHED lists the most recent result first', async ({ client, assert }) => {
+    const older = await scheduledMatch()
+    const recent = await scheduledMatch()
+    // The schedule would put the scheduled one first; a result is read by its last update.
+    older.match.merge({
       status: MATCH_STATUS.FINISHED,
       scheduledAt: DateTime.now().minus({ days: 2 }),
     })
-    await antigo.match.save()
-    recente.match.status = MATCH_STATUS.FINISHED
-    await recente.match.save()
-    // Pela query, e não pelo model: o `save()` regravaria `updatedAt` com agora,
-    // e duas gravações no mesmo milissegundo deixariam a ordem ao acaso.
-    await Stored.touchMatch(antigo.match.id, DateTime.now().minus({ hours: 1 }))
+    await older.match.save()
+    recent.match.status = MATCH_STATUS.FINISHED
+    await recent.match.save()
+    // Through the query, not the model: `save()` would rewrite `updatedAt` with now,
+    // and two writes in the same millisecond would leave the order to chance.
+    await Stored.touchMatch(older.match.id, DateTime.now().minus({ hours: 1 }))
 
     const response = await client.get('/storefront/matches').qs({ status: MATCH_STATUS.FINISHED })
 
     response.assertStatus(200)
     assert.deepEqual(
       body(response).data.map((match: { id: string }) => match.id),
-      [recente.match.id, antigo.match.id],
+      [recent.match.id, older.match.id],
     )
   })
 
-  test('sem filtro de status, a ordem é a da agenda', async ({ client, assert }) => {
-    const semHorario = await scheduledMatch()
-    const marcada = await scheduledMatch()
-    marcada.match.scheduledAt = DateTime.now().plus({ days: 1 })
-    await marcada.match.save()
+  test('without a status filter, the order is the schedule one', async ({ client, assert }) => {
+    const noTime = await scheduledMatch()
+    const scheduled = await scheduledMatch()
+    scheduled.match.scheduledAt = DateTime.now().plus({ days: 1 })
+    await scheduled.match.save()
 
     const response = await client.get('/storefront/matches')
 
     response.assertStatus(200)
     assert.deepEqual(
       body(response).data.map((match: { id: string }) => match.id),
-      [marcada.match.id, semHorario.match.id],
+      [scheduled.match.id, noTime.match.id],
     )
-    assert.equal(body(response).data[0].bracket.sport.id, marcada.bracket.sportId)
+    assert.equal(body(response).data[0].bracket.sport.id, scheduled.bracket.sportId)
   })
 
-  test('?status fora da lista responde 422 apontando o campo', async ({ client, assert }) => {
-    // Na URL, e não em `.qs()`: o registry do Tuyau tipa o valor pela lista fechada.
+  test('?status outside the list responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
+    // In the URL, not in `.qs()`: the Tuyau registry types the value by the closed list.
     const response = await client.get('/storefront/matches?status=ADIADO')
 
     response.assertStatus(422)

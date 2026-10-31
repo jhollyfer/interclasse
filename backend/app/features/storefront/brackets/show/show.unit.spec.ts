@@ -17,17 +17,17 @@ async function setup() {
 }
 
 test.group('storefront/brackets > show (unit)', () => {
-  test('devolve a chave inteira', async ({ assert }) => {
+  test('returns the whole bracket', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { bracket } = await BracketUnitFixtures.drawn(brackets)
 
     const result = await useCase.execute({ id: bracket.id })
 
-    if (result.isLeft()) throw new Error('chave deveria existir')
+    if (result.isLeft()) throw new Error('bracket should exist')
     assert.lengthOf(result.value.matches, 3)
   })
 
-  test('chave inexistente é 404 BRACKET_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent bracket is 404 BRACKET_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })
