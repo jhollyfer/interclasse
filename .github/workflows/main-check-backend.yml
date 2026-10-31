@@ -103,7 +103,6 @@ jobs:
           LOG_LEVEL: info
           APP_KEY: ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL: http://localhost:3333
-          SESSION_DRIVER: cookie
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
           UPLOAD_MAX_SIZE: '1073741824'
           STORAGE_KEY: ci-placeholder
@@ -210,7 +209,6 @@ jobs:
           LOG_LEVEL: info
           APP_KEY: ci-placeholder-sem-uso-fora-deste-job
           APP_SERVER_URL: http://localhost:3333
-          SESSION_DRIVER: cookie
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
           UPLOAD_MAX_SIZE: '1073741824'
           STORAGE_KEY: ci-placeholder
