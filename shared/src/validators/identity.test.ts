@@ -13,7 +13,7 @@ const VALID = {
   passwordConfirmation: 'Senha@123',
 } as const
 
-describe('validators de identidade', () => {
+describe('identity validators', () => {
   it('accepts the valid account', () => {
     expect(AdministratorUserCreateValidator.safeParse(VALID).success).toBe(true)
   })
@@ -43,7 +43,7 @@ describe('validators de identidade', () => {
     useValidatorLocale('pt-BR')
   })
 
-  it('trocar a senha do perfil exige a senha atual', () => {
+  it('changing the profile password requires the current password', () => {
     const result = AccountProfileUpdateValidator.safeParse({
       password: 'Senha@123',
       passwordConfirmation: 'Senha@123',

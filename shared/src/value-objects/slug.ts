@@ -4,7 +4,7 @@
  * (`_standards/domain.md` §3).
  */
 export class Slug {
-  /** O teto da coluna `slug`. */
+  /** The ceiling of the `slug` column. */
   static readonly MAX_LENGTH = 255
 
   private constructor(readonly value: string) {}

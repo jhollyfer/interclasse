@@ -15,7 +15,7 @@ describe('Slug', () => {
     expect(slug.value.endsWith('-')).toBe(false)
   })
 
-  it('compara pelo valor', () => {
+  it('compares by value', () => {
     expect(Slug.from('Futsal').equals(Slug.from('futsal'))).toBe(true)
   })
 })

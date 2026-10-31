@@ -7,7 +7,7 @@
 export const TRASHED_MODE = {
   /** Only what is in the trash. It is the listing of the restore screen. */
   ONLY: 'only',
-  /** Ativos e removidos juntos. */
+  /** Active and removed together. */
   WITH: 'with',
 } as const
 

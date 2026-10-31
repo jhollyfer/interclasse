@@ -49,7 +49,7 @@ describe('validators business rules', () => {
     ).toBe(true)
   })
 
-  it('perfil: senha nova exige a senha atual', () => {
+  it('profile: a new password requires the current password', () => {
     const result = AccountProfileUpdateValidator.safeParse({
       password: 'Abcdef1!',
       passwordConfirmation: 'Abcdef1!',
