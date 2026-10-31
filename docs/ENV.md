@@ -8,7 +8,7 @@
 
 ## 1. Variáveis
 
-Mesma ordem de blocos do `backend/.env.example`.
+Mesma ordem de blocos do `backend/.env.example`. Nome de bloco e comentário dos arquivos `.env*` são em inglês (`typescript.md` §12); o português mora aqui.
 
 ### API (`backend/`)
 
@@ -71,14 +71,14 @@ APP_KEY=<segredo>
 APP_SERVER_URL=http://${HOST}:${PORT}
 # TRUSTED_PROXIES=172.16.0.0/12
 
-# CORS (produção)
+# CORS
 CORS_ORIGINS=http://localhost:3001  # produção: https://interclass.maiyu.com.br
 # COOKIE_DOMAIN=.maiyu.com.br
 
-# Banco de dados
+# Database
 DATABASE_URL=postgres://<usuario>:<senha>@localhost:5434/<banco>
 
-# Armazenamento de arquivos
+# Storage
 UPLOAD_MAX_SIZE=1073741824
 STORAGE_KEY=<segredo>
 STORAGE_SECRET=<segredo>
@@ -86,7 +86,7 @@ STORAGE_BUCKET=interclasse
 STORAGE_ENDPOINT=http://localhost:9004
 STORAGE_FORCE_PATH_STYLE=true
 
-# Semeadura
+# Seeding
 SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
 SEED_ADMINISTRATOR_PASSWORD=<segredo>
 ```

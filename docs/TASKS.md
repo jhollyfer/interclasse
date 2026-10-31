@@ -117,8 +117,8 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | Feita | #256; `architecture.md` §3.4 |
 | 7.4 | Campos dos checks em inglês e `reason` nas exceções | Média | Feita | #258 |
 | 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | Feita | #259; o gerador usa o tipo do fato (`Refusal.http(fato)`), então o que o tipo de domínio declara largo aparece largo no `openapi.json` (ex.: `ensureDeletable(): Either<BracketError, …>`). Estreitar o left por operação fica como 7.10 |
-| 7.6 | `.env.example` e `.env.test` em inglês | Baixa | Em andamento | #260 |
-| 7.7 | Frontend: `new.tsx` com `head` em toda tela e escala de z-index | Alta | A fazer | #257 |
+| 7.6 | `.env.example` e `.env.test` em inglês | Baixa | Feita | #260 |
+| 7.7 | Frontend: `new.tsx` com `head` em toda tela e escala de z-index | Alta | Em andamento | #257 |
 | 7.8 | Suíte rápida: banco clonado por worker, shards no CI, merge de relatórios | Alta | A fazer | #253 |
 | 7.9 | Lições do adacaibs conferidas contra o código | Média | A fazer | #255 |
 | 7.10 | Estreitar o left dos métodos de domínio por operação (`Extract<BracketError, …>`) para o `openapi.json` não listar código de outra operação | Baixa | A fazer | efeito da 7.5 |
