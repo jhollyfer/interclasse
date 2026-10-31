@@ -88,7 +88,7 @@ beforeEach(() => {
 })
 
 describe('useMutationForm', () => {
-  it('invalida antes de chamar o onSuccess da tela', async () => {
+  it('invalidates before calling the screen onSuccess', async () => {
     const order: string[] = []
     invalidateQueries.mockImplementation(() => {
       order.push('invalidate')
@@ -106,7 +106,7 @@ describe('useMutationForm', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['scores'] })
   })
 
-  it('avisa com o texto fixo, ou com o que cita o registro salvo', async () => {
+  it('notifies with the fixed text, or with the one citing the saved record', async () => {
     const fixed = setup()
     await fixed
       .options()
@@ -123,7 +123,7 @@ describe('useMutationForm', () => {
     expect(toast.success).toHaveBeenNthCalledWith(2, 'Ana salva.')
   })
 
-  it('não avisa quando o formulário não declara texto de sucesso', async () => {
+  it('does not notify when the form declares no success text', async () => {
     const { options } = setup({ success: undefined })
 
     await options()?.onSuccess?.(SAVED, { name: 'Ana' }, undefined, CONTEXT)
@@ -131,7 +131,7 @@ describe('useMutationForm', () => {
     expect(toast.success).not.toHaveBeenCalled()
   })
 
-  it('limpa o erro de rodapé e manda o payload transformado', () => {
+  it('clears the footer error and sends the transformed payload', () => {
     const { result, mutate } = setup({
       payload: (values: Values) => ({ name: values.name.toUpperCase() }),
     })
@@ -143,7 +143,7 @@ describe('useMutationForm', () => {
     expect(mutate).toHaveBeenCalledWith({ name: 'ANA' })
   })
 
-  it('leva o erro da API aos campos que o formulário declara', () => {
+  it('carries the API error to the fields the form declares', () => {
     const { options } = setup()
     const error = new HTTPError({
       message: 'Erro interno',

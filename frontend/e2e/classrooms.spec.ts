@@ -2,7 +2,7 @@ import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
 // docs/USER-FLOWS.md, "Cadastrar uma turma", steps 1 and 4.
-test('o administrador vê as turmas em cartões, filtra o Fundamental 1 e abre uma turma', async ({
+test('when the administrator views the classrooms as cards, filters Fundamental 1 and opens a classroom', async ({
   administrator: { page },
   expectAccessible,
 }) => {

@@ -1,15 +1,15 @@
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
-// Separado do `vite.config.ts` de propósito: os plugins do Start e do Nitro
-// montam o ambiente de servidor da aplicação, e sob o Vitest isso carregava o
-// `react` CJS no module runner ("module is not defined"). Teste só precisa de
-// JSX e do alias `#/*`.
+// Separate from `vite.config.ts` on purpose: the Start and Nitro plugins
+// build the application's server environment, and under Vitest that loaded the
+// CJS `react` in the module runner ("module is not defined"). Tests only need
+// JSX and the `#/*` alias.
 //
-// Dois projetos (_doc-lib/vitest.md#projects, #config/isolate): o `shared` não
-// isola o arquivo, que é o maior ganho de tempo da suíte e só vale para teste
-// sem efeito global; o `isolated` guarda o que troca módulo (`vi.mock`), global
-// ou DOM e por isso precisa de ambiente próprio por arquivo
+// Two projects (_doc-lib/vitest.md#projects, #config/isolate): `shared` does not
+// isolate the file, which is the suite's biggest time gain and only holds for tests
+// without global side effects; `isolated` keeps what swaps modules (`vi.mock`), global
+// or DOM and therefore needs its own environment per file
 // (_doc-lib/vitest.md#improving-performance, `tooling.md` §10.6).
 const STATEFUL = [
   'src/env.test.ts',

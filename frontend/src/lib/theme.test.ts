@@ -19,11 +19,11 @@ afterEach(() => {
 })
 
 describe('parseTheme', () => {
-  it('aceita cada tema da lista', () => {
+  it('accepts each theme in the list', () => {
     for (const theme of THEMES) expect(parseTheme(theme)).toBe(theme)
   })
 
-  it('cookie ausente ou torto vale system', () => {
+  it('treats an absent or crooked cookie as system', () => {
     expect(parseTheme(undefined)).toBe('system')
     expect(parseTheme('roxo')).toBe('system')
     expect(parseTheme(42)).toBe('system')
@@ -31,13 +31,13 @@ describe('parseTheme', () => {
 })
 
 describe('THEME_CLASS', () => {
-  it('system não leva classe: o script antes da hidratação decide', () => {
+  it('gives system no class: the script before hydration decides', () => {
     expect(THEME_CLASS).toEqual({ light: 'light', dark: 'dark', system: '' })
   })
 })
 
 describe('writeTheme', () => {
-  it('grava a preferência no cookie', () => {
+  it('saves the preference in the cookie', () => {
     writeTheme('dark')
 
     expect(document.cookie).toContain(`${THEME_COOKIE}=dark`)
@@ -45,14 +45,14 @@ describe('writeTheme', () => {
 })
 
 describe('applyTheme', () => {
-  it('escreve a classe e o color-scheme do tema escolhido', () => {
+  it('writes the class and the color-scheme of the chosen theme', () => {
     applyTheme('dark')
 
     expect(document.documentElement.classList.contains('dark')).toBe(true)
     expect(document.documentElement.style.colorScheme).toBe('dark')
   })
 
-  it('troca a classe anterior em vez de somar', () => {
+  it('swaps the previous class instead of adding to it', () => {
     applyTheme('dark')
     applyTheme('light')
 
@@ -60,7 +60,7 @@ describe('applyTheme', () => {
     expect(document.documentElement.classList.contains('light')).toBe(true)
   })
 
-  it('system segue a preferência do sistema', () => {
+  it('makes system follow the system preference', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }))
 
     applyTheme('system')

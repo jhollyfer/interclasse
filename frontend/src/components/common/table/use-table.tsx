@@ -270,8 +270,8 @@ export function useTable<TRow extends RowData>({
   let canSelectRow: boolean | ((row: { original: TRow }) => boolean) = false
   if (typeof selectable === 'boolean') canSelectRow = selectable
   if (typeof selectable === 'function') {
-    const permite = selectable
-    canSelectRow = (row) => permite(row.original)
+    const isAllowed = selectable
+    canSelectRow = (row) => isAllowed(row.original)
   }
 
   return useTableRoot({

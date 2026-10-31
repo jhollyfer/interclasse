@@ -3,7 +3,7 @@ import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
 // Regression: opening the profile from the account menu fell into "Algo quebrou aqui" (500).
-test('o administrador abre o menu da conta e chega ao perfil sem erro', async ({
+test('when the administrator opens the account menu, reaches the profile without error', async ({
   administrator: { page },
 }) => {
   const { email } = credentialsOf('administrator')
@@ -20,7 +20,7 @@ test('o administrador abre o menu da conta e chega ao perfil sem erro', async ({
   await expect(page.getByRole('link', { name: 'Editar perfil' })).toBeVisible()
 })
 
-test('o endereço antigo do perfil leva ao /profile', async ({
+test('when the old profile address is opened, redirects to /profile', async ({
   administrator: { page },
 }) => {
   await page.goto('/administrator/profile')

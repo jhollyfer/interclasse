@@ -15,7 +15,7 @@ function Uploading(): null {
 }
 
 describe('SubmitButton', () => {
-  it('é submit e fica habilitado por padrão', () => {
+  it('is a submit and is enabled by default', () => {
     render(<SubmitButton>Salvar</SubmitButton>)
     const button = screen.getByRole('button', { name: 'Salvar' })
 
@@ -23,7 +23,7 @@ describe('SubmitButton', () => {
     expect(button.hasAttribute('disabled')).toBe(false)
   })
 
-  it('com a mutation em voo trava e mostra o spinner', () => {
+  it('when the mutation is in flight, locks and shows the spinner', () => {
     render(<SubmitButton isPending>Salvar</SubmitButton>)
     const button = screen.getByRole('button', { name: /Salvar/ })
 
@@ -31,7 +31,7 @@ describe('SubmitButton', () => {
     expect(button.querySelector('svg, [role="status"]')).toBeTruthy()
   })
 
-  it('disabled explícito também trava', () => {
+  it('locks with explicit disabled too', () => {
     render(<SubmitButton disabled>Salvar</SubmitButton>)
 
     expect(
@@ -39,7 +39,7 @@ describe('SubmitButton', () => {
     ).toBe(true)
   })
 
-  it('trava enquanto algum campo do formulário ainda está enviando arquivo', () => {
+  it('locks while any form field is still uploading a file', () => {
     render(
       <UploadingProvider>
         <Uploading />

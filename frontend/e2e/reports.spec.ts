@@ -6,7 +6,7 @@ import { expect, test } from './support/test'
 const BOM = '﻿'
 
 // docs/USER-FLOWS.md, "Baixar o relatório".
-test('a tela de relatórios abre e o botão baixa o CSV com BOM e o cabeçalho', async ({
+test('when the reports screen opens, the button downloads the CSV with BOM and header', async ({
   administrator: { page },
 }) => {
   await page.goto('/administrator/reports')

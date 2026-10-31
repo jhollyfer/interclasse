@@ -37,19 +37,19 @@ function board(
 }
 
 describe('EnrollmentBoard', () => {
-  it('sem aluno diz que a lista de alunos vem antes', () => {
+  it('when there is no student, says the student list comes first', () => {
     render(<EnrollmentBoard board={board({ students: [] })} onSave={vi.fn()} />)
 
     expect(screen.getByText(m.common_enrollment_no_students())).toBeTruthy()
   })
 
-  it('sem modalidade diz que não há nenhuma cadastrada', () => {
+  it('when there is no sport, says none is registered', () => {
     render(<EnrollmentBoard board={board({ sports: [] })} onSave={vi.fn()} />)
 
     expect(screen.getByText(m.common_enrollment_no_sports())).toBeTruthy()
   })
 
-  it('marca quem já está inscrito e mostra a contagem', () => {
+  it('marks who is already enrolled and shows the count', () => {
     render(<EnrollmentBoard board={board({})} onSave={vi.fn()} />)
 
     expect(
@@ -62,7 +62,7 @@ describe('EnrollmentBoard', () => {
     ).toBeTruthy()
   })
 
-  it('salvar fica travado até haver mudança', () => {
+  it('keeps save locked until there is a change', () => {
     render(<EnrollmentBoard board={board({})} onSave={vi.fn()} />)
 
     expect(
@@ -74,7 +74,7 @@ describe('EnrollmentBoard', () => {
     ).toBe(true)
   })
 
-  it('salvar manda a lista inteira e os nomes de quem saiu', async () => {
+  it('when saving, sends the whole list and the names of those who left', async () => {
     const onSave = vi.fn()
     render(<EnrollmentBoard board={board({})} onSave={onSave} />)
 
@@ -90,7 +90,7 @@ describe('EnrollmentBoard', () => {
     expect(onSave).toHaveBeenCalledWith('futsal', ['bia', 'caio'], ['Ana'])
   })
 
-  it('passar do máximo avisa e trava o salvar', async () => {
+  it('when the maximum is exceeded, warns and locks save', async () => {
     render(<EnrollmentBoard board={board({})} onSave={vi.fn()} />)
 
     await userEvent.click(screen.getByRole('checkbox', { name: 'Bia' }))
@@ -109,13 +109,13 @@ describe('EnrollmentBoard', () => {
     ).toBe(true)
   })
 
-  it('abaixo do mínimo avisa que a turma fica fora do sorteio', () => {
+  it('when below the minimum, warns that the classroom stays out of the draw', () => {
     render(<EnrollmentBoard board={board({})} onSave={vi.fn()} />)
 
     expect(screen.getByText(m.common_enrollment_under())).toBeTruthy()
   })
 
-  it('modalidade travada não deixa marcar nem salvar', () => {
+  it('when a sport is locked, does not allow ticking or saving', () => {
     render(
       <EnrollmentBoard
         board={board({ sports: [{ ...FUTSAL, locked: true, drawn: true }] })}
@@ -135,7 +135,7 @@ describe('EnrollmentBoard', () => {
     ).toBeNull()
   })
 
-  it('sem canRemove o inscrito não sai, mas o novo entra', () => {
+  it('without canRemove, the enrolled athlete does not leave but the new one enters', () => {
     render(
       <EnrollmentBoard board={board({})} onSave={vi.fn()} canRemove={false} />,
     )
@@ -152,7 +152,7 @@ describe('EnrollmentBoard', () => {
     ).toBe(false)
   })
 
-  it('só o cartão da modalidade em salvamento trava', () => {
+  it('locks only the card of the sport being saved', () => {
     render(
       <EnrollmentBoard
         board={board({

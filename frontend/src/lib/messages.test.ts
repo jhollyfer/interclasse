@@ -28,7 +28,7 @@ function keysOf(file: Record<string, unknown>): Array<string> {
 
 describe('messages', () => {
   it.each(Object.entries(FILES))(
-    '%s não tem travessão nem "..." em valor nenhum',
+    '%s has no em dash nor "..." in any value',
     (_locale, file) => {
       const offenders = Object.entries(file)
         .filter(([key]) => key !== '$schema')
@@ -44,7 +44,7 @@ describe('messages', () => {
   it.each([
     ['es', es],
     ['en', en],
-  ])('%s tem o mesmo conjunto de chaves do pt-BR', (_locale, file) => {
+  ])('%s has the same key set as pt-BR', (_locale, file) => {
     expect(keysOf(file)).toEqual(keysOf(ptBR))
   })
 })

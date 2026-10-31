@@ -109,7 +109,7 @@ afterEach(() => {
 })
 
 describe('putPart', () => {
-  it('devolve o ETag quando o bucket aceita de primeira', async () => {
+  it('returns the ETag when the bucket accepts on the first try', async () => {
     scripts = [{ kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY)
@@ -120,7 +120,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('insiste depois de um 503 e vence na tentativa seguinte', async () => {
+  it('insists after a 503 and succeeds on the next attempt', async () => {
     scripts = [
       { kind: 'status', status: 503 },
       { kind: 'ok', etag: '"abc"' },
@@ -134,7 +134,7 @@ describe('putPart', () => {
     expect(sent).toBe(2)
   })
 
-  it('insiste depois de falha de rede - é a queda curta que ela existe para cobrir', async () => {
+  it('insists after a network failure - the short drop it exists to cover', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY)
@@ -150,7 +150,7 @@ describe('putPart', () => {
    * next batch of `GET /storages/:id/parts`, which brings new URLs - repeating
    * here would only spend the attempts before getting there.
    */
-  it('não insiste em 403', async () => {
+  it('does not insist on 403', async () => {
     scripts = [
       { kind: 'status', status: 403 },
       { kind: 'ok', etag: '"abc"' },
@@ -166,7 +166,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('não insiste quando o ETag não veio - o CORS não se conserta repetindo', async () => {
+  it('does not insist when the ETag did not come - CORS is not fixed by repeating', async () => {
     scripts = [{ kind: 'ok-sem-etag' }, { kind: 'ok', etag: '"abc"' }]
 
     const refused = expect(
@@ -179,7 +179,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('respeita o teto de tentativas', async () => {
+  it('respects the attempt cap', async () => {
     scripts = [
       { kind: 'rede' },
       { kind: 'rede' },
@@ -197,7 +197,7 @@ describe('putPart', () => {
     expect(sent).toBe(3)
   })
 
-  it('não insiste depois de cancelado', async () => {
+  it('does not insist after cancelled', async () => {
     scripts = [{ kind: 'mudo' }]
 
     const controller = new AbortController()
@@ -213,7 +213,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('cancelar durante a espera do backoff interrompe na hora', async () => {
+  it('when cancelled during the backoff wait, interrupts at once', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const controller = new AbortController()
@@ -237,7 +237,7 @@ describe('putPart', () => {
    * long time to notice that - the silence clock is what turns the
    * infinite wait into a lost attempt, which is then redone.
    */
-  it('desiste da tentativa muda e refaz', async () => {
+  it('gives up on the silent attempt and redoes it', async () => {
     scripts = [{ kind: 'mudo' }, { kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY, {
@@ -254,7 +254,7 @@ describe('putPart', () => {
    * Without the zero, the caller's byte counter would keep what the lost attempt
    * had already added, and the bar would go past 100% when resending the part.
    */
-  it('zera o progresso antes de reenviar', async () => {
+  it('zeroes the progress before resending', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const reported: Array<number> = []

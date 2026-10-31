@@ -57,7 +57,7 @@ afterEach(() => {
 })
 
 describe('useMultipartUpload', () => {
-  it('cada PUT leva a parte com o tamanho exato do Blob.slice', async () => {
+  it('sends each PUT with the part at the exact Blob.slice size', async () => {
     request
       .mockResolvedValueOnce(plan())
       .mockResolvedValueOnce({ id: 's1', status: 'UPLOADED' })
@@ -80,7 +80,7 @@ describe('useMultipartUpload', () => {
     expect(sizes.sort((a, b) => b - a)).toEqual([10, 10, 5])
   })
 
-  it('arquivo inteiro sobe com o tipo, que a URL assina; parte de multipart, sem', async () => {
+  it('uploads a whole file with the type, which the URL signs; a multipart part, without', async () => {
     request
       .mockResolvedValueOnce(
         plan({
@@ -109,7 +109,7 @@ describe('useMultipartUpload', () => {
     expect(types).toEqual(['image/png', '', '', ''])
   })
 
-  it('confirma com os ETags das três partes em ordem', async () => {
+  it('confirms with the ETags of the three parts in order', async () => {
     request
       .mockResolvedValueOnce(plan())
       .mockResolvedValueOnce({ id: 's1', status: 'UPLOADED' })
@@ -136,7 +136,7 @@ describe('useMultipartUpload', () => {
     )
   })
 
-  it('arquivo de zero byte ainda manda uma parte vazia', async () => {
+  it('when the file is zero bytes, still sends an empty part', async () => {
     request
       .mockResolvedValueOnce(
         plan({ parts: [{ partNumber: 1, url: 'https://bucket/part-1' }] }),
@@ -153,7 +153,7 @@ describe('useMultipartUpload', () => {
     expect(putPart).toHaveBeenCalledTimes(1)
   })
 
-  it('recusa um tipo fora da lista antes de gastar requisição', async () => {
+  it('refuses a type outside the list before spending a request', async () => {
     const { result } = renderHook(() => useMultipartUpload())
     const exe = new File(['x'], 'a.exe', { type: 'application/x-msdownload' })
 
@@ -163,7 +163,7 @@ describe('useMultipartUpload', () => {
     expect(request).not.toHaveBeenCalled()
   })
 
-  it('só reenvia o que o servidor não tem (retomada)', async () => {
+  it('resends only what the server does not have (resume)', async () => {
     request
       .mockResolvedValueOnce(
         plan({

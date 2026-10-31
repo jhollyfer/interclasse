@@ -37,7 +37,7 @@ function renderArchive(action: (item: string) => Promise<unknown>) {
 }
 
 describe('BulkArchive', () => {
-  it('confirmar roda a ação em cada item e relata o total', async () => {
+  it('when confirmed, runs the action on each item and reports the total', async () => {
     const action = vi.fn(async () => undefined)
     renderArchive(action)
 

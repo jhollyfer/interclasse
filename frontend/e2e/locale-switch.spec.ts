@@ -8,7 +8,9 @@ const HOME = {
   en: 'Student Games 2026',
 } as const
 
-test('troca para en e es pelo seletor, e volta ao pt-BR', async ({ page }) => {
+test('when the selector switches to en and es, switches back to pt-BR', async ({
+  page,
+}) => {
   await page.goto('/')
   await waitForHydration(page)
   await expect(
@@ -52,7 +54,9 @@ test('troca para en e es pelo seletor, e volta ao pt-BR', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
 })
 
-test('a troca mantém a mesma página no outro idioma', async ({ page }) => {
+test('when the language changes, keeps the same page in the other language', async ({
+  page,
+}) => {
   await page.goto('/about')
   await waitForHydration(page)
   await expect(

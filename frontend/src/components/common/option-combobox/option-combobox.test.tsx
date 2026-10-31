@@ -16,14 +16,14 @@ const OPTIONS = [
 ]
 
 describe('toOptions', () => {
-  it('monta valor e rótulo a partir do mapa', () => {
+  it('builds value and label from the map', () => {
     expect(toOptions(['x', 'y'], { x: 'Xis', y: 'Ipsilon' })).toEqual([
       { value: 'x', label: 'Xis', dot: undefined },
       { value: 'y', label: 'Ipsilon', dot: undefined },
     ])
   })
 
-  it('valor sem rótulo usa o próprio valor, e a bolinha vem do segundo mapa', () => {
+  it('when a value has no label, uses the value itself, and the dot comes from the second map', () => {
     expect(toOptions(['x'], {}, { x: 'bg-red' })).toEqual([
       { value: 'x', label: 'x', dot: 'bg-red' },
     ])
@@ -31,7 +31,7 @@ describe('toOptions', () => {
 })
 
 describe('OptionCombobox', () => {
-  it('mostra o rótulo do valor escolhido', () => {
+  it('shows the label of the chosen value', () => {
     render(
       <OptionCombobox options={OPTIONS} value="b" onValueChange={vi.fn()} />,
     )
@@ -39,7 +39,7 @@ describe('OptionCombobox', () => {
     expect(screen.getByRole('combobox')).toHaveProperty('value', 'Beta')
   })
 
-  it('valor vazio mostra o placeholder', () => {
+  it('when the value is empty, shows the placeholder', () => {
     render(
       <OptionCombobox options={OPTIONS} value="" onValueChange={vi.fn()} />,
     )
@@ -49,7 +49,7 @@ describe('OptionCombobox', () => {
     ).toBeTruthy()
   })
 
-  it('escolher uma opção devolve o valor dela', async () => {
+  it('when an option is chosen, returns its value', async () => {
     const onValueChange = vi.fn()
     render(
       <OptionCombobox
@@ -65,7 +65,7 @@ describe('OptionCombobox', () => {
     expect(onValueChange).toHaveBeenCalledWith('a')
   })
 
-  it('com mais páginas no servidor oferece "Carregar mais"', async () => {
+  it('when the server has more pages, offers "Carregar mais"', async () => {
     const onLoadMore = vi.fn()
     render(
       <OptionCombobox
@@ -86,7 +86,7 @@ describe('OptionCombobox', () => {
     expect(onLoadMore).toHaveBeenCalledTimes(1)
   })
 
-  it('sem mais páginas não oferece "Carregar mais"', async () => {
+  it('when the server has no more pages, does not offer "Carregar mais"', async () => {
     render(
       <OptionCombobox
         options={OPTIONS}

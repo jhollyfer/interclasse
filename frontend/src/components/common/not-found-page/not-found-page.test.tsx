@@ -25,7 +25,7 @@ vi.mock('@tanstack/react-router', () => ({
 afterEach(cleanup)
 
 describe('NotFoundPage', () => {
-  it('sem filhos escreve o 404 genérico com a saída para o início', () => {
+  it('without children, writes the generic 404 with the exit to the start', () => {
     render(<NotFoundPage />)
 
     expect(
@@ -42,14 +42,14 @@ describe('NotFoundPage', () => {
     ).toBe('/')
   })
 
-  it('a fronteira de erro troca o número gigante', () => {
+  it('when the error boundary uses it, swaps the giant number', () => {
     render(<NotFoundPage code="500" />)
 
     expect(screen.getByText('500')).toBeTruthy()
     expect(screen.queryByText('404')).toBeNull()
   })
 
-  it('a tela que sabe o que faltou troca as partes e deixa o resto', () => {
+  it('when a screen knows what is missing, swaps the parts and keeps the rest', () => {
     render(
       <NotFoundPage>
         <NotFoundPageTitle>Turma não encontrada</NotFoundPageTitle>
@@ -63,7 +63,7 @@ describe('NotFoundPage', () => {
     expect(screen.getByText('Confira o link.')).toBeTruthy()
   })
 
-  it('as ações ficam soltas num grupo e somem quando não há ação', () => {
+  it('keeps the actions loose in a group and drops them when there is none', () => {
     const { container, rerender } = render(
       <NotFoundPageActions>
         <button type="button">Tentar de novo</button>

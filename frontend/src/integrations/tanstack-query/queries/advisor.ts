@@ -15,7 +15,7 @@ import { queryString } from '#/lib/list-search'
 
 import { request } from '../http'
 
-/** As turmas do conselheiro. O administrador recebe todas. */
+/** The advisor classrooms. The administrator receives all of them. */
 export const advisorClassroomsQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisor.classrooms.list(params),

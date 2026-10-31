@@ -118,7 +118,7 @@ beforeEach(() => {
 })
 
 describe('useResourceForm', () => {
-  it('espalha as quatro props do FormShell, com o destino escrito uma vez só', () => {
+  it('spreads the four FormShell props, with the destination written once', () => {
     const { result } = setup({ backParams: { id: '7' } })
 
     expect(result.current.shell).toEqual({
@@ -129,7 +129,7 @@ describe('useResourceForm', () => {
     })
   })
 
-  it('limpa o erro de rodapé da tentativa anterior antes de reenviar', () => {
+  it('clears the previous attempt footer error before resending', () => {
     const { result, stub } = setup()
 
     result.current.form.setError('root', { message: 'já existe' })
@@ -139,7 +139,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith({ name: 'Ana' })
   })
 
-  it('manda o payload transformado quando a edição acrescenta o id', () => {
+  it('sends the transformed payload when the edit adds the id', () => {
     const { result, stub } = setup({
       payload: (values: Values) => ({ ...values, id: '7' }),
     })
@@ -149,7 +149,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith({ name: 'Ana', id: '7' })
   })
 
-  it('invalida, avisa e volta, nessa ordem, no sucesso', async () => {
+  it('on success, invalidates, notifies and goes back, in that order', async () => {
     const { result, stub } = setup()
 
     await stub
@@ -172,7 +172,7 @@ describe('useResourceForm', () => {
     expect(result.current.mutation.isPending).toBe(false)
   })
 
-  it('aceita o texto de sucesso fixo, para quem não cita o registro', async () => {
+  it('accepts the fixed success text, for those that do not cite the record', async () => {
     const { stub } = setup({ success: 'Depoimento salvo.' })
 
     await stub
@@ -187,7 +187,7 @@ describe('useResourceForm', () => {
     expect(toast.success).toHaveBeenCalledWith('Depoimento salvo.')
   })
 
-  it('onSuccess próprio substitui a volta para backTo', async () => {
+  it('when a custom onSuccess is given, it replaces the return to backTo', async () => {
     const onSuccess = vi.fn()
     const { stub } = setup({ onSuccess })
 
@@ -210,7 +210,7 @@ describe('useResourceForm', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('oferece "Tentar de novo" reenviando o mesmo payload, quando há id de aviso', () => {
+  it('offers "Tentar de novo" resending the same payload, when there is a notice id', () => {
     const { stub } = setup({ retry: 'testimonial-update-error' })
     const sent = { name: 'Ana' }
 
@@ -223,7 +223,7 @@ describe('useResourceForm', () => {
     expect(stub.mutate).toHaveBeenCalledWith(sent)
   })
 
-  it('não oferece reenvio quando o cadastro insere direto', () => {
+  it('does not offer a resend when the create inserts directly', () => {
     const { stub } = setup()
 
     stub

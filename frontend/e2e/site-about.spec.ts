@@ -9,7 +9,7 @@ function textOf(value: unknown): string {
 }
 
 // docs/USER-FLOWS.md, "Editar o site", passos 1 e 3.
-test('a organização muda o texto do Sobre, o /about mostra, e o original volta no fim', async ({
+test('when the organization changes the About text, /about shows it and the original returns at the end', async ({
   administrator: { page, context },
   browser,
   baseURL,

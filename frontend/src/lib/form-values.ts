@@ -14,7 +14,7 @@ export function blankToNull(value: string): string | null {
   return value
 }
 
-/** Texto apagado vira ausente: campo opcional "em branco = não mexer". */
+/** Erased text becomes absent: an optional field "em branco = não mexer". */
 export function blankToUndefined(value: string): string | undefined {
   if (value === '') return undefined
 

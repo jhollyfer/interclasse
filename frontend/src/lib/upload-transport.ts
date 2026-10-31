@@ -18,7 +18,7 @@ import { m } from '#/paraglide/messages'
 export type PutPartOptions = {
   onProgress?: (loaded: number, total: number) => void
   signal?: AbortSignal
-  /** Quantas vezes tentar no total, contando a primeira. */
+  /** How many times to try in total, counting the first. */
   attempts?: number
   /** How long with no byte moving before giving up on the attempt, in ms. */
   stallTimeout?: number

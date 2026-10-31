@@ -27,7 +27,7 @@ function renderState(reason: 'empty' | 'filtered' | 'trash') {
 }
 
 describe('EmptyState', () => {
-  it('no vazio de verdade mostra o texto da tela e a ação', () => {
+  it('when truly empty, shows the screen text and the action', () => {
     renderState('empty')
 
     expect(screen.getByText('Nada cadastrado')).toBeTruthy()
@@ -35,7 +35,7 @@ describe('EmptyState', () => {
     expect(screen.getByRole('button', { name: 'Criar' })).toBeTruthy()
   })
 
-  it('no filtro troca título e descrição e some com a ação', () => {
+  it('when filtered, swaps title and description and drops the action', () => {
     renderState('filtered')
 
     expect(screen.getByText(m.table_empty_filtered_title())).toBeTruthy()
@@ -44,7 +44,7 @@ describe('EmptyState', () => {
     expect(screen.queryByRole('button', { name: 'Criar' })).toBeNull()
   })
 
-  it('na lixeira troca o título, mantém a descrição e some com a ação', () => {
+  it('when in the trash, swaps the title, keeps the description and drops the action', () => {
     renderState('trash')
 
     expect(screen.getByText(m.table_empty_trash_title())).toBeTruthy()
@@ -52,7 +52,7 @@ describe('EmptyState', () => {
     expect(screen.queryByRole('button', { name: 'Criar' })).toBeNull()
   })
 
-  it('uma parte fora do EmptyState diz qual ficou sem provider', () => {
+  it('when a part is outside EmptyState, says which one is without a provider', () => {
     expect(() => render(<EmptyStateTitle>x</EmptyStateTitle>)).toThrow(
       'EmptyStateTitle',
     )

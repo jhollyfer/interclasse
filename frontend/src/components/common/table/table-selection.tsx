@@ -63,7 +63,7 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
 
 type TableSelectionBarProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
-  /** O nome do recurso no singular e no plural: `['tabela', 'tabelas']`. */
+  /** The resource name in singular and plural: `['tabela', 'tabelas']`. */
   noun: [string, string]
   /** The action buttons. They receive the selected rows. */
   children: (rows: ReadonlyArray<TRow>) => React.ReactNode

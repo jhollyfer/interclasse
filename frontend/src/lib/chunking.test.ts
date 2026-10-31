@@ -5,17 +5,17 @@ import { missingParts, planParts } from './chunking'
 const PART = 10 * 1024 * 1024
 
 describe('planParts', () => {
-  it('numera a partir de 1, porque o S3 recusa a parte zero', () => {
+  it('numbers from 1, because S3 refuses part zero', () => {
     const plan = planParts(PART * 2, PART)
 
     expect(plan.map((part) => part.partNumber)).toEqual([1, 2])
   })
 
-  it('conta a sobra como uma parte a mais', () => {
+  it('counts the remainder as one extra part', () => {
     expect(planParts(PART * 2 + 1, PART)).toHaveLength(3)
   })
 
-  it('corta a última parte no fim do arquivo, e não no múltiplo', () => {
+  it('cuts the last part at the end of the file, not at the multiple', () => {
     const plan = planParts(PART + 500, PART)
 
     expect(plan.at(-1)).toEqual({
@@ -25,7 +25,7 @@ describe('planParts', () => {
     })
   })
 
-  it('cobre o arquivo inteiro, sem buraco nem sobreposição', () => {
+  it('covers the whole file, with no gap or overlap', () => {
     const size = PART * 3 + 7
     const plan = planParts(size, PART)
 
@@ -37,19 +37,19 @@ describe('planParts', () => {
     })
   })
 
-  it('arquivo menor que uma parte dá uma parte só', () => {
+  it('when the file is smaller than one part, gives a single part', () => {
     expect(planParts(1024, PART)).toEqual([
       { partNumber: 1, start: 0, end: 1024 },
     ])
   })
 
-  it('arquivo vazio ainda dá uma parte: zero byte é arquivo válido', () => {
+  it('when the file is empty, still gives one part: zero bytes is a valid file', () => {
     expect(planParts(0, PART)).toEqual([{ partNumber: 1, start: 0, end: 0 }])
   })
 })
 
 describe('missingParts', () => {
-  it('devolve só o que falta, na ordem', () => {
+  it('returns only what is missing, in order', () => {
     const plan = planParts(PART * 4, PART)
 
     expect(missingParts(plan, [1, 3]).map((part) => part.partNumber)).toEqual([
@@ -57,7 +57,7 @@ describe('missingParts', () => {
     ])
   })
 
-  it('retoma da primeira faltante, nunca do começo', () => {
+  it('resumes from the first missing part, never from the start', () => {
     const plan = planParts(PART * 1500, PART)
     const uploaded = Array.from({ length: 1499 }, (_, index) => index + 1)
 
@@ -67,7 +67,7 @@ describe('missingParts', () => {
     expect(missing[0]?.partNumber).toBe(1500)
   })
 
-  it('nada falta quando tudo subiu', () => {
+  it('when everything has uploaded, nothing is missing', () => {
     const plan = planParts(PART * 2, PART)
 
     expect(missingParts(plan, [1, 2])).toEqual([])

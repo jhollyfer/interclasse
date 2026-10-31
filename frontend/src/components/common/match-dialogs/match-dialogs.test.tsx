@@ -98,7 +98,7 @@ describe('MatchScoreDialog', () => {
     )
   }
 
-  it('só monta o formulário aberto, com a partida do clique', async () => {
+  it('mounts the form only when open, with the clicked match', async () => {
     renderScore()
 
     expect(screen.queryByRole('dialog')).toBeNull()
@@ -113,7 +113,7 @@ describe('MatchScoreDialog', () => {
     ).toBeTruthy()
   })
 
-  it('salva o placar na partida, avisa e fecha', async () => {
+  it('saves the score on the match, notifies and closes', async () => {
     renderScore()
     await userEvent.click(screen.getByRole('button', { name: 'Abrir' }))
 
@@ -142,7 +142,7 @@ describe('MatchScoreDialog', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('empate pede quem venceu nos pênaltis; placar decidido, não', async () => {
+  it('when tied, asks who won on penalties; when decided, does not', async () => {
     renderScore()
     await userEvent.click(screen.getByRole('button', { name: 'Abrir' }))
 
@@ -160,7 +160,7 @@ describe('MatchScoreDialog', () => {
 describe('MatchScheduleDialog', () => {
   const handle = createDialogHandle<MatchRef>()
 
-  it('grava o local da partida', async () => {
+  it('saves the match venue', async () => {
     render(
       withClient(
         <>
@@ -205,7 +205,7 @@ describe('MatchScheduleDialog', () => {
 describe('MatchUnscoreDialog', () => {
   const handle = createConfirmHandle<MatchRef>()
 
-  it('só desfaz o placar depois de confirmar', async () => {
+  it('undoes the score only after confirming', async () => {
     render(
       withClient(
         <>
@@ -259,7 +259,7 @@ describe('MatchUnscoreDialog', () => {
 describe('MatchCardsDialog', () => {
   const handle = createDialogHandle<MatchRef>()
 
-  it('abre com a lista de cartões vazia e o formulário do novo', async () => {
+  it('opens with an empty card list and the form for a new one', async () => {
     render(
       withClient(
         <>

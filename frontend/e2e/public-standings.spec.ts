@@ -15,8 +15,8 @@ async function firstBracketId(request: APIRequestContext): Promise<string> {
 }
 
 // docs/USER-FLOWS.md, "Consultar o site público", steps 1 and 3.
-test.describe('classificação pública', () => {
-  test('a home troca de categoria e de modalidade sem mudar de página', async ({
+test.describe('public standings', () => {
+  test('when the home switches category and sport, stays on the same page', async ({
     page,
     expectAccessible,
   }) => {
@@ -61,7 +61,7 @@ test.describe('classificação pública', () => {
     await expect(standings).toBeVisible()
   })
 
-  test('a página da chave tem "Voltar ao início" e leva à home', async ({
+  test('when the bracket page is opened, has "Voltar ao início" and leads to the home', async ({
     page,
     request,
   }) => {

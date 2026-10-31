@@ -53,7 +53,7 @@ async function purge(
 }
 
 // docs/USER-FLOWS.md, "Enviar e aprovar fotos".
-test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é apagada', async ({
+test('when the advisor uploads and the organization approves, the photo reaches the carousel and is deleted', async ({
   advisor,
   administrator,
   browser,
@@ -62,7 +62,7 @@ test('a conselheira envia, a organização aprova, a foto vai ao carrossel e é 
   const caption = `E2E foto ${Date.now()}`
 
   try {
-    // 1. A conselheira envia: a foto fica aguardando.
+    // 1. The advisor uploads: the photo stays pending.
     await advisor.page.goto('/advisor/photos')
     await waitForHydration(advisor.page)
     await advisor.page.locator('input[type="file"]').setInputFiles({

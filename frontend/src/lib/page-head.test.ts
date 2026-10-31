@@ -14,7 +14,7 @@ import {
 } from './page-head'
 
 describe('localizedUrl', () => {
-  it('pt-BR fica sem prefixo e es/en levam o idioma', () => {
+  it('leaves pt-BR without prefix and gives es/en the language prefix', () => {
     expect(localizedUrl('/matches', 'pt-BR')).toBe(
       `${env.VITE_SITE_URL}/matches`,
     )
@@ -26,7 +26,7 @@ describe('localizedUrl', () => {
     )
   })
 
-  it('tira a barra do fim, menos na raiz', () => {
+  it('strips the trailing slash, except at the root', () => {
     expect(localizedUrl('/', 'es')).toBe(`${env.VITE_SITE_URL}/es`)
   })
 })
@@ -34,19 +34,19 @@ describe('localizedUrl', () => {
 describe('pageHead', () => {
   const head = pageHead({ title: 'Jogos', pathname: '/matches' })
 
-  it('põe o sufixo do site no título', () => {
+  it('puts the site suffix on the title', () => {
     expect(head.meta).toContainEqual({
       title: `Jogos | ${m.common_site_title()}`,
     })
   })
 
-  it('sem título vale só o nome do site', () => {
+  it('without a title, uses only the site name', () => {
     const bare = pageHead({ pathname: '/' })
 
     expect(bare.meta).toContainEqual({ title: m.common_site_title() })
   })
 
-  it('declara o canonical e o hreflang recíproco das três versões', () => {
+  it('declares the canonical and the reciprocal hreflang of the three versions', () => {
     expect(head.links).toContainEqual({
       rel: 'canonical',
       href: `${env.VITE_SITE_URL}/matches`,
@@ -57,13 +57,13 @@ describe('pageHead', () => {
     }
   })
 
-  it('x-default aponta para a versão pt-BR', () => {
+  it('makes x-default point at the pt-BR version', () => {
     const fallback = head.links.find((link) => link.hrefLang === 'x-default')
 
     expect(fallback?.href).toBe(`${env.VITE_SITE_URL}/matches`)
   })
 
-  it('leva o Open Graph', () => {
+  it('carries the Open Graph', () => {
     const properties = head.meta.flatMap((item) => {
       if ('property' in item) return [item.property]
 
@@ -81,7 +81,7 @@ describe('pageHead', () => {
     )
   })
 
-  it('structuredData vira script application/ld+json', () => {
+  it('turns structuredData into an application/ld+json script', () => {
     const withData = pageHead({ pathname: '/x', structuredData: ['{"a":1}'] })
 
     expect(withData.scripts).toEqual([
@@ -90,7 +90,7 @@ describe('pageHead', () => {
     expect(head.scripts).toEqual([])
   })
 
-  it('noindex acrescenta o robots, e a página normal não leva', () => {
+  it('adds robots for noindex, and a normal page does not carry it', () => {
     const hidden = pageHead({ pathname: '/x', noindex: true })
 
     expect(hidden.meta).toContainEqual({
@@ -102,7 +102,7 @@ describe('pageHead', () => {
 })
 
 describe('noindexMeta', () => {
-  it('só gera o robots quando o ambiente não é indexável', () => {
+  it('generates robots only when the environment is not indexable', () => {
     expect(noindexMeta(false)).toEqual([
       { name: 'robots', content: 'noindex, nofollow' },
     ])
@@ -112,7 +112,7 @@ describe('noindexMeta', () => {
 })
 
 describe('jsonLd', () => {
-  it('escapa o < para não fechar a tag script por dentro', () => {
+  it('escapes the < so the script tag is not closed from the inside', () => {
     const text = jsonLd({ name: '</script><b>' })
 
     expect(text).not.toContain('<')
@@ -131,7 +131,7 @@ describe('jsonLd', () => {
 })
 
 describe('breadcrumbJsonLd', () => {
-  it('numera os degraus e usa a URL absoluta de cada um', () => {
+  it('numbers the steps and uses each one absolute URL', () => {
     const data: unknown = JSON.parse(
       breadcrumbJsonLd([
         { name: 'Início', pathname: '/' },
@@ -161,7 +161,7 @@ describe('sportsEventJsonLd', () => {
     pathname: '/standings/1',
   }
 
-  it('usa o jogo mais cedo como startDate', () => {
+  it('uses the earliest match as startDate', () => {
     const data: unknown = JSON.parse(
       sportsEventJsonLd({
         ...base,
@@ -181,7 +181,7 @@ describe('sportsEventJsonLd', () => {
     })
   })
 
-  it('sem jogo agendado o startDate não sai', () => {
+  it('when no match is scheduled, omits startDate', () => {
     const text = sportsEventJsonLd({ ...base, scheduledAt: [null] })
 
     expect(text).not.toContain('startDate')

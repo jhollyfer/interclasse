@@ -17,7 +17,7 @@ describe('InputPassword', () => {
     expect(screen.getByLabelText('Senha').getAttribute('type')).toBe('password')
   })
 
-  it('o botão mostra e esconde, e troca o próprio nome', async () => {
+  it('when the button is clicked, shows and hides, and changes its own name', async () => {
     render(<InputPassword aria-label="Senha" />)
 
     await userEvent.click(
@@ -33,7 +33,7 @@ describe('InputPassword', () => {
     expect(screen.getByLabelText('Senha').getAttribute('type')).toBe('password')
   })
 
-  it('o botão fica fora da ordem de Tab', () => {
+  it('keeps the button out of the Tab order', () => {
     render(<InputPassword aria-label="Senha" />)
 
     expect(

@@ -88,7 +88,7 @@ async function choose(
 }
 
 // docs/USER-FLOWS.md, "Cadastrar uma modalidade" and "Sortear uma chave".
-test('o administrador cria a modalidade, sorteia a chave, sorteia de novo e apaga a chave', async ({
+test('when the administrator creates the sport, draws the bracket, draws again and deletes the bracket', async ({
   administrator: { page, context },
   advisor,
   secondAdvisor,

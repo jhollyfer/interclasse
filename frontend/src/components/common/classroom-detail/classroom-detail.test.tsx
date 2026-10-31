@@ -121,7 +121,7 @@ function requestsTo(url: string, method: string) {
 }
 
 describe('ClassroomDetail', () => {
-  it('abre com o nome, a categoria e o quadro da turma', async () => {
+  it('opens with the name, the category and the classroom panel', async () => {
     renderDetail()
 
     expect(
@@ -134,7 +134,7 @@ describe('ClassroomDetail', () => {
     expect(await screen.findByText('Caio')).toBeTruthy()
   })
 
-  it('com back mostra a seta de voltar; sem back, não', async () => {
+  it('when back is given, shows the back arrow; without it, does not', async () => {
     renderDetail('/administrator/classrooms')
 
     expect(
@@ -150,7 +150,7 @@ describe('ClassroomDetail', () => {
     expect(screen.queryByRole('link', { name: m.common_back() })).toBeNull()
   })
 
-  it('salvar só com acréscimo grava direto, sem pedir motivo', async () => {
+  it('when saving only additions, saves directly without asking for a reason', async () => {
     ROUTES['/advisor/enrollments'] = BOARD
     renderDetail()
 
@@ -178,7 +178,7 @@ describe('ClassroomDetail', () => {
     )
   })
 
-  it('tirar atleta abre o pedido de motivo antes de gravar', async () => {
+  it('when removing an athlete, opens the reason request before saving', async () => {
     renderDetail()
 
     await userEvent.click(await screen.findByRole('checkbox', { name: 'Ana' }))
@@ -202,7 +202,7 @@ describe('ClassroomDetail', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('com o motivo informado grava a lista, avisa e fecha o pedido', async () => {
+  it('when the reason is given, saves the list, notifies and closes the request', async () => {
     renderDetail()
 
     await userEvent.click(await screen.findByRole('checkbox', { name: 'Ana' }))
@@ -233,7 +233,7 @@ describe('ClassroomDetail', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('a aba de alunos lista a turma e cadastra um novo', async () => {
+  it('when on the students tab, lists the classroom and registers a new student', async () => {
     renderDetail()
 
     await userEvent.click(
@@ -257,7 +257,7 @@ describe('ClassroomDetail', () => {
     ).toEqual({ classroomId: CLASSROOM_ID, name: 'Duda' })
   })
 
-  it('tirar um aluno pede confirmação e só então apaga', async () => {
+  it('when removing a student, asks for confirmation and only then deletes', async () => {
     renderDetail()
 
     await userEvent.click(
@@ -283,7 +283,7 @@ describe('ClassroomDetail', () => {
     )
   })
 
-  it('as abas de cartões e de jogos dizem quando não há nada', async () => {
+  it('when there is nothing, the cards and matches tabs say so', async () => {
     renderDetail()
 
     await userEvent.click(

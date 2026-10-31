@@ -67,7 +67,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-test('toda requisição leva o cookie da sessão', async () => {
+test('sends the session cookie on every request', async () => {
   const fetcher = respond(200, { id: '1' })
 
   await request('/account', ANY)
@@ -79,13 +79,13 @@ test('toda requisição leva o cookie da sessão', async () => {
   expect(init?.credentials).toBe('include')
 })
 
-test('204 resolve sem tentar ler corpo vazio', async () => {
+test('when 204, resolves without trying to read an empty body', async () => {
   respond(204)
 
   await expect(send('/authentication/sign-in')).resolves.toBeUndefined()
 })
 
-test('204 onde se esperava registro vira HTTPError, não SyntaxError', async () => {
+test('when 204 arrives where a record was expected, becomes an HTTPError, not a SyntaxError', async () => {
   respond(204)
 
   const error = await rejection(request('/account', ANY))
@@ -93,7 +93,7 @@ test('204 onde se esperava registro vira HTTPError, não SyntaxError', async () 
   expect(error.status).toBe(204)
 })
 
-test('422 vira erro de campo', async () => {
+test('when 422, becomes a field error', async () => {
   respond(422, {
     message: 'Dados inválidos',
     status: 422,
@@ -113,7 +113,7 @@ test('422 vira erro de campo', async () => {
   })
 })
 
-test('401 de credencial inválida não é erro de campo nem de servidor', async () => {
+test('when 401 is invalid credentials, is neither a field error nor a server error', async () => {
   respond(401, {
     message: 'Credenciais inválidas',
     status: 401,
@@ -127,7 +127,7 @@ test('401 de credencial inválida não é erro de campo nem de servidor', async 
   expect(error.message).toBe('Credenciais inválidas')
 })
 
-test('401 de credencial inválida não dispara refresh', async () => {
+test('when 401 is invalid credentials, does not fire a refresh', async () => {
   const fetcher = respond(401, {
     message: 'Credenciais inválidas',
     status: 401,
@@ -145,7 +145,7 @@ test('401 de credencial inválida não dispara refresh', async () => {
   expect(fetcher).toHaveBeenCalledTimes(1)
 })
 
-test('500 é erro de servidor', async () => {
+test('when 500, is a server error', async () => {
   respond(500, {
     message: 'Erro interno do servidor',
     status: 500,
@@ -157,7 +157,7 @@ test('500 é erro de servidor', async () => {
   expect(error.isServerError).toBe(true)
 })
 
-test('corpo ilegível mantém o status real da resposta', async () => {
+test('when the body is unreadable, keeps the real response status', async () => {
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(
     new Response('<html>502 Bad Gateway</html>', { status: 502 }),
   )
@@ -169,7 +169,7 @@ test('corpo ilegível mantém o status real da resposta', async () => {
   expect(error.isServerError).toBe(true)
 })
 
-test('falha de rede vira HTTPError com status sintético', async () => {
+test('when the network fails, becomes an HTTPError with a synthetic status', async () => {
   vi.spyOn(globalThis, 'fetch').mockRejectedValue(
     new TypeError('Failed to fetch'),
   )
@@ -181,7 +181,7 @@ test('falha de rede vira HTTPError com status sintético', async () => {
   expect(error.isServerError).toBe(true)
 })
 
-test('401 do guard renova a sessão e repete a requisição uma vez só', async () => {
+test('when the guard 401 arrives, renews the session and repeats the request only once', async () => {
   const refreshes = respondExpired()
 
   await runInRequestScope(() => rejection(request('/account', ANY)))
@@ -198,7 +198,7 @@ test('401 do guard renova a sessão e repete a requisição uma vez só', async 
   expect(calls).toHaveLength(2)
 })
 
-test('no mesmo escopo, cinco 401 simultâneos renovam uma vez só', async () => {
+test('in the same scope, five simultaneous 401s renew only once', async () => {
   const refreshes = respondExpired()
 
   await runInRequestScope(async () => {
@@ -214,7 +214,7 @@ test('no mesmo escopo, cinco 401 simultâneos renovam uma vez só', async () => 
   expect(refreshes).toHaveLength(1)
 })
 
-test('escopos diferentes renovam cada um por conta própria', async () => {
+test('when scopes differ, each renews on its own', async () => {
   const refreshes = respondExpired()
 
   // They are two visitors, with different cookies. Sharing the renewal between
@@ -227,7 +227,7 @@ test('escopos diferentes renovam cada um por conta própria', async () => {
   expect(refreshes).toHaveLength(2)
 })
 
-test('FormData monta o próprio Content-Type', async () => {
+test('makes FormData build its own Content-Type', async () => {
   const fetcher = respond(201, { id: '1' })
 
   await request('/storages', ANY, { method: 'POST', body: new FormData() })
@@ -238,7 +238,7 @@ test('FormData monta o próprio Content-Type', async () => {
   expect(new Headers(init?.headers).get('Content-Type')).toBeNull()
 })
 
-test('corpo de objeto continua declarando JSON', async () => {
+test('keeps declaring JSON for an object body', async () => {
   const fetcher = respond(201, { id: '1' })
 
   await request('/administrator/testimonials', ANY, {
@@ -252,7 +252,7 @@ test('corpo de objeto continua declarando JSON', async () => {
   )
 })
 
-test('o signal do queryFn chega ao fetch', async () => {
+test('delivers the queryFn signal to fetch', async () => {
   const fetcher = respond(200, { id: '1' })
   const controller = new AbortController()
 
@@ -273,7 +273,7 @@ test('o signal do queryFn chega ao fetch', async () => {
   expect(init?.signal?.aborted).toBe(true)
 })
 
-test('a requisição tem prazo mesmo sem signal do chamador', async () => {
+test('gives the request a deadline even without a caller signal', async () => {
   const fetcher = respond(200, { id: '1' })
 
   await request('/account', ANY)
@@ -286,7 +286,7 @@ test('a requisição tem prazo mesmo sem signal do chamador', async () => {
   expect(init?.signal?.aborted).toBe(false)
 })
 
-test('o signal sobrevive ao replay depois do refresh', async () => {
+test('keeps the signal alive through the replay after the refresh', async () => {
   respondExpired()
   const controller = new AbortController()
 
@@ -313,7 +313,7 @@ test('o signal sobrevive ao replay depois do refresh', async () => {
   for (const [, init] of replay) expect(init?.signal?.aborted).toBe(true)
 })
 
-test('corpo de sucesso fora do schema vira HTTPError de servidor', async () => {
+test('when a success body is outside the schema, becomes a server HTTPError', async () => {
   respond(200, { id: 1 })
 
   const error = await rejection(
@@ -325,7 +325,7 @@ test('corpo de sucesso fora do schema vira HTTPError de servidor', async () => {
   expect(error.isServerError).toBe(true)
 })
 
-test('corpo de sucesso dentro do schema devolve o dado tipado', async () => {
+test('when a success body is inside the schema, returns the typed data', async () => {
   respond(200, { id: 'a' })
 
   await expect(

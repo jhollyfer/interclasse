@@ -17,7 +17,7 @@ afterEach(() => {
 })
 
 describe('useIsBelow', () => {
-  it('responde pela largura da janela', () => {
+  it('answers by the window width', () => {
     window.innerWidth = 500
     const { result } = renderHook(() => useIsBelow(768))
 
@@ -35,7 +35,7 @@ describe('useIsBelow', () => {
     expect(result.current).toBe(true)
   })
 
-  it('na largura exata do breakpoint já não é "abaixo"', () => {
+  it('when at the exact breakpoint width, is no longer "below"', () => {
     window.innerWidth = 768
     const { result } = renderHook(() => useIsMobile())
 

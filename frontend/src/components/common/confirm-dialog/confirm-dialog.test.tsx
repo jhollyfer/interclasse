@@ -36,7 +36,7 @@ function body() {
 }
 
 describe('ConfirmDialog', () => {
-  it('abre pelo gatilho visível e nomeia o alerta pelo título', async () => {
+  it('opens from the visible trigger and names the alert by its title', async () => {
     render(
       <ConfirmDialog render={<Button>Abrir</Button>} onConfirm={vi.fn()}>
         {body()}
@@ -50,7 +50,7 @@ describe('ConfirmDialog', () => {
     ).toBeTruthy()
   })
 
-  it('confirmar roda a ação uma vez e fecha o alerta', async () => {
+  it('when confirmed, runs the action once and closes the alert', async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmDialog render={<Button>Abrir</Button>} onConfirm={onConfirm}>
@@ -67,7 +67,7 @@ describe('ConfirmDialog', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
   })
 
-  it('cancelar fecha sem rodar a ação', async () => {
+  it('when cancelled, closes without running the action', async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmDialog render={<Button>Abrir</Button>} onConfirm={onConfirm}>
@@ -84,7 +84,7 @@ describe('ConfirmDialog', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
   })
 
-  it('abre por handle, sem gatilho, e passa o payload ao texto e à ação', async () => {
+  it('opens by handle, without a trigger, and passes the payload to the text and the action', async () => {
     const handle = createConfirmHandle<{ name: string }>()
     const onConfirm = vi.fn()
     render(
@@ -110,7 +110,7 @@ describe('ConfirmDialog', () => {
     expect(onConfirm).toHaveBeenCalledWith({ name: '8B' })
   })
 
-  it('uma parte fora do ConfirmDialog diz qual ficou sem provider', () => {
+  it('when a part is outside ConfirmDialog, says which one is without a provider', () => {
     expect(() =>
       render(<ConfirmDialogConfirm>Remover</ConfirmDialogConfirm>),
     ).toThrow('ConfirmDialogConfirm')

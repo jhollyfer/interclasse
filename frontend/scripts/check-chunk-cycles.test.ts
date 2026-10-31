@@ -19,24 +19,24 @@ import { eagerOnly } from './check-chunk-cycles.mjs'
 describe('eagerOnly', () => {
   const eager = (code: string): string => eagerOnly(code)
 
-  it('preserva comprimento e quebras de linha', () => {
+  it('preserves length and line breaks', () => {
     const code = 'var a = 1\nfunction f() {\n  return b\n}\n'
 
     expect(eager(code)).toHaveLength(code.length)
     expect(eager(code).split('\n')).toHaveLength(code.split('\n').length)
   })
 
-  it('mantém o que roda na avaliação', () => {
+  it('keeps what runs during evaluation', () => {
     expect(eager('var TOTAL = contar(itens)')).toContain('contar')
   })
 
-  it('apaga corpo de função declarada', () => {
+  it('erases the body of a declared function', () => {
     expect(eager('function f() {\n  return contar()\n}')).not.toContain(
       'contar',
     )
   })
 
-  it('apaga corpo de função com parâmetro desestruturado', () => {
+  it('erases the body of a function with a destructured parameter', () => {
     // The brace in `{ className }` is not the body. Confusing them let
     // every component in the bundle through.
     const code =
@@ -45,7 +45,7 @@ describe('eagerOnly', () => {
     expect(eager(code)).not.toContain('cn(')
   })
 
-  it('apaga corpo de arrow com bloco e de arrow de expressão', () => {
+  it('erases the body of a block arrow and of an expression arrow', () => {
     expect(eager('var f = () => {\n  return contar()\n}')).not.toContain(
       'contar',
     )
@@ -54,7 +54,7 @@ describe('eagerOnly', () => {
     ).not.toContain('contar')
   })
 
-  it('a arrow de expressão acaba na vírgula, e o que vem depois volta a contar', () => {
+  it('when an expression arrow ends at the comma, what comes after counts again', () => {
     const code = 'var rota = { loader: () => adiado(), chave: agora() }'
     const result = eager(code)
 
@@ -62,14 +62,14 @@ describe('eagerOnly', () => {
     expect(result).toContain('agora')
   })
 
-  it('não confunde string, template nem comentário com código', () => {
+  it('does not confuse string, template or comment with code', () => {
     expect(eager('var s = "contar()"')).not.toContain('contar')
     expect(eager('var s = `contar()`')).not.toContain('contar')
     expect(eager('// contar()\nvar a = 1')).not.toContain('contar')
     expect(eager('/* contar() */\nvar a = 1')).not.toContain('contar')
   })
 
-  it('não confunde literal de expressão regular com divisão', () => {
+  it('does not confuse a regular expression literal with division', () => {
     // Without the cut, the slash would open a "string" that swallowed the rest of
     // the file - and the guard would find nothing, silently.
     expect(eager('var re = /contar()/g\nvar total = somar(1)')).toContain(

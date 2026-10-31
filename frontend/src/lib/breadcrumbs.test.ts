@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import { breadcrumbTitle, buildBreadcrumbs } from './breadcrumbs'
 
-test('rotula os segmentos fixos e não linka a página atual', () => {
+test('labels the fixed segments and does not link the current page', () => {
   expect(
     buildBreadcrumbs([
       { fullPath: '/administrator', pathname: '/administrator' },
@@ -17,7 +17,7 @@ test('rotula os segmentos fixos e não linka a página atual', () => {
   ])
 })
 
-test('não linka prefixo que não casou com rota', () => {
+test('does not link a prefix that matched no route', () => {
   // Only the listing's match exists, so the first item stays text and does not become
   // a link to a 404.
   const crumbs = buildBreadcrumbs([
@@ -34,7 +34,7 @@ test('não linka prefixo que não casou com rota', () => {
   ])
 })
 
-test('linka o prefixo que casou', () => {
+test('links the prefix that matched', () => {
   const crumbs = buildBreadcrumbs([
     {
       fullPath: '/administrator/sports',
@@ -54,18 +54,18 @@ test('linka o prefixo que casou', () => {
   ])
 })
 
-test('segmento sem rótulo aparece cru em vez de sumir', () => {
+test('shows a segment without a label raw instead of dropping it', () => {
   expect(
     buildBreadcrumbs([{ fullPath: '/relatorios', pathname: '/relatorios' }]),
   ).toEqual([{ label: 'relatorios' }])
 })
 
-test('sem match, sem trilha', () => {
+test('without a match, has no trail', () => {
   expect(buildBreadcrumbs([])).toEqual([])
   expect(buildBreadcrumbs([{ fullPath: '/', pathname: '/' }])).toEqual([])
 })
 
-test('o título da aba vai do mais específico ao mais geral, sem o Painel', () => {
+test('orders the tab title from most specific to most general, without the Painel', () => {
   expect(
     breadcrumbTitle([
       { label: 'Painel' },

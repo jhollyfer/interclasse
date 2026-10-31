@@ -60,7 +60,7 @@ function renderForm(
 }
 
 describe('FormShell', () => {
-  it('a seta e o Descartar voltam para o mesmo destino', () => {
+  it('when the arrow and Descartar are used, go back to the same destination', () => {
     renderForm(false)
 
     expect(
@@ -73,7 +73,7 @@ describe('FormShell', () => {
     ).toBe('/about')
   })
 
-  it('o título é o h1 e o Salvar aponta para o formulário da casca', () => {
+  it('renders the title as the h1 and points Salvar at the shell form', () => {
     renderForm(false)
 
     expect(
@@ -86,7 +86,7 @@ describe('FormShell', () => {
     ).toBe('turma')
   })
 
-  it('o Salvar do cabeçalho submete o formulário que rola', async () => {
+  it('when the header Salvar is clicked, submits the scrolling form', async () => {
     const onSubmit = vi.fn((event: React.SyntheticEvent) => {
       event.preventDefault()
     })
@@ -97,7 +97,7 @@ describe('FormShell', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('com a mutation em voo o Salvar trava', () => {
+  it('when the mutation is in flight, locks Salvar', () => {
     renderForm(true)
 
     expect(
@@ -107,7 +107,7 @@ describe('FormShell', () => {
     ).toBe(true)
   })
 
-  it('o formulário é post, para o envio nativo não pôr campo na URL', () => {
+  it('renders the form as post, so a native submit puts no field in the URL', () => {
     renderForm(false)
 
     expect(

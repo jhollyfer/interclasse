@@ -58,7 +58,7 @@ function renderForm(area: 'administrator' | 'advisor') {
 }
 
 describe('PhotoUploadForm', () => {
-  it('mostra o título, a descrição de quem envia e a legenda', () => {
+  it('shows the title, the uploader description and the caption', () => {
     renderForm('advisor')
 
     expect(screen.getAllByText(m.common_photo_upload_title())).toHaveLength(2)
@@ -68,7 +68,7 @@ describe('PhotoUploadForm', () => {
     ).toBeTruthy()
   })
 
-  it('sem a imagem escolhida o envio é recusado antes da API', async () => {
+  it('when no image is chosen, refuses the upload before the API', async () => {
     renderForm('administrator')
 
     await userEvent.click(
@@ -79,7 +79,7 @@ describe('PhotoUploadForm', () => {
     expect(toast.success).not.toHaveBeenCalled()
   })
 
-  it('envia a foto escolhida com a legenda para a área de quem envia', async () => {
+  it('sends the chosen photo with the caption to the uploader area', async () => {
     upload.mockResolvedValue({ id: STORAGE_ID, url: 'https://x/foto.png' })
     const container = renderForm('advisor')
     const input =
