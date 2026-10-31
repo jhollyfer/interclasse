@@ -138,7 +138,7 @@ function ClassroomCard({
           {CATEGORY_LABELS[classroom.category]} ·{' '}
           {CATEGORY_SHORT_LABELS[classroom.category]}
         </CardDescription>
-        <div className="absolute top-3 right-3 z-dropdown">
+        <div className="absolute top-3 right-3 z-1">
           <ClassroomRowActions classroom={classroom} />
         </div>
       </CardHeader>

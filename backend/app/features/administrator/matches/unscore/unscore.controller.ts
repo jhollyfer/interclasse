@@ -14,9 +14,6 @@ export default class AdministratorMatchUnscoreController {
       'Apaga o placar e devolve a partida para "a jogar". O vencedor sai da vaga da ' +
       'partida seguinte, e uma final desfeita reabre a chave. Recusado com `409` quando a ' +
       'partida seguinte já tem placar: desfaça-a antes.',
-    // Nascem na entidade e são traduzidos em `_shared.match-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: { 409: ['MATCH_NOT_PLAYED', 'NEXT_MATCH_PLAYED'] },
   })
 
   constructor(private readonly useCase: AdministratorMatchUnscoreUseCase) {}

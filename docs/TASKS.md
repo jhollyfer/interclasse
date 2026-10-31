@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** fases 1 a 6 feitas, CI verde na `main` e régua sincronizada — atualizado 2026-10-31
+**Resumo:** fases 1 a 7 feitas (a 7 na branch, sem PR ainda) — atualizado 2026-10-31
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -83,12 +83,14 @@ Nada vira exceção local: a régua muda e volta pelo sync.
 
 | Item | Situação |
 |---|---|
-| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-so-model-da-conta` no `.dependency-cruiser.cjs`. `pnpm depcruise` sem violação |
+| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-so-model-da-conta` no `scripts/depcruise.config.ts`. `pnpm depcruise` sem violação |
 | Spec de comando Ace em `commands/_<nome>.command.e2e.spec.ts` | Na régua (decisão #248, maiyu-pattern#4) |
 | Modelos de `docs/` sem "desvio aceito" | Na régua (maiyu-pattern#4) |
 | `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |
 | Passo de autor do CI até o head do PR | Na régua (decisão #250, maiyu-pattern#5); aqui desde o #18 |
 | Parte do multipart assina só o tamanho; arquivo inteiro sobe com `Content-Type` | Na régua (decisão #251, maiyu-pattern#5); aqui no #20 |
+| Japa sem worker e sem `merge-reports`: `tooling.md` §10.6 pede banco clonado por worker (template do Postgres) e relatório juntado de shards, e o Japa roda em série num processo e não junta relatório (`_doc-lib/japa.md#docs/test-suites`, `#docs/filtering-tests`, https://japa.dev/docs/filtering-tests) | Proposta ao upstream (#253): dizer na régua que, no Japa, o paralelismo é o shard com banco por job e não há relatório juntado. Aqui, sem exceção local: shards com banco por job |
+| `tooling.md` §10.6 manda shard sempre e `playwright.md#docs/test-sharding` só quando o job passa do tempo aceitável | Proposta ao upstream (#253): alinhar as duas frases. Aqui, o Playwright fica num job |
 
 Resolvidos aqui: arquivar e restaurar respondem 409 de estado (`USER_ALREADY_ARCHIVED`, `USER_NOT_ARCHIVED`); `account/profile/show` não tem 404 alcançável pela rota (o guard responde 401 antes), coberto no unitário.
 
@@ -105,6 +107,23 @@ Primeira execução real dos workflows da fase 5, PR a PR.
 | 6.5 | Régua sincronizada com o maiyu-pattern#4 | Média | Feita | sync sem divergência |
 | 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5 sincronizado |
 | 6.7 | API do E2E em produção e seeds de demonstração pelo workspace | Alta | Feita | #22; primeiro run inteiro verde |
+
+## Fase 7 · Régua: lições do adacaibs (9/10)
+
+Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/10), sem exceção local.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 7.1 | `maiyu-guard` habilitado e `AGENTS.md` da raiz no modelo novo | Alta | Feita | #254 |
+| 7.2 | Migration no *Post-deployment command* do Coolify | Alta | Feita | #252; `docs/ENV.md`, `docs/ARCHITECTURE.md` §9.1, Dockerfile, workflows |
+| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | Feita | #256; `architecture.md` §3.4. Movidos: `.editorconfig`, `scripts/depcruise.config.ts`, `core/transaction-context.ts`, `paraglide.config.ts`, `get-theme.ts`, `devtools.tsx`. Sem arquivo novo por não haver uso: `.gitleaks.toml` (o gitleaks roda sem allowlist), `core/translation.ts` e `core/same-site.ts` (o projeto injeta o `I18n` e o `sameSite` é `lax` fixo em `config/cookie.ts`) |
+| 7.4 | Campos dos checks em inglês e `reason` nas exceções | Média | Feita | #258 |
+| 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | Feita | #259; o gerador usa o tipo do fato (`Refusal.http(fato)`), então o que o tipo de domínio declara largo aparece largo no `openapi.json` (ex.: `ensureDeletable(): Either<BracketError, …>`). Estreitar o left por operação fica como 7.10 |
+| 7.6 | `.env.example` e `.env.test` em inglês | Baixa | Feita | #260 |
+| 7.7 | Frontend: `new.tsx` com `head` em toda tela e escala de z-index | Alta | Feita | #257; z-index na escala nova. `new.tsx` só existe em tela com `head` por rota (`frontend.md` §1.2): aqui o título das telas privadas vem do `head` do `_private/layout.tsx` pela trilha, então nenhuma `new.lazy.tsx` precisa do par |
+| 7.8 | Suíte rápida: banco clonado por worker, shards no CI, merge de relatórios | Alta | Feita | #253. Backend: o Japa roda em série num processo (migration e kernel uma vez, `_doc-lib/japa.md#docs/test-suites`), então o que a régua chama de worker é o shard: job `e2e` do `main-check-backend.yml` em matriz `--shard=i/3`, banco e MinIO por job (692 = 209+253+230 conferido); `disallowPinnedTests` no CI. Frontend: Vitest em dois projetos, `shared` com `isolate: false` e `isolated` para o que usa `vi.mock`, global ou DOM. Playwright segue num job (14 jornadas, ~2 min; a doc só manda shard quando passa do tempo aceitável) |
+| 7.9 | Lições do adacaibs conferidas contra o código | Média | Feita | #255. Conferido: hook de fiação sem teste próprio (`use-mutation-form`, agora com teste); sem schema local em `lib/`; renomeios desta fase com `grep` do nome antigo. Cobertura de “spec reimplementa a função” e “comentário muda com a condição” não é verificável por varredura e fica para a revisão de cada diff |
+| 7.10 | Estreitar o left dos métodos de domínio por operação (`Extract<BracketError, …>`) para o `openapi.json` não listar código de outra operação | Baixa | A fazer | efeito da 7.5 |
 
 ## Fase N · Ideias (fora do escopo atual)
 

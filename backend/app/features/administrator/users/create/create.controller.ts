@@ -19,11 +19,6 @@ export default class AdministratorUserCreateController {
       'E-mail de uma conta viva responde `409`. E-mail de uma conta **arquivada** reativa ' +
       'aquela linha com os dados novos: `email` é `UNIQUE` global, e inserir de novo ' +
       'esbarraria no índice.',
-    // Declarados à mão porque nascem fora deste par: `USER_ALREADY_EXISTS` é
-    // traduzido em `_shared.user-refusal.ts` e `STORAGE_NOT_FOUND` em
-    // `_shared.attachment-refusal.ts`, e a leitura de AST do gerador só
-    // enxerga o `HTTPException` escrito no use-case irmão.
-    errors: { 409: 'USER_ALREADY_EXISTS', 422: 'STORAGE_NOT_FOUND' },
   })
 
   constructor(private readonly useCase: AdministratorUserCreateUseCase) {}

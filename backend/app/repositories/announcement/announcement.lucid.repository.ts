@@ -6,7 +6,7 @@ import { AnnouncementRepository, type AnnouncementListCriteria } from './announc
 
 import AnnouncementModel from '#models/announcement'
 import { Announcement } from '#domain/announcement/announcement.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class AnnouncementLucidRepository extends AnnouncementRepository {

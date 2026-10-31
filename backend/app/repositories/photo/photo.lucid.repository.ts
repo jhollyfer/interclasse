@@ -19,7 +19,7 @@ import PhotoModel from '#models/photo'
 import StorageModel from '#models/storage'
 import UserModel from '#models/user'
 import { Photo } from '#domain/photo/photo.entity'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class PhotoLucidRepository extends PhotoRepository {

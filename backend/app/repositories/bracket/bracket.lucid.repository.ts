@@ -32,7 +32,7 @@ import { PostgresError } from '#core/postgres-error'
 import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
 import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class BracketLucidRepository extends BracketRepository {

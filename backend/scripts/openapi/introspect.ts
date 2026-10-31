@@ -281,24 +281,13 @@ function messageText(node: ts.Expression): string | undefined {
 }
 
 /**
- * Coleta `HTTPException.Fábrica(mensagem, 'CODE')` do use-case irmão.
+ * Coleta `HTTPException.Fábrica(mensagem, 'CODE')` sob um nó.
  *
  * Só argumentos literais são lidos. Code montado em variável não é adivinhado -
  * ficaria de fora e o `--strict` cobra, que é melhor que documentar um palpite.
  */
-async function readErrors(file: string): Promise<IntrospectedError[]> {
-  let source
-
-  try {
-    source = await parse(file)
-  } catch {
-    return []
-  }
-
-  const errors: IntrospectedError[] = []
-  const seen = new Set<string>()
-
-  walk(source, function (node) {
+function collectErrors(root: ts.Node, errors: IntrospectedError[], seen: Set<string>): void {
+  walk(root, function (node) {
     if (!ts.isCallExpression(node)) return
 
     const callee = calleeText(node)
@@ -324,6 +313,204 @@ async function readErrors(file: string): Promise<IntrospectedError[]> {
     seen.add(key)
     errors.push({ status, code: codeNode.text, message })
   })
+}
+
+// ---------------------------------------------------------------------------
+// Tradutor `_shared.<recurso>-refusal.ts`
+// ---------------------------------------------------------------------------
+
+const BACKEND_ROOT = resolve(dirname(new URL(import.meta.url).pathname), '../..')
+
+const REFUSAL_IMPORT = /_shared\.[a-z-]+-refusal(\.ts)?$/
+
+let featureProgramCache: ts.Program | undefined
+
+/**
+ * O programa com os use-cases como raiz, criado uma vez: o tipo do fato que
+ * chega ao tradutor só o checador sabe, e ele precisa dos imports resolvidos.
+ */
+function featureProgram(): ts.Program | undefined {
+  if (featureProgramCache) return featureProgramCache
+
+  const parsed = ts.getParsedCommandLineOfConfigFile(
+    resolve(BACKEND_ROOT, 'tsconfig.json'),
+    {},
+    { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} },
+  )
+
+  if (!parsed) return undefined
+
+  featureProgramCache = ts.createProgram({
+    rootNames: parsed.fileNames.filter((name) => name.endsWith('.use-case.ts')),
+    options: parsed.options,
+  })
+
+  return featureProgramCache
+}
+
+/** Os `code` de cada fato que o argumento pode ser, lidos do tipo dele. */
+function factCodes(argument: ts.Expression, checker: ts.TypeChecker): string[] {
+  const codeSymbol = checker.getTypeAtLocation(argument).getProperty('code')
+
+  if (!codeSymbol) return []
+
+  const codeType = checker.getTypeOfSymbolAtLocation(codeSymbol, argument)
+  let members = [codeType]
+
+  if (codeType.isUnion()) members = codeType.types
+
+  return members.filter((member) => member.isStringLiteral()).map((member) => member.value)
+}
+
+/** O nome de uma chave de objeto ou de método, quando é literal. */
+function entryKey(name: ts.PropertyName): string | undefined {
+  if (ts.isIdentifier(name) || ts.isStringLiteralLike(name)) return name.text
+  return undefined
+}
+
+/**
+ * Os erros que o use-case recusa por um `_shared.<recurso>-refusal.ts`: da
+ * tabela, só as entradas dos fatos que ele pode receber (o tipo do argumento de
+ * `Refusal.http(fato, i18n)`); de qualquer outro método estático do tradutor, o
+ * corpo inteiro (`_standards/openapi.md`, "erros-do-use-case").
+ */
+async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> {
+  const program = featureProgram()
+
+  if (!program) return []
+
+  const checker = program.getTypeChecker()
+  // Caminho do tradutor -> o que se pede dele (`code` de fato ou `method:<nome>`).
+  const wanted = new Map<string, Set<string>>()
+
+  for (const sourceFile of sharedChain(program, useCase)) {
+    const refusals = new Map<string, string>()
+
+    for (const [name, specifier] of collectImports(sourceFile)) {
+      const path = featurePath(specifier, sourceFile.fileName)
+
+      if (path && REFUSAL_IMPORT.test(specifier)) refusals.set(name, path)
+    }
+
+    walk(sourceFile, function (node) {
+      if (!ts.isCallExpression(node)) return
+      if (!ts.isPropertyAccessExpression(node.expression)) return
+      if (!ts.isIdentifier(node.expression.expression)) return
+
+      const path = refusals.get(node.expression.expression.text)
+
+      if (!path) return
+
+      const entries = wanted.get(path) ?? new Set<string>()
+      const [argument] = node.arguments
+
+      if (node.expression.name.text === 'http' && argument) {
+        for (const code of factCodes(argument, checker)) entries.add(code)
+      } else {
+        entries.add(`method:${node.expression.name.text}`)
+      }
+
+      wanted.set(path, entries)
+    })
+  }
+
+  const errors: IntrospectedError[] = []
+  const seen = new Set<string>()
+
+  for (const [path, entries] of wanted) {
+    let translator
+
+    try {
+      translator = await parse(path)
+    } catch {
+      continue
+    }
+
+    walk(translator, function (node) {
+      if (ts.isPropertyAssignment(node)) {
+        const key = entryKey(node.name)
+
+        if (key && entries.has(key)) collectErrors(node.initializer, errors, seen)
+      }
+
+      if (ts.isMethodDeclaration(node)) {
+        const key = entryKey(node.name)
+
+        if (key && entries.has(`method:${key}`)) collectErrors(node, errors, seen)
+      }
+    })
+  }
+
+  return errors
+}
+
+/** O arquivo de `app/features` que o especificador (relativo ou `#features/`) aponta. */
+function featurePath(specifier: string, from: string): string | undefined {
+  let base: string | undefined
+
+  if (specifier.startsWith('#features/')) {
+    base = resolve(BACKEND_ROOT, 'app/features', specifier.slice('#features/'.length))
+  }
+
+  if (specifier.startsWith('.')) base = resolve(dirname(from), specifier)
+
+  if (!base) return undefined
+
+  if (base.endsWith('.ts')) return base
+
+  return `${base}.ts`
+}
+
+/**
+ * O use-case e os `_shared.*` que ele importa, de forma transitiva: a base
+ * `_shared.<tema>.base` que ele estende também chama o tradutor.
+ */
+function sharedChain(program: ts.Program, useCase: string): ts.SourceFile[] {
+  const visited = new Map<string, ts.SourceFile>()
+  const queue = [useCase]
+
+  for (const next of queue) {
+    const sourceFile = program.getSourceFile(next)
+
+    if (!sourceFile || visited.has(next)) continue
+
+    visited.set(next, sourceFile)
+
+    for (const specifier of collectImports(sourceFile).values()) {
+      const path = featurePath(specifier, next)
+
+      if (path && basename(path).startsWith('_shared.') && !REFUSAL_IMPORT.test(specifier)) {
+        queue.push(path)
+      }
+    }
+  }
+
+  return [...visited.values()]
+}
+
+/** Os erros do use-case irmão: os que ele escreve e os que o tradutor dele devolve. */
+async function readErrors(file: string): Promise<IntrospectedError[]> {
+  let source
+
+  try {
+    source = await parse(file)
+  } catch {
+    return []
+  }
+
+  const errors: IntrospectedError[] = []
+  const seen = new Set<string>()
+
+  collectErrors(source, errors, seen)
+
+  for (const error of await readRefusalErrors(file)) {
+    const key = `${error.status}:${error.code}`
+
+    if (seen.has(key)) continue
+
+    seen.add(key)
+    errors.push(error)
+  }
 
   return errors
 }

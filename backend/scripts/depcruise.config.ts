@@ -3,10 +3,10 @@
  * (`domain.md` §8). Toda regra de `forbidden` leva `severity: 'error'`: o padrão
  * é `warn`, e o código de saída é o número de violações `error`, então regra sem
  * severidade passa o CI verde (_doc-lib/dependency-cruiser.md#doc/rules-reference.md).
- *
- * @type {import('dependency-cruiser').IConfiguration}
  */
-module.exports = {
+import type { IConfiguration } from 'dependency-cruiser'
+
+const config: IConfiguration = {
   forbidden: [
     {
       name: 'no-circular',
@@ -124,3 +124,5 @@ module.exports = {
     includeOnly: '^app/',
   },
 }
+
+export default config

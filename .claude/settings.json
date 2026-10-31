@@ -4,7 +4,13 @@
     "pr": "",
     "sessionUrl": false
   },
+  "extraKnownMarketplaces": {
+    "maiyu-pattern": {
+      "source": { "source": "github", "repo": "jhollyfer/maiyu-pattern" }
+    }
+  },
   "enabledPlugins": {
+    "maiyu-guard@maiyu-pattern": true,
     "superpowers@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "claude-security@claude-plugins-official": true

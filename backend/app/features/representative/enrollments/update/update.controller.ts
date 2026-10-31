@@ -13,13 +13,6 @@ export default class RepresentativeEnrollmentUpdateController {
       'Acrescenta atletas da própria turma numa modalidade: a lista enviada é a nova lista ' +
       'inteira, e precisa conter todos os atletas já inscritos - tirar alguém é do professor ' +
       'conselheiro (`403`). Só alunos da turma; depois do sorteio, `409`.',
-    // Nascem na entidade e são traduzidos em `_shared.enrollment-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: {
-      403: 'ENROLLMENT_REMOVAL_FORBIDDEN',
-      409: 'ENROLLMENT_LOCKED',
-      422: ['SPORT_NOT_FOUND', 'STUDENT_NOT_FOUND', 'ENROLLMENT_LIMIT_EXCEEDED'],
-    },
   })
 
   constructor(private readonly useCase: RepresentativeEnrollmentUpdateUseCase) {}

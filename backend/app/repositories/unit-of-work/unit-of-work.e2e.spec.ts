@@ -3,9 +3,9 @@ import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
 import { left, right } from '@interclasse/shared'
 
-import { TransactionContext } from './transaction-context.ts'
 import { UnitOfWorkLucid } from './unit-of-work.lucid.ts'
 
+import { TransactionContext } from '#core/transaction-context'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /** Uma escrita dentro da unidade, pelo cliente que os repositories usam. */

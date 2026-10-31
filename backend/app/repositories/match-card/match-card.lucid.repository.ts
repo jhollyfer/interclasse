@@ -12,7 +12,7 @@ import MatchCardModel from '#models/match-card'
 import StudentModel from '#models/student'
 import { MatchCard, type MatchCardProps } from '#domain/match-card/match-card.entity'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class MatchCardLucidRepository extends MatchCardRepository {

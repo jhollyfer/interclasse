@@ -2,6 +2,7 @@ import { assert } from '@japa/assert'
 import { ApiClient, apiClient } from '@japa/api-client'
 import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
+import { disallowPinnedTests } from '@japa/runner/plugins'
 import { spec } from '@japa/runner/reporters'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import { dbAssertions } from '@adonisjs/lucid/plugins/db'
@@ -42,6 +43,9 @@ ApiClient.setup((request) => {
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
 export const plugins: Config['plugins'] = [
+  // `.pin()` esquecido faz o CI rodar só o teste fixado e ficar verde
+  // (_doc-lib/japa.md#docs/filtering-tests): no CI a execução reprova.
+  disallowPinnedTests({ disallow: process.env.CI === 'true' }),
   assert(),
   pluginAdonisJS(app),
   dbAssertions(app),

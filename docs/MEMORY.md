@@ -7,7 +7,7 @@
 
 | Atualizado | Fase atual                                   | Progresso | Status                                           |
 | ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90%       | Concluída, CI verde na `main` |
+| 2026-10-31 | Fase 7: lições do adacaibs (#252 a #260)     | 95%       | Feita na branch, falta PR e CI |
 
 ## Já feito
 
@@ -16,13 +16,15 @@
 
 ## Parou em
 
-Tudo fechado: régua aplicada por inteiro (fase 5, #16), CI rodando de verdade e verde na `main` (fase 6, #17 a #22) e régua sincronizada com o maiyu-pattern#5. Backend 462 unit + 692 e2e e Playwright 14/14 contra o MinIO da release do CI.
+Fase 7 feita na branch `frente-regua-adacaibs` (sem push): migration no *Post-deployment* (#252), shards do e2e do backend e Vitest em dois projetos (#253), `maiyu-guard` (#254), arquivos de apoio nas casas novas (#256), z-index com o dropdown acima do modal (#257), checks com `file`/`section` e `reason` (#258), gerador de OpenAPI lendo o `*-refusal.ts` (#259) e `.env` em inglês (#260). Portões locais: backend 465 unit + 692 e2e, depcruise limpo; frontend 414+ unit, build e ciclos; Playwright 14/14; sync sem divergência. Os workflows novos não rodaram (sem Actions).
 
 ## Próximos passos
 
-1. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
-2. Medir o `size-adjust` das fontes de reserva.
-3. Ajuste visual das turmas quando chegarem os prints do Geison.
+1. Abrir o PR da fase 7 e conferir a matriz `e2e` (3 shards) do `main-check-backend.yml` no primeiro run; o nome dos checks mudou (`Backend - E2E 1/3`…), então ajustar a proteção da `main` se ela exige o nome antigo.
+2. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
+3. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). No painel, migration no *Post-deployment command* e *Pre-deployment* vazio. Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
+4. Medir o `size-adjust` das fontes de reserva.
+5. Ajuste visual das turmas quando chegarem os prints do Geison.
 
 ## Contexto importante
 
@@ -47,7 +49,7 @@ Tudo fechado: régua aplicada por inteiro (fase 5, #16), CI rodando de verdade e
 
 | Problema | Onde | Contorno |
 |---|---|---|
-| `pnpm depcruise` acusa 18 violações de camada e ciclo (policies, guard e session service importando model; controllers de sessão importando o `CookieService`; ciclos entre models) | `backend/app` | corrigir na tarefa 5.4; o passo do CI falha até lá |
+| O projeto ainda escreve comentário, título de teste e mensagem de commit de código em português; `typescript.md` §12 manda inglês | todo o código | desvio antigo, fora da fase 7; migrar por área em fase própria |
 | Dockerfiles, job E2E do frontend e workflows novos escritos sem acesso a Docker daemon nem a GitHub Actions | `.github/workflows/`, `*/Dockerfile-production` | validar no primeiro PR e na tarefa 5.8 |
 
 ## Links úteis

@@ -9,7 +9,7 @@ import SportModel from '#models/sport'
 import { PostgresError } from '#core/postgres-error'
 import { Sport } from '#domain/sport/sport.entity'
 import type { SportError } from '#domain/sport/sport.errors'
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 @inject()
 export class SportLucidRepository extends SportRepository {

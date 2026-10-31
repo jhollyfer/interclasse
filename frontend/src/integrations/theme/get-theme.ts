@@ -8,7 +8,7 @@
 import { getCookie } from '@tanstack/react-start/server'
 
 /** O valor cru do cookie de tema; `undefined` fora de uma requisição. */
-export function themeCookie(name: string): string | undefined {
+export function getThemeCookie(name: string): string | undefined {
   try {
     return getCookie(name)
   } catch {

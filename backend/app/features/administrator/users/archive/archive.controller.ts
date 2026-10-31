@@ -20,7 +20,7 @@ export default class AdministratorUserArchiveController {
       '`PATCH /:id/unarchive`. Usuário já arquivado responde `409`.\n\n' +
       'A **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava ' +
       'administrando, e o conserto seria rodar o seeder.',
-    // Declarado à mão porque nasce fora deste par: quem nega é a `UserPolicy`.
+    // Declarado à mão porque nasce em outra camada da cadeia: quem nega é a `UserPolicy`.
     errors: { 403: 'SELF_ARCHIVE_FORBIDDEN' },
   })
 

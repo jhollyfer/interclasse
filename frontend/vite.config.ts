@@ -53,15 +53,10 @@ const config = defineConfig(({ mode }) => {
     resolve: { tsconfigPaths: true },
     plugins: [
       devtools(),
-      // Os três idiomas (_standards/i18n.md §2): a URL é a fonte da verdade, com o
-      // pt-BR sem prefixo e `/es`, `/en` com prefixo. A estratégia é declarada: o
-      // padrão do compilador inclui `globalVariable`, que vaza o idioma entre
-      // requisições no servidor (_doc-lib/paraglide.md#/strategy, #/tanstack-start).
-      paraglideVitePlugin({
-        project: './project.inlang',
-        outdir: './src/paraglide',
-        strategy: ['url', 'baseLocale'],
-      }),
+      // Os três idiomas (_standards/i18n.md §2). As opções do compilador moram em
+      // `project.inlang/paraglide.config.ts`, lido por este plugin e pela CLI
+      // (_doc-lib/paraglide.md#/vite).
+      paraglideVitePlugin({ project: './project.inlang' }),
       // As opções vão direto no plugin, que é a forma que o tipo declara:
       // `nitro(pluginConfig?: NitroPluginConfig)` com `NitroPluginConfig extends
       // NitroConfig` (nitro/dist/vite.d.mts).

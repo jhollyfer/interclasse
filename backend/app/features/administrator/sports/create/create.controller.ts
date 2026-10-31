@@ -12,9 +12,6 @@ export default class AdministratorSportCreateController {
     description:
       'O `slug` sai do nome. `minAthletes` é o corte do sorteio: turma com menos inscritos ' +
       'não entra na chave.',
-    // Nascem na entidade e são traduzidos em `_shared.sport-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: { 422: ['SPORT_INVALID_LIMITS'] },
   })
 
   constructor(private readonly useCase: AdministratorSportCreateUseCase) {}

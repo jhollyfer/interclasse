@@ -13,16 +13,6 @@ export default class AdvisorEnrollmentUpdateController {
       'Troca a lista de atletas da turma numa modalidade pela enviada, inteira. Responde a ' +
       'matriz atualizada. Vale também depois do sorteio: o time sorteado é a turma. Tirar ' +
       'atleta exige `reason`, que vira aviso para a organização. Turma alheia responde `404`.',
-    // Nascem na entidade e são traduzidos em `_shared.enrollment-refusal.ts`, fora da
-    // pasta da ação: o introspector não os lê sozinho.
-    errors: {
-      422: [
-        'SPORT_NOT_FOUND',
-        'STUDENT_NOT_FOUND',
-        'ENROLLMENT_LIMIT_EXCEEDED',
-        'ENROLLMENT_REASON_REQUIRED',
-      ],
-    },
   })
 
   constructor(private readonly useCase: AdvisorEnrollmentUpdateUseCase) {}

@@ -8,7 +8,7 @@ import {
 
 import { ReportRepository } from './report.repository.ts'
 
-import { TransactionContext } from '#repositories/unit-of-work/transaction-context'
+import { TransactionContext } from '#core/transaction-context'
 
 type ClassroomRow = AdministratorReportShowResponse['classrooms'][number]
 type SportRow = AdministratorReportShowResponse['bySport'][number]

@@ -1,18 +1,16 @@
 import { IconContext } from '@phosphor-icons/react'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import { ThemeProvider } from '#/components/common/theme-provider'
 import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
 import { env } from '#/env'
+import { AppDevtools } from '#/integrations/tanstack-query/devtools'
 import { noindexMeta, organizationJsonLd } from '#/lib/page-head'
 import { isIndexable } from '#/lib/site-environment'
 import { THEME_CLASS, readTheme } from '#/lib/theme'
@@ -127,32 +125,7 @@ function RootDocument({
           </IconContext.Provider>
           <Toaster />
         </ThemeProvider>
-        {/*
-          Só em desenvolvimento. Os dois painéis de dentro já se anulam sozinhos
-          fora dele - `TanStackRouterDevtoolsPanel` e `ReactQueryDevtoolsPanel`
-          viram função vazia quando `NODE_ENV !== 'development'` -, mas a casca
-          `TanStackDevtools` não tem essa guarda: sem esta linha o botão
-          flutuante das ferramentas aparece por cima da vitrine para quem entrou
-          para ler uma notícia, e o núcleo `@tanstack/devtools` vai junto no
-          bundle.
-        */}
-        {import.meta.env.DEV && (
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              {
-                name: 'Tanstack Query',
-                render: <ReactQueryDevtoolsPanel />,
-              },
-            ]}
-          />
-        )}
+        <AppDevtools />
         <Scripts />
       </body>
     </html>

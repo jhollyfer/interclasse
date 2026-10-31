@@ -8,7 +8,7 @@
 
 ## 1. Variáveis
 
-Mesma ordem de blocos do `backend/.env.example`.
+Mesma ordem de blocos do `backend/.env.example`. Nome de bloco e comentário dos arquivos `.env*` são em inglês (`typescript.md` §12); o português mora aqui.
 
 ### API (`backend/`)
 
@@ -71,14 +71,14 @@ APP_KEY=<segredo>
 APP_SERVER_URL=http://${HOST}:${PORT}
 # TRUSTED_PROXIES=172.16.0.0/12
 
-# CORS (produção)
+# CORS
 CORS_ORIGINS=http://localhost:3001  # produção: https://interclass.maiyu.com.br
 # COOKIE_DOMAIN=.maiyu.com.br
 
-# Banco de dados
+# Database
 DATABASE_URL=postgres://<usuario>:<senha>@localhost:5434/<banco>
 
-# Armazenamento de arquivos
+# Storage
 UPLOAD_MAX_SIZE=1073741824
 STORAGE_KEY=<segredo>
 STORAGE_SECRET=<segredo>
@@ -86,7 +86,7 @@ STORAGE_BUCKET=interclasse
 STORAGE_ENDPOINT=http://localhost:9004
 STORAGE_FORCE_PATH_STYLE=true
 
-# Semeadura
+# Seeding
 SEED_ADMINISTRATOR_EMAIL=administrator@mail.com
 SEED_ADMINISTRATOR_PASSWORD=<segredo>
 ```
@@ -113,7 +113,7 @@ roda `truncate()` entre os testes.
 |---|---|---|
 | Desenvolvimento | `backend/.env` copiado de `backend/.env.example`; `docker compose up -d` sobe Postgres (5434) e MinIO (9004 e 9005) | portas deslocadas de propósito |
 | Teste | `backend/.env.test` (versionado) | banco `interclasse_test` e bucket `interclasse-test`, descartáveis |
-| Produção | painel do Coolify, uma aplicação para a API e outra para o site | nunca em arquivo no servidor de build |
+| Produção | painel do Coolify, uma aplicação para a API e outra para o site | nunca em arquivo no servidor de build. A migration roda no *Post-deployment command* da API (`node ace migration:run --force`), com o *Pre-deployment* vazio |
 
 Secrets de CI no repositório: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COOLIFY_TOKEN`.
 

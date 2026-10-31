@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-lessons.py - deterministic bookkeeping for the tlc-spec-lean lessons layer.
+lessons.py - deterministic bookkeeping for the .specs lessons layer.
 
 The LLM supplies judgment (which failure happened, how to phrase the lesson, what
 signal grounds it). This script owns everything mechanical: IDs, distinct-feature
@@ -41,7 +41,7 @@ RENDER_REL = os.path.join(".specs", "LESSONS.md")
 
 SIGNALS = {
     "ac_gap": "Acceptance criterion not covered / failed",
-    "surviving_mutant": "Discrimination sensor mutant survived (weak test)",
+    "surviving_mutant": "Mutant survived (weak test)",
     "spec_precision_gap": "Spec did not define a precise outcome",
     "spec_deviation": "Implementation diverged from spec/design (SPEC_DEVIATION)",
     "gate_fail": "Build-level gate check failed",
@@ -369,7 +369,7 @@ def cmd_status(root, args):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="lessons.py", description="Deterministic lessons bookkeeping for tlc-spec-lean.")
+    p = argparse.ArgumentParser(prog="lessons.py", description="Deterministic lessons bookkeeping for .specs/lessons.json.")
     p.add_argument("--root", default=".", help="Project root containing .specs/ (default: current dir)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -402,6 +402,9 @@ def main(argv=None):
 
     sp = sub.add_parser("selftest", help="Run stdlib regressions (normalization)")
     sp.set_defaults(fn=lambda root, args: _selftest_norm())
+
+    for sp in sub.choices.values():
+        sp.add_argument("--root", default=argparse.SUPPRESS, help="Same as --root before the subcommand")
 
     args = p.parse_args(argv)
     root = os.path.abspath(args.root)

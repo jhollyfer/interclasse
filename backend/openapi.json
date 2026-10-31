@@ -176,17 +176,17 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual · Arquivo não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -884,11 +884,11 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos · A chave comporta até {maxTeams} turmas · A chave já tem placar lançado: desfaça os placares antes de apagá-la · A chave desta modalidade e categoria já foi sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409NotEnoughTeamsTooManyTeams"
+                  "$ref": "#/components/schemas/Error409BracketAlreadyExistsBracketHasResultsNotEnoughTeamsTooManyTeams"
                 }
               }
             }
@@ -1158,11 +1158,11 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos · A chave comporta até {maxTeams} turmas · A chave já tem placar lançado: desfaça os placares antes de apagá-la · A chave desta modalidade e categoria já foi sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409BracketHasResults"
+                  "$ref": "#/components/schemas/Error409BracketAlreadyExistsBracketHasResultsNotEnoughTeamsTooManyTeams"
                 }
               }
             }
@@ -1390,7 +1390,7 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "A partida ainda não tem os dois times definidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -1400,7 +1400,7 @@
             }
           },
           "422": {
-            "description": "Dados inválidos · Partida não encontrada",
+            "description": "Dados inválidos · Partida não encontrada · Atleta fora da partida",
             "content": {
               "application/json": {
                 "schema": {
@@ -1722,17 +1722,17 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "A turma já está numa chave sorteada · Turma já existe · Conselheiro já vinculado a outra turma · Representante já vinculado a outra turma",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409AdvisorTakenRepresentativeTaken"
+                  "$ref": "#/components/schemas/Error409AdvisorTakenClassroomAlreadyExistsClassroomInCompetitionRepresentativeTaken"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Ano inválido · Conselheiro não encontrado · Representante não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -1910,17 +1910,17 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "A turma já está numa chave sorteada · Turma já existe · Conselheiro já vinculado a outra turma · Representante já vinculado a outra turma",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409AdvisorTakenRepresentativeTaken"
+                  "$ref": "#/components/schemas/Error409AdvisorTakenClassroomAlreadyExistsClassroomInCompetitionRepresentativeTaken"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Ano inválido · Conselheiro não encontrado · Representante não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -2011,12 +2011,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "A turma já está numa chave sorteada · Turma já existe · Conselheiro já vinculado a outra turma · Representante já vinculado a outra turma",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409AdvisorTakenClassroomAlreadyExistsClassroomInCompetitionRepresentativeTaken"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Ano inválido · Conselheiro não encontrado · Representante não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422AdvisorNotFoundClassroomInvalidGradeRepresentativeNotFoundValidationError"
                 }
               }
             }
@@ -2485,12 +2495,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "A partida ainda não tem os dois times definidos · A partida ainda não tem placar · A partida seguinte já tem placar: corrija-a antes · São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos · A chave comporta até {maxTeams} turmas · A chave já tem placar lançado: desfaça os placares antes de apagá-la · A chave desta modalidade e categoria já foi sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409BracketAlreadyExistsBracketHasResultsMatchNotPlayedMatchTeamsPendingNextMatchPlayedNotEnoughTeamsTooManyTeams"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Informe quem venceu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422MatchWinnerRequiredValidationError"
                 }
               }
             }
@@ -2678,17 +2698,17 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "A partida ainda não tem os dois times definidos · A partida ainda não tem placar · A partida seguinte já tem placar: corrija-a antes · São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos · A chave comporta até {maxTeams} turmas · A chave já tem placar lançado: desfaça os placares antes de apagá-la · A chave desta modalidade e categoria já foi sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409MatchTeamsPendingNextMatchPlayed"
+                  "$ref": "#/components/schemas/Error409BracketAlreadyExistsBracketHasResultsMatchNotPlayedMatchTeamsPendingNextMatchPlayedNotEnoughTeamsTooManyTeams"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Informe quem venceu",
             "content": {
               "application/json": {
                 "schema": {
@@ -2787,21 +2807,21 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "A partida ainda não tem os dois times definidos · A partida ainda não tem placar · A partida seguinte já tem placar: corrija-a antes · São necessárias ao menos {minTeams} turmas com {minAthletes} atletas inscritos · A chave comporta até {maxTeams} turmas · A chave já tem placar lançado: desfaça os placares antes de apagá-la · A chave desta modalidade e categoria já foi sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409MatchNotPlayedNextMatchPlayed"
+                  "$ref": "#/components/schemas/Error409BracketAlreadyExistsBracketHasResultsMatchNotPlayedMatchTeamsPendingNextMatchPlayedNotEnoughTeamsTooManyTeams"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Informe quem venceu",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error422MatchWinnerRequiredValidationError"
                 }
               }
             }
@@ -2994,7 +3014,7 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · A foto precisa ser uma imagem · Arquivo não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -3437,11 +3457,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Arquivo não encontrado · O regulamento precisa ser PDF",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error422RegulationNotPdfStorageNotFoundValidationError"
                 }
               }
             }
@@ -3651,8 +3671,18 @@
               }
             }
           },
+          "409": {
+            "description": "Há turma com mais atletas inscritos que o novo máximo · Modalidade já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409SportAlreadyExistsSportRosterAboveLimit"
+                }
+              }
+            }
+          },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Limites de atletas inválidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -3830,17 +3860,17 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Há turma com mais atletas inscritos que o novo máximo · Modalidade já existe",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409SportRosterAboveLimit"
+                  "$ref": "#/components/schemas/Error409SportAlreadyExistsSportRosterAboveLimit"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Limites de atletas inválidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -4205,21 +4235,21 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Arquivo não encontrado · Senha atual inválida · A nova senha deve ser diferente da atual",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422StorageNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentStorageNotFoundValidationError"
                 }
               }
             }
@@ -4394,21 +4424,21 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409UserAlreadyExists"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual · Arquivo não encontrado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422StorageNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentStorageNotFoundValidationError"
                 }
               }
             }
@@ -4496,21 +4526,21 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error409UserNotArchived"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
                 }
               }
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError"
                 }
               }
             }
@@ -4589,12 +4619,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError"
                 }
               }
             }
@@ -4673,12 +4713,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "Usuário já existe · Usuário já está arquivado · Usuário não está arquivado",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Senha atual inválida · A nova senha deve ser diferente da atual",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError"
                 }
               }
             }
@@ -5081,7 +5131,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error403AccessDenied"
+                  "$ref": "#/components/schemas/Error403AccessDeniedEnrollmentRemovalForbidden"
                 }
               }
             }
@@ -5096,8 +5146,18 @@
               }
             }
           },
+          "409": {
+            "description": "As inscrições desta modalidade estão encerradas: o sorteio já aconteceu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409EnrollmentLocked"
+                }
+              }
+            }
+          },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Atletas demais · Aluno não encontrado na turma · Informe o motivo da remoção · Modalidade não encontrada",
             "content": {
               "application/json": {
                 "schema": {
@@ -5283,7 +5343,7 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · A foto precisa ser uma imagem · Arquivo não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -5581,12 +5641,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "O aluno está inscrito numa modalidade já sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409StudentInCompetition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Informe o nome do aluno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422StudentNameEmptyValidationError"
                 }
               }
             }
@@ -5672,12 +5742,22 @@
               }
             }
           },
-          "422": {
-            "description": "Dados inválidos",
+          "409": {
+            "description": "O aluno está inscrito numa modalidade já sorteada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error409StudentInCompetition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos · Informe o nome do aluno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error422StudentNameEmptyValidationError"
                 }
               }
             }
@@ -5766,7 +5846,7 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "O aluno está inscrito numa modalidade já sorteada",
             "content": {
               "application/json": {
                 "schema": {
@@ -5776,11 +5856,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Informe o nome do aluno",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error422StudentNameEmptyValidationError"
                 }
               }
             }
@@ -6066,7 +6146,7 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "As inscrições desta modalidade estão encerradas: o sorteio já aconteceu",
             "content": {
               "application/json": {
                 "schema": {
@@ -6076,11 +6156,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Atletas demais · Aluno não encontrado na turma · Informe o motivo da remoção · Modalidade não encontrada",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422EnrollmentLimitExceededSportNotFoundStudentNotFoundValidationError"
+                  "$ref": "#/components/schemas/Error422EnrollmentLimitExceededEnrollmentReasonRequiredSportNotFoundStudentNotFoundValidationError"
                 }
               }
             }
@@ -6445,7 +6525,7 @@
             }
           },
           "409": {
-            "description": "Conflito com o estado atual",
+            "description": "Arquivo em uso",
             "content": {
               "application/json": {
                 "schema": {
@@ -6455,11 +6535,11 @@
             }
           },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Arquivo incompleto · Arquivo incompleto",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error422ValidationError"
+                  "$ref": "#/components/schemas/Error422StorageContentMismatchStorageSizeMismatchValidationError"
                 }
               }
             }
@@ -6532,8 +6612,18 @@
               }
             }
           },
+          "409": {
+            "description": "Arquivo em uso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error409StorageInUse"
+                }
+              }
+            }
+          },
           "422": {
-            "description": "Dados inválidos",
+            "description": "Dados inválidos · Arquivo incompleto · Arquivo incompleto",
             "content": {
               "application/json": {
                 "schema": {
@@ -18749,7 +18839,7 @@
           "code"
         ]
       },
-      "Error409AdvisorTakenRepresentativeTaken": {
+      "Error409AdvisorTakenClassroomAlreadyExistsClassroomInCompetitionRepresentativeTaken": {
         "type": "object",
         "properties": {
           "message": {
@@ -18767,6 +18857,8 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "ADVISOR_TAKEN",
+              "CLASSROOM_ALREADY_EXISTS",
+              "CLASSROOM_IN_COMPETITION",
               "REPRESENTATIVE_TAKEN"
             ]
           },
@@ -18784,7 +18876,7 @@
           "code"
         ]
       },
-      "Error409BracketHasResults": {
+      "Error409BracketAlreadyExistsBracketHasResultsMatchNotPlayedMatchTeamsPendingNextMatchPlayedNotEnoughTeamsTooManyTeams": {
         "type": "object",
         "properties": {
           "message": {
@@ -18801,7 +18893,50 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "BRACKET_HAS_RESULTS"
+              "BRACKET_ALREADY_EXISTS",
+              "BRACKET_HAS_RESULTS",
+              "MATCH_NOT_PLAYED",
+              "MATCH_TEAMS_PENDING",
+              "NEXT_MATCH_PLAYED",
+              "NOT_ENOUGH_TEAMS",
+              "TOO_MANY_TEAMS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
+        ]
+      },
+      "Error409BracketAlreadyExistsBracketHasResultsNotEnoughTeamsTooManyTeams": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "BRACKET_ALREADY_EXISTS",
+              "BRACKET_HAS_RESULTS",
+              "NOT_ENOUGH_TEAMS",
+              "TOO_MANY_TEAMS"
             ]
           },
           "errors": {
@@ -18852,41 +18987,6 @@
           "code"
         ]
       },
-      "Error409MatchNotPlayedNextMatchPlayed": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "MATCH_NOT_PLAYED",
-              "NEXT_MATCH_PLAYED"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
       "Error409MatchTeamsPending": {
         "type": "object",
         "properties": {
@@ -18921,7 +19021,7 @@
           "code"
         ]
       },
-      "Error409MatchTeamsPendingNextMatchPlayed": {
+      "Error409SportAlreadyExistsSportRosterAboveLimit": {
         "type": "object",
         "properties": {
           "message": {
@@ -18938,43 +19038,8 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "MATCH_TEAMS_PENDING",
-              "NEXT_MATCH_PLAYED"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error409NotEnoughTeamsTooManyTeams": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "NOT_ENOUGH_TEAMS",
-              "TOO_MANY_TEAMS"
+              "SPORT_ALREADY_EXISTS",
+              "SPORT_ROSTER_ABOVE_LIMIT"
             ]
           },
           "errors": {
@@ -19009,40 +19074,6 @@
             "description": "Identificador de máquina da falha.",
             "enum": [
               "SPORT_IN_USE"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error409SportRosterAboveLimit": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "SPORT_ROSTER_ABOVE_LIMIT"
             ]
           },
           "errors": {
@@ -19127,7 +19158,7 @@
           "code"
         ]
       },
-      "Error409UserAlreadyExists": {
+      "Error409UserAlreadyArchivedUserAlreadyExistsUserNotArchived": {
         "type": "object",
         "properties": {
           "message": {
@@ -19144,40 +19175,8 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "USER_ALREADY_EXISTS"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code"
-        ]
-      },
-      "Error409UserNotArchived": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              409
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
+              "USER_ALREADY_ARCHIVED",
+              "USER_ALREADY_EXISTS",
               "USER_NOT_ARCHIVED"
             ]
           },
@@ -19271,6 +19270,43 @@
           "errors"
         ]
       },
+      "Error422CurrentPasswordInvalidPasswordSameAsCurrentValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "CURRENT_PASSWORD_INVALID",
+              "PASSWORD_SAME_AS_CURRENT",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422EnrollmentLimitExceededEnrollmentReasonRequiredSportNotFoundStudentNotFoundValidationError": {
         "type": "object",
         "properties": {
@@ -19290,44 +19326,6 @@
             "enum": [
               "ENROLLMENT_LIMIT_EXCEEDED",
               "ENROLLMENT_REASON_REQUIRED",
-              "SPORT_NOT_FOUND",
-              "STUDENT_NOT_FOUND",
-              "VALIDATION_ERROR"
-            ]
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
-          }
-        },
-        "required": [
-          "message",
-          "status",
-          "code",
-          "errors"
-        ]
-      },
-      "Error422EnrollmentLimitExceededSportNotFoundStudentNotFoundValidationError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Mensagem em português, exibível ao usuário."
-          },
-          "status": {
-            "type": "integer",
-            "enum": [
-              422
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "Identificador de máquina da falha.",
-            "enum": [
-              "ENROLLMENT_LIMIT_EXCEEDED",
               "SPORT_NOT_FOUND",
               "STUDENT_NOT_FOUND",
               "VALIDATION_ERROR"
@@ -19458,6 +19456,43 @@
           "errors"
         ]
       },
+      "Error422RegulationNotPdfStorageNotFoundValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem em português, exibível ao usuário."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Identificador de máquina da falha.",
+            "enum": [
+              "REGULATION_NOT_PDF",
+              "STORAGE_NOT_FOUND",
+              "VALIDATION_ERROR"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Mensagem por campo, quando a falha é atribuível a campos do payload."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code",
+          "errors"
+        ]
+      },
       "Error422SportInvalidLimitsValidationError": {
         "type": "object",
         "properties": {
@@ -19567,7 +19602,7 @@
           "errors"
         ]
       },
-      "Error422StorageNotFoundValidationError": {
+      "Error422StudentNameEmptyValidationError": {
         "type": "object",
         "properties": {
           "message": {
@@ -19584,7 +19619,7 @@
             "type": "string",
             "description": "Identificador de máquina da falha.",
             "enum": [
-              "STORAGE_NOT_FOUND",
+              "STUDENT_NAME_EMPTY",
               "VALIDATION_ERROR"
             ]
           },

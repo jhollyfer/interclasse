@@ -13,9 +13,6 @@ export default class AdministratorPhotoCreateController {
     description:
       'Uma foto para o carrossel do site, já aprovada. `storageId` é uma imagem já ' +
       'enviada por `/storages`.',
-    // Nascem na entidade e no helper de envio, fora da pasta da ação: o
-    // introspector não os lê sozinho.
-    errors: { 422: ['PHOTO_NOT_IMAGE', 'STORAGE_NOT_FOUND'] },
   })
 
   constructor(private readonly useCase: AdministratorPhotoCreateUseCase) {}

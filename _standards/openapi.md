@@ -229,7 +229,8 @@ Por isso o código é literal no use-case; catálogo central só nas condições
 **Componente de erro compartilhado** *(opinião da casa)*: operações que falham com o mesmo
 status e o mesmo conjunto de `code` apontam para um componente só, nomeado
 `Error<Status><Codes em PascalCase, ordenados>` (`Error404PostNotFound`) — não um schema anônimo
-repetido por rota.
+repetido por rota. O nome, o schema e a descrição desses componentes moram em
+`scripts/openapi/errors.ts`, para o `emit.ts` não crescer com eles (`DECISIONS.md` #256).
 
 #### seguranca-e-papeis
 código: `scripts/openapi/emit.ts`

@@ -73,15 +73,21 @@ controller → use-case → domain
 
 ```
 backend/
-├── package.json  tsconfig.json  eslint.config.js  prettier.config.js
+├── package.json  tsconfig.json  eslint.config.js  prettier.config.js  .prettierignore
+├── tsconfig.depcruise.json          # §3.4: o `paths` que o dependency-cruiser lê (tsconfig.json só tem `imports`)
 ├── Dockerfile-production  .dockerignore  docker-compose.yml   # compose = só infra local
 ├── .env.example  .env.test                                     # backend.md §6
 ├── openapi.json                                                # artefato commitado (openapi.md)
+├── infra/<serviço>/                 # Dockerfile e script do serviço local (minio…); config de provedor em infra/<provedor>-<tema>.json (§3.4)
 ├── app/
 │   ├── core/
 │   │   ├── response.ts              # envelope { message, status, code, errors? }, Paginated<T>
+│   │   ├── translation.ts           # Adonis: Translation.t(chave, variáveis) com o idioma da requisição (i18n.md §3)
+│   │   ├── same-site.ts             # valor de sameSite do cookie de sessão, decidido no boot (backend.md §4.10)
+│   │   ├── transaction-context.ts   # AsyncLocalStorage da transação, lido por 2+ repositories (domain.md §6)
 │   │   ├── validator.ts             # Fastify: reexporta o z de shared/ + regras só do backend; Adonis: o vine do backend (arquivo)
 │   │   ├── validator.unit.spec.ts   # meta-spec dos validators (backend.md §4.4)
+│   │   ├── <tema>.{unit,e2e}.spec.ts # spec de configuração ou de recurso sem arquivo-casa (trust proxy, arquivos de idioma)
 │   │   └── openapi/                 # defineDocs, registro de resposta, authz-baseline.json
 │   ├── domain/
 │   │   ├── <entidade>/
@@ -90,6 +96,8 @@ backend/
 │   │   │   └── <entidade>.unit.spec.ts
 │   │   └── shared/<nome>.value-object.ts  # value object só do backend (Money, Slug com unicidade…)
 │   ├── repositories/
+│   │   ├── shared/<nome>.ts               # só o que importa model e serve a 2+ repositories (Adonis: lucid-mapping.ts); sem model, vai para core/
+│   │   ├── unit-of-work/{unit-of-work.ts, unit-of-work.lucid.ts, unit-of-work.memory.ts}   # domain.md §6
 │   │   └── <entidade>/
 │   │       ├── <entidade>.repository.ts            # contrato: abstract class, métodos por intenção
 │   │       ├── <entidade>.lucid.repository.ts      # implementação (Adonis); .mongo. no Fastify
@@ -129,6 +137,8 @@ backend/
 │   ├── factories/<entidade>.factory.ts   # só para teste
 │   └── data/<nome>.ts               # dado de seed/conteúdo, fora de seeders/
 ├── scripts/{pattern-check.ts, pattern-check.config.ts, authz-check.ts, <nome>-check.ts} (+ .unit.spec.ts)
+├── scripts/depcruise.config.ts      # regras de camada (domain.md §8), passado por `depcruise --config`
+├── scripts/openapi/{generate,introspect,emit,errors,verify}.ts   # openapi.md
 ├── start/{env.ts, kernel.ts, limiter.ts}
 └── tests/
     ├── bootstrap.ts | setup.<suíte>.ts
@@ -190,15 +200,21 @@ por mecanismo.
 backend/
 ├── adonisrc.ts  ace.js  bin/{console,server,test}.ts
 ├── app/
+│   ├── abilities/main.ts            # criado por `node ace add @adonisjs/bouncer` (backend.md §1.1)
 │   ├── core/column.ts               # prepare/consume compartilhados das colunas
 │   ├── guards/<nome>.guard.ts
 │   ├── validators/<módulo>/<recurso>.validator.ts   # VineJS, par de caminho e nome do Zod em shared/ (§9)
 │   └── jobs/<nome>.job.ts
+├── .adonisjs/{client,server}/       # gerado pelo framework e VERSIONADO: o código importa `#generated/*` (§3.4)
 ├── providers/<nome>.provider.ts     # composition root: liga contrato → implementação
 ├── database/{schema.ts (gerado), schema_rules.ts}
 ├── resources/lang/{pt-BR,es,en}/*.json   # i18n.md
 └── start/{routes.ts, validator.ts}
 ```
+
+`tmp/` (pasta de trabalho do Adonis) é ignorada pelo `.gitignore` e **não** leva `.gitkeep`: o
+framework a cria quando precisa (_doc-lib/adonisjs.md#folder-structure,
+https://docs.adonisjs.com/folder-structure).
 
 Suítes Japa: `unit` (`app/**/*.unit.spec.ts`, `scripts/**/*.unit.spec.ts`) e `functional`
 (`app/**/*.e2e.spec.ts`). _doc-lib/adonisjs.md#guides/testing/introduction.
@@ -222,6 +238,30 @@ backend/
 Repository Mongo: `<entidade>.mongo.repository.ts` sobre o driver `mongodb`
 (_doc-lib/mongodb.md). Detalhes do perfil em `backend-fastify.md`.
 
+### 3.4 Arquivos de apoio: config de ferramenta, gerado, fixture *(opinião da casa, `DECISIONS.md` #256)*
+
+Arquivo que não é código de camada também tem casa. O que não está aqui nem na árvore é desvio.
+
+| Arquivo | Casa | Regra |
+|---|---|---|
+| `.editorconfig` | raiz do repositório, um só | vale para os três pacotes; nenhum pacote tem o seu |
+| `.gitleaks.toml` | raiz, só se o projeto usa `gitleaks` (`tooling.md` §7) | allowlist com o motivo de cada entrada |
+| `.prettierignore` | um por pacote (`backend/`, `frontend/`, `shared/`) | só gerados e saída de build: o `.gitignore` da raiz não alcança o pacote onde o Prettier roda. Página do Prettier sobre `.prettierignore` não conferida |
+| `tsconfig.depcruise.json` | raiz do backend | estende `tsconfig.json` e repete o alias em `paths` para o dependency-cruiser; o `tsConfig` dele só lê `compilerOptions` (_doc-lib/dependency-cruiser.md#doc/options-reference.md) |
+| `scripts/depcruise.config.ts` | `backend/scripts/` | `depcruise app --config scripts/depcruise.config.ts` (_doc-lib/dependency-cruiser.md#doc/cli.md) |
+| `backend/infra/<serviço>/` | Dockerfile e script do serviço de teste local; CORS e política de provedor em `infra/<provedor>-<tema>.json` | nunca produção (`tooling.md` §8.3) |
+| `backend/.adonisjs/` | versionado | a doc manda commitar (_doc-lib/adonisjs.md#folder-structure) |
+| `backend/tmp/` | ignorada, sem `.gitkeep` | a doc manda ignorar (§3.2) |
+| `app/core/<tema>.<unit\|e2e>.spec.ts` | `app/core/` | spec de configuração ou de recurso sem arquivo-casa; nome pelo tema |
+| `scripts/openapi/errors.ts` | `backend/scripts/openapi/` | componentes de erro compartilhados (`openapi.md` #erros-do-use-case) |
+| `shared/src/merge.ts` | `shared/src/` | o utilitário `Merge` (`typescript.md` §8), exportado pelo `index.ts` |
+| `shared/src/validators/client/<nome>.validator.ts` | `shared/src/validators/client/` | schema de dado que nasce e fica no navegador (`localStorage`, retomada de upload), sem recurso par no backend; vale o resto de §9 |
+| `shared/src/<tema>-fixtures.ts` | `shared/src/`, fora do `tsconfig.build.json` | helper de teste usado por 2+ specs; mesmo molde de `tests/<tema>-fixtures.ts` do backend |
+| `frontend/project.inlang/paraglide.config.ts` | `project.inlang/` | opções do compilador, lidas pelo plugin do Vite e pela CLI: uma config só para as duas não divergirem (_doc-lib/paraglide.md#/vite, https://paraglidejs.com/vite, aberta em 2026-10-31) |
+| `frontend/src/vite-env.d.ts` | `src/` | tipa as `VITE_*` de `import.meta.env`; sem ele `env.ts` lê `any` |
+| `frontend/src/integrations/theme/` | `integrations/theme/get-theme.ts` | cookie de tema lido no servidor (`frontend.md` §6) |
+| `frontend/src/integrations/tanstack-query/devtools.tsx` | ao lado do cliente HTTP | as devtools, carregadas só em desenvolvimento |
+
 ## 4. Árvore do frontend
 
 ```
@@ -230,11 +270,12 @@ frontend/
 ├── vite.config.ts  vitest.config.ts  components.json  Dockerfile-production
 ├── .env.example                     # só VITE_* público
 ├── public/                          # só nome estável: favicon, manifest (frontend.md §9.6)
-├── project.inlang/settings.json  messages/{pt-BR,es,en}.json   # i18n.md
+├── project.inlang/{settings.json, paraglide.config.ts}  messages/{pt-BR,es,en}.json   # i18n.md, §3.4
+├── .prettierignore
 ├── scripts/check-chunk-cycles.mjs (+ .test.ts)
 ├── e2e/{playwright.config.ts, <fluxo>.spec.ts, support/{test.ts, <tema>.ts}}
 └── src/
-    ├── router.tsx  start.ts  env.ts  styles.css
+    ├── router.tsx  start.ts  env.ts  vite-env.d.ts  styles.css
     ├── server.ts                    # paraglideMiddleware(req, () => handler.fetch(req)), i18n.md §2
     ├── routeTree.gen.ts             # gerado, commitado
     ├── assets/                      # imagem e fonte importadas (frontend.md §9.6)
@@ -250,7 +291,7 @@ frontend/
     │       └── <área>/
     │           ├── layout.tsx       # guard de capacidade da área
     │           └── <recurso>/
-    │               ├── index.tsx  index.lazy.tsx  new.lazy.tsx
+    │               ├── index.tsx  index.lazy.tsx  new.tsx  new.lazy.tsx   # new.tsx: só `head` (frontend.md §1.2)
     │               ├── $id/{index,edit}.tsx  $id/{index,edit}.lazy.tsx
     │               ├── -search.ts   # validateSearch da rota (nunca inline)
     │               ├── -use-<nome>.ts   # hook de uma rota só (frontend.md §1.1)
@@ -263,9 +304,10 @@ frontend/
     │   ├── use-<nome>.ts
     │   └── tanstack-query/_query-keys.ts
     ├── integrations/
-    │   ├── tanstack-query/{http.ts, http.server.ts, query-context.ts, invalidate.ts,
+    │   ├── tanstack-query/{http.ts, http.server.ts, query-context.ts, invalidate.ts, devtools.tsx,
     │   │                   queries/<módulo>.ts, mutations/<módulo>.ts}
-    │   └── react-hook-form/app-field.tsx
+    │   ├── react-hook-form/app-field.tsx
+    │   └── theme/get-theme.ts
     └── lib/{cn,labels,i18n,form-errors,form-a11y,list-search,redirect-search,page-head,sitemap,
              load-or-not-found,local-store,bulk,chunking,upload-transport,upload-resume,dialog-handle}.ts
              + <tema>.ts, cada um com .test.ts ao lado
@@ -303,7 +345,7 @@ Tecnologia nova entra na casa adicionando **uma coluna** nesta tabela, não uma 
   nem implementação concreta de repository/service; `domain/` não importa nada além de `core/` e
   `shared/`; `models/` só é importado por `repositories/`. *(opinião da casa; ferramenta:
   `pattern:check` ou dependency-cruiser)*
-- Exceção da regra fica em `scripts/pattern-check.config.ts`, cada uma com motivo; exceção sem
+- Exceção da regra fica em `scripts/pattern-check.config.ts`, cada uma com `reason`; exceção sem
   uso reprova o check.
 - Projeto atual que diverge migra; o roteiro está em `MIGRATIONS.md`.
 
@@ -373,11 +415,18 @@ executa um plano, o unitário acompanha cada fase e o E2E roda só na fase final
 
 O sufixo separa o runner: a suíte E2E nunca pega `*.unit.spec.ts`, e a unitária nunca sobe banco.
 
-**E2E não divide banco entre processos.** O Japa roda os testes em série num processo; suíte em
-paralelo (`concurrently`) só junta a `unit`, que não abre banco, a uma `functional`
-(_doc-lib/japa.md#docs/test-suites). `--shard` só em job de CI separado, cada um com o próprio
-banco em `services:` (_doc-lib/japa.md#docs/filtering-tests). No Fastify, a config `e2e` do Vitest
-desliga `fileParallelism` no project que fala com o banco (_doc-lib/vitest.md#config/fileparallelism).
+**O `<x>.e2e.spec.ts` do backend é teste de integração de API**: banco real, rota chamada por
+`supertest`/`inject`/`@japa/api-client`, sem navegador. É a rede principal de "nada quebrou" e cobre
+toda rota. E2E de navegador é só o Playwright do frontend, e só nas jornadas críticas. Como a suíte
+fica rápida e quem roda a suíte inteira: `tooling.md` §10.6 (`DECISIONS.md` #253).
+
+**Banco sobe uma vez, cada processo no seu.** O Japa roda os testes em série num processo, com a
+aplicação de pé uma vez só; suíte em paralelo (`concurrently`) junta a `unit`, que não abre banco, a
+uma `functional` (_doc-lib/japa.md#docs/test-suites). No Vitest, o banco e a migration sobem no
+`globalSetup`, uma vez (_doc-lib/vitest.md#config/globalsetup), e cada worker recebe um banco próprio
+clonado da base semeada; nunca banco criado nem kernel subido por arquivo. `--shard` divide a suíte
+em jobs de CI, cada um com o próprio banco em `services:` (_doc-lib/japa.md#docs/filtering-tests,
+_doc-lib/vitest.md#improving-performance).
 
 **O que cada camada leva:**
 
@@ -410,7 +459,7 @@ Um repositório por produto, monorepo com **pnpm workspace** (`DECISIONS.md` #11
 ├── package.json                     # scripts de topo + devDeps de repositório (commitlint, husky)
 ├── pnpm-workspace.yaml              # packages: backend, frontend, shared
 ├── pnpm-lock.yaml                   # um lockfile, na raiz
-├── .commitlintrc.json  .gitignore
+├── .commitlintrc.json  .gitignore  .editorconfig  .gitleaks.toml   # §3.4
 ├── .husky/{pre-commit,commit-msg}   # um hook para o repositório inteiro (tooling.md)
 ├── .github/
 │   ├── dependabot.yml               # tooling.md §9
@@ -431,7 +480,10 @@ shared/
 └── src/
     ├── index.ts                     # o que o pacote exporta, e só isto
     ├── either.ts                    # Either<L, R>, left, right: usado por value objects, domínio e use-case
+    ├── merge.ts                     # Merge<A, B> (typescript.md §8)
+    ├── <tema>-fixtures.ts           # helper de teste de 2+ specs; fora de dist/ (§3.4)
     ├── validator.ts                 # z configurado (z.config + locale) + regras compartilhadas + mensagens das regras (pt-BR/es/en)
+    ├── validators/client/<nome>.validator.ts   # dado só do navegador, sem par no backend (§3.4)
     ├── validators/<módulo>/<recurso>.validator.ts   # um arquivo por recurso, schema Zod usado pelos dois lados (Adonis: só pelo frontend; o backend tem o par em app/validators/)
     ├── enums/<nome>.ts              # POST_STATUS / PostStatus / POST_STATUSES
     ├── value-objects/<nome>.ts      # Cpf, Cnpj, Email, Phone: create() devolve Either; formatação pura

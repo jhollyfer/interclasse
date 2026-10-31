@@ -24,15 +24,8 @@ export default class AdministratorUserUpdateController {
       'Sobre a **própria** conta, `role` e `status` respondem `403`: rebaixar-se a conselheiro ou ' +
       'marcar-se `INACTIVE` tira do painel quem estava administrando. Nome, e-mail, senha e ' +
       'foto continuam editáveis.',
-    // Declarados à mão porque nascem fora deste par: `SELF_ACCESS_FORBIDDEN` vem
-    // da `UserPolicy`, e `USER_ALREADY_EXISTS` e `STORAGE_NOT_FOUND` dos
-    // tradutores `_shared`; a leitura de AST do gerador só enxerga o
-    // `HTTPException` escrito no use-case irmão.
-    errors: {
-      403: 'SELF_ACCESS_FORBIDDEN',
-      409: 'USER_ALREADY_EXISTS',
-      422: 'STORAGE_NOT_FOUND',
-    },
+    // Declarado à mão porque nasce em outra camada da cadeia: quem nega é a `UserPolicy`.
+    errors: { 403: 'SELF_ACCESS_FORBIDDEN' },
   })
 
   constructor(

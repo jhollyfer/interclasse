@@ -19,6 +19,9 @@ Nenhuma `_doc-lib` cobre isto: é escolha da casa. Onde há convenção pública
   árvore da casa (serviços, integrações, dados, ambientes), nunca uma árvore própria; `RULES.md` e
   `DECISIONS.md` guardam restrição e decisão **do produto**, nunca exceção à régua; `DESIGN.md` é o
   único que escolhe livremente, e só o visual (`AGENTS.md`), não onde o tema e o kit moram.
+- **Forma da régua que não cabe no caso** (assinatura de fábrica, nome de arquivo, ordem de
+  parâmetro): adapta-se o detalhe (a chave da tradução, o conteúdo) e mantém-se a forma. Trocar a
+  forma por exceção local e registrá-la como decisão é desvio, não decisão (`DECISIONS.md` #255).
 - **Conflito entre `docs/` e a régua: a régua vence** e o doc se corrige. Regra que não serve ao
   projeto muda no upstream e volta pelo sync, nunca vira linha em `RULES.md` ou `DECISIONS.md`.
 
@@ -55,7 +58,7 @@ solto (seção "Linguagem do domínio" de `ARCHITECTURE.md`, `DECISIONS.md` #118
 regra no upstream ou some; estado vai para `MEMORY.md`).
 
 **"O que a plataforma faz e o repositório não"** mora em `ARCHITECTURE.md` §9.1: comando de
-pré-deploy (`migration:run --force`), variável que só existe no painel (`COOKIE_DOMAIN`), segundo
+migration do deploy (`migration:run --force`; no Coolify, o *Post-deployment command*, `tooling.md` §8.2), variável que só existe no painel (`COOKIE_DOMAIN`), segundo
 serviço (worker de fila), regra de proxy (gzip sem `text/event-stream`), healthcheck configurado no
 painel, CORS do bucket (com `ETag` exposto, `backend.md` §5.4). É o que se perde quando só o `CLAUDE.md` sabia.
 

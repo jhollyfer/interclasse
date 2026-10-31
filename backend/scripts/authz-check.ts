@@ -86,13 +86,13 @@ function report(baseline: Record<string, string>, now: Record<string, string>): 
   const total = added.length + removed.length + changed.length
 
   if (total === 0) {
-    console.log(`authz:check: ${Object.keys(now).length} rotas, nenhuma mudanca.`)
+    console.log(`authz:check: ${Object.keys(now).length} routes, no changes.`)
     return 0
   }
 
-  console.log(`authz:check: ${total} mudancas na cadeia de autorizacao\n`)
+  console.log(`authz:check: ${total} changes in the authorization chain\n`)
   for (const line of [...added, ...removed, ...changed]) console.log(line)
-  console.log('\n  Intencional? `pnpm authz:check -- --write` e commite o baseline junto.')
+  console.log('\n  Intentional? Run `pnpm authz:check -- --write` and commit the baseline with it.')
 
   return total
 }
@@ -103,14 +103,14 @@ async function main(): Promise<void> {
 
   if (flags.has('--write')) {
     await writeFile(BASELINE, `${JSON.stringify(now, null, 2)}\n`, 'utf8')
-    console.log(`authz:check --write: ${Object.keys(now).length} rotas gravadas.`)
+    console.log(`authz:check --write: ${Object.keys(now).length} routes written.`)
     return
   }
 
   const raw = await readFile(BASELINE, 'utf8').catch(() => '')
 
   if (raw === '') {
-    console.error('authz:check: baseline ausente. Rode com `--write` uma vez e commite.')
+    console.error('authz:check: baseline missing. Run once with `--write` and commit it.')
     process.exitCode = 1
     return
   }

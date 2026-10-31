@@ -135,7 +135,7 @@ function AuthShellAsideBody({
     <div
       data-slot="auth-shell-aside-body"
       className={cn(
-        'relative z-dropdown flex flex-1 flex-col items-center justify-center gap-6 py-10',
+        'relative z-1 flex flex-1 flex-col items-center justify-center gap-6 py-10',
         className,
       )}
       {...props}
