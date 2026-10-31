@@ -8,7 +8,7 @@ const NOT_FOUND_ID = '00000000-0000-4000-8000-000000000000'
 test.group('advisor/photos > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('201: a foto do conselheiro nasce PENDING', async ({ client, assert }) => {
+  test('201: the advisor photo is born PENDING', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
 
@@ -21,7 +21,7 @@ test.group('advisor/photos > create', (group) => {
     assert.equal(body(response).status, 'PENDING')
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const image = await StorageFactory.create()
 
     const response = await client.post('/advisor/photos').json({ storageId: image.id })
@@ -29,7 +29,7 @@ test.group('advisor/photos > create', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: representante não envia foto', async ({ client }) => {
+  test('403: representative does not submit a photo', async ({ client }) => {
     const { session } = await signInWithFactory(client, 'representative')
     const image = await StorageFactory.create()
 
@@ -41,7 +41,7 @@ test.group('advisor/photos > create', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: sem storageId', async ({ client, assert }) => {
+  test('422: without storageId', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.post('/advisor/photos').cookies(advisor).json({})
@@ -50,7 +50,7 @@ test.group('advisor/photos > create', (group) => {
     assert.property(body(response).errors, 'storageId')
   })
 
-  test('422: arquivo inexistente', async ({ client, assert }) => {
+  test('422: nonexistent file', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client

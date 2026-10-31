@@ -34,8 +34,8 @@ export default class AdvisorStudentCreateUseCase {
 
   async execute({ actor, ...payload }: Payload): Promise<Response> {
     try {
-      // `404` também para a turma de outro conselheiro: dizer `403` confirmaria
-      // que ela existe. O alcance entra na consulta (`findOwned`).
+      // `404` also for another advisor's classroom: saying `403` would confirm
+      // that it exists. The scope goes into the query (`findOwned`).
       const classroom = await this.classrooms.findOwned({ id: payload.classroomId, actor })
       if (!classroom)
         return left(

@@ -5,11 +5,11 @@ import HTTPException from '#exceptions/http.exception'
 import type { EnrollmentError } from '#domain/enrollment/enrollment.errors'
 
 /**
- * Cada recusa da lista de atletas como resposta HTTP, a mesma para o conselheiro
- * e para o representante: a regra escrita duas vezes divergiria, e a divergência
- * seria um representante conseguindo o que o conselheiro não consegue
- * (`_standards/domain.md` §2). Tabela por `code`: fato novo sem entrada não
- * compila.
+ * Each refusal of the athlete list as an HTTP response, the same for the advisor
+ * and the representative: the rule written twice would diverge, and the divergence
+ * would be a representative getting what the advisor cannot
+ * (`_standards/domain.md` §2). Table by `code`: a new fact without an entry does not
+ * compile.
  */
 export class EnrollmentRefusal extends RefusalBase {
   private static readonly TABLE = {
@@ -44,7 +44,7 @@ export class EnrollmentRefusal extends RefusalBase {
     return EnrollmentRefusal.translate(EnrollmentRefusal.TABLE, error.code, error, i18n)
   }
 
-  /** A modalidade da lista não existe: não é regra da lista, é referência solta. */
+  /** The sport of the list does not exist: not a list rule, a dangling reference. */
   static sportNotFound(i18n: I18n): HTTPException {
     return HTTPException.UnprocessableEntity(
       i18n.t('enrollments.sport_not_found'),

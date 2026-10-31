@@ -21,7 +21,7 @@ async function setup() {
     { advisor: { exists: true, taken: false } },
   )
   const foreign = Classroom.create({ id: FOREIGN, name: '8º A', grade: 8, now: new Date() }, {})
-  if (own.isLeft() || foreign.isLeft()) throw new Error('arranjo inválido')
+  if (own.isLeft() || foreign.isLeft()) throw new Error('invalid arrangement')
   await classrooms.save(own.value)
   await classrooms.save(foreign.value)
   const students = MemoryRepositories.students().withClassroom(CLASSROOM, ADVISOR)
@@ -34,7 +34,7 @@ async function setup() {
 }
 
 test.group('advisor/students > create (unit)', () => {
-  test('cadastra o aluno na turma do conselheiro', async ({ assert }) => {
+  test('registers the student in the advisor classroom', async ({ assert }) => {
     const { students, useCase } = await setup()
 
     const result = await useCase.execute({ classroomId: CLASSROOM, name: ' Ana ', actor: OWNER })
@@ -45,7 +45,7 @@ test.group('advisor/students > create (unit)', () => {
     assert.equal(listed.meta.total, 1)
   })
 
-  test('turma de outro conselheiro é 404 CLASSROOM_NOT_FOUND e nada é gravado', async ({
+  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND and nothing is saved', async ({
     assert,
   }) => {
     const { students, useCase } = await setup()
@@ -61,7 +61,7 @@ test.group('advisor/students > create (unit)', () => {
     assert.equal(listed.meta.total, 0)
   })
 
-  test('o administrador cadastra em qualquer turma', async ({ assert }) => {
+  test('the administrator registers in any classroom', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -73,7 +73,7 @@ test.group('advisor/students > create (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('nome em branco é 422 STUDENT_NAME_EMPTY', async ({ assert }) => {
+  test('blank name is 422 STUDENT_NAME_EMPTY', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ classroomId: CLASSROOM, name: '   ', actor: OWNER })

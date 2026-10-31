@@ -14,7 +14,10 @@ import {
 test.group('students > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o conselheiro corrige o nome do aluno da própria turma', async ({ client, assert }) => {
+  test('the advisor fixes the name of a student in their own classroom', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
 
@@ -32,14 +35,17 @@ test.group('students > update', (group) => {
     assert.equal(student.name, 'Maria Clara')
   })
 
-  test('aluno de outro conselheiro responde 404 e fica intocado', async ({ client, assert }) => {
+  test('student of another advisor responds 404 and stays untouched', async ({
+    client,
+    assert,
+  }) => {
     const { classroom } = await signInAsAdvisorOfClassroom(client)
-    const outro = await signInWithFactory(client)
+    const other = await signInWithFactory(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id, name: 'Ana' }).create()
 
     const response = await client
       .put(`/advisor/students/${student.id}`)
-      .cookies(outro.session)
+      .cookies(other.session)
       .json({ name: 'Outra' })
 
     response.assertStatus(404)
@@ -49,7 +55,7 @@ test.group('students > update', (group) => {
     assert.equal(student.name, 'Ana')
   })
 
-  test('aluno inexistente responde o mesmo 404', async ({ client, assert }) => {
+  test('nonexistent student responds the same 404', async ({ client, assert }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -61,7 +67,7 @@ test.group('students > update', (group) => {
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
   })
 
-  test('o administrador corrige aluno de qualquer turma', async ({ client, assert }) => {
+  test('the administrator fixes a student of any classroom', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const student = await StudentFactory.with('classroom').create()
 
@@ -75,7 +81,7 @@ test.group('students > update', (group) => {
     assert.equal(student.name, 'Corrigido')
   })
 
-  test('nome vazio responde 422 apontando o campo', async ({ client, assert }) => {
+  test('empty name responds 422 pointing at the field', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
 
@@ -88,18 +94,18 @@ test.group('students > update', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('sem sessão é 401, e o representante recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
     const student = await StudentFactory.with('classroom').create()
-    const representante = await signInWithFactory(client, 'representative')
+    const representative = await signInWithFactory(client, 'representative')
 
-    const anonimo = await client.put(`/advisor/students/${student.id}`).json({ name: 'X' })
-    const negado = await client
+    const anonymous = await client.put(`/advisor/students/${student.id}`).json({ name: 'X' })
+    const denied = await client
       .put(`/advisor/students/${student.id}`)
-      .cookies(representante.session)
+      .cookies(representative.session)
       .json({ name: 'X' })
 
-    anonimo.assertStatus(401)
-    negado.assertStatus(403)
-    assert.equal(body(negado).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    denied.assertStatus(403)
+    assert.equal(body(denied).code, 'ACCESS_DENIED')
   })
 })

@@ -6,7 +6,7 @@ import { authenticateAsAdvisor, body, resetDatabase, signInWithFactory } from '#
 test.group('advisor/photos > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: só as fotos de quem pede', async ({ client, assert }) => {
+  test('200: only the requester photos', async ({ client, assert }) => {
     const mine = await authenticateAsAdvisor(client)
     const other = await authenticateAsAdvisor(client)
     const first = await StorageFactory.create()
@@ -21,13 +21,13 @@ test.group('advisor/photos > paginate', (group) => {
     assert.equal(body(response).data[0].storage.id, first.id)
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/advisor/photos')
 
     response.assertStatus(401)
   })
 
-  test('403: representante não lista fotos', async ({ client }) => {
+  test('403: representative does not list photos', async ({ client }) => {
     const { session } = await signInWithFactory(client, 'representative')
 
     const response = await client.get('/advisor/photos').cookies(session)
@@ -35,7 +35,7 @@ test.group('advisor/photos > paginate', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: página inválida', async ({ client }) => {
+  test('422: invalid page', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/advisor/photos').qs({ page: 0 }).cookies(advisor)

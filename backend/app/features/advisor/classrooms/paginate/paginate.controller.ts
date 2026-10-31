@@ -10,7 +10,7 @@ import { AdvisorClassroomPaginateValidator } from '#validators/advisor/classroom
 export default class AdvisorClassroomPaginateController {
   static docs = defineDocs({
     description:
-      'As turmas que o conselheiro aconselha. O administrador, que também entra aqui, vê todas.',
+      'The classrooms the advisor advises. The administrator, who also enters here, sees all of them.',
   })
 
   constructor(private readonly useCase: AdvisorClassroomPaginateUseCase) {}

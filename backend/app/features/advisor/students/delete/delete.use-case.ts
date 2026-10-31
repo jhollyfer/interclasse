@@ -13,8 +13,8 @@ type Payload = Merge<IdentifierPayload, { actor: Actor }>
 type Response = Either<HTTPException, null>
 
 /**
- * Tira o aluno da turma, com as inscrições dele. Inscrito numa modalidade já
- * sorteada fica: o time sorteado perderia um atleta (regra da entidade).
+ * Removes the student from the classroom, with their enrollments. One enrolled in a sport already
+ * drawn stays: the drawn team would lose an athlete (entity rule).
  */
 @inject()
 export default class AdvisorStudentDeleteUseCase {

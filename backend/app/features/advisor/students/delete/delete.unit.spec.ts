@@ -16,7 +16,7 @@ const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 async function setup() {
   const students = MemoryRepositories.students().withClassroom(CLASSROOM, ADVISOR)
   const ana = Student.create({ id: ID, classroomId: CLASSROOM, name: 'Ana', now: new Date() })
-  if (ana.isLeft()) throw new Error('arranjo inválido')
+  if (ana.isLeft()) throw new Error('invalid arrangement')
   await students.save(ana.value)
   const useCase = await makeWithMemory(AdvisorStudentDeleteUseCase, [[StudentRepository, students]])
 
@@ -24,7 +24,7 @@ async function setup() {
 }
 
 test.group('advisor/students > delete (unit)', () => {
-  test('tira o aluno da turma', async ({ assert }) => {
+  test('removes the student from the classroom', async ({ assert }) => {
     const { students, useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, actor: OWNER })
@@ -33,7 +33,7 @@ test.group('advisor/students > delete (unit)', () => {
     assert.isNull(await students.findOwned({ id: ID, actor: OWNER }))
   })
 
-  test('inscrito em modalidade já sorteada é 409 STUDENT_IN_COMPETITION e fica', async ({
+  test('enrolled in an already drawn sport is 409 STUDENT_IN_COMPETITION and stays', async ({
     assert,
   }) => {
     const { students, useCase } = await setup()
@@ -45,7 +45,9 @@ test.group('advisor/students > delete (unit)', () => {
     assert.isNotNull(await students.findOwned({ id: ID, actor: OWNER }))
   })
 
-  test('aluno de turma alheia ou inexistente é 404 STUDENT_NOT_FOUND', async ({ assert }) => {
+  test('student of a foreign or nonexistent classroom is 404 STUDENT_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const foreign = await useCase.execute({

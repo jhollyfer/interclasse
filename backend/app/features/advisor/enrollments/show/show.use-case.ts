@@ -28,7 +28,7 @@ export default class AdvisorEnrollmentShowUseCase {
 
   async execute({ classroomId, actor }: Payload): Promise<Response> {
     try {
-      // `404` também para a turma de outro conselheiro: o alcance entra na consulta.
+      // `404` also for another advisor's classroom: the scope goes into the query.
       const classroom = await this.classrooms.findOwned({ id: classroomId, actor })
       if (!classroom)
         return left(

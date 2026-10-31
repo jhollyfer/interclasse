@@ -10,9 +10,9 @@ import { AdvisorEnrollmentUpdateValidator } from '#validators/advisor/enrollment
 export default class AdvisorEnrollmentUpdateController {
   static docs = defineDocs({
     description:
-      'Troca a lista de atletas da turma numa modalidade pela enviada, inteira. Responde a ' +
-      'matriz atualizada. Vale também depois do sorteio: o time sorteado é a turma. Tirar ' +
-      'atleta exige `reason`, que vira aviso para a organização. Turma alheia responde `404`.',
+      'Replaces the classroom athlete list in a sport with the one sent, whole. Responds with the ' +
+      'updated matrix. Also valid after the draw: the drawn team is the classroom. Removing an ' +
+      'athlete requires `reason`, which becomes a notice for the organization. A foreign classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorEnrollmentUpdateUseCase) {}

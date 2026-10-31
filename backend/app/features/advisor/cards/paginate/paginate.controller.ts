@@ -10,8 +10,8 @@ import { AdvisorCardPaginateValidator } from '#validators/advisor/cards.validato
 export default class AdvisorCardPaginateController {
   static docs = defineDocs({
     description:
-      'Os cartões que os atletas da turma levaram, do mais novo ao mais antigo. Turma ' +
-      'alheia responde `404`.',
+      'The cards the classroom athletes received, newest to oldest. A foreign ' +
+      'classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorCardPaginateUseCase) {}

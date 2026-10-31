@@ -17,7 +17,7 @@ async function setup(mimetype = 'image/png') {
 }
 
 test.group('advisor/photos > create (unit)', () => {
-  test('a foto do conselheiro nasce pendente e sem revisão', async ({ assert }) => {
+  test('the advisor photo is born pending and without review', async ({ assert }) => {
     const { storage, actor, useCase } = await setup()
 
     const result = await useCase.execute({ storageId: storage.id, actor })
@@ -30,7 +30,7 @@ test.group('advisor/photos > create (unit)', () => {
     })
   })
 
-  test('arquivo que não é imagem é 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
+  test('a file that is not an image is 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
     const { storage, actor, useCase } = await setup('audio/mpeg')
 
     const result = await useCase.execute({ storageId: storage.id, actor })
@@ -38,7 +38,7 @@ test.group('advisor/photos > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'PHOTO_NOT_IMAGE' })
   })
 
-  test('arquivo inexistente é 422 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 422 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { actor, useCase } = await setup()
 
     const result = await useCase.execute({

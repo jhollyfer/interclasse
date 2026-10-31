@@ -11,9 +11,9 @@ type Payload = Merge<IdentifierPayload, { actor: { readonly id: string; readonly
 type Response = Either<HTTPException, null>
 
 /**
- * Tira do carrossel uma foto que o próprio conselheiro enviou. A de outro é
- * `404`, como a turma alheia: dizer "proibido" confirmaria que ela existe. O
- * administrador apaga qualquer uma. O arquivo fica para o `storages:prune`.
+ * Removes from the carousel a photo the advisor themselves submitted. Another's is
+ * `404`, like the foreign classroom: saying "forbidden" would confirm it exists. The
+ * administrator deletes any one. The file is left for `storages:prune`.
  */
 @inject()
 export default class AdvisorPhotoDeleteUseCase {
@@ -24,8 +24,8 @@ export default class AdvisorPhotoDeleteUseCase {
 
   async execute({ id, actor }: Payload): Promise<Response> {
     try {
-      // A posse entra no critério da busca: foto alheia volta `null`, igual à
-      // que não existe.
+      // Ownership goes into the search criteria: a foreign photo returns `null`, just like
+      // one that does not exist.
       let photo = await this.photos.findOwned(id, actor.id)
       if (!photo && actor.role === USER_ROLE.ADMINISTRATOR) photo = await this.photos.findById(id)
       if (!photo)

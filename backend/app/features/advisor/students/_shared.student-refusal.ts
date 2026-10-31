@@ -4,7 +4,7 @@ import { RefusalBase, type RefusalTable } from '#features/_shared.refusal.base'
 import HTTPException from '#exceptions/http.exception'
 import type { StudentError } from '#domain/student/student.errors'
 
-/** Cada recusa do aluno como resposta HTTP (`_standards/domain.md` §2). */
+/** Each refusal of the student as an HTTP response (`_standards/domain.md` §2). */
 export class StudentRefusal extends RefusalBase {
   private static readonly TABLE = {
     STUDENT_NAME_EMPTY: (_fact, i18n) =>

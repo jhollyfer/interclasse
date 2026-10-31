@@ -12,7 +12,10 @@ import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 test.group('students > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('tira o aluno da turma junto com as inscrições dele', async ({ client, assert }) => {
+  test('removes the student from the classroom along with their enrollments', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
     await EnrollmentFactory.merge({ studentId: student.id }).with('sport').create()
@@ -24,7 +27,7 @@ test.group('students > delete', (group) => {
     assert.lengthOf(await Stored.enrollmentsOfStudent(student.id), 0)
   })
 
-  test('aluno numa modalidade já sorteada responde 409 e fica', async ({ client, assert }) => {
+  test('student in an already drawn sport responds 409 and stays', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
     const sport = await SportFactory.create()
@@ -38,19 +41,19 @@ test.group('students > delete', (group) => {
     assert.isNotNull(await Stored.student(student.id))
   })
 
-  test('aluno de outro conselheiro responde 404 e fica', async ({ client, assert }) => {
+  test('student of another advisor responds 404 and stays', async ({ client, assert }) => {
     const { classroom } = await signInAsAdvisorOfClassroom(client)
-    const outro = await signInWithFactory(client)
+    const other = await signInWithFactory(client)
     const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
 
-    const response = await client.delete(`/advisor/students/${student.id}`).cookies(outro.session)
+    const response = await client.delete(`/advisor/students/${student.id}`).cookies(other.session)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
     assert.isNotNull(await Stored.student(student.id))
   })
 
-  test('aluno inexistente responde o mesmo 404', async ({ client, assert }) => {
+  test('nonexistent student responds the same 404', async ({ client, assert }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client.delete(`/advisor/students/${randomUUID()}`).cookies(session)
@@ -59,18 +62,18 @@ test.group('students > delete', (group) => {
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
   })
 
-  test('sem sessão é 401, e o representante recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
     const student = await StudentFactory.with('classroom').create()
-    const representante = await signInWithFactory(client, 'representative')
+    const representative = await signInWithFactory(client, 'representative')
 
-    const anonimo = await client.delete(`/advisor/students/${student.id}`)
-    const negado = await client
+    const anonymous = await client.delete(`/advisor/students/${student.id}`)
+    const denied = await client
       .delete(`/advisor/students/${student.id}`)
-      .cookies(representante.session)
+      .cookies(representative.session)
 
-    anonimo.assertStatus(401)
-    negado.assertStatus(403)
-    assert.equal(body(negado).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    denied.assertStatus(403)
+    assert.equal(body(denied).code, 'ACCESS_DENIED')
     assert.isNotNull(await Stored.student(student.id))
   })
 })
@@ -78,7 +81,7 @@ test.group('students > delete', (group) => {
 test.group('advisor/students/delete > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const { session } = await signInWithFactory(client)
 
     const response = await client.delete('/advisor/students/x').cookies(session)
