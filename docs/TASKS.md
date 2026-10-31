@@ -106,6 +106,22 @@ Primeira execução real dos workflows da fase 5, PR a PR.
 | 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5 sincronizado |
 | 6.7 | API do E2E em produção e seeds de demonstração pelo workspace | Alta | Feita | #22; primeiro run inteiro verde |
 
+## Fase 7 · Régua: lições do adacaibs (0/9)
+
+Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/10), sem exceção local.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 7.1 | `maiyu-guard` habilitado e `AGENTS.md` da raiz no modelo novo | Alta | Em andamento | #254 |
+| 7.2 | Migration no *Post-deployment command* do Coolify | Alta | A fazer | #252; `docs/ENV.md`, `docs/ARCHITECTURE.md` §9.1, Dockerfile, workflows |
+| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | A fazer | #256; `architecture.md` §3.4 |
+| 7.4 | Campos dos checks em inglês e `reason` nas exceções | Média | A fazer | #258 |
+| 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | A fazer | #259 |
+| 7.6 | `.env.example` e `.env.test` em inglês | Baixa | A fazer | #260 |
+| 7.7 | Frontend: `new.tsx` com `head` em toda tela e escala de z-index | Alta | A fazer | #257 |
+| 7.8 | Suíte rápida: banco clonado por worker, shards no CI, merge de relatórios | Alta | A fazer | #253 |
+| 7.9 | Lições do adacaibs conferidas contra o código | Média | A fazer | #255 |
+
 ## Fase N · Ideias (fora do escopo atual)
 
 - Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10
