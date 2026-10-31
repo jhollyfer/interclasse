@@ -35,8 +35,8 @@ export const REPRESENTATIVE_ACTOR: Actor = {
 }
 
 /**
- * A turma 7º A do conselheiro e do representante, a modalidade Futsal e dois
- * alunos, nos repositórios em memória que a lista de atletas lê e grava.
+ * The advisor's and representative's 7º A classroom, the Futsal sport and two
+ * students, in the in-memory repositories the athlete list reads and writes.
  */
 export function enrollmentWorld() {
   const classrooms = new ClassroomMemoryRepository()
@@ -54,7 +54,7 @@ export function enrollmentWorld() {
   return { classrooms, enrollments, removals, unitOfWork: new UnitOfWorkMemory() }
 }
 
-/** Grava a turma 7º A ligada ao conselheiro e ao representante do mundo. */
+/** Saves the 7º A classroom linked to the world's advisor and representative. */
 export async function seedWorldClassroom(classrooms: ClassroomMemoryRepository): Promise<void> {
   await classrooms.save(
     Classroom.restore({

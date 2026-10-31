@@ -47,7 +47,7 @@ async function openMenu() {
 }
 
 describe('RowActions', () => {
-  it('o gatilho de três pontos tem nome acessível e abre o menu com os itens', async () => {
+  it('gives the three-dot trigger an accessible name and opens the menu with the items', async () => {
     render(<Row onConfirm={vi.fn()} />)
 
     await openMenu()
@@ -58,7 +58,7 @@ describe('RowActions', () => {
     ).toBeTruthy()
   })
 
-  it('o item de apagar abre o alerta, que vive fora do menu', async () => {
+  it('when the delete item is used, opens the alert, which lives outside the menu', async () => {
     render(<Row onConfirm={vi.fn()} />)
 
     await openMenu()
@@ -72,7 +72,7 @@ describe('RowActions', () => {
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull())
   })
 
-  it('confirmar no alerta roda a ação uma vez', async () => {
+  it('when confirmed in the alert, runs the action once', async () => {
     const onConfirm = vi.fn()
     render(<Row onConfirm={onConfirm} />)
 

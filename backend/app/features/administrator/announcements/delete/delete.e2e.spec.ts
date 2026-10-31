@@ -14,7 +14,7 @@ import {
 test.group('announcements > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('apaga de vez e responde 204 sem corpo', async ({ client, assert }) => {
+  test('deletes for good and responds 204 without a body', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.apply('pinned').create()
 
@@ -27,7 +27,7 @@ test.group('announcements > delete', (group) => {
     assert.isNull(await Stored.announcement(announcement.id))
   })
 
-  test('aviso inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent announcement responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -38,7 +38,7 @@ test.group('announcements > delete', (group) => {
     assert.equal(body(response).code, 'ANNOUNCEMENT_NOT_FOUND')
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const announcement = await AnnouncementFactory.create()
 
     const anonymous = await client.delete(`/administrator/announcements/${announcement.id}`)
@@ -54,10 +54,10 @@ test.group('announcements > delete', (group) => {
   })
 })
 
-test.group('administrator/announcements/delete > acesso e validação', (group) => {
+test.group('administrator/announcements/delete > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/administrator/announcements/nao-e-uuid').cookies(admin)

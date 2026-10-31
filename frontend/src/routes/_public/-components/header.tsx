@@ -12,9 +12,9 @@ import { AUTHENTICATION, NAVIGATION } from './menu'
 import type { MenuItem } from './menu'
 
 /**
- * A pílula de cada destino: na faixa do topo (`bar`) ou no painel do celular
- * (`panel`). Variante de estilo do próprio link, via `cva`, e não prop
- * booleana de estrutura.
+ * The pill for each destination: in the top strip (`bar`) or in the phone panel
+ * (`panel`). A style variant of the link itself, via `cva`, and not a
+ * boolean structure prop.
  */
 const navigationLinkVariants = cva(
   'font-medium transition-colors duration-200 motion-reduce:transition-none',
@@ -34,9 +34,9 @@ type NavigationLinkVariant = NonNullable<
 >
 
 /**
- * O item ativo é o âmbar da marca, e o inativo é a tinta clara esmaecida sobre
- * o verde-noite. Não é `text-foreground`: esta faixa não inverte com o tema -
- * ela é escura nos dois -, então a tinta é o token da faixa.
+ * The active item is the brand amber, and the inactive one is the faded light ink over
+ * the night green. It is not `text-foreground`: this strip does not invert with the theme -
+ * it is dark in both -, so the ink is the strip's token.
  */
 const ACTIVE = {
   bar: 'bg-brand text-brand-ink font-semibold',
@@ -49,13 +49,13 @@ const INACTIVE = {
     'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/5 hover:text-brand-ink-foreground',
 } satisfies Record<NavigationLinkVariant, string>
 
-/** O painel do menu: aberto ocupa altura, fechado sai do fluxo de foco. */
+/** The menu panel: open it takes up height, closed it leaves the focus flow. */
 const MENU_PANEL: Record<string, string> = {
   true: 'py-6',
   false: 'invisible',
 }
 
-/** Um destino da navegação, na faixa do topo ou no painel do celular. */
+/** A navigation destination, in the top strip or in the phone panel. */
 type NavigationLinkProps = Readonly<{
   item: MenuItem
   variant?: NavigationLinkVariant
@@ -71,12 +71,12 @@ function NavigationLink({
     <Link
       data-slot="public-header-link"
       to={item.to}
-      // `exact` para a home: sem ele `/` casaria com toda tela da vitrine, e
-      // "Início" ficaria aceso o site inteiro.
+      // `exact` for the home: without it `/` would match every storefront screen, and
+      // "Início" would stay lit across the whole site.
       activeOptions={{ exact: item.to === '/' }}
-      // `inactiveProps` e não `className`: o Router soma `className` com
-      // `activeProps`, e as duas cores juntas deixavam o texto branco sobre o
-      // amarelo no item ativo.
+      // `inactiveProps` and not `className`: the Router adds `className` to
+      // `activeProps`, and the two colors together left white text over the
+      // yellow on the active item.
       className={navigationLinkVariants({ variant })}
       activeProps={{ className: ACTIVE[variant] }}
       inactiveProps={{ className: INACTIVE[variant] }}
@@ -88,26 +88,26 @@ function NavigationLink({
 }
 
 /**
- * O cabeçalho da vitrine: faixa escura fixa no topo, com a marca à esquerda, a
- * navegação em pílula ao centro e a porta do painel à direita.
+ * The storefront header: a fixed dark strip at the top, with the brand on the left, the
+ * pill navigation in the center and the dashboard door on the right.
  *
- * Fixa e não estática, como no frontend anterior: as páginas públicas são
- * longas - a home tem seis seções - e a navegação some da vista logo no
- * primeiro rolar. `backdrop-blur` porque a faixa é translúcida e o conteúdo
- * passa por baixo dela.
+ * Fixed and not static, as in the previous frontend: the public pages are
+ * long - the home has six sections - and the navigation leaves the view at the
+ * first scroll. `backdrop-blur` because the strip is translucent and the content
+ * passes underneath it.
  *
- * A faixa de pílulas aparece a partir de `xl`, e não de `lg`. São oito
- * destinos mais a porta do painel, e nos 1024px do `lg` eles não cabem ao lado
- * da marca sem espremer a pílula até a linha quebrar. Abaixo disso quem
- * responde é o painel do hamburguer, que lista os mesmos oito em coluna, com
- * espaço de sobra. Esconder um pedaço da faixa até `xl` é o que a referência
- * faz com o seletor de território do topo (`hidden xl:flex`).
+ * The pill strip appears from `xl`, and not from `lg`. There are eight
+ * destinations plus the dashboard door, and at `lg`'s 1024px they do not fit beside
+ * the brand without squeezing the pill until the line breaks. Below that the
+ * hamburger panel answers, which lists the same eight in a column, with
+ * room to spare. Hiding a piece of the strip until `xl` is what the reference
+ * does with the territory selector at the top (`hidden xl:flex`).
  *
- * O menu móvel é `useState` e CSS, e não uma biblioteca de animação: o
- * frontend anterior trazia `framer-motion` só para as três barras do
- * hamburguer e para a altura do painel, e as duas coisas são uma transição de
- * `transform` e de `grid-template-rows`. O `prefers-reduced-motion` global de
- * `styles.css` alcança as duas.
+ * The mobile menu is `useState` and CSS, and not an animation library: the
+ * previous frontend carried `framer-motion` just for the hamburger's three bars
+ * and for the panel's height, and both are a transition of
+ * `transform` and of `grid-template-rows`. The global `prefers-reduced-motion` in
+ * `styles.css` reaches both.
  */
 export function Header(): React.JSX.Element {
   const [open, setOpen] = React.useState(false)
@@ -153,9 +153,9 @@ export function Header(): React.JSX.Element {
         </nav>
 
         {/*
-          O hamburguer que vira X. As três barras são `<span>` com `transform`:
-          a de cima gira e desce, a do meio encolhe até sumir, a de baixo gira e
-          sobe. `origin-center` para as duas diagonais se cruzarem no meio.
+          The hamburger that becomes an X. The three bars are `<span>`s with `transform`:
+          the top one rotates and drops, the middle one shrinks until it vanishes, the bottom one rotates and
+          rises. `origin-center` so the two diagonals cross in the middle.
         */}
         <button
           type="button"
@@ -173,10 +173,10 @@ export function Header(): React.JSX.Element {
       </div>
 
       {/*
-        O painel móvel. `grid-rows-collapsed` para `grid-rows-expanded` anima a altura sem que
-        ninguém precise medi-la - é o truque de CSS que substitui o
-        `height: auto` que a transição não sabe animar. `invisible` no fechado
-        porque altura zero com `overflow-hidden` ainda deixa o link focável.
+        The mobile panel. `grid-rows-collapsed` to `grid-rows-expanded` animates the height without anyone
+        having to measure it - it is the CSS trick that replaces the
+        `height: auto` that a transition does not know how to animate. `invisible` when closed
+        because zero height with `overflow-hidden` still leaves the link focusable.
       */}
       <div
         data-slot="public-header-mobile"

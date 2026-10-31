@@ -65,8 +65,8 @@ export function AnnouncementFormFields({
         {({ field, control }) => <Textarea {...field} {...control} rows={5} />}
       </AppField>
 
-      {/* Caixa de marcar: o rótulo vem depois do controle, então fica fora do
-          `AppField`, que desenha rótulo, controle e erro nessa ordem. */}
+      {/* Checkbox: the label comes after the control, so it stays outside
+          `AppField`, which draws label, control and error in that order. */}
       <Controller
         name="pinned"
         control={form.control}

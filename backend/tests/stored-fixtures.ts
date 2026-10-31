@@ -14,12 +14,12 @@ import TeamModel from '#models/team'
 import UserModel from '#models/user'
 
 /**
- * O que ficou gravado no banco, lido para a asserção "gravou" / "não gravou"
- * (`_standards/backend.md` §7). A spec de `features/` não importa model
- * (`architecture.md` §2): o e2e confere o estado por aqui, e semeia pelas
- * factories de `database/factories/`.
+ * What was left stored in the database, read for the "saved" / "not saved" assertion
+ * (`_standards/backend.md` §7). A `features/` spec does not import a model
+ * (`architecture.md` §2): the e2e checks the state through here, and seeds through
+ * the `database/factories/` factories.
  *
- * `x(id)` devolve `null` quando a linha não existe; `xOrFail` falha o teste.
+ * `x(id)` returns `null` when the row does not exist; `xOrFail` fails the test.
  */
 export class Stored {
   static announcement(id: string) {
@@ -74,7 +74,7 @@ export class Stored {
     return MatchModel.query().where('bracketId', bracketId)
   }
 
-  /** Grava `updatedAt` direto, sem o hook do model que o regravaria com agora. */
+  /** Writes `updatedAt` directly, without the model hook that would rewrite it with now. */
   static async touchMatch(id: string, updatedAt: DateTime) {
     await MatchModel.query().where('id', id).update({ updatedAt: updatedAt.toSQL() })
   }
@@ -135,7 +135,7 @@ export class Stored {
     return UserModel.findOrFail(id)
   }
 
-  /** Abre uma sessão para a conta, como o sign-in faz. */
+  /** Opens a session for the account, as the sign-in does. */
   static issueToken(user: UserModel) {
     return UserModel.accessTokens.create(user)
   }

@@ -18,7 +18,7 @@ const DOCUMENT = {
 }
 
 describe('RichEditor', () => {
-  it('mostra o conteúdo gravado e a barra de formatação', async () => {
+  it('shows the saved content and the formatting bar', async () => {
     render(
       <RichEditor value={DOCUMENT} onValueChange={() => undefined}>
         <RichEditorToolbar />
@@ -35,7 +35,7 @@ describe('RichEditor', () => {
     ).toBeTruthy()
   })
 
-  it('um botão da barra edita o documento e avisa com o JSON', async () => {
+  it('when a bar button is used, edits the document and notifies with the JSON', async () => {
     const onValueChange = vi.fn()
 
     render(
@@ -53,7 +53,7 @@ describe('RichEditor', () => {
     expect(JSON.stringify(onValueChange.mock.lastCall)).toContain('bulletList')
   })
 
-  it('desabilitado, a barra trava os botões', async () => {
+  it('when disabled, the bar locks the buttons', async () => {
     render(
       <RichEditor value={null} onValueChange={() => undefined} disabled>
         <RichEditorToolbar />
@@ -68,7 +68,7 @@ describe('RichEditor', () => {
     await waitFor(() => expect(bold.hasAttribute('disabled')).toBe(true))
   })
 
-  it('uma parte fora do RichEditor diz qual ficou sem provider', () => {
+  it('when a part is outside RichEditor, says which one is without a provider', () => {
     expect(() => render(<RichEditorToolbar />)).toThrow('RichEditorToolbar')
   })
 })

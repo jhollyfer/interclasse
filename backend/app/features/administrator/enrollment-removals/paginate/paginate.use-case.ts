@@ -17,7 +17,7 @@ import type { AdministratorEnrollmentRemovalPaginatePayload } from '#validators/
 type Payload = AdministratorEnrollmentRemovalPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorEnrollmentRemovalShowResponse>>
 
-/** Os avisos de remoção, do mais novo ao mais antigo, pendentes primeiro. */
+/** The removal notices, newest to oldest, pending first. */
 @inject()
 export default class AdministratorEnrollmentRemovalPaginateUseCase {
   constructor(

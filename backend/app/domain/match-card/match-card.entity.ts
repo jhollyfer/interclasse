@@ -4,9 +4,9 @@ import type { MatchCardError } from './match-card.errors.ts'
 
 export type MatchCardProps = {
   readonly id: string
-  /** Outro agregado (a chave) entra só por id. */
+  /** Another aggregate (the bracket) enters only by id. */
   readonly matchId: string
-  /** O time por que o atleta jogava: sai da turma dele, e não do corpo do pedido. */
+  /** The team the athlete played for: it comes from their classroom, not from the request body. */
   readonly teamId: string
   readonly studentId: string
   color: CardColor
@@ -22,21 +22,21 @@ type LaunchInput = {
   readonly color: CardColor
   readonly note: string | null
   readonly now: Date
-  /** Os dois times da partida; nulo enquanto a chave não os definiu. */
+  /** The two teams of the match; null while the bracket has not defined them. */
   readonly homeTeamId: string | null
   readonly awayTeamId: string | null
-  /** O time da turma do atleta entre os da partida, ou nulo se ele é de fora. */
+  /** The team of the athlete's classroom among the match's, or null if they are an outsider. */
   readonly studentTeamId: string | null
 }
 
 /**
- * O cartão que um atleta levou numa partida (`_standards/domain.md` §1). A regra
- * que o protege: só leva cartão quem é de uma das duas turmas da partida.
+ * The card an athlete received in a match (`_standards/domain.md` §1). The rule
+ * that protects it: only someone from one of the match's two classrooms receives a card.
  */
 export class MatchCard {
   private constructor(private readonly props: MatchCardProps) {}
 
-  /** Lança o cartão. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Enters the card. The id and the clock come from outside: the domain does no I/O. */
   static launch(input: LaunchInput): Either<MatchCardError, MatchCard> {
     if (!input.homeTeamId || !input.awayTeamId) return left({ code: 'MATCH_TEAMS_PENDING' })
 
@@ -53,13 +53,13 @@ export class MatchCard {
         color: input.color,
         note: input.note,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce.
+        // Born with the edit stamped, the way the database row is born.
         updatedAt: input.now,
       }),
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: MatchCardProps): MatchCard {
     return new MatchCard({ ...props })
   }

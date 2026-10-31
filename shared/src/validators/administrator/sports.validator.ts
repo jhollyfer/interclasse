@@ -6,10 +6,10 @@ import {
 } from '../../validator.js'
 
 /**
- * A modalidade, como o painel a cadastra. Par de caminho e nome do VineJS de
+ * The sport, as the panel registers it. Mirror (path and name) of the VineJS one in
  * `backend/app/validators/administrator/sports.validator.ts`
- * (`_standards/architecture.md` §10). Que o mínimo não passe do máximo é regra
- * da entidade, não do formulário.
+ * (`_standards/architecture.md` §10). That the minimum does not exceed the maximum is
+ * an entity rule, not a form one.
  */
 export const SPORT_SORT_COLUMNS = ['name', 'createdAt'] as const
 

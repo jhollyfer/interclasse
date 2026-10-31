@@ -40,7 +40,7 @@ async function setup() {
 }
 
 test.group('administrator/site > update (unit)', () => {
-  test('grava o que veio e devolve a configuração', async ({ assert }) => {
+  test('saves what came and returns the configuration', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ about: 'Os jogos do CMEI', edition: 2 })
@@ -49,7 +49,7 @@ test.group('administrator/site > update (unit)', () => {
     assert.deepInclude(result.value, { about: 'Os jogos do CMEI', edition: 2, organizer: null })
   })
 
-  test('null apaga o campo e ausente não mexe', async ({ assert }) => {
+  test('null erases the field and missing does not touch', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ organizer: 'Professores', edition: 3 })
 
@@ -58,7 +58,7 @@ test.group('administrator/site > update (unit)', () => {
     assert.deepInclude(result.value, { organizer: null, edition: 3 })
   })
 
-  test('aceita regulamento em PDF e devolve o arquivo', async ({ assert }) => {
+  test('accepts a PDF regulation and returns the file', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ regulationId: PDF_ID })
@@ -67,7 +67,7 @@ test.group('administrator/site > update (unit)', () => {
     assert.isTrue(result.isRight() && result.value.regulation?.id === PDF_ID)
   })
 
-  test('regulamento que não é PDF é 422 REGULATION_NOT_PDF', async ({ assert }) => {
+  test('regulation that is not a PDF is 422 REGULATION_NOT_PDF', async ({ assert }) => {
     const { settings, useCase } = await setup()
 
     const result = await useCase.execute({ regulationId: PNG_ID })
@@ -77,7 +77,7 @@ test.group('administrator/site > update (unit)', () => {
     assert.isNull(current.snapshot().regulationId)
   })
 
-  test('arquivo desconhecido é 422 STORAGE_NOT_FOUND apontando o campo', async ({ assert }) => {
+  test('unknown file is 422 STORAGE_NOT_FOUND pointing at the field', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ regulationId: '0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f' })
@@ -86,7 +86,7 @@ test.group('administrator/site > update (unit)', () => {
     assert.isTrue(result.isLeft() && 'regulationId' in (result.value.errors ?? {}))
   })
 
-  test('null tira o regulamento', async ({ assert }) => {
+  test('null removes the regulation', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ regulationId: PDF_ID })
 

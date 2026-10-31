@@ -10,8 +10,8 @@ import { AdvisorStudentPaginateValidator } from '#validators/advisor/students.va
 export default class AdvisorStudentPaginateController {
   static docs = defineDocs({
     description:
-      'Os alunos das turmas do conselheiro, em ordem alfabética. `?classroomId` recorta uma ' +
-      'turma só; turma de outro conselheiro responde vazio.',
+      'The students of the advisor classrooms, in alphabetical order. `?classroomId` narrows to one ' +
+      'classroom only; a classroom of another advisor responds empty.',
   })
 
   constructor(private readonly useCase: AdvisorStudentPaginateUseCase) {}

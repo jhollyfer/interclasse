@@ -19,16 +19,16 @@ async function setup() {
 }
 
 test.group('storefront/matches > paginate (unit)', () => {
-  test('lista as próximas partidas na ordem da agenda', async ({ assert }) => {
+  test('lists the upcoming matches in schedule order', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ status: MATCH_STATUS.SCHEDULED })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.equal(result.value.meta.total, 2)
   })
 
-  test('os resultados vêm do mais recente para trás', async ({ assert }) => {
+  test('results come from the most recent backwards', async ({ assert }) => {
     const { brackets, useCase, bracket } = await setup()
     const [first, second] = bracket
       .snapshot()
@@ -40,7 +40,7 @@ test.group('storefront/matches > paginate (unit)', () => {
 
     const result = await useCase.execute({ status: MATCH_STATUS.FINISHED })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.deepEqual(
       result.value.data.map((match) => match.id),
       [second?.id, first?.id],

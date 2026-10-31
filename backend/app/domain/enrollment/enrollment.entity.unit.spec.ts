@@ -19,7 +19,7 @@ function context(overrides: { maxAthletes?: number; drawn?: boolean } = {}) {
 }
 
 test.group('Enrollment', () => {
-  test('troca a lista inteira e devolve quem saiu', ({ assert }) => {
+  test('replaces the whole list and returns who left', ({ assert }) => {
     const enrollment = roster(['a', 'b'])
 
     const result = enrollment.replace({ studentIds: ['b', 'c'], writer: ADVISOR }, context())
@@ -28,7 +28,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(enrollment.snapshot().studentIds, ['b', 'c'])
   })
 
-  test('acima do máximo da modalidade é ENROLLMENT_LIMIT_EXCEEDED', ({ assert }) => {
+  test('above the sport maximum is ENROLLMENT_LIMIT_EXCEEDED', ({ assert }) => {
     const result = roster([]).replace(
       { studentIds: ['a', 'b'], writer: ADVISOR },
       context({ maxAthletes: 1 }),
@@ -37,7 +37,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(result.value, { code: 'ENROLLMENT_LIMIT_EXCEEDED', maxAthletes: 1 })
   })
 
-  test('o máximo vale igual: lista no limite passa', ({ assert }) => {
+  test('the maximum counts equally: a list at the limit passes', ({ assert }) => {
     const result = roster([]).replace(
       { studentIds: ['a', 'b'], writer: ADVISOR },
       context({ maxAthletes: 2 }),
@@ -46,7 +46,9 @@ test.group('Enrollment', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('aluno de fora da turma é recusado e a lista fica como estava', ({ assert }) => {
+  test('a student from outside the classroom is refused and the list stays as it was', ({
+    assert,
+  }) => {
     const enrollment = roster(['a'])
 
     const result = enrollment.replace({ studentIds: ['a', 'alheio'], writer: ADVISOR }, context())
@@ -55,7 +57,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(enrollment.snapshot().studentIds, ['a'])
   })
 
-  test('representante só acrescenta', ({ assert }) => {
+  test('the representative only adds', ({ assert }) => {
     const added = roster(['a']).replace(
       { studentIds: ['a', 'b'], writer: REPRESENTATIVE },
       context(),
@@ -69,7 +71,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(removing.value, { code: 'ENROLLMENT_REMOVAL_FORBIDDEN' })
   })
 
-  test('depois do sorteio a lista do representante trava', ({ assert }) => {
+  test("after the draw the representative's list locks", ({ assert }) => {
     const result = roster([]).replace(
       { studentIds: ['a'], writer: REPRESENTATIVE },
       context({ drawn: true }),
@@ -78,7 +80,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(result.value, { code: 'ENROLLMENT_LOCKED' })
   })
 
-  test('o conselheiro mexe depois do sorteio', ({ assert }) => {
+  test('the advisor changes it after the draw', ({ assert }) => {
     const result = roster(['a']).replace(
       { studentIds: ['b'], writer: ADVISOR },
       context({ drawn: true }),
@@ -87,7 +89,7 @@ test.group('Enrollment', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('tirar atleta sem motivo é ENROLLMENT_REASON_REQUIRED', ({ assert }) => {
+  test('removing an athlete without a reason is ENROLLMENT_REASON_REQUIRED', ({ assert }) => {
     const enrollment = roster(['a'])
 
     const result = enrollment.replace({ studentIds: [], writer: { role: 'advisor' } }, context())
@@ -96,7 +98,7 @@ test.group('Enrollment', () => {
     assert.deepEqual(enrollment.snapshot().studentIds, ['a'])
   })
 
-  test('sem ninguém saindo, o motivo não é exigido', ({ assert }) => {
+  test('with nobody leaving, the reason is not required', ({ assert }) => {
     const result = roster(['a']).replace(
       { studentIds: ['a', 'b'], writer: { role: 'advisor' } },
       context(),
@@ -105,7 +107,7 @@ test.group('Enrollment', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('as recusas seguem a ordem da tela: limite antes de aluno alheio', ({ assert }) => {
+  test('refusals follow the screen order: limit before foreign student', ({ assert }) => {
     const result = roster([]).replace(
       { studentIds: ['x', 'y'], writer: REPRESENTATIVE },
       context({ maxAthletes: 1, drawn: true }),

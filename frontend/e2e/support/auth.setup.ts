@@ -7,9 +7,9 @@ import { waitForHydration } from './hydration'
 import { storageStatePath } from './session'
 
 /**
- * Entra uma vez por papel e guarda a sessão em arquivo
- * (_doc-lib/playwright.md#docs/auth). A API limita o login a 5 por minuto por
- * IP e 20 por hora por conta, então logar a cada teste bloquearia a suíte.
+ * Signs in once per role and saves the session to a file
+ * (_doc-lib/playwright.md#docs/auth). The API limits login to 5 per minute per
+ * IP and 20 per hour per account, so logging in on every test would block the suite.
  */
 async function signIn(role: Role, area: string, page: Page): Promise<void> {
   const { email, password } = credentialsOf(role)
@@ -24,18 +24,27 @@ async function signIn(role: Role, area: string, page: Page): Promise<void> {
   await page.context().storageState({ path: storageStatePath(role) })
 }
 
-setup('entra como organização', async ({ page }) => {
-  await signIn('administrator', 'administrator', page)
-  await expect(page).toHaveURL(/\/administrator/)
-})
+setup(
+  'when the organization signs in, reaches the administrator area',
+  async ({ page }) => {
+    await signIn('administrator', 'administrator', page)
+    await expect(page).toHaveURL(/\/administrator/)
+  },
+)
 
-setup('entra como conselheira', async ({ page }) => {
-  await signIn('advisor', 'advisor', page)
-  await expect(page).toHaveURL(/\/advisor/)
-})
+setup(
+  'when the advisor signs in, reaches the advisor area',
+  async ({ page }) => {
+    await signIn('advisor', 'advisor', page)
+    await expect(page).toHaveURL(/\/advisor/)
+  },
+)
 
-// A segunda turma do mesmo sorteio precisa de outro conselheiro.
-setup('entra como a segunda conselheira', async ({ page }) => {
-  await signIn('secondAdvisor', 'advisor', page)
-  await expect(page).toHaveURL(/\/advisor/)
-})
+// The second classroom of the same draw needs a different advisor.
+setup(
+  'when the second advisor signs in, reaches the advisor area',
+  async ({ page }) => {
+    await signIn('secondAdvisor', 'advisor', page)
+    await expect(page).toHaveURL(/\/advisor/)
+  },
+)

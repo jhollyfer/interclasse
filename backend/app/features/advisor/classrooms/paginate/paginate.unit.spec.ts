@@ -27,7 +27,7 @@ async function setup() {
     { id: '00000000-0000-4000-8000-000000000002', name: '8º A', grade: 8, now: new Date() },
     {},
   )
-  if (own.isLeft() || foreign.isLeft()) throw new Error('arranjo inválido')
+  if (own.isLeft() || foreign.isLeft()) throw new Error('invalid arrangement')
   await classrooms.save(own.value)
   await classrooms.save(foreign.value)
   const useCase = await makeWithMemory(AdvisorClassroomPaginateUseCase, [
@@ -38,7 +38,7 @@ async function setup() {
 }
 
 test.group('advisor/classrooms > paginate (unit)', () => {
-  test('o conselheiro vê só a turma que aconselha', async ({ assert }) => {
+  test('the advisor sees only the classroom they advise', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -48,7 +48,9 @@ test.group('advisor/classrooms > paginate (unit)', () => {
     assert.deepEqual(result.isRight() && result.value.data.map((item) => item.name), ['9º A'])
   })
 
-  test('o administrador vê todas, por nome, e a busca recorta', async ({ assert }) => {
+  test('the administrator sees all of them, by name, and the search narrows', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
     const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 
@@ -59,7 +61,7 @@ test.group('advisor/classrooms > paginate (unit)', () => {
     assert.equal(searched.isRight() && searched.value.meta.total, 1)
   })
 
-  test('conta sem vínculo não vê nada', async ({ assert }) => {
+  test('account without a link sees nothing', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({

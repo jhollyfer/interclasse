@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 /**
- * O formulário de entrada. O guard inverso (quem já tem sessão sai daqui) e
- * o `?redirect=` validado moram no layout de `_authentication/`.
+ * The sign-in form. The inverse guard (whoever already has a session leaves here) and
+ * the validated `?redirect=` live in the `_authentication/` layout.
  */
 export const Route = createFileRoute('/_authentication/sign-in/')({})

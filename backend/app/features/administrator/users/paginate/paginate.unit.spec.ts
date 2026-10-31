@@ -17,7 +17,7 @@ async function setup() {
 }
 
 test.group('administrator/users > paginate (unit)', () => {
-  test('lista só as contas vivas, por nome, vinte por página', async ({ assert }) => {
+  test('lists only the live accounts, by name, twenty per page', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { id: USER_ID, name: 'Zeca', email: 'zeca@mail.com' })
     await seedUser(users, { id: OTHER_ID, name: 'Ana', email: 'ana@mail.com' })
@@ -37,7 +37,7 @@ test.group('administrator/users > paginate (unit)', () => {
     assert.equal(page.meta.perPage, 20)
   })
 
-  test('?trashed=only traz a lixeira, e papel e status recortam', async ({ assert }) => {
+  test('?trashed=only brings the trash, and role and status narrow', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { id: USER_ID, name: 'Ana', email: 'ana@mail.com', role: 'ADVISOR' })
     await seedUser(users, {
@@ -77,10 +77,10 @@ test.group('administrator/users > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_USER_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_PAGINATE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.paginate = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({})

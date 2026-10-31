@@ -46,10 +46,10 @@ const SITE_FIELDS = [
   'regulationId',
 ] as const
 
-/** Só PDF: o regulamento é para baixar e imprimir. */
+/** PDF only: the regulation is for downloading and printing. */
 const PDF = ['application/pdf'] as const
 
-/** O registro como o formulário o edita: tudo o que o PUT aceita. */
+/** The record as the form edits it: everything the PUT accepts. */
 function valuesOf(
   site: AdministratorSiteShowResponse,
 ): AdministratorSiteUpdatePayload {
@@ -65,8 +65,8 @@ function valuesOf(
 }
 
 /**
- * O que o site mostra sobre os jogos e que só a organização sabe. Uma tela
- * só, sem lista: a configuração é uma.
+ * What the site shows about the games and only the organization knows. A single screen,
+ * with no list: the configuration is one.
  */
 export function SiteForm(): React.JSX.Element {
   const { data: site } = useSuspenseQuery(siteQueryOptions())

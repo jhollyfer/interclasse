@@ -23,7 +23,7 @@ import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
 import { MemoryPagination } from '#core/memory-pagination'
 
-/** A turma como o teste a arranja: o que a chave lê dela. */
+/** The classroom as the test arranges it: what the bracket reads from it. */
 export type ClassroomView = {
   readonly id: string
   readonly name: string
@@ -42,32 +42,32 @@ export type StudentView = {
 }
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência. As modalidades, turmas, alunos e inscrições que a chave só
- * lê são arranjadas pelo teste.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference. The sports, classrooms, students and enrollments the bracket only
+ * reads are arranged by the test.
  */
 export class BracketMemoryRepository extends BracketRepository {
   private readonly rows = new Map<string, BracketProps>()
   private readonly sports = new Map<string, AdministratorSportShowResponse>()
   private readonly classrooms = new Map<string, ClassroomView>()
   private readonly students = new Map<string, StudentView>()
-  /** Quem está inscrito em qual modalidade: `sportId` -> ids dos alunos. */
+  /** Who is enrolled in which sport: `sportId` -> student ids. */
   private readonly enrollments = new Map<string, Set<string>>()
 
-  /** Arranjo do teste: uma modalidade existente. */
+  /** Test arrangement: an existing sport. */
   withSport(sport: AdministratorSportShowResponse): this {
     this.sports.set(sport.id, sport)
     return this
   }
 
-  /** Arranjo do teste: uma turma existente. */
+  /** Test arrangement: an existing classroom. */
   withClassroom(classroom: ClassroomView): this {
     this.classrooms.set(classroom.id, classroom)
     return this
   }
 
-  /** Arranjo do teste: um aluno da turma, inscrito ou não nas modalidades. */
+  /** Test arrangement: a student of the classroom, enrolled or not in the sports. */
   withStudent(student: StudentView, enrolledIn: ReadonlyArray<string> = []): this {
     this.students.set(student.id, student)
     for (const sportId of enrolledIn) {
@@ -143,7 +143,7 @@ export class BracketMemoryRepository extends BracketRepository {
         row.sportId === snapshot.sportId &&
         row.category === snapshot.category,
     )
-    // O `unique` de modalidade e categoria, como o banco o garante.
+    // The `unique` of sport and category, as the database guarantees it.
     if (taken) return left({ code: 'BRACKET_ALREADY_EXISTS' })
 
     this.rows.set(snapshot.id, snapshot)
@@ -293,7 +293,7 @@ export class BracketMemoryRepository extends BracketRepository {
     return nameOf(a).localeCompare(nameOf(b)) || a.category.localeCompare(b.category)
   }
 
-  /** As marcadas por horário (as sem horário por último), depois a rodada e a posição. */
+  /** The ones scheduled by time (unscheduled last), then the round and the position. */
   private compareMatches(a: MatchProps, b: MatchProps, criteria: MatchListCriteria): number {
     if (criteria.order === 'recent-results')
       return (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0)

@@ -5,13 +5,13 @@ import { MATCH_STATUSES } from '../../enums/match-status.js'
 import { z } from '../../validator.js'
 
 /**
- * A partida como a API devolve (`_standards/architecture.md` §10). A tabela de
- * jogos mostra só o que a vitrine pode ver da turma; a partida que o painel
- * acaba de mexer leva a turma inteira.
+ * The match as the API returns it (`_standards/architecture.md` §10). The match table
+ * shows only what the storefront may see of the classroom; the match the panel has just
+ * changed carries the whole classroom.
  */
 const iso = () => z.iso.datetime({ offset: true })
 
-/** A turma como a tabela de jogos a mostra: sem conselheiro nem representante. */
+/** The classroom as the match table shows it: without advisor or representative. */
 const publicClassroom = z.object({
   id: z.uuid(),
   name: z.string(),
@@ -29,7 +29,7 @@ const fullClassroom = z.object({
   updatedAt: iso().nullable(),
 })
 
-/** O time é a turma dentro da competição: o nome no placar vem da turma. */
+/** The team is the classroom inside the competition: the scoreboard name comes from the classroom. */
 function teamOf<TClassroom extends z.ZodType>(classroom: TClassroom) {
   return z.object({
     id: z.uuid(),
@@ -59,10 +59,10 @@ const matchFields = {
   updatedAt: iso().nullable(),
 }
 
-/** O time com a turma inteira: o cartão e a partida mexida reaproveitam. */
+/** The team with the whole classroom: the card and the changed match reuse it. */
 export const AdministratorMatchTeamResponse = teamOf(fullClassroom)
 
-/** A tabela de jogos: os dois times já definidos, a turma só com o que é público. */
+/** The match table: both teams already defined, the classroom with only what is public. */
 export const AdministratorMatchPaginateResponse = z.object({
   ...matchFields,
   homeTeam: teamOf(publicClassroom),
@@ -70,7 +70,7 @@ export const AdministratorMatchPaginateResponse = z.object({
   bracket: AdministratorBracketPaginateResponse,
 })
 
-/** A partida agendada ou com placar: ainda pode faltar um time. */
+/** The scheduled match or one with a score: a team may still be missing. */
 export const AdministratorMatchUpdateResponse = z.object({
   ...matchFields,
   homeTeam: AdministratorMatchTeamResponse.nullable(),
@@ -84,8 +84,8 @@ export const AdministratorMatchUnscoreResponse =
   AdministratorMatchUpdateResponse
 
 /**
- * Os atletas que podem levar cartão numa partida: os alunos das duas turmas,
- * com os inscritos na modalidade marcados - são eles que entram em quadra.
+ * The athletes who can receive a card in a match: the students of both classrooms,
+ * with those enrolled in the sport marked - they are the ones who take the court.
  */
 export const AdministratorMatchAthletesResponse = z.object({
   teams: z.array(

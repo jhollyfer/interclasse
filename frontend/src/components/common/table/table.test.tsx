@@ -115,7 +115,7 @@ function Harness({
 }
 
 describe('Table', () => {
-  it('carregando mostra o esqueleto no formato da lista', () => {
+  it('when loading, shows the skeleton in the list shape', () => {
     const { container } = render(<TableSkeleton columns={3} rows={2} />)
 
     expect(container.querySelector('[data-slot="table-skeleton"]')).toBeTruthy()
@@ -124,7 +124,7 @@ describe('Table', () => {
     ).toBeGreaterThan(0)
   })
 
-  it('com dados desenha o título e uma linha por registro', () => {
+  it('with data, draws the title and one row per record', () => {
     render(
       <Harness
         rows={[
@@ -142,13 +142,13 @@ describe('Table', () => {
     expect(screen.queryByText('Nenhuma turma')).toBeNull()
   })
 
-  it('vazio de verdade mostra o texto da tela', () => {
+  it('when truly empty, shows the screen text', () => {
     render(<Harness rows={[]} />)
 
     expect(screen.getByText('Nenhuma turma')).toBeTruthy()
   })
 
-  it('vazio por filtro troca o texto e limpa o termo no botão', async () => {
+  it('when empty by filter, swaps the text and clears the term on the button', async () => {
     render(<Harness rows={[]} search={{ search: 'xyz', page: 3 }} />)
 
     expect(screen.getByText(m.table_empty_filtered_title())).toBeTruthy()
@@ -163,13 +163,13 @@ describe('Table', () => {
     })
   })
 
-  it('vazio na lixeira diz que a lixeira está vazia', () => {
+  it('when empty in the trash, says the trash is empty', () => {
     render(<Harness rows={[]} search={{ trashed: TRASHED_MODE.ONLY }} />)
 
     expect(screen.getByText(m.table_empty_trash_title())).toBeTruthy()
   })
 
-  it('o filtro vence a lixeira quando os dois estão ativos', () => {
+  it('when both are active, the filter beats the trash', () => {
     render(
       <Harness
         rows={[]}
@@ -180,7 +180,7 @@ describe('Table', () => {
     expect(screen.getByText(m.table_empty_filtered_title())).toBeTruthy()
   })
 
-  it('erro troca a lista pela mensagem e o botão refaz a consulta', async () => {
+  it('when there is an error, swaps the list for the message and the button redoes the query', async () => {
     const onRetry = vi.fn()
     render(<Harness rows={[]} isError onRetry={onRetry} />)
 
@@ -194,13 +194,13 @@ describe('Table', () => {
     expect(onRetry).toHaveBeenCalledTimes(1)
   })
 
-  it('erro sem onRetry não oferece tentar de novo', () => {
+  it('when there is an error without onRetry, does not offer to try again', () => {
     render(<Harness rows={[]} isError />)
 
     expect(screen.queryByRole('button', { name: m.common_retry() })).toBeNull()
   })
 
-  it('a paginação mostra a página e trava os extremos', () => {
+  it('shows the page in the pagination and locks the extremes', () => {
     render(<Harness rows={[{ id: '1', name: 'Ana' }]} meta={META} />)
 
     expect(screen.getByText(m.table_page({ current: 2, last: 3 }))).toBeTruthy()
@@ -216,13 +216,13 @@ describe('Table', () => {
     ).toBe('/lista?page=1')
   })
 
-  it('sem meta não há rodapé de paginação', () => {
+  it('without meta, has no pagination footer', () => {
     const { container } = render(<Harness rows={[]} />)
 
     expect(container.querySelector('[data-slot="table-pagination"]')).toBeNull()
   })
 
-  it('uma parte fora do Table diz qual ficou sem provider', () => {
+  it('when a part is outside Table, says which one is without a provider', () => {
     expect(() => render(<TableContent>x</TableContent>)).toThrow('TableContent')
   })
 })

@@ -24,7 +24,7 @@ export type ClassroomListCriteria = {
   readonly direction: SortDirection
 }
 
-/** A lista do conselheiro: só as turmas do alcance dele, por nome. */
+/** The advisor's list: only the classrooms in their reach, by name. */
 export type ClassroomOwnedListCriteria = {
   readonly page: number
   readonly perPage: number
@@ -33,43 +33,43 @@ export type ClassroomOwnedListCriteria = {
 }
 
 /**
- * A persistência da turma, por intenção (`_standards/domain.md` §5.1). O escritor
- * único da tabela `classrooms`; lê `users` só para responder se a conta indicada
- * serve ao vínculo, e `teams` e `enrollments` para os totais e o sorteio.
+ * The classroom persistence, by intent (`_standards/domain.md` §5.1). The single
+ * writer of the `classrooms` table; it reads `users` only to answer whether the given account
+ * fits the link, and `teams` and `enrollments` for the totals and the draw.
  */
 export abstract class ClassroomRepository {
   abstract findById(id: string): Promise<Classroom | null>
   /**
-   * A turma ao alcance de quem age: o administrador alcança todas, o conselheiro
-   * a dele. Turma alheia volta `null`, igual à inexistente (`backend.md` §4.6).
+   * The classroom within reach of whoever acts: the administrator reaches all, the advisor
+   * their own. A foreign classroom comes back `null`, same as a nonexistent one (`backend.md` §4.6).
    */
   abstract findOwned(criteria: {
     readonly id: string
     readonly actor: Actor
   }): Promise<Classroom | null>
-  /** A turma que a conta representa, que é uma só. */
+  /** The classroom the account represents, which is only one. */
   abstract findOfRepresentative(accountId: string): Promise<Classroom | null>
-  /** Leitura leve: a turma com conselheiro e representante, direto da query. */
+  /** Lightweight read: the classroom with advisor and representative, straight from the query. */
   abstract findDetail(id: string): Promise<AdministratorClassroomShowResponse | null>
-  /** Outra turma, que não `exceptId`, já usa o nome. */
+  /** Another classroom, other than `exceptId`, already uses the name. */
   abstract existsByName(name: string, exceptId?: string): Promise<boolean>
-  /** Os fatos de cada conta indicada; conta ausente do critério fica sem fato. */
+  /** The facts of each given account; an account absent from the criteria has no fact. */
   abstract peopleFacts(
     links: ClassroomLinks,
     exceptClassroomId?: string,
   ): Promise<ClassroomPeopleFacts>
-  /** A turma já tem time numa chave sorteada. */
+  /** The classroom already has a team in a drawn bracket. */
   abstract isInCompetition(id: string): Promise<boolean>
   /**
-   * Grava a turma; a corrida no `unique` volta como o fato do campo que colidiu: o nome,
-   * o conselheiro ou o representante.
+   * Saves the classroom; the race on the `unique` comes back as the fact of the field that collided: the name,
+   * the advisor or the representative.
    */
   abstract save(classroom: Classroom): Promise<Either<ClassroomError, void>>
   abstract delete(classroom: Classroom): Promise<void>
   /**
-   * Desfaz os vínculos de turma de uma conta que deixou de ser o que era (papel
-   * mudou ou foi arquivada). Arquivar é remoção lógica, então o `ON DELETE SET
-   * NULL` da coluna nunca dispara: quem faz o papel dele é este método.
+   * Undoes the classroom links of an account that stopped being what it was (role
+   * changed or was archived). Archiving is a soft delete, so the column's `ON DELETE SET
+   * NULL` never fires: this method is what plays its part.
    */
   abstract detachAccount(accountId: string): Promise<void>
   abstract paginate(

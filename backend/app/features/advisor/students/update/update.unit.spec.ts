@@ -16,7 +16,7 @@ const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 async function setup() {
   const students = MemoryRepositories.students().withClassroom(CLASSROOM, ADVISOR)
   const ana = Student.create({ id: ID, classroomId: CLASSROOM, name: 'Ana', now: new Date() })
-  if (ana.isLeft()) throw new Error('arranjo inválido')
+  if (ana.isLeft()) throw new Error('invalid arrangement')
   await students.save(ana.value)
   const useCase = await makeWithMemory(AdvisorStudentUpdateUseCase, [[StudentRepository, students]])
 
@@ -32,7 +32,7 @@ test.group('advisor/students > update (unit)', () => {
     assert.deepInclude(result.value, { id: ID, name: 'Ana Clara' })
   })
 
-  test('aluno de turma alheia é 404 STUDENT_NOT_FOUND', async ({ assert }) => {
+  test('student of a foreign classroom is 404 STUDENT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -48,7 +48,7 @@ test.group('advisor/students > update (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STUDENT_NOT_FOUND' })
   })
 
-  test('aluno inexistente é 404, e o administrador alcança qualquer um', async ({ assert }) => {
+  test('nonexistent student is 404, and the administrator reaches any one', async ({ assert }) => {
     const { useCase } = await setup()
     const administrator = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 
@@ -63,7 +63,7 @@ test.group('advisor/students > update (unit)', () => {
     assert.isTrue(found.isRight())
   })
 
-  test('nome em branco é 422 STUDENT_NAME_EMPTY', async ({ assert }) => {
+  test('blank name is 422 STUDENT_NAME_EMPTY', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, name: ' ', actor: OWNER })

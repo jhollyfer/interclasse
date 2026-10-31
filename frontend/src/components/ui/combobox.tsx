@@ -26,8 +26,8 @@ function ComboboxTrigger({
   return (
     <ComboboxPrimitive.Trigger
       data-slot="combobox-trigger"
-      // Botão só de ícone, como o `ComboboxClear`: sem nome não se anuncia.
-      // casa: rótulo traduzido (_standards/i18n.md)
+      // Icon-only button, like `ComboboxClear`: without a name it is not announced.
+      // house: translated label (_standards/i18n.md)
       aria-label={m.common_ui_open_options()}
       className={cn(
         "outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg:not([class*='size-'])]:size-3.5",
@@ -45,8 +45,8 @@ function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
   return (
     <ComboboxPrimitive.Clear
       data-slot="combobox-clear"
-      // Botão só de ícone: sem nome, o leitor de tela anuncia "botão" e mais nada.
-      // casa: rótulo traduzido (_standards/i18n.md)
+      // Icon-only button: without a name, the screen reader announces "button" and nothing else.
+      // house: translated label (_standards/i18n.md)
       aria-label={m.common_ui_clear_selection()}
       render={<InputGroupButton variant="ghost" size="icon-xs" />}
       className={cn(className)}

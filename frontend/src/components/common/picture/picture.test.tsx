@@ -8,7 +8,7 @@ import { Picture } from './index'
 afterEach(cleanup)
 
 describe('Picture', () => {
-  it('imagem de LCP carrega já e com prioridade alta', () => {
+  it('loads an LCP image eagerly and with high priority', () => {
     render(
       <Picture
         src="/a.png"
@@ -25,7 +25,7 @@ describe('Picture', () => {
     expect(image.getAttribute('fetchpriority')).toBe('high')
   })
 
-  it('imagem abaixo da dobra carrega sob demanda', () => {
+  it('loads an image below the fold on demand', () => {
     render(
       <Picture
         src="/a.png"
@@ -41,7 +41,7 @@ describe('Picture', () => {
     ).toBe('lazy')
   })
 
-  it('leva a dimensão e a decodificação assíncrona', () => {
+  it('carries the dimension and async decoding', () => {
     render(
       <Picture
         src="/a.png"

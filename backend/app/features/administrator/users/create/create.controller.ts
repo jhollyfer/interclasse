@@ -9,16 +9,16 @@ import { AdministratorUserCreateValidator } from '#validators/administrator/user
 @inject()
 export default class AdministratorUserCreateController {
   static docs = defineDocs({
-    summary: 'Criar usuário',
+    summary: 'Create user',
     description:
-      'Devolve `201` com a conta criada, objeto nu, sem envelope e **sem a senha**.\n\n' +
-      'Único caminho de criação de usuário na API: não há cadastro público, e o primeiro ' +
-      'administrador vem do seeder.\n\n' +
-      '`role` é obrigatório - o papel é sempre explícito no servidor. `password` exige ' +
-      '`passwordConfirmation` com o mesmo valor.\n\n' +
-      'E-mail de uma conta viva responde `409`. E-mail de uma conta **arquivada** reativa ' +
-      'aquela linha com os dados novos: `email` é `UNIQUE` global, e inserir de novo ' +
-      'esbarraria no índice.',
+      'Returns `201` with the created account, bare object, without envelope and **without the password**.\n\n' +
+      'The only way to create a user in the API: there is no public sign-up, and the first ' +
+      'administrator comes from the seeder.\n\n' +
+      '`role` is required - the role is always explicit on the server. `password` requires ' +
+      '`passwordConfirmation` with the same value.\n\n' +
+      'The email of a live account responds `409`. The email of an **archived** account reactivates ' +
+      'that row with the new data: `email` is a global `UNIQUE`, and inserting again ' +
+      'would hit the index.',
   })
 
   constructor(private readonly useCase: AdministratorUserCreateUseCase) {}

@@ -28,13 +28,13 @@ const CARD = fromPartial<AdministratorCardPaginateResponse>({
 })
 
 describe('CardList', () => {
-  it('sem cartão diz o que a tela mandou dizer', () => {
+  it('when there is no card, says what the screen told it to say', () => {
     render(<CardList cards={[]} empty="Nenhum cartão" />)
 
     expect(screen.getByText('Nenhum cartão')).toBeTruthy()
   })
 
-  it('mostra o atleta, a turma e a observação', () => {
+  it('shows the athlete, the classroom and the note', () => {
     render(<CardList cards={[CARD]} empty="Nenhum cartão" showMatch={false} />)
 
     expect(screen.getByText('Maria')).toBeTruthy()
@@ -42,7 +42,7 @@ describe('CardList', () => {
     expect(screen.getByText('Falta dura')).toBeTruthy()
   })
 
-  it('a bolinha da cor tem nome acessível', () => {
+  it('gives the color dot an accessible name', () => {
     render(<CardList cards={[CARD]} empty="x" showMatch={false} />)
 
     expect(screen.getByRole('img').getAttribute('aria-label')).toContain(
@@ -50,7 +50,7 @@ describe('CardList', () => {
     )
   })
 
-  it('o botão de apagar só existe com onDelete e devolve o cartão da linha', async () => {
+  it('renders the delete button only with onDelete and returns the row card', async () => {
     const onDelete = vi.fn()
     const { rerender } = render(
       <CardList cards={[CARD]} empty="x" showMatch={false} />,
@@ -75,7 +75,7 @@ describe('CardList', () => {
     expect(onDelete).toHaveBeenCalledWith(CARD)
   })
 
-  it('carregando mostra o esqueleto e não a mensagem de vazio', () => {
+  it('when loading, shows the skeleton and not the empty message', () => {
     render(<CardList cards={[]} isPending empty="Nenhum cartão" />)
 
     expect(screen.queryByText('Nenhum cartão')).toBeNull()

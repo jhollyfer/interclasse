@@ -10,17 +10,17 @@ import {
 } from '#tests/http-fixtures'
 import { findUserByEmail, userExists } from '#tests/users-fixtures'
 
-/** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
+/** An already confirmed file, which is the only state `assertExist` accepts. */
 
 /**
- * A guarda de auto-trancamento. Todo caminho que tiraria do painel quem está
- * administrando responde `403`, e nenhum deles chega a escrever - é o que
- * mantém sempre um administrador vivo sem precisar contar administradores.
+ * The self-lockout guard. Every path that would remove from the panel whoever is
+ * administering answers `403`, and none of them gets to write - it is what
+ * always keeps one administrator alive without having to count administrators.
  */
-test.group('administrador > users > o administrador não se tranca', (group) => {
+test.group('administrator > users > the administrator does not lock themselves out', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('arquivar a própria conta responde 403 e não escreve', async ({ client, assert }) => {
+  test('archiving their own account answers 403 and does not write', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const eu = await findUserByEmail(ADMINISTRATOR.email)
 
@@ -33,7 +33,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert.isNull(eu.deletedAt)
   })
 
-  test('apagar a própria conta responde 403, e não o 409 de não arquivada', async ({
+  test('deleting their own account answers 403, and not the 409 of not archived', async ({
     client,
     assert,
   }) => {
@@ -47,7 +47,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert.isTrue(await userExists(eu.id))
   })
 
-  test('rebaixar o próprio papel responde 403 e não escreve', async ({ client, assert }) => {
+  test('demoting their own role answers 403 and does not write', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const eu = await findUserByEmail(ADMINISTRATOR.email)
 
@@ -63,7 +63,10 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert.equal(eu.role, USER_ROLE.ADMINISTRATOR)
   })
 
-  test('desativar a própria conta responde 403 e não escreve', async ({ client, assert }) => {
+  test('deactivating their own account answers 403 and does not write', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const eu = await findUserByEmail(ADMINISTRATOR.email)
 
@@ -79,7 +82,7 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert.equal(eu.status, ACTIVE_STATUS.ACTIVE)
   })
 
-  test('a guarda é só sobre papel e status: o próprio nome segue editável', async ({
+  test('the guard is only about role and status: their own name stays editable', async ({
     client,
     assert,
   }) => {
@@ -95,18 +98,18 @@ test.group('administrador > users > o administrador não se tranca', (group) => 
     assert.equal(body(response).name, 'Editado')
   })
 
-  test('a guarda é sobre quem pede, não sobre o papel: outro administrador é arquivável', async ({
+  test('the guard is about who asks, not about the role: another administrator is archivable', async ({
     client,
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const outro = await UserFactory.merge({ role: USER_ROLE.ADMINISTRATOR }).create()
+    const other = await UserFactory.merge({ role: USER_ROLE.ADMINISTRATOR }).create()
 
-    const response = await client.patch(`/administrator/users/${outro.id}/archive`).cookies(session)
+    const response = await client.patch(`/administrator/users/${other.id}/archive`).cookies(session)
 
     response.assertStatus(204)
 
-    await outro.refresh()
-    assert.isNotNull(outro.deletedAt)
+    await other.refresh()
+    assert.isNotNull(other.deletedAt)
   })
 })

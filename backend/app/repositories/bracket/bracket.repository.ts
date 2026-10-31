@@ -17,7 +17,7 @@ import type {
 import type { Bracket } from '#domain/bracket/bracket.entity'
 import type { BracketError } from '#domain/bracket/bracket.errors'
 
-/** A ordem da lista de chaves: a mais nova primeiro (painel) ou por modalidade (abas do site). */
+/** The order of the bracket list: newest first (panel) or by sport (site tabs). */
 export type BracketListOrder = 'newest' | 'sport-name'
 
 export type BracketListCriteria = {
@@ -30,8 +30,8 @@ export type BracketListCriteria = {
 }
 
 /**
- * A ordem da tabela de jogos: a agenda (marcadas por horário, depois as sem
- * horário por rodada) ou, nos resultados do site, o mais recente primeiro.
+ * The order of the match table: the schedule (scheduled by time, then the
+ * unscheduled by round) or, in the site results, the most recent first.
  */
 export type MatchListOrder = 'schedule' | 'recent-results'
 
@@ -48,45 +48,45 @@ export type MatchListCriteria = {
 }
 
 /**
- * A persistência da chave, por intenção (`_standards/domain.md` §5.1). O
- * escritor único de `brackets`, `teams` e `matches`: time e partida só mudam
- * pela raiz, então não têm repository próprio. Lê modalidades, turmas, alunos e
- * inscrições só para responder o que o sorteio e as telas perguntam.
+ * The bracket persistence, by intent (`_standards/domain.md` §5.1). The
+ * single writer of `brackets`, `teams` and `matches`: team and match only change
+ * through the root, so they have no repository of their own. It reads sports, classrooms, students and
+ * enrollments only to answer what the draw and the screens ask.
  */
 export abstract class BracketRepository {
   abstract findById(id: string): Promise<Bracket | null>
-  /** A chave dona da partida. */
+  /** The bracket that owns the match. */
   abstract findByMatchId(matchId: string): Promise<Bracket | null>
   /**
-   * A chave dona da partida, com a linha travada até o fim da unidade de
-   * trabalho: dois placares ao mesmo tempo na mesma chave leriam a mesma partida
-   * seguinte e um sobrescreveria o outro. Só vale dentro de `UnitOfWork.run`.
+   * The bracket that owns the match, with the row locked until the end of the unit of
+   * work: two scores at the same time in the same bracket would read the same next
+   * match and one would overwrite the other. Only holds inside `UnitOfWork.run`.
    */
   abstract findByMatchIdForUpdate(matchId: string): Promise<Bracket | null>
   abstract findBySportAndCategory(sportId: string, category: Category): Promise<Bracket | null>
   abstract findSport(sportId: string): Promise<AdministratorSportShowResponse | null>
   /**
-   * A modalidade, com a linha travada até o fim da unidade de trabalho: a
-   * inscrição trava a mesma linha antes de gravar, e sem isso uma lista salva no
-   * meio do sorteio ficaria fora de uma chave que já fechou as inscrições. Só
-   * vale dentro de `UnitOfWork.run`.
+   * The sport, with the row locked until the end of the unit of work: the
+   * enrollment locks the same row before saving, and without that a list saved in
+   * the middle of the draw would be left out of a bracket that already closed enrollments. Only
+   * holds inside `UnitOfWork.run`.
    */
   abstract lockSport(sportId: string): Promise<AdministratorSportShowResponse | null>
-  /** As turmas da categoria com ao menos `minAthletes` inscritos na modalidade. */
+  /** The category's classrooms with at least `minAthletes` enrolled in the sport. */
   abstract eligibleClassroomIds(
     sportId: string,
     category: Category,
     minAthletes: number,
   ): Promise<string[]>
-  /** O nome de cada turma, pelo id. */
+  /** The name of each classroom, by id. */
   abstract classroomNames(classroomIds: ReadonlyArray<string>): Promise<Map<string, string>>
-  /** Grava a chave inteira: nova, em lote; existente, só o que mudou. */
-  /** Grava a chave; a modalidade e categoria já sorteadas (a corrida no `unique`) voltam como `BRACKET_ALREADY_EXISTS`. */
+  /** Saves the whole bracket: new, in batch; existing, only what changed. */
+  /** Saves the bracket; the already drawn sport and category (the race on the `unique`) come back as `BRACKET_ALREADY_EXISTS`. */
   abstract save(bracket: Bracket): Promise<Either<BracketError, void>>
-  /** Times e partidas vão junto. */
+  /** Teams and matches go along. */
   abstract delete(bracket: Bracket): Promise<void>
 
-  /** Leitura leve: a prévia do sorteio, ou `null` se a modalidade não existe. */
+  /** Lightweight read: the draw preview, or `null` if the sport does not exist. */
   abstract preview(
     sportId: string,
     category: Category,
@@ -98,16 +98,16 @@ export abstract class BracketRepository {
     criteria: MatchListCriteria,
   ): Promise<Paginated<AdministratorMatchPaginateResponse>>
   /**
-   * As partidas com os dois times, as turmas inteiras e a chave com a modalidade,
-   * pelo id. Em lote para o cartão buscar as de uma página numa ida só.
+   * The matches with both teams, the whole classrooms and the bracket with the sport,
+   * by id. In batch so the card fetches those of a page in a single trip.
    */
   abstract findMatchResponses(
     matchIds: ReadonlyArray<string>,
   ): Promise<Map<string, AdministratorMatchUpdateResponse>>
-  /** Os alunos das duas turmas da partida, os inscritos na modalidade primeiro. */
+  /** The students of the match's two classrooms, those enrolled in the sport first. */
   abstract matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null>
 
-  /** A partida com os dois times, as turmas inteiras e a chave com a modalidade. */
+  /** The match with both teams, the whole classrooms and the bracket with the sport. */
   async findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null> {
     const responses = await this.findMatchResponses([matchId])
 
@@ -115,9 +115,9 @@ export abstract class BracketRepository {
   }
 
   /**
-   * A chave inteira como a tela a desenha: as partidas de cada fase com o nome
-   * das turmas. Composta do que as duas implementações já sabem ler, para a
-   * forma da resposta existir uma vez só.
+   * The whole bracket as the screen draws it: the matches of each phase with the
+   * classroom names. Composed of what both implementations already know how to read, so the
+   * response shape exists only once.
    */
   async detail(id: string): Promise<AdministratorBracketShowResponse | null> {
     const bracket = await this.findById(id)

@@ -2,42 +2,42 @@ import { vine, notNull, email, password } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
- * A própria conta, editada pelo dono dela.
+ * The account itself, edited by its owner.
  *
- * **Todo campo é opcional**: campo ausente significa "não mexer", e não
- * "apagar". `backend-old` usava `PATCH` com um schema que exigia `name`,
- * `email`, `role` e `avatarId` - o verbo prometia parcial e o schema recusava
- * parcial.
+ * **Every field is optional**: an absent field means "leave alone", not
+ * "erase". `backend-old` used `PATCH` with a schema that required `name`,
+ * `email`, `role` and `avatarId` - the verb promised partial and the schema refused
+ * partial.
  *
- * `role` e `status` não entram: o papel é definido na criação, pelo
- * administrador, e ninguém muda o próprio. Declará-los só para ignorar depois
- * convidaria alguém a tentar.
+ * `role` and `status` are not here: the role is set on creation, by the
+ * administrator, and nobody changes their own. Declaring them just to ignore them later
+ * would invite someone to try.
  */
 export const AccountProfileUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
   email: email().optional().use(notNull()),
   password: password().optional().use(notNull()),
   /**
-   * A senha atual, exigida **só** quando `password` vem no payload.
+   * The current password, required **only** when `password` comes in the payload.
    *
-   * É prova de identidade, e não de força: quem sequestra uma sessão tem o
-   * cookie, mas não sabe a senha. `PASSWORD_SAME_AS_CURRENT` não serve para
-   * isso - ele compara a nova com o hash, e passar por ele é justamente não
-   * saber a atual.
+   * It is proof of identity, not of strength: whoever hijacks a session has the
+   * cookie, but does not know the password. `PASSWORD_SAME_AS_CURRENT` does not serve
+   * that - it compares the new one with the hash, and getting past it is precisely not
+   * knowing the current one.
    *
-   * `requiredIfExists` e não uma checagem no use-case: a obrigatoriedade
-   * condicional é forma do payload, e aqui ela vira `422` apontando o campo -
-   * é o que `backend-old` respondia como erro genérico
+   * `requiredIfExists` and not a check in the use case: conditional
+   * requiredness is payload shape, and here it becomes a `422` pointing at the field -
+   * which is what `backend-old` answered as a generic error
    * (`profile/use-cases/update.use-case.ts:22`).
    *
-   * Sem as regras de força de `password()`: o valor é conferido contra o hash,
-   * não gravado. O teto de 32 é o mesmo da política, porque é o maior valor que
-   * a aplicação já pode ter gravado.
+   * Without the strength rules of `password()`: the value is checked against the hash,
+   * not saved. The ceiling of 32 is the same as the policy's, because it is the largest value
+   * the application may already have saved.
    */
   currentPassword: vine.string().maxLength(32).optional().requiredIfExists('password'),
-  // `nullable` é o que permite tirar a foto sem trocá-la. O uuid só garante o
-  // formato; que o arquivo exista é checado no use-case, senão a violação da
-  // chave estrangeira estouraria como 500 em vez de 422.
+  // `nullable` is what lets the photo be removed without replacing it. The uuid only guarantees the
+  // format; that the file exists is checked in the use case, otherwise the foreign
+  // key violation would blow up as a 500 instead of a 422.
   avatarId: vine.string().uuid().nullable().optional(),
 })
 

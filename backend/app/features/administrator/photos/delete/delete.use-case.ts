@@ -10,7 +10,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
-/** Apaga de vez. O arquivo fica para o `storages:prune`. */
+/** Deletes for good. The file is left for `storages:prune`. */
 @inject()
 export default class AdministratorPhotoDeleteUseCase {
   constructor(

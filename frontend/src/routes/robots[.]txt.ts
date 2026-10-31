@@ -4,9 +4,9 @@ import { isIndexable } from '#/lib/site-environment'
 import { robotsTxt } from '#/lib/sitemap'
 
 /**
- * O `robots.txt` é rota de servidor, e não arquivo de `public/`: o `Disallow: /`
- * de ambiente que não é produção e a URL absoluta do sitemap dependem do
- * ambiente (`frontend.md` §9.7).
+ * `robots.txt` is a server route, and not a `public/` file: the environment's `Disallow: /`
+ * when it is not production and the sitemap's absolute URL depend on the
+ * environment (`frontend.md` §9.7).
  * _doc-lib/tanstack-start.md#guide/server-routes.
  */
 export const Route = createFileRoute('/robots.txt')({

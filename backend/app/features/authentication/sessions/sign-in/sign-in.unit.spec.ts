@@ -19,7 +19,7 @@ async function setup() {
 }
 
 test.group('authentication/sessions > sign-in (unit)', () => {
-  test('credencial correta emite o par de tokens', async ({ assert }) => {
+  test('correct credential issues the token pair', async ({ assert }) => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
@@ -29,7 +29,7 @@ test.group('authentication/sessions > sign-in (unit)', () => {
     assert.deepEqual(sessions.issued, [USER_ID])
   })
 
-  test('senha errada, e-mail desconhecido, conta arquivada e inativa dão o mesmo 401', async ({
+  test('wrong password, unknown email, archived and inactive account give the same 401', async ({
     assert,
   }) => {
     const { users, sessions, useCase } = await setup()
@@ -59,12 +59,12 @@ test.group('authentication/sessions > sign-in (unit)', () => {
     assert.deepEqual(sessions.issued, [])
   })
 
-  test('falha do repositório é 500 AUTHENTICATION_SESSION_SIGN_IN_ERROR, e não 401', async ({
+  test('repository failure is 500 AUTHENTICATION_SESSION_SIGN_IN_ERROR, not 401', async ({
     assert,
   }) => {
     const { users, useCase } = await setup()
     users.findByEmail = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ email: 'ana@mail.com', password: PASSWORD })

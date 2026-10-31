@@ -15,16 +15,16 @@ import {
 type RegulationRow = NonNullable<SiteSettingRead['regulation']>
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
 export class SiteSettingMemoryRepository extends SiteSettingRepository {
   private row: SiteSettingProps | null = null
-  /** Os arquivos enviados, por id: o que o teste arranja no lugar da tabela `storages`. */
+  /** The uploaded files, by id: what the test arranges in place of the `storages` table. */
   private readonly files = new Map<string, RegulationRow>()
 
-  /** Arranjo do teste: um arquivo enviado e não arquivado. */
+  /** Test arrangement: an uploaded, non-archived file. */
   withFile(file: RegulationRow): this {
     this.files.set(file.id, file)
     return this

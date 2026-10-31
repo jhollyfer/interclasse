@@ -31,7 +31,7 @@ function lastOptions(): BlockerOptions {
 }
 
 describe('useUnsavedChangesBlocker', () => {
-  it('formulário limpo não bloqueia nem pergunta', () => {
+  it('when the form is clean, neither blocks nor asks', () => {
     const confirm = vi.spyOn(window, 'confirm')
     renderHook(() => useUnsavedChangesBlocker(false))
 
@@ -40,7 +40,7 @@ describe('useUnsavedChangesBlocker', () => {
     expect(confirm).not.toHaveBeenCalled()
   })
 
-  it('formulário sujo pergunta e bloqueia quando a pessoa fica', () => {
+  it('when the form is dirty, asks and blocks if the person stays', () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderHook(() => useUnsavedChangesBlocker(true))
 
@@ -49,7 +49,7 @@ describe('useUnsavedChangesBlocker', () => {
     expect(lastOptions().enableBeforeUnload).toBe(true)
   })
 
-  it('formulário sujo deixa sair quando a pessoa confirma', () => {
+  it('when the form is dirty, lets the person leave once they confirm', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderHook(() => useUnsavedChangesBlocker(true))
 

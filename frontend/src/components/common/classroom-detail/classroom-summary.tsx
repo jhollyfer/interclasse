@@ -11,10 +11,10 @@ import { m } from '#/paraglide/messages'
 import { VISIBLE_CLASSROOMS } from './classroom-detail-loader'
 
 /**
- * O quadro do canto: quem aconselha, quem representa e os totais da turma.
+ * The corner panel: who advises, who represents and the classroom's totals.
  *
- * Os totais saem do quadro de inscrições, que a tela já leu; as pessoas, da
- * lista de turmas visíveis, que já vem com elas precarregadas.
+ * The totals come from the enrollment board, which the screen already read; the people from
+ * the visible classrooms list, which already comes with them preloaded.
  */
 export function ClassroomSummary({
   board,

@@ -12,8 +12,8 @@ type RichEditorContentProps = Readonly<
 >
 
 /**
- * A área de escrita. O `id` e o `aria-*` do campo (`AppField`) vão para o
- * elemento editável, que é o que o `<label>` e a leitora de tela alcançam.
+ * The writing area. The field's `id` and `aria-*` (`AppField`) go to the
+ * editable element, which is what the `<label>` and the screen reader reach.
  */
 export function RichEditorContent({
   className,

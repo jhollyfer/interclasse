@@ -30,7 +30,7 @@ import { CLASSROOM_FIELDS, ClassroomFormFields } from './form-fields'
 
 const route = getRouteApi('/_private/administrator/classrooms/$id/edit')
 
-/** Valida com o schema de criação: nome e ano não podem ser apagados. */
+/** Validates with the create schema: name and year cannot be erased. */
 export function ClassroomFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: classroom } = useSuspenseQuery(classroomQueryOptions(id))

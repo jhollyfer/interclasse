@@ -6,7 +6,10 @@ import { body, resetDatabase } from '#tests/http-fixtures'
 test.group('sports > paginate (site)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('responde sem sessão, em ordem alfabética e com meta', async ({ client, assert }) => {
+  test('responds without a session, in alphabetical order and with meta', async ({
+    client,
+    assert,
+  }) => {
     await SportFactory.merge([
       { name: 'Vôlei' },
       { name: 'Futsal' },
@@ -24,7 +27,7 @@ test.group('sports > paginate (site)', (group) => {
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('cada item traz o slug e os limites de atletas', async ({ client, assert }) => {
+  test('each item carries the slug and the athlete limits', async ({ client, assert }) => {
     const sport = await SportFactory.merge({ minAthletes: 5, maxAthletes: 12 }).create()
 
     const response = await client.get('/storefront/sports')
@@ -36,7 +39,7 @@ test.group('sports > paginate (site)', (group) => {
     assert.equal(body(response).data[0].maxAthletes, 12)
   })
 
-  test('?search recorta pelo nome', async ({ client, assert }) => {
+  test('?search narrows by name', async ({ client, assert }) => {
     const futsal = await SportFactory.merge({ name: 'Futsal' }).create()
     await SportFactory.merge({ name: 'Vôlei' }).create()
 
@@ -47,7 +50,7 @@ test.group('sports > paginate (site)', (group) => {
     assert.equal(body(response).data[0].id, futsal.id)
   })
 
-  test('?perPage acima do teto responde 422', async ({ client, assert }) => {
+  test('?perPage above the cap responds 422', async ({ client, assert }) => {
     const response = await client.get('/storefront/sports').qs({ perPage: 101 })
 
     response.assertStatus(422)

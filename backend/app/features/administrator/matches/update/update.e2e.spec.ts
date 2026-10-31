@@ -14,7 +14,10 @@ import {
 test.group('matches > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('marca data e local, e sai com os times e a chave', async ({ client, assert }) => {
+  test('schedules date and place, and comes out with the teams and the bracket', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket, match } = await scheduledMatch()
 
@@ -25,7 +28,7 @@ test.group('matches > update', (group) => {
 
     response.assertStatus(200)
     assert.equal(body(response).location, 'Quadra coberta')
-    // Gravado em UTC: 14h30 em Brasília são 17h30.
+    // Saved in UTC: 14:30 in Brasilia is 17:30.
     assert.equal(
       DateTime.fromISO(body(response).scheduledAt).toUTC().toISO(),
       '2026-11-03T17:30:00.000Z',
@@ -34,7 +37,7 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).bracket.sport.id, bracket.sportId)
   })
 
-  test('null desmarca, e o campo ausente fica como estava', async ({ client, assert }) => {
+  test('null unschedules, and the missing field stays as it was', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
     match.merge({ scheduledAt: DateTime.now(), location: 'Ginásio' })
@@ -50,7 +53,7 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).location, 'Ginásio')
   })
 
-  test('data inválida e local longo demais respondem 422', async ({ client, assert }) => {
+  test('invalid date and too long place respond 422', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -64,12 +67,15 @@ test.group('matches > update', (group) => {
     assert.property(body(response).errors, 'location')
   })
 
-  test('data fora de ISO 8601 com fuso responde 422 e não grava', async ({ client, assert }) => {
+  test('date outside ISO 8601 with a time zone responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
-    // `03/11/2026 14:30` virava 11 de março e `2026-11-03` virava meia-noite
-    // UTC pelo `iso8601` do VineJS, que cai no parse solto do dayjs.
+    // `03/11/2026 14:30` became March 11 and `2026-11-03` became midnight
+    // UTC through VineJS `iso8601`, which falls back to dayjs loose parsing.
     for (const scheduledAt of [
       '03/11/2026 14:30',
       '2026-11-03',
@@ -88,7 +94,7 @@ test.group('matches > update', (group) => {
     assert.isNull(match.scheduledAt)
   })
 
-  test('partida que não existe responde 404', async ({ client, assert }) => {
+  test('match that does not exist responds 404', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -100,15 +106,15 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
   })
 
-  test('sem sessão é 401, e o conselheiro recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/matches/${randomUUID()}`
 
-    const anonimo = await client.put(url).json({ location: 'Quadra' })
-    const conselheiro = await client.put(url).cookies(advisor).json({ location: 'Quadra' })
+    const anonymous = await client.put(url).json({ location: 'Quadra' })
+    const advisorSession = await client.put(url).cookies(advisor).json({ location: 'Quadra' })
 
-    anonimo.assertStatus(401)
-    conselheiro.assertStatus(403)
-    assert.equal(body(conselheiro).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    advisorSession.assertStatus(403)
+    assert.equal(body(advisorSession).code, 'ACCESS_DENIED')
   })
 })

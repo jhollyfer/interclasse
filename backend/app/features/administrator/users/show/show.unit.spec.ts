@@ -17,7 +17,7 @@ async function setup() {
 }
 
 test.group('administrator/users > show (unit)', () => {
-  test('devolve a conta sem a senha', async ({ assert }) => {
+  test('returns the account without the password', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
 
@@ -27,7 +27,7 @@ test.group('administrator/users > show (unit)', () => {
     assert.notProperty(user, 'password')
   })
 
-  test('conta inexistente ou arquivada é 404 USER_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent or archived account is 404 USER_NOT_FOUND', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
 
@@ -38,10 +38,10 @@ test.group('administrator/users > show (unit)', () => {
     assert.deepInclude(missing.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_USER_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_SHOW_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.detail = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: USER_ID })

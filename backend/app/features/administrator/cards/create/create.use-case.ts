@@ -17,11 +17,11 @@ type Payload = AdministratorCardCreatePayload
 type Response = Either<HTTPException, AdministratorCardCreateResponse>
 
 /**
- * Lança um cartão. O atleta tem que ser de uma das duas turmas da partida (regra
- * da entidade): o time do cartão sai daí, e não do corpo.
+ * Records a card. The athlete must be from one of the two classrooms of the match (entity
+ * rule): the card team comes from there, not from the body.
  *
- * Grava só o cartão. A chave entra apenas para dizer quem joga a partida, e é o
- * repository dela que a conhece (um agregado por transação).
+ * Saves only the card. The bracket enters just to say who plays the match, and it is its
+ * repository that knows it (one aggregate per transaction).
  */
 @inject()
 export default class AdministratorCardCreateUseCase {

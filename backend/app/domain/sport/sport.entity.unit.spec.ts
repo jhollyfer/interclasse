@@ -17,7 +17,7 @@ function futsal(): Sport {
 }
 
 test.group('Sport', () => {
-  test('nasce com o slug do nome', ({ assert }) => {
+  test('is born with the name slug', ({ assert }) => {
     const sport = Sport.create({
       id: 'id',
       name: 'Tênis de mesa',
@@ -30,7 +30,7 @@ test.group('Sport', () => {
     assert.equal(sport.isRight() && sport.value.snapshot().slug, 'tenis-de-mesa')
   })
 
-  test('recusa mínimo acima do máximo ao nascer e ao mudar', ({ assert }) => {
+  test('refuses a minimum above the maximum on birth and on change', ({ assert }) => {
     const born = Sport.create({ id: 'id', name: 'Vôlei', minAthletes: 9, maxAthletes: 6, now: NOW })
     const changed = futsal().update({ minAthletes: 13 }, { largestRoster: 0, now: NOW })
 
@@ -38,7 +38,7 @@ test.group('Sport', () => {
     assert.deepEqual(changed.value, { code: 'SPORT_INVALID_LIMITS' })
   })
 
-  test('o máximo não desce abaixo do maior elenco inscrito', ({ assert }) => {
+  test('the maximum does not go below the largest enrolled roster', ({ assert }) => {
     const refused = futsal().update({ maxAthletes: 8 }, { largestRoster: 10, now: NOW })
     const accepted = futsal().update({ maxAthletes: 10 }, { largestRoster: 10, now: NOW })
 
@@ -46,7 +46,7 @@ test.group('Sport', () => {
     assert.isTrue(accepted.isRight())
   })
 
-  test('renomear troca o slug e carimba a edição', ({ assert }) => {
+  test('renaming changes the slug and stamps the edit', ({ assert }) => {
     const sport = futsal()
     sport.update({ name: 'Futsal masculino' }, { largestRoster: 0, now: NOW })
 

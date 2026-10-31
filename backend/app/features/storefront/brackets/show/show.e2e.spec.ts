@@ -9,7 +9,10 @@ import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fi
 test.group('storefront brackets > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem sessão, a chave sai com as fases e o nome das turmas', async ({ client, assert }) => {
+  test('without a session, the bracket comes with the phases and the classroom names', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { sport, bracket } = await drawnBracket(client, admin, 2)
 
@@ -19,7 +22,7 @@ test.group('storefront brackets > show', (group) => {
     assert.equal(body(response).status, BRACKET_STATUS.KNOCKOUT)
     assert.deepEqual(body(response).sport, { id: sport.id, name: sport.name, slug: sport.slug })
     assert.isNull(body(response).championTeamId)
-    // 2 turmas: direto para a final.
+    // 2 classrooms: straight to the final.
     assert.lengthOf(body(response).matches, 1)
     const [final] = body(response).matches
     assert.equal(final.phase, MATCH_PHASE.FINAL)
@@ -28,19 +31,22 @@ test.group('storefront brackets > show', (group) => {
     assert.isNull(final.scheduledAt)
   })
 
-  test('a chave encerrada mostra a campeã e a agenda em ISO', async ({ client, assert }) => {
+  test('the finished bracket shows the champion and the schedule in ISO', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket, away, match } = await scheduledMatch()
-    const agenda = await client
+    const schedule = await client
       .put(`/administrator/matches/${match.id}`)
       .cookies(admin)
       .json({ scheduledAt: '2026-11-03T14:30:00-03:00', location: 'Quadra' })
-    agenda.assertStatus(200)
-    const placar = await client
+    schedule.assertStatus(200)
+    const score = await client
       .put(`/administrator/matches/${match.id}/score`)
       .cookies(admin)
       .json({ homeScore: 0, awayScore: 2 })
-    placar.assertStatus(200)
+    score.assertStatus(200)
 
     const response = await client.get(`/storefront/brackets/${bracket.id}`)
 
@@ -51,14 +57,14 @@ test.group('storefront brackets > show', (group) => {
     assert.equal(body(response).matches[0].location, 'Quadra')
   })
 
-  test('chave que não existe responde 404', async ({ client, assert }) => {
+  test('bracket that does not exist responds 404', async ({ client, assert }) => {
     const response = await client.get(`/storefront/brackets/${randomUUID()}`)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'BRACKET_NOT_FOUND')
   })
 
-  test('id fora do formato uuid responde 422', async ({ client, assert }) => {
+  test('id outside the uuid format responds 422', async ({ client, assert }) => {
     const response = await client.get('/storefront/brackets/nao-e-uuid')
 
     response.assertStatus(422)

@@ -18,17 +18,17 @@ const meta = {
 describe('paginatedResponse', () => {
   const schema = paginatedResponse(z.object({ id: z.string() }))
 
-  it('aceita o rodapé e os registros', () => {
+  it('accepts the footer and the records', () => {
     expect(schema.parse({ meta, data: [{ id: 'a' }] }).data).toEqual([
       { id: 'a' },
     ])
   })
 
-  it('recusa registro fora do schema do item', () => {
+  it('rejects a record outside the item schema', () => {
     expect(schema.safeParse({ meta, data: [{ id: 1 }] }).success).toBe(false)
   })
 
-  it('recusa corpo sem o rodapé', () => {
+  it('rejects a body without the footer', () => {
     expect(schema.safeParse({ data: [] }).success).toBe(false)
   })
 })

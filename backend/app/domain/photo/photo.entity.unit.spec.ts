@@ -15,13 +15,13 @@ function send(sender: PhotoSender): Photo {
     sender,
     now: NOW,
   })
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
 
   return created.value
 }
 
 test.group('Photo', () => {
-  test('a foto do conselheiro nasce pendente e sem revisão', ({ assert }) => {
+  test("the advisor's photo is born pending and unreviewed", ({ assert }) => {
     const photo = send(PHOTO_SENDER.ADVISOR)
 
     assert.deepInclude(photo.snapshot(), {
@@ -33,7 +33,7 @@ test.group('Photo', () => {
     })
   })
 
-  test('a foto da organização nasce aprovada por quem a enviou', ({ assert }) => {
+  test("the organization's photo is born approved by whoever uploaded it", ({ assert }) => {
     const photo = send(PHOTO_SENDER.ADMINISTRATOR)
 
     assert.deepInclude(photo.snapshot(), {
@@ -43,7 +43,7 @@ test.group('Photo', () => {
     })
   })
 
-  test('só imagem: outro tipo de arquivo é PHOTO_NOT_IMAGE', ({ assert }) => {
+  test('images only: another file type is PHOTO_NOT_IMAGE', ({ assert }) => {
     const created = Photo.create({
       id: 'photo',
       storage: { id: 'storage', mimetype: 'application/pdf' },
@@ -55,7 +55,7 @@ test.group('Photo', () => {
     assert.deepEqual(created.value, { code: 'PHOTO_NOT_IMAGE' })
   })
 
-  test('a revisão se refaz e carimba quem decidiu', ({ assert }) => {
+  test('the review can be redone and stamps who decided', ({ assert }) => {
     const photo = send(PHOTO_SENDER.ADVISOR)
 
     photo.review({ status: PHOTO_STATUS.APPROVED, reviewerId: 'a', now: NOW })

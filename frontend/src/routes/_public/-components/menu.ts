@@ -3,27 +3,27 @@ import { linkOptions } from '@tanstack/react-router'
 import { m } from '#/paraglide/messages'
 
 /**
- * Os destinos do site, tipados contra a árvore de rotas.
+ * The site's destinations, typed against the route tree.
  *
- * O `label` é a função da mensagem, chamada na tela: assim o texto acompanha o idioma.
- * Cabeçalho e rodapé desenham a **mesma** lista: escrevê-la duas vezes
- * garantiria que divergissem no dia em que uma tela mudar de endereço.
+ * The `label` is the message function, called on screen: that way the text follows the language.
+ * Header and footer draw the **same** list: writing it twice
+ * would guarantee they diverge the day a screen changes address.
  */
 const HOME = linkOptions({ to: '/', label: m.public_nav_home })
 
-const GAMES = linkOptions({ to: '/jogos', label: m.public_nav_games })
+const GAMES = linkOptions({ to: '/matches', label: m.public_nav_games })
 
 const STANDINGS = linkOptions({
-  to: '/classificacao',
+  to: '/standings',
   label: m.public_nav_standings,
 })
 
 const ANNOUNCEMENTS = linkOptions({
-  to: '/avisos',
+  to: '/announcements',
   label: m.public_nav_announcements,
 })
 
-const ABOUT = linkOptions({ to: '/sobre', label: m.public_nav_about })
+const ABOUT = linkOptions({ to: '/about', label: m.public_nav_about })
 
 const SIGN_IN = linkOptions({
   to: '/sign-in',
@@ -46,5 +46,5 @@ export const NAVIGATION: ReadonlyArray<MenuItem> = [
   ABOUT,
 ]
 
-/** A porta do painel. Fica fora de `NAVIGATION`: é ação, e não destino de leitura. */
+/** The dashboard door. It stays outside `NAVIGATION`: it is an action, not a reading destination. */
 export const AUTHENTICATION = SIGN_IN

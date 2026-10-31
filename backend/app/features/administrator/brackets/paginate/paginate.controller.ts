@@ -9,7 +9,7 @@ import { AdministratorBracketPaginateValidator } from '#validators/administrator
 @inject()
 export default class AdministratorBracketPaginateController {
   static docs = defineDocs({
-    description: 'As chaves sorteadas, da mais nova para a mais antiga.',
+    description: 'The drawn brackets, from newest to oldest.',
   })
 
   constructor(private readonly useCase: AdministratorBracketPaginateUseCase) {}

@@ -2,10 +2,10 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 import { CARD_COLORS } from '@interclasse/shared'
 
 /**
- * Os cartões que um atleta levou numa partida.
+ * The cards an athlete received in a match.
  *
- * O time vem junto, e não só o aluno: a turma do aluno pode mudar depois, e o
- * cartão foi levado jogando por aquele time.
+ * The team comes along, not just the student: the student's classroom may change later, and the
+ * card was received playing for that team.
  */
 export default class extends BaseSchema {
   protected tableName = 'match_cards'

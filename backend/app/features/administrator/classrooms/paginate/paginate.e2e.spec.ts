@@ -14,7 +14,7 @@ import {
 test.group('classrooms > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('devolve o envelope paginado, ordenado por nome, com as pessoas aninhadas', async ({
+  test('returns the paginated envelope, ordered by name, with the people nested', async ({
     client,
     assert,
   }) => {
@@ -40,17 +40,20 @@ test.group('classrooms > paginate', (group) => {
     assert.isNull(body(response).data[1].advisor)
   })
 
-  test('cada turma traz os totais de alunos, atletas e modalidades', async ({ client, assert }) => {
+  test('each classroom brings the totals of students, athletes and sports', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const futsal = await createSport(client, session)
-    const volei = await createSport(client, session, 1, 'Vôlei')
+    const volleyball = await createSport(client, session, 1, 'Vôlei')
     const [classroomId] = await enrolledClassrooms(client, session, futsal.id, 1)
-    // O mesmo aluno também no vôlei, e um segundo aluno que não joga nada.
+    // The same student also in volleyball, and a second student who plays nothing.
     const students = await client.get('/advisor/students').qs({ classroomId }).cookies(session)
     await client
       .put('/advisor/enrollments')
       .cookies(session)
-      .json({ classroomId, sportId: volei.id, studentIds: [body(students).data[0].id] })
+      .json({ classroomId, sportId: volleyball.id, studentIds: [body(students).data[0].id] })
     await client.post('/advisor/students').cookies(session).json({ classroomId, name: 'Reserva' })
 
     const response = await client.get('/administrator/classrooms').cookies(session)
@@ -63,29 +66,29 @@ test.group('classrooms > paginate', (group) => {
     })
   })
 
-  test('`?category` e `?search` recortam a lista', async ({ client, assert }) => {
+  test('`?category` and `?search` narrow the list', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     await ClassroomFactory.merge({ name: '4º A', grade: 4, category: CATEGORY.F1 }).create()
     await ClassroomFactory.merge({ name: '7º A', grade: 7, category: CATEGORY.F2 }).create()
     await ClassroomFactory.merge({ name: '9º C', grade: 9, category: CATEGORY.F2 }).create()
 
-    const porCategoria = await client
+    const byCategory = await client
       .get('/administrator/classrooms')
       .qs({ category: CATEGORY.F1 })
       .cookies(session)
-    const porNome = await client
+    const byName = await client
       .get('/administrator/classrooms')
       .qs({ search: '9º' })
       .cookies(session)
 
-    porCategoria.assertStatus(200)
+    byCategory.assertStatus(200)
     assert.deepEqual(
-      body(porCategoria).data.map((classroom: { name: string }) => classroom.name),
+      body(byCategory).data.map((classroom: { name: string }) => classroom.name),
       ['4º A'],
     )
-    porNome.assertStatus(200)
+    byName.assertStatus(200)
     assert.deepEqual(
-      body(porNome).data.map((classroom: { name: string }) => classroom.name),
+      body(byName).data.map((classroom: { name: string }) => classroom.name),
       ['9º C'],
     )
   })
@@ -107,28 +110,28 @@ test.group('classrooms > paginate', (group) => {
     )
   })
 
-  test('categoria ou coluna de ordenação fora da lista responde 422', async ({
-    client,
-    assert,
-  }) => {
+  test('category or sort column outside the list responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const categoria = await client
+    const category = await client
       .get('/administrator/classrooms')
       .qs({ category: 'F9' })
       .cookies(session)
-    const ordenacao = await client
+    const sorting = await client
       .get('/administrator/classrooms')
       .qs({ sort: 'password' })
       .cookies(session)
 
-    categoria.assertStatus(422)
-    assert.property(body(categoria).errors, 'category')
-    ordenacao.assertStatus(422)
-    assert.property(body(ordenacao).errors, 'sort')
+    category.assertStatus(422)
+    assert.property(body(category).errors, 'category')
+    sorting.assertStatus(422)
+    assert.property(body(sorting).errors, 'sort')
   })
 
-  test('sem sessão responde 401, representante responde 403', async ({ client, assert }) => {
+  test('without a session responds 401, representative responds 403', async ({
+    client,
+    assert,
+  }) => {
     const anonymous = await client.get('/administrator/classrooms')
     anonymous.assertStatus(401)
 

@@ -36,8 +36,8 @@ export default class AdministratorAnnouncementPaginateUseCase {
           search: payload.search,
           sort,
           direction,
-          // Fixado sempre antes, a não ser que peçam outra ordem: é o que o site
-          // mostra no topo, e a lista do painel espelha a ordem do site.
+          // Pinned always first, unless another order is requested: it is what the site
+          // shows at the top, and the panel list mirrors the site order.
           pinnedFirst: !payload.sort,
         }),
       )

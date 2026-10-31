@@ -9,7 +9,7 @@ import { StorefrontBracketPaginateValidator } from '#validators/storefront/brack
 @inject()
 export default class StorefrontBracketPaginateController {
   static docs = defineDocs({
-    description: 'As chaves sorteadas, com a modalidade. É o índice da página de classificação.',
+    description: 'The drawn brackets, with the sport. It is the index of the standings page.',
   })
 
   constructor(private readonly useCase: StorefrontBracketPaginateUseCase) {}

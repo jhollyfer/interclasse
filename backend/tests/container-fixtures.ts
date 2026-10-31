@@ -3,17 +3,17 @@ import app from '@adonisjs/core/services/app'
 import { StorageContract } from '#services/storage/storage.contract'
 import { StorageFake } from '#services/storage/storage.fake'
 
-/** Um contrato e a implementação que o teste põe no lugar dela. */
+/** A contract and the implementation the test puts in its place. */
 type Binding<T> = readonly [abstract new (...args: never[]) => T, T]
 
 /**
- * Monta o use-case pelo container com as implementações em memória no lugar das
- * reais (`_standards/architecture.md` §8): `swap` só enquanto o use-case é
- * construído, e `restore` logo depois, para nenhuma troca vazar para o teste
- * seguinte (_doc-lib/adonisjs.md#guides/concepts/dependency-injection).
+ * Builds the use case through the container with the in-memory implementations in
+ * place of the real ones (`_standards/architecture.md` §8): `swap` only while the use
+ * case is being built, and `restore` right after, so no swap leaks into the next test
+ * (_doc-lib/adonisjs.md#guides/concepts/dependency-injection).
  *
- * O bucket é sempre o `StorageFake`, salvo se o teste passar o seu: use-case que
- * assina URL de leitura nunca fala com o bucket de verdade no unitário.
+ * The bucket is always the `StorageFake`, unless the test passes its own: a use case
+ * that signs a read URL never talks to the real bucket in a unit test.
  */
 export async function makeWithMemory<TUseCase>(
   useCase: new (...args: never[]) => TUseCase,

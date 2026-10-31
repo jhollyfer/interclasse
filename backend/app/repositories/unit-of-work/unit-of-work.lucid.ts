@@ -7,9 +7,9 @@ import { UnitOfWork } from './unit-of-work.ts'
 import { TransactionContext } from '#core/transaction-context'
 
 /**
- * A unidade de trabalho sobre a transação gerenciada à mão do Lucid
- * (_doc-lib/lucid.md#transactions): abre, deixa o `trx` no
- * `TransactionContext` que os repositories leem, e decide pelo `Either`.
+ * The unit of work over Lucid's manually managed transaction
+ * (_doc-lib/lucid.md#transactions): it opens, leaves the `trx` in the
+ * `TransactionContext` the repositories read, and decides by the `Either`.
  */
 @inject()
 export class UnitOfWorkLucid extends UnitOfWork {

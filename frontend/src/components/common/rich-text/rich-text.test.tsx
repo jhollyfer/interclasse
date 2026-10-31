@@ -32,7 +32,7 @@ const DOCUMENT = {
 }
 
 describe('RichText', () => {
-  it('lê o JSON do editor como elementos, sem innerHTML', () => {
+  it('reads the editor JSON as elements, without innerHTML', () => {
     render(<RichText json={DOCUMENT} />)
 
     expect(screen.getByRole('heading', { name: 'Regulamento' })).toBeTruthy()
@@ -41,14 +41,14 @@ describe('RichText', () => {
     ).toBe('https://example.com')
   })
 
-  it('converte Markdown de fora pelo mesmo renderizador', () => {
+  it('converts outside Markdown through the same renderer', () => {
     render(<RichText markdown={'## Título\n\n- um\n- dois'} />)
 
     expect(screen.getByRole('heading', { name: 'Título' })).toBeTruthy()
     expect(screen.getAllByRole('listitem')).toHaveLength(2)
   })
 
-  it('não troca -- por travessão (Typography com emDash desligado)', () => {
+  it('does not swap -- for an em dash (Typography with emDash off)', () => {
     const manager = new MarkdownManager({ extensions: RICH_TEXT_EXTENSIONS })
     const markdown = renderToMarkdown({
       extensions: RICH_TEXT_EXTENSIONS,
@@ -59,7 +59,7 @@ describe('RichText', () => {
     expect(markdown).not.toContain('—')
   })
 
-  it('Markdown vira JSON e volta a Markdown sem perder a estrutura', () => {
+  it('when Markdown becomes JSON and back, keeps the structure', () => {
     const manager = new MarkdownManager({ extensions: RICH_TEXT_EXTENSIONS })
     const source = '## Título\n\n- um\n- dois'
     const back = renderToMarkdown({

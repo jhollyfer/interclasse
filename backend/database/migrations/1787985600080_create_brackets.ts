@@ -12,8 +12,8 @@ export default class extends BaseSchema {
       table.enum('status', BRACKET_STATUSES).notNullable()
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
-      // Uma competição por modalidade e categoria. Dois sorteios simultâneos
-      // esbarram aqui, e não em duas chaves paralelas.
+      // One competition per sport and category. Two simultaneous draws
+      // collide here, and not in two parallel brackets.
       table.unique(['sport_id', 'category'])
     })
   }

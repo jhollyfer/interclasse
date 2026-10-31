@@ -11,7 +11,7 @@ import {
 
 const Schema = z.object({ open: z.boolean() })
 
-/** O `localStorage` não existe no node (o caso do SSR): cada teste monta o seu. */
+/** `localStorage` does not exist in node (the SSR case): each test builds its own. */
 function withStorage() {
   const data = new Map<string, string>()
 
@@ -43,25 +43,25 @@ describe('localStoreKey', () => {
 describe('readLocal', () => {
   const input = { theme: 'panel', schema: Schema, fallback: { open: false } }
 
-  it('devolve o fallback sem storage', () => {
+  it('returns the fallback without storage', () => {
     expect(readLocal(input)).toEqual({ open: false })
   })
 
-  it('devolve o valor gravado quando bate com o schema', () => {
+  it('returns the saved value when it matches the schema', () => {
     withStorage()
     writeLocal('panel', { open: true })
 
     expect(readLocal(input)).toEqual({ open: true })
   })
 
-  it('devolve o fallback com JSON torto', () => {
+  it('returns the fallback with crooked JSON', () => {
     const data = withStorage()
     data.set(localStoreKey('panel'), '{torto')
 
     expect(readLocal(input)).toEqual({ open: false })
   })
 
-  it('devolve o fallback com forma fora do schema', () => {
+  it('returns the fallback with a shape outside the schema', () => {
     const data = withStorage()
     data.set(localStoreKey('panel'), JSON.stringify({ open: 'sim' }))
 
@@ -70,7 +70,7 @@ describe('readLocal', () => {
 })
 
 describe('writeLocal e removeLocal', () => {
-  it('não lançam sem storage', () => {
+  it('does not throw without storage', () => {
     expect(() => writeLocal('panel', { open: true })).not.toThrow()
     expect(() => removeLocal('panel')).not.toThrow()
   })
@@ -85,7 +85,7 @@ describe('writeLocal e removeLocal', () => {
 })
 
 describe('listLocalThemes', () => {
-  it('lista só os temas do prefixo', () => {
+  it('lists only the themes with the prefix', () => {
     withStorage()
     writeLocal('upload:a', 1)
     writeLocal('upload:b', 2)

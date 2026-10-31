@@ -1,12 +1,12 @@
 import type { StorageMimetype } from '@interclasse/shared'
 
-/** O que o bucket sabe de um objeto: o que a confirmação do upload confere. */
+/** What the bucket knows about an object: what the upload confirmation checks. */
 export type StorageMetadata = {
   readonly contentLength: number
   readonly etag?: string
 }
 
-/** O arquivo, só pelo que o bucket precisa para assinar a URL de download. */
+/** The file, only by what the bucket needs to sign the download URL. */
 export type StorageDownload = {
   readonly path: string
   readonly mimetype: string
@@ -14,37 +14,37 @@ export type StorageDownload = {
 }
 
 /**
- * O contrato do bucket (_standards/solid.md §2): I/O externo.
+ * The bucket contract (_standards/solid.md §2): external I/O.
  *
- * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
- * tempo. O concreto é `StorageService`, ligado em `providers/storage.provider.ts`;
- * use-cases dependem só daqui, e o teste unitário passa o `StorageFake`.
+ * `abstract class` and not `type`: it serves as a container token and as a type at the same
+ * time. The concrete one is `StorageService`, bound in `providers/storage.provider.ts`;
+ * use cases depend only on this, and the unit test passes the `StorageFake`.
  *
- * Só fala de objeto, pelo `path`. A linha em `storages` é do `StorageRepository`.
+ * It only talks about objects, by `path`. The `storages` row belongs to the `StorageRepository`.
  */
 export abstract class StorageContract {
-  /** A chave sob a qual o objeto vai viver no bucket. */
+  /** The key under which the object will live in the bucket. */
   abstract key(mimetype: StorageMimetype): string
-  /** O que o bucket sabe sobre o objeto: tamanho e `ETag`. */
+  /** What the bucket knows about the object: size and `ETag`. */
   abstract metadata(path: string): Promise<StorageMetadata>
   /**
-   * Os primeiros bytes do objeto (`STORAGE_SIGNATURE_BYTES`), para conferir o tipo pelo
-   * conteúdo e não pelo que o cliente declarou.
+   * The first bytes of the object (`STORAGE_SIGNATURE_BYTES`), to check the type by
+   * content and not by what the client declared.
    */
   abstract head(path: string): Promise<Uint8Array>
-  /** Apaga o binário do bucket. */
+  /** Deletes the binary from the bucket. */
   abstract discard(path: string): Promise<void>
-  /** A URL assinada de leitura, derivada de `path` a cada leitura do registro. */
+  /** The signed read URL, derived from `path` on every read of the record. */
   abstract signedUrl(path: string): Promise<string>
-  /** Uma URL temporária que entrega o arquivo com o nome original. */
+  /** A temporary URL that delivers the file with the original name. */
   abstract signedDownload(file: StorageDownload): Promise<string>
-  /** O header `Content-Disposition` de um download, com o nome original. */
+  /** The `Content-Disposition` header of a download, with the original name. */
   abstract contentDisposition(originalName: string): string
 
   /**
-   * O ponto único da assinatura de leitura: o registro do arquivo com a `url` ao lado
-   * do `path`. O repository devolve a leitura sem `url` (`_standards/architecture.md`
-   * §2: nenhum service dentro dele) e o use-case assina por aqui, a cada leitura.
+   * The single point of read signing: the file record with the `url` beside
+   * the `path`. The repository returns the read without `url` (`_standards/architecture.md`
+   * §2: no service inside it) and the use case signs through here, on every read.
    */
   async withUrl<TFile extends { readonly path: string }>(
     file: TFile,
@@ -52,7 +52,7 @@ export abstract class StorageContract {
     return { ...file, url: await this.signedUrl(file.path) }
   }
 
-  /** `withUrl` do anexo opcional (avatar): sem arquivo, segue `null`. */
+  /** `withUrl` of the optional attachment (avatar): without a file, it stays `null`. */
   async withOptionalUrl<TFile extends { readonly path: string }>(
     file: TFile | null,
   ): Promise<(TFile & { readonly url: string }) | null> {

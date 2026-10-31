@@ -20,7 +20,7 @@ import type { AdvisorPhotoPaginatePayload } from '#validators/advisor/photos.val
 type Payload = Merge<AdvisorPhotoPaginatePayload, { actor: { readonly id: string } }>
 type Response = Either<HTTPException, Paginated<AdvisorPhotoShowResponse>>
 
-/** As fotos que o conselheiro enviou, com a decisão da organização em cada uma. */
+/** The photos the advisor submitted, with the organization decision on each one. */
 @inject()
 export default class AdvisorPhotoPaginateUseCase extends PhotoReadBase {
   constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {

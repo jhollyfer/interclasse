@@ -3,38 +3,38 @@ import * as React from 'react'
 import type { ListSearch } from '#/lib/list-search'
 
 /**
- * O que toda a listagem compartilha - e nada além.
+ * What the whole listing shares - and nothing else.
  *
- * **A instância da tabela não está aqui de propósito.** Um `React.Context` não
- * carrega o genérico de quem o provê, e a instância do TanStack recebe `TRow`
- * em posição de parâmetro em `options`, `getRowId`, `Column.accessorFn` e
- * afins: sob `strictFunctionTypes`, `TableInstance<Testimonial>` deixa de ser um
- * `TableInstance<RowData>`. Guardá-la aqui custaria um `as` ou um `any` e
- * apagaria o tipo do registro em toda a árvore. Ela vai por prop, de pai para
- * filho, nos três subcomponentes que a leem - e `row.original` segue tipado.
+ * **The table instance is not here on purpose.** A `React.Context` does not
+ * carry the generic of whoever provides it, and TanStack's instance takes `TRow`
+ * in parameter position in `options`, `getRowId`, `Column.accessorFn` and
+ * the like: under `strictFunctionTypes`, `TableInstance<Testimonial>` stops being a
+ * `TableInstance<RowData>`. Keeping it here would cost an `as` or an `any` and
+ * would erase the record type across the whole tree. It goes by prop, from parent to
+ * child, in the three subcomponents that read it - and `row.original` stays typed.
  *
- * O que sobra é o que não tem genérico nenhum: a rota e os filtros, de que o
- * cabeçalho ordenável, a busca, a lixeira e a paginação precisam para navegar.
- * Passar `to` e `search` em cada `ColumnDef` seria repetir os dois em toda
- * coluna de toda tela - e a declaração das colunas mora fora do componente,
- * longe de onde esses valores existem.
+ * What is left is what has no generic at all: the route and the filters, which the
+ * sortable header, the search, the trash and the pagination need in order to navigate.
+ * Passing `to` and `search` in each `ColumnDef` would repeat both in every
+ * column of every screen - and the column declaration lives outside the component,
+ * far from where those values exist.
  */
 export type TableContextValue = {
-  /** A rota desta listagem, para os links de ordenação, busca e paginação. */
+  /** This listing's route, for the sorting, search and pagination links. */
   to: string
   search: ListSearch
-  /** A consulta está servindo a página anterior enquanto refaz a nova. */
+  /** The query is serving the previous page while it redoes the new one. */
   isPlaceholderData: boolean
   /**
-   * A consulta falhou.
+   * The query failed.
    *
-   * Mora aqui e não em cada tela porque a decisão que ele governa é sempre a
-   * mesma, e sempre a mesma ordem: **erro antes de vazio**. Uma consulta que
-   * falhou também devolve zero linha, e anunciar "nenhum registro ainda" para
-   * quem está sem rede convida a cadastrar de novo o que já existe.
+   * It lives here and not on each screen because the decision it governs is always the
+   * same, and always in the same order: **error before empty**. A query that
+   * failed also returns zero rows, and announcing "nenhum registro ainda" to
+   * someone without a network invites registering again what already exists.
    */
   isError: boolean
-  /** Refaz a consulta. Ausente quando a tela não passou `onRetry`. */
+  /** Redoes the query. Absent when the screen did not pass `onRetry`. */
   onRetry?: () => void
 }
 
@@ -43,17 +43,17 @@ const TableContext = React.createContext<TableContextValue | null>(null)
 export const TableProvider = TableContext.Provider
 
 /**
- * A rota e os filtros da listagem, para quem está dentro de `Table`.
+ * The listing's route and filters, for whoever is inside `Table`.
  *
- * O `consumer` entra na mensagem para o erro dizer **qual** subcomponente ficou
- * fora do provider - sem isso o `throw` reporta "faltou provider" e deixa a
- * busca por conta de quem lê a stack.
+ * The `consumer` goes into the message so the error says **which** subcomponent was left
+ * outside the provider - without it the `throw` reports "missing provider" and leaves the
+ * search to whoever reads the stack.
  */
 export function useTableContext(consumer: string): TableContextValue {
   const context = React.use(TableContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`Table\``)
+    throw new Error(`\`${consumer}\` must be used within \`Table\``)
   }
 
   return context

@@ -6,18 +6,18 @@ import { Button } from '#/components/ui/button'
 import { cn } from '#/lib/cn'
 
 /**
- * O cabeçalho fixo da listagem: título e descrição à esquerda, ações à direita.
+ * The listing's fixed header: title and description on the left, actions on the right.
  *
- * Slots e não props de texto porque as telas não concordam sobre o que vai
- * aqui: a de depoimentos não cria nada - eles chegam da vitrine -, a de
- * notícias cria, e a da biblioteca de arquivos não tem descrição. Com prop,
- * cada uma dessas variações vira mais uma
- * prop opcional aqui dentro; com slot, a tela escreve o que tem e omite o
- * resto.
+ * Slots and not text props because the screens do not agree on what goes
+ * here: the testimonials screen creates nothing - they arrive from the storefront -, the
+ * news screen creates, and the file library has no description. With a prop,
+ * each of these variations becomes one more
+ * optional prop in here; with a slot, the screen writes what it has and omits the
+ * rest.
  *
- * A grade de duas colunas só existe quando há `TableActions` - é o mesmo
- * `has-data-[slot=...]` que o `Card` usa, e é o que deixa o título ocupar a
- * linha inteira quando a tela não tem ação nenhuma.
+ * The two-column grid only exists when there is a `TableActions` - it is the same
+ * `has-data-[slot=...]` that `Card` uses, and it is what lets the title take
+ * the whole line when the screen has no action at all.
  */
 function TableHeader({
   className,
@@ -51,7 +51,7 @@ function TableTitle({
   )
 }
 
-/** Some quando a tela não tem o que explicar - nem toda listagem precisa. */
+/** Disappears when the screen has nothing to explain - not every listing needs one. */
 function TableDescription({
   className,
   children,
@@ -71,8 +71,8 @@ function TableDescription({
 }
 
 /**
- * As ações da direita: criar, exportar, o que a tela tiver - uma, três ou
- * nenhuma. `flex-wrap` porque três botões não cabem lado a lado no telefone.
+ * The actions on the right: create, export, whatever the screen has - one, three or
+ * none. `flex-wrap` because three buttons do not fit side by side on a phone.
  */
 function TableActions({
   className,
@@ -96,10 +96,10 @@ function TableActions({
 }
 
 /**
- * O botão de criar, para o cabeçalho e para o estado vazio.
+ * The create button, for the header and for the empty state.
  *
- * `Link` e não `onClick` com `navigate()`: criar é navegação, e como link ele
- * responde a abrir em nova aba, ao clique do meio e ao menu de contexto.
+ * `Link` and not `onClick` with `navigate()`: creating is navigation, and as a link it
+ * responds to open in a new tab, to middle click and to the context menu.
  */
 function TableCreateButton({
   to,

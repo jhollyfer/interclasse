@@ -5,7 +5,7 @@ import { Announcement } from './announcement.entity.ts'
 const NOW = new Date('2026-10-29T12:00:00Z')
 const LATER = new Date('2026-10-30T12:00:00Z')
 
-function aviso(): Announcement {
+function buildAnnouncement(): Announcement {
   return Announcement.restore({
     id: 'aviso',
     title: 'Jogo adiado',
@@ -17,7 +17,7 @@ function aviso(): Announcement {
 }
 
 test.group('Announcement', () => {
-  test('nasce sem destaque quando não pedem', ({ assert }) => {
+  test('is born unpinned when not asked', ({ assert }) => {
     const announcement = Announcement.create({ id: 'id', title: 'T', body: 'B', now: NOW })
 
     assert.deepEqual(announcement.snapshot(), {
@@ -30,7 +30,7 @@ test.group('Announcement', () => {
     })
   })
 
-  test('nasce fixado quando pedem', ({ assert }) => {
+  test('is born pinned when requested', ({ assert }) => {
     const announcement = Announcement.create({
       id: 'id',
       title: 'T',
@@ -42,8 +42,8 @@ test.group('Announcement', () => {
     assert.isTrue(announcement.snapshot().pinned)
   })
 
-  test('editar muda só o que veio e carimba a edição', ({ assert }) => {
-    const announcement = aviso()
+  test('editing changes only what came and stamps the edit', ({ assert }) => {
+    const announcement = buildAnnouncement()
 
     announcement.edit({ pinned: true }, LATER)
 
@@ -55,8 +55,8 @@ test.group('Announcement', () => {
     })
   })
 
-  test('editar título e texto troca os dois e mantém o destaque', ({ assert }) => {
-    const announcement = aviso()
+  test('editing title and text changes both and keeps the pin', ({ assert }) => {
+    const announcement = buildAnnouncement()
 
     announcement.edit({ title: 'Novo', body: 'Outro texto' }, LATER)
 
@@ -67,8 +67,8 @@ test.group('Announcement', () => {
     })
   })
 
-  test('snapshot devolve cópia', ({ assert }) => {
-    const announcement = aviso()
+  test('snapshot returns a copy', ({ assert }) => {
+    const announcement = buildAnnouncement()
 
     const copy = announcement.snapshot()
     announcement.edit({ title: 'Mudou' }, LATER)

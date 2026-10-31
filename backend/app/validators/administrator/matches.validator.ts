@@ -8,28 +8,28 @@ export const AdministratorMatchPaginateValidator = vine.create({
   ...matchFilterFields(),
 })
 
-/** Data e hora com fuso: `2026-11-03T14:30:00-04:00` ou `...T18:30:00.000Z`. */
+/** Date and time with offset: `2026-11-03T14:30:00-04:00` or `...T18:30:00.000Z`. */
 const ISO_DATE_TIME =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:\d{2})$/
 
 /**
- * ISO 8601 **com fuso**, e não `vine.date({ formats: ['iso8601'] })`.
+ * ISO 8601 **with offset**, and not `vine.date({ formats: ['iso8601'] })`.
  *
- * O `iso8601` do VineJS cai no `dayjs(value)` solto quando o formato estrito
- * falha, e aceita qualquer texto que o `Date` do JavaScript entenda:
- * `03/11/2026 14:30` virava 11 de março, e `2026-11-03` sem fuso, meia-noite
- * UTC. O formato estrito do dayjs, por sua vez, não lê fuso. Daí o texto
- * conferido aqui e convertido pelo Luxon, que respeita o fuso recebido.
+ * VineJS's `iso8601` falls to a loose `dayjs(value)` when the strict format
+ * fails, and accepts any text JavaScript's `Date` understands:
+ * `03/11/2026 14:30` became March 11th, and `2026-11-03` without offset, midnight
+ * UTC. dayjs' strict format, in turn, does not read an offset. Hence the text is
+ * checked here and converted by Luxon, which respects the received offset.
  */
 const isoDateTimeRule = vine.createRule((value: unknown, _options: undefined, field) => {
   if (typeof value !== 'string') return
   if (ISO_DATE_TIME.test(value) && DateTime.fromISO(value).isValid) return
 
-  // A frase mora no catálogo de `core/validator.ts` (chave `isoDateTime`), nos três idiomas.
+  // The phrase lives in the `core/validator.ts` catalog (key `isoDateTime`), in the three languages.
   field.report('Informe {{ field }}', 'isoDateTime', field)
 })
 
-/** O campo da agenda: ISO com fuso, `null` desmarca, ausente não mexe. */
+/** The schedule field: ISO with offset, `null` unschedules, absent leaves it alone. */
 export function scheduledAt() {
   return vine
     .string()
@@ -38,8 +38,8 @@ export function scheduledAt() {
     .nullable()
     .optional()
     .transform((value): DateTime | null | undefined => {
-      // O VineJS não chama o `transform` com o campo ausente, mas o tipo do campo
-      // opcional é `T | undefined`: o retorno diz os três estados.
+      // VineJS does not call the `transform` with the field absent, but the optional field
+      // type is `T | undefined`: the return says the three states.
       if (value === undefined) return undefined
       if (value === null) return null
 
@@ -48,8 +48,8 @@ export function scheduledAt() {
 }
 
 /**
- * A agenda da partida. A escola joga no horário local, e o servidor grava em
- * UTC; `null` desmarca.
+ * The match schedule. The school plays in local time, and the server saves in
+ * UTC; `null` unschedules.
  */
 export const AdministratorMatchUpdateValidator = vine.create({
   scheduledAt: scheduledAt(),
@@ -57,8 +57,8 @@ export const AdministratorMatchUpdateValidator = vine.create({
 })
 
 /**
- * O placar. `winnerTeamId` só é lido no mata-mata empatado - o vencedor nos
- * pênaltis; em qualquer outro caso o placar decide sozinho.
+ * The score. `winnerTeamId` is only read in a tied knockout - the winner on
+ * penalties; in any other case the score decides on its own.
  */
 export const AdministratorMatchScoreValidator = vine.create({
   homeScore: vine.number().withoutDecimals().min(0).max(999),

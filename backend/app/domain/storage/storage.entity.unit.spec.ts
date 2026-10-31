@@ -20,7 +20,7 @@ function pending(): Storage {
 }
 
 test.group('Storage', () => {
-  test('nasce PENDING com a chave como caminho', ({ assert }) => {
+  test('is born PENDING with the key as the path', ({ assert }) => {
     const file = pending()
 
     assert.deepInclude(file.snapshot(), {
@@ -32,7 +32,9 @@ test.group('Storage', () => {
     assert.isTrue(file.isPending())
   })
 
-  test('confirma quando o tamanho que subiu é o declarado e solta o uploadId', ({ assert }) => {
+  test('confirms when the size that went up is the declared one and drops the uploadId', ({
+    assert,
+  }) => {
     const file = pending()
 
     const result = file.complete({ contentLength: 1024, head: PNG }, NOW)
@@ -41,7 +43,9 @@ test.group('Storage', () => {
     assert.deepInclude(file.snapshot(), { status: 'UPLOADED', uploadId: null })
   })
 
-  test('tamanho diferente do declarado é STORAGE_SIZE_MISMATCH e não confirma', ({ assert }) => {
+  test('a size different from the declared one is STORAGE_SIZE_MISMATCH and does not confirm', ({
+    assert,
+  }) => {
     const file = pending()
 
     const result = file.complete({ contentLength: 10, head: PNG }, NOW)
@@ -54,7 +58,7 @@ test.group('Storage', () => {
     assert.isTrue(file.isPending())
   })
 
-  test('conteúdo que não é do tipo declarado é STORAGE_CONTENT_MISMATCH e não confirma', ({
+  test('content that is not of the declared type is STORAGE_CONTENT_MISMATCH and does not confirm', ({
     assert,
   }) => {
     const file = pending()
@@ -66,7 +70,7 @@ test.group('Storage', () => {
     assert.isTrue(file.isPending())
   })
 
-  test('confirmar de novo é idempotente, mesmo com outro tamanho', ({ assert }) => {
+  test('confirming again is idempotent, even with another size', ({ assert }) => {
     const file = pending()
     file.complete({ contentLength: 1024, head: PNG }, NOW)
 
@@ -76,7 +80,7 @@ test.group('Storage', () => {
     assert.isTrue(file.isUploaded())
   })
 
-  test('PENDING sai sempre; UPLOADED só sem uso', ({ assert }) => {
+  test('PENDING always goes; UPLOADED only when unused', ({ assert }) => {
     const free = pending()
     const used = pending()
     used.complete({ contentLength: 1024, head: PNG }, NOW)

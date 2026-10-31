@@ -12,14 +12,14 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Tira a conta da lixeira. O espelho de `archive`: busca só o que está
- * arquivado, então usuário vivo é `404` aqui pela mesma razão que usuário
- * arquivado é `404` lá.
+ * Takes the account out of the trash. The mirror of `archive`: it searches only what is
+ * archived, so a live user is `404` here for the same reason an
+ * archived user is `404` there.
  *
- * Nenhum token é recriado - quem foi restaurado entra de novo pelo sign-in.
+ * No token is recreated - whoever was restored signs in again through sign-in.
  *
- * Sem guarda de colisão de e-mail: o `create` reativa a linha arquivada em vez
- * de inserir outra, então nunca existe um registro-sombra ocupando o `unique`.
+ * No email collision guard: `create` reactivates the archived row instead
+ * of inserting another, so there is never a shadow record occupying the `unique`.
  */
 @inject()
 export default class AdministratorUserUnarchiveUseCase {

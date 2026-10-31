@@ -11,7 +11,7 @@ export const AdvisorStudentCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
-/** Só o nome: trocar o aluno de turma é apagar e cadastrar na outra. */
+/** Name only: moving a student to another classroom is delete and register in the other. */
 export const AdvisorStudentUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
 })

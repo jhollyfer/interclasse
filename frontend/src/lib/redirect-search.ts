@@ -1,17 +1,17 @@
-/** Para onde voltar depois de entrar, quando o guard barrou alguém no meio. */
+/** Where to go back to after signing in, when the guard blocked someone midway. */
 export type RedirectSearch = {
   redirect?: string
 }
 
 /**
- * Valida o `?redirect=` da tela de autenticação.
+ * Validates the authentication screen's `?redirect=`.
  *
- * À mão, e não com um schema Zod: a regra é de caminho (`/`, nunca `//` nem
- * `/\`), não de forma, e o `validateSearch` do roteador precisa devolver o
- * objeto limpo, sem lançar.
+ * By hand, and not with a Zod schema: the rule is about the path (`/`, never `//` or
+ * `/\`), not the shape, and the router's `validateSearch` has to return the
+ * clean object, without throwing.
  *
- * Mora fora de `routes/` para poder ser testado sem que o gerador da árvore de
- * rotas trate o arquivo de teste como uma rota.
+ * Lives outside `routes/` so it can be tested without the route tree generator
+ * treating the test file as a route.
  */
 export function validateRedirectSearch(
   search: Record<string, unknown>,
@@ -20,14 +20,14 @@ export function validateRedirectSearch(
 
   if (typeof value !== 'string') return {}
 
-  // Só caminho interno. `https://evil.com` é óbvio, mas `//evil.com` também é
-  // navegação externa: o navegador o lê como "mesmo protocolo, outro host".
-  // Sem esta linha, um link com `?redirect=` leva o usuário para fora logo
-  // depois de ele digitar a senha, e a barra de endereços não denuncia nada.
+  // Internal paths only. `https://evil.com` is obvious, but `//evil.com` is also
+  // external navigation: the browser reads it as "same protocol, other host".
+  // Without this line, a link with `?redirect=` takes the user off-site right
+  // after typing the password, and the address bar gives nothing away.
   if (!value.startsWith('/') || value.startsWith('//')) return {}
 
-  // `\` no lugar de `/` é a variação que os navegadores normalizam de volta
-  // para `//`, e que passa por uma checagem feita só sobre a barra.
+  // `\` in place of `/` is the variation that browsers normalize back
+  // to `//`, and that gets past a check made only on the slash.
   if (value.startsWith('/\\')) return {}
 
   return { redirect: value }

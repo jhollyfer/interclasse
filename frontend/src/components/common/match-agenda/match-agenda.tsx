@@ -19,7 +19,7 @@ export function phaseLabel(
   return MATCH_PHASE_LABELS[match.phase] ?? match.phase
 }
 
-/** O placar, ou o "x" de quem ainda não jogou. */
+/** The score, or the "x" for those who have not played yet. */
 export function scoreOf(match: AdministratorMatchPaginateResponse): string {
   if (match.status === MATCH_STATUS.FINISHED)
     return `${match.homeScore} x ${match.awayScore}`
@@ -34,8 +34,8 @@ type Day = {
 }
 
 /**
- * A agenda em dias, na ordem em que a API devolveu. Jogo sem horário fica
- * num grupo próprio, no fim.
+ * The agenda in days, in the order the API returned. A match without a time goes in
+ * a group of its own, at the end.
  */
 export function groupByDay(
   matches: ReadonlyArray<AdministratorMatchPaginateResponse>,
@@ -60,9 +60,9 @@ export function groupByDay(
 }
 
 /**
- * Um jogo na agenda: a hora, as duas turmas com o placar no meio, e embaixo a
- * modalidade e o local. Linha, e não cartão: a agenda é lida de cima para
- * baixo como a grade de um campeonato.
+ * A match in the agenda: the time, the two classrooms with the score in the middle, and below the
+ * sport and the venue. A row, and not a card: the agenda is read top to
+ * bottom like a championship grid.
  */
 export function MatchRow({
   match,
@@ -110,7 +110,7 @@ export function MatchRow({
   )
 }
 
-/** A agenda inteira, dia por dia. */
+/** The whole agenda, day by day. */
 export function Agenda({
   matches,
 }: Readonly<{

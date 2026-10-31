@@ -5,8 +5,8 @@ import {
 import { pageFields, z } from '../../validator.js'
 
 /**
- * A foto do carrossel, como o painel a envia, lista e revisa. Par de caminho e
- * nome do VineJS de `backend/app/validators/administrator/photos.validator.ts`
+ * The carousel photo, as the panel uploads, lists and reviews it. Mirror (path and
+ * name) of the VineJS one in `backend/app/validators/administrator/photos.validator.ts`
  * (`_standards/architecture.md` §10).
  */
 export const AdministratorPhotoCreateValidator = z.object({

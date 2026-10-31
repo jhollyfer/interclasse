@@ -17,13 +17,13 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { UserFactory } from '#database/factories/user.factory'
 
 /**
- * O que cada implementação precisa para o teste arranjar o mundo: um conselheiro
- * com turma e um aluno inscrito numa modalidade já sorteada. O contrato roda
- * igual nas duas (`_standards/domain.md` §5.4).
+ * What each implementation needs for the test to arrange the world: an advisor
+ * with a classroom and a student enrolled in an already drawn sport. The contract runs
+ * the same on both (`_standards/domain.md` §5.4).
  */
 type Harness = {
   readonly repository: StudentRepository
-  /** Uma turma e o conselheiro dela. */
+  /** A classroom and its advisor. */
   classroom(): Promise<{ classroomId: string; advisorId: string }>
   drawn(student: Student, classroomId: string): Promise<void>
 }
@@ -66,7 +66,7 @@ const NOW = new Date('2026-10-29T12:00:00.000Z')
 
 function newStudent(classroomId: string, name: string): Student {
   const created = Student.create({ id: randomUUID(), classroomId, name, now: NOW })
-  if (created.isLeft()) throw new Error('aluno inválido no arranjo')
+  if (created.isLeft()) throw new Error('invalid student in the arrangement')
 
   return created.value
 }
@@ -75,7 +75,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`StudentRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findOwned devolvem o mesmo aluno', async ({ assert }) => {
+    test('save and findOwned return the same student', async ({ assert }) => {
       const { repository, classroom } = await make()
       const { classroomId, advisorId } = await classroom()
       const ana = newStudent(classroomId, 'Ana')
@@ -89,7 +89,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(found?.snapshot(), ana.snapshot())
     })
 
-    test('findOwned: aluno de turma alheia volta null, e o administrador alcança', async ({
+    test('findOwned: a student of a foreign classroom comes back null, and the administrator reaches it', async ({
       assert,
     }) => {
       const { repository, classroom } = await make()
@@ -111,7 +111,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(administrator)
     })
 
-    test('save de aluno existente atualiza o nome', async ({ assert }) => {
+    test('save of an existing student updates the name', async ({ assert }) => {
       const { repository, classroom } = await make()
       const { classroomId, advisorId } = await classroom()
       const ana = newStudent(classroomId, 'Ana')
@@ -127,7 +127,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(found?.snapshot().name, 'Ana Clara')
     })
 
-    test('isInDrawnSport só é verdade com inscrição em modalidade sorteada', async ({ assert }) => {
+    test('isInDrawnSport is only true with an enrollment in a drawn sport', async ({ assert }) => {
       const { repository, classroom, drawn } = await make()
       const { classroomId } = await classroom()
       const ana = newStudent(classroomId, 'Ana')
@@ -138,7 +138,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isTrue(await repository.isInDrawnSport(ana.id))
     })
 
-    test('delete tira o aluno', async ({ assert }) => {
+    test('delete removes the student', async ({ assert }) => {
       const { repository, classroom } = await make()
       const { classroomId, advisorId } = await classroom()
       const ana = newStudent(classroomId, 'Ana')
@@ -153,7 +153,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(found)
     })
 
-    test('paginate lista só o alcance, em ordem alfabética, com busca e recorte de turma', async ({
+    test('paginate lists only the scope, in alphabetical order, with search and classroom cut', async ({
       assert,
     }) => {
       const { repository, classroom } = await make()

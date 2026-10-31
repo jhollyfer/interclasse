@@ -21,12 +21,12 @@ import { queryString } from '#/lib/list-search'
 import { request } from '../http'
 
 /**
- * O site público, sem sessão. O `request` continua o mesmo: manda o cookie
- * quando existe, e estas rotas simplesmente não o exigem.
+ * The public site, without a session. `request` stays the same: it sends the cookie
+ * when there is one, and these routes simply do not require it.
  *
- * Jogos e chaves se atualizam sozinhos a cada minuto com a aba aberta: no dia
- * dos jogos o placar entra pelo painel, e quem acompanha pelo celular não
- * precisa recarregar a página para ver.
+ * Matches and brackets refresh on their own every minute with the tab open: on
+ * game day the score is entered through the dashboard, and whoever follows on a phone
+ * does not need to reload the page to see it.
  */
 const LIVE = 60 * 1000
 
@@ -43,8 +43,8 @@ export const storefrontSportsQueryOptions = () =>
   })
 
 /**
- * O carrossel do site. As URLs são assinadas e vencem em minutos: `staleTime`
- * abaixo disso, para nenhuma foto virar imagem quebrada na tela aberta.
+ * The site carousel. The URLs are signed and expire in minutes: `staleTime`
+ * below that, so no photo turns into a broken image on an open screen.
  */
 export const storefrontPhotosQueryOptions = (params: StorefrontSearch) =>
   queryOptions({
@@ -59,9 +59,9 @@ export const storefrontPhotosQueryOptions = (params: StorefrontSearch) =>
   })
 
 /**
- * O "Sobre" e o regulamento no site. A URL do PDF é assinada e vence em
- * minutos: `staleTime` abaixo disso, para o botão nunca apontar para um link
- * vencido.
+ * The "Sobre" and the regulation on the site. The PDF URL is signed and expires in
+ * minutes: `staleTime` below that, so the button never points to an expired
+ * link.
  */
 export const storefrontSiteQueryOptions = () =>
   queryOptions({

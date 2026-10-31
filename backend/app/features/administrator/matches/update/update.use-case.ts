@@ -21,7 +21,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = Merge<AdministratorMatchUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, AdministratorMatchUpdateResponse>
 
-/** Agenda a partida: data, hora e local. Campo ausente é "não mexer"; `null` desmarca. */
+/** Schedules the match: date, time and place. A missing field means "leave alone"; `null` unschedules. */
 @inject()
 export default class AdministratorMatchUpdateUseCase {
   constructor(
@@ -29,7 +29,7 @@ export default class AdministratorMatchUpdateUseCase {
     private readonly i18n: I18n,
   ) {}
 
-  /** Ausente continua ausente e `null` continua `null`: só a data de verdade vira `Date`. */
+  /** Missing stays missing and `null` stays `null`: only a real date becomes `Date`. */
   private static dateOf(value: DateTime | null | undefined): Date | null | undefined {
     if (value === undefined) return undefined
     if (value === null) return null

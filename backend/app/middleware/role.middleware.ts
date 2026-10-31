@@ -5,25 +5,25 @@ import { type UserRole } from '@interclasse/shared'
 import HTTPException from '#exceptions/http.exception'
 
 /**
- * Recusa quem chega a um módulo cujo papel não é o seu.
+ * Refuses whoever reaches a module whose role is not theirs.
  *
- * Aplicado no **grupo** de rotas, nunca no endpoint: um endpoint novo nasce
- * protegido pelo módulo em que foi colocado, sem depender de alguém lembrar de
- * anotá-lo.
+ * Applied on the route **group**, never on the endpoint: a new endpoint is born
+ * protected by the module it was placed in, without depending on someone remembering to
+ * annotate it.
  *
- * Roda sempre depois de `middleware.auth()`. A ordem importa: sem sessão o papel
- * do requisitante é desconhecido, então a resposta correta é `401`, e é o `auth`
- * que a devolve. O `403` daqui só faz sentido quando já se sabe quem está
- * chamando - diferente do escopo de dados, que responde "não encontrado" para
- * não confirmar a existência do recurso.
+ * Always runs after `middleware.auth()`. The order matters: without a session the role
+ * of the requester is unknown, so the correct answer is `401`, and it is `auth`
+ * that returns it. The `403` here only makes sense when it is already known who is
+ * calling - unlike data scope, which answers "not found" so as
+ * not to confirm the resource exists.
  */
 export default class RoleMiddleware {
   async handle(context: HttpContext, next: NextFn, roles: ReadonlyArray<UserRole>) {
     const user = context.auth.user
 
-    // `schema.ts` é gerado do banco e tipa `role` como `string`. Alargar a lista
-    // para `readonly string[]` é atribuição segura - comparar com `as UserRole`
-    // seria mentir para o compilador sobre um valor que vem do banco.
+    // `schema.ts` is generated from the database and types `role` as `string`. Widening the list
+    // to `readonly string[]` is a safe assignment - comparing with `as UserRole`
+    // would lie to the compiler about a value that comes from the database.
     const allowed: readonly string[] = roles
 
     if (!user || !allowed.includes(user.role)) {

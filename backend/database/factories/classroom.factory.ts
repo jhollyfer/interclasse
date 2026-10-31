@@ -5,8 +5,8 @@ import { Classroom as ClassroomEntity } from '#domain/classroom/classroom.entity
 import { UserFactory } from '#database/factories/user.factory'
 
 /**
- * Turma. A categoria é derivada do ano pela mesma regra da entidade - o
- * banco nunca recebe um par ano/categoria que a aplicação não gravaria.
+ * Classroom. The category is derived from the grade by the same rule as the entity - the
+ * database never receives a grade/category pair the application would not write.
  */
 export const ClassroomFactory = factory
   .define(Classroom, ({ faker }) => {

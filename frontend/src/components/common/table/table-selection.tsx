@@ -10,15 +10,15 @@ import { m } from '#/paraglide/messages'
 import type { TableFeatures, TableInstance } from './use-table'
 
 /**
- * A coluna de caixas de seleção, para espalhar antes das colunas da tela.
+ * The column of selection checkboxes, to spread before the screen's columns.
  *
- * `enableHiding: false` e `enableResizing: false`: ela é âncora da tabela, não
- * conteúdo - esconder a seleção deixaria as ações em massa inalcançáveis, e
- * redimensionar uma caixa de 16px não faz sentido.
+ * `enableHiding: false` and `enableResizing: false`: it is a table anchor, not
+ * content - hiding the selection would leave the bulk actions unreachable, and
+ * resizing a 16px checkbox makes no sense.
  *
- * O indeterminado é `algum && !todos` porque na v9 `getIsSomePageRowsSelected()`
- * passou a significar **pelo menos um**, incluindo quando são todos. Usá-lo
- * sozinho deixaria a caixa em traço mesmo com a página inteira marcada.
+ * Indeterminate is `some && !all` because in v9 `getIsSomePageRowsSelected()`
+ * came to mean **at least one**, including when all are selected. Using it
+ * alone would leave the box dashed even with the whole page ticked.
  */
 export function selectionColumn<TRow extends RowData>(): ColumnDef<
   TableFeatures,
@@ -36,8 +36,8 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
       return (
         <Checkbox
           checked={all}
-          // No Base UI o traço é uma prop à parte, e não um terceiro valor de
-          // `checked` - o componente aceita só booleano ali.
+          // In Base UI the dash is a separate prop, and not a third value of
+          // `checked` - the component only accepts a boolean there.
           indeterminate={some && !all}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label={m.table_select_all()}
@@ -45,13 +45,13 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
       )
     },
     cell: ({ row }) => (
-      // O clique na caixa não pode também abrir o registro.
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- só contém o clique: o teclado não atravessa a borda
+      // Clicking the checkbox must not also open the record.
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- only contains the click: the keyboard does not cross the border
       <div onClick={(event) => event.stopPropagation()}>
         <Checkbox
           checked={row.getIsSelected()}
-          // O predicado de `selectable` chega aqui: linha que a API recusaria
-          // arquivar não entra na seleção, e a caixa diz isso antes do clique.
+          // The `selectable` predicate arrives here: a row the API would refuse to
+          // archive does not enter the selection, and the checkbox says so before the click.
           disabled={!row.getCanSelect()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label={m.table_select_row()}
@@ -63,20 +63,20 @@ export function selectionColumn<TRow extends RowData>(): ColumnDef<
 
 type TableSelectionBarProps<TRow extends RowData> = Readonly<{
   table: TableInstance<TRow>
-  /** O nome do recurso no singular e no plural: `['tabela', 'tabelas']`. */
+  /** The resource name in singular and plural: `['tabela', 'tabelas']`. */
   noun: [string, string]
-  /** Os botões de ação. Recebem as linhas selecionadas. */
+  /** The action buttons. They receive the selected rows. */
   children: (rows: ReadonlyArray<TRow>) => React.ReactNode
 }>
 
 /**
- * A barra que aparece quando há linhas selecionadas.
+ * The bar that appears when rows are selected.
  *
- * `sticky bottom-4` dentro da área que rola: ela acompanha a lista em vez de
- * ficar presa ao fim dela, então continua alcançável com 50 linhas na tela.
+ * `sticky bottom-4` inside the scrolling area: it follows the list instead of
+ * being stuck at its end, so it stays reachable with 50 rows on screen.
  *
- * Some sozinha quando a seleção zera - não há estado de "barra aberta e vazia"
- * a manter.
+ * It disappears on its own when the selection drops to zero - there is no "open and empty
+ * bar" state to maintain.
  */
 export function TableSelectionBar<TRow extends RowData>({
   table,
@@ -91,19 +91,19 @@ export function TableSelectionBar<TRow extends RowData>({
   const [singular, plural] = noun
 
   /**
-   * "Seleção:" e não "selecionadas": a referência fixa o particípio no feminino,
-   * o que aqui daria "3 eventos selecionadas" em seis dos sete recursos. Pôr um
-   * gênero no `noun` seria desenho que a referência não tem; a forma sem
-   * particípio concorda com os dois e diz a mesma coisa.
+   * "Seleção:" and not "selecionadas": the reference fixes the participle in the feminine,
+   * which here would give "3 eventos selecionadas" in six of the seven resources. Putting a
+   * gender in `noun` would be a design the reference does not have; the form without a
+   * participle agrees with both and says the same thing.
    */
   let name = plural
   if (count === 1) name = singular
   const label = m.table_selection({ count, noun: name })
 
   return (
-    // Barra de ações sobre a seleção, e por isso `ButtonGroup`. Os filhos
-    // entram em grupos aninhados porque são ações independentes - colá-las
-    // desenharia um controle segmentado, que é outra coisa.
+    // Action bar over the selection, and hence `ButtonGroup`. The children
+    // enter in nested groups because they are independent actions - gluing them
+    // would draw a segmented control, which is something else.
     <ButtonGroup
       data-slot="table-selection-bar"
       data-test-id="selection-bar"

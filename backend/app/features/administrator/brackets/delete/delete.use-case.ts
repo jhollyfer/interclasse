@@ -13,11 +13,11 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Times e partidas vão junto.
+ * Teams and matches go along.
  *
- * Só sai a chave sem resultado (regra da entidade): com placar lançado, apagar
- * levaria embora o que aconteceu em quadra, sem volta. Para refazer uma chave já
- * jogada, desfazem-se os placares antes (`DELETE /administrator/matches/:id/score`).
+ * Only a bracket without results goes (entity rule): with a recorded score, deleting
+ * would take away what happened on the court, with no way back. To redo an already
+ * played bracket, the scores are undone first (`DELETE /administrator/matches/:id/score`).
  */
 @inject()
 export default class AdministratorBracketDeleteUseCase {

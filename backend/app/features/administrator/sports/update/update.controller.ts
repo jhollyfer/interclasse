@@ -11,8 +11,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdministratorSportUpdateController {
   static docs = defineDocs({
     description:
-      'Campo ausente é "não mexer". Trocar o nome troca o `slug`, e com ele o endereço da ' +
-      'modalidade no site.',
+      'A missing field means "leave alone". Changing the name changes the `slug`, and with it the address of the ' +
+      'sport on the site.',
   })
 
   constructor(private readonly useCase: AdministratorSportUpdateUseCase) {}

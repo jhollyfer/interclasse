@@ -19,8 +19,8 @@ type Payload = PagePayload
 type Response = Either<HTTPException, Paginated<StorefrontPhotoShowResponse>>
 
 /**
- * O carrossel do site: só as aprovadas, da mais nova à mais antiga. Sai a URL
- * assinada e a legenda; quem enviou e o caminho no bucket ficam de fora.
+ * The site carousel: only the approved ones, newest to oldest. The signed URL
+ * and the caption go out; who submitted and the path in the bucket stay out.
  */
 @inject()
 export default class StorefrontPhotoPaginateUseCase {

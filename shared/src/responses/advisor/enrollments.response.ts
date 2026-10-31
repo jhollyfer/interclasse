@@ -2,11 +2,11 @@ import { CATEGORIES } from '../../enums/category.js'
 import { z } from '../../validator.js'
 
 /**
- * As inscrições de uma turma: as modalidades, os alunos e em quais modalidades
- * cada um está. É a matriz aluno x modalidade do conselheiro e do representante.
+ * The enrollments of a classroom: the sports, the students and which sports each one
+ * is in. It is the student x sport matrix of the advisor and the representative.
  *
- * `drawn` diz que a modalidade já foi sorteada na categoria da turma; `locked`,
- * que a lista dela não muda mais para quem lê (só o representante trava).
+ * `drawn` says the sport was already drawn in the classroom's category; `locked`,
+ * that its list no longer changes for whoever reads it (only the representative is locked).
  */
 export const AdvisorEnrollmentShowResponse = z.object({
   classroom: z.object({

@@ -22,8 +22,8 @@ type Payload = Merge<AdministratorSportUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, AdministratorSportShowResponse>
 
 /**
- * Renomeia e muda os limites. Campo ausente é "não mexer". O máximo não desce
- * abaixo do maior elenco já inscrito (regra da entidade).
+ * Renames and changes the limits. A missing field means "leave alone". The maximum does not go
+ * below the largest roster already enrolled (entity rule).
  */
 @inject()
 export default class AdministratorSportUpdateUseCase {

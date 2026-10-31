@@ -18,7 +18,7 @@ import type { AdministratorPhotoCreatePayload } from '#validators/administrator/
 type Payload = Merge<AdministratorPhotoCreatePayload, { actor: { readonly id: string } }>
 type Response = Either<HTTPException, AdministratorPhotoShowResponse>
 
-/** A foto da organização vai direto ao site: quem aprova é ela mesma. */
+/** The organization photo goes straight to the site: it approves itself. */
 @inject()
 export default class AdministratorPhotoCreateUseCase extends PhotoSubmissionBase {
   constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {

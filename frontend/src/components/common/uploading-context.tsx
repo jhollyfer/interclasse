@@ -9,16 +9,16 @@ type UploadingContextValue = {
 const UploadingContext = React.createContext<UploadingContextValue | null>(null)
 
 /**
- * Quem está enviando arquivo, agora, em qualquer lugar da árvore.
+ * Who is uploading a file, right now, anywhere in the tree.
  *
- * Existe por causa do submit: o upload acontece na hora da escolha e o
- * formulário só conhece o `id` depois que o arquivo existe. Sem isto, salvar
- * enquanto a barra ainda corre manda um payload sem o anexo - e o registro nasce
- * sem imagem, sem erro nenhum que denuncie.
+ * It exists because of the submit: the upload happens when the file is chosen and the
+ * form only knows the `id` after the file exists. Without this, saving
+ * while the bar is still running sends a payload without the attachment - and the record is born
+ * without an image, with no error to give it away.
  *
- * Um `Set` de chaves e não um contador: dois campos de upload na mesma tela
- * registram e cancelam em ordens imprevisíveis, e um contador que desce duas
- * vezes pelo mesmo campo chega a zero com o outro ainda em voo.
+ * A `Set` of keys and not a counter: two upload fields on the same screen
+ * register and cancel in unpredictable orders, and a counter that goes down twice
+ * for the same field reaches zero with the other still in flight.
  */
 export function UploadingProvider({
   children,
@@ -53,19 +53,19 @@ export function UploadingProvider({
 }
 
 /**
- * Registra este campo como ocupado enquanto `active` for verdadeiro.
+ * Registers this field as busy while `active` is true.
  *
- * Fora de um `UploadingProvider` não faz nada - o campo de upload continua
- * funcionando, só ninguém está perguntando se ele terminou.
+ * Outside an `UploadingProvider` it does nothing - the upload field keeps
+ * working, it is just that nobody is asking whether it finished.
  */
 export function useRegisterUpload(active: boolean): void {
   const context = React.use(UploadingContext)
   const key = React.useId()
 
-  // `useEffectEvent`: o efeito reage só a `active`. O contexto muda de
-  // identidade a cada render do provider (register/unregister são funções
-  // novas sem o memo manual), e tê-lo nas dependências cancelaria e refaria o
-  // registro em laço.
+  // `useEffectEvent`: the effect reacts only to `active`. The context changes
+  // identity on every provider render (register/unregister are new functions
+  // without the manual memo), and having it in the dependencies would cancel and redo the
+  // registration in a loop.
   const sync = React.useEffectEvent((on: boolean): void => {
     if (!context) return
 
@@ -76,13 +76,13 @@ export function useRegisterUpload(active: boolean): void {
   React.useEffect(() => {
     sync(active)
 
-    // Desmontar com um upload em voo tem de liberar o cadeado, senão o botão
-    // de salvar fica travado para sempre.
+    // Unmounting with an upload in flight must release the lock, otherwise the save
+    // button stays locked forever.
     return () => sync(false)
   }, [active])
 }
 
-/** Há upload em andamento? Use para desabilitar o botão de salvar. */
+/** Is an upload in progress? Use it to disable the save button. */
 export function useIsUploading(): boolean {
   const context = React.use(UploadingContext)
 

@@ -1,24 +1,24 @@
 import type { z } from '@interclasse/shared'
 
 /**
- * A casa única do `localStorage` (`frontend.md` §2): nenhum componente nem
- * módulo toca nele direto.
+ * The single home of `localStorage` (`frontend.md` §2): no component or
+ * module touches it directly.
  *
- * - **Chave versionada** `<app>:<tema>:v1`. Subir a versão descarta o que está
- *   gravado, que é o único jeito de corrigir um formato durável que já nasceu
- *   errado.
- * - **Leitura em `try/catch`**: o storage não existe no SSR e lança com a cota
- *   cheia ou em modo restrito. Perder a preferência é aceitável; derrubar a
- *   tela por causa dela, não.
- * - **Valor `unknown` convertido pelo schema** de `@interclasse/shared`
- *   (`typescript.md` §2), com o default quando o parse falha: o que está
- *   gravado sobrevive a deploy, e a forma de ontem não é garantia da de hoje.
+ * - **Versioned key** `<app>:<theme>:v1`. Bumping the version discards what is
+ *   stored, which is the only way to fix a durable format that was born
+ *   wrong.
+ * - **Read in `try/catch`**: the storage does not exist on SSR and throws with a full
+ *   quota or in restricted mode. Losing the preference is acceptable; bringing the
+ *   screen down because of it is not.
+ * - **`unknown` value converted by the schema** from `@interclasse/shared`
+ *   (`typescript.md` §2), with the default when the parse fails: what is stored
+ *   survives a deploy, and yesterday's shape is no guarantee of today's.
  */
 
 const APP = 'interclasse'
 const VERSION = 'v1'
 
-/** A chave completa de um tema: `interclasse:<tema>:v1`. */
+/** The full key of a theme: `interclasse:<theme>:v1`. */
 export function localStoreKey(theme: string): string {
   return `${APP}:${theme}:${VERSION}`
 }
@@ -26,11 +26,11 @@ export function localStoreKey(theme: string): string {
 type ReadLocalInput<TSchema extends z.ZodType> = Readonly<{
   theme: string
   schema: TSchema
-  /** O que volta quando não há nada gravado ou o que há não bate com o schema. */
+  /** What comes back when nothing is stored or what is stored does not match the schema. */
   fallback: z.infer<TSchema>
 }>
 
-/** Lê e valida um tema; o `fallback` cobre ausência, JSON torto e forma antiga. */
+/** Reads and validates a theme; the `fallback` covers absence, crooked JSON and an old shape. */
 export function readLocal<TSchema extends z.ZodType>({
   theme,
   schema,
@@ -50,12 +50,12 @@ export function readLocal<TSchema extends z.ZodType>({
   }
 }
 
-/** Grava um tema. Sem cota ou sem storage, a preferência não persiste e a tela segue. */
+/** Saves a theme. Without quota or without storage, the preference does not persist and the screen carries on. */
 export function writeLocal(theme: string, value: unknown): void {
   try {
     globalThis.localStorage.setItem(localStoreKey(theme), JSON.stringify(value))
   } catch {
-    // Cota estourada, modo privativo ou SSR.
+    // Quota exceeded, private mode or SSR.
   }
 }
 
@@ -67,7 +67,7 @@ export function removeLocal(theme: string): void {
   }
 }
 
-/** Os temas gravados que começam com `themePrefix`, para varredura de vencidos. */
+/** The stored themes that start with `themePrefix`, for sweeping expired ones. */
 export function listLocalThemes(themePrefix: string): Array<string> {
   const head = `${APP}:${themePrefix}`
   const tail = `:${VERSION}`
@@ -82,7 +82,7 @@ export function listLocalThemes(themePrefix: string): Array<string> {
       themes.push(key.slice(APP.length + 1, key.length - tail.length))
     }
   } catch {
-    // Sem storage não há o que varrer.
+    // Without storage there is nothing to sweep.
   }
 
   return themes

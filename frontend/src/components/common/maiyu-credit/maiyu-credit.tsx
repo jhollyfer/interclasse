@@ -6,11 +6,11 @@ import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
- * O crédito de quem fez o sistema: a marca da Maiyu e o nome, com link.
+ * The credit to whoever built the system: the Maiyu brand and name, with a link.
  *
- * Mora em `common` porque todo layout o mostra - o site, o painel e a entrada.
- * A cor vem de quem usa (`className`): o rodapé do site é escuro, o do painel
- * segue o tema.
+ * Lives in `common` because every layout shows it - the site, the dashboard and the sign-in.
+ * The color comes from whoever uses it (`className`): the site's footer is dark, the dashboard's
+ * follows the theme.
  */
 export function MaiyuCredit({
   className,

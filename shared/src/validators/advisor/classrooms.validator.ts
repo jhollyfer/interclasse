@@ -1,7 +1,7 @@
 import { paginationFields, z } from '../../validator.js'
 
 /**
- * As turmas do conselheiro, com busca pelo nome. Par do VineJS de
+ * The advisor's classrooms, with search by name. Mirror of the VineJS one in
  * `backend/app/validators/advisor/classrooms.validator.ts`.
  */
 export const AdvisorClassroomPaginateValidator = z.object({

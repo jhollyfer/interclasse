@@ -10,8 +10,8 @@ import { StorefrontMatchPaginateValidator } from '#validators/storefront/matches
 export default class StorefrontMatchPaginateController {
   static docs = defineDocs({
     description:
-      'A tabela de jogos do site: as próximas partidas com `?status=SCHEDULED`, os ' +
-      'resultados com `?status=FINISHED`. Mesma ordem e filtros do painel.',
+      'The site match table: the upcoming matches with `?status=SCHEDULED`, the ' +
+      'results with `?status=FINISHED`. Same order and filters as the panel.',
   })
 
   constructor(private readonly useCase: StorefrontMatchPaginateUseCase) {}

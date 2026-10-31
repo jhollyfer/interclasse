@@ -11,24 +11,24 @@ export type StudentListCriteria = {
 }
 
 /**
- * A persistência do aluno, por intenção (`_standards/domain.md` §5.1). O escritor
- * único da tabela `students`; lê `classrooms`, `enrollments` e `brackets` só para
- * responder o alcance de quem age e o que o sorteio já travou.
+ * The student persistence, by intent (`_standards/domain.md` §5.1). The single
+ * writer of the `students` table; it reads `classrooms`, `enrollments` and `brackets` only to
+ * answer the scope of whoever acts and what the draw has already locked.
  */
 export abstract class StudentRepository {
   /**
-   * O aluno de uma turma ao alcance de quem age: o administrador alcança todas, o
-   * conselheiro a dele. Aluno alheio volta `null`, igual ao inexistente
+   * A classroom's student within reach of whoever acts: the administrator reaches all, the
+   * advisor their own. A foreign student comes back `null`, same as a nonexistent one
    * (`backend.md` §4.6).
    */
   abstract findOwned(criteria: {
     readonly id: string
     readonly actor: Actor
   }): Promise<Student | null>
-  /** O aluno está inscrito numa modalidade já sorteada na categoria da turma dele. */
+  /** The student is enrolled in a sport already drawn in their classroom's category. */
   abstract isInDrawnSport(studentId: string): Promise<boolean>
   abstract save(student: Student): Promise<void>
   abstract delete(student: Student): Promise<void>
-  /** Leitura leve: a forma da resposta direto da query, sem hidratar entidade. */
+  /** Lightweight read: the response shape straight from the query, without hydrating an entity. */
   abstract paginate(criteria: StudentListCriteria): Promise<Paginated<AdvisorStudentShowResponse>>
 }

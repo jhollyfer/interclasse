@@ -14,21 +14,21 @@ type FormShellProps = Readonly<{
 }>
 
 /**
- * A casca de todo formulário de criar/editar do painel.
+ * The shell of every dashboard create/edit form.
  *
- * Todo formulário do painel abre com as mesmas ~55 linhas: `PageShell`,
- * cabeçalho fixo com voltar/título/descartar/salvar, e o `<form>` no conteúdo
- * que rola. Só o miolo muda. Repetido um por recurso, um ajuste de cabeçalho
- * vira uma edição por tela - e a próxima nasce com o cabeçalho da versão
- * anterior.
+ * Every dashboard form opens with the same ~55 lines: `PageShell`, a
+ * fixed header with back/title/discard/save, and the `<form>` in the scrolling
+ * content. Only the middle changes. Repeated once per resource, a header tweak
+ * becomes one edit per screen - and the next one is born with the previous
+ * version's header.
  *
- * Compound e não props `title`/`actions`: as telas divergem no miolo e no
- * cabeçalho. A de notícia põe três blocos de campos onde a de depoimento põe
- * um, e a que precisar de um terceiro botão ao lado do `Salvar` escreve o botão
- * dentro de `FormShellActions`. Com prop, cada divergência dessas vira mais uma
- * prop opcional aqui dentro.
+ * Compound and not `title`/`actions` props: screens diverge in the middle and in the
+ * header. The news screen puts three field blocks where the testimonial puts
+ * one, and one that needs a third button beside `Salvar` writes the button
+ * inside `FormShellActions`. With props, each such divergence becomes one more
+ * optional prop in here.
  *
- * O `<Card>` também não vem embutido - ver `FormShellCard`.
+ * The `<Card>` is not embedded either - see `FormShellCard`.
  */
 export function FormShell({
   formId,
@@ -37,7 +37,7 @@ export function FormShell({
   isPending = false,
   children,
 }: FormShellProps): React.JSX.Element {
-  // Sem `useMemo`: o React Compiler memoiza o objeto pelo que ele lê.
+  // No `useMemo`: the React Compiler memoizes the object by what it reads.
   const value = { formId, backTo, backParams, isPending }
 
   return (

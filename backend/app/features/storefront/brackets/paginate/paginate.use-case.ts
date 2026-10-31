@@ -32,7 +32,7 @@ export default class StorefrontBracketPaginateUseCase {
           perPage: payload.perPage ?? PAGINATION.PER_PAGE,
           sportId: payload.sportId,
           category: payload.category,
-          // Por modalidade e categoria: é como o site agrupa as abas.
+          // By sport and category: it is how the site groups the tabs.
           order: 'sport-name',
         }),
       )

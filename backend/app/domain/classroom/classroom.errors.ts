@@ -1,14 +1,14 @@
 /**
- * O que a turma recusa, como fato (`_standards/domain.md` §2): sem status HTTP
- * nem texto de tela. O `_shared.classroom-refusal.ts` traduz cada um.
+ * What the classroom refuses, as a fact (`_standards/domain.md` §2): no HTTP status
+ * or screen text. `_shared.classroom-refusal.ts` translates each one.
  */
 export type ClassroomError =
   | { readonly code: 'CLASSROOM_INVALID_GRADE' }
-  /** Mudar o ano levaria a turma sorteada para outra categoria. */
+  /** Changing the grade would take the drawn classroom to another category. */
   | { readonly code: 'CLASSROOM_CATEGORY_LOCKED' }
-  /** A turma já tem time numa chave: apagar a deixaria jogando sem turma. */
+  /** The classroom already has a team in a bracket: deleting would leave it playing without a classroom. */
   | { readonly code: 'CLASSROOM_IN_COMPETITION' }
-  /** O nome é de outra turma: a checagem antes de gravar e a corrida no `unique`. */
+  /** The name belongs to another classroom: the check before saving and the race on the `unique`. */
   | { readonly code: 'CLASSROOM_ALREADY_EXISTS' }
   | { readonly code: 'ADVISOR_NOT_FOUND' }
   | { readonly code: 'ADVISOR_TAKEN' }

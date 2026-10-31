@@ -2,14 +2,14 @@ import { I18n } from '@adonisjs/i18n'
 import type { ApplicationService } from '@adonisjs/core/types'
 
 /**
- * O `I18n` que todo use-case recebe no construtor para escrever a mensagem do
- * `HTTPException` (`_standards/i18n.md` §3).
+ * The `I18n` every use case receives in the constructor to write the
+ * `HTTPException` message (`_standards/i18n.md` §3).
  *
- * Na requisição, o middleware de idioma liga no resolver da requisição o
- * tradutor do `Accept-Language`, e é esse que chega. Fora dela - seed, comando
- * do ace, teste unitário - vale este, no idioma base: o use-case roda nos dois
- * lugares, e por isso o idioma entra por injeção, a forma que a doc prefere ao
- * async local storage (_doc-lib/adonisjs.md#guides/basics/http-context).
+ * In a request, the language middleware binds the `Accept-Language` translator to the
+ * request resolver, and that is the one that arrives. Outside it - seed, ace command,
+ * unit test - this one applies, in the base language: the use case runs in both
+ * places, which is why the language comes in by injection, the form the doc prefers
+ * over async local storage (_doc-lib/adonisjs.md#guides/basics/http-context).
  */
 export default class I18nProvider {
   constructor(protected app: ApplicationService) {}

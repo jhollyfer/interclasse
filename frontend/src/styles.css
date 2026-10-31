@@ -10,32 +10,32 @@
 
 /*
  * ============================================================================
- * PALETA DOS JOGOS
+ * GAMES PALETTE
  * ============================================================================
  *
- * Vem do site anterior (`site-jogos-estudantis/codigo-fonte/base.html`): o verde
- * da quadra, o verde-noite do cabeçalho e o amarelo do placar.
+ * Comes from the previous site (`site-jogos-estudantis/codigo-fonte/base.html`): the court
+ * green, the header's night green and the scoreboard yellow.
  *
- *   --brand              o amarelo do placar e dos destaques
- *   --brand-ink          o verde-noite do cabeçalho e do rodapé
- *   --brand-ink-foreground  a tinta clara sobre o verde-noite (texto, filete,
- *                        véu translúcido com `/opacidade`)
- *   --brand-ink-shade    a sombra sobre o verde-noite (cartão afundado)
+ *   --brand              the scoreboard and highlights yellow
+ *   --brand-ink          the header and footer night green
+ *   --brand-ink-foreground  the light ink over the night green (text, rule,
+ *                        translucent veil with `/opacity`)
+ *   --brand-ink-shade    the shadow over the night green (sunken card)
  *
- * O amarelo é cor de ACENTO: anel de foco, item ativo, placar. A ação primária
- * é o verde da quadra.
+ * Yellow is an ACCENT color: focus ring, active item, scoreboard. The primary
+ * action is the court green.
  * ============================================================================
  */
 
 :root {
   --brand: #ffd400;
   --brand-ink: #04260f;
-  /* A faixa verde-noite não inverte com o tema: as duas tintas dela também
-     não, e por isso só existem aqui. */
+  /* The night-green band does not invert with the theme: its two inks do
+     not either, and that is why they only exist here. */
   --brand-ink-foreground: #ffffff;
   --brand-ink-shade: #000000;
-  /* #12873a do site antigo dava 4,4:1 sobre o fundo claro; este é o mesmo
-     verde um tom abaixo, e passa de 4,5:1 para texto. */
+  /* The old site's #12873a gave 4.4:1 on the light background; this is the same
+     green one shade down, and it passes 4.5:1 for text. */
   --field: #0f7a34;
 
   --background: #f6fbf7;
@@ -48,16 +48,16 @@
   --card-foreground: oklch(0.145 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  /* O escuro institucional, e não o âmbar: botão, link ativo e checkbox marcado
-     herdam daqui, e são o que mais se repete numa tela de catálogo. */
+  /* The institutional dark, and not amber: button, active link and checked checkbox
+     inherit from here, and they are what repeats most on a catalog screen. */
   --primary: var(--field);
   --primary-foreground: oklch(0.985 0.003 85);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --accent: var(--brand);
   --accent-foreground: var(--brand-ink);
-  /* Um tom abaixo do vermelho do shadcn: o botão de excluir é texto vermelho
-     sobre fundo vermelho a 10%, e o original dava 3,8:1. */
+  /* One shade below shadcn's red: the delete button is red text
+     on a 10% red background, and the original gave 3.8:1. */
   --destructive: oklch(0.5 0.21 27.325);
   --destructive-foreground: oklch(1 0 0);
   --ring: var(--brand);
@@ -77,16 +77,16 @@
   --sidebar-ring: var(--brand);
 
   /*
-   * A escala semântica de badge: cor por **significado**, não por estética.
+   * The badge's semantic scale: color by **meaning**, not by aesthetics.
    *
-   * Cada par é fundo pálido com tinta escura do mesmo matiz, calibrado para
-   * texto pequeno - o que um `bg-success/10 text-success` não garante, porque
-   * ali a tinta é a mesma cor cheia do fundo e o contraste vira acaso. Como par
-   * nomeado, os dois lados andam juntos e o `Badge` só recebe um nome de
-   * variante.
+   * Each pair is a pale background with a dark ink of the same hue, calibrated for
+   * small text - which a `bg-success/10 text-success` does not guarantee, because
+   * there the ink is the same full color as the background and the contrast
+   * becomes chance. As a named pair, both sides move together and `Badge` only
+   * receives a variant name.
    *
-   * `bg-badge-*-foreground` também é a bolinha sólida do formulário
-   * (`*_DOTS` em `lib/labels.ts`): o fundo pálido em 8px não se enxerga.
+   * `bg-badge-*-foreground` is also the form's solid dot
+   * (`*_DOTS` in `lib/labels.ts`): the pale background at 8px cannot be seen.
    */
   --badge-neutral: oklch(0.95 0.008 150);
   --badge-neutral-fg: oklch(0.4 0.02 150);
@@ -98,17 +98,17 @@
   --badge-warning-fg: oklch(0.4 0.09 95);
 
   /*
-   * Os tokens de acabamento.
+   * The finishing tokens.
    *
-   * `--surface-warm` é o creme de um degrau abaixo do branco, para separar um
-   * bloco do fundo sem desenhar borda; `--surface-elevated` é o branco do card.
+   * `--surface-warm` is the cream one step below white, to separate a
+   * block from the background without drawing a border; `--surface-elevated` is the card's white.
    *
-   * As sombras se chamam `--elevation-*` aqui e viram `--shadow-card*` dentro
-   * do `@theme inline`. O desvio de nome não é enfeite: o Tailwind gera o
-   * utilitário a partir da chave do tema, e um token de `:root` chamado
-   * `--shadow-card` colidiria com a variável que o próprio `@theme` declara.
-   * Cada uma das três soma um anel de 1px à sombra, que é o que dá contorno ao
-   * card sem uma segunda borda.
+   * The shadows are called `--elevation-*` here and become `--shadow-card*` inside
+   * `@theme inline`. The name deviation is not decoration: Tailwind generates the
+   * utility from the theme key, and a `:root` token called
+   * `--shadow-card` would collide with the variable `@theme` itself declares.
+   * Each of the three adds a 1px ring to the shadow, which is what outlines the
+   * card without a second border.
    */
   --surface-warm: oklch(0.98 0.005 60);
   --surface-elevated: oklch(1 0 0);
@@ -119,16 +119,16 @@
   --elevation-card-elevated:
     0 8px 32px oklch(0 0 0 / 0.08), 0 0 0 1px oklch(0 0 0 / 0.04);
 
-  /* O respiro entre seções da vitrine, em `clamp` porque é a única medida que
-     atravessa do celular ao desktop sem virar dois valores. */
+  /* The breathing room between storefront sections, in `clamp` because it is the only measure that
+     crosses from phone to desktop without becoming two values. */
   --space-section: clamp(5rem, 8vw, 8rem);
 
   /*
-   * Curvas e tracking, consumidos por `var()` dentro de componente - não viram
-   * utilitário. `ease-out-expo` e `ease-out-quart` já são os nomes que o
-   * frontend anterior usava, e `--heading-tight`/`--heading-tighter` são o
-   * tracking negativo dos dois degraus de título: corpo grande com tracking
-   * neutro parece texto esticado.
+   * Curves and tracking, consumed by `var()` inside a component - they do not become
+   * a utility. `ease-out-expo` and `ease-out-quart` are already the names the
+   * previous frontend used, and `--heading-tight`/`--heading-tighter` are the
+   * negative tracking of the two heading steps: large body text with neutral
+   * tracking looks like stretched text.
    */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.32, 0.72, 0, 1);
@@ -137,7 +137,7 @@
 }
 
 .dark {
-  /* O amarelo do placar segura o contraste nos dois temas; o verde-noite também. */
+  /* The scoreboard yellow holds contrast in both themes; so does the night green. */
   --background: #08150d;
 
   --foreground: oklch(0.985 0 0);
@@ -149,8 +149,8 @@
   --card-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  /* A inversão de papel: no escuro a ação primária é a superfície clara, com o
-     texto escuro por cima. O escuro institucional aqui sumiria no fundo. */
+  /* The role inversion: in dark mode the primary action is the light surface, with
+     dark text on top. The institutional dark would vanish into the background here. */
   --primary: #3fb866;
   --primary-foreground: #04260f;
   --secondary: oklch(0.269 0 0);
@@ -174,8 +174,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: var(--brand);
 
-  /* No escuro o par inverte a luminosidade e mantém o matiz: fundo escuro
-     saturado com tinta clara do mesmo tom. */
+  /* In dark mode the pair inverts the lightness and keeps the hue: a saturated dark
+     background with light ink of the same tone. */
   --badge-neutral: oklch(0.28 0.014 150);
   --badge-neutral-fg: oklch(0.85 0.02 150);
   --badge-info: oklch(0.28 0.05 235);
@@ -185,8 +185,8 @@
   --badge-warning: oklch(0.28 0.06 95);
   --badge-warning-fg: oklch(0.85 0.11 95);
 
-  /* No escuro a profundidade não vem da sombra, que quase não aparece: vem do
-     anel claro de 1px que cada uma das três carrega. */
+  /* In dark mode depth does not come from the shadow, which barely shows: it comes from the
+     light 1px ring that each of the three carries. */
   --surface-warm: oklch(0.16 0.005 60);
   --surface-elevated: oklch(0.205 0 0);
   --elevation-card: 0 1px 4px oklch(0 0 0 / 0.2), 0 0 0 1px oklch(1 0 0 / 0.04);
@@ -197,30 +197,30 @@
 }
 
 @theme inline {
-  /* A família da casa, com a de métrica ajustada logo atrás: o navegador
-     mostra o fallback enquanto o woff2 baixa (`font-display: swap`), e o
-     `size-adjust` dele evita o salto de layout quando a Barlow entra. */
+  /* The house family, with the metric-adjusted one right behind it: the browser
+     shows the fallback while the woff2 downloads (`font-display: swap`), and its
+     `size-adjust` avoids the layout jump when Barlow comes in. */
   --font-sans: 'Barlow', 'Barlow Fallback', system-ui, sans-serif;
   --font-display:
     'Barlow Condensed', 'Barlow Condensed Fallback', 'Barlow', sans-serif;
 
-  /* Tamanhos por papel (`--text-*`), não por valor: o número gigante da tela
-     de erro e o título do herói têm nome e não aparecem como `text-[7rem]`. */
+  /* Sizes by role (`--text-*`), not by value: the giant number of the error screen
+     and the hero title have names and do not show up as `text-[7rem]`. */
   --text-error-code: 7rem;
   --text-error-code-lg: 9rem;
   --leading-display: 1.05;
 
-  /* Larguras e proporções nomeadas, no lugar do valor solto em classe. */
+  /* Named widths and proportions, in place of a loose value in a class. */
   --container-aside: 20rem;
   --aspect-photo: 4 / 3;
 
-  /* O traço do ícone de menu: o espaço entre as barras e o quanto as de
-     cima e de baixo andam para formar o X. */
+  /* The menu icon's stroke: the space between the bars and how far the
+     top and bottom ones travel to form the X. */
   --spacing-menu-bar: 5px;
   --spacing-menu-bar-shift: 7px;
 
-  /* A escala de camadas, da mais baixa à mais alta. Tailwind não tem
-     namespace de z-index: o token vira variável e o `@utility` dá o nome. */
+  /* The layer scale, from lowest to highest. Tailwind has no z-index
+     namespace: the token becomes a variable and `@utility` gives it the name. */
   --z-sticky: 10;
   --z-overlay: 20;
   --z-modal: 30;
@@ -264,8 +264,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* A marca com nome de cor, para `text-brand`, `bg-brand` e `border-brand`
-     existirem sem ninguém precisar escrever a literal de novo. */
+  /* The brand with a color name, so `text-brand`, `bg-brand` and `border-brand`
+     exist without anyone having to write the literal again. */
   --color-brand: var(--brand);
   --color-brand-ink: var(--brand-ink);
   --color-brand-ink-foreground: var(--brand-ink-foreground);
@@ -287,18 +287,18 @@
   --shadow-card-hover: var(--elevation-card-hover);
   --shadow-card-elevated: var(--elevation-card-elevated);
 
-  /* Vira `p-section`, `py-section`, `gap-section` - o espaçamento entre blocos
-     de uma página da vitrine. */
+  /* Becomes `p-section`, `py-section`, `gap-section` - the spacing between blocks
+     of a storefront page. */
   --spacing-section: var(--space-section);
 }
 
 /*
- * Fonte de reserva com a métrica da Barlow: `size-adjust` e os overrides de
- * ascent/descent fazem o texto da Arial ocupar a caixa da Barlow, e a troca ao
- * carregar o woff2 não move a página. Ascent 1000, descent 200 e upm 1000 são
- * da própria Barlow; o `size-adjust` é a razão de largura média estimada
- * contra a Arial (conferir com a ferramenta de métrica do Capsize antes de
- * afinar). _doc-lib/vitejs.md#assets.
+ * Fallback font with Barlow's metrics: `size-adjust` and the ascent/descent
+ * overrides make Arial's text fill Barlow's box, and the swap when the woff2
+ * loads does not move the page. Ascent 1000, descent 200 and upm 1000 come
+ * from Barlow itself; `size-adjust` is the estimated average-width ratio
+ * against Arial (check with Capsize's metrics tool before
+ * fine-tuning). _doc-lib/vitejs.md#assets.
  */
 @font-face {
   font-family: 'Barlow Fallback';
@@ -319,11 +319,11 @@
 }
 
 /*
- * Camadas: da mais baixa à mais alta, `sticky < overlay < modal < dropdown <
- * toast < tooltip` (`frontend.md` §6, `DECISIONS.md` #257). Os popups do Base UI
- * (select, menu, popover, combobox) usam `z-dropdown`, acima do `modal`: eles
- * abrem de dentro de dialog e sheet, e popup abaixo do modal que o abriu é
- * inalcançável. Camada local de um componente (`z-1`) fica fora da escala.
+ * Layers: from lowest to highest, `sticky < overlay < modal < dropdown <
+ * toast < tooltip` (`frontend.md` §6, `DECISIONS.md` #257). Base UI popups
+ * (select, menu, popover, combobox) use `z-dropdown`, above `modal`: they
+ * open from inside dialogs and sheets, and a popup below the modal that opened it
+ * is unreachable. A component's local layer (`z-1`) stays outside the scale.
  */
 @utility z-dropdown {
   z-index: var(--z-dropdown);
@@ -349,8 +349,8 @@
   z-index: var(--z-tooltip);
 }
 
-/* Alturas e larguras de tela que não são espaçamento: cada uma com o papel
-   que cumpre. */
+/* Screen heights and widths that are not spacing: each with the role
+   it plays. */
 @utility min-h-stage {
   min-height: 70dvh;
 }
@@ -379,13 +379,13 @@
   width: calc(33.333% - 0.667rem);
 }
 
-/* O botão pressionado encolhe um pouco: o retorno tátil do toque. */
+/* The pressed button shrinks a little: the touch's tactile feedback. */
 @utility scale-press {
   scale: 0.97;
 }
 
-/* Colunas e linhas de grade por papel, no lugar do `grid-cols-[...]` solto.
-   O nome diz o que a grade organiza; a medida mora aqui, num lugar só. */
+/* Grid columns and rows by role, in place of a loose `grid-cols-[...]`.
+   The name says what the grid organizes; the measure lives here, in one place. */
 @utility grid-cols-term-value {
   grid-template-columns: auto 1fr;
 }
@@ -426,7 +426,7 @@
   grid-template-columns: 1.1fr 0.9fr;
 }
 
-/* Abrir e fechar um painel animando a altura sem medi-la: `0fr` para `1fr`. */
+/* Open and close a panel animating the height without measuring it: `0fr` to `1fr`. */
 @utility grid-rows-collapsed {
   grid-template-rows: 0fr;
 }
@@ -458,12 +458,12 @@
   }
 
   /*
-   * A barra de rolagem de 4px.
+   * The 4px scrollbar.
    *
-   * Só o WebKit/Blink a atende, e é de propósito que não há um
-   * `scrollbar-width: thin` ao lado: o padrão do Firefox já é discreto, e os
-   * dois juntos davam espessuras visivelmente diferentes na mesma tela. Quando
-   * a barra some, a régua continua sendo a borda do painel.
+   * Only WebKit/Blink honor it, and it is on purpose that there is no
+   * `scrollbar-width: thin` beside it: Firefox's default is already discreet, and the
+   * two together gave visibly different thicknesses on the same screen. When
+   * the bar disappears, the ruler is still the panel's border.
    */
   ::-webkit-scrollbar {
     width: 4px;
@@ -484,12 +484,12 @@
 }
 
 /*
- * O brilho que atravessa um esqueleto de carregamento.
+ * The shimmer that crosses a loading skeleton.
  *
- * Fica fora do `@theme` porque é animação de superfície, não token: quem a usa
- * é a casca cinza que espera a listagem chegar, e ela precisa da faixa clara
- * viajando por cima - `background-size: 200%` com a posição indo de -200% a
- * 200% é o que faz a faixa cruzar a peça inteira.
+ * It sits outside `@theme` because it is a surface animation, not a token: whoever uses it
+ * is the gray shell waiting for the listing to arrive, and it needs the light band
+ * travelling over it - `background-size: 200%` with the position going from -200% to
+ * 200% is what makes the band cross the whole piece.
  */
 @keyframes shimmer {
   0% {
@@ -511,8 +511,8 @@
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* No escuro a faixa é mais escura que o claro e menos opaca: sobre o cinza do
-   esqueleto escuro, a faixa clara do tema claro vira um flash. */
+/* In dark mode the band is darker than in light mode and less opaque: over the gray of the
+   dark skeleton, the light theme's light band becomes a flash. */
 .dark .animate-shimmer {
   background: linear-gradient(
     90deg,
@@ -525,24 +525,24 @@
 }
 
 /*
- * Movimento reduzido, para o app inteiro.
+ * Reduced motion, for the whole app.
  *
- * O que se escreve à mão pode guardar o movimento uma classe por vez, com
- * `motion-reduce:`. Os componentes de `components/ui/` não: são arquivos
- * gerados pelo shadcn, somam dezenas de animações - dialog, sheet, dropdown,
- * accordion, tooltip, popover - e anotar cada uma os tiraria do caminho do
- * `shadcn diff`, que é como eles se atualizam. Uma regra alcança todos e também
- * o próximo componente que for gerado. Alcança o `.animate-shimmer` acima
- * junto.
+ * What is written by hand can guard motion one class at a time, with
+ * `motion-reduce:`. The `components/ui/` components cannot: they are files
+ * generated by shadcn, they add up to dozens of animations - dialog, sheet, dropdown,
+ * accordion, tooltip, popover - and annotating each would take them off the path of
+ * `shadcn diff`, which is how they get updated. One rule reaches all of them and also
+ * the next component that is generated. It reaches the `.animate-shimmer` above
+ * as well.
  *
- * `0.01ms` e **não** `0s`: o Base UI desmonta o popup quando a transição de
- * saída termina, e escuta `transitionend` para saber disso. Duração zero em
- * alguns navegadores não dispara o evento, e o popup ficaria montado para
- * sempre - invisível, capturando clique. Um centésimo de milissegundo é
- * imperceptível e ainda é uma transição que acaba.
+ * `0.01ms` and **not** `0s`: Base UI unmounts the popup when the exit
+ * transition ends, and listens for `transitionend` to know that. A zero duration in
+ * some browsers does not fire the event, and the popup would stay mounted
+ * forever - invisible, capturing clicks. A hundredth of a millisecond is
+ * imperceptible and is still a transition that ends.
  *
- * `!important` porque o que se sobrescreve aqui é utilitário do Tailwind com a
- * mesma especificidade, e a preferência do sistema tem de ganhar de todos.
+ * `!important` because what is overridden here is a Tailwind utility with the
+ * same specificity, and the system preference must beat them all.
  */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -557,11 +557,11 @@
 
 /*
  * ============================================================================
- * PEÇAS DO SITE PÚBLICO
+ * PUBLIC SITE PIECES
  * ============================================================================
  *
- * As três marcas do site anterior que não são utilitário do Tailwind: o placar
- * (caixa preta, dígitos amarelos), o herói verde e o botão inclinado.
+ * The three marks from the previous site that are not a Tailwind utility: the scoreboard
+ * (black box, yellow digits), the green hero and the slanted button.
  */
 @layer components {
   .scoreboard {
@@ -579,8 +579,8 @@
   }
 
   /*
-   * A faixa de resultados. Rola sozinha só para quem não pediu movimento
-   * reduzido; para os demais é uma faixa com rolagem lateral comum.
+   * The results strip. It scrolls on its own only for those who did not ask for reduced
+   * motion; for the rest it is a strip with ordinary side scrolling.
    */
   @media (prefers-reduced-motion: no-preference) {
     .ticker {

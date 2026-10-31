@@ -19,8 +19,8 @@ import { StudentFactory } from '#database/factories/student.factory'
 type World = { id: string; name: string; category: Category }
 
 /**
- * O que cada implementação precisa para o teste arranjar o mundo: modalidade,
- * turma, alunos e o sorteio. O contrato roda igual nas duas
+ * What each implementation needs for the test to arrange the world: sport,
+ * classroom, students and the draw. The contract runs the same on both
  * (`_standards/domain.md` §5.4).
  */
 type Harness = {
@@ -82,7 +82,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`EnrollmentRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('findSport devolve o teto; modalidade inexistente é null', async ({ assert }) => {
+    test('findSport returns the ceiling; a nonexistent sport is null', async ({ assert }) => {
       const { repository, sport } = await make()
       const futsal = await sport('Futsal', 12)
 
@@ -90,7 +90,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findSport(randomUUID()))
     })
 
-    test('studentsOf lista os alunos da turma por nome', async ({ assert }) => {
+    test('studentsOf lists the classroom students by name', async ({ assert }) => {
       const { repository, classroom, student } = await make()
       const seven = await classroom('7º A', 7)
       const other = await classroom('8º A', 8)
@@ -104,7 +104,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       ])
     })
 
-    test('isDrawn olha a categoria da turma', async ({ assert }) => {
+    test('isDrawn looks at the classroom category', async ({ assert }) => {
       const { repository, classroom, sport, draw } = await make()
       const futsal = await sport('Futsal', 12)
       const f2 = await classroom('9º A', 9)
@@ -116,7 +116,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isFalse(await repository.isDrawn({ classroomId: f1.id, sportId: futsal }))
     })
 
-    test('save troca a lista da turma e findForUpdate a devolve', async ({ assert }) => {
+    test('save swaps the classroom list and findForUpdate returns it', async ({ assert }) => {
       const { repository, classroom, sport, student } = await make()
       const futsal = await sport('Futsal', 12)
       const seven = await classroom('7º A', 7)
@@ -133,7 +133,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(replaced.snapshot().studentIds, [bia])
     })
 
-    test('save de uma turma não mexe na lista de outra na mesma modalidade', async ({ assert }) => {
+    test("save of one classroom does not touch another one's list in the same sport", async ({
+      assert,
+    }) => {
       const { repository, classroom, sport, student } = await make()
       const futsal = await sport('Futsal', 12)
       const seven = await classroom('7º A', 7)
@@ -155,11 +157,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(kept.snapshot().studentIds, [caio])
     })
 
-    test('board: turma, modalidades por nome, alunos com o que jogam e o travamento', async ({
+    test('board: classroom, sports by name, students with what they play and the lock', async ({
       assert,
     }) => {
       const { repository, classroom, sport, student, draw } = await make()
-      const volei = await sport('Vôlei', 8)
+      const volleyball = await sport('Vôlei', 8)
       const futsal = await sport('Futsal', 12)
       const seven = await classroom('7º A', 7)
       const ana = await student(seven.id, 'Ana')
@@ -177,14 +179,14 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         advisor?.sports.map((item) => [item.id, item.drawn, item.locked]),
         [
           [futsal, true, false],
-          [volei, false, false],
+          [volleyball, false, false],
         ],
       )
       assert.deepEqual(
         representative?.sports.map((item) => [item.id, item.drawn, item.locked]),
         [
           [futsal, true, true],
-          [volei, false, false],
+          [volleyball, false, false],
         ],
       )
       assert.deepEqual(
@@ -196,7 +198,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('board de turma inexistente é null', async ({ assert }) => {
+    test('board of a nonexistent classroom is null', async ({ assert }) => {
       const { repository } = await make()
 
       assert.isNull(await repository.board({ classroomId: randomUUID(), lockAfterDraw: false }))

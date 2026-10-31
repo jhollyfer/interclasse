@@ -7,7 +7,7 @@ import { makeWithMemory } from '#tests/container-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
 test.group('documentation/reference > show (unit)', () => {
-  test('a página aponta para o /openapi.json e leva o título da API', async ({ assert }) => {
+  test('the page points at /openapi.json and carries the API title', async ({ assert }) => {
     const useCase = await makeWithMemory(DocumentationReferenceShowUseCase, [])
     const page = rightOf(await useCase.execute())
 

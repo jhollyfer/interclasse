@@ -32,7 +32,7 @@ import { m } from '#/paraglide/messages'
 
 const PHOTO_FIELDS = ['storageId', 'caption'] as const
 
-/** O hook de cada área, escolhido por lookup: a área é fixa por tela. */
+/** Each area's hook, chosen by lookup: the area is fixed per screen. */
 const PHOTO_CREATE = {
   administrator: useAdministratorPhotoCreateMutation,
   advisor: useAdvisorPhotoCreateMutation,
@@ -41,16 +41,16 @@ const PHOTO_CREATE = {
 const EMPTY: AdministratorPhotoCreatePayload = { storageId: '', caption: null }
 
 type PhotoUploadFormProps = Readonly<{
-  /** Quem envia: a foto do administrador já vai ao site, a do conselheiro espera. */
+  /** Who uploads: the administrator's photo goes straight to the site, the advisor's waits. */
   area: 'administrator' | 'advisor'
-  /** O que acontece depois de enviar, dito a quem envia. */
+  /** What happens after uploading, told to whoever uploads. */
   description: string
   success: string
 }>
 
 /**
- * Enviar uma foto para o carrossel: a imagem (sobe na hora da escolha, como o
- * avatar) e uma legenda opcional. O mesmo formulário nas duas áreas.
+ * Upload a photo to the carousel: the image (uploads on choice, like the
+ * avatar) and an optional caption. The same form in both areas.
  */
 export function PhotoUploadForm({
   area,

@@ -3,8 +3,8 @@ import type { AdvisorStudentShowResponse } from '@interclasse/shared'
 import type { Student } from '#domain/student/student.entity'
 
 /**
- * O aluno na forma da resposta do `shared/` (`_standards/architecture.md` §10):
- * campo que não está no schema não chega à resposta.
+ * The student in the shape of the `shared/` response (`_standards/architecture.md` §10):
+ * a field that is not in the schema does not reach the response.
  */
 export class StudentPresenter {
   static show(student: Student): AdvisorStudentShowResponse {

@@ -25,8 +25,8 @@ import { notifyError } from '#/lib/form-errors'
 import { m } from '#/paraglide/messages'
 
 /**
- * Editar e apagar. Modalidade com inscrições é recusada pelo servidor com
- * `409 SPORT_IN_USE`, que vira toast - a linha fica.
+ * Edit and delete. A sport with enrollments is refused by the server with
+ * `409 SPORT_IN_USE`, which becomes a toast - the row stays.
  */
 export function SportRowActions({
   sport,

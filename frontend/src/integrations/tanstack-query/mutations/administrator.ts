@@ -38,7 +38,7 @@ import type { HTTPError } from '../http'
 import { request, send } from '../http'
 import { shouldRetryQuery } from '../query-context'
 
-/** O módulo inteiro exige `ADMINISTRATOR`. */
+/** The whole module requires `ADMINISTRATOR`. */
 
 export function useUserCreateMutation(
   options?: MutationProps<
@@ -61,19 +61,19 @@ export function useUserCreateMutation(
   })
 }
 
-/** O `id` viaja com o payload porque ele vai no caminho, não no corpo. */
+/** The `id` travels with the payload because it goes in the path, not in the body. */
 export type UserUpdateVariables = Merge<
   AdministratorUserUpdatePayload,
   { readonly id: string }
 >
 
 /**
- * Campo ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
- * `null` explícito.
+ * An absent field means "leave alone", and not "erase". Only `avatarId` accepts an
+ * explicit `null`.
  *
- * `password` entra no payload só quando há senha nova: o `confirmed` do
- * validator olha o par, e mandar `password: ''` deixaria a chave no corpo com um
- * valor que o servidor recusa.
+ * `password` enters the payload only when there is a new password: the validator's `confirmed`
+ * looks at the pair, and sending `password: ''` would leave the key in the body with a
+ * value the server refuses.
  */
 export function useUserUpdateMutation(
   options?: MutationProps<AdministratorUserShowResponse, UserUpdateVariables>,
@@ -97,7 +97,7 @@ export function useUserUpdateMutation(
   })
 }
 
-/** Manda para a lixeira: preenche `deletedAt`, não apaga nada. */
+/** Sends to the trash: fills in `deletedAt`, deletes nothing. */
 export function useUserArchiveMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
     ...options,
@@ -109,7 +109,7 @@ export function useUserArchiveMutation(options?: MutationProps<void, string>) {
   })
 }
 
-/** Tira da lixeira. */
+/** Takes out of the trash. */
 export function useUserUnarchiveMutation(
   options?: MutationProps<void, string>,
 ) {
@@ -124,8 +124,8 @@ export function useUserUnarchiveMutation(
 }
 
 /**
- * Apaga de vez. O backend exige o registro arquivado, e recusa a própria conta
- * de quem está logado.
+ * Deletes for good. The backend requires the record to be archived, and refuses the account
+ * of whoever is logged in.
  */
 export function useUserDeleteMutation(options?: MutationProps<void, string>) {
   return useMutation<void, HTTPError, string>({
@@ -139,8 +139,8 @@ export function useUserDeleteMutation(options?: MutationProps<void, string>) {
 }
 
 /**
- * Sem lixeira: turma, modalidade e aviso apagam de vez. Quem protege o que já
- * entrou numa chave é o servidor, com `409`.
+ * No trash: classroom, sport and announcement delete for good. Whoever protects what has already
+ * entered a bracket is the server, with `409`.
  */
 
 export function useClassroomCreateMutation(
@@ -338,7 +338,7 @@ export function useAnnouncementDeleteMutation(
   })
 }
 
-/** O sorteio. Cria a chave e o mata-mata inteiro, da primeira fase à final. */
+/** The draw. Creates the bracket and the whole knockout, from the first round to the final. */
 export function useBracketCreateMutation(
   options?: MutationProps<
     AdministratorBracketCreateResponse,
@@ -350,10 +350,10 @@ export function useBracketCreateMutation(
     HTTPError,
     AdministratorBracketCreatePayload
   >({
-    // Mutation não repete por padrão, porque repetir escrita duplica. O sorteio
-    // pode: a API é idempotente por modalidade e categoria e devolve a chave
-    // que já existe. Sem isto, a queda de rede depois do commit mostrava erro
-    // com a chave criada (_doc-lib/tanstack-query.md#guides/mutations, "Retry").
+    // A mutation does not retry by default, because retrying a write duplicates. The draw
+    // can: the API is idempotent per sport and category and returns the bracket
+    // that already exists. Without this, a network drop after the commit showed an error
+    // with the bracket created (_doc-lib/tanstack-query.md#guides/mutations, "Retry").
     retry: shouldRetryQuery,
     ...options,
     mutationFn: function (payload) {
@@ -369,7 +369,7 @@ export function useBracketCreateMutation(
   })
 }
 
-/** Apaga a chave inteira e reabre as inscrições. É como se refaz um sorteio. */
+/** Deletes the whole bracket and reopens the enrollments. That is how a draw is redone. */
 export function useBracketDeleteMutation(
   options?: MutationProps<void, string>,
 ) {
@@ -419,7 +419,7 @@ export type MatchScoreVariables = Merge<
   { readonly id: string }
 >
 
-/** O placar. No mata-mata o vencedor avança sozinho. */
+/** The score. In the knockout the winner advances on its own. */
 export function useMatchScoreMutation(
   options?: MutationProps<AdministratorMatchScoreResponse, MatchScoreVariables>,
 ) {
@@ -442,7 +442,7 @@ export function useMatchScoreMutation(
   })
 }
 
-/** Desfaz o placar: a partida volta a "a jogar" e o vencedor sai da seguinte. */
+/** Undoes the score: the match goes back to "a jogar" and the winner leaves the next one. */
 export function useMatchUnscoreMutation(
   options?: MutationProps<AdministratorMatchUnscoreResponse, string>,
 ) {
@@ -460,7 +460,7 @@ export function useMatchUnscoreMutation(
   })
 }
 
-/** Lança um cartão. O time sai do atleta, no servidor. */
+/** Records a card. The team comes from the athlete, on the server. */
 export function useCardCreateMutation(
   options?: MutationProps<
     AdministratorCardCreateResponse,
@@ -491,7 +491,7 @@ export function useCardDeleteMutation(options?: MutationProps<void, string>) {
   })
 }
 
-/** A ciência do aviso de remoção. Repetir não muda nada. */
+/** Acknowledging the removal notice. Repeating changes nothing. */
 export function useEnrollmentRemovalAcknowledgeMutation(
   options?: MutationProps<AdministratorEnrollmentRemovalShowResponse, string>,
 ) {
@@ -511,7 +511,7 @@ export function useEnrollmentRemovalAcknowledgeMutation(
   })
 }
 
-/** Grava o "Sobre" e o regulamento. Campo ausente não muda; `null` apaga. */
+/** Saves the "Sobre" and the regulation. An absent field does not change; `null` deletes. */
 export function useSiteUpdateMutation(
   options?: MutationProps<
     AdministratorSiteShowResponse,
@@ -534,8 +534,8 @@ export function useSiteUpdateMutation(
 }
 
 /**
- * Envia uma foto para o carrossel. O caminho decide o estado em que ela nasce:
- * a do administrador vai direto ao site, a do conselheiro espera aprovação.
+ * Uploads a photo to the carousel. The path decides the state it is born in:
+ * the administrator's goes straight to the site, the advisor's waits for approval.
  */
 function usePhotoCreateMutation(
   area: 'administrator' | 'advisor',
@@ -563,7 +563,7 @@ function usePhotoCreateMutation(
   })
 }
 
-/** O envio de foto do administrador: vai direto ao site. */
+/** The administrator's photo upload: goes straight to the site. */
 export function useAdministratorPhotoCreateMutation(
   options?: MutationProps<
     AdministratorPhotoShowResponse,
@@ -573,7 +573,7 @@ export function useAdministratorPhotoCreateMutation(
   return usePhotoCreateMutation('administrator', options)
 }
 
-/** O envio de foto do conselheiro: espera aprovação. */
+/** The advisor's photo upload: waits for approval. */
 export function useAdvisorPhotoCreateMutation(
   options?: MutationProps<
     AdministratorPhotoShowResponse,
@@ -588,7 +588,7 @@ export type PhotoReviewVariables = Merge<
   { id: string }
 >
 
-/** Aprova (vai ao site) ou recusa (sai do site). A decisão se refaz. */
+/** Approves (goes to the site) or rejects (leaves the site). The decision can be redone. */
 export function usePhotoReviewMutation(
   options?: MutationProps<AdministratorPhotoShowResponse, PhotoReviewVariables>,
 ) {
@@ -611,7 +611,7 @@ export function usePhotoReviewMutation(
   })
 }
 
-/** Apaga a foto. O conselheiro só alcança as que enviou (as outras são 404). */
+/** Deletes the photo. The advisor only reaches the ones they uploaded (the others are 404). */
 export function usePhotoDeleteMutation(
   area: 'administrator' | 'advisor',
   options?: MutationProps<void, string>,

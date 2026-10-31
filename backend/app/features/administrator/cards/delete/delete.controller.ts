@@ -9,7 +9,8 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorCardDeleteController {
   static docs = defineDocs({
-    description: '**Irreversível**: o cartão some da partida e da ficha do atleta.',
+    description:
+      '**Irreversible**: the card disappears from the match and from the athlete record.',
   })
 
   constructor(private readonly useCase: AdministratorCardDeleteUseCase) {}

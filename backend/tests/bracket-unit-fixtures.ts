@@ -12,12 +12,12 @@ import { UnitOfWork } from '#repositories/unit-of-work/unit-of-work'
 import { UnitOfWorkMemory } from '#repositories/unit-of-work/unit-of-work.memory'
 
 /**
- * A montagem dos testes unitários de chave, partida e cartão: a chave e o que
- * ela lê (modalidade, turmas, alunos inscritos) no repositório em memória. O
- * arranjo em si é o mesmo do teste de contrato (`tests/bracket-harness-fixtures.ts`).
+ * The assembly of the bracket, match and card unit tests: the bracket and what it
+ * reads (sport, classrooms, enrolled students) in the in-memory repository. The
+ * arrangement itself is the same as the contract test (`tests/bracket-harness-fixtures.ts`).
  */
 export class BracketUnitFixtures {
-  /** Os contratos do use-case de chave trocados pelas implementações em memória. */
+  /** The bracket use case contracts swapped for the in-memory implementations. */
   static bindings(brackets: BracketMemoryRepository) {
     return [
       [BracketRepository, brackets],
@@ -25,12 +25,12 @@ export class BracketUnitFixtures {
     ] as const
   }
 
-  /** Os mesmos, mais o cartão, que lê a partida pelo repositório da chave. */
+  /** The same, plus the card, which reads the match through the bracket repository. */
   static cardBindings(brackets: BracketMemoryRepository, cards: MatchCardMemoryRepository) {
     return [...BracketUnitFixtures.bindings(brackets), [MatchCardRepository, cards]] as const
   }
 
-  /** O repositório de cartões em memória, com os alunos que ele só lê. */
+  /** The in-memory card repository, with the students it only reads. */
   static cards(
     brackets: BracketMemoryRepository,
     students: ReadonlyArray<StudentView>,
@@ -42,7 +42,7 @@ export class BracketUnitFixtures {
     return cards
   }
 
-  /** A modalidade e `names.length` turmas, cada uma com um aluno inscrito nela. */
+  /** The sport and `names.length` classrooms, each with one student enrolled in it. */
   static async enrolled(brackets: BracketMemoryRepository, names: ReadonlyArray<string>) {
     const harness = new MemoryBracketHarness(brackets)
     const sport = BracketArrangements.sport('Futsal')
@@ -64,7 +64,7 @@ export class BracketUnitFixtures {
     return { sport, classrooms, students }
   }
 
-  /** `total` turmas sorteadas e gravadas, sem embaralhar: o resultado é sempre o mesmo. */
+  /** `total` classrooms drawn and saved, without shuffling: the result is always the same. */
   static async drawn(brackets: BracketMemoryRepository, total = 4) {
     return BracketArrangements.drawn(
       new MemoryBracketHarness(brackets),

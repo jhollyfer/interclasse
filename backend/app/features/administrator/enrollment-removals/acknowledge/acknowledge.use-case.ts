@@ -16,9 +16,9 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, AdministratorEnrollmentRemovalShowResponse>
 
 /**
- * A ciência do administrador. Idempotente: dar ciência de novo mantém a data da
- * primeira (a entidade devolve o fato `ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED`,
- * que aqui é sucesso sem gravar).
+ * The administrator acknowledgement. Idempotent: acknowledging again keeps the date of the
+ * first (the entity returns the fact `ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED`,
+ * which here is success without saving).
  */
 @inject()
 export default class AdministratorEnrollmentRemovalAcknowledgeUseCase {

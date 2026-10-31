@@ -40,7 +40,7 @@ async function born(
       advisor: { exists: true, taken: false },
     },
   )
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
   await classrooms.save(created.value)
 }
 
@@ -57,7 +57,7 @@ async function setup() {
 }
 
 test.group('administrator/classrooms > update (unit)', () => {
-  test('turma inexistente é 404', async ({ assert }) => {
+  test('nonexistent classroom is 404', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000', name: 'X' })
@@ -65,7 +65,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
   })
 
-  test('renomeia e devolve a turma com os vínculos', async ({ assert }) => {
+  test('renames and returns the classroom with the links', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, name: '7º B' })
@@ -73,7 +73,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.deepInclude(result.value, { name: '7º B', grade: 7, advisorId: ADVISOR })
   })
 
-  test('manter o próprio nome não é conflito', async ({ assert }) => {
+  test('keeping its own name is not a conflict', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, name: '7º A', grade: 8 })
@@ -81,7 +81,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('nome de outra turma é 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
+  test('name of another classroom is 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
     const { classrooms, useCase } = await setup()
     await born(classrooms, OTHER, '8º A', 8)
 
@@ -98,7 +98,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.deepInclude(result.value, { grade: 4, category: 'F1' })
   })
 
-  test('turma sorteada não muda de categoria: 409 CLASSROOM_IN_COMPETITION no campo grade', async ({
+  test('drawn classroom does not change category: 409 CLASSROOM_IN_COMPETITION on the grade field', async ({
     assert,
   }) => {
     const { classrooms, useCase } = await setup()
@@ -110,7 +110,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.isTrue(result.isLeft() && Boolean(result.value.errors?.grade))
   })
 
-  test('turma sorteada muda de ano dentro da categoria', async ({ assert }) => {
+  test('drawn classroom changes year within the category', async ({ assert }) => {
     const { classrooms, useCase } = await setup()
     classrooms.markInCompetition(ID)
 
@@ -119,7 +119,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('conselheiro de outra turma é 409 ADVISOR_TAKEN', async ({ assert }) => {
+  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({ assert }) => {
     const { classrooms, useCase } = await setup()
     await born(classrooms, OTHER, '8º A', 8, SECOND_ADVISOR)
 
@@ -128,7 +128,7 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'ADVISOR_TAKEN' })
   })
 
-  test('repetir o conselheiro atual não é conflito, e null desfaz o vínculo', async ({
+  test('repeating the current advisor is not a conflict, and null undoes the link', async ({
     assert,
   }) => {
     const { useCase } = await setup()

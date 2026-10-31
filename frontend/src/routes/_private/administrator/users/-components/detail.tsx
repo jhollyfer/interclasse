@@ -56,14 +56,14 @@ const route = getRouteApi('/_private/administrator/users/$id/')
 
 export function UserDetail(): React.JSX.Element {
   const { id } = route.useParams()
-  // O client vem do contexto do router, que é onde `query-context.ts` o
-  // coloca - o mesmo que os `loader` usam. `useQueryClient()` pediria de novo
-  // o que a rota já entrega.
+  // The client comes from the router context, which is where `query-context.ts` puts it
+  // - the same one the `loader`s use. `useQueryClient()` would ask again for
+  // what the route already delivers.
   const { queryClient, account } = route.useRouteContext()
-  // Só administrador apaga de vez. Ver o comentário na listagem.
+  // Only the administrator deletes for good. See the comment in the listing.
   const canDelete = account.role === USER_ROLE.ADMINISTRATOR
-  // A própria conta não se arquiva nem se apaga: o backend responde
-  // `403 SELF_ARCHIVE_FORBIDDEN` e `403 SELF_DELETE_FORBIDDEN`.
+  // The account itself is neither archived nor deleted: the backend answers
+  // `403 SELF_ARCHIVE_FORBIDDEN` and `403 SELF_DELETE_FORBIDDEN`.
   const isSelf = account.id === id
   const router = useRouter()
 
@@ -80,8 +80,8 @@ export function UserDetail(): React.JSX.Element {
     async onSuccess() {
       toast.success(m.admin_users_archived_ok({ name: user.name }))
       await invalidate()
-      // Arquivado, o detalhe responde 404 (o backend esconde o arquivado
-      // fora da lixeira): ficar aqui deixava a tela parada no estado antigo.
+      // Once archived, the detail answers 404 (the backend hides the archived
+      // outside the trash): staying here left the screen stuck in the old state.
       await router.navigate({ to: '/administrator/users' })
     },
   })
@@ -93,7 +93,7 @@ export function UserDetail(): React.JSX.Element {
     onError: (error) => notifyError(error, { id: 'user-delete' }),
     async onSuccess() {
       await invalidate()
-      // O registro não existe mais: ficar na tela dele daria 404 no próximo
+      // The record no longer exists: staying on its screen would give a 404 on the next
       // refetch.
       await router.navigate({ to: '/administrator/users' })
     },
@@ -187,8 +187,8 @@ export function UserDetail(): React.JSX.Element {
               </ConfirmDialog>
             )}
 
-            {/* Só no que já está arquivado: o `delete.use-case.ts` recusa conta
-                viva com `409 USER_NOT_ARCHIVED`. */}
+            {/* Only on what is already archived: `delete.use-case.ts` refuses a live
+                account with `409 USER_NOT_ARCHIVED`. */}
             {user.deletedAt && canDelete && !isSelf && (
               <ConfirmDialog
                 destructive
@@ -227,9 +227,9 @@ export function UserDetail(): React.JSX.Element {
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <div className="flex items-center gap-4">
-              {/* Sem foto, o espaço continua reservado e o `AvatarFallback`
-                  desenha as iniciais: a linha não muda de altura por causa de
-                  um arquivo que não subiu. */}
+              {/* Without a photo, the space is still reserved and `AvatarFallback`
+                  draws the initials: the row does not change height because of
+                  a file that was not uploaded. */}
               <Avatar className="size-16">
                 <AvatarImage src={user.avatar?.url} alt="" />
                 <AvatarFallback className="bg-brand text-brand-ink font-semibold">

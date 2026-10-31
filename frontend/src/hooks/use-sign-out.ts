@@ -4,33 +4,33 @@ import { useRouter } from '@tanstack/react-router'
 import { useAuthenticationSignOutMutation } from '#/integrations/tanstack-query/mutations/authentication'
 
 /**
- * Sair do painel: encerra a sessão, esvazia o cache e volta para a entrada.
+ * Signing out of the dashboard: ends the session, empties the cache and goes back to the sign-in.
  *
- * Hook e não markup repetido porque a saída fica em **dois** lugares - o menu
- * do avatar no cabeçalho e o pé da barra lateral -, e a parte delicada é a
- * ordem das três coisas abaixo. Escrita duas vezes, bastava uma delas envelhecer
- * para a segunda saída deixar rastro da sessão anterior.
+ * A hook and not repeated markup because sign-out lives in **two** places - the
+ * avatar menu in the header and the sidebar footer -, and the delicate part is
+ * the order of the three things below. Written twice, it only takes one of them
+ * aging for the second sign-out to leave a trace of the previous session.
  *
- * Devolve a mutation inteira: quem chama precisa de `isPending` para desabilitar
- * o próprio botão.
+ * Returns the whole mutation: the caller needs `isPending` to disable its
+ * own button.
  */
 export function useSignOut() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
   return useAuthenticationSignOutMutation({
-    // `onSettled` e não `onSuccess`: se o token de acesso já expirou, o endpoint
-    // responde 401 e a sessão morre do mesmo jeito - o que sobrar vence
-    // sozinho. Limpar o cache só no sucesso deixaria o nome do usuário anterior
-    // no cabeçalho de quem entrar depois.
+    // `onSettled` and not `onSuccess`: if the access token has already expired, the endpoint
+    // answers 401 and the session dies all the same - whatever remains wins
+    // on its own. Clearing the cache only on success would leave the previous user's
+    // name in the header of whoever signs in next.
     async onSettled() {
-      // O cache inteiro, e não só `account`: o painel, as listagens e as fichas
-      // são todos dados de uma sessão que acabou de deixar de existir.
+      // The whole cache, not only `account`: the dashboard, the listings and the records
+      // are all data from a session that has just ceased to exist.
       queryClient.clear()
 
-      // Depois de limpar, e não antes: navegar primeiro remonta o guard de
-      // `_private` sobre um cache que ainda tem a sessão velha, e ele deixaria
-      // passar.
+      // After clearing, not before: navigating first remounts the `_private`
+      // guard over a cache that still holds the old session, and it would let
+      // it through.
       await router.navigate({ to: '/sign-in' })
     },
   })

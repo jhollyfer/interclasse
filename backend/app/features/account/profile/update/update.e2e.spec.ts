@@ -13,26 +13,26 @@ import { Stored } from '#tests/stored-fixtures'
 import { storageRow } from '#tests/storages-fixtures'
 
 /**
- * A atualização parcial, e as duas regras que a acompanham.
+ * Partial update, and the two rules that come with it.
  *
- * `backend-old` usava `PATCH` com um validator que exigia `name`, `email`,
- * `role` e `avatarId` em todo pedido: o verbo prometia parcial e o schema
- * recusava parcial. Aqui o `PUT` é parcial de verdade, e o teste do
- * campo ausente é o que impede a regressão para o schema exigente.
+ * `backend-old` used `PATCH` with a validator that required `name`, `email`,
+ * `role` and `avatarId` on every request: the verb promised partial and the schema
+ * refused partial. Here `PUT` is truly partial, and the missing
+ * field test is what prevents regression to the demanding schema.
  *
- * As outras afirmam o que o merge sozinho não garante: senha nova igual à
- * atual é 422, e trocar a senha derruba a sessão em curso - sem isso um token
- * anterior à troca sobreviveria a ela.
+ * The others assert what the merge alone does not guarantee: a new password equal to the
+ * current one is 422, and changing the password drops the running session - without it a token
+ * issued before the change would survive it.
  *
- * E as três de `currentPassword`, que é prova de identidade e não de força: a
- * sessão prova posse do cookie, então sem a senha atual quem sequestra um
- * cookie troca a senha do dono da conta. `backend-old` já exigia
- * (`profile.validator.ts:15`); a migração tinha deixado a exigência para trás.
+ * And the three on `currentPassword`, which is proof of identity and not of strength: the
+ * session proves possession of the cookie, so without the current password whoever hijacks a
+ * cookie changes the account owner's password. `backend-old` already required it
+ * (`profile.validator.ts:15`); the migration had left the requirement behind.
  */
-test.group('conta > atualização', (group) => {
+test.group('account > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('payload parcial não apaga o campo ausente', async ({ client, assert }) => {
+  test('partial payload does not erase the missing field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.put('/account').cookies(session).json({ name: 'Outro Nome' })
@@ -41,13 +41,13 @@ test.group('conta > atualização', (group) => {
     assert.equal(body(response).name, 'Outro Nome')
     assert.equal(body(response).email, ADMINISTRATOR.email)
 
-    // E a linha no banco também: nem `email` nem `role` foram tocados.
+    // And the database row too: neither `email` nor `role` were touched.
     const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
     assert.equal(user.name, 'Outro Nome')
     assert.equal(user.role, 'ADMINISTRATOR')
   })
 
-  test('senha nova igual à atual responde 422', async ({ client, assert }) => {
+  test('new password equal to the current one responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.put('/account').cookies(session).json({
@@ -60,7 +60,10 @@ test.group('conta > atualização', (group) => {
     assert.equal(body(response).code, 'PASSWORD_SAME_AS_CURRENT')
   })
 
-  test('trocar a senha sem a atual responde 422 apontando o campo', async ({ client, assert }) => {
+  test('changing the password without the current one responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -71,11 +74,11 @@ test.group('conta > atualização', (group) => {
     response.assertStatus(422)
     assert.property(body(response).errors, 'currentPassword')
 
-    // E a senha continua sendo a de antes: a sessão nova é a prova.
+    // And the password is still the old one: the new session is the proof.
     await authenticate(client, ADMINISTRATOR.email, ADMINISTRATOR.password)
   })
 
-  test('senha atual errada responde 422', async ({ client, assert }) => {
+  test('wrong current password responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.put('/account').cookies(session).json({
@@ -90,46 +93,49 @@ test.group('conta > atualização', (group) => {
     await authenticate(client, ADMINISTRATOR.email, ADMINISTRATOR.password)
   })
 
-  test('o resto do payload não exige a senha atual', async ({ client, assert }) => {
+  test('the rest of the payload does not require the current password', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    // `requiredIfExists('password')`: sem `password` no payload não há
-    // identidade a provar, e cobrar a senha atual para trocar o nome tornaria
-    // toda edição de perfil um formulário de senha.
+    // `requiredIfExists('password')`: without `password` in the payload there is no
+    // identity to prove, and demanding the current password to change the name would make
+    // every profile edit a password form.
     const response = await client.put('/account').cookies(session).json({ name: 'Sem Senha' })
 
     response.assertStatus(200)
     assert.equal(body(response).name, 'Sem Senha')
   })
 
-  test('trocar a senha derruba a sessão em curso', async ({ client }) => {
+  test('changing the password drops the running session', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const troca = await client.put('/account').cookies(session).json({
+    const swap = await client.put('/account').cookies(session).json({
       password: 'Outra-Senha1!',
       passwordConfirmation: 'Outra-Senha1!',
       currentPassword: ADMINISTRATOR.password,
     })
 
-    troca.assertStatus(200)
+    swap.assertStatus(200)
 
-    // O mesmo cookie que acabou de funcionar, agora sem token que o sustente.
-    const depois = await client.get('/account').cookies(session)
+    // The same cookie that just worked, now without a token to back it.
+    const after = await client.get('/account').cookies(session)
 
-    depois.assertStatus(401)
+    after.assertStatus(401)
   })
 
-  test('e-mail já usado por outra conta responde 409', async ({ client, assert }) => {
-    const outro = await UserFactory.create()
+  test('email already used by another account responds 409', async ({ client, assert }) => {
+    const other = await UserFactory.create()
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.put('/account').cookies(session).json({ email: outro.email })
+    const response = await client.put('/account').cookies(session).json({ email: other.email })
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'USER_ALREADY_EXISTS')
   })
 
-  test('avatarId inexistente responde 422 em vez de estourar a chave estrangeira', async ({
+  test('nonexistent avatarId responds 422 instead of blowing up on the foreign key', async ({
     client,
     assert,
   }) => {
@@ -144,7 +150,7 @@ test.group('conta > atualização', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('nome vazio responde 422 e não grava', async ({ client, assert }) => {
+  test('empty name responds 422 and does not save', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.put('/account').cookies(session).json({ name: '   ' })
@@ -157,14 +163,14 @@ test.group('conta > atualização', (group) => {
 })
 
 /**
- * Só o arquivo confirmado anexa. Desde que o binário sobe direto para o bucket,
- * a linha nasce antes do arquivo, e anexar um `PENDING` publicaria um avatar
- * que ainda está a meio caminho - a tela mostraria um 404.
+ * Only the confirmed file attaches. Since the binary goes straight to the bucket,
+ * the row is born before the file, and attaching a `PENDING` one would publish an avatar
+ * that is still halfway there - the screen would show a 404.
  */
-test.group('conta > atualização > avatar', (group) => {
+test.group('account > update > avatar', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('recusa com 422 anexar um arquivo ainda PENDING', async ({ client, assert }) => {
+  test('refuses with 422 to attach a still PENDING file', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await storageRow({ status: UPLOAD_STATUS.PENDING })
 
@@ -174,8 +180,8 @@ test.group('conta > atualização > avatar', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  /** O par do teste acima: sem ele, recusar tudo passaria por vacuidade. */
-  test('aceita o mesmo arquivo depois de ele estar UPLOADED', async ({ client, assert }) => {
+  /** The pair of the test above: without it, refusing everything would pass vacuously. */
+  test('accepts the same file after it is UPLOADED', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await storageRow({ status: UPLOAD_STATUS.UPLOADED })
 

@@ -14,54 +14,58 @@ import {
 test.group('matches > unscore', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('placar errado se desfaz, e a final desfeita reabre a chave', async ({ client, assert }) => {
+  test('a wrong score is undone, and the undone final reopens the bracket', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.FINAL)
 
-    const jogada = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
-    const semi = jogada.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
-    const final = jogada.matches.find(
+    const played = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
+    const semi = played.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
+    const final = played.matches.find(
       (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
 
-    // A semifinal não sai enquanto a final, que depende dela, tem placar.
-    const cedo = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
-    cedo.assertStatus(409)
-    assert.equal(body(cedo).code, 'NEXT_MATCH_PLAYED')
+    // The semifinal does not leave while the final, which depends on it, has a score.
+    const early = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    early.assertStatus(409)
+    assert.equal(body(early).code, 'NEXT_MATCH_PLAYED')
 
-    const desfazFinal = await client
-      .delete(`/administrator/matches/${final.id}/score`)
-      .cookies(admin)
-    desfazFinal.assertStatus(200)
-    assert.equal(body(desfazFinal).status, 'SCHEDULED')
+    const undoFinal = await client.delete(`/administrator/matches/${final.id}/score`).cookies(admin)
+    undoFinal.assertStatus(200)
+    assert.equal(body(undoFinal).status, 'SCHEDULED')
 
-    const desfazSemi = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
-    desfazSemi.assertStatus(200)
+    const undoSemi = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    undoSemi.assertStatus(200)
 
-    const depois = body(await client.get(`/storefront/brackets/${bracket.id}`))
-    const finalDepois = depois.matches.find(
+    const after = body(await client.get(`/storefront/brackets/${bracket.id}`))
+    const finalAfter = after.matches.find(
       (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
-    assert.equal(depois.status, 'KNOCKOUT')
-    assert.isNull(depois.championTeamId)
-    // O vencedor da semifinal desfeita saiu da vaga dele na final.
-    assert.isTrue(finalDepois.homeTeamId === null || finalDepois.awayTeamId === null)
+    assert.equal(after.status, 'KNOCKOUT')
+    assert.isNull(after.championTeamId)
+    // The winner of the undone semifinal left its slot in the final.
+    assert.isTrue(finalAfter.homeTeamId === null || finalAfter.awayTeamId === null)
 
-    const deNovo = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
-    deNovo.assertStatus(409)
-    assert.equal(body(deNovo).code, 'MATCH_NOT_PLAYED')
+    const again = await client.delete(`/administrator/matches/${semi.id}/score`).cookies(admin)
+    again.assertStatus(409)
+    assert.equal(body(again).code, 'MATCH_NOT_PLAYED')
   })
 
-  test('a partida volta sem placar e sai com os times e a chave', async ({ client, assert }) => {
+  test('the match returns without a score and comes out with the teams and the bracket', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { bracket, match } = await scheduledMatch()
-    const placar = await client
+    const score = await client
       .put(`/administrator/matches/${match.id}/score`)
       .cookies(admin)
       .json({ homeScore: 2, awayScore: 0 })
-    placar.assertStatus(200)
+    score.assertStatus(200)
 
     const response = await client.delete(`/administrator/matches/${match.id}/score`).cookies(admin)
 
@@ -74,7 +78,7 @@ test.group('matches > unscore', (group) => {
     assert.equal(body(response).bracket.sport.id, bracket.sportId)
   })
 
-  test('partida sem placar responde 409', async ({ client, assert }) => {
+  test('match without a score responds 409', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -84,7 +88,7 @@ test.group('matches > unscore', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_PLAYED')
   })
 
-  test('partida que não existe responde 404', async ({ client, assert }) => {
+  test('match that does not exist responds 404', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -95,15 +99,15 @@ test.group('matches > unscore', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
   })
 
-  test('sem sessão é 401, e o conselheiro recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/matches/${randomUUID()}/score`
 
-    const anonimo = await client.delete(url)
-    const conselheiro = await client.delete(url).cookies(advisor)
+    const anonymous = await client.delete(url)
+    const advisorSession = await client.delete(url).cookies(advisor)
 
-    anonimo.assertStatus(401)
-    conselheiro.assertStatus(403)
-    assert.equal(body(conselheiro).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    advisorSession.assertStatus(403)
+    assert.equal(body(advisorSession).code, 'ACCESS_DENIED')
   })
 })

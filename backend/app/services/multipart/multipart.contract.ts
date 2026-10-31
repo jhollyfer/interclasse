@@ -1,24 +1,24 @@
 /**
- * O contrato do upload em partes (_standards/solid.md §2): I/O externo, o S3.
+ * The multipart upload contract (_standards/solid.md §2): external I/O, S3.
  *
- * `abstract class` e não `type`: serve de token no container e de tipo ao mesmo
- * tempo. O concreto é `MultipartService`, ligado em `providers/storage.provider.ts`;
- * o use-case depende só daqui, e um teste troca o fornecedor por `container.swap`.
+ * `abstract class` and not `type`: it serves as a container token and as a type at the same
+ * time. The concrete one is `MultipartService`, bound in `providers/storage.provider.ts`;
+ * the use case depends only on this, and a test swaps the vendor with `container.swap`.
  */
 
-/** Uma parte que o cliente ainda vai enviar, e o endereço para onde enviá-la. */
+/** A part the client is still going to send, and the address to send it to. */
 export type PresignedPart = {
   readonly partNumber: number
   readonly url: string
 }
 
-/** Uma parte a assinar: o número e o tamanho exato, que a assinatura prende. */
+/** A part to sign: the number and the exact size, which the signature pins. */
 export type PartToSign = {
   readonly partNumber: number
   readonly size: number
 }
 
-/** Uma parte que o bucket já recebeu. O `etag` é o que o `complete` exige. */
+/** A part the bucket has already received. The `etag` is what `complete` requires. */
 export type UploadedPart = {
   readonly partNumber: number
   readonly size: number
@@ -26,22 +26,22 @@ export type UploadedPart = {
 }
 
 /**
- * O tamanho de cada parte, em bytes.
+ * The size of each part, in bytes.
  *
- * 10 MB e não 5 MB, que é o mínimo do S3: com o dobro do tamanho são metade das
- * partes, metade das conexões e metade das URLs para assinar. O teto de 10.000
- * partes por upload vira um teto de 100 GB por arquivo, folgado para o
- * `UPLOAD_MAX_SIZE` de 1 GiB.
+ * 10 MB and not 5 MB, which is the S3 minimum: at double the size there are half the
+ * parts, half the connections and half the URLs to sign. The 10,000-part ceiling per
+ * upload becomes a 100 GB ceiling per file, comfortable for the 1 GiB
+ * `UPLOAD_MAX_SIZE`.
  */
 export const PART_SIZE = 10 * 1024 * 1024
 
 /**
- * Quantas URLs saem numa resposta só.
+ * How many URLs come out in a single response.
  *
- * Um arquivo grande tem partes demais para assinar tudo de uma vez: cada URL
- * assinada tem uns 500 bytes, e mil delas seriam meio megabyte de JSON para
- * entregar antes do primeiro byte de arquivo subir. O cliente pede o próximo
- * lote em `GET /storages/:id/parts`, que é o mesmo endpoint da retomada.
+ * A large file has too many parts to sign all at once: each signed URL
+ * is about 500 bytes, and a thousand of them would be half a megabyte of JSON to
+ * deliver before the first byte of the file goes up. The client asks for the next
+ * batch at `GET /storages/:id/parts`, which is the same endpoint as resuming.
  */
 export const PRESIGNED_BATCH = 100
 

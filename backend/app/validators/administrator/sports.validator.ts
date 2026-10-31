@@ -4,8 +4,8 @@ import type { Infer } from '#core/validator'
 export const SPORT_SORT_COLUMNS = ['name', 'createdAt'] as const
 
 /**
- * Atletas por time. Que o mínimo não passe do máximo é regra da entidade
- * (`app/domain/sport/sport.entity.ts`). Par de caminho e nome do Zod de
+ * Athletes per team. That the minimum does not exceed the maximum is an entity rule
+ * (`app/domain/sport/sport.entity.ts`). Mirror (path and name) of the Zod one in
  * `shared/src/validators/administrator/sports.validator.ts`.
  */
 function athletes() {

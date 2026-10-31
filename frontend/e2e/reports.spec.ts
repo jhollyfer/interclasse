@@ -6,7 +6,7 @@ import { expect, test } from './support/test'
 const BOM = '﻿'
 
 // docs/USER-FLOWS.md, "Baixar o relatório".
-test('a tela de relatórios abre e o botão baixa o CSV com BOM e o cabeçalho', async ({
+test('when the reports screen opens, the button downloads the CSV with BOM and header', async ({
   administrator: { page },
 }) => {
   await page.goto('/administrator/reports')
@@ -27,7 +27,7 @@ test('a tela de relatórios abre e o botão baixa o CSV com BOM e o cabeçalho',
   const path = await file.path()
   const csv = await readFile(path, 'utf8')
 
-  // O BOM é o que faz o Excel abrir os acentos certos; `;` separa as colunas.
+  // The BOM makes Excel open the accents correctly; `;` separates the columns.
   expect(csv.startsWith(BOM)).toBe(true)
   const [header] = csv.slice(BOM.length).split(/\r?\n/)
   expect(header).toBe(

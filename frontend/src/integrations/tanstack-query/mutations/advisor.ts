@@ -76,7 +76,7 @@ export function useStudentDeleteMutation(
   })
 }
 
-/** Troca a lista de atletas da turma numa modalidade, inteira. */
+/** Replaces the classroom's athlete list for a sport, in full. */
 export function useAdvisorEnrollmentUpdateMutation(
   options?: MutationProps<
     AdvisorEnrollmentShowResponse,

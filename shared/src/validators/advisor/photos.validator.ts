@@ -1,8 +1,8 @@
 import { pageFields, z } from '../../validator.js'
 
 /**
- * A foto do conselheiro: o mesmo envio do painel, e a lista é só a dele, então
- * não filtra por status. Par do VineJS de
+ * The advisor's photo: the same upload as the panel, and the list is only theirs, so
+ * it does not filter by status. Mirror of the VineJS one in
  * `backend/app/validators/advisor/photos.validator.ts`.
  */
 export const AdvisorPhotoCreateValidator = z.object({

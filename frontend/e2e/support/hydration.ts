@@ -1,13 +1,15 @@
 import type { Page } from '@playwright/test'
 
 /**
- * O app é renderizado no servidor: o HTML chega antes de o React assumir. O que
- * o teste digita nessa janela é apagado quando a hidratação termina (campo
- * controlado volta a vazio), e um clique cai no envio nativo do formulário.
+ * The app renders on the server: the HTML arrives before React takes over.
+ * Whatever the test types in that window is wiped when hydration finishes
+ * (the controlled field goes back to empty), and a click falls on the form's
+ * native submit.
  *
- * O React 19 grava `__reactProps$...` no elemento que hidratou; é o sinal que o
- * DOM expõe. Olha a página toda, e não só o `main`: página de texto (Sobre) não
- * tem link nem botão ali, mas o cabeçalho hidrata junto. Sem `waitForTimeout` e sem `networkidle` (que o lint reprova).
+ * React 19 writes `__reactProps$...` on the element it hydrated; that is the
+ * signal the DOM exposes. It looks at the whole page, not only `main`: a text
+ * page (About) has no link or button there, but the header hydrates with it.
+ * No `waitForTimeout` and no `networkidle` (which the lint rejects).
  */
 export async function waitForHydration(page: Page): Promise<void> {
   await page.waitForFunction(() =>

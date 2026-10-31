@@ -21,20 +21,22 @@ function denied(response: unknown): { status: number | undefined; code: string |
 const NOT_FOUND = { status: 404, code: 'STORAGE_NOT_FOUND' }
 
 test.group('policies > storage (unit)', () => {
-  test('ADMINISTRATOR baixa qualquer arquivo', async ({ assert }) => {
+  test('ADMINISTRATOR downloads any file', async ({ assert }) => {
     const policy = await makeWithMemory(StoragePolicy, [])
 
     assert.isTrue(policy.download(actorOf(USER_ROLE.ADMINISTRATOR), uploadedFile()))
   })
 
   for (const role of [USER_ROLE.ADVISOR, USER_ROLE.REPRESENTATIVE]) {
-    test(`${role}: baixa o próprio avatar`, async ({ assert }) => {
+    test(`${role}: downloads their own avatar`, async ({ assert }) => {
       const policy = await makeWithMemory(StoragePolicy, [])
 
       assert.isTrue(policy.download(actorOf(role, FILE_ID), uploadedFile()))
     })
 
-    test(`${role}: arquivo alheio responde 404, como o inexistente`, async ({ assert }) => {
+    test(`${role}: a file owned by someone else answers 404, like a nonexistent one`, async ({
+      assert,
+    }) => {
       const policy = await makeWithMemory(StoragePolicy, [])
 
       assert.deepEqual(denied(policy.download(actorOf(role), uploadedFile())), NOT_FOUND)
@@ -42,7 +44,7 @@ test.group('policies > storage (unit)', () => {
   }
 
   for (const role of Object.values(USER_ROLE)) {
-    test(`${role}: arquivo inexistente responde 404`, async ({ assert }) => {
+    test(`${role}: nonexistent file answers 404`, async ({ assert }) => {
       const policy = await makeWithMemory(StoragePolicy, [])
 
       assert.deepEqual(denied(policy.download(actorOf(role, FILE_ID), null)), NOT_FOUND)

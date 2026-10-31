@@ -10,8 +10,8 @@ import { AdvisorPhotoPaginateValidator } from '#validators/advisor/photos.valida
 export default class AdvisorPhotoPaginateController {
   static docs = defineDocs({
     description:
-      'As fotos que quem está logado enviou, da mais nova à mais antiga, com o `status` ' +
-      'da revisão: `PENDING` aguarda, `APPROVED` está no site, `REJECTED` foi recusada.',
+      'The photos the logged user submitted, newest to oldest, with the review `status`: ' +
+      '`PENDING` waits, `APPROVED` is on the site, `REJECTED` was refused.',
   })
 
   constructor(private readonly useCase: AdvisorPhotoPaginateUseCase) {}

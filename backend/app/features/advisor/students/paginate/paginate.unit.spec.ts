@@ -24,7 +24,7 @@ async function setup() {
   ] as const
   for (const [id, classroomId, name] of names) {
     const created = Student.create({ id, classroomId, name, now: new Date() })
-    if (created.isLeft()) throw new Error('arranjo inválido')
+    if (created.isLeft()) throw new Error('invalid arrangement')
     await students.save(created.value)
   }
   const useCase = await makeWithMemory(AdvisorStudentPaginateUseCase, [
@@ -35,7 +35,7 @@ async function setup() {
 }
 
 test.group('advisor/students > paginate (unit)', () => {
-  test('lista só os alunos do conselheiro, em ordem alfabética, com meta', async ({ assert }) => {
+  test('lists only the advisor students, in alphabetical order, with meta', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ actor: ACTOR })
@@ -44,7 +44,7 @@ test.group('advisor/students > paginate (unit)', () => {
     assert.equal(result.isRight() && result.value.meta.perPage, 20)
   })
 
-  test('turma de outro conselheiro responde vazio, sem confirmar que existe', async ({
+  test('classroom of another advisor responds empty, without confirming it exists', async ({
     assert,
   }) => {
     const { useCase } = await setup()
@@ -54,7 +54,7 @@ test.group('advisor/students > paginate (unit)', () => {
     assert.equal(result.isRight() && result.value.meta.total, 0)
   })
 
-  test('o administrador vê todos, e a busca recorta', async ({ assert }) => {
+  test('the administrator sees all of them, and the search narrows', async ({ assert }) => {
     const { useCase } = await setup()
     const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 

@@ -12,19 +12,19 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorUserUpdateController {
   static docs = defineDocs({
-    summary: 'Atualizar usuário',
+    summary: 'Update user',
     description:
-      'Todo campo é opcional: só o que vier no payload muda. Campo ausente significa ' +
-      '"não mexer", não "apagar" - a exceção é `avatarId`, onde `null` é como se tira a foto ' +
-      'sem trocá-la.\n\n' +
-      '`role` entra aqui, ao contrário de `PUT /account`: promover e rebaixar é o que este ' +
-      'recurso existe para fazer.\n\n' +
-      'Trocar e-mail ou senha **derruba todas as sessões** da conta alterada - sem isso, ' +
-      'desligar o acesso de alguém não desligaria nada. A resposta nunca traz a senha.\n\n' +
-      'Sobre a **própria** conta, `role` e `status` respondem `403`: rebaixar-se a conselheiro ou ' +
-      'marcar-se `INACTIVE` tira do painel quem estava administrando. Nome, e-mail, senha e ' +
-      'foto continuam editáveis.',
-    // Declarado à mão porque nasce em outra camada da cadeia: quem nega é a `UserPolicy`.
+      'Every field is optional: only what comes in the payload changes. A missing field means ' +
+      '"leave alone", not "erase" - the exception is `avatarId`, where `null` is how the photo is removed ' +
+      'without replacing it.\n\n' +
+      '`role` is accepted here, unlike `PUT /account`: promoting and demoting is what this ' +
+      'resource exists to do.\n\n' +
+      'Changing email or password **drops all sessions** of the changed account - without that, ' +
+      "switching someone's access off would switch nothing off. The response never carries the password.\n\n" +
+      'On the **own** account, `role` and `status` respond `403`: demoting oneself to advisor or ' +
+      'marking oneself `INACTIVE` removes from the panel whoever was administering. Name, email, password and ' +
+      'photo remain editable.',
+    // Declared by hand because it is born in another layer of the chain: it is `UserPolicy` that denies.
     errors: { 403: 'SELF_ACCESS_FORBIDDEN' },
   })
 
@@ -34,9 +34,9 @@ export default class AdministratorUserUpdateController {
   ) {}
 
   async handle(context: HttpContext) {
-    // Corpo e params validados separadamente e fundidos: o `:id` vem da URL e
-    // não do payload, e um schema só aceitaria um `id` no corpo capaz de
-    // apontar para outra linha.
+    // Body and params validated separately and merged: the `:id` comes from the URL and
+    // not from the payload, and a single schema would accept an `id` in the body able to
+    // point at another row.
     const body = await context.request.validateUsing(AdministratorUserUpdateValidator)
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,

@@ -4,8 +4,8 @@ import { USER_ROLES } from '../../enums/user-role.js'
 import { z } from '../../validator.js'
 
 /**
- * A foto do carrossel como a API devolve: com o arquivo e quem enviou
- * (`_standards/architecture.md` §10). Datas em ISO 8601, o tipo de transporte.
+ * The carousel photo as the API returns it: with the file and who uploaded it
+ * (`_standards/architecture.md` §10). Dates in ISO 8601, the transport type.
  */
 const datetime = () => z.iso.datetime({ offset: true })
 
@@ -25,13 +25,13 @@ export const AdministratorPhotoShowResponse = z.object({
     size: z.number(),
     path: z.string(),
     status: z.enum(UPLOAD_STATUSES),
-    /** Assinada e de vida curta: sai pronta em toda leitura. */
+    /** Signed and short-lived: comes ready on every read. */
     url: z.string(),
     createdAt: datetime().nullable(),
     updatedAt: datetime().nullable(),
     deletedAt: datetime().nullable(),
   }),
-  /** Nulo quando a conta de quem enviou foi apagada. */
+  /** Null when the uploader's account was deleted. */
   author: z
     .object({
       id: z.uuid(),

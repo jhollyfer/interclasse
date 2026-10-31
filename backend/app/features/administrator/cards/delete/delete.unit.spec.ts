@@ -23,7 +23,7 @@ async function setup() {
 }
 
 test.group('administrator/cards > delete (unit)', () => {
-  test('apaga o cartão', async ({ assert }) => {
+  test('deletes the card', async ({ assert }) => {
     const { cards, useCase, drawn } = await setup()
     const semi = drawn.bracket.snapshot().matches.find((m) => m.phase === MATCH_PHASE.SEMI)
     const launched = MatchCard.launch({
@@ -37,7 +37,7 @@ test.group('administrator/cards > delete (unit)', () => {
       awayTeamId: semi?.awayTeamId ?? null,
       studentTeamId: semi?.homeTeamId ?? null,
     })
-    if (launched.isLeft()) throw new Error('cartão inválido no arranjo')
+    if (launched.isLeft()) throw new Error('invalid card in the arrangement')
     await cards.save(launched.value)
 
     const result = await useCase.execute({ id: launched.value.id })
@@ -46,7 +46,7 @@ test.group('administrator/cards > delete (unit)', () => {
     assert.isNull(await cards.findById(launched.value.id))
   })
 
-  test('cartão inexistente é 404 CARD_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent card is 404 CARD_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: randomUUID() })

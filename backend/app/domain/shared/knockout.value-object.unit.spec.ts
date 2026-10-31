@@ -4,11 +4,11 @@ import { MATCH_PHASE } from '@interclasse/shared'
 import { Knockout } from './knockout.value-object.ts'
 
 /**
- * As regras puras do mata-mata, sem banco nem HTTP. O sorteio recebe um gerador
- * determinístico para o resultado ser reproduzível.
+ * The pure knockout rules, without database or HTTP. The draw receives a
+ * deterministic generator so the result is reproducible.
  */
 
-/** Gerador linear determinístico: mesmo resultado a cada execução. */
+/** Deterministic linear generator: same result on every run. */
 function seeded(seed: number) {
   let state = seed
 
@@ -18,18 +18,18 @@ function seeded(seed: number) {
   }
 }
 
-const turmas = (total: number) => Array.from({ length: total }, (_, index) => `T${index + 1}`)
+const teams = (total: number) => Array.from({ length: total }, (_, index) => `T${index + 1}`)
 
-test.group('torneio > sorteio', () => {
-  test('o embaralhamento não perde nem repete ninguém', ({ assert }) => {
-    const times = turmas(13)
-    const embaralhado = Knockout.shuffle(times, seeded(7))
+test.group('tournament > draw', () => {
+  test('the shuffle neither loses nor repeats anyone', ({ assert }) => {
+    const times = teams(13)
+    const shuffled = Knockout.shuffle(times, seeded(7))
 
-    assert.sameMembers(embaralhado, times)
-    assert.notDeepEqual(embaralhado, times)
+    assert.sameMembers(shuffled, times)
+    assert.notDeepEqual(shuffled, times)
   })
 
-  test('a chave é a menor potência de dois que cabe todo mundo', ({ assert }) => {
+  test('the bracket is the smallest power of two that fits everyone', ({ assert }) => {
     assert.equal(Knockout.sizeFor(2), 2)
     assert.equal(Knockout.sizeFor(3), 4)
     assert.equal(Knockout.sizeFor(8), 8)
@@ -38,22 +38,22 @@ test.group('torneio > sorteio', () => {
   })
 
   for (const total of [2, 3, 5, 8, 11, 13, 16]) {
-    test(`com ${total} turmas todo mundo entra uma vez, e folga nunca enfrenta folga`, ({
+    test(`with ${total} classrooms everyone enters once, and a bye never faces a bye`, ({
       assert,
     }) => {
-      const confrontos = Knockout.pair(turmas(total), seeded(total))
-      const presentes = confrontos.flatMap((c) => [c.home, c.away]).filter((time) => time !== null)
-      const folgas = confrontos.filter((c) => c.away === null).length
+      const pairings = Knockout.pair(teams(total), seeded(total))
+      const presentes = pairings.flatMap((c) => [c.home, c.away]).filter((time) => time !== null)
+      const byes = pairings.filter((c) => c.away === null).length
 
-      assert.lengthOf(confrontos, Knockout.sizeFor(total) / 2)
-      assert.sameMembers(presentes, turmas(total))
-      assert.equal(folgas, Knockout.sizeFor(total) - total)
+      assert.lengthOf(pairings, Knockout.sizeFor(total) / 2)
+      assert.sameMembers(presentes, teams(total))
+      assert.equal(byes, Knockout.sizeFor(total) - total)
     })
   }
 })
 
-test.group('torneio > mata-mata', () => {
-  test('a fase sai do número de vagas', ({ assert }) => {
+test.group('tournament > knockout', () => {
+  test('the phase comes from the number of slots', ({ assert }) => {
     assert.equal(Knockout.phaseOf(2), MATCH_PHASE.FINAL)
     assert.equal(Knockout.phaseOf(4), MATCH_PHASE.SEMI)
     assert.equal(Knockout.phaseOf(8), MATCH_PHASE.QUARTER)
@@ -63,7 +63,7 @@ test.group('torneio > mata-mata', () => {
     assert.isUndefined(Knockout.nextPhase(MATCH_PHASE.FINAL))
   })
 
-  test('o vencedor da posição par vai como mandante, o da ímpar como visitante', ({ assert }) => {
+  test('the winner of the even position goes as home, the odd one as away', ({ assert }) => {
     assert.deepEqual(Knockout.advanceSlot(0), { position: 0, side: 'home' })
     assert.deepEqual(Knockout.advanceSlot(1), { position: 0, side: 'away' })
     assert.deepEqual(Knockout.advanceSlot(2), { position: 1, side: 'home' })

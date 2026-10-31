@@ -17,7 +17,7 @@ import type { AdministratorCardPaginatePayload } from '#validators/administrator
 type Payload = AdministratorCardPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorCardPaginateResponse>>
 
-/** Os cartões lançados, do mais novo ao mais antigo. */
+/** The recorded cards, newest to oldest. */
 @inject()
 export default class AdministratorCardPaginateUseCase {
   constructor(

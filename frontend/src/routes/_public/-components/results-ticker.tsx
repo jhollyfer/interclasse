@@ -5,12 +5,12 @@ import { phaseLabel } from '#/components/common/match-agenda'
 import { m } from '#/paraglide/messages'
 
 /**
- * A faixa amarela de resultados, a marca do site anterior.
+ * The yellow results strip, the previous site's trademark.
  *
- * É a única marquee da página, e a razão é o conteúdo: resultados chegam ao
- * longo do dia e ninguém precisa parar em cada um. A lista vai duplicada para
- * o laço não ter emenda; a cópia fica fora da árvore de acessibilidade. Com
- * movimento reduzido a faixa para e vira rolagem lateral.
+ * It is the page's only marquee, and the reason is the content: results arrive
+ * throughout the day and nobody needs to stop at each one. The list is duplicated so
+ * the loop has no seam; the copy stays outside the accessibility tree. With
+ * reduced motion the strip stops and becomes side scrolling.
  */
 export function ResultsTicker({
   matches,
@@ -31,11 +31,11 @@ export function ResultsTicker({
   ))
 
   return (
-    // Região rolável: precisa de região nomeada e foco de teclado para quem
-    // não usa o mouse (WCAG 2.1.1).
+    // Scrollable region: it needs a named region and keyboard focus for whoever
+    // does not use the mouse (WCAG 2.1.1).
     <div
       role="region"
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco de teclado (axe scrollable-region-focusable, WCAG 2.1.1)
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region needs keyboard focus (axe scrollable-region-focusable, WCAG 2.1.1)
       tabIndex={0}
       className="ticker bg-brand text-brand-ink overflow-x-auto"
       aria-label={m.public_ticker_label()}

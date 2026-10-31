@@ -22,7 +22,7 @@ async function setup() {
 }
 
 test.group('authentication/sessions > refresh (unit)', () => {
-  test('rotaciona: gasta o refresh e emite o par novo', async ({ assert }) => {
+  test('rotates: spends the refresh and issues the new pair', async ({ assert }) => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
@@ -32,7 +32,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepEqual(sessions.issued, [USER_ID])
   })
 
-  test('usar o mesmo refresh duas vezes derruba a segunda: 401 REFRESH_TOKEN_INVALID', async ({
+  test('using the same refresh twice drops the second: 401 REFRESH_TOKEN_INVALID', async ({
     assert,
   }) => {
     const { users, useCase } = await setup()
@@ -44,7 +44,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepInclude(second.value, { status: 401, code: 'REFRESH_TOKEN_INVALID' })
   })
 
-  test('sem cookie é 401 REFRESH_TOKEN_MISSING', async ({ assert }) => {
+  test('without a cookie is 401 REFRESH_TOKEN_MISSING', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
@@ -52,7 +52,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepInclude(result.value, { status: 401, code: 'REFRESH_TOKEN_MISSING' })
   })
 
-  test('token ilegível ou desconhecido é 401 REFRESH_TOKEN_INVALID', async ({ assert }) => {
+  test('unreadable or unknown token is 401 REFRESH_TOKEN_INVALID', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ refreshToken: 'lixo' })
@@ -60,7 +60,7 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepInclude(result.value, { status: 401, code: 'REFRESH_TOKEN_INVALID' })
   })
 
-  test('conta arquivada, inativa ou apagada não renova', async ({ assert }) => {
+  test('archived, inactive or deleted account does not refresh', async ({ assert }) => {
     const { users, sessions, useCase } = await setup()
     const user = await seedUser(users, { inactive: true })
 
@@ -73,10 +73,10 @@ test.group('authentication/sessions > refresh (unit)', () => {
     assert.deepEqual(sessions.issued, [])
   })
 
-  test('falha do repositório é 500 AUTHENTICATION_SESSION_REFRESH_ERROR', async ({ assert }) => {
+  test('repository failure is 500 AUTHENTICATION_SESSION_REFRESH_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.findById = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ refreshToken: 'refresh-ok' })

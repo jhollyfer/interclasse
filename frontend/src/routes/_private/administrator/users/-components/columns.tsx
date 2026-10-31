@@ -15,12 +15,12 @@ import {
 import { m } from '#/paraglide/messages'
 
 /**
- * `meta.label` é o rótulo em texto puro, para o menu de colunas visíveis:
- * `header` virou componente, e `String(elemento)` imprime `[object Object]`.
+ * `meta.label` is the plain-text label, for the visible-columns menu:
+ * `header` became a component, and `String(element)` prints `[object Object]`.
  *
- * `sortKey` só existe onde o backend ordena - `USER_SORT_COLUMNS` é `name`,
- * `email`, `role`, `status` e `createdAt`. Qualquer outra coluna oferecendo a
- * ordem viraria `422` ao primeiro clique no cabeçalho.
+ * `sortKey` only exists where the backend sorts - `USER_SORT_COLUMNS` is `name`,
+ * `email`, `role`, `status` and `createdAt`. Any other column offering sorting
+ * would become a `422` on the first click on the header.
  */
 export function userColumns(): TableColumns<AdministratorUserShowResponse> {
   return [
@@ -33,9 +33,9 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
           {m.admin_users_user()}
         </TableColumnHeader>
       ),
-      // A foto acompanha o nome na mesma célula: uma coluna só para o avatar
-      // deixaria a tabela mais larga sem dizer nada a mais, e `?sort=avatarId`
-      // não existe no backend.
+      // The photo goes with the name in the same cell: a column just for the avatar
+      // would make the table wider without saying anything more, and `?sort=avatarId`
+      // does not exist on the backend.
       cell: ({ row }) => (
         <div className="flex items-center gap-2.5">
           <Avatar className="size-8">
@@ -75,8 +75,8 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
           {m.admin_common_role()}
         </TableColumnHeader>
       ),
-      // O `??` cobre um papel novo do backend chegando aqui antes de esta tela
-      // saber dele: melhor imprimir o papel cru do que uma célula vazia.
+      // The `??` covers a new backend role arriving here before this screen
+      // knows about it: better to print the raw role than an empty cell.
       cell: ({ row }) => (
         <Badge variant={USER_ROLE_VARIANTS[row.original.role]}>
           {USER_ROLE_LABELS[row.original.role] ?? row.original.role}
@@ -92,9 +92,9 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
           {m.admin_common_status()}
         </TableColumnHeader>
       ),
-      // `ACCOUNT_STATUS_LABELS` e não `ACTIVE_STATUS_LABELS`: o sujeito desta
-      // tela é gente, e a concordância é "Ativo", não "Ativa". A cor é a mesma do
-      // enum, que não muda com o sujeito.
+      // `ACCOUNT_STATUS_LABELS` and not `ACTIVE_STATUS_LABELS`: this screen's subject
+      // is people, and the agreement is "Ativo", not "Ativa". The color is the same
+      // as the enum's, which does not change with the subject.
       cell: ({ row }) => (
         <Badge variant={ACTIVE_STATUS_VARIANTS[row.original.status]}>
           {ACCOUNT_STATUS_LABELS[row.original.status] ?? row.original.status}

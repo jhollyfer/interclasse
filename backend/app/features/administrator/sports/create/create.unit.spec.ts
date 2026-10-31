@@ -14,7 +14,7 @@ async function setup() {
 }
 
 test.group('administrator/sports > create (unit)', () => {
-  test('cadastra com o slug do nome', async ({ assert }) => {
+  test('registers with the slug from the name', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: 'Tênis de mesa', minAthletes: 1, maxAthletes: 2 })
@@ -23,7 +23,7 @@ test.group('administrator/sports > create (unit)', () => {
     assert.deepInclude(result.value, { name: 'Tênis de mesa', slug: 'tenis-de-mesa' })
   })
 
-  test('mínimo acima do máximo é 422 SPORT_INVALID_LIMITS', async ({ assert }) => {
+  test('minimum above the maximum is 422 SPORT_INVALID_LIMITS', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: 'Vôlei', minAthletes: 9, maxAthletes: 6 })
@@ -32,7 +32,7 @@ test.group('administrator/sports > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'SPORT_INVALID_LIMITS' })
   })
 
-  test('nome ou slug repetido é 409 SPORT_ALREADY_EXISTS', async ({ assert }) => {
+  test('repeated name or slug is 409 SPORT_ALREADY_EXISTS', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ name: 'Futsal', minAthletes: 5, maxAthletes: 12 })
 

@@ -1,15 +1,15 @@
 /**
- * As partes de `request` que só existem no servidor de SSR.
+ * The parts of `request` that only exist on the SSR server.
  *
- * Com SSR, a primeira navegação é renderizada pelo Nitro, e é o Nitro - não o
- * navegador - que fala com o AdonisJS. O `credentials: 'include'` do `fetch` não
- * ajuda ali: quem tem o cookie é o navegador, e ele ficou uma camada acima. Sem
- * o repasse daqui, todo `beforeLoad` renderizado no servidor veria 401.
+ * With SSR, the first navigation is rendered by Nitro, and it is Nitro - not the
+ * browser - that talks to AdonisJS. `fetch`'s `credentials: 'include'` does not
+ * help there: the browser holds the cookie, and it stayed one layer above. Without
+ * the forwarding done here, every `beforeLoad` rendered on the server would see 401.
  *
- * Este módulo importa `@tanstack/react-start/server` e por isso nunca pode
- * entrar no bundle do navegador. Quem o consome é o `.server()` de um
- * `createIsomorphicFn` em `http.ts`, e o plugin do Start remove do build do
- * cliente tanto a chamada quanto este import.
+ * This module imports `@tanstack/react-start/server` and therefore can never
+ * enter the browser bundle. Whoever consumes it is the `.server()` of a
+ * `createIsomorphicFn` in `http.ts`, and the Start plugin strips both the call and
+ * this import from the client build.
  */
 
 import {
@@ -19,18 +19,17 @@ import {
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 /**
- * O que precisa valer por requisição, e não por processo.
+ * What needs to hold per request, and not per process.
  *
- * Hoje só a renovação de token mora aqui. Ela precisa deste escopo porque o
- * backend **rotaciona**: `refresh.use-case.ts` apaga o refresh token antigo ao
- * emitir o novo. Uma promessa de renovação guardada no módulo seria
- * compartilhada por todos os visitantes que o servidor de SSR atende ao mesmo
- * tempo, e a segunda requisição a reusá-la terminaria segurando um cookie que
- * o backend já invalidou.
+ * Today only the token renewal lives here. It needs this scope because the
+ * backend **rotates**: `refresh.use-case.ts` deletes the old refresh token when
+ * issuing the new one. A renewal promise kept at module level would be
+ * shared by every visitor the SSR server serves at the same time,
+ * and the second request to reuse it would end up holding a cookie that
+ * the backend already invalidated.
  *
- * É a mesma regra que faz o `QueryClient` nascer por requisição em
- * `query-context.ts` - no servidor, o escopo do módulo é o escopo de todo
- * mundo.
+ * It is the same rule that makes the `QueryClient` be born per request in
+ * `query-context.ts` - on the server, module scope is everyone's scope.
  */
 export type RequestScope = {
   renewal: Promise<string | undefined> | null
@@ -39,47 +38,47 @@ export type RequestScope = {
 const storage = new AsyncLocalStorage<RequestScope>()
 
 /**
- * Abre um escopo e roda `fn` dentro dele. Quem chama é o middleware de request
- * registrado em `src/start.ts`, que o Start executa antes de toda requisição -
- * SSR, server route e server function.
+ * Opens a scope and runs `fn` inside it. The caller is the request middleware
+ * registered in `src/start.ts`, which Start runs before every request -
+ * SSR, server route and server function.
  */
 export function runInRequestScope<T>(fn: () => T): T {
   return storage.run({ renewal: null }, fn)
 }
 
 /**
- * O escopo da requisição em curso, ou `undefined` fora de uma - teste, script,
- * qualquer código que rode sem o middleware ter aberto o escopo.
+ * The scope of the request in progress, or `undefined` outside one - test, script,
+ * any code that runs without the middleware having opened the scope.
  */
 export function requestScope(): RequestScope | undefined {
   return storage.getStore()
 }
 
 /**
- * O header `Cookie` que o navegador mandou ao Nitro, para ser repassado literal
- * ao AdonisJS.
+ * The `Cookie` header the browser sent to Nitro, to be forwarded verbatim
+ * to AdonisJS.
  *
- * Literal é requisito, não preferência: o `response.cookie()` do AdonisJS assina
- * o valor (`s:<base64>.<hmac>` verificado com a `APP_KEY`), então ler, remontar
- * ou reinterpretar qualquer parte dele invalida a assinatura.
+ * Verbatim is a requirement, not a preference: AdonisJS's `response.cookie()` signs
+ * the value (`s:<base64>.<hmac>` verified with the `APP_KEY`), so reading, reassembling
+ * or reinterpreting any part of it invalidates the signature.
  */
 export function inboundCookie(): string | undefined {
   try {
     return getRequestHeader('cookie')
   } catch {
-    // Fora de um ciclo de requisição - teste, script - não há cookie a repassar.
+    // Outside a request cycle - test, script - there is no cookie to forward.
     return undefined
   }
 }
 
 /**
- * Copia os `Set-Cookie` que o AdonisJS devolveu para a resposta que o Nitro vai
- * mandar ao navegador, e devolve o header `Cookie` já atualizado.
+ * Copies the `Set-Cookie`s that AdonisJS returned into the response Nitro will
+ * send to the browser, and returns the already updated `Cookie` header.
  *
- * O retorno é o que faz o replay depois de um refresh usar o cookie novo. O
- * backend apaga o refresh token antigo ao rotacionar (`refresh.use-case.ts`),
- * então repetir a requisição com o cookie de entrada gastaria um token que
- * acabou de deixar de existir, e derrubaria a sessão recém-criada.
+ * The return value is what makes the replay after a refresh use the new cookie. The
+ * backend deletes the old refresh token on rotation (`refresh.use-case.ts`),
+ * so repeating the request with the incoming cookie would spend a token that
+ * just ceased to exist, and would take down the freshly created session.
  */
 export function applySetCookie(
   cookie: string | undefined,
@@ -90,22 +89,22 @@ export function applySetCookie(
   if (!values.length) return cookie
 
   try {
-    // A primitiva do Start para repassar `Set-Cookie` cru de outro servidor:
-    // acrescenta sem trocar o que já está na resposta.
+    // Start's primitive for forwarding raw `Set-Cookie` from another server:
+    // it appends without replacing what is already in the response.
     appendResponseHeader('set-cookie', values)
   } catch {
-    // idem `inboundCookie`: sem requisição em curso, não há onde escrever.
+    // same as `inboundCookie`: without a request in progress, there is nowhere to write.
   }
 
   return mergeCookieHeader(cookie, values)
 }
 
 /**
- * Aplica sobre um header `Cookie` os pares `nome=valor` de uma lista de
- * `Set-Cookie`: substitui o que já existe, acrescenta o que não existe.
+ * Applies to a `Cookie` header the `name=value` pairs of a list of
+ * `Set-Cookie`: replaces what already exists, appends what does not.
  *
- * Exportada para teste - é a única lógica deste arquivo que não é uma chamada
- * direta ao Start.
+ * Exported for testing - it is the only logic in this file that is not a direct
+ * call to Start.
  */
 export function mergeCookieHeader(
   cookie: string | undefined,
@@ -120,8 +119,8 @@ export function mergeCookieHeader(
   }
 
   for (const value of setCookies) {
-    // O par vem antes do primeiro `;`. O resto são atributos (`Path`,
-    // `HttpOnly`, `Max-Age`) que não existem no header `Cookie`.
+    // The pair comes before the first `;`. The rest are attributes (`Path`,
+    // `HttpOnly`, `Max-Age`) that do not exist in the `Cookie` header.
     const [pair = ''] = value.split(';')
     const separator = pair.indexOf('=')
     if (separator < 0) continue

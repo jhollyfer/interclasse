@@ -11,15 +11,15 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * O sorteio, por HTTP: turmas, alunos e inscrições pela rota, porque é delas
- * que a chave sai. Placar, desfazer placar, apagar a chave e o site têm a spec
- * da própria ação; a montagem comum está em `tests/brackets-fixtures.ts`.
+ * The draw, over HTTP: classrooms, students and enrollments through the route, because the bracket
+ * comes out of them. Score, undoing a score, deleting the bracket and the site have a spec
+ * of their own action; the common setup is in `tests/brackets-fixtures.ts`.
  */
 
 test.group('brackets > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('turma abaixo do mínimo não entra, e menos de duas turmas é 409', async ({
+  test('classroom below the minimum does not enter, and fewer than two classrooms is 409', async ({
     client,
     assert,
   }) => {
@@ -36,7 +36,10 @@ test.group('brackets > create', (group) => {
     assert.equal(body(response).code, 'NOT_ENOUGH_TEAMS')
   })
 
-  test('com 3 turmas: uma de folga vai direto para a final', async ({ client, assert }) => {
+  test('with 3 classrooms: the one with a bye goes straight to the final', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 3)
@@ -50,14 +53,14 @@ test.group('brackets > create', (group) => {
     const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
 
     assert.equal(body(detail).status, 'KNOCKOUT')
-    // Chave de 4 com uma folga: só uma semifinal de verdade.
+    // Bracket of 4 with one bye: only one real semifinal.
     assert.lengthOf(semis, 1)
-    // O time de folga já está na final, à espera do vencedor da semifinal.
+    // The bye team is already in the final, waiting for the semifinal winner.
     assert.isString(final?.homeTeamId)
     assert.isNull(final?.awayTeamId)
   })
 
-  test('depois do sorteio a lista do conselheiro segue editável, com motivo', async ({
+  test('after the draw the advisor list stays editable, with a reason', async ({
     client,
     assert,
   }) => {
@@ -78,7 +81,7 @@ test.group('brackets > create', (group) => {
     assert.isFalse(body(response).sports[0].locked)
   })
 
-  test('sortear de novo a mesma modalidade e categoria devolve a chave já sorteada', async ({
+  test('drawing again the same sport and category returns the already drawn bracket', async ({
     client,
     assert,
   }) => {
@@ -86,8 +89,8 @@ test.group('brackets > create', (group) => {
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 3)
 
-    // O primeiro pedido comitou, mas o navegador desistiu antes da resposta: o
-    // reenvio tem de levar à mesma chave, e não a um erro nem a um novo sorteio.
+    // The first request committed, but the browser gave up before the response: the
+    // resend must lead to the same bracket, not to an error nor to a new draw.
     const first = await draw(client, admin, sport.id)
     const again = await client
       .post('/administrator/brackets')
@@ -102,16 +105,16 @@ test.group('brackets > create', (group) => {
   })
 })
 
-test.group('administrator/brackets/create > acesso e validação', (group) => {
+test.group('administrator/brackets/create > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.post('/administrator/brackets')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.post('/administrator/brackets').cookies(advisor)
@@ -123,7 +126,7 @@ test.group('administrator/brackets/create > acesso e validação', (group) => {
 test.group('administrator/brackets/create > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('modalidade malformada e categoria fora da lista respondem 422, e nada é sorteado', async ({
+  test('malformed sport and category outside the list respond 422, and nothing is drawn', async ({
     client,
     assert,
   }) => {

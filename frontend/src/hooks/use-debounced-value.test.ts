@@ -14,13 +14,13 @@ afterEach(() => {
 })
 
 describe('useDebouncedValue', () => {
-  it('começa com o valor de entrada', () => {
+  it('starts with the input value', () => {
     const { result } = renderHook(() => useDebouncedValue('a', 300))
 
     expect(result.current).toBe('a')
   })
 
-  it('só troca depois do silêncio, e descarta o valor do meio', () => {
+  it('changes only after the silence, and drops the middle value', () => {
     const { result, rerender } = renderHook(
       ({ value }) => useDebouncedValue(value, 300),
       { initialProps: { value: 'a' } },

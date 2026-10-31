@@ -39,20 +39,20 @@ import type {
 } from '#core/openapi/types'
 
 /**
- * Monta o documento OpenAPI a partir do router de verdade.
+ * Builds the OpenAPI document from the real router.
  *
- * A regra que orienta tudo aqui: **o que o código já diz, o gerador lê; o que só
- * uma pessoa sabe, o controller declara.** Caminho, método, parâmetros de
- * caminho, exigência de sessão, papéis aceitos e as falhas de infraestrutura
- * saem de `router.toJSON()` e da cadeia de middleware. Só resumo, payload,
- * resposta e os códigos de erro do domínio precisam ser escritos.
+ * The rule behind everything here: **what the code already says, the generator reads;
+ * what only a person knows, the controller declares.** Path, method, path
+ * parameters, session requirement, accepted roles and the infrastructure
+ * failures come from `router.toJSON()` and the middleware chain. Only the summary,
+ * payload, response and the domain error codes need to be written.
  *
- * O corpo de resposta sai do schema `…Response` de `shared/src/responses/`, pelo
- * registro `RESPONSES` (`_standards/openapi.md`): o mesmo schema tipa o
- * use-case, o presenter e o frontend, e o gerador nunca lê o model.
+ * The response body comes from the `…Response` schema in `shared/src/responses/`, through
+ * the `RESPONSES` registry (`_standards/openapi.md`): the same schema types the
+ * use case, the presenter and the frontend, and the generator never reads the model.
  */
 
-/** Tipos de token que `router.parsePattern` devolve para um segmento. */
+/** Token types that `router.parsePattern` returns for a segment. */
 const TOKEN = {
   STATIC: 0,
   PARAM: 1,
@@ -63,12 +63,12 @@ const TOKEN = {
 const METHOD_ORDER: string[] = ['get', 'post', 'put', 'patch', 'delete']
 
 const SUCCESS_DESCRIPTIONS: Record<number, string> = {
-  200: 'Sucesso',
-  201: 'Recurso criado',
-  204: 'Sucesso, sem corpo',
+  200: 'Success',
+  201: 'Resource created',
+  204: 'Success, no body',
 }
 
-/** O status que uma operação ainda não documentada provavelmente devolve. */
+/** The status an operation not yet documented probably returns. */
 const IMPLIED_SUCCESS: Record<string, number> = {
   post: 201,
   delete: 204,
@@ -82,14 +82,14 @@ type BuildResult = {
 }
 
 // ---------------------------------------------------------------------------
-// Resolução do controller
+// Controller resolution
 // ---------------------------------------------------------------------------
 
 type LazyController = () => Promise<{ default?: DocumentedController }>
 
 /**
- * Classes têm `prototype`; arrow functions, não. É o que separa o controller já
- * carregado do `() => import('#features/...')` que o registry gerado usa.
+ * Classes have a `prototype`; arrow functions do not. That is what separates the already
+ * loaded controller from the `() => import('#features/...')` the generated registry uses.
  */
 function isController(target: unknown): target is DocumentedController {
   return typeof target === 'function' && 'prototype' in target
@@ -100,10 +100,10 @@ function isLazyController(target: unknown): target is LazyController {
 }
 
 /**
- * O arquivo-fonte do controller da rota, para ler o AST dele.
+ * The controller source file of the route, to read its AST.
  *
- * O registry gerado referencia o controller por `#features/...`, que mapeia
- * direto para `app/features/...`.
+ * The generated registry references the controller by `#features/...`, which maps
+ * straight to `app/features/...`.
  */
 function controllerFile(handler: unknown): string | undefined {
   if (typeof handler !== 'object' || handler === null) return undefined
@@ -138,15 +138,15 @@ async function resolveDocs(handler: unknown): Promise<OperationDocs | undefined>
 }
 
 // ---------------------------------------------------------------------------
-// Caminho, nome e tag
+// Path, name and tag
 // ---------------------------------------------------------------------------
 
 /**
- * `/administrator/companies/:id` → `/administrator/companies/{id}`.
+ * `/administrator/companies/:id` -> `/administrator/companies/{id}`.
  *
- * Parâmetro opcional não existe em OpenAPI: o caminho com e sem ele são dois
- * caminhos. Nenhuma rota do projeto usa, então aqui ele só é tratado como
- * obrigatório, e um aviso apontaria o dia em que passar a usar.
+ * An optional parameter does not exist in OpenAPI: the path with and without it are two
+ * paths. No route in the project uses one, so here it is only treated as
+ * required, and a warning would point to the day one starts using it.
  */
 function toOpenAPIPath(pattern: string): { path: string; params: string[] } {
   const params: string[] = []
@@ -193,11 +193,11 @@ function pascalize(value: string): string {
 }
 
 /**
- * O tipo de conteúdo do payload, derivado do próprio schema em vez de declarado.
+ * The payload content type, derived from the schema itself instead of declared.
  *
- * Um campo `format: 'binary'` só existe em upload, e upload não trafega em JSON.
- * Documentar `application/json` numa rota de multipart faria o "Test Request" do
- * Scalar enviar o corpo errado - e o cliente gerado a partir do documento, também.
+ * A `format: 'binary'` field only exists in an upload, and an upload does not travel as JSON.
+ * Documenting `application/json` on a multipart route would make Scalar's "Test Request"
+ * send the wrong body - and so would the client generated from the document.
  */
 function requestContentType(schema: SchemaObject): string {
   const properties = Object.values(schema.properties ?? {})
@@ -214,9 +214,9 @@ function requestContentType(schema: SchemaObject): string {
 }
 
 /**
- * A tag sai do caminho, não do nome da rota. O subgrupo de remoção do painel é
- * `.as('destroy')`, então apagar empresa se chama `administrator.destroy.companies`
- * e cairia no mesmo grupo que apagar categoria. O caminho não confunde.
+ * The tag comes from the path, not from the route name. The panel removal subgroup is
+ * `.as('destroy')`, so deleting a company is called `administrator.destroy.companies`
+ * and would fall in the same group as deleting a category. The path does not confuse.
  */
 function resolveTagRule(path: string): TagRule | undefined {
   const matches = openapi.tags
@@ -231,45 +231,45 @@ function resolveTagRule(path: string): TagRule | undefined {
 }
 
 /**
- * O resumo de cada operação, montado do nome do arquivo do controller mais o
- * substantivo do grupo: `create.controller.ts` sob um grupo cujo `singular` é
- * "empresa" vira "Criar empresa".
+ * The summary of each operation, built from the controller file name plus the
+ * group noun: `create.controller.ts` under a group whose `singular` is
+ * "company" becomes "Create company".
  *
- * Os pares de substantivos em `config/openapi.ts` cobrem as operações de
- * recurso. A alternativa era um resumo escrito à mão por operação, que é onde a
- * documentação começa a envelhecer.
+ * The noun pairs in `config/openapi.ts` cover the resource operations. The
+ * alternative was a hand-written summary per operation, which is where the
+ * documentation starts to age.
  *
- * As ações sem substantivo - as de sessão e as de upload - têm resumo fixo: o
- * que elas fazem não é uma operação sobre o recurso do grupo, então flexionar o
- * substantivo daria frase errada. Elas não dependem do grupo, e por isso são as
- * únicas que respondem mesmo sem `singular` declarado.
+ * Actions without a noun - the session ones and the upload ones - have a fixed summary:
+ * what they do is not an operation on the group resource, so inflecting the
+ * noun would give a wrong sentence. They do not depend on the group, and so they are the
+ * only ones that answer even without a declared `singular`.
  *
- * A tabela é de mecanismo e vale em todo projeto. Ação de domínio - ou que
- * precisa de outra frase - vai para `ACTION_OVERRIDES` em `config/openapi.ts`,
- * que é o arquivo do projeto; aqui, um nome de domínio viraria resumo errado em
- * outro projeto.
+ * The table is mechanism and holds in every project. A domain action - or one that
+ * needs another phrase - goes to `ACTION_OVERRIDES` in `config/openapi.ts`,
+ * which is the project file; here, a domain name would become a wrong summary in
+ * another project.
  */
 const ACTION_SUMMARY: Record<string, (rule: TagRule) => string> = {
-  create: (rule) => `Criar ${rule.singular}`,
-  paginate: (rule) => `Listar ${rule.plural}`,
-  show: (rule) => `Detalhar ${rule.singular}`,
-  update: (rule) => `Atualizar ${rule.singular}`,
-  archive: (rule) => `Arquivar ${rule.singular}`,
-  unarchive: (rule) => `Restaurar ${rule.singular}`,
-  delete: (rule) => `Remover ${rule.singular}`,
+  create: (rule) => `Create ${rule.singular}`,
+  paginate: (rule) => `List ${rule.plural}`,
+  show: (rule) => `Show ${rule.singular}`,
+  update: (rule) => `Update ${rule.singular}`,
+  archive: (rule) => `Archive ${rule.singular}`,
+  unarchive: (rule) => `Restore ${rule.singular}`,
+  delete: (rule) => `Remove ${rule.singular}`,
 }
 
 /**
- * As ações cujo resumo não depende do grupo, e por isso são as únicas que
- * respondem mesmo onde o `singular` não foi declarado.
+ * The actions whose summary does not depend on the group, and so are the only ones that
+ * answer even where `singular` was not declared.
  */
 const FIXED_SUMMARY: Record<string, string> = {
-  'sign-in': 'Entrar',
-  'sign-out': 'Sair',
-  'refresh': 'Renovar a sessão',
-  'complete': 'Confirmar o upload',
-  'parts': 'Retomar o upload',
-  'download': 'Baixar o arquivo',
+  'sign-in': 'Sign in',
+  'sign-out': 'Sign out',
+  'refresh': 'Renew the session',
+  'complete': 'Confirm the upload',
+  'parts': 'Resume the upload',
+  'download': 'Download the file',
 }
 
 function deriveSummary(action: string, rule: TagRule | undefined): string | undefined {
@@ -296,7 +296,7 @@ type Protection = {
   roles: string[]
 }
 
-/** O que `route.middleware.all()` entrega, sem repetir a união do framework. */
+/** What `route.middleware.all()` returns, without repeating the framework union. */
 type MiddlewareEntry = Parameters<typeof middlewareInfo>[0]
 
 function toRoles(args: unknown): string[] {
@@ -308,14 +308,14 @@ function toRoles(args: unknown): string[] {
 }
 
 /**
- * Lê a proteção da rota da própria cadeia de middleware. Os papéis vêm dos
- * argumentos de `middleware.role([...])`, então a documentação não pode
- * divergir de quem realmente pode chamar o endpoint.
+ * Reads the route protection from the middleware chain itself. The roles come from the
+ * arguments of `middleware.role([...])`, so the documentation cannot
+ * diverge from who can actually call the endpoint.
  *
- * Grupos de papel aninham - apagar no painel está dentro de
- * `role(['OWNER', 'ADMINISTRATOR'])` **e** de `role(['OWNER'])`. As duas checagens
- * precisam passar, então quem pode chamar é a interseção das listas, não a
- * última delas.
+ * Role groups nest - deleting in the panel is inside
+ * `role(['OWNER', 'ADMINISTRATOR'])` **and** `role(['OWNER'])`. Both checks
+ * must pass, so who can call is the intersection of the lists, not the
+ * last one.
  */
 async function readProtection(middleware: Iterable<MiddlewareEntry>): Promise<Protection> {
   const protection: Protection = { authenticated: false, roles: [] }
@@ -345,16 +345,16 @@ async function readProtection(middleware: Iterable<MiddlewareEntry>): Promise<Pr
 }
 
 // ---------------------------------------------------------------------------
-// Contrato
+// Contract
 // ---------------------------------------------------------------------------
 
 /**
- * O que se sabe sobre uma operação depois de juntar as duas fontes.
+ * What is known about an operation after merging the two sources.
  *
- * A introspecção do código é a base; `static docs` só entra por cima, para
- * prosa e para o que o código não consegue dizer. A ordem importa: se a
- * declaração fosse a base, uma rota sem declaração ficaria vazia - que foi
- * exatamente o problema da primeira versão, com 5 de 46 operações completas.
+ * Code introspection is the base; `static docs` only comes on top, for
+ * prose and for what the code cannot say. The order matters: if the
+ * declaration were the base, a route without a declaration would be empty - which was
+ * exactly the problem of the first version, with 5 of 46 operations complete.
  */
 type Contract = {
   summary: string
@@ -365,12 +365,12 @@ type Contract = {
   query?: DocumentedValidator
   params?: DocumentedValidator
   responses: Record<number, ResponseBody>
-  /** status → code → mensagem. */
+  /** status -> code -> message. */
   errors: Map<number, Map<string, string>>
   overrides?: OperationDocs['overrides']
 }
 
-/** Status de sucesso presumido quando o controller não revelou o seu. */
+/** Success status assumed when the controller did not reveal its own. */
 function impliedSuccess(method: string): number {
   return IMPLIED_SUCCESS[method] ?? 200
 }
@@ -392,7 +392,7 @@ async function buildContract(
   for (const [rawStatus, declared] of Object.entries(docs?.errors ?? {})) {
     const status = Number(rawStatus)
     const codes = errors.get(status) ?? new Map<string, string>()
-    // `[x].flat()` normaliza um valor ou uma lista para lista sem ramificar.
+    // `[x].flat()` normalizes a value or a list into a list without branching.
     const list = [declared].flat()
 
     for (const code of list) {
@@ -420,9 +420,9 @@ async function buildContract(
 
   if (docs?.responses) return contract
 
-  // Sem declaração: o status vem do `context.response.<método>()` do controller,
-  // e o corpo da entrada da feature em `#core/response`. Listagem ganha o envelope
-  // paginado, porque `paginate` é o único caso em que ele se aplica.
+  // No declaration: the status comes from the controller's `context.response.<method>()`,
+  // and the body from the feature entry in `#core/response`. A listing gets the paginated
+  // envelope, because `paginate` is the only case where it applies.
   const status = intro?.successStatus ?? impliedSuccess(method)
 
   if (status === 204) {
@@ -431,8 +431,8 @@ async function buildContract(
     return contract
   }
 
-  // Guarda antes da leitura: sem diretório não há o que carregar, e o corte
-  // que o ternário fazia é o mesmo que o `if` logo abaixo já fazia de novo.
+  // Guard before the read: without a directory there is nothing to load, and the cut
+  // the ternary made is the same the `if` right below already made again.
   if (!intro?.directory) return contract
 
   const schema = loadResponseSchema(intro.directory, app.makePath('.'), intro.action)
@@ -451,7 +451,7 @@ async function buildContract(
 }
 
 // ---------------------------------------------------------------------------
-// Respostas
+// Responses
 // ---------------------------------------------------------------------------
 
 type Components = Record<string, SchemaObject>
@@ -461,18 +461,18 @@ function isPaginated(body: ResponseBody): body is PaginatedResponse {
 }
 
 /**
- * O corpo de uma resposta como JSON Schema, seja ele qual for.
+ * The body of a response as JSON Schema, whatever it is.
  *
- * Duas origens: o schema `…Response` do `shared/` (Zod), que é a fonte da régua,
- * e o schema VineJS de quem não tem resposta no `shared/` - o plano de upload
- * multipart.
+ * Two origins: the `…Response` schema of `shared/` (Zod), which is the rule's source,
+ * and the VineJS schema of whoever has no response in `shared/` - the multipart
+ * upload plan.
  */
 function bodySchema(
   body: DocumentedValidator | z.ZodType,
   context: string,
   warnings: string[],
 ): SchemaObject {
-  // A fonte da régua: o schema `…Response` do `shared/` (`openapi.md`).
+  // The rule's source: the `…Response` schema of `shared/` (`openapi.md`).
   if (ZodSchema.is(body)) return ZodSchema.toOpenAPI(body)
 
   return VineSchema.toSchema(body, context, warnings)
@@ -489,7 +489,7 @@ function buildSuccessResponses(
 
   for (const [rawStatus, body] of Object.entries(contract.responses)) {
     const status = Number(rawStatus)
-    const description = SUCCESS_DESCRIPTIONS[status] ?? 'Sucesso'
+    const description = SUCCESS_DESCRIPTIONS[status] ?? 'Success'
 
     if (body === 'no-content') {
       responses[rawStatus] = { description }
@@ -525,8 +525,8 @@ function buildSuccessResponses(
 }
 
 /**
- * As falhas da operação: as automáticas, deduzidas da proteção e da presença de
- * validator, unidas às que o controller declarou.
+ * The failures of the operation: the automatic ones, deduced from the protection and the
+ * presence of a validator, joined with the ones the controller declared.
  */
 function buildErrorResponses(
   contract: Contract,
@@ -543,10 +543,10 @@ function buildErrorResponses(
     codes.set(status, current)
   }
 
-  if (protection.authenticated) add(401, AUTOMATIC_CODES.unauthenticated, 'Não autorizado')
+  if (protection.authenticated) add(401, AUTOMATIC_CODES.unauthenticated, 'Unauthorized')
   if (protection.roles.length > 0) add(403, AUTOMATIC_CODES.forbidden, 'Acesso negado')
   if (contract.body || contract.query || contract.params) {
-    add(422, AUTOMATIC_CODES.validation, 'Dados inválidos')
+    add(422, AUTOMATIC_CODES.validation, 'Invalid data')
   }
 
   add(500)
@@ -568,8 +568,8 @@ function buildErrorResponses(
     let description
     if (status === 403) description = forbiddenDescription(protection.roles)
 
-    // As mensagens vieram literalmente do `left(...)` do use-case, então servem
-    // como descrição sem ninguém escrever nada.
+    // The messages came literally from the use case's `left(...)`, so they serve
+    // as description without anyone writing anything.
     const messages = [...found.values()].filter(Boolean)
     if (!description && messages.length > 0) description = messages.join(' · ')
 
@@ -580,7 +580,7 @@ function buildErrorResponses(
 }
 
 // ---------------------------------------------------------------------------
-// Operação
+// Operation
 // ---------------------------------------------------------------------------
 
 function buildParameters(
@@ -594,7 +594,7 @@ function buildParameters(
   const declared = new Map<string, OpenAPIParameter>()
 
   if (contract.params) {
-    const schema = VineSchema.toSchema(contract.params, `${operationId} (parâmetros)`, warnings)
+    const schema = VineSchema.toSchema(contract.params, `${operationId} (parameters)`, warnings)
 
     for (const parameter of VineSchema.toParameters(schema, 'path')) {
       declared.set(parameter.name, parameter)
@@ -636,15 +636,15 @@ function buildOperation(
 
   if (!contract.tag) {
     warnings.push(
-      `${method.toUpperCase()} ${path}: nenhum prefixo de \`config/openapi.ts\` casa com este ` +
-        'caminho. A operação cai em "Sem grupo" na barra lateral.',
+      `${method.toUpperCase()} ${path}: no prefix of \`config/openapi.ts\` matches this ` +
+        'path. The operation falls in "No group" in the sidebar.',
     )
   }
 
   const operation: OpenAPIOperation = {
     operationId,
     summary: contract.summary,
-    tags: [contract.tag ?? 'Sem grupo'],
+    tags: [contract.tag ?? 'No group'],
     responses: {},
   }
 
@@ -652,9 +652,9 @@ function buildOperation(
   if (contract.deprecated) operation.deprecated = true
   if (protection.authenticated) operation.security = [{ [SECURITY_SCHEME]: [] }]
 
-  // Quem pode chamar, em campo próprio e não só na frase do 403. É o que
-  // `authz:check` compara contra o baseline: abrir uma rota sem querer é uma
-  // linha a menos aqui, e sem o campo essa linha se esconde numa descrição.
+  // Who can call, in its own field and not only in the 403 sentence. It is what
+  // `authz:check` compares against the baseline: opening a route by accident is one
+  // line less here, and without the field that line hides in a description.
   if (protection.roles.length > 0) operation['x-roles'] = protection.roles
 
   const parameters = buildParameters(contract, pathParams, operationId, warnings)
@@ -681,12 +681,12 @@ function buildOperation(
     const status = impliedSuccess(method)
     operation.responses[String(status)] = {
       description:
-        'Sucesso. O corpo desta resposta não está descrito: a feature não está ' +
-        'registrada em `app/core/response.ts`.',
+        'Success. The body of this response is not described: the feature is not ' +
+        'registered in `app/core/response.ts`.',
     }
     warnings.push(
-      `${method.toUpperCase()} ${path}: sem corpo de resposta. Registre a feature em ` +
-        '`app/core/response.ts`, apontando o schema `…Response` do `shared/`.',
+      `${method.toUpperCase()} ${path}: no response body. Register the feature in ` +
+        '`app/core/response.ts`, pointing to the `…Response` schema of `shared/`.',
     )
   }
 
@@ -696,7 +696,7 @@ function buildOperation(
 }
 
 // ---------------------------------------------------------------------------
-// Documento
+// Document
 // ---------------------------------------------------------------------------
 
 export async function buildDocument(): Promise<BuildResult> {
@@ -716,14 +716,14 @@ export async function buildDocument(): Promise<BuildResult> {
   for (const route of routes) {
     const { path, params } = toOpenAPIPath(route.pattern)
 
-    // Compara com as duas formas: o caminho já convertido para OpenAPI e o
-    // padrão cru do Adonis. Sem a segunda, uma rota curinga só sairia do
-    // documento se o config escrevesse `/uploads/{*}`, que é a forma de saída,
-    // não a que a pessoa escreve.
+    // Compare with both forms: the path already converted to OpenAPI and the
+    // raw Adonis pattern. Without the second, a wildcard route would only leave the
+    // document if the config wrote `/uploads/{*}`, which is the output form,
+    // not the one a person writes.
     if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern)) continue
 
-    // `HEAD` é gerado pelo framework a partir de cada `GET`; documentá-lo só
-    // duplicaria toda operação de leitura.
+    // `HEAD` is generated by the framework from each `GET`; documenting it would only
+    // duplicate every read operation.
     const methods = route.methods.filter(function (method) {
       return method !== 'HEAD'
     })
@@ -734,15 +734,15 @@ export async function buildDocument(): Promise<BuildResult> {
     const protection = await readProtection(route.middleware.all())
     const rule = resolveTagRule(path)
 
-    // O contrato que o próprio código declara: validators usados, status
-    // devolvido e erros lançados pelo use-case irmão.
+    // The contract the code itself declares: validators used, status
+    // returned and errors thrown by the sibling use case.
     const source = controllerFile(route.handler)
     let intro: Introspection | undefined
 
     if (source) intro = await introspect(source)
 
     if (source && !intro) {
-      warnings.push(`${path}: não foi possível ler \`${source}\`.`)
+      warnings.push(`${path}: could not read \`${source}\`.`)
     }
 
     for (const method of methods) {
@@ -797,11 +797,11 @@ export async function buildDocument(): Promise<BuildResult> {
 }
 
 /**
- * Ordena caminhos e métodos.
+ * Sorts paths and methods.
  *
- * A ordem de iteração do router já é estável, mas ordenar aqui é o que faz uma
- * rota nova aparecer no diff como uma adição no lugar certo, em vez de deslocar
- * tudo que vem depois dela no arquivo.
+ * The router iteration order is already stable, but sorting here is what makes a new
+ * route show up in the diff as an addition in the right place, instead of shifting
+ * everything that comes after it in the file.
  */
 function sortPaths(
   paths: Record<string, Record<string, OpenAPIOperation>>,

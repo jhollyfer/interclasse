@@ -30,7 +30,7 @@ import { SPORT_FIELDS, SportFormFields } from './form-fields'
 
 const route = getRouteApi('/_private/administrator/sports/$id/edit')
 
-/** Valida com o schema de criação: campo obrigatório não pode ser apagado. */
+/** Validates with the create schema: a required field cannot be erased. */
 export function SportFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
   const { data: sport } = useSuspenseQuery(sportQueryOptions(id))

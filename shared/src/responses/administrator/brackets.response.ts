@@ -6,11 +6,11 @@ import { MATCH_STATUSES } from '../../enums/match-status.js'
 import { z } from '../../validator.js'
 
 /**
- * A chave como a API devolve (`_standards/architecture.md` §10). Datas em
- * ISO 8601, o tipo de transporte.
+ * The bracket as the API returns it (`_standards/architecture.md` §10). Dates in
+ * ISO 8601, the transport type.
  */
 
-/** A chave com a modalidade: a listagem, o sorteio e a partida que a aninha. */
+/** The bracket with its sport: the listing, the draw and the match that nests it. */
 export const AdministratorBracketPaginateResponse = z.object({
   id: z.uuid(),
   sportId: z.uuid(),
@@ -21,20 +21,20 @@ export const AdministratorBracketPaginateResponse = z.object({
   sport: AdministratorSportShowResponse,
 })
 
-/** O sorteio devolve a chave da lista; repetido, a mesma que já existia. */
+/** The draw returns the bracket of the list; when repeated, the one that already existed. */
 export const AdministratorBracketCreateResponse =
   AdministratorBracketPaginateResponse
 
 /**
- * A competição inteira, numa resposta: todas as partidas, de cada fase, com os
- * nomes das turmas já resolvidos. É a tela de chave do painel e do site.
+ * The whole competition in one response: all matches, of every phase, with the
+ * classroom names already resolved. It is the bracket screen of the panel and the site.
  */
 export const AdministratorBracketShowResponse = z.object({
   id: z.uuid(),
   category: z.enum(CATEGORIES),
   status: z.enum(BRACKET_STATUSES),
   sport: z.object({ id: z.uuid(), name: z.string(), slug: z.string() }),
-  /** Nulo até a chave terminar. */
+  /** Null until the bracket finishes. */
   championTeamId: z.uuid().nullable(),
   matches: z.array(
     z.object({
@@ -57,14 +57,14 @@ export const AdministratorBracketShowResponse = z.object({
 })
 
 /**
- * O que o sorteio faria agora: cada turma da categoria com quantos atletas tem
- * inscritos na modalidade, e se entra. É o que o diálogo mostra antes de
- * sortear, para a turma de fora não ser surpresa.
+ * What the draw would do now: each classroom of the category with how many athletes it
+ * has enrolled in the sport, and whether it enters. It is what the dialog shows before
+ * drawing, so a left-out classroom is no surprise.
  */
 export const AdministratorBracketPreviewResponse = z.object({
   minAthletes: z.number().int(),
   maxTeams: z.number().int(),
-  /** Já existe chave desta modalidade nesta categoria. */
+  /** A bracket for this sport already exists in this category. */
   drawn: z.boolean(),
   classrooms: z.array(
     z.object({

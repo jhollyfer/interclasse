@@ -7,24 +7,24 @@ import { cn } from '#/lib/cn'
 import { MATCH_PHASE_LABELS, championName, formatWhen } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
-/** Uma partida da chave, como `GET /brackets/:id` a devolve. */
+/** A match in the bracket, as `GET /brackets/:id` returns it. */
 export type BracketMatch = AdministratorBracketShowResponse['matches'][number]
 
 type BracketTreeProps = Readonly<{
   bracket: AdministratorBracketShowResponse
-  /** O que vai embaixo de cada partida: no painel, placar, agenda e cartões. */
+  /** What goes under each match: on the dashboard, score, schedule and cards. */
   renderActions?: (match: BracketMatch) => React.ReactNode
 }>
 
-/** Uma vaga de uma fase: a partida, ou a folga de quem subiu sem jogar. */
+/** A slot in a round: the match, or the bye of whoever advanced without playing. */
 type Slot =
   | { kind: 'match'; match: BracketMatch }
   | { kind: 'bye'; key: string; teamName: string | null }
 
 /**
- * A fase seguinte guarda quem subiu de folga: a vaga `position` da primeira
- * fase cai na partida `position / 2` da seguinte, como mandante quando é par -
- * a mesma conta do `advanceSlot` do backend.
+ * The next round holds whoever advanced on a bye: slot `position` of the first
+ * round falls into match `position / 2` of the next, as home when even -
+ * the same calculation as the backend's `advanceSlot`.
  */
 function byeTeam(
   matches: ReadonlyArray<BracketMatch>,
@@ -42,8 +42,8 @@ function byeTeam(
 }
 
 /**
- * O número de cada jogo, como na súmula do professor: em ordem de fase e de
- * posição, contando só as partidas que existem (folga não é jogo).
+ * Each game's number, as on the teacher's match sheet: in round and
+ * position order, counting only the matches that exist (a bye is not a game).
  */
 function numbering(matches: ReadonlyArray<BracketMatch>): Map<string, number> {
   const ordered = [...matches].sort(
@@ -54,9 +54,9 @@ function numbering(matches: ReadonlyArray<BracketMatch>): Map<string, number> {
 }
 
 /**
- * O que mostrar na vaga ainda vazia: de qual jogo sai quem ocupa ela. A vaga
- * de mandante vem do jogo na posição `2p` da fase anterior; a de visitante,
- * do `2p + 1` - o inverso do `advanceSlot` do backend.
+ * What to show in a still-empty slot: which game the occupant comes from. The home
+ * slot comes from the game at position `2p` of the previous round; the away slot
+ * from `2p + 1` - the inverse of the backend's `advanceSlot`.
  */
 function feederLabel(
   matches: ReadonlyArray<BracketMatch>,
@@ -78,7 +78,7 @@ function feederLabel(
   return m.common_bracket_winner_of({ number })
 }
 
-/** As colunas da chave, uma por fase, com o número de vagas de cada uma. */
+/** The bracket's columns, one per round, with the number of slots in each. */
 function columns(matches: ReadonlyArray<BracketMatch>) {
   const rounds = Math.max(1, ...matches.map((match) => match.round))
 
@@ -104,12 +104,12 @@ function columns(matches: ReadonlyArray<BracketMatch>) {
 }
 
 /**
- * A chave de mata-mata desenhada como chave: uma coluna por fase, cada partida
- * entre as duas que a alimentam. Quem venceu leva o ✓ e segue; quem perdeu
- * fica riscado - está fora.
+ * The knockout bracket drawn as a bracket: one column per round, each match
+ * between the two that feed it. The winner gets the ✓ and moves on; the loser
+ * is struck through - out.
  *
- * Mora em `common` porque o site e o painel desenham a mesma chave; o painel
- * só acrescenta as ações embaixo de cada partida.
+ * Lives in `common` because the site and the dashboard draw the same bracket; the
+ * dashboard only adds the actions under each match.
  */
 export function BracketTree({
   bracket,
@@ -192,12 +192,12 @@ export function BracketTree({
 type MatchBoxProps = Readonly<{
   match: BracketMatch
   number: number | undefined
-  /** O texto da vaga vazia: "Vencedor do Jogo N". */
+  /** The empty slot's text: "Vencedor do Jogo N". */
   homePending: string
   awayPending: string
 }>
 
-/** Uma partida: o número, os dois lados, o placar e quem seguiu. */
+/** A match: the number, the two sides, the score and who advanced. */
 function MatchBox({
   match,
   number,

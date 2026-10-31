@@ -33,7 +33,7 @@ async function setup() {
 }
 
 test.group('advisor/enrollments > update (unit)', () => {
-  test('grava a lista nova e devolve a matriz', async ({ assert }) => {
+  test('saves the new list and returns the matrix', async ({ assert }) => {
     const { useCase } = await setup()
 
     const board = rightOf(
@@ -50,7 +50,7 @@ test.group('advisor/enrollments > update (unit)', () => {
     )
   })
 
-  test('tirar atleta sem motivo é 422 ENROLLMENT_REASON_REQUIRED e nada grava', async ({
+  test('removing an athlete without a reason is 422 ENROLLMENT_REASON_REQUIRED and nothing is saved', async ({
     assert,
   }) => {
     const { enrollments, useCase } = await setup()
@@ -63,7 +63,9 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepEqual(stored.snapshot().studentIds, [ENROLLMENT_IDS.ana])
   })
 
-  test('tirar atleta com motivo grava a lista e o aviso para a organização', async ({ assert }) => {
+  test('removing an athlete with a reason saves the list and the notice for the organization', async ({
+    assert,
+  }) => {
     const { enrollments, removals, useCase } = await setup()
     enrollments.withList(KEY, [ENROLLMENT_IDS.ana])
     const notices: EnrollmentRemoval[] = []
@@ -86,7 +88,7 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepInclude(notices[0]?.snapshot(), { studentName: 'Ana', reason: 'Mudou de turno' })
   })
 
-  test('acima do máximo da modalidade é 422 ENROLLMENT_LIMIT_EXCEEDED', async ({ assert }) => {
+  test('above the sport maximum is 422 ENROLLMENT_LIMIT_EXCEEDED', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -98,7 +100,7 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'ENROLLMENT_LIMIT_EXCEEDED' })
   })
 
-  test('modalidade inexistente é 422 SPORT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent sport is 422 SPORT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -111,7 +113,7 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'SPORT_NOT_FOUND' })
   })
 
-  test('turma de outro conselheiro é 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -123,10 +125,10 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 ADVISOR_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADVISOR_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
     const { enrollments, useCase } = await setup()
     enrollments.findSport = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ ...KEY, studentIds: [], actor: ADVISOR_ACTOR })

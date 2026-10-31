@@ -8,7 +8,7 @@ import { UnitOfWorkLucid } from './unit-of-work.lucid.ts'
 import { TransactionContext } from '#core/transaction-context'
 import { resetDatabase } from '#tests/http-fixtures'
 
-/** Uma escrita dentro da unidade, pelo cliente que os repositories usam. */
+/** A write inside the unit, through the client the repositories use. */
 async function insertSport(context: TransactionContext, name: string): Promise<void> {
   await context.client().insertQuery().table('sports').insert({
     name,
@@ -22,7 +22,7 @@ async function insertSport(context: TransactionContext, name: string): Promise<v
 test.group('UnitOfWorkLucid', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('right comita a escrita', async ({ assert }) => {
+  test('right commits the write', async ({ assert }) => {
     const unit = await app.container.make(UnitOfWorkLucid)
     const context = await app.container.make(TransactionContext)
 
@@ -35,7 +35,7 @@ test.group('UnitOfWorkLucid', (group) => {
     assert.lengthOf(await db.from('sports').where('name', 'Xadrez'), 1)
   })
 
-  test('left desfaz a escrita sem throw', async ({ assert }) => {
+  test('left undoes the write without throw', async ({ assert }) => {
     const unit = await app.container.make(UnitOfWorkLucid)
     const context = await app.container.make(TransactionContext)
 
@@ -48,7 +48,7 @@ test.group('UnitOfWorkLucid', (group) => {
     assert.lengthOf(await db.from('sports').where('name', 'Damas'), 0)
   })
 
-  test('exceção desfaz a escrita e sobe', async ({ assert }) => {
+  test('an exception undoes the write and rises', async ({ assert }) => {
     const unit = await app.container.make(UnitOfWorkLucid)
     const context = await app.container.make(TransactionContext)
 

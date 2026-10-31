@@ -9,17 +9,17 @@ import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 @inject()
 export default class AuthenticationSessionRefreshController {
   static docs = defineDocs({
-    summary: 'Renovar sessão',
+    summary: 'Refresh session',
     description:
-      'Renova a sessão a partir do cookie de refresh, e responde `204` com o par de tokens ' +
-      'novo no `Set-Cookie`.\n\n' +
-      'Fica **fora** do grupo autenticado de propósito: é justamente o token de acesso vencido ' +
-      'que traz alguém até aqui, então exigir sessão válida tornaria a rota inalcançável. Quem ' +
-      'autoriza é o cookie de refresh, e nada mais.\n\n' +
-      '**Rotaciona**: o refresh usado é apagado ao emitir o novo. Duas renovações simultâneas ' +
-      'com o mesmo token gastam-no duas vezes, e a segunda derruba a sessão.\n\n' +
-      'Cookie ausente, ilegível ou que não seja de refresh responde `401`, sem distinguir qual ' +
-      'dos três foi.',
+      'Refreshes the session from the refresh cookie, and responds `204` with the new token pair ' +
+      'in `Set-Cookie`.\n\n' +
+      'It sits **outside** the authenticated group on purpose: it is precisely the expired access token ' +
+      'that brings someone here, so requiring a valid session would make the route unreachable. What ' +
+      'authorizes is the refresh cookie, and nothing else.\n\n' +
+      '**Rotates**: the used refresh is deleted when the new one is issued. Two simultaneous refreshes ' +
+      'with the same token spend it twice, and the second drops the session.\n\n' +
+      'A missing, unreadable or non-refresh cookie responds `401`, without distinguishing which ' +
+      'of the three it was.',
   })
 
   constructor(private readonly useCase: AuthenticationSessionRefreshUseCase) {}

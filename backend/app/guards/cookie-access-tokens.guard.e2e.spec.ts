@@ -5,16 +5,16 @@ import { ADMINISTRATOR, authenticateAsAdministrator, resetDatabase } from '#test
 import { findUserByEmail } from '#tests/users-fixtures'
 
 /**
- * O guard confere o `name` do token, e não só a assinatura.
+ * The guard checks the token `name`, not just the signature.
  *
- * Os dois tokens saem do mesmo `DbAccessTokensProvider` e são indistinguíveis
- * pela verificação: sem esta conferência, apresentar o de refresh como token de
- * acesso daria uma sessão de sete dias onde o contrato promete um.
+ * Both tokens come out of the same `DbAccessTokensProvider` and are indistinguishable
+ * by verification: without this check, presenting the refresh one as an access token
+ * would give a seven-day session where the contract promises one.
  */
 test.group('guards > cookie-access-tokens', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('token de acesso válido autentica', async ({ client }) => {
+  test('a valid access token authenticates', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/account').cookies(session)
@@ -22,13 +22,13 @@ test.group('guards > cookie-access-tokens', (group) => {
     response.assertStatus(200)
   })
 
-  test('sem cookie responde 401', async ({ client }) => {
+  test('without a cookie answers 401', async ({ client }) => {
     const response = await client.get('/account')
 
     response.assertStatus(401)
   })
 
-  test('token de refresh apresentado como token de acesso responde 401', async ({ client }) => {
+  test('a refresh token presented as an access token answers 401', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/account').cookies({
@@ -38,7 +38,7 @@ test.group('guards > cookie-access-tokens', (group) => {
     response.assertStatus(401)
   })
 
-  test('token que não existe responde 401', async ({ client }) => {
+  test('a token that does not exist answers 401', async ({ client }) => {
     const response = await client.get('/account').cookies({
       [COOKIE_TOKEN.ACCESS]: 'oat_abc.def',
     })
@@ -46,7 +46,7 @@ test.group('guards > cookie-access-tokens', (group) => {
     response.assertStatus(401)
   })
 
-  test('conta desativada perde o acesso na requisição seguinte', async ({ client }) => {
+  test('a deactivated account loses access on the next request', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await findUserByEmail(ADMINISTRATOR.email)
     user.status = 'INACTIVE'

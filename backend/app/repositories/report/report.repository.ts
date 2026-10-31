@@ -1,12 +1,12 @@
 import type { AdministratorReportShowResponse } from '@interclasse/shared'
 
 /**
- * A leitura dos números dos jogos (`_standards/domain.md` §5.1): quantas
- * turmas, alunos e atletas participaram, por categoria, por modalidade e por
- * turma. Só lê - não tem entidade, porque não há regra a proteger - e serve a
- * duas saídas, a tela e o CSV, que precisam dar os mesmos números.
+ * The read of the games numbers (`_standards/domain.md` §5.1): how many
+ * classrooms, students and athletes took part, by category, by sport and by
+ * classroom. It only reads - it has no entity, because there is no rule to protect - and serves
+ * two outputs, the screen and the CSV, which must give the same numbers.
  */
 export abstract class ReportRepository {
-  /** Tudo contado de uma vez; nenhuma linha de aluno sobe para a aplicação. */
+  /** Everything counted at once; no student row goes up to the application. */
   abstract summarize(): Promise<AdministratorReportShowResponse>
 }

@@ -48,7 +48,7 @@ function renderField(onValueChange: (ids: ReadonlyArray<string>) => void) {
 const PHOTO = new File(['x'], 'foto.png', { type: 'image/png' })
 
 describe('MultiFileUpload', () => {
-  it('sobe o arquivo escolhido e entrega o id do anexo ao pai', async () => {
+  it('uploads the chosen file and hands the attachment id to the parent', async () => {
     upload.mockResolvedValue({ id: 'storage-1' })
     const onValueChange = vi.fn()
     const input = renderField(onValueChange)
@@ -62,7 +62,7 @@ describe('MultiFileUpload', () => {
     expect(screen.getByText('foto.png')).toBeTruthy()
   })
 
-  it('o botão de adicionar existe com o texto da casa', () => {
+  it('renders the add button with the house text', () => {
     renderField(() => undefined)
 
     expect(
@@ -70,7 +70,7 @@ describe('MultiFileUpload', () => {
     ).toBeTruthy()
   })
 
-  it('tirar da fila avisa o pai com a lista sem o arquivo', async () => {
+  it('when removed from the queue, notifies the parent with the list without the file', async () => {
     upload.mockResolvedValue({ id: 'storage-1' })
     const onValueChange = vi.fn()
     const input = renderField(onValueChange)
@@ -85,7 +85,7 @@ describe('MultiFileUpload', () => {
     await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith([]))
   })
 
-  it('uma parte fora do MultiFileUpload diz qual ficou sem provider', () => {
+  it('when a part is outside MultiFileUpload, says which one is without a provider', () => {
     expect(() => render(<MultiFileUploadList />)).toThrow('MultiFileUploadList')
   })
 })

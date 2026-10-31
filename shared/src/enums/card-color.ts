@@ -1,4 +1,4 @@
-/** A cor do cartão que um atleta levou numa partida. */
+/** The color of the card an athlete received in a match. */
 export const CARD_COLOR = {
   YELLOW: 'YELLOW',
   RED: 'RED',

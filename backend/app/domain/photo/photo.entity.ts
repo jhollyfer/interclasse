@@ -3,8 +3,8 @@ import { PHOTO_STATUS, left, right, type Either, type PhotoStatus } from '@inter
 import type { PhotoError } from './photo.errors.ts'
 
 /**
- * Quem envia. O estado em que a foto nasce é decisão de quem a manda, não do
- * papel da conta: o conselheiro propõe, a organização publica.
+ * Who uploads. The state in which the photo is born is the decision of who sends it, not of the
+ * account role: the advisor proposes, the organization publishes.
  */
 export const PHOTO_SENDER = {
   ADMINISTRATOR: 'ADMINISTRATOR',
@@ -13,7 +13,7 @@ export const PHOTO_SENDER = {
 
 export type PhotoSender = (typeof PHOTO_SENDER)[keyof typeof PHOTO_SENDER]
 
-/** O estado de nascimento de cada remetente. */
+/** The birth state of each sender. */
 const BIRTH_STATUS = {
   [PHOTO_SENDER.ADMINISTRATOR]: PHOTO_STATUS.APPROVED,
   [PHOTO_SENDER.ADVISOR]: PHOTO_STATUS.PENDING,
@@ -38,14 +38,14 @@ type Review = {
 }
 
 /**
- * Uma foto do carrossel do site. A do conselheiro nasce `PENDING`, a da
- * organização `APPROVED`; só imagem entra, e a decisão se refaz
+ * A photo of the site carousel. The advisor's is born `PENDING`, the
+ * organization's `APPROVED`; only images enter, and the decision can be redone
  * (`_standards/domain.md` §1).
  */
 export class Photo {
   private constructor(private readonly props: PhotoProps) {}
 
-  /** Nascimento. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Birth. The id and the clock come from outside: the domain does no I/O. */
   static create(input: {
     readonly id: string
     readonly storage: { readonly id: string; readonly mimetype: string }
@@ -54,11 +54,11 @@ export class Photo {
     readonly sender: PhotoSender
     readonly now: Date
   }): Either<PhotoError, Photo> {
-    // O carrossel é de fotos: PDF ou áudio no lugar viraria imagem quebrada.
+    // The carousel is for photos: a PDF or audio in its place would become a broken image.
     if (!input.storage.mimetype.startsWith('image/')) return left({ code: 'PHOTO_NOT_IMAGE' })
 
     const status = BIRTH_STATUS[input.sender]
-    // A foto da organização é aprovada por quem a enviou, no ato.
+    // The organization's photo is approved by whoever uploaded it, on the spot.
     let reviewedById: string | null = null
     let reviewedAt: Date | null = null
     if (status === PHOTO_STATUS.APPROVED) {
@@ -76,20 +76,20 @@ export class Photo {
         reviewedById,
         reviewedAt,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce.
+        // Born with the edit stamped, the way the database row is born.
         updatedAt: input.now,
       }),
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: PhotoProps): Photo {
     return new Photo({ ...props })
   }
 
   /**
-   * Aprova ou recusa. Pode ser refeita a qualquer hora: foto recusada por
-   * engano é aprovada de novo, e a aprovada sai do ar sem ser apagada.
+   * Approves or rejects. It can be redone at any time: a photo rejected by
+   * mistake is approved again, and the approved one leaves the air without being deleted.
    */
   review(decision: Review): void {
     this.props.status = decision.status

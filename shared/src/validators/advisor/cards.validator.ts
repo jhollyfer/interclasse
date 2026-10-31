@@ -1,6 +1,6 @@
 import { pageFields, z } from '../../validator.js'
 
-/** Os cartões de uma turma do conselheiro. */
+/** The cards of an advisor's classroom. */
 export const AdvisorCardPaginateValidator = z.object({
   ...pageFields(),
   classroomId: z.uuid(),

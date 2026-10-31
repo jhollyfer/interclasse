@@ -37,7 +37,7 @@ import { PHOTO_PAGE } from '../index'
 
 const route = getRouteApi('/_private/administrator/photos/')
 
-/** "Todas" é a aba sem `?status`. */
+/** "Todas" is the tab without `?status`. */
 const ALL = 'ALL'
 
 const TABS = [
@@ -48,8 +48,8 @@ const TABS = [
 ] as const
 
 /**
- * As fotos do carrossel: a fila do que os conselheiros enviaram e o envio da
- * própria organização, que já vai ao ar.
+ * The carousel photos: the queue of what the advisors uploaded and the organization's
+ * own upload, which goes live at once.
  */
 export function PhotosPage(): React.JSX.Element {
   const search = route.useSearch()
@@ -102,7 +102,7 @@ export function PhotosPage(): React.JSX.Element {
   )
 }
 
-/** Aprovar, recusar e apagar. Só o que muda a situação atual aparece. */
+/** Approve, reject and delete. Only what changes the current state appears. */
 function ReviewActions({
   photo,
 }: Readonly<{ photo: AdministratorPhotoShowResponse }>): React.JSX.Element {

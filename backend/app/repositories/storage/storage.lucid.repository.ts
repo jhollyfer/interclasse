@@ -14,13 +14,13 @@ import { Storage } from '#domain/storage/storage.entity'
 import { TransactionContext } from '#core/transaction-context'
 
 /**
- * Toda coluna que aponta para `storages`, com o rótulo que a mensagem de erro
- * mostra quando o arquivo está em uso.
+ * Every column that points to `storages`, with the label the error message
+ * shows when the file is in use.
  *
- * Uma lista só de objetos, e não listas casadas por índice: com duas, uma
- * inserção no meio de uma delas troca o rótulo de todas as seguintes. Toda
- * referência a `storages` é `SET NULL` ou `CASCADE`, então o banco não impediria
- * nada: uma coluna que faltar aqui é um arquivo em uso que some sem aviso.
+ * A single list of objects, not lists matched by index: with two, an
+ * insertion in the middle of one of them shifts the label of all the following ones. Every
+ * reference to `storages` is `SET NULL` or `CASCADE`, so the database would prevent
+ * nothing: a column missing here is a file in use that vanishes without warning.
  */
 const REFERENCES = [
   { table: 'users', column: 'avatar_id', label: 'avatar de usuário' },
@@ -85,7 +85,7 @@ export class StorageLucidRepository extends StorageRepository {
           .where(reference.column, id)
           .count('* as total')
 
-        // `count` do Postgres é `bigint`, e o driver o entrega como string.
+        // Postgres `count` is `bigint`, and the driver delivers it as a string.
         return { label: reference.label, total: Number(rows[0]?.total ?? 0) }
       }),
     )
@@ -120,8 +120,8 @@ export class StorageLucidRepository extends StorageRepository {
     if (criteria.status) query.where('status', criteria.status)
     if (criteria.mimetype) query.where('mimetype', criteria.mimetype)
 
-    // O `OR` vai dentro de uma subquery: encadeado direto ele escaparia do
-    // `AND` anterior, e a busca anularia o filtro de status.
+    // The `OR` goes inside a subquery: chained directly it would escape the
+    // previous `AND`, and the search would cancel the status filter.
     if (criteria.search) {
       const search = `%${criteria.search}%`
 
@@ -160,7 +160,7 @@ export class StorageLucidRepository extends StorageRepository {
     })
   }
 
-  /** A `url` não sai daqui: o use-case a assina, pelo contrato do bucket, a cada leitura. */
+  /** The `url` does not come out of here: the use case signs it, through the bucket contract, on every read. */
   private toResponse(row: StorageModel): StorageFileRead {
     return {
       id: row.id,

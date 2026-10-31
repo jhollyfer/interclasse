@@ -8,17 +8,17 @@ import {
 } from '#/integrations/tanstack-query/queries/storefront'
 import { pageHead } from '#/lib/page-head'
 
-/** As consultas da home, com os mesmos parâmetros no loader e na tela. */
+/** The home's queries, with the same parameters in the loader and on screen. */
 export const HOME_NEXT = { status: 'SCHEDULED', perPage: 6 }
 export const HOME_RESULTS = { status: 'FINISHED', perPage: 10 }
 export const HOME_ANNOUNCEMENTS = { perPage: 3 }
 export const HOME_BRACKETS = { perPage: 100 }
-/** O carrossel: as últimas fotos aprovadas. */
+/** The carousel: the latest approved photos. */
 export const HOME_PHOTOS = { perPage: 20 }
 
 /**
- * Erro engolido (`.catch`): a API fora do ar não derruba a home,
- * cada seção desenha o próprio estado.
+ * Swallowed error (`.catch`): the API being down does not bring the home down,
+ * each section draws its own state.
  */
 export const Route = createFileRoute('/_public/')({
   loader: ({ context }) =>

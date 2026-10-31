@@ -17,9 +17,9 @@ import type { StorageRepository } from '#repositories/storage/storage.repository
 type Pair = { users: UserRepository; storages: StorageRepository }
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double.
  */
 const IMPLEMENTATIONS = {
   lucid: async (): Promise<Pair> => ({
@@ -51,7 +51,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`UserRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem a mesma conta, com a senha cifrada', async ({ assert }) => {
+    test('save and findById return the same account, with the password hashed', async ({
+      assert,
+    }) => {
       const { users } = await make()
       const ana = account(ANA, 'Ana', 'ana@t.dev')
 
@@ -64,7 +66,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await users.findById(BIA))
     })
 
-    test('save de e-mail que é de outra conta devolve USER_ALREADY_EXISTS', async ({ assert }) => {
+    test('save of an e-mail that belongs to another account returns USER_ALREADY_EXISTS', async ({
+      assert,
+    }) => {
       const { users } = await make()
       await users.save(account(ANA, 'Ana', 'ana@t.dev'))
 
@@ -73,7 +77,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(saved.value, { code: 'USER_ALREADY_EXISTS' })
     })
 
-    test('salvar de novo sem trocar a senha não a cifra outra vez', async ({ assert }) => {
+    test('saving again without changing the password does not hash it again', async ({
+      assert,
+    }) => {
       const { users } = await make()
       await users.save(account(ANA, 'Ana', 'ana@t.dev'))
       const first = await users.findById(ANA)
@@ -87,7 +93,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(again?.snapshot().name, 'Ana Maria')
     })
 
-    test('trocar a senha grava o hash novo', async ({ assert }) => {
+    test('changing the password stores the new hash', async ({ assert }) => {
       const { users } = await make()
       await users.save(account(ANA, 'Ana', 'ana@t.dev'))
       const ana = await users.findById(ANA)
@@ -100,7 +106,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isTrue(await hash.verify(stored, 'Nova@12345'))
     })
 
-    test('a conta arquivada some de findById e aparece em findArchivedById e findAnyById', async ({
+    test('the archived account disappears from findById and shows up in findArchivedById and findAnyById', async ({
       assert,
     }) => {
       const { users } = await make()
@@ -114,7 +120,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(await users.findAnyById(ANA))
     })
 
-    test('findByEmail e existsByEmail enxergam também a conta arquivada', async ({ assert }) => {
+    test('findByEmail and existsByEmail also see the archived account', async ({ assert }) => {
       const { users } = await make()
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.archive(NOW)
@@ -126,20 +132,22 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await users.findByEmail('outra@t.dev'))
     })
 
-    test('detail traz a conta com o avatar e sem a senha; arquivada é null', async ({ assert }) => {
+    test('detail brings the account with the avatar and without the password; archived is null', async ({
+      assert,
+    }) => {
       const { users, storages } = await make()
-      const foto = Storage.open({
+      const photo = Storage.open({
         id: CAIO,
-        key: 'foto.png',
-        originalName: 'foto.png',
+        key: 'photo.png',
+        originalName: 'photo.png',
         mimetype: 'image/png',
         size: 1,
         uploadId: null,
         partSize: 1,
         now: NOW,
       })
-      foto.complete({ contentLength: 1, head: PNG_HEAD }, NOW)
-      await storages.save(foto)
+      photo.complete({ contentLength: 1, head: PNG_HEAD }, NOW)
+      await storages.save(photo)
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.update({ avatarId: CAIO }, NOW)
       await users.save(ana)
@@ -155,7 +163,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await users.detail(BIA))
     })
 
-    test('paginate esconde a lixeira, busca por nome e e-mail e filtra por papel', async ({
+    test('paginate hides the trash, searches by name and e-mail and filters by role', async ({
       assert,
     }) => {
       const { users } = await make()
@@ -164,7 +172,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const caio = account(CAIO, 'Caio', 'caio@t.dev')
       caio.archive(NOW)
       await users.save(caio)
-      // O seeder deixa o administrador na tabela: a busca recorta só as contas do teste.
+      // The seeder leaves the administrator in the table: the search cuts only the test accounts.
       const base = {
         page: 1,
         perPage: 10,
@@ -198,7 +206,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('delete apaga de vez', async ({ assert }) => {
+    test('delete deletes for good', async ({ assert }) => {
       const { users } = await make()
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.archive(NOW)

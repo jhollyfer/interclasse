@@ -9,10 +9,10 @@ import { AdministratorBracketPreviewValidator } from '#validators/administrator/
 @inject()
 export default class AdministratorBracketPreviewController {
   static docs = defineDocs({
-    summary: 'Prever sorteio de chave',
+    summary: 'Preview bracket draw',
     description:
-      'Quem entraria no sorteio agora: cada turma da categoria com quantos atletas inscreveu ' +
-      'na modalidade, e se chegou ao mínimo. Não grava nada.',
+      'Who would enter the draw now: each classroom of the category with how many athletes it enrolled ' +
+      'in the sport, and whether it reached the minimum. Saves nothing.',
   })
 
   constructor(private readonly useCase: AdministratorBracketPreviewUseCase) {}

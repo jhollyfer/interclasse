@@ -16,7 +16,7 @@ async function setup() {
 }
 
 test.group('administrator/sports > show (unit)', () => {
-  test('devolve a modalidade com o slug', async ({ assert }) => {
+  test('returns the sport with the slug', async ({ assert }) => {
     const { sports, useCase } = await setup()
     const id = await seedSport(sports, 'Queimada')
 
@@ -25,7 +25,7 @@ test.group('administrator/sports > show (unit)', () => {
     assert.deepInclude(sport, { id, name: 'Queimada', slug: 'queimada' })
   })
 
-  test('inexistente é 404 SPORT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent is 404 SPORT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })
@@ -33,10 +33,10 @@ test.group('administrator/sports > show (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'SPORT_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_SPORT_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_SPORT_SHOW_ERROR', async ({ assert }) => {
     const { sports, useCase } = await setup()
     sports.findById = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })

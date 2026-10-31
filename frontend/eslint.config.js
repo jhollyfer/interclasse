@@ -12,15 +12,15 @@ import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 
 export default [
-  // Saída do compilador do Paraglide: gerada, não versionada (_standards/i18n.md §2).
+  // Paraglide compiler output: generated, not versioned (_standards/i18n.md §2).
   { ignores: ['src/paraglide/**'] },
   ...tanstackConfig,
 
-  // Os dois plugins pegam a classe de erro que o TypeScript não pega: chave de
-  // query incompleta, `queryKey` e `queryFn` declarados soltos em vez de num
-  // `queryOptions()`, e ordem de propriedade em `createFileRoute` - que decide
-  // se o contexto enriquecido pelo `beforeLoad` aparece tipado no `loader`, e
-  // que falha só no tipo, em silêncio.
+  // The two plugins catch the class of error that TypeScript does not: an
+  // incomplete query key, `queryKey` and `queryFn` declared loose instead of in a
+  // `queryOptions()`, and property order in `createFileRoute` - which decides
+  // whether the context enriched by `beforeLoad` shows up typed in `loader`, and
+  // which fails only in the type, silently.
   ...pluginQuery.configs['flat/recommended'],
   ...pluginRouter.configs['flat/recommended'],
   comments.recommended,
@@ -52,17 +52,17 @@ export default [
     },
   },
   {
-    // `projectService` no lugar do `project: true` do `tanstackConfig`: é o que
-    // `_standards/tooling.md` §4 pede para as regras que dependem de tipo.
+    // `projectService` in place of `tanstackConfig`'s `project: true`: it is what
+    // `_standards/tooling.md` §4 asks for the rules that depend on types.
     files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
       parserOptions: { project: null, projectService: true },
     },
   },
   {
-    // A ordem de import da régua (`tooling.md` §4): externo, alias `#/`,
-    // relativo, com linha em branco entre os grupos. O `import/order` do
-    // `tanstackConfig` sai para não brigar com este.
+    // The house import order (`tooling.md` §4): external, `#/` alias,
+    // relative, with a blank line between groups. `tanstackConfig`'s
+    // `import/order` is dropped so it does not fight with this one.
     files: ['**/*.{js,ts,tsx}'],
     plugins: { 'import-x': importX },
     rules: {
@@ -95,37 +95,37 @@ export default [
     },
   },
   {
-    // As regras 1 a 4 do skill `code-pattern`, cobradas pelo compilador em vez
-    // de pela disciplina de quem revisa. `lowcodejs` já as tinha; aqui e em
-    // `simple-hub` elas viviam só no skill.
+    // Rules 1 to 4 of the `code-pattern` skill, enforced by the compiler instead
+    // of by the discipline of whoever reviews. `lowcodejs` already had them; here and in
+    // `simple-hub` they lived only in the skill.
     //
-    // Só estas quatro entram: são nativas do ESLint e do typescript-eslint. As
-    // outras (Merge no lugar de `&`, lookup object no lugar de if/else, e
-    // async/await no lugar de cadeia `.then`) precisariam de plugin próprio e
-    // seguem cobradas na revisão do diff.
+    // Only these four enter: they are native to ESLint and typescript-eslint. The
+    // others (Merge in place of `&`, lookup object in place of if/else, and
+    // async/await in place of a `.then` chain) would need a plugin of their own and
+    // remain enforced in the diff review.
     //
-    // Exceção: `routeTree.gen.ts` é gerado. `components/ui/**` segue as mesmas
-    // regras (tooling.md §4.2).
+    // Exception: `routeTree.gen.ts` is generated. `components/ui/**` follows the same
+    // rules (tooling.md §4.2).
     files: ['**/*.{ts,tsx}'],
     ignores: ['src/routeTree.gen.ts'],
     rules: {
-      // regra 1: sem ternário como control flow. `??`, `?.` e `&&` seguem livres.
+      // rule 1: no ternary as control flow. `??`, `?.` and `&&` remain free.
       'no-ternary': 'error',
-      // regra 2: sem `any`.
+      // rule 2: no `any`.
       '@typescript-eslint/no-explicit-any': 'error',
-      // regra 3: sem `as`. `as const` continua permitido - ele não mente para o
-      // compilador, só pede inferência mais estreita.
+      // rule 3: no `as`. `as const` remains allowed - it does not lie to the
+      // compiler, it only asks for narrower inference.
       '@typescript-eslint/consistent-type-assertions': [
         'error',
         { assertionStyle: 'never' },
       ],
-      // regra 4: sempre `type`, nunca `interface`. Module augmentation não
-      // dispara aqui porque é limite da linguagem, não escolha de estilo - o
-      // bloco de `.d.ts` abaixo cobre o caso.
+      // rule 4: always `type`, never `interface`. Module augmentation does not
+      // trigger here because it is a language limit, not a style choice - the
+      // `.d.ts` block below covers the case.
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-      // sem `!`: o narrowing (`if (!x) return`) é quem prova o não-nulo.
+      // no `!`: narrowing (`if (!x) return`) is what proves non-null.
       '@typescript-eslint/no-non-null-assertion': 'error',
-      // promessa solta e promessa onde se espera `void` (`tooling.md` §4).
+      // a floating promise, and a promise where `void` is expected (`tooling.md` §4).
       '@typescript-eslint/consistent-type-imports': 'error',
       '@eslint-community/eslint-comments/require-description': 'error',
       'no-console': 'error',
@@ -135,9 +135,9 @@ export default [
       ],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
-      // colaborador vem do container, nunca de `new` (`tooling.md` §4). O
-      // `AbortController` sai do seletor: é API da plataforma, não colaborador,
-      // e o sufixo casaria por acaso.
+      // the collaborator comes from the container, never from `new` (`tooling.md` §4). The
+      // `AbortController` is removed from the selector: it is a platform API, not a collaborator,
+      // and the suffix would match by accident.
       'no-restricted-syntax': [
         'error',
         {
@@ -151,16 +151,16 @@ export default [
     },
   },
   {
-    // O TypeScript **exige** `interface` para declaration merging; `type` não
-    // funciona. É o caso dos `.d.ts` que aumentam biblioteca de terceiro.
+    // TypeScript **requires** `interface` for declaration merging; `type` does not
+    // work. It is the case of the `.d.ts` files that augment a third-party library.
     files: ['**/*.d.ts'],
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
     },
   },
   {
-    // O E2E (`tooling.md` §4.2): espera fixa, `networkidle`, teste focado e
-    // teste pulado reprovam no lint, não na revisão.
+    // E2E (`tooling.md` §4.2): fixed waits, `networkidle`, focused tests and
+    // skipped tests fail in lint, not in review.
     files: ['e2e/**/*.ts'],
     ...playwright.configs['flat/recommended'],
     rules: {
@@ -172,15 +172,15 @@ export default [
     },
   },
   {
-    // Arquivos gerados e artefatos de build.
+    // Generated files and build artifacts.
     //
-    // `src/routeTree.gen.ts` é saída versionada, não código: o plugin do Router
-    // o reescreve a cada mudança em `src/routes`.
+    // `src/routeTree.gen.ts` is versioned output, not code: the Router plugin
+    // rewrites it on every change in `src/routes`.
     //
-    // Nenhum deles está no `include` do tsconfig, e o `parserOptions.project`
-    // recusa arquivo que não pertence a projeto nenhum - então cada um vira um
-    // erro de parser em vez de um erro de lint. Com `.output/`, isso são
-    // centenas de erros depois de um `pnpm build`.
+    // None of them is in the tsconfig `include`, and `parserOptions.project`
+    // refuses a file that belongs to no project - so each one becomes a
+    // parser error instead of a lint error. With `.output/`, that is
+    // hundreds of errors after a `pnpm build`.
     ignores: [
       'eslint.config.js',
       'prettier.config.js',

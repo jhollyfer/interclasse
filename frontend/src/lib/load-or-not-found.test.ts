@@ -9,7 +9,7 @@ function failure(status: number): HTTPError {
   return new HTTPError({ message: 'falha', status, code: 'X' })
 }
 
-/** Captura a rejeição já como `unknown`, sem `.catch((e) => e)` tipado. */
+/** Captures the rejection as `unknown`, without a typed `.catch((e) => e)`. */
 async function rejection(promise: Promise<unknown>): Promise<unknown> {
   try {
     await promise
@@ -21,11 +21,11 @@ async function rejection(promise: Promise<unknown>): Promise<unknown> {
 }
 
 describe('loadOrNotFound', () => {
-  it('devolve o que a leitura devolve', async () => {
+  it('returns what the read returns', async () => {
     await expect(loadOrNotFound(async () => 'ok')).resolves.toBe('ok')
   })
 
-  it('converte 404 em notFound', async () => {
+  it('converts 404 into notFound', async () => {
     const error = await rejection(
       loadOrNotFound(async () => {
         throw failure(HTTPStatus.NOT_FOUND)
@@ -35,7 +35,7 @@ describe('loadOrNotFound', () => {
     expect(isNotFound(error)).toBe(true)
   })
 
-  it('deixa 403 e 500 subirem como estão', async () => {
+  it('lets 403 and 500 bubble up as they are', async () => {
     for (const status of [
       HTTPStatus.FORBIDDEN,
       HTTPStatus.INTERNAL_SERVER_ERROR,

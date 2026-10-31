@@ -8,12 +8,11 @@ import {
 } from '#/components/ui/alert-dialog'
 
 /**
- * O topo do alerta: título e descrição.
+ * The top of the alert: title and description.
  *
- * Existe como parte, e não embutido no `ConfirmDialog`, porque é ele quem
- * carrega a grade e o alinhamento que o `AlertDialogContent` não dá - sem ele o
- * título e a descrição herdariam o `gap-3` do conteúdo em vez do `gap-1` de um
- * cabeçalho.
+ * It exists as a part, and not embedded in `ConfirmDialog`, because it carries the
+ * grid and the alignment that `AlertDialogContent` does not provide - without it the
+ * title and description would inherit the content's `gap-3` instead of a header's `gap-1`.
  */
 export function ConfirmDialogHeader(
   props: React.ComponentProps<typeof AlertDialogHeader>,
@@ -22,16 +21,16 @@ export function ConfirmDialogHeader(
 }
 
 /**
- * O ícone da ação, no bloco que o `AlertDialogHeader` já reserva para ele.
+ * The action's icon, in the block that `AlertDialogHeader` already reserves for it.
  *
- * Fora do `ConfirmDialogTitle` de propósito: o cabeçalho troca de grade quando
- * enxerga um `data-slot="alert-dialog-media"` (`has-data-[slot=...]`), e ícone
- * enfiado dentro do título não dispara essa troca - ele só empurra o texto para
- * o lado e some do leitor de tela junto com o resto do título.
+ * Outside `ConfirmDialogTitle` on purpose: the header switches grid when it
+ * sees a `data-slot="alert-dialog-media"` (`has-data-[slot=...]`), and an icon
+ * stuffed inside the title does not trigger that switch - it only pushes the text
+ * aside and vanishes from the screen reader along with the rest of the title.
  *
- * É o único da família que **não** reescreve o `data-slot`: são esses seletores
- * do `ui/alert-dialog` que leem o slot, e renomeá-lo desligaria a grade que a
- * parte existe para ligar.
+ * It is the only one in the family that does **not** rewrite the `data-slot`: it is these
+ * `ui/alert-dialog` selectors that read the slot, and renaming it would turn off the grid
+ * the part exists to turn on.
  */
 export function ConfirmDialogMedia(
   props: React.ComponentProps<typeof AlertDialogMedia>,
@@ -40,8 +39,8 @@ export function ConfirmDialogMedia(
 }
 
 /**
- * O título nomeia o registro: "Arquivar o depoimento de Maria?", nunca "Tem
- * certeza?". A primitiva anuncia este elemento, então ele não pode faltar.
+ * The title names the record: "Arquivar o depoimento de Maria?", never "Tem
+ * certeza?". The primitive announces this element, so it cannot be missing.
  */
 export function ConfirmDialogTitle(
   props: React.ComponentProps<typeof AlertDialogTitle>,
@@ -50,10 +49,10 @@ export function ConfirmDialogTitle(
 }
 
 /**
- * O que acontece se confirmar.
+ * What happens if confirmed.
  *
- * Slot e não prop de texto: é aqui que a tela fora da curva põe um `<Alert>`
- * com o que trava a ação, ou um `<Checkbox>` de "também arquivar os arquivos".
+ * A slot and not a text prop: this is where the off-curve screen puts an `<Alert>`
+ * with whatever blocks the action, or a `<Checkbox>` saying "também arquivar os arquivos".
  */
 export function ConfirmDialogDescription(
   props: React.ComponentProps<typeof AlertDialogDescription>,

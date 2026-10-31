@@ -44,7 +44,7 @@ export function ClassroomFormCreate(): React.JSX.Element {
     backTo: '/administrator/classrooms',
     success: (classroom) =>
       m.admin_classrooms_created({ name: classroom.name }),
-    // Nome repetido é `409 CLASSROOM_ALREADY_EXISTS`: reenviar é seguro.
+    // A repeated name is `409 CLASSROOM_ALREADY_EXISTS`: resending is safe.
     retry: 'classroom-create-error',
     payload: (values) => values,
   })

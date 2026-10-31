@@ -4,11 +4,11 @@ import { redirect } from '@tanstack/react-router'
 import { HOME_BY_ROLE } from './menu'
 
 /**
- * Manda para a própria tela inicial quem abriu a área de outro papel.
+ * Sends to their own home screen whoever opened another role's area.
  *
- * Não é autorização - essa é do backend, que responde 403 de qualquer jeito.
- * É tela: sem isto, o administrador que abria `/representative` via "Não foi
- * possível carregar a lista agora", um erro que não existe.
+ * It is not authorization - that belongs to the backend, which answers 403 anyway.
+ * It is screen: without this, the administrator who opened `/representative` saw "Não foi
+ * possível carregar a lista agora", an error that does not exist.
  */
 export function requireRole(
   role: UserRole,

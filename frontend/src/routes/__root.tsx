@@ -20,17 +20,17 @@ import { getLocale } from '../paraglide/runtime'
 import appCss from '../styles.css?url'
 
 /**
- * O que toda rota enxerga em `context`.
+ * What every route sees in `context`.
  *
- * `type` e não `interface`: aqui não é module augmentation - é declaração local,
- * e a regra do projeto vale (o único `interface` legítimo é o de
- * `vite-env.d.ts`, que aumenta o `ImportMetaEnv` do Vite).
+ * `type` and not `interface`: this is not module augmentation - it is a local declaration,
+ * and the project rule holds (the only legitimate `interface` is the one in
+ * `vite-env.d.ts`, which augments Vite's `ImportMetaEnv`).
  */
 type RouterContext = {
   queryClient: QueryClient
 }
 
-/** Ícone padrão da casa: decorativo, do tamanho do texto, traço regular (`frontend.md` §10.2). */
+/** The house's default icon: decorative, text-sized, regular stroke (`frontend.md` §10.2). */
 const ICON_DEFAULTS = {
   size: '1em',
   weight: 'regular',
@@ -38,9 +38,9 @@ const ICON_DEFAULTS = {
 } as const
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  // O tema vem do cookie, lido no servidor: o primeiro HTML já sai com a classe
-  // certa (`frontend.md` §6). `isIndexable` é a ENV de ambiente: fora de
-  // produção a página inteira responde `noindex` (`frontend.md` §9.7).
+  // The theme comes from the cookie, read on the server: the first HTML already comes out with the
+  // right class (`frontend.md` §6). `isIndexable` is the environment ENV: outside
+  // production the whole page answers `noindex` (`frontend.md` §9.7).
   loader: async () => ({
     theme: readTheme(),
     indexable: await isIndexable(),
@@ -70,7 +70,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
     ],
     links: [
-      // A conexão com a API abre junto do HTML (`frontend.md` §9.5).
+      // The connection to the API opens together with the HTML (`frontend.md` §9.5).
       {
         rel: 'preconnect',
         href: env.VITE_API_URL,
@@ -102,10 +102,10 @@ function RootDocument({
   const { theme } = Route.useLoaderData()
 
   return (
-    // `suppressHydrationWarning` só aqui, e é obrigatório para `system`: sem
-    // cookie o servidor não sabe a preferência do sistema, e o script antes da
-    // hidratação escreve a classe no `<html>` - nó que diverge por natureza
-    // (`frontend.md` §3.2). Com `light` ou `dark` o servidor já manda a classe.
+    // `suppressHydrationWarning` only here, and it is mandatory for `system`: without a
+    // cookie the server does not know the system preference, and the script before
+    // hydration writes the class on `<html>` - a node that diverges by nature
+    // (`frontend.md` §3.2). With `light` or `dark` the server already sends the class.
     <html
       lang={getLocale()}
       className={THEME_CLASS[theme]}
@@ -116,8 +116,8 @@ function RootDocument({
       </head>
       <body>
         {/*
-          Um provider só para toda a árvore: ele agrupa o atraso de abertura,
-          então passar o mouse de um botão a outro não recomeça a contagem.
+          A single provider for the whole tree: it groups the opening delay,
+          so moving the mouse from one button to another does not restart the count.
         */}
         <ThemeProvider theme={theme}>
           <IconContext.Provider value={ICON_DEFAULTS}>

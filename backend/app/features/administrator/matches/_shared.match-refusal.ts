@@ -4,7 +4,7 @@ import { RefusalBase, type RefusalTable } from '#features/_shared.refusal.base'
 import HTTPException from '#exceptions/http.exception'
 import type { MatchError } from '#domain/bracket/bracket.errors'
 
-/** Cada recusa da partida como resposta HTTP (`_standards/domain.md` §2). */
+/** Each refusal of the match as an HTTP response (`_standards/domain.md` §2). */
 export class MatchRefusal extends RefusalBase {
   private static readonly TABLE = {
     MATCH_NOT_FOUND: (_fact, i18n) =>

@@ -16,7 +16,7 @@ async function setup() {
 }
 
 test.group('administrator/announcements > create (unit)', () => {
-  test('publica sem destaque quando não pedem', async ({ assert }) => {
+  test('publishes unpinned when not asked', async ({ assert }) => {
     const { announcements, useCase } = await setup()
 
     const result = await useCase.execute({ title: 'Jogo adiado', body: 'Às 15h' })
@@ -26,7 +26,7 @@ test.group('administrator/announcements > create (unit)', () => {
     assert.isNotNull(await announcements.findById(String(result.isRight() && result.value.id)))
   })
 
-  test('publica fixado quando pedem', async ({ assert }) => {
+  test('publishes pinned when asked', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ title: 'Regulamento', body: 'Leia', pinned: true })

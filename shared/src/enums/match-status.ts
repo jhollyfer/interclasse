@@ -1,4 +1,4 @@
-/** Uma partida está marcada ou tem placar. Não há "em andamento": o placar entra ao final. */
+/** A match is scheduled or has a score. There is no "in progress": the score is entered at the end. */
 export const MATCH_STATUS = {
   SCHEDULED: 'SCHEDULED',
   FINISHED: 'FINISHED',

@@ -20,7 +20,7 @@ async function setup() {
 }
 
 test.group('storages/files > delete (unit)', () => {
-  test('arquivo órfão sai: binário e linha', async ({ assert }) => {
+  test('orphan file goes: binary and row', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
 
@@ -31,7 +31,7 @@ test.group('storages/files > delete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('arquivo em uso é 409 STORAGE_IN_USE e nada é apagado', async ({ assert }) => {
+  test('file in use is 409 STORAGE_IN_USE and nothing is deleted', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
     storages.markUsed(FILE_ID, ['avatar de usuário'])
@@ -43,7 +43,9 @@ test.group('storages/files > delete (unit)', () => {
     assert.isNotNull(await storages.findById(FILE_ID))
   })
 
-  test('PENDING multipart é cancelado: aborta o upload e apaga a linha', async ({ assert }) => {
+  test('PENDING multipart is cancelled: aborts the upload and deletes the row', async ({
+    assert,
+  }) => {
     const { storages, multipart, useCase } = await setup()
     await storages.save(pendingFile({ uploadId: 'up' }))
 
@@ -54,13 +56,13 @@ test.group('storages/files > delete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('PENDING de parte única apaga o objeto, e o objeto ausente não é erro', async ({
+  test('PENDING single-part deletes the object, and the missing object is not an error', async ({
     assert,
   }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(pendingFile())
     bucket.discard = async () => {
-      throw new Error('objeto não existe')
+      throw new Error('object does not exist')
     }
 
     const result = await useCase.execute({ id: FILE_ID })
@@ -69,7 +71,7 @@ test.group('storages/files > delete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('arquivo inexistente é 404 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 404 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: FILE_ID })

@@ -1,9 +1,9 @@
 import type { Paginated } from '@interclasse/shared'
 
 /**
- * A página que o repository em memória devolve, com o rodapé que o Lucid daria
- * (`_standards/domain.md` §5.3): a segunda implementação não pode devolver um
- * `meta` diferente da primeira. Só as implementações em memória usam.
+ * The page the in-memory repository returns, with the footer Lucid would give
+ * (`_standards/domain.md` §5.3): the second implementation cannot return a different
+ * `meta` from the first. Only the in-memory implementations use it.
  */
 export class MemoryPagination {
   static slice<T>(all: ReadonlyArray<T>, page: number, perPage: number): Paginated<T> {

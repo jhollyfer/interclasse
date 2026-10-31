@@ -5,7 +5,7 @@ import { CardList } from '#/components/common/card-list'
 import { advisorCardsQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 import { m } from '#/paraglide/messages'
 
-/** Os cartões que os atletas da turma levaram. Só leitura: quem lança é a organização. */
+/** The cards the classroom's athletes received. Read-only: the organization records them. */
 export function ClassroomCards({
   classroomId,
 }: Readonly<{ classroomId: string }>): React.JSX.Element {

@@ -17,25 +17,25 @@ import { Header } from './-components/header'
 import { Sidebar } from './-components/sidebar'
 
 /**
- * O portão do painel. Fica no layout, e não em cada tela, porque assim rota nova
- * dentro de `_private/` nasce protegida por estar no lugar certo - que é a mesma
- * ideia do `middleware.auth()` aplicado ao grupo em `backend/start/routes.ts`.
+ * The dashboard gate. It lives in the layout, and not on each screen, because that way a new route
+ * inside `_private/` is born protected by being in the right place - which is the same
+ * idea as the `middleware.auth()` applied to the group in `backend/start/routes.ts`.
  *
- * **Sem verificação de papel aqui, e é decisão.** Quem autoriza é o backend: o
- * grupo `/administrator` aceita `EDITOR` e `ADMINISTRATOR`, e as rotas que só a
- * administradora pode abrir - o módulo `/administrator/users` inteiro e todo
- * purge - respondem `403`. Repetir a matriz no cliente daria dois lugares para
- * ela ficar desatualizada, e o do cliente não protege nada: quem quer chamar a
- * API chama sem passar por esta tela.
+ * **No role check here, and it is a decision.** Whoever authorizes is the backend: the
+ * `/administrator` group accepts `EDITOR` and `ADMINISTRATOR`, and the routes that only the
+ * administrator can open - the whole `/administrator/users` module and every
+ * purge - answer `403`. Repeating the matrix on the client would give two places for
+ * it to go stale, and the client's protects nothing: whoever wants to call the
+ * API calls it without going through this screen.
  */
 export const Route = createFileRoute('/_private')({
-  // O painel não tem o que indexar, e o HTML do servidor não sabe a largura da
-  // tela: desenhava a barra lateral aberta, a hidratação recolhia em tablet e o
-  // clique do meio-tempo caía no lugar errado. Dados no servidor, tela no
-  // cliente - como no lowcodejs.
+  // The dashboard has nothing to index, and the server's HTML does not know the screen
+  // width: it drew the sidebar open, hydration collapsed it on tablet and the
+  // in-between click landed in the wrong place. Data on the server, screen on the
+  // client - as in lowcodejs.
   ssr: 'data-only',
-  // Sem HTML do servidor, é isto que aparece até o JS montar o painel - em
-  // vez de uma página em branco.
+  // Without server HTML, this is what shows up until the JS mounts the dashboard - instead
+  // of a blank page.
   pendingComponent: () => (
     <div className="flex h-svh items-center justify-center">
       <Spinner className="size-6 text-muted-foreground" />
@@ -43,35 +43,35 @@ export const Route = createFileRoute('/_private')({
   ),
   beforeLoad: async ({ context, location }) => {
     try {
-      // `query()` com `staleTime: 'static'` (o antigo `ensureQueryData`):
-      // devolve o dado e propaga o erro. Engolir o erro aqui faria o guard
-      // nunca reprovar.
+      // `query()` with `staleTime: 'static'` (the former `ensureQueryData`):
+      // returns the data and propagates the error. Swallowing the error here would make the guard
+      // never reject.
       const account = await context.queryClient.query({
         ...accountQueryOptions(),
         staleTime: 'static',
       })
 
-      // Volta para o contexto da rota: toda tela descendente lê o usuário por
-      // `useRouteContext()`, sem consulta nova.
+      // Back into the route context: every descendant screen reads the user through
+      // `useRouteContext()`, with no new query.
       return { account }
     } catch {
-      // Qualquer falha aqui é ausência de sessão utilizável: o `request` já
-      // tentou renovar com o refresh token antes de deixar o erro subir.
+      // Any failure here is the absence of a usable session: `request` already
+      // tried to renew with the refresh token before letting the error bubble up.
       throw redirect({
         to: '/sign-in',
         search: { redirect: location.href },
       })
     }
   },
-  // Um título por tela sem um `head()` em cada rota: a trilha já sabe onde se
-  // está. Aba com "Jogos Estudantis" em todas não se distingue de outra.
+  // One title per screen without a `head()` in every route: the trail already knows where
+  // one is. A tab with "Jogos Estudantis" on all of them cannot be told from another.
   head: ({ matches }) => {
     const title = breadcrumbTitle(buildBreadcrumbs(matches))
 
     return {
       meta: [
         { title: [title, m.common_site_title()].filter(Boolean).join(' | ') },
-        // Área restrita fora do índice (`frontend.md` §9.7).
+        // Restricted area outside the index (`frontend.md` §9.7).
         { name: 'robots', content: 'noindex, nofollow' },
       ],
     }
@@ -79,25 +79,24 @@ export const Route = createFileRoute('/_private')({
   component: RouteComponent,
 })
 
-/** O alvo do "pular para o conteúdo", e o `id` do `<main>` que o `SidebarInset` renderiza. */
+/** The target of "pular para o conteúdo", and the `id` of the `<main>` that `SidebarInset` renders. */
 const MAIN_ID = 'conteudo'
 
 function RouteComponent(): React.JSX.Element {
   const tablet = useIsBelow(TABLET_BREAKPOINT)
 
   return (
-    // `h-svh` sobre o `min-h-svh` do componente: com altura mínima o container
-    // cresce junto com o conteúdo, e uma altura que cresce não limita ninguém -
-    // o `PageShell` das telas nunca conseguiria prender o rodapé. Altura fixa
-    // dá o teto, e quem rola passa a ser a área interna de cada tela.
+    // `h-svh` over the component's `min-h-svh`: with a minimum height the container
+    // grows with the content, and a height that grows limits no one -
+    // the screens' `PageShell` would never manage to pin the footer. A fixed height
+    // gives the ceiling, and what scrolls becomes each screen's inner area.
     <SidebarProvider collapsed={tablet} className="h-svh overflow-hidden">
       {/*
-        A barra lateral do painel abre com nove destinos, e eles vêm antes do
-        conteúdo em toda tela, a cada navegação.
+        The dashboard sidebar opens with nine destinations, and they come before the
+        content on every screen, on every navigation.
 
-        `sr-only` com `focus:not-sr-only`, e não `display: none`: escondido de
-        verdade o link não receberia foco e deixaria de existir para quem ele
-        serve.
+        `sr-only` with `focus:not-sr-only`, and not `display: none`: truly hidden the link
+        would not receive focus and would cease to exist for whoever it serves.
       */}
       <a
         href={'#'.concat(MAIN_ID)}
@@ -108,47 +107,47 @@ function RouteComponent(): React.JSX.Element {
 
       <Sidebar />
 
-      {/* `tabIndex={-1}` para o alvo do salto poder receber o foco: sem ele o
-          navegador rola até aqui e deixa o foco no link, e a tabulação seguinte
-          volta para o topo da barra lateral. */}
+      {/* `tabIndex={-1}` so the jump target can receive focus: without it the
+          browser scrolls here and leaves focus on the link, and the next tab
+          goes back to the top of the sidebar. */}
       {/*
-        `min-w-0` é o par horizontal do `min-h-0`, e faz falta pelo mesmo
-        motivo: o `SidebarInset` é item de um flex em linha, e item de flex não
-        encolhe abaixo do próprio conteúdo por default. Uma tabela larga
-        empurrava a área inteira para além da tela - e como o `SidebarProvider`
-        acima é `overflow-hidden`, o que passava do fim era **recortado**, não
-        rolável. A última coluna da tabela, que é a do menu de ações, é
-        exatamente a que mora nessa borda.
+        `min-w-0` is the horizontal pair of `min-h-0`, and is needed for the same
+        reason: `SidebarInset` is an item of an inline flex, and a flex item does not
+        shrink below its own content by default. A wide table
+        pushed the whole area beyond the screen - and since the `SidebarProvider`
+        above is `overflow-hidden`, what went past the end was **clipped**, not
+        scrollable. The table's last column, which is the actions menu's, is
+        exactly the one that lives on that edge.
       */}
       <SidebarInset id={MAIN_ID} tabIndex={-1} className="min-h-0 min-w-0">
         <Header />
 
         {/*
-          O provider fica aqui, e não em cada formulário: o upload acontece na
-          escolha do arquivo e o formulário só conhece o `id` depois que ele
-          existe, então **todo** botão de salvar do painel precisa saber se há
-          arquivo em voo. Um por tela seriam sete chances de esquecer numa
-          oitava - e a falha é silenciosa, porque `useRegisterUpload` fora do
-          provider não faz nada e o registro nasce sem imagem, sem erro nenhum.
+          The provider lives here, and not in each form: the upload happens when the
+          file is chosen and the form only knows the `id` after it exists, so
+          **every** save button on the dashboard needs to know whether a file is in flight. One per screen would be
+          seven chances to forget on an eighth - and the failure is silent, because
+          `useRegisterUpload` outside the provider does nothing and the record is born without
+          an image, with no error at all.
         */}
         <UploadingProvider>
           {/*
-            `min-h-0` é o que faz o `PageShell` das telas conseguir prender o
-            rodapé: sem ele um filho flex não encolhe abaixo do próprio
-            conteúdo, a área de rolagem interna nunca recebe altura limitada, e
-            o scroll vaza para a página inteira.
+            `min-h-0` is what lets the screens' `PageShell` pin the
+            footer: without it a flex child does not shrink below its own
+            content, the inner scroll area never gets a bounded height, and
+            the scroll leaks to the whole page.
 
-            `overflow-auto` é o par da altura fixa acima: as telas que **não**
-            usam `PageShell` - formulários, painel inicial - voltam a rolar por
-            inteiro em vez de terem o conteúdo recortado.
+            `overflow-auto` is the pair of the fixed height above: the screens that do **not**
+            use `PageShell` - forms, dashboard home - go back to scrolling
+            entirely instead of having their content clipped.
           */}
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-auto p-4">
             {/*
-              Erro de query que escapa de uma tela (`useSuspenseQuery`) para
-              aqui, e não para a fronteira do router: o painel continua de pé,
-              e "Tentar de novo" limpa o erro guardado no cache do Query antes
-              de remontar - sem isso a query refaria e a fronteira seguiria
-              mostrando o erro antigo (`frontend.md` §5).
+              A query error that escapes a screen (`useSuspenseQuery`) lands
+              here, and not at the router boundary: the dashboard stays up,
+              and "Tentar de novo" clears the error held in Query's cache before
+              remounting - without that the query would redo and the boundary would keep
+              showing the old error (`frontend.md` §5).
             */}
             <QueryErrorResetBoundary>
               {({ reset }) => (
@@ -165,8 +164,8 @@ function RouteComponent(): React.JSX.Element {
           </div>
         </UploadingProvider>
 
-        {/* O crédito fica fora da área que rola: sempre no pé, abaixo da
-            paginação, sem disputar espaço com a tela. */}
+        {/* The credit stays outside the scrolling area: always at the foot, below the
+            pagination, without competing for space with the screen. */}
         <footer className="text-muted-foreground shrink-0 border-t px-4 py-2 text-xs [&_a]:text-foreground">
           <MaiyuCredit />
         </footer>

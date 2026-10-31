@@ -68,17 +68,17 @@ type FormProps = Readonly<{
 const SCORE_FIELDS = ['homeScore', 'awayScore', 'winnerTeamId'] as const
 const SCHEDULE_FIELDS = ['scheduledAt', 'location'] as const
 
-/** Placar e agenda mexem na chave inteira, e ela no site e nas inscrições. */
+/** Score and schedule touch the whole bracket, and it touches the site and the enrollments. */
 const GAME_CHANGE = [...GAME_KEYS, ...DEPENDENTS.games]
 
-/** O `<select>` de quem venceu nos pênaltis, que só aparece no empate. */
+/** The `<select>` for who won on penalties, which only appears on a draw. */
 function isTied(home: number | undefined, away: number | undefined): boolean {
   return home !== undefined && !Number.isNaN(home) && home === away
 }
 
 /**
- * O placar. Empatado, aparece a escolha de quem venceu nos pênaltis - o
- * servidor recusa o empate sem ela.
+ * The score. When tied, the choice of who won on penalties appears - the
+ * server refuses the tie without it.
  */
 export function MatchScoreDialog({ handle }: DialogProps): React.JSX.Element {
   return (
@@ -103,7 +103,7 @@ function MatchScoreForm({ match, handle }: FormProps): React.JSX.Element {
     fields: SCORE_FIELDS,
     mutation: useMatchScoreMutation,
     success: m.common_match_score_saved(),
-    // Placar é escrita idempotente: reenviar grava o mesmo resultado.
+    // The score is an idempotent write: resending saves the same result.
     retry: 'match-score',
     payload: (values) => {
       let winnerTeamId: string | undefined = undefined
@@ -206,7 +206,7 @@ type ScoreInputProps = Readonly<{
   onBlur: () => void
 }>
 
-/** Gols de um lado. Vazio vira `NaN`, que o validator recusa como número. */
+/** Goals for one side. Empty becomes `NaN`, which the validator refuses as a number. */
 function ScoreInput({
   value,
   onValueChange,
@@ -227,7 +227,7 @@ function ScoreInput({
   )
 }
 
-/** Data, hora e local da partida. */
+/** The match's date, time and venue. */
 export function MatchScheduleDialog({
   handle,
 }: DialogProps): React.JSX.Element {
@@ -245,8 +245,8 @@ function MatchScheduleForm({ match, handle }: FormProps): React.JSX.Element {
     MatchUpdateVariables
   >({
     validator: AdministratorMatchUpdateValidator,
-    // O formulário guarda o que a API recebe: ISO com fuso e o local, ou
-    // `null`. O relógio da escola é só o que o campo mostra.
+    // The form stores what the API receives: ISO with time zone and the venue, or
+    // `null`. The school's clock is only what the field shows.
     defaults: { scheduledAt: match.scheduledAt, location: match.location },
     fields: SCHEDULE_FIELDS,
     mutation: useMatchUpdateMutation,
@@ -325,8 +325,8 @@ function MatchScheduleForm({ match, handle }: FormProps): React.JSX.Element {
 }
 
 /**
- * Desfazer o placar lançado errado. O servidor recusa quando a partida
- * seguinte já tem placar, e o motivo chega por toast.
+ * Undo a wrongly recorded score. The server refuses when the next match
+ * already has a score, and the reason arrives by toast.
  */
 export function MatchUnscoreDialog({
   handle,

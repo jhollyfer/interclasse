@@ -11,7 +11,10 @@ import {
 test.group('photos > review', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('foto do conselheiro só vai ao site depois de aprovada', async ({ client, assert }) => {
+  test('an advisor photo only goes to the site after being approved', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const admin = await authenticateAsAdministrator(client)
     const image = await StorageFactory.create()
@@ -41,14 +44,14 @@ test.group('photos > review', (group) => {
     assert.lengthOf(body(after).data, 1)
     assert.equal(body(after).data[0].caption, 'Final do futsal')
     assert.isString(body(after).data[0].url)
-    // O site anônimo não sabe quem enviou.
+    // The anonymous site does not know who submitted it.
     assert.notProperty(body(after).data[0], 'authorId')
 
     const mine = await client.get('/advisor/photos').cookies(advisor)
     assert.equal(body(mine).data[0].status, 'APPROVED')
   })
 
-  test('foto da organização nasce aprovada', async ({ client, assert }) => {
+  test('organization photo is born approved', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const image = await StorageFactory.create()
 
@@ -61,7 +64,7 @@ test.group('photos > review', (group) => {
     assert.equal(body(response).status, 'APPROVED')
   })
 
-  test('arquivo que não é imagem responde 422', async ({ client, assert }) => {
+  test('file that is not an image responds 422', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
 
@@ -74,7 +77,7 @@ test.group('photos > review', (group) => {
     assert.equal(body(response).code, 'PHOTO_NOT_IMAGE')
   })
 
-  test('conselheiro não apaga foto de outro: 404', async ({ client }) => {
+  test("advisor does not delete another one's photo: 404", async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
@@ -89,10 +92,10 @@ test.group('photos > review', (group) => {
   })
 })
 
-test.group('administrator/photos/review > acesso e validação', (group) => {
+test.group('administrator/photos/review > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.put(
       '/administrator/photos/00000000-0000-4000-8000-000000000000/review',
     )
@@ -100,7 +103,7 @@ test.group('administrator/photos/review > acesso e validação', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client

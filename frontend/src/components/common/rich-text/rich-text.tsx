@@ -12,34 +12,34 @@ type RichTextProps = Readonly<
   Merge<
     Omit<React.ComponentProps<'div'>, 'children'>,
     {
-      /** O JSON que o editor gravou (`editor.getJSON()`). */
+      /** The JSON the editor saved (`editor.getJSON()`). */
       json?: JSONContent
       /**
-       * Markdown que vem de fora (resposta de IA, importação, conteúdo legado).
-       * Converte **sem editor**, com a mesma lista de extensões, e segue pelo
-       * mesmo renderizador.
+       * Markdown that comes from outside (AI response, import, legacy content).
+       * Converts **without an editor**, with the same extension list, and goes through
+       * the same renderer.
        *
-       * A conversão depende do `DOMParser`: no SSR o `@tiptap/markdown@3.32`
-       * devolve HTML embutido como texto literal. Por isso a conversão roda num
-       * lado só (no backend, ao gravar, ou só no cliente) e a tela recebe JSON;
-       * converter no SSR e de novo no cliente quebra a hidratação.
+       * The conversion depends on `DOMParser`: on SSR `@tiptap/markdown@3.32`
+       * returns embedded HTML as literal text. That is why the conversion runs on one
+       * side only (on the backend, when saving, or on the client only) and the screen receives JSON;
+       * converting on SSR and again on the client breaks hydration.
        */
       markdown?: string
     }
   >
 >
 
-/** O conversor de Markdown em JSON, sem editor: um para todas as telas. */
+/** The Markdown to JSON converter, without an editor: one for all screens. */
 const MARKDOWN = new MarkdownManager({ extensions: RICH_TEXT_EXTENSIONS })
 
-/** O documento vazio: o que se lê quando a tela não passa conteúdo nenhum. */
+/** The empty document: what is read when the screen passes no content at all. */
 const EMPTY_DOCUMENT: JSONContent = { type: 'doc', content: [] }
 
 /**
- * Leitura de conteúdo rico: JSON do editor ou Markdown de fora, por
- * `renderToReactElement` do `@tiptap/static-renderer`. Devolve elemento React,
- * sem editor e sem `innerHTML`: a injeção de HTML deixa de ser possível por
- * construção. _doc-lib/tiptap.md#api/utilities/static-renderer.
+ * Rich content reading: editor JSON or outside Markdown, through
+ * `renderToReactElement` from `@tiptap/static-renderer`. Returns a React element,
+ * with no editor and no `innerHTML`: HTML injection is no longer possible by
+ * construction. _doc-lib/tiptap.md#api/utilities/static-renderer.
  */
 export function RichText({
   json,

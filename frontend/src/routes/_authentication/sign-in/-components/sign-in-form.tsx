@@ -30,16 +30,16 @@ import {
 const route = getRouteApi('/_authentication/sign-in/')
 
 /**
- * Os campos que este formulário sabe destacar. Uma chave de `errors` fora
- * desta lista (o backend ganhou um campo, por exemplo) não some em silêncio:
- * vira mensagem do formulário.
+ * The fields this form knows how to highlight. A key of `errors` outside
+ * this list (the backend gained a field, for example) does not vanish silently:
+ * it becomes a form message.
  */
 const FIELDS = ['email', 'password'] as const
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter()
-  // Validado no layout pai (`_authentication/layout.tsx`), que já recusou
-  // qualquer destino que não seja um caminho deste app.
+  // Validated in the parent layout (`_authentication/layout.tsx`), which already refused
+  // any destination that is not a path in this app.
   const search = route.useSearch()
 
   const { form, mutation, onSubmit } = useMutationForm<
@@ -48,31 +48,31 @@ export function SignInForm(): React.JSX.Element {
     AuthenticationSessionSignInPayload
   >({
     validator: AuthenticationSessionSignInValidator,
-    // Sem isto os campos nascem `undefined`, e o input monta não controlado
-    // para virar controlado na primeira tecla.
+    // Without this the fields are born `undefined`, and the input mounts uncontrolled
+    // only to become controlled on the first keystroke.
     defaults: { email: '', password: '' },
-    // O 401 chega em `root` - o canal do backend para "a mensagem é do
-    // formulário, não de um campo", e ele o usa porque não revela se falhou o
-    // e-mail, a senha, a conta inativa ou a arquivada.
+    // The 401 arrives in `root` - the backend's channel for "the message belongs to the
+    // form, not to a field", and it uses it because it does not reveal whether the
+    // e-mail, the password, the inactive account or the archived one failed.
     fields: FIELDS,
     mutation: useAuthenticationSignInMutation,
-    // O sign-in responde 204 e não diz quem entrou - quem sabe é o
-    // `GET /account`. Sem invalidar, o cache ainda guarda a ausência de sessão
-    // de um segundo atrás, e o guard do painel mandaria de volta ao login.
+    // The sign-in answers 204 and does not say who came in - whoever knows is
+    // `GET /account`. Without invalidating, the cache still holds the absence of a session
+    // from a second ago, and the dashboard guard would send back to the login.
     invalidate: [queryKeys.account.profile.all],
-    // Entrar não cria nada: 5xx e rede viram aviso com "Tentar de novo".
+    // Signing in creates nothing: 5xx and network become a notice with "Tentar de novo".
     retry: 'sign-in-error',
     payload: (values) => values,
     async onSuccess() {
-      // `href` e não `to`: o destino veio da URL como string, e `to` é o campo
-      // tipado contra a árvore de rotas. Tem prioridade sobre o painel: quem
-      // foi barrado no meio volta para onde estava.
+      // `href` and not `to`: the destination came from the URL as a string, and `to` is the field
+      // typed against the route tree. It takes priority over the dashboard: whoever
+      // was stopped midway goes back to where they were.
       if (search.redirect) {
         await router.navigate({ href: search.redirect })
         return
       }
 
-      await router.navigate({ to: '/painel' })
+      await router.navigate({ to: '/dashboard' })
     },
   })
 
@@ -80,9 +80,9 @@ export function SignInForm(): React.JSX.Element {
     <AuthShell>
       <AuthShellAside>
         <AuthShellAsideBody>
-          {/* A logo da edição faz o papel da marca aqui: com as duas, o
-              selo aparecia repetido em tamanhos diferentes. Leva ao site,
-              como a marca levava. */}
+          {/* The edition's logo plays the brand's role here: with both, the
+              seal showed up repeated at different sizes. It leads to the site,
+              as the brand used to. */}
           <Link to="/" aria-label={m.auth_back_to_site()}>
             <Picture
               src={logo512}
@@ -93,16 +93,16 @@ export function SignInForm(): React.JSX.Element {
               placement="lcp"
             />
           </Link>
-          {/* O nome por extenso, e a mesma constante que o `head` da raiz
-              anuncia: a marca desenha a sigla, e é aqui que ela é dita
-              inteira. */}
+          {/* The full name, and the same constant that the root `head`
+              announces: the brand draws the acronym, and this is where it is spoken
+              in full. */}
           <AuthShellTagline>{m.common_site_description()}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
 
       <AuthShellContent className="max-w-md">
-        {/* `method="post"`: clique em "Entrar" antes da hidratação vira envio
-            nativo, e com GET a senha iria parar na URL e no histórico. */}
+        {/* `method="post"`: a click on "Entrar" before hydration becomes a native
+            submit, and with GET the password would end up in the URL and the history. */}
         <form method="post" onSubmit={onSubmit} className="flex flex-col gap-6">
           <AuthShellHeader title={m.auth_sign_in_title()}>
             {m.auth_sign_in_description()}
@@ -157,9 +157,9 @@ export function SignInForm(): React.JSX.Element {
           </FieldGroup>
         </form>
         {/*
-          Sem rodapé de "cadastre-se": não existe cadastro público neste
-          produto. A conta nasce em `/administrator/users`, criada por quem já
-          está dentro, e o primeiro administrador vem do `db:seed` do backend.
+          No "cadastre-se" footer: there is no public sign-up in this
+          product. The account is born in `/administrator/users`, created by someone who is already
+          inside, and the first administrator comes from the backend's `db:seed`.
         */}
       </AuthShellContent>
     </AuthShell>

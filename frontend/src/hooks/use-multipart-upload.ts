@@ -12,30 +12,30 @@ import { putPart } from '#/lib/upload-transport'
 import { m } from '#/paraglide/messages'
 
 /**
- * O upload de um arquivo, do começo ao fim, do lado do cliente.
+ * A file upload, start to finish, on the client side.
  *
- * Três passos, porque o binário não passa pela API: `POST /storages` abre e
- * devolve URLs assinadas, o navegador envia cada parte direto ao bucket, e
- * `POST /storages/:id/complete` confirma. É o que permite arquivo grande - um
- * corpo HTTP de centenas de megabytes esbarra no limite do proxy antes de
- * chegar à aplicação - e é o que permite retomar.
+ * Three steps, because the binary does not go through the API: `POST /storages`
+ * opens it and returns signed URLs, the browser sends each part straight to the
+ * bucket, and `POST /storages/:id/complete` confirms. That is what allows large
+ * files - an HTTP body of hundreds of megabytes hits the proxy limit before
+ * reaching the application - and what allows resuming.
  *
- * A retomada tem duas metades, e as duas precisam existir para valer alguma
- * coisa. A queda de rede é resolvida por `GET /storages/:id/parts`, que diz o
- * que o bucket já tem. O recarregamento da página é resolvido pelo
- * `localStorage`, que é onde o `storageId` sobrevive - sem ele o upload
- * continuaria aberto no servidor, invisível, e o usuário recomeçaria do zero um
- * arquivo que já está quase todo lá.
+ * Resuming has two halves, and both must exist for it to be worth anything. A
+ * network drop is solved by `GET /storages/:id/parts`, which says what the bucket
+ * already has. A page reload is solved by `localStorage`, which is where the
+ * `storageId` survives - without it the upload would stay open on the server,
+ * invisible, and the user would restart from zero a file that is almost
+ * entirely there.
  */
 
 export type MultipartUploadOptions = {
   /**
-   * Quantas partes sobem ao mesmo tempo.
+   * How many parts upload at the same time.
    *
-   * Três porque o gargalo é a banda de subida, que é compartilhada: mais
-   * conexões não a aumentam, só dividem a mesma em mais pedaços e deixam cada
-   * parte demorar mais para terminar - e parte que não termina é parte que a
-   * retomada vai reenviar inteira.
+   * Three because the bottleneck is the upload bandwidth, which is shared: more
+   * connections do not increase it, they only split the same bandwidth into more
+   * pieces and make each part take longer to finish - and a part that does not
+   * finish is a part the resume will resend in full.
    */
   concurrency?: number
 }
@@ -66,13 +66,13 @@ export function useMultipartUpload({
 
     const plan = await open(file, mimetype)
 
-    // Já estava confirmado quando reencontramos o upload: nada a enviar.
+    // Already confirmed when we found the upload again: nothing to send.
     if (plan.storage.status === 'UPLOADED') {
       clearResume(file)
       onProgress(100)
 
-      // O plano traz o arquivo sem a `url` derivada; o registro com ela vem do
-      // `GET /storages/:id`.
+      // The plan brings the file without the derived `url`; the record with it
+      // comes from `GET /storages/:id`.
       return request(
         '/storages/'.concat(plan.storage.id),
         StoragesFileShowResponse,
@@ -98,12 +98,12 @@ export function useMultipartUpload({
 }
 
 /**
- * O plano de upload: o de um upload retomado, quando há um, e o de um novo
- * quando não há.
+ * The upload plan: the one of a resumed upload, when there is one, and a new
+ * one when there is not.
  *
- * O retomado pode ter morrido do outro lado - cancelado noutra aba, varrido por
- * abandono -, e um `404` aqui não é erro: é só um upload que não existe mais, e
- * o certo é abrir outro.
+ * The resumed one may have died on the other side - cancelled in another tab,
+ * swept for abandonment -, and a `404` here is not an error: it is just an
+ * upload that no longer exists, and the right move is to open another.
  */
 async function open(
   file: File,
@@ -135,10 +135,10 @@ async function open(
 }
 
 /**
- * O pedaço do arquivo que vai num `PUT`. A URL de arquivo inteiro (sem
- * `uploadId`) assina o `Content-Type`, e o XHR só o manda se o `Blob` tiver
- * tipo; a parte de multipart não assina tipo, e mandá-lo seria um cabeçalho
- * fora da assinatura, que o S3 recusa.
+ * The piece of the file that goes in a `PUT`. The whole-file URL (without
+ * `uploadId`) signs the `Content-Type`, and XHR only sends it if the `Blob` has
+ * a type; the multipart part signs no type, and sending one would be a header
+ * outside the signature, which S3 refuses.
  */
 function sliceFor(file: File, part: PartPlan, uploadId: string | null): Blob {
   if (uploadId === null) return file.slice(part.start, part.end, file.type)
@@ -147,13 +147,13 @@ function sliceFor(file: File, part: PartPlan, uploadId: string | null): Blob {
 }
 
 /**
- * Envia o que falta e devolve o `ETag` de cada parte, inclusive das que já
- * estavam lá - a confirmação precisa da lista inteira, e não só do que subiu
- * nesta sessão.
+ * Sends what is missing and returns each part's `ETag`, including the ones that
+ * were already there - the confirmation needs the whole list, not only what
+ * went up in this session.
  *
- * O laço externo existe por causa do lote: um arquivo grande não recebe todas
- * as URLs de uma vez, então quando as deste lote acabam ele pede o próximo no
- * mesmo endpoint da retomada.
+ * The outer loop exists because of the batch: a large file does not get all the
+ * URLs at once, so when this batch's run out it asks for the next one on the
+ * same endpoint as the resume.
  */
 async function send(
   file: File,
@@ -170,7 +170,7 @@ async function send(
     let loaded = 0
     for (const bytes of progress.values()) loaded += bytes
 
-    // Arquivo de zero byte não tem como render fração: já está inteiro.
+    // A zero-byte file has no way to yield a fraction: it is already whole.
     if (file.size === 0) {
       onProgress(100)
       return
@@ -193,8 +193,8 @@ async function send(
     const urls = new Map(batch.parts.map((part) => [part.partNumber, part.url]))
     const ready = pending.filter((part) => urls.has(part.partNumber))
 
-    // O lote acabou e ainda falta parte: peça o próximo, que vem com URLs
-    // recém-assinadas - as antigas podem já ter expirado.
+    // The batch ended and a part is still missing: ask for the next one, which comes with
+    // freshly signed URLs - the old ones may have expired.
     if (ready.length === 0) {
       batch = await request(
         `/storages/${initial.storage.id}/parts`,
@@ -206,7 +206,7 @@ async function send(
         progress.set(part.partNumber, part.size)
       }
 
-      // O servidor não deu URL nova nem parte nova: insistir seria laço eterno.
+      // The server gave neither a new URL nor a new part: insisting would be an endless loop.
       if (batch.parts.length === 0 && etags.size < plan.length) {
         throw new Error(m.upload_error_missing_urls())
       }
@@ -219,10 +219,10 @@ async function send(
 
       if (!url) return
 
-      // O backend assina o `Content-Length` da parte: o corpo precisa ter
-      // exatamente o tamanho planejado (`Blob.slice` de `[start, end)`). O
-      // navegador manda o cabeçalho sozinho a partir do `Blob`, e uma parte de
-      // outro tamanho voltaria `403` do bucket sem dizer por quê.
+      // The backend signs the part's `Content-Length`: the body must be exactly
+      // the planned size (`Blob.slice` of `[start, end)`). The browser sends the
+      // header on its own from the `Blob`, and a part of any other size would
+      // come back `403` from the bucket without saying why.
       const blob = sliceFor(file, part, initial.uploadId)
 
       if (blob.size !== part.end - part.start) {
@@ -249,8 +249,8 @@ async function send(
 }
 
 /**
- * Fecha o upload. As partes só vão no corpo quando houve multipart - o `PUT`
- * simples não tem parte para confirmar.
+ * Closes the upload. The parts only go in the body when there was a multipart -
+ * the simple `PUT` has no part to confirm.
  */
 async function complete(
   storageId: string,
@@ -270,19 +270,19 @@ async function complete(
 }
 
 /**
- * Executa as tarefas com um teto de simultâneas.
+ * Runs the tasks with a cap on how many run at once.
  *
- * Trabalhadores puxando de uma fila comum, e não lotes de tamanho fixo: com
- * lotes, o lote inteiro espera a parte mais lenta antes de o próximo começar, e
- * numa rede irregular isso é a maior parte do tempo parado.
+ * Workers pulling from a shared queue, and not fixed-size batches: with batches,
+ * the whole batch waits for the slowest part before the next one starts, and on
+ * an uneven network that is most of the time spent idle.
  */
 async function pool<TItem>(
   items: ReadonlyArray<TItem>,
   limit: number,
   run: (item: TItem) => Promise<void>,
 ): Promise<void> {
-  // Um iterador só, compartilhado: cada `next()` entrega o item a um
-  // trabalhador e nenhum outro o vê de novo.
+  // A single shared iterator: each `next()` hands the item to one
+  // worker and no other sees it again.
   const queue = items.values()
 
   async function worker() {

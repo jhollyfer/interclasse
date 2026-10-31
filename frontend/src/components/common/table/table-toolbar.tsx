@@ -11,11 +11,11 @@ import { useTableContext } from './table-context'
 import { InputSearch } from './table-search-input'
 
 /**
- * A faixa de controles entre o cabeçalho e a tabela: busca, filtros do recurso,
- * lixeira e menu de colunas.
+ * The strip of controls between the header and the table: search, the resource's filters,
+ * trash and the columns menu.
  *
- * Só um `ButtonGroup` com espaçamento - quem decide o que entra e em que ordem
- * é a tela, e um filtro próprio do recurso vira mais um filho aqui.
+ * Just a `ButtonGroup` with spacing - the screen decides what goes in and in what
+ * order, and a resource-specific filter becomes one more child here.
  */
 export function TableToolbar({
   children,
@@ -25,9 +25,9 @@ export function TableToolbar({
   const { isPlaceholderData } = useTableContext('TableToolbar')
 
   return (
-    // `div` com `gap`, e não `ButtonGroup`: a barra mistura busca, filtro e
-    // ações, e são peças independentes - o grupo cola os filhos diretos, que é o
-    // desenho de um controle segmentado, não o de uma barra.
+    // `div` with `gap`, and not `ButtonGroup`: the bar mixes search, filter and
+    // actions, and they are independent pieces - the group glues its direct children, which is
+    // the design of a segmented control, not of a bar.
     <div
       data-slot="table-toolbar"
       className="flex shrink-0 flex-wrap items-center gap-2"
@@ -39,10 +39,10 @@ export function TableToolbar({
 }
 
 /**
- * A caixa de busca da listagem.
+ * The listing's search box.
  *
- * O termo aplicado mora na URL, não aqui: fechar a tela, recarregar ou
- * compartilhar o link tem de trazer a mesma lista de volta.
+ * The applied term lives in the URL, not here: closing the screen, reloading or
+ * sharing the link must bring the same list back.
  */
 export function TableSearch({
   placeholder,
@@ -60,8 +60,8 @@ export function TableSearch({
       placeholder={placeholder}
       help={help}
       onSearch={(term) =>
-        // `page` some junto: a página 3 do filtro anterior quase nunca existe no
-        // novo, e a tela abriria vazia sem dizer por quê.
+        // `page` goes away too: page 3 of the previous filter almost never exists in the
+        // new one, and the screen would open empty without saying why.
         void navigate({
           to,
           search: { ...search, search: term, page: undefined },
@@ -71,15 +71,15 @@ export function TableSearch({
   )
 }
 
-/** O botão que alterna entre a lista e a lixeira. */
+/** The button that toggles between the list and the trash. */
 export function TableTrashToggle(): React.JSX.Element {
   const { to, search } = useTableContext('TableTrashToggle')
   const navigate = useNavigate()
 
   const isTrash = search.trashed === TRASHED_MODE.ONLY
 
-  // Sem ternário de atribuição: o botão liga e desliga, e cada estado é uma
-  // linha legível de cima para baixo.
+  // No assignment ternary: the button turns on and off, and each state is a
+  // line readable from top to bottom.
   let variant: 'default' | 'outline' = 'outline'
   if (isTrash) variant = 'default'
 

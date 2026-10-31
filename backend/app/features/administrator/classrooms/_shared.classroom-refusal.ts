@@ -5,11 +5,11 @@ import HTTPException from '#exceptions/http.exception'
 import type { ClassroomError } from '#domain/classroom/classroom.errors'
 
 /**
- * Cada recusa da turma como resposta HTTP, a mesma no cadastro, na edição e na
- * exclusão (`_standards/domain.md` §2). Tabela por `code`: fato novo sem entrada
- * não compila. O 409 do nome repetido e o dos vínculos tomados são o mesmo da
- * checagem antes de gravar e o da corrida no `unique`, que o repository
- * devolve como fato.
+ * Each refusal of the classroom as an HTTP response, the same in the registration, the edit and the
+ * deletion (`_standards/domain.md` §2). Table by `code`: a new fact without an entry
+ * does not compile. The 409 of the repeated name and the one of the taken links are the same for the
+ * check before saving and the race on the `unique`, which the repository
+ * returns as a fact.
  */
 export class ClassroomRefusal extends RefusalBase {
   private static readonly TABLE = {

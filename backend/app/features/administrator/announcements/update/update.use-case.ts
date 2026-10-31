@@ -19,7 +19,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = Merge<AdministratorAnnouncementUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, AdministratorAnnouncementShowResponse>
 
-/** Campo ausente é "não mexer": só o que vier no payload muda. */
+/** A missing field means "leave alone": only what comes in the payload changes. */
 @inject()
 export default class AdministratorAnnouncementUpdateUseCase {
   constructor(

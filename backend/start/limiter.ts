@@ -1,14 +1,14 @@
 import limiter from '@adonisjs/limiter/services/main'
 
 /**
- * As chaves dos limites que não são o IP, em métodos que se testam sem banco.
+ * The keys of the limits that are not the IP, in methods that can be tested without a database.
  */
 export class LimiterKey {
   /**
-   * A conta do sign-in, pelo e-mail normalizado (`trim` e minúsculas): a mesma
-   * conta com caixa ou espaço diferente conta no mesmo balde
-   * (_standards/backend.md §4.10). Sem e-mail no corpo não há conta a proteger, e
-   * `null` é como o limiter recebe "não aplique teto aqui".
+   * The sign-in account, by the normalized e-mail (`trim` and lower case): the same
+   * account with different case or spacing counts in the same bucket
+   * (_standards/backend.md §4.10). With no e-mail in the body there is no account to protect, and
+   * `null` is how the limiter receives "apply no ceiling here".
    */
   static account(email: unknown): string | null {
     if (typeof email !== 'string') return null
@@ -21,9 +21,9 @@ export class LimiterKey {
   }
 
   /**
-   * O usuário autenticado numa política de limite. `null` sem sessão: o teto
-   * por usuário só existe depois do `auth()`, e inventar uma chave juntaria
-   * todos os anônimos num balde só.
+   * The authenticated user in a limit policy. `null` without a session: the per-user
+   * ceiling only exists after `auth()`, and inventing a key would put
+   * all anonymous users in a single bucket.
    */
   static user(scope: string, user: { readonly id: string } | undefined): string | null {
     if (!user) return null
@@ -33,67 +33,67 @@ export class LimiterKey {
 }
 
 /**
- * Os tetos de tentativa, por rota.
+ * The attempt ceilings, per route.
  *
- * A chave padrão é o IP, lido com o `trustProxy` de `config/app.ts`. Não é
- * perfeito - várias pessoas atrás do mesmo NAT contam junto -, mas quem entra
- * ainda não tem sessão, e não há outra coisa a contar. Rota autenticada conta
- * por usuário (`LimiterKey.user`).
+ * The default key is the IP, read with the `trustProxy` of `config/app.ts`. It is not
+ * perfect - several people behind the same NAT count together -, but whoever signs in
+ * has no session yet, and there is nothing else to count. An authenticated route counts
+ * per user (`LimiterKey.user`).
  */
 
 /**
- * A porta do painel, por IP. Cinco tentativas por minuto é folgado para quem
- * erra a senha e apertado para quem a adivinha.
+ * The panel door, by IP. Five attempts per minute is generous for whoever
+ * mistypes the password and tight for whoever guesses it.
  *
- * `blockFor` é o que transforma o teto em custo: sem ele a janela expira sozinha
- * e o atacante volta a tentar cinco vezes no minuto seguinte, indefinidamente.
- * Com ele, estourar o teto custa dez minutos parado.
+ * `blockFor` is what turns the ceiling into a cost: without it the window expires by itself
+ * and the attacker tries five times again in the next minute, indefinitely.
+ * With it, blowing the ceiling costs ten minutes stopped.
  */
 export const signInThrottle = limiter.define('signIn', function () {
   return limiter.allowRequests(5).every('1 minute').blockFor('10 mins')
 })
 
 /**
- * A mesma porta, contada por conta.
+ * The same door, counted per account.
  *
- * O teto por IP sozinho não protege a conta: quem tem muitos endereços tenta a
- * mesma senha em cada um e nunca estoura o limite de nenhum. Contar por e-mail
- * fecha isso.
+ * The per-IP ceiling alone does not protect the account: whoever has many addresses tries the
+ * same password on each one and never blows any one's limit. Counting by e-mail
+ * closes that.
  *
- * É um segundo limite e não uma chave composta `ip:email`, que seria o inverso
- * do que se quer: com a chave junta, o mesmo IP ganharia cinco tentativas **por
- * e-mail**, e enumerar contas ficaria mais barato, não mais caro.
+ * It is a second limit and not a composite `ip:email` key, which would be the opposite
+ * of what is wanted: with the joint key, the same IP would get five attempts **per
+ * e-mail**, and enumerating accounts would get cheaper, not more expensive.
  *
- * Mais folgado que o do IP - vinte por hora - porque este é o limite que uma
- * pessoa esquecida da própria senha esbarra, e trancá-la por engano é o abuso
- * que ele mesmo poderia causar.
+ * Looser than the IP one - twenty per hour - because this is the limit a person
+ * who forgot their own password runs into, and locking them out by mistake is the abuse
+ * it could cause itself.
  */
 export const signInAccountThrottle = limiter.define('signInAccount', function (context) {
-  // Normalizado antes do validator, porque o limite roda antes dele.
+  // Normalized before the validator, because the limit runs before it.
   const key = LimiterKey.account(context.request.input('email'))
 
-  // Inventar uma chave para o corpo malformado juntaria toda requisição
-  // inválida num balde só, e vinte delas trancariam o login de quem não fez nada.
+  // Inventing a key for the malformed body would put every invalid request in a
+  // single bucket, and twenty of them would lock out the login of someone who did nothing.
   if (!key) return null
 
   return limiter.allowRequests(20).every('1 hour').blockFor('10 mins').usingKey(key)
 })
 
 /**
- * A renovação da sessão, por IP. Fica fora do `auth()` e escreve cookie: o token
- * de refresh é opaco e de alta entropia, então não há força bruta prática, e o
- * teto leve (30 por minuto) só protege o custo da consulta por requisição.
+ * Session renewal, by IP. It stays outside `auth()` and writes a cookie: the refresh
+ * token is opaque and high-entropy, so there is no practical brute force, and the
+ * light ceiling (30 per minute) only protects the cost of the per-request lookup.
  */
 export const refreshThrottle = limiter.define('refresh', function () {
   return limiter.allowRequests(30).every('1 minute')
 })
 
 /**
- * O upload, **por usuário**: a rota é autenticada, e contar por IP juntaria numa
- * cota só toda a escola atrás do mesmo NAT. Mais alto que o resto porque um
- * arquivo grande vira várias partes, e cada parte é uma requisição - o teto
- * conta requisição, não arquivo. Só as escritas da biblioteca (abrir, pedir
- * partes, completar) o usam; as leituras do painel não gastam esta cota.
+ * The upload, **per user**: the route is authenticated, and counting by IP would put the
+ * whole school behind the same NAT in a single quota. Higher than the rest because a
+ * large file becomes several parts, and each part is a request - the ceiling
+ * counts requests, not files. Only the library writes (open, request
+ * parts, complete) use it; the panel reads do not spend this quota.
  */
 export const uploadThrottle = limiter.define('upload', function (context) {
   const key = LimiterKey.user('upload', context.auth.user)
@@ -104,8 +104,8 @@ export const uploadThrottle = limiter.define('upload', function (context) {
 })
 
 /**
- * A troca de e-mail e de senha (`PUT /account`), por usuário: exige a senha
- * atual, e sem teto a rota serve de oráculo de senha para quem roubou uma sessão.
+ * E-mail and password change (`PUT /account`), per user: it requires the current
+ * password, and without a ceiling the route serves as a password oracle for whoever stole a session.
  */
 export const accountUpdateThrottle = limiter.define('accountUpdate', function (context) {
   const key = LimiterKey.user('account-update', context.auth.user)
@@ -116,8 +116,8 @@ export const accountUpdateThrottle = limiter.define('accountUpdate', function (c
 })
 
 /**
- * A exportação do relatório, por usuário: monta o arquivo inteiro a cada pedido
- * (rota cara, _standards/backend.md §4.10).
+ * The report export, per user: it builds the whole file on every request
+ * (expensive route, _standards/backend.md §4.10).
  */
 export const reportExportThrottle = limiter.define('reportExport', function (context) {
   const key = LimiterKey.user('report-export', context.auth.user)

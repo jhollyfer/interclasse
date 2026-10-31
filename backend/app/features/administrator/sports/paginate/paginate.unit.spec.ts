@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('administrator/sports > paginate (unit)', () => {
-  test('lista por nome, em ordem crescente, com meta', async ({ assert }) => {
+  test('lists by name, ascending, with meta', async ({ assert }) => {
     const { sports, useCase } = await setup()
     await seedSport(sports, 'Queimada')
     await seedSport(sports, 'Futsal')
@@ -32,7 +32,7 @@ test.group('administrator/sports > paginate (unit)', () => {
     assert.equal(page.meta.total, 2)
   })
 
-  test('a busca recorta pelo nome', async ({ assert }) => {
+  test('the search narrows by name', async ({ assert }) => {
     const { sports, useCase } = await setup()
     await seedSport(sports, 'Queimada')
     await seedSport(sports, 'Futsal')
@@ -45,10 +45,10 @@ test.group('administrator/sports > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_SPORT_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_SPORT_PAGINATE_ERROR', async ({ assert }) => {
     const { sports, useCase } = await setup()
     sports.paginate = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({})

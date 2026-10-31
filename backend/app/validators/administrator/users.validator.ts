@@ -13,28 +13,28 @@ import {
 import type { Infer } from '#core/validator'
 
 /**
- * O papel de um usuário gerenciado pelo painel.
+ * The role of a user managed by the panel.
  *
- * O enum inteiro, sem recorte: os três papéis nascem pelo painel, e o purge fica
- * com o `ADMINISTRATOR`. Não há papel a excluir da lista.
+ * The whole enum, no cut: the three roles are born through the panel, and purge stays
+ * with `ADMINISTRATOR`. There is no role to exclude from the list.
  */
 export function manageableRole() {
   return vine.enum(USER_ROLES)
 }
 
 /**
- * O que `POST /administrator/users` recebe.
+ * What `POST /administrator/users` receives.
  *
- * `role` é **obrigatório**: a coluna não tem `DEFAULT`, e o papel é sempre
- * explícito. `backend-old` caía em `ADMINISTRATOR` por omissão, e um caminho de
- * criação esquecido gravava o papel mais poderoso em silêncio.
+ * `role` is **required**: the column has no `DEFAULT`, and the role is always
+ * explicit. `backend-old` fell back to `ADMINISTRATOR` by omission, and a forgotten
+ * creation path silently wrote the most powerful role.
  *
- * `password` passa pela regra de força compartilhada, que também exige
- * `passwordConfirmation` com o mesmo valor - o campo é lido do input cru e não
- * entra no payload validado, então não há o que descartar antes do `merge()`.
+ * `password` goes through the shared strength rule, which also requires
+ * `passwordConfirmation` with the same value - the field is read from the raw input and does not
+ * enter the validated payload, so there is nothing to discard before `merge()`.
  *
- * `status` é opcional porque a coluna tem `DEFAULT 'ACTIVE'`: a conta nasce
- * podendo entrar, e desativar é edição.
+ * `status` is optional because the column has `DEFAULT 'ACTIVE'`: the account is born
+ * able to sign in, and deactivating is an edit.
  */
 export const AdministratorUserCreateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
@@ -42,22 +42,22 @@ export const AdministratorUserCreateValidator = vine.create({
   password: password(),
   role: manageableRole(),
   status: activeStatus().optional(),
-  // `nullable` é o que permite tirar a foto sem trocá-la. O uuid só garante o
-  // formato; que o arquivo exista é checado no use-case, senão a violação da
-  // chave estrangeira estouraria como `500` em vez de `422`.
+  // `nullable` is what lets the photo be removed without replacing it. The uuid only guarantees the
+  // format; that the file exists is checked in the use case, otherwise the foreign
+  // key violation would blow up as a `500` instead of a `422`.
   avatarId: vine.string().uuid().nullable().optional(),
 })
 
 /**
- * O que `PUT /administrator/users/:id` recebe.
+ * What `PUT /administrator/users/:id` receives.
  *
- * **Todo campo é opcional**, inclusive os obrigatórios na criação: campo
- * ausente significa "não mexer", e não "apagar". Só `avatarId` aceita
- * `null` explícito.
+ * **Every field is optional**, including the ones required on creation: an absent
+ * field means "leave alone", not "erase". Only `avatarId` accepts an
+ * explicit `null`.
  *
- * `role` entra aqui, ao contrário de `ProfileUpdateValidator`: promover e
- * rebaixar é o que este recurso existe para fazer, e ninguém muda o próprio
- * papel por `/account`.
+ * `role` is in here, unlike `ProfileUpdateValidator`: promoting and
+ * demoting is what this resource exists to do, and nobody changes their own
+ * role through `/account`.
  */
 export const AdministratorUserUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
@@ -69,11 +69,11 @@ export const AdministratorUserUpdateValidator = vine.create({
 })
 
 /**
- * O que `GET /administrator/users` aceita na query.
+ * What `GET /administrator/users` accepts in the query.
  *
- * Dois filtros próprios, que são os dois recortes da tela: `role` separa quem
- * administra de quem edita, e `status` separa quem entra de quem foi desativado
- * sem ser arquivado.
+ * Two filters of its own, which are the screen's two cuts: `role` separates who
+ * administers from who edits, and `status` separates who can sign in from who was deactivated
+ * without being archived.
  */
 export const AdministratorUserPaginateValidator = vine.create({
   ...paginationFields(),

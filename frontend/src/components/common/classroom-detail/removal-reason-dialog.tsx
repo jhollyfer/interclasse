@@ -26,7 +26,7 @@ import { useAdvisorEnrollmentUpdateMutation } from '#/integrations/tanstack-quer
 import type { DialogHandle } from '#/lib/dialog-handle'
 import { m } from '#/paraglide/messages'
 
-/** A lista que espera o motivo para ser gravada. */
+/** The list waiting for the reason to be saved. */
 export type PendingRemoval = Readonly<{
   sportId: string
   sportName: string
@@ -38,17 +38,17 @@ const FIELDS = ['reason', 'studentIds'] as const
 
 type RemovalReasonDialogProps = Readonly<{
   classroomId: string
-  /** Um handle por diálogo; a tela abre com `handle.openWithPayload(pedido)`. */
+  /** One handle per dialog; the screen opens with `handle.openWithPayload(request)`. */
   handle: DialogHandle<PendingRemoval>
   onSaved: (board: AdvisorEnrollmentShowResponse) => void
 }>
 
 /**
- * Tirar atleta da lista pede o motivo. Ele vai para a organização como aviso,
- * junto com o nome de quem saiu - é assim que o administrador fica sabendo.
+ * Removing an athlete from the list asks for the reason. It goes to the organization as a notice,
+ * together with the name of whoever left - that is how the administrator finds out.
  *
- * Uncontrolled, aberto por `handle` com o pedido como payload (`frontend.md`
- * §6.2): o formulário só monta aberto e nasce com a lista do clique.
+ * Uncontrolled, opened by `handle` with the request as payload (`frontend.md`
+ * §6.2): the form only mounts open and is born with the click's list.
  * _doc-lib/base-ui.md#react/components/dialog.
  */
 export function RemovalReasonDialog({

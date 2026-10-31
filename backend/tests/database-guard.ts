@@ -1,28 +1,29 @@
 /**
- * A guarda do bootstrap dos testes: a suíte roda `truncate()` entre os testes,
- * então subir contra o banco de desenvolvimento ou de produção apagaria dado de
- * verdade. O banco da suíte tem o sufixo `_test` no nome, e qualquer outro
- * derruba o runner antes da primeira migration (_standards/backend.md §7,
- * "E2E nunca toca banco de produção").
+ * The test bootstrap guard: the suite runs `truncate()` between tests, so starting
+ * against the development or production database would erase real data. The suite
+ * database has the `_test` suffix in its name, and any other one brings the runner
+ * down before the first migration (_standards/backend.md §7, "E2E never touches the
+ * production database").
  */
 export class DatabaseGuard {
   static readonly SUFFIX = '_test'
 
-  /** O nome do banco da `DATABASE_URL`, sem a query string. */
+  /** The name of the `DATABASE_URL` database, without the query string. */
   static databaseName(url: string): string {
     return new URL(url).pathname.replace(/^\//, '')
   }
 
-  /** Lança se a URL não aponta para um banco `_test`. */
+  /** Throws if the URL does not point to a `_test` database. */
   static assertTestDatabase(url: string | undefined): void {
-    if (!url) throw new Error('DATABASE_URL ausente: a suíte não sabe em que banco rodar.')
+    if (!url)
+      throw new Error('DATABASE_URL missing: the suite does not know which database to run on.')
 
     const name = DatabaseGuard.databaseName(url)
 
     if (!name.endsWith(DatabaseGuard.SUFFIX))
       throw new Error(
-        `A suíte recusa subir: o banco "${name}" não termina em "${DatabaseGuard.SUFFIX}". ` +
-          'Ela apaga as tabelas entre os testes; aponte DATABASE_URL de .env.test para o banco de teste.',
+        `The suite refuses to start: database "${name}" does not end in "${DatabaseGuard.SUFFIX}". ` +
+          'It drops the tables between tests; point DATABASE_URL of .env.test to the test database.',
       )
   }
 }

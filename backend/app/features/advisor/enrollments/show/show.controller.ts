@@ -10,8 +10,8 @@ import { AdvisorEnrollmentShowValidator } from '#validators/advisor/enrollments.
 export default class AdvisorEnrollmentShowController {
   static docs = defineDocs({
     description:
-      'A matriz aluno x modalidade de uma turma do conselheiro: quem está inscrito em quê, e ' +
-      'quais modalidades já travaram pelo sorteio. Turma alheia ou ausente responde `404`.',
+      'The student x sport matrix of an advisor classroom: who is enrolled in what, and ' +
+      'which sports are already locked by the draw. A foreign or missing classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorEnrollmentShowUseCase) {}

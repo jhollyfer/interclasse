@@ -9,20 +9,20 @@ import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
- * A casca de uma tela do painel: cabeçalho fixo, conteúdo que rola, rodapé fixo.
+ * The shell of a dashboard screen: fixed header, scrolling content, fixed footer.
  *
- * O que ela resolve é uma coisa só, e é a que mais dá trabalho em CSS: a
- * paginação parar de descer junto com a lista. Sem ela a tela inteira rola, e a
- * paginação de uma lista de 50 linhas fica abaixo da dobra - para trocar de
- * página é preciso rolar até o fim, e ao chegar na página seguinte rolar de
- * volta ao topo.
+ * It solves a single thing, and the one that gives the most trouble in CSS: the
+ * pagination stopping from scrolling away with the list. Without it the whole screen scrolls, and the
+ * pagination of a 50-row list ends up below the fold - to change
+ * page one has to scroll to the end, and on reaching the next page scroll back
+ * to the top.
  *
- * A corrente de `min-h-0` é o que faz isso funcionar: um filho `flex` não encolhe
- * abaixo do próprio conteúdo por default, então sem ele o `overflow-auto` do
- * meio nunca recebe altura limitada e o scroll vaza para fora.
+ * The `min-h-0` chain is what makes this work: a `flex` child does not shrink
+ * below its own content by default, so without it the middle `overflow-auto`
+ * never gets a bounded height and the scroll leaks outside.
  *
- * Compound e não uma prop `header`/`footer`: os slots aceitam qualquer coisa, e
- * a ordem no JSX é a ordem na tela.
+ * Compound and not a `header`/`footer` prop: the slots accept anything, and
+ * the order in the JSX is the order on screen.
  */
 type PageShellProps = Readonly<
   Merge<
@@ -39,14 +39,14 @@ export function PageShell({
   return (
     <div
       data-slot="page-shell"
-      // `min-h-0 flex-1` e não `h-full`: dentro de um pai flex com altura ela
-      // preenche o que sobra; fora de um, ela simplesmente flui. `h-full`
-      // resolveria para `auto` no segundo caso e o `overflow-hidden`
-      // recortaria o conteúdo.
-      // No celular, a lista de cards rolava numa caixa de meia tela dentro da
-      // página. Ali quem rola passa a ser a página: o shell cresce com o
-      // conteúdo. Só com lista (`has-`), porque nos formulários o `Salvar` mora
-      // no cabeçalho e tem de continuar à vista.
+      // `min-h-0 flex-1` and not `h-full`: inside a flex parent with a height it
+      // fills what is left; outside one, it simply flows. `h-full`
+      // would resolve to `auto` in the second case and `overflow-hidden`
+      // would clip the content.
+      // On mobile, the card list scrolled in a half-screen box inside the
+      // page. There the page becomes the one that scrolls: the shell grows with the
+      // content. Only with a list (`has-`), because in forms `Salvar` lives
+      // in the header and has to stay in view.
       className={cn(
         'flex min-h-0 flex-1 flex-col gap-4 overflow-hidden',
         'max-sm:has-data-[slot=table-mobile-cards]:flex-none max-sm:has-data-[slot=table-mobile-cards]:overflow-visible',
@@ -59,8 +59,8 @@ export function PageShell({
   )
 }
 
-// A linha divisória é sempre desenhada: quem não a quer passa `border-b-0`
-// em `className`, e o `cn` resolve o conflito - estrutura não vira prop.
+// The divider line is always drawn: whoever does not want it passes `border-b-0`
+// in `className`, and `cn` resolves the conflict - structure does not become a prop.
 type PageShellHeaderProps = Readonly<
   Merge<
     Omit<React.ComponentProps<'div'>, 'children'>,
@@ -88,18 +88,18 @@ export function PageShellHeader({
 }
 
 /**
- * A área que rola de toda tela do painel.
+ * The scrolling area of every dashboard screen.
  *
- * **`data-scroll-restoration-id` é o que dá nome a esta rolagem.** O router
- * salva a posição de qualquer elemento que role, mas sem um id ele identifica
- * o elemento por um seletor posicional montado subindo a árvore com índices de
- * `nth-child`. Basta a página renderizar com um filho a mais numa visita - o
- * aviso de "nenhum depoimento aguardando análise" do painel inicial é
- * condicional - para o seletor gravado não casar mais com o elemento, e a volta
- * cair no topo da lista em vez de onde a pessoa estava.
+ * **`data-scroll-restoration-id` is what names this scroll.** The router
+ * saves the position of any element that scrolls, but without an id it identifies
+ * the element by a positional selector built by climbing the tree with `nth-child`
+ * indexes. It is enough for the page to render with one extra child on a visit - the
+ * "nenhum depoimento aguardando análise" notice on the dashboard home is
+ * conditional - for the saved selector to stop matching the element, and the return
+ * to land at the top of the list instead of where the person was.
  *
- * Constante e não derivado da rota: só existe uma destas por tela, e o router
- * guarda a posição por chave de localização, não por id.
+ * A constant and not derived from the route: there is only one of these per screen, and the router
+ * stores the position by location key, not by id.
  */
 const SCROLL_ID = 'page-shell-content'
 
@@ -148,19 +148,19 @@ export function PageShellFooter({
 }
 
 /**
- * O título de uma tela, com voltar opcional à esquerda e ações à direita.
+ * A screen's title, with an optional back on the left and actions on the right.
  *
- * Separado do `PageShellHeader` porque nem todo cabeçalho é um título: o de uma
- * tela de formulário em passos tem outra coisa ali.
+ * Separate from `PageShellHeader` because not every header is a title: that of a
+ * step-by-step form screen has something else there.
  *
- * Slots e não props de texto porque as telas não concordam sobre o que vai
- * aqui: umas não voltam para lugar nenhum, outras têm três botões à direita, e
- * a ficha de uma notícia mostra dois badges que a de um depoimento não tem. Com
- * prop, cada variação dessas vira mais uma prop opcional aqui dentro.
+ * Slots and not text props because the screens do not agree on what goes
+ * here: some do not go back anywhere, others have three buttons on the right, and
+ * a news record shows two badges that a testimonial does not have. With a
+ * prop, each such variation becomes one more optional prop in here.
  *
- * A grade tem três colunas fixas - `grid-cols-page-header` - e cada parte declara
- * onde entra. Assim a ordem no JSX não decide o layout, e a coluna de uma parte
- * ausente colapsa para largura zero sozinha, sem `has-data-[...]`.
+ * The grid has three fixed columns - `grid-cols-page-header` - and each part declares
+ * where it goes. That way the order in the JSX does not decide the layout, and the column of an
+ * absent part collapses to zero width on its own, without `has-data-[...]`.
  */
 export function PageHeader({
   className,
@@ -170,8 +170,8 @@ export function PageHeader({
     <div
       data-slot="page-header"
       className={cn(
-        // Sem o "voltar", a coluna 1 fica vazia e o `gap-x` ainda a separava do
-        // título: 12px de recuo que nenhum outro bloco da tela tinha.
+        // Without the "voltar", column 1 is empty and the `gap-x` still separated it from the
+        // title: a 12px indent that no other block on the screen had.
         'grid w-full grid-cols-page-header items-center gap-x-0 gap-y-0.5 has-[[data-slot$=-back]]:gap-x-3',
         className,
       )}
@@ -182,20 +182,20 @@ export function PageHeader({
 
 type PageHeaderBackProps = Readonly<{
   /**
-   * Para onde o botão de voltar aponta.
+   * Where the back button points.
    *
-   * Uma rota, e não um callback: voltar é navegação, e como `Link` ele responde
-   * a abrir em nova aba, ao clique do meio e ao menu de contexto. Um `onClick`
-   * com `navigate()` não faz nada disso. Por isso segue prop e não slot - é
-   * destino, não markup.
+   * A route, and not a callback: going back is navigation, and as a `Link` it responds
+   * to open in a new tab, to middle click and to the context menu. An `onClick`
+   * with `navigate()` does none of that. That is why it stays a prop and not a slot - it is
+   * a destination, not markup.
    */
   to: LinkProps['to']
   params?: LinkProps['params']
-  /** A parte de outro compound que é esta seta (`form-shell-back`). */
+  /** The part of another compound that is this arrow (`form-shell-back`). */
   'data-slot'?: `${string}-back`
 }>
 
-/** A seta de voltar. A tela que não veio de lugar nenhum simplesmente não a escreve. */
+/** The back arrow. A screen that came from nowhere simply does not write it. */
 export function PageHeaderBack({
   to,
   params,
@@ -238,11 +238,11 @@ export function PageHeaderTitle({
 }
 
 /**
- * Os badges à direita do título, na mesma linha.
+ * The badges to the right of the title, on the same line.
  *
- * Parte própria, e não texto solto dentro do título: o `<span>` isola o que é
- * estado do que é nome. Para quem lê a tela por leitor de tela, "Semana da
- * Consciência Negra Publicada Arquivada" viraria o nome do registro.
+ * A part of its own, and not loose text inside the title: the `<span>` isolates what is
+ * state from what is name. For someone reading the screen with a screen reader, "Semana da
+ * Consciência Negra Publicada Arquivada" would become the record's name.
  */
 export function PageHeaderBadges({
   className,
@@ -265,7 +265,7 @@ export function PageHeaderBadges({
   )
 }
 
-/** Some quando a tela não tem o que explicar. */
+/** Disappears when the screen has nothing to explain. */
 export function PageHeaderDescription({
   className,
   children,
@@ -288,13 +288,13 @@ export function PageHeaderDescription({
 }
 
 /**
- * As ações da direita: criar, editar, arquivar, exportar - uma, três ou
- * nenhuma. `flex-wrap` porque três botões não cabem lado a lado no telefone.
+ * The actions on the right: create, edit, archive, export - one, three or
+ * none. `flex-wrap` because three buttons do not fit side by side on a phone.
  *
- * Um `div` com `gap`, e não `ButtonGroup`: o grupo **cola** os filhos diretos -
- * tira o arredondamento da direita e a borda da esquerda - e é assim que se
- * desenha um controle segmentado. Estas ações não são um controle só; são
- * botões independentes que às vezes quebram linha.
+ * A `div` with `gap`, and not `ButtonGroup`: the group **glues** its direct children -
+ * it removes the right rounding and the left border - and that is how a
+ * segmented control is drawn. These actions are not a single control; they are
+ * independent buttons that sometimes wrap to a new line.
  */
 export function PageHeaderActions({
   className,
@@ -307,8 +307,8 @@ export function PageHeaderActions({
     <div
       data-slot="page-header-actions"
       className={cn(
-        // No celular as ações descem para a linha de baixo: na mesma linha do
-        // título elas o espremiam em três linhas.
+        // On mobile the actions drop to the line below: on the same line as the
+        // title they squeezed it into three lines.
         'col-span-full row-start-3 flex flex-wrap items-center gap-2 justify-start max-sm:mt-2 sm:col-span-1 sm:ml-3 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:justify-end sm:self-center',
         className,
       )}

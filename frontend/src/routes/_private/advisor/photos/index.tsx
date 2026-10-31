@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { advisorPhotosQueryOptions } from '#/integrations/tanstack-query/queries/advisor'
 
-/** As fotos que o conselheiro enviou, todas numa tela. */
+/** The photos the advisor uploaded, all on one screen. */
 export const MY_PHOTOS = { perPage: 100 }
 
 export const Route = createFileRoute('/_private/advisor/photos/')({

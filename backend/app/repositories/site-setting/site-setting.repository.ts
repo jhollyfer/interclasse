@@ -7,14 +7,14 @@ import type {
 import type { RegulationFile, SiteSetting } from '#domain/site-setting/site-setting.entity'
 
 /**
- * A configuração na forma da resposta do painel, com o regulamento sem a `url`:
- * assinar é do use-case, pelo contrato do bucket (`_standards/architecture.md` §2).
+ * The configuration in the panel response shape, with the regulation without the `url`:
+ * signing belongs to the use case, through the bucket contract (`_standards/architecture.md` §2).
  */
 export type SiteSettingRead = Omit<AdministratorSiteShowResponse, 'regulation'> & {
   readonly regulation: Omit<AdministratorSiteRegulationResponse, 'url'> | null
 }
 
-/** O recorte do site anônimo, com o `path` do regulamento no lugar da `url`. */
+/** The anonymous site slice, with the regulation `path` in place of the `url`. */
 export type PublicSiteSettingRead = Omit<StorefrontSiteShowResponse, 'regulation'> & {
   readonly regulation: {
     readonly path: string
@@ -24,18 +24,18 @@ export type PublicSiteSettingRead = Omit<StorefrontSiteShowResponse, 'regulation
 }
 
 /**
- * A persistência da configuração do site, por intenção (`_standards/domain.md`
- * §5.1). O escritor único da tabela `site_settings`; lê `storages` só para
- * responder o que a regra do regulamento pergunta e para montar a resposta.
+ * The site configuration persistence, by intent (`_standards/domain.md`
+ * §5.1). The single writer of the `site_settings` table; it reads `storages` only to
+ * answer what the regulation rule asks and to build the response.
  */
 export abstract class SiteSettingRepository {
-  /** A linha única. Nasce vazia na primeira leitura. */
+  /** The single row. Born empty on the first read. */
   abstract current(): Promise<SiteSetting>
-  /** O arquivo já enviado e não arquivado, ou `null`: candidato a regulamento. */
+  /** The already uploaded, non-archived file, or `null`: a regulation candidate. */
   abstract findRegulationFile(id: string): Promise<RegulationFile | null>
   abstract save(setting: SiteSetting): Promise<void>
-  /** Leitura leve: a resposta do painel, com o regulamento, direto da query. */
+  /** Lightweight read: the panel response, with the regulation, straight from the query. */
   abstract show(): Promise<SiteSettingRead>
-  /** Leitura leve: o recorte do site anônimo. */
+  /** Lightweight read: the anonymous site slice. */
   abstract showPublic(): Promise<PublicSiteSettingRead>
 }

@@ -8,7 +8,7 @@ export const AdministratorCardPaginateValidator = z.object({
   studentId: z.uuid().optional(),
 })
 
-/** O cartão: em qual partida, para qual atleta, e a cor. O time sai do atleta. */
+/** The card: in which match, for which athlete, and the color. The team comes from the athlete. */
 export const AdministratorCardCreateValidator = z.object({
   matchId: z.uuid(),
   studentId: z.uuid(),

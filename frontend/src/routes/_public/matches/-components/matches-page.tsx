@@ -20,11 +20,11 @@ import {
   SectionTitle,
 } from '../../-components/section'
 
-const route = getRouteApi('/_public/jogos/')
+const route = getRouteApi('/_public/matches/')
 
-export function GamesPage(): React.JSX.Element {
+export function MatchesPage(): React.JSX.Element {
   const search = route.useSearch()
-  const navigate = useNavigate({ from: '/jogos/' })
+  const navigate = useNavigate({ from: '/matches/' })
   const { data } = useQuery(storefrontMatchesQueryOptions(search))
   const { data: sports } = useQuery(storefrontSportsQueryOptions())
 

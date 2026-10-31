@@ -10,8 +10,8 @@ import { AdministratorPhotoPaginateValidator } from '#validators/administrator/p
 export default class AdministratorPhotoPaginateController {
   static docs = defineDocs({
     description:
-      'As fotos enviadas, da mais nova à mais antiga, com quem enviou. `?status=PENDING` ' +
-      'é a fila do que espera revisão.',
+      'The submitted photos, newest to oldest, with who submitted them. `?status=PENDING` ' +
+      'is the queue of what awaits review.',
   })
 
   constructor(private readonly useCase: AdministratorPhotoPaginateUseCase) {}

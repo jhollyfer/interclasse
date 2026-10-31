@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('administrator/brackets > delete (unit)', () => {
-  test('apaga a chave sem placar', async ({ assert }) => {
+  test('deletes the bracket without a score', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { bracket } = await BracketUnitFixtures.drawn(brackets)
 
@@ -28,7 +28,7 @@ test.group('administrator/brackets > delete (unit)', () => {
     assert.isNull(await brackets.findById(bracket.id))
   })
 
-  test('chave inexistente é 404 BRACKET_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent bracket is 404 BRACKET_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })
@@ -36,7 +36,7 @@ test.group('administrator/brackets > delete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'BRACKET_NOT_FOUND' })
   })
 
-  test('chave com placar lançado é 409 BRACKET_HAS_RESULTS e fica', async ({ assert }) => {
+  test('bracket with a recorded score is 409 BRACKET_HAS_RESULTS and stays', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { bracket } = await BracketUnitFixtures.drawn(brackets)
     const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)

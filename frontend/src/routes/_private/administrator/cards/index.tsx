@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { TableSkeleton } from '#/components/common/table/table-skeleton'
 import { cardsQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
-/** Todos de uma vez: um campeonato da escola não passa de poucas dezenas. */
+/** All at once: a school championship does not exceed a few dozen. */
 export const ADMINISTRATOR_CARDS = { perPage: 100 }
 
 export const Route = createFileRoute('/_private/administrator/cards/')({

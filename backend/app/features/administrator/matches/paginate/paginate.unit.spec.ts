@@ -19,23 +19,23 @@ async function setup() {
 }
 
 test.group('administrator/matches > paginate (unit)', () => {
-  test('lista só as partidas com os dois times definidos', async ({ assert }) => {
+  test('lists only the matches with both teams defined', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
-    // Duas semifinais; a final ainda não tem adversário.
+    if (result.isLeft()) throw new Error('list should have come')
+    // Two semifinals; the final does not have an opponent yet.
     assert.equal(result.value.meta.total, 2)
     assert.isTrue(result.value.data.every((match) => match.phase === MATCH_PHASE.SEMI))
   })
 
-  test('mostra a turma só com id, nome e categoria', async ({ assert }) => {
+  test('shows the classroom with only id, name and category', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.deepEqual(Object.keys(result.value.data[0]?.homeTeam.classroom ?? {}).sort(), [
       'category',
       'id',
@@ -43,21 +43,21 @@ test.group('administrator/matches > paginate (unit)', () => {
     ])
   })
 
-  test('filtra por turma', async ({ assert }) => {
+  test('filters by classroom', async ({ assert }) => {
     const { useCase, classrooms } = await setup()
 
     const result = await useCase.execute({ classroomId: classrooms[0]?.id })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.equal(result.value.meta.total, 1)
   })
 
-  test('filtra por fase sem partida pronta', async ({ assert }) => {
+  test('filters by phase without a ready match', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ phase: MATCH_PHASE.FINAL })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.equal(result.value.meta.total, 0)
   })
 })

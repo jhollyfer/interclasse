@@ -12,15 +12,15 @@ export default class StoragesFilePaginateController {
   static docs = defineDocs({
     summary: 'Listar arquivos',
     description:
-      'A biblioteca de arquivos do painel. `?search` filtra por nome original, nome gerado e ' +
-      'tipo, `?status` separa o que já subiu do upload em aberto, e `?mimetype` recorta um ' +
-      'tipo só.\n\n' +
-      // As duas listas saem das próprias tuplas: escritas à mão, a documentação
-      // passaria a prometer um valor no dia em que alguém o tirasse do validator.
-      `\`?mimetype\` aceita ${STORAGE_MIMETYPES.join(', ')}.\n\n` +
-      `\`?sort\` aceita ${STORAGE_SORT_COLUMNS.join(', ')} e \`?direction\` aceita asc ou desc. ` +
-      'Padrão: página 1, 20 por página, do mais recente para o mais antigo - numa biblioteca ' +
-      'de arquivos o que interessa é o que acabou de subir.',
+      'The panel file library. `?search` filters by original name, generated name and ' +
+      'type, `?status` separates what has already been uploaded from the open upload, and `?mimetype` narrows to one ' +
+      'type only.\n\n' +
+      // Both lists come from the tuples themselves: written by hand, the documentation
+      // would start promising a value the day someone removed it from the validator.
+      `\`?mimetype\` accepts ${STORAGE_MIMETYPES.join(', ')}.\n\n` +
+      `\`?sort\` accepts ${STORAGE_SORT_COLUMNS.join(', ')} and \`?direction\` accepts asc or desc. ` +
+      'Default: page 1, 20 per page, from most recent to oldest - in a file library ' +
+      'what matters is what has just been uploaded.',
   })
 
   constructor(private readonly useCase: StoragesFilePaginateUseCase) {}

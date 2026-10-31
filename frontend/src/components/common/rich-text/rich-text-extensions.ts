@@ -2,22 +2,22 @@ import Typography from '@tiptap/extension-typography'
 import StarterKit from '@tiptap/starter-kit'
 
 /**
- * Link só `https:`, `http:` e `mailto:` (`frontend.md` §8). O React 19 bloqueia
- * `javascript:`, mas não `data:`; o validator do backend confere de novo ao
- * gravar o JSON.
+ * Links only `https:`, `http:` and `mailto:` (`frontend.md` §8). React 19 blocks
+ * `javascript:`, but not `data:`; the backend validator checks again when
+ * saving the JSON.
  */
 const ALLOWED_LINK = /^(https?:|mailto:)/i
 
 /**
- * A lista de extensões do conteúdo rico, uma só para o editor, para o
- * `MarkdownManager` e para o renderizador estático: um nó lido de um lado e
- * ausente do outro simplesmente some.
+ * The rich content extension list, a single one for the editor, for the
+ * `MarkdownManager` and for the static renderer: a node read on one side and
+ * missing on the other simply vanishes.
  *
- * - O `StarterKit` do Tiptap 3 já inclui o `Link`; configura-se por ele, e não
- *   com um segundo registro (extensão duplicada).
- * - `Typography` com `emDash: false`: a extensão troca `--` por travessão no
- *   texto de quem escreve, e a casa não aceita travessão em texto (`i18n.md`
- *   §5). As outras trocas (reticências, aspas curvas) ficam.
+ * - Tiptap 3's `StarterKit` already includes `Link`; configure it through that, and not
+ *   with a second registration (duplicate extension).
+ * - `Typography` with `emDash: false`: the extension swaps `--` for an em dash in
+ *   the writer's text, and the house does not accept em dashes in text (`i18n.md`
+ *   §5). The other swaps (ellipsis, curly quotes) stay.
  *
  * _doc-lib/tiptap.md#extensions/functionality/starterkit;
  * https://tiptap.dev/docs/editor/extensions/functionality/typography.

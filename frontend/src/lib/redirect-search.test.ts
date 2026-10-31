@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import { validateRedirectSearch } from './redirect-search'
 
-test('aceita caminho interno', () => {
+test('accepts an internal path', () => {
   expect(validateRedirectSearch({ redirect: '/administrator' })).toEqual({
     redirect: '/administrator',
   })
@@ -13,8 +13,8 @@ test('aceita caminho interno', () => {
   ).toEqual({ redirect: '/administrator/testimonials?page=2#topo' })
 })
 
-test('recusa destino externo', () => {
-  // Cada um destes leva o usuário para fora logo depois de ele digitar a senha.
+test('refuses an external destination', () => {
+  // Each of these takes the user off-site right after typing the password.
   const attacks = [
     'https://evil.com',
     'http://evil.com',
@@ -29,7 +29,7 @@ test('recusa destino externo', () => {
   }
 })
 
-test('ignora o que não é string', () => {
+test('ignores what is not a string', () => {
   expect(validateRedirectSearch({})).toEqual({})
   expect(validateRedirectSearch({ redirect: 42 })).toEqual({})
   expect(validateRedirectSearch({ redirect: ['/administrator'] })).toEqual({})

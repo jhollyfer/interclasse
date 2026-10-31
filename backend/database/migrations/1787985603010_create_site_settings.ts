@@ -1,12 +1,12 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 /**
- * O que o site mostra sobre os jogos e que só a organização sabe: o texto do
- * "Sobre", a edição em curso, desde quando acontece, quem organiza, os
- * Instagrams e o regulamento em PDF.
+ * What the site shows about the games that only the organization knows: the
+ * "About" text, the current edition, since when it has been held, who organizes, the
+ * Instagrams and the PDF regulation.
  *
- * Uma linha só (singleton). Tabela e não variável de ambiente: quem muda é o
- * administrador, pela tela, sem deploy.
+ * A single row (singleton). A table and not an environment variable: whoever changes it is the
+ * administrator, through the screen, without a deploy.
  */
 export default class extends BaseSchema {
   protected tableName = 'site_settings'
@@ -20,8 +20,8 @@ export default class extends BaseSchema {
       table.smallint('edition').nullable()
       table.string('school_instagram', 60).nullable()
       table.string('developer_instagram', 60).nullable()
-      // `SET NULL`: o arquivo apagado do storage tira o botão de baixar, não a
-      // configuração inteira.
+      // `SET NULL`: the deleted storage file removes the download button, not the
+      // whole configuration.
       table
         .uuid('regulation_id')
         .nullable()

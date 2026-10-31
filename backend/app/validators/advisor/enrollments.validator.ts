@@ -8,7 +8,7 @@ export const AdvisorEnrollmentShowValidator = vine.create({
 export const AdvisorEnrollmentUpdateValidator = vine.create({
   classroomId: vine.string().uuid(),
   ...athleteListFields(),
-  /** O motivo, quando a lista nova tira alguém da atual. */
+  /** The reason, when the new list removes someone from the current one. */
   reason: vine.string().trim().minLength(5).maxLength(500).optional(),
 })
 

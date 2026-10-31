@@ -17,7 +17,7 @@ import type { AdministratorBracketPaginatePayload } from '#validators/administra
 type Payload = AdministratorBracketPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorBracketPaginateResponse>>
 
-/** As chaves sorteadas, da mais nova para a mais antiga. */
+/** The drawn brackets, from newest to oldest. */
 @inject()
 export default class AdministratorBracketPaginateUseCase {
   constructor(

@@ -6,12 +6,12 @@ import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
- * A marca dos jogos: a logo do 2º JIC e o nome em itálico esportivo.
+ * The games' brand: the 2nd JIC logo and the name in sporty italics.
  *
- * A logo é decorativa (`alt` vazio): o nome ao lado já diz o que ela diz, e
- * repeti-lo faria o leitor de tela ler a marca duas vezes.
+ * The logo is decorative (empty `alt`): the name beside it already says what it
+ * says, and repeating it would make the screen reader read the brand twice.
  *
- * Não é um link: quem decide para onde ela leva é quem a usa.
+ * It is not a link: whoever uses it decides where it leads.
  */
 export function BrandMark({
   className,
@@ -23,8 +23,8 @@ export function BrandMark({
       {...rest}
       className={cn('flex items-center gap-2 leading-none', className)}
     >
-      {/* Na barra lateral recolhida sobra só a logo: o nome some da tela, e
-          não do leitor de tela. Fora da barra o seletor não casa nada. */}
+      {/* In the collapsed sidebar only the logo is left: the name disappears from the screen,
+          not from the screen reader. Outside the sidebar the selector matches nothing. */}
       <Picture
         src={logo128}
         alt=""

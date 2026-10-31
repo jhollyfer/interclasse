@@ -14,8 +14,8 @@ type Payload = Merge<AdvisorPhotoCreatePayload, { actor: { readonly id: string }
 type Response = Either<HTTPException, AdvisorPhotoShowResponse>
 
 /**
- * A foto do conselheiro nasce pendente: é foto de aluno num site aberto, e quem
- * decide se vai ao ar é a organização.
+ * The advisor photo is born pending: it is a student photo on an open site, and whoever
+ * decides whether it goes live is the organization.
  */
 @inject()
 export default class AdvisorPhotoCreateUseCase extends PhotoSubmissionBase {

@@ -1,50 +1,50 @@
 import env from '#start/env'
 
 /**
- * Configuração do documento OpenAPI.
+ * OpenAPI document configuration.
  *
- * Só o que não dá para derivar do código mora aqui. Rota, método, parâmetros de
- * caminho, exigência de autenticação e papéis saem do próprio router em tempo
- * de geração (`app/core/openapi/document.ts`); payload e resposta saem dos
- * schemas VineJS e dos models. O que sobra é identidade do documento e rótulo
- * humano de tag.
+ * Only what cannot be derived from the code lives here. Route, method, path
+ * parameters, authentication requirement and roles come from the router itself at
+ * generation time (`app/core/openapi/document.ts`); payload and response come from the
+ * VineJS schemas and the models. What remains is the document identity and the human
+ * label of a tag.
  */
 
 /**
- * Nome do esquema de segurança referenciado por toda operação autenticada.
+ * Name of the security scheme referenced by every authenticated operation.
  *
- * É `apiKey` em cookie, não `bearer`: o guard da aplicação lê o token de
- * `request.cookie('access-token')` e não tem fallback para o header
- * `Authorization` (`app/guards/cookie-access-tokens.guard.ts`). Documentar
- * bearer aqui faria o "Test Request" do Scalar falhar sempre.
+ * It is `apiKey` in a cookie, not `bearer`: the application guard reads the token from
+ * `request.cookie('access-token')` and has no fallback to the `Authorization`
+ * header (`app/guards/cookie-access-tokens.guard.ts`). Documenting bearer here would
+ * make Scalar's "Test Request" always fail.
  */
 export const SECURITY_SCHEME = 'cookieAuth'
 
 /**
- * Cookie que carrega o token de acesso. Espelha `COOKIE_TOKEN.ACCESS` de
+ * Cookie that carries the access token. Mirrors `COOKIE_TOKEN.ACCESS` of
  * `config/cookie.ts`.
  */
 export const SECURITY_COOKIE = 'access-token'
 
 /**
- * Rótulo de um grupo de operações na barra lateral do Scalar.
+ * Label of an operation group in the Scalar sidebar.
  *
- * O casamento é por prefixo de **caminho**, não por nome de rota: o subgrupo de
- * ciclo de vida do painel é `.as('lifecycle')`, então apagar usuário se chama
- * `administrator.lifecycle.users.purge`. O caminho (`/administrator/users/:id`)
- * não tem esse problema.
+ * Matching is by **path** prefix, not by route name: the panel lifecycle subgroup is
+ * `.as('lifecycle')`, so deleting a user is called
+ * `administrator.lifecycle.users.purge`. The path (`/administrator/users/:id`)
+ * does not have that problem.
  *
- * Os prefixos são disjuntos de propósito. Toda rota registrada casa com
- * exatamente uma regra, e o gerador avisa a que não casar com nenhuma.
+ * The prefixes are disjoint on purpose. Every registered route matches exactly one
+ * rule, and the generator warns about the one that matches none.
  */
 export type TagRule = {
   prefix: string
   name: string
   description: string
   /**
-   * O substantivo do recurso, usado para montar o resumo de cada operação:
-   * `create` + `modalidade` -> "Criar modalidade". Escrever o par uma vez por grupo
-   * cobre as sete operações dele, em vez de um resumo por controller.
+   * The resource noun, used to build each operation's summary:
+   * `create` + `sport` -> "Create sport". Writing the pair once per group covers its
+   * seven operations, instead of one summary per controller.
    */
   singular?: string
   plural?: string
@@ -53,143 +53,146 @@ export type TagRule = {
 const tags: TagRule[] = [
   {
     prefix: '/authentication',
-    name: 'Autenticação',
+    name: 'Authentication',
     description:
-      'Entrada, saída e renovação de sessão. O par de tokens viaja em cookie `httpOnly`, ' +
-      'então estas rotas respondem `204` sem corpo - o que importa é o `Set-Cookie`.',
-    singular: 'sessão',
-    plural: 'sessões',
+      'Sign in, sign out and session renewal. The token pair travels in an `httpOnly` cookie, ' +
+      'so these routes answer `204` with no body - what matters is the `Set-Cookie`.',
+    singular: 'session',
+    plural: 'sessions',
   },
   {
     prefix: '/account',
-    name: 'Conta',
+    name: 'Account',
     description:
-      'A própria conta, seja qual for o papel. Sem identificador no caminho: o escopo vem da ' +
-      'sessão, nunca do payload - quem edita é sempre quem está autenticado.',
-    singular: 'conta',
-    plural: 'contas',
+      'The account itself, whatever the role. No identifier in the path: the scope comes from the ' +
+      'session, never from the payload - whoever edits is always whoever is authenticated.',
+    singular: 'account',
+    plural: 'accounts',
   },
   {
     prefix: '/storages',
-    name: 'Anexos',
+    name: 'Attachments',
     description:
-      'Upload em três passos, porque o binário **não** atravessa esta aplicação: o ' +
-      '`POST` abre e devolve URLs assinadas, o navegador sobe as partes direto no bucket, e o ' +
-      '`complete` confirma contra o objeto real. O registro nasce sem dono - quem anexa guarda ' +
-      'a referência.',
-    singular: 'anexo',
-    plural: 'anexos',
+      'Upload in three steps, because the binary does **not** cross this application: ' +
+      '`POST` opens and returns signed URLs, the browser uploads the parts straight to the bucket, and ' +
+      '`complete` confirms against the real object. The record is born without an owner - whoever attaches ' +
+      'keeps the reference.',
+    singular: 'attachment',
+    plural: 'attachments',
   },
   {
     prefix: '/administrator/classrooms',
-    name: 'Painel · Turmas',
+    name: 'Panel · Classrooms',
     description:
-      'As turmas que competem. A categoria (Fundamental 1 ou 2) sai do ano, e cada turma tem ' +
-      'um professor conselheiro e um aluno representante.',
-    singular: 'turma',
-    plural: 'turmas',
+      'The classrooms that compete. The category (Fundamental 1 or 2) comes from the grade, and each classroom has ' +
+      'a teacher advisor and a student representative.',
+    singular: 'classroom',
+    plural: 'classrooms',
   },
   {
     prefix: '/administrator/sports',
-    name: 'Painel · Modalidades',
-    description: 'Futsal, vôlei, queimada... Cada uma com o mínimo e o máximo de atletas por time.',
-    singular: 'modalidade',
-    plural: 'modalidades',
+    name: 'Panel · Sports',
+    description:
+      'Futsal, volleyball, dodgeball... Each with its minimum and maximum athletes per team.',
+    singular: 'sport',
+    plural: 'sports',
   },
   {
     prefix: '/administrator/announcements',
-    name: 'Painel · Avisos',
-    description: 'Os avisos que o site mostra. Fixados aparecem primeiro.',
-    singular: 'aviso',
-    plural: 'avisos',
+    name: 'Panel · Announcements',
+    description: 'The announcements the site shows. Pinned ones appear first.',
+    singular: 'announcement',
+    plural: 'announcements',
   },
   {
     prefix: '/administrator/reports',
-    name: 'Painel · Relatórios',
-    description: 'Quantas turmas, alunos e atletas participaram dos jogos, na tela ou em CSV.',
-    singular: 'relatório',
-    plural: 'relatórios',
+    name: 'Panel · Reports',
+    description:
+      'How many classrooms, students and athletes took part in the games, on screen or as CSV.',
+    singular: 'report',
+    plural: 'reports',
   },
   {
     prefix: '/administrator/photos',
-    name: 'Painel · Fotos',
+    name: 'Panel · Photos',
     description:
-      'As fotos do carrossel do site. As do conselheiro chegam pendentes e só vão ao ar ' +
-      'depois de aprovadas.',
-    singular: 'foto',
-    plural: 'fotos',
+      'The site carousel photos. Those from the advisor arrive pending and only go live ' +
+      'once approved.',
+    singular: 'photo',
+    plural: 'photos',
   },
   {
     prefix: '/administrator/site',
-    name: 'Painel · Site',
+    name: 'Panel · Site',
     description:
-      'O "Sobre" dos jogos e o regulamento em PDF que o site público mostra. Uma configuração só.',
-    singular: 'configuração',
-    plural: 'configurações',
+      'The games "About" and the PDF regulation the public site shows. A single configuration.',
+    singular: 'configuration',
+    plural: 'configurations',
   },
   {
     prefix: '/administrator/brackets',
-    name: 'Painel · Chaves',
+    name: 'Panel · Brackets',
     description:
-      'O sorteio de uma modalidade numa categoria, que monta o mata-mata inteiro. Chave não ' +
-      'se edita: apaga e sorteia de novo.',
-    singular: 'chave',
-    plural: 'chaves',
+      'The draw of a sport in a category, which builds the whole knockout. A bracket is not ' +
+      'edited: delete it and draw again.',
+    singular: 'bracket',
+    plural: 'brackets',
   },
   {
     prefix: '/administrator/matches',
-    name: 'Painel · Partidas',
-    description: 'A agenda e o placar. As partidas nascem do sorteio, nunca à mão.',
-    singular: 'partida',
-    plural: 'partidas',
+    name: 'Panel · Matches',
+    description: 'The schedule and the score. Matches are born from the draw, never by hand.',
+    singular: 'match',
+    plural: 'matches',
   },
   {
     prefix: '/administrator/cards',
-    name: 'Painel · Cartões',
-    description: 'Os cartões amarelos e vermelhos que os atletas levaram nas partidas.',
-    singular: 'cartão',
-    plural: 'cartões',
+    name: 'Panel · Cards',
+    description: 'The yellow and red cards athletes received in matches.',
+    singular: 'card',
+    plural: 'cards',
   },
   {
     prefix: '/administrator/enrollment-removals',
-    name: 'Painel · Remoções de atleta',
-    description: 'O aviso de cada atleta que o conselheiro tirou de uma modalidade, com o motivo.',
-    singular: 'aviso de remoção',
-    plural: 'avisos de remoção',
+    name: 'Panel · Athlete removals',
+    description: 'The notice for each athlete the advisor removed from a sport, with the reason.',
+    singular: 'removal notice',
+    plural: 'removal notices',
   },
   {
     prefix: '/administrator/users',
-    name: 'Painel · Usuários',
+    name: 'Panel · Users',
     description:
-      'As contas de acesso: administradores, professores conselheiros e alunos representantes. ' +
-      'Não há cadastro público - toda conta nasce aqui. A senha não sai em resposta nenhuma.',
-    singular: 'usuário',
-    plural: 'usuários',
+      'The access accounts: administrators, teacher advisors and student representatives. ' +
+      'There is no public sign-up - every account is born here. The password is never returned in any response.',
+    singular: 'user',
+    plural: 'users',
   },
   {
     prefix: '/advisor',
-    name: 'Conselheiro',
+    name: 'Advisor',
     description:
-      'Os alunos e as inscrições das turmas que o professor aconselha. Turma de outro ' +
-      'conselheiro responde `404`.',
-    singular: 'turma',
-    plural: 'turmas',
+      'The students and enrollments of the classrooms the teacher advises. A classroom of ' +
+      'another advisor answers `404`.',
+    singular: 'classroom',
+    plural: 'classrooms',
   },
   {
     prefix: '/representative',
-    name: 'Representante',
-    description: 'A lista de atletas da própria turma, por modalidade. A turma sai da sessão.',
-    singular: 'inscrição',
-    plural: 'inscrições',
+    name: 'Representative',
+    description:
+      'The athlete list of their own classroom, per sport. The classroom comes from the session.',
+    singular: 'enrollment',
+    plural: 'enrollments',
   },
   {
     prefix: '/storefront',
     name: 'Site',
     description:
-      'O site público, **sem autenticação** e somente leitura: tabela de jogos, classificação, ' +
-      'chaves e avisos.',
+      'The public site, **unauthenticated** and read-only: match table, standings, ' +
+      'brackets and announcements.',
     singular: 'item',
-    plural: 'itens',
+    plural: 'items',
   },
 ]
 
@@ -198,41 +201,41 @@ const openapi = {
     title: 'API Interclasse',
     version: '1.0.0',
     description:
-      'API dos Jogos Estudantis: turmas, inscrições, sorteio, tabela de jogos, placar e ' +
-      'classificação, com painel da organização, do conselheiro e do representante.\n\n' +
-      'O site (`/storefront`) responde sem sessão. Todo o resto exige o cookie `httpOnly` ' +
-      '`access-token`, emitido por `POST /authentication/sign-in` e renovado por ' +
+      'Student Games API: classrooms, enrollments, draw, match table, score and ' +
+      'standings, with panels for the organization, the advisor and the representative.\n\n' +
+      'The site (`/storefront`) answers without a session. Everything else requires the `httpOnly` cookie ' +
+      '`access-token`, issued by `POST /authentication/sign-in` and renewed by ' +
       '`POST /authentication/refresh`.\n\n' +
-      'Toda falha devolve o mesmo corpo: `{ message, status, code, errors? }`, onde `code` é o ' +
-      'identificador de máquina e `errors` mapeia campo para mensagem quando a falha é por ' +
-      'campo.',
+      'Every failure returns the same body: `{ message, status, code, errors? }`, where `code` is the ' +
+      'machine identifier and `errors` maps field to message when the failure is per ' +
+      'field.',
   },
 
-  servers: [{ url: env.get('APP_SERVER_URL'), description: 'Servidor atual' }],
+  servers: [{ url: env.get('APP_SERVER_URL'), description: 'Current server' }],
 
-  /** Caminhos que nunca entram no documento: não são operação de API. */
+  /** Paths that never enter the document: they are not API operations. */
   ignore: ['/documentation', '/openapi.json', '/health-check'],
 
   tags,
 }
 
 /**
- * Resumo fixo para ação de domínio deste projeto - ou que precisa de outra
- * frase.
+ * Fixed summary for a domain action of this project - or one that needs another
+ * phrase.
  *
- * `scripts/openapi/emit.ts` é igual em todo projeto da casa, então a tabela de
- * ações dele é de mecanismo: `create`, `paginate`, `show`, `update`, `archive`,
- * `unarchive`, `delete` mais as de sessão e upload. Um nome de domínio ali
- * viraria resumo errado em outro projeto, e é este arquivo - que é do
- * projeto - o lugar de dizer o que só vale aqui.
+ * `scripts/openapi/emit.ts` is the same in every house project, so its action table
+ * is about mechanism: `create`, `paginate`, `show`, `update`, `archive`,
+ * `unarchive`, `delete` plus the session and upload ones. A domain name there would
+ * become a wrong summary in another project, and this file - which belongs to the
+ * project - is the place to say what only holds here.
  *
- * A chave é o nome do arquivo do controller sem o sufixo, e o valor ganha de
- * tudo: se estiver aqui, nem a tabela de mecanismo nem o substantivo do grupo
- * são consultados.
+ * The key is the controller file name without the suffix, and the value beats
+ * everything: if it is here, neither the mechanism table nor the group noun
+ * is consulted.
  */
 export const ACTION_OVERRIDES: Record<string, string> = {
-  score: 'Lançar placar',
-  unscore: 'Desfazer placar',
+  score: 'Enter score',
+  unscore: 'Undo score',
 }
 
 export default openapi

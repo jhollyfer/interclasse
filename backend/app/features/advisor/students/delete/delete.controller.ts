@@ -10,9 +10,9 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdvisorStudentDeleteController {
   static docs = defineDocs({
     description:
-      'Tira o aluno da turma, com as inscrições dele. Aluno inscrito numa modalidade já ' +
-      'sorteada responde `409`: o time sorteado perderia um atleta. Aluno de turma alheia ' +
-      'responde `404`.',
+      'Removes the student from the classroom, with their enrollments. A student enrolled in a sport already ' +
+      'drawn responds `409`: the drawn team would lose an athlete. A student from a foreign classroom ' +
+      'responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorStudentDeleteUseCase) {}

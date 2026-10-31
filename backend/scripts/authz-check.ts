@@ -1,21 +1,21 @@
 /**
- * Reprova mudanca na cadeia de autorizacao de qualquer rota.
+ * Fails on any change in the authorization chain of any route.
  *
- * O que se quer pegar aqui e a rota que abriu sem querer: um `role()` que saiu
- * do grupo, um `auth()` esquecido num endpoint novo, um papel a mais numa lista.
- * Nenhuma dessas mudancas quebra teste - a rota continua respondendo, so que
- * para mais gente -, e nenhuma se destaca num diff grande.
+ * What we want to catch here is the route that opened by accident: a `role()` that left
+ * the group, an `auth()` forgotten on a new endpoint, an extra role in a list.
+ * None of these changes breaks a test - the route keeps answering, only
+ * to more people -, and none stands out in a big diff.
  *
- * A fonte e o `openapi.json`, que ja carrega `security` e `x-roles` colhidos da
- * propria cadeia de middleware por `app/core/openapi/document.ts`. Ler dali, e
- * nao o router de novo, evita uma segunda implementacao da mesma leitura -- que
- * e como as duas passam a discordar.
+ * The source is `openapi.json`, which already carries `security` and `x-roles` collected from the
+ * middleware chain itself by `app/core/openapi/document.ts`. Reading from there, rather than
+ * the router again, avoids a second implementation of the same reading -- which is
+ * how the two come to disagree.
  *
- * O baseline e versionado. Mudanca intencional entra no mesmo commit da rota,
- * com `--write`, e o diff do baseline e o que o revisor le: uma linha por rota,
- * dizendo quem pode chamar.
+ * The baseline is versioned. An intentional change goes in the same commit as the route,
+ * with `--write`, and the baseline diff is what the reviewer reads: one line per route,
+ * saying who can call it.
  *
- * Uso:
+ * Usage:
  *   node --import @poppinss/ts-exec scripts/authz-check.ts
  *   node --import @poppinss/ts-exec scripts/authz-check.ts --write
  */
@@ -25,7 +25,7 @@ import { dirname, join, resolve } from 'node:path'
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
 const DOCUMENT = join(ROOT, 'openapi.json')
-// `AUTHZ_BASELINE` troca o arquivo só para a spec do script provar a recusa sem tocar o baseline real.
+// `AUTHZ_BASELINE` swaps the file only so the script spec can prove the refusal without touching the real baseline.
 const BASELINE = process.env.AUTHZ_BASELINE ?? join(ROOT, 'app/core/openapi/authz-baseline.json')
 
 type Operation = {
@@ -37,14 +37,14 @@ type OpenapiDocument = {
   paths: Record<string, Record<string, Operation>>
 }
 
-/** `anonima`, `autenticada`, ou os papeis em ordem. */
+/** `anonymous`, `authenticated`, or the roles in order. */
 function protectionOf(operation: Operation): string {
   const roles = operation['x-roles'] ?? []
   if (roles.length > 0) return [...roles].sort().join(', ')
 
-  if (operation.security && operation.security.length > 0) return 'autenticada'
+  if (operation.security && operation.security.length > 0) return 'authenticated'
 
-  return 'anonima'
+  return 'anonymous'
 }
 
 async function current(): Promise<Record<string, string>> {
@@ -76,7 +76,7 @@ function report(baseline: Record<string, string>, now: Record<string, string>): 
     }
 
     if (after === undefined) {
-      removed.push(`  - ${route}  (era ${before})`)
+      removed.push(`  - ${route}  (was ${before})`)
       continue
     }
 

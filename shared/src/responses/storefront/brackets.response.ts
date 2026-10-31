@@ -5,8 +5,8 @@ import {
 } from '../administrator/brackets.response.js'
 
 /**
- * A chave no site: a mesma forma do painel. Nome de turma, placar e fase são
- * públicos por natureza.
+ * The bracket on the site: the same shape as the panel. Classroom name, score and
+ * phase are public by nature.
  */
 export const StorefrontBracketPaginateResponse =
   AdministratorBracketPaginateResponse

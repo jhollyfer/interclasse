@@ -10,12 +10,12 @@ import HTTPException from '#exceptions/http.exception'
 import { RESPONSES } from '#core/openapi/response'
 
 /**
- * Lê o contrato que o código já declara.
+ * Reads the contract the code already declares.
  *
- * Esta é a diferença em relação ao `adonis-autoswagger`: lá a documentação vem
- * de JSDoc que alguém escreve no controller, então uma rota só aparece completa
- * se alguém lembrou de anotá-la - e cada rota vira um bloco de comentário para
- * manter. Aqui o controller já diz tudo:
+ * This is the difference from `adonis-autoswagger`: there the documentation comes
+ * from JSDoc someone writes on the controller, so a route only shows up complete
+ * if someone remembered to annotate it - and every route becomes a comment block to
+ * maintain. Here the controller already says everything:
  *
  * ```ts
  * const payload = await context.request.validateUsing(AdministratorNoticeCreateValidator)
@@ -24,12 +24,12 @@ import { RESPONSES } from '#core/openapi/response'
  * return context.response.created(result.value)
  * ```
  *
- * Payload, origem do payload e status de sucesso estão ali, escritos pelo
- * mesmo código que roda em produção. Ler o AST em vez de pedir declaração faz o
- * documento não ter como divergir: mudar o validator do controller muda a
- * documentação no próximo `openapi:generate`, sem ninguém lembrar de nada.
+ * Payload, payload origin and success status are there, written by the
+ * same code that runs in production. Reading the AST instead of asking for a declaration makes the
+ * document unable to diverge: changing the controller's validator changes the
+ * documentation on the next `openapi:generate`, with nobody remembering anything.
  *
- * O use-case irmão fornece os erros do domínio, pelo mesmo raciocínio.
+ * The sibling use case supplies the domain errors, by the same reasoning.
  */
 
 type IntrospectedError = {
@@ -46,14 +46,14 @@ export type Introspection = {
   errors: IntrospectedError[]
   /** `create`, `update`, `show`, `paginate`, `delete`... */
   action: string
-  /** Diretório da feature, para achar a entrada dela em `#core/response`. */
+  /** Feature directory, to find its entry in `#core/response`. */
   directory: string
 }
 
 /**
- * Métodos de `response` que carregam o status no nome. Nenhum controller do
- * projeto usa `response.status(n)`, e se algum passar a usar o status fica
- * indefinido em vez de errado.
+ * `response` methods that carry the status in the name. No controller in the
+ * project uses `response.status(n)`, and if one starts to, the status becomes
+ * undefined instead of wrong.
  */
 const RESPONSE_STATUS: Record<string, number> = {
   ok: 200,
@@ -63,11 +63,11 @@ const RESPONSE_STATUS: Record<string, number> = {
 }
 
 /**
- * Status de cada fábrica do `HTTPException`, montado chamando as próprias
- * fábricas.
+ * Status of each `HTTPException` factory, built by calling the factories
+ * themselves.
  *
- * Uma tabela escrita à mão aqui divergiria no dia em que alguém mudasse o
- * status de uma fábrica. Perguntar ao objeto não tem esse risco.
+ * A hand-written table here would diverge the day someone changed the
+ * status of a factory. Asking the object has no such risk.
  */
 function factoryStatuses(): Record<string, number> {
   const statuses: Record<string, number> = {}
@@ -83,7 +83,7 @@ function factoryStatuses(): Record<string, number> {
 
       if (instance instanceof HTTPException) statuses[name] = instance.status
     } catch {
-      // Fábrica com assinatura diferente do esperado: ignorada, não adivinhada.
+      // Factory with a signature different from the expected: ignored, not guessed.
     }
   }
 
@@ -93,7 +93,7 @@ function factoryStatuses(): Record<string, number> {
 const FACTORY_STATUS = factoryStatuses()
 
 // ---------------------------------------------------------------------------
-// Leitura do AST
+// AST reading
 // ---------------------------------------------------------------------------
 
 async function parse(file: string): Promise<ts.SourceFile> {
@@ -107,7 +107,7 @@ function walk(node: ts.Node, visit: (node: ts.Node) => void) {
   ts.forEachChild(node, (child) => walk(child, visit))
 }
 
-/** Mapa identificador -> especificador de import, para resolver o validator. */
+/** Identifier -> import specifier map, to resolve the validator. */
 function collectImports(source: ts.SourceFile): Map<string, string> {
   const imports = new Map<string, string>()
 
@@ -135,11 +135,11 @@ function calleeText(call: ts.CallExpression): string {
 }
 
 /**
- * De onde o payload vem, pelo argumento da chamada.
+ * Where the payload comes from, by the call argument.
  *
- * `request.validateUsing(X)` sem opção valida o corpo; com `{ data: ... }` a
- * origem é a que a opção aponta (`context.request.qs()`, `context.params`).
- * `Validator.validate(...)` diz a origem no próprio argumento.
+ * `request.validateUsing(X)` with no option validates the body; with `{ data: ... }` the
+ * origin is the one the option points to (`context.request.qs()`, `context.params`).
+ * `Validator.validate(...)` states the origin in the argument itself.
  */
 function sourceOf(call: ts.CallExpression): 'body' | 'query' | 'params' | undefined {
   const callee = calleeText(call)
@@ -160,10 +160,10 @@ function sourceOf(call: ts.CallExpression): 'body' | 'query' | 'params' | undefi
 
   const text = argument.getText()
 
-  // O argumento pode ser a origem direta (`context.params`) ou um objeto que a
-  // espalha (`{ ...context.request.body() }`), que é como os controllers de
-  // atualização juntam corpo e parâmetros. Procurar a origem dentro do texto
-  // cobre as duas formas.
+  // The argument can be the direct origin (`context.params`) or an object that
+  // spreads it (`{ ...context.request.body() }`), which is how the update controllers
+  // join body and params. Searching for the origin inside the text
+  // covers both forms.
   if (text.includes('.body(')) return 'body'
   if (text.includes('.qs(')) return 'query'
   if (text.includes('.params')) return 'params'
@@ -171,7 +171,7 @@ function sourceOf(call: ts.CallExpression): 'body' | 'query' | 'params' | undefi
   return undefined
 }
 
-/** O identificador do validator usado numa chamada. */
+/** The identifier of the validator used in a call. */
 function validatorName(call: ts.CallExpression): string | undefined {
   const callee = calleeText(call)
 
@@ -183,7 +183,7 @@ function validatorName(call: ts.CallExpression): string | undefined {
     return undefined
   }
 
-  // `XValidator.validate(...)` -> o nome está antes do ponto.
+  // `XValidator.validate(...)` -> the name is before the dot.
   const owner = callee.slice(0, -'.validate'.length)
 
   if (/^[A-Za-z_$][\w$]*$/.test(owner)) return owner
@@ -192,7 +192,7 @@ function validatorName(call: ts.CallExpression): string | undefined {
 }
 
 // ---------------------------------------------------------------------------
-// Resolução do validator
+// Validator resolution
 // ---------------------------------------------------------------------------
 
 function isValidator(value: unknown): value is DocumentedValidator {
@@ -202,11 +202,11 @@ function isValidator(value: unknown): value is DocumentedValidator {
 }
 
 /**
- * Importa o módulo do validator e devolve a instância exportada.
+ * Imports the validator module and returns the exported instance.
  *
- * Especificadores relativos são resolvidos contra o arquivo do controller;
- * `#alias/...` é entregue ao Node, que já sabe resolvê-lo pelo mapa `imports`
- * do `package.json`.
+ * Relative specifiers are resolved against the controller file;
+ * `#alias/...` is handed to Node, which already knows how to resolve it through the `imports` map
+ * of `package.json`.
  */
 async function loadValidator(
   name: string,
@@ -232,13 +232,13 @@ async function loadValidator(
 }
 
 // ---------------------------------------------------------------------------
-// Erros do use-case
+// Use case errors
 // ---------------------------------------------------------------------------
 
 /**
- * As mensagens de negócio em pt-BR, a língua do documento (`_standards/openapi.md`,
- * "erros-do-use-case"): a chave é `<arquivo>.<caminho>`, como o `i18n.t()` do
- * Adonis resolve (_doc-lib/adonisjs.md#guides/digging-deeper/i18n).
+ * The business messages in pt-BR, the document language (`_standards/openapi.md`,
+ * "erros-do-use-case"): the key is `<file>.<path>`, as Adonis's `i18n.t()`
+ * resolves it (_doc-lib/adonisjs.md#guides/digging-deeper/i18n).
  */
 const PT_BR_MESSAGES: ReadonlyMap<string, string> = (() => {
   const messages = new Map<string, string>()
@@ -264,8 +264,8 @@ const PT_BR_MESSAGES: ReadonlyMap<string, string> = (() => {
 })()
 
 /**
- * O texto da mensagem: literal, ou a chave de `t('chave')` / `this.i18n.t('chave')`
- * resolvida em pt-BR. Chave montada em variável não é adivinhada.
+ * The message text: a literal, or the key of `t('key')` / `this.i18n.t('key')`
+ * resolved in pt-BR. A key built in a variable is not guessed.
  */
 function messageText(node: ts.Expression): string | undefined {
   if (ts.isStringLiteralLike(node)) return node.text
@@ -281,10 +281,10 @@ function messageText(node: ts.Expression): string | undefined {
 }
 
 /**
- * Coleta `HTTPException.Fábrica(mensagem, 'CODE')` sob um nó.
+ * Collects `HTTPException.Factory(message, 'CODE')` under a node.
  *
- * Só argumentos literais são lidos. Code montado em variável não é adivinhado -
- * ficaria de fora e o `--strict` cobra, que é melhor que documentar um palpite.
+ * Only literal arguments are read. A code built in a variable is not guessed -
+ * it would be left out and `--strict` charges for it, which is better than documenting a guess.
  */
 function collectErrors(root: ts.Node, errors: IntrospectedError[], seen: Set<string>): void {
   walk(root, function (node) {
@@ -316,7 +316,7 @@ function collectErrors(root: ts.Node, errors: IntrospectedError[], seen: Set<str
 }
 
 // ---------------------------------------------------------------------------
-// Tradutor `_shared.<recurso>-refusal.ts`
+// Translator `_shared.<resource>-refusal.ts`
 // ---------------------------------------------------------------------------
 
 const BACKEND_ROOT = resolve(dirname(new URL(import.meta.url).pathname), '../..')
@@ -326,8 +326,8 @@ const REFUSAL_IMPORT = /_shared\.[a-z-]+-refusal(\.ts)?$/
 let featureProgramCache: ts.Program | undefined
 
 /**
- * O programa com os use-cases como raiz, criado uma vez: o tipo do fato que
- * chega ao tradutor só o checador sabe, e ele precisa dos imports resolvidos.
+ * The program with the use cases as root, created once: the type of the fact that
+ * reaches the translator is only known to the checker, and it needs the imports resolved.
  */
 function featureProgram(): ts.Program | undefined {
   if (featureProgramCache) return featureProgramCache
@@ -348,7 +348,7 @@ function featureProgram(): ts.Program | undefined {
   return featureProgramCache
 }
 
-/** Os `code` de cada fato que o argumento pode ser, lidos do tipo dele. */
+/** The `code` of each fact the argument can be, read from its type. */
 function factCodes(argument: ts.Expression, checker: ts.TypeChecker): string[] {
   const codeSymbol = checker.getTypeAtLocation(argument).getProperty('code')
 
@@ -362,17 +362,17 @@ function factCodes(argument: ts.Expression, checker: ts.TypeChecker): string[] {
   return members.filter((member) => member.isStringLiteral()).map((member) => member.value)
 }
 
-/** O nome de uma chave de objeto ou de método, quando é literal. */
+/** The name of an object key or method, when it is a literal. */
 function entryKey(name: ts.PropertyName): string | undefined {
   if (ts.isIdentifier(name) || ts.isStringLiteralLike(name)) return name.text
   return undefined
 }
 
 /**
- * Os erros que o use-case recusa por um `_shared.<recurso>-refusal.ts`: da
- * tabela, só as entradas dos fatos que ele pode receber (o tipo do argumento de
- * `Refusal.http(fato, i18n)`); de qualquer outro método estático do tradutor, o
- * corpo inteiro (`_standards/openapi.md`, "erros-do-use-case").
+ * The errors the use case refuses through a `_shared.<resource>-refusal.ts`: from the
+ * table, only the entries of the facts it can receive (the type of the argument of
+ * `Refusal.http(fact, i18n)`); from any other static method of the translator, the
+ * whole body (`_standards/openapi.md`, "erros-do-use-case").
  */
 async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> {
   const program = featureProgram()
@@ -380,7 +380,7 @@ async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> 
   if (!program) return []
 
   const checker = program.getTypeChecker()
-  // Caminho do tradutor -> o que se pede dele (`code` de fato ou `method:<nome>`).
+  // Translator path -> what is asked of it (a fact `code` or `method:<name>`).
   const wanted = new Map<string, Set<string>>()
 
   for (const sourceFile of sharedChain(program, useCase)) {
@@ -444,7 +444,7 @@ async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> 
   return errors
 }
 
-/** O arquivo de `app/features` que o especificador (relativo ou `#features/`) aponta. */
+/** The `app/features` file the specifier (relative or `#features/`) points to. */
 function featurePath(specifier: string, from: string): string | undefined {
   let base: string | undefined
 
@@ -462,8 +462,8 @@ function featurePath(specifier: string, from: string): string | undefined {
 }
 
 /**
- * O use-case e os `_shared.*` que ele importa, de forma transitiva: a base
- * `_shared.<tema>.base` que ele estende também chama o tradutor.
+ * The use case and the `_shared.*` it imports, transitively: the
+ * `_shared.<theme>.base` it extends also calls the translator.
  */
 function sharedChain(program: ts.Program, useCase: string): ts.SourceFile[] {
   const visited = new Map<string, ts.SourceFile>()
@@ -488,7 +488,7 @@ function sharedChain(program: ts.Program, useCase: string): ts.SourceFile[] {
   return [...visited.values()]
 }
 
-/** Os erros do use-case irmão: os que ele escreve e os que o tradutor dele devolve. */
+/** The errors of the sibling use case: the ones it writes and the ones its translator returns. */
 async function readErrors(file: string): Promise<IntrospectedError[]> {
   let source
 
@@ -516,14 +516,14 @@ async function readErrors(file: string): Promise<IntrospectedError[]> {
 }
 
 // ---------------------------------------------------------------------------
-// Entrada
+// Entry
 // ---------------------------------------------------------------------------
 
 /**
- * Do `importExpression` da rota para o arquivo-fonte do controller.
+ * From the route's `importExpression` to the controller source file.
  *
- * O router guarda o texto da expressão inteira - `"()=>import('#features/...')"` -
- * e não só o especificador, então ele é extraído de dentro do `import()`.
+ * The router stores the text of the whole expression - `"()=>import('#features/...')"` -
+ * and not only the specifier, so it is extracted from inside the `import()`.
  */
 export function controllerPath(importExpression: string, appRoot: string): string | undefined {
   const specifier = importExpression.match(/import\(\s*['"]([^'"]+)['"]\s*\)/)?.[1]
@@ -536,15 +536,15 @@ export function controllerPath(importExpression: string, appRoot: string): strin
 }
 
 /**
- * A resposta da feature, lida do registro central em `#core/response`.
+ * The feature response, read from the central registry in `#core/response`.
  *
- * A chave é o caminho da pasta dentro de `app/features` - `administrator/sports`,
- * `storefront/photos`. Uma entrada por feature cobre as sete operações dela:
- * criar, listar, detalhar, atualizar, arquivar, restaurar e remover devolvem o
- * mesmo recurso, em envelopes que o gerador monta sozinho.
+ * The key is the folder path inside `app/features` - `administrator/sports`,
+ * `storefront/photos`. One entry per feature covers its seven operations:
+ * create, list, show, update, archive, restore and remove return the
+ * same resource, in envelopes the generator builds by itself.
  *
- * Um arquivo de resposta por pasta repetiria o schema `…Response` do `shared/`:
- * o mesmo contrato escrito duas vezes, e a segunda cópia envelhecendo calada.
+ * One response file per folder would repeat the `…Response` schema of `shared/`:
+ * the same contract written twice, and the second copy aging silently.
  */
 export function loadResponseSchema(
   directory: string,
@@ -554,8 +554,8 @@ export function loadResponseSchema(
   const features = resolve(appRoot, 'app/features')
   const key = relative(features, directory)
 
-  // A entrada da ação ganha da do recurso: `administrator/sports/paginate`
-  // aponta o item da lista quando ele não é a forma do detalhe
+  // The action entry beats the resource one: `administrator/sports/paginate`
+  // points to the list item when it is not the shape of the detail
   // (`_standards/openapi.md`, "registro-de-resposta").
   if (action) {
     const specific = RESPONSES[`${key}/${action}`]
@@ -575,8 +575,8 @@ export async function introspect(file: string): Promise<Introspection | undefine
   }
 
   const imports = collectImports(source)
-  // A ação é uma pasta (`users/archive/archive.controller.ts`), e o recurso é
-  // a pasta acima dela - é a chave de `RESPONSES`.
+  // The action is a folder (`users/archive/archive.controller.ts`), and the resource is
+  // the folder above it - it is the key of `RESPONSES`.
   const action = file.split('/').pop()?.replace('.controller.ts', '') ?? ''
   let directory = dirname(file)
   if (basename(directory) === action) directory = dirname(directory)

@@ -11,7 +11,7 @@ import { PhotoMemoryRepository } from '#repositories/photo/photo.memory.reposito
 
 type StorageRow = AdministratorPhotoShowResponse['storage']
 
-/** O arquivo do arranjo do repositório em memória: enviado, não arquivado. */
+/** The file of the in-memory repository arrangement: uploaded, not archived. */
 export function memoryStorage(overrides: Partial<StorageRow> = {}): StorageRow {
   return {
     id: randomUUID(),
@@ -29,12 +29,12 @@ export function memoryStorage(overrides: Partial<StorageRow> = {}): StorageRow {
   }
 }
 
-/** A conta de quem envia, no arranjo do repositório em memória. */
+/** The uploader's account, in the in-memory repository arrangement. */
 export function memoryAuthor(role: UserRole = USER_ROLE.ADVISOR) {
   return { id: randomUUID(), name: 'Ana', email: 'ana@mail.com', role }
 }
 
-/** O repositório em memória já com o arquivo e quem envia. */
+/** The in-memory repository already holding the file and the uploader. */
 export function memoryPhotos(storage: StorageRow, author: ReturnType<typeof memoryAuthor>) {
   return new PhotoMemoryRepository().withStorage(storage).withAuthor(author)
 }

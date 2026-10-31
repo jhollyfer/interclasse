@@ -1,4 +1,4 @@
-/** A fase de uma partida, nomeada pelo número de times que entram nela. */
+/** The phase of a match, named by the number of teams that enter it. */
 export const MATCH_PHASE = {
   ROUND_OF_16: 'ROUND_OF_16',
   QUARTER: 'QUARTER',

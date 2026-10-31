@@ -1,19 +1,19 @@
 import { SORT_DIRECTION, type SortDirection } from '@interclasse/shared'
 
 /**
- * A ordem que a consulta vai usar: o que o payload pediu, ou o padrão do
- * recurso. Feito para ser espalhado - `query.orderBy(...sortOrder(payload,
+ * The order the query will use: what the payload asked for, or the resource's
+ * default. Made to be spread - `query.orderBy(...sortOrder(payload,
  * 'createdAt'))`.
  *
- * O `fallback` é obrigatório porque é a ordem que a listagem já tinha antes de
- * aceitar o parâmetro: quem não manda `?sort` recebe exatamente a mesma
- * resposta de antes.
+ * The `fallback` is required because it is the order the listing already had before
+ * accepting the parameter: whoever does not send `?sort` gets exactly the same
+ * response as before.
  *
- * A coluna não é conferida aqui - quem fecha a lista é o `sortFields()` do
- * validator, antes de o payload chegar ao use-case.
+ * The column is not checked here - the validator's `sortFields()` closes
+ * the list, before the payload reaches the use case.
  *
- * Só serve a listagem cujo padrão é **crescente** - catálogo, cadastro, tudo
- * que se lê em ordem alfabética. Feed cronológico usa `recentFirst()`.
+ * Only for listings whose default is **ascending** - catalogs, registries, anything
+ * read in alphabetical order. A chronological feed uses `recentFirst()`.
  */
 export function sortOrder<TColumn extends string>(
   payload: { sort?: TColumn; direction?: SortDirection },
@@ -23,16 +23,16 @@ export function sortOrder<TColumn extends string>(
 }
 
 /**
- * A ordem de uma listagem cronológica: `createdAt` **decrescente**, ao
- * contrário de todas as outras. Espalhado como o irmão -
+ * The order of a chronological listing: `createdAt` **descending**, unlike
+ * all the others. Spread like its sibling -
  * `query.orderBy(...recentFirst(payload))`.
  *
- * Existe porque `sortOrder()` assume `asc`, e num feed o que interessa é o
- * último registro, não o primeiro.
+ * It exists because `sortOrder()` assumes `asc`, and in a feed what matters is the
+ * latest record, not the first.
  *
- * Função com nome próprio, e não um parâmetro de direção em `sortOrder()`: a
- * exceção fica visível na chamada, em vez de escondida atrás de um argumento
- * que ninguém lê ao passar os olhos pela consulta.
+ * A function with its own name, and not a direction parameter on `sortOrder()`: the
+ * exception stays visible at the call site, instead of hidden behind an argument
+ * nobody reads when skimming the query.
  */
 export function recentFirst<TColumn extends string>(payload: {
   sort?: TColumn

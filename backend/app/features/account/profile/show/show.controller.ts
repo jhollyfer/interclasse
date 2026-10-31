@@ -8,12 +8,12 @@ import { defineDocs } from '#core/openapi/types'
 @inject()
 export default class AccountProfileShowController {
   static docs = defineDocs({
-    summary: 'Ler a própria conta',
+    summary: 'Read own account',
     description:
-      'A própria conta, seja qual for o papel. O usuário vem sempre da sessão: não há ' +
-      'identificador no caminho, e não teria como haver - o escopo vem do token, nunca do ' +
+      'The own account, whatever the role. The user always comes from the session: there is no ' +
+      'identifier in the path, and there could not be - the scope comes from the token, never from the ' +
       'payload.\n\n' +
-      'O avatar vem precarregado, com a `url` derivada na serialização.',
+      'The avatar comes preloaded, with the `url` derived at serialization.',
   })
 
   constructor(private readonly useCase: AccountProfileShowUseCase) {}

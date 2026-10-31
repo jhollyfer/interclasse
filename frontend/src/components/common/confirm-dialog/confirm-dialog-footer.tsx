@@ -12,10 +12,10 @@ import { m } from '#/paraglide/messages'
 import { useConfirmDialogContext } from './confirm-dialog-context'
 
 /**
- * A linha de botões. Em telas estreitas ela empilha, com a saída por cima.
+ * The row of buttons. On narrow screens it stacks, with the exit on top.
  *
- * Sem children, "Cancelar" e "Confirmar": um rodapé vazio deixava o alerta sem
- * botão nenhum, e quem abria só saía pelo Esc.
+ * Without children, "Cancelar" and "Confirmar": an empty footer left the alert with
+ * no button at all, and whoever opened it could only leave with Esc.
  */
 export function ConfirmDialogFooter({
   children,
@@ -34,8 +34,8 @@ export function ConfirmDialogFooter({
 }
 
 /**
- * A saída. Sem children escreve "Cancelar", que é o que toda confirmação do
- * painel diz.
+ * The exit. Without children it writes "Cancelar", which is what every dashboard
+ * confirmation says.
  */
 export function ConfirmDialogCancel({
   children = m.common_cancel(),
@@ -61,11 +61,11 @@ type ConfirmDialogConfirmProps = Readonly<
 >
 
 /**
- * O botão que confirma.
+ * The button that confirms.
  *
- * A ação e o peso dela vêm do contexto, não de prop: quem os declara é a tela,
- * no `ConfirmDialog`, e repeti-los aqui daria duas fontes de verdade para a
- * mesma decisão.
+ * The action and its weight come from the context, not from a prop: the screen declares
+ * them, in `ConfirmDialog`, and repeating them here would give two sources of truth for
+ * the same decision.
  */
 export function ConfirmDialogConfirm({
   children,
@@ -78,9 +78,9 @@ export function ConfirmDialogConfirm({
   let variant: 'destructive' | 'default' = 'default'
   if (destructive) variant = 'destructive'
 
-  // `variant` direto no `AlertDialogAction`, que já é um `Button`: por
-  // `render`, o `Button` de fora aplicava as classes do `default` por cima, e
-  // o "Remover" saía verde.
+  // `variant` directly on `AlertDialogAction`, which is already a `Button`: through
+  // `render`, the outer `Button` applied the `default` classes on top, and
+  // the "Remover" came out green.
   return (
     <AlertDialogAction
       data-slot="confirm-dialog-confirm"

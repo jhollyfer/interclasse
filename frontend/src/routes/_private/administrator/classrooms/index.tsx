@@ -6,7 +6,7 @@ import { LIST_SEARCH_DEFAULTS } from '#/lib/list-search'
 
 import { validateSearch } from './-search'
 
-/** Todas de uma vez: a escola tem 24 turmas, e o cartão não pagina. */
+/** All at once: the school has 24 classrooms, and the card list does not paginate. */
 export const CLASSROOM_GRID = { perPage: 100 }
 
 export const Route = createFileRoute('/_private/administrator/classrooms/')({

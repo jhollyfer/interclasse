@@ -34,7 +34,7 @@
 | # | Usuário faz | Sistema responde | Tela |
 |---|---|---|---|
 | 1 | abre "Entrar" | mostra o formulário | `/sign-in` |
-| 2 | preenche e-mail e senha e envia | cria a sessão em cookie e abre o painel | `/painel` |
+| 2 | preenche e-mail e senha e envia | cria a sessão em cookie e abre o painel | `/dashboard` |
 | 3 | nada | redireciona cada papel à primeira tela: organização em `/administrator`, conselheiro em `/advisor`, representante em `/representative` | área do papel |
 
 **Caminhos alternativos**
@@ -252,11 +252,11 @@
 | # | Usuário faz | Sistema responde | Tela |
 |---|---|---|---|
 | 1 | abre o site | mostra os últimos resultados, os próximos jogos, a classificação em abas, avisos e o carrossel de fotos aprovadas | `/` |
-| 2 | abre "Jogos" | tabela com filtros de modalidade, categoria e situação | `/jogos` |
-| 3 | abre "Classificação" | abas por categoria (Fundamental 1, Fundamental 2) e modalidade, sem sair da página | `/classificacao` |
-| 4 | abre uma chave | árvore do mata-mata | `/classificacao/$id` |
-| 5 | abre "Avisos" | lista paginada | `/avisos` |
-| 6 | abre "Sobre" | texto da organização, regulamento em PDF e Instagram | `/sobre` |
+| 2 | abre "Jogos" | tabela com filtros de modalidade, categoria e situação | `/matches` |
+| 3 | abre "Classificação" | abas por categoria (Fundamental 1, Fundamental 2) e modalidade, sem sair da página | `/standings` |
+| 4 | abre uma chave | árvore do mata-mata | `/standings/$id` |
+| 5 | abre "Avisos" | lista paginada | `/announcements` |
+| 6 | abre "Sobre" | texto da organização, regulamento em PDF e Instagram | `/about` |
 
 **Caminhos alternativos**
 
@@ -280,7 +280,7 @@
 |---|---|---|---|
 | 1 | preenche os campos | valida | `/administrator/site` |
 | 2 | envia o PDF do regulamento | sobe direto ao bucket e confirma | `/administrator/site` |
-| 3 | salva | o site passa a mostrar o link de download | `/sobre` |
+| 3 | salva | o site passa a mostrar o link de download | `/about` |
 
 **Caminhos alternativos**
 

@@ -28,15 +28,15 @@ import { USER_FIELDS, USER_FORM_DEFAULTS, UserFormFields } from './form-fields'
 const FORM_ID = 'user-create'
 
 /**
- * O único caminho de criação de conta na API: não há cadastro público, e o
- * primeiro administrador vem do seeder. O módulo inteiro é de `ADMINISTRATOR`,
- * - quem não tem o papel leva `403` do backend, que é
- * onde a autorização de verdade mora.
+ * The only account-creation path in the API: there is no public sign-up, and the
+ * first administrator comes from the seeder. The whole module belongs to `ADMINISTRATOR`,
+ * - whoever lacks the role gets the backend's `403`, which is
+ * where the real authorization lives.
  */
 export function UserFormCreate(): React.JSX.Element {
-  // Os três parâmetros explícitos, e não inferidos como no molde de
-  // depoimento: `USER_FORM_DEFAULTS` é `DefaultValues<>`, que é um parcial
-  // profundo, e o compilador não tem como voltar dele ao tipo do formulário.
+  // The three parameters are explicit, and not inferred as in the testimonial
+  // mold: `USER_FORM_DEFAULTS` is `DefaultValues<>`, which is a deep partial,
+  // and the compiler has no way back from it to the form's type.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     AdministratorUserShowResponse,
@@ -50,13 +50,13 @@ export function UserFormCreate(): React.JSX.Element {
     invalidate: queryKeys.administrator.users.all,
     backTo: '/administrator/users',
     success: (user) => m.admin_users_created_ok({ name: user.name }),
-    // Com `retry`, ao contrário dos depoimentos: o `create.use-case.ts` recusa
-    // e-mail de conta viva com `409 USER_ALREADY_EXISTS`, então reenviar depois
-    // de um 5xx que possa ter gravado não cria uma segunda conta - esbarra no
-    // 409 e diz isso.
+    // With `retry`, unlike testimonials: `create.use-case.ts` refuses the
+    // e-mail of a live account with `409 USER_ALREADY_EXISTS`, so resending after
+    // a 5xx that may have saved does not create a second account - it bumps into the
+    // 409 and says so.
     retry: 'user-create-error',
-    // O resolver já validou; o `parse` devolve o tipo de criação, em que o
-    // formulário (o da atualização, tudo opcional) não prova nome, e-mail e papel.
+    // The resolver already validated; `parse` returns the create type, in which the
+    // form (the update one, everything optional) does not prove name, e-mail and role.
     payload: (values) => AdministratorUserCreateValidator.parse(values),
   })
 

@@ -5,9 +5,9 @@ import HTTPException from '#exceptions/http.exception'
 import type { PhotoError } from '#domain/photo/photo.errors'
 
 /**
- * Cada recusa da foto como resposta HTTP, a mesma no envio do painel e no do
- * conselheiro (`_standards/domain.md` §2). Tabela por `code`: fato novo sem
- * entrada não compila.
+ * Each refusal of the photo as an HTTP response, the same in the panel submission and in the
+ * advisor one (`_standards/domain.md` §2). Table by `code`: a new fact without an
+ * entry does not compile.
  */
 export class PhotoRefusal extends RefusalBase {
   private static readonly TABLE = {
@@ -21,7 +21,7 @@ export class PhotoRefusal extends RefusalBase {
     return PhotoRefusal.translate(PhotoRefusal.TABLE, error.code, error, i18n)
   }
 
-  /** O arquivo do envio não existe, não terminou de subir ou foi arquivado. */
+  /** The submission file does not exist, did not finish uploading or was archived. */
   static storageNotFound(i18n: I18n): HTTPException {
     return HTTPException.UnprocessableEntity(
       i18n.t('photos.storage_not_found'),

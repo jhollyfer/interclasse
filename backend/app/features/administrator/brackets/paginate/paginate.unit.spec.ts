@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('administrator/brackets > paginate (unit)', () => {
-  test('lista as chaves com a modalidade', async ({ assert }) => {
+  test('lists the brackets with the sport', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.drawn(brackets)
 
@@ -29,7 +29,7 @@ test.group('administrator/brackets > paginate (unit)', () => {
     assert.equal(result.isRight() && result.value.data[0]?.sport.name, sport.name)
   })
 
-  test('filtra por status', async ({ assert }) => {
+  test('filters by status', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     await BracketUnitFixtures.drawn(brackets)
 

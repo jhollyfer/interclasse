@@ -12,9 +12,9 @@ const authConfig = defineConfig({
 
   guards: {
     /**
-     * Sessão da API, transportada em cookie `httpOnly`. Reaproveita a
-     * maquinaria nativa de access tokens opacos do Adonis e troca o
-     * transporte: nada de cabeçalho `Authorization`.
+     * API session, carried in an `httpOnly` cookie. Reuses Adonis' native
+     * machinery of opaque access tokens and swaps the
+     * transport: no `Authorization` header.
      */
     api: cookieAccessTokensGuard(),
   },
@@ -34,9 +34,9 @@ declare module '@adonisjs/core/types' {
 }
 
 /**
- * Quem age na requisição, posto pelo `auth.middleware.ts` depois de validar a
- * conta contra o `ActorSchema` (_standards/backend.md §4.3). Declarado aqui, num
- * arquivo só de tipo e config, pelo mesmo motivo do `ctx.i18n`
+ * Who acts in the request, set by `auth.middleware.ts` after validating the
+ * account against the `ActorSchema` (_standards/backend.md §4.3). Declared here, in a
+ * type-and-config-only file, for the same reason as `ctx.i18n`
  * (`config/i18n.ts`).
  */
 declare module '@adonisjs/core/http' {

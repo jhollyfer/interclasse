@@ -6,7 +6,7 @@ import {
   runInRequestScope,
 } from './http.server'
 
-test('substitui o par que já existia e preserva o resto', () => {
+test('replaces the pair that already existed and preserves the rest', () => {
   const merged = mergeCookieHeader('access-token=s:velho.aaa; outro=1', [
     'access-token=s:novo.bbb; Path=/; HttpOnly; Max-Age=86400',
   ])
@@ -14,7 +14,7 @@ test('substitui o par que já existia e preserva o resto', () => {
   expect(merged).toBe('access-token=s:novo.bbb; outro=1')
 })
 
-test('acrescenta o par que ainda não existia', () => {
+test('appends the pair that did not exist yet', () => {
   const merged = mergeCookieHeader('outro=1', [
     'refresh-token=s:novo.ccc; Path=/; HttpOnly',
   ])
@@ -22,14 +22,14 @@ test('acrescenta o par que ainda não existia', () => {
   expect(merged).toBe('outro=1; refresh-token=s:novo.ccc')
 })
 
-test('parte de um header ausente', () => {
+test('starts from an absent header', () => {
   expect(
     mergeCookieHeader(undefined, ['access-token=s:novo.bbb; Path=/']),
   ).toBe('access-token=s:novo.bbb')
 })
 
-test('não parte o valor assinado no `=` interno', () => {
-  // O valor assinado do AdonisJS é base64 e pode terminar em `=`.
+test('does not split the signed value at the inner `=`', () => {
+  // AdonisJS's signed value is base64 and can end in `=`.
   const merged = mergeCookieHeader(undefined, [
     'access-token=s:abc==.hmac; Path=/',
   ])
@@ -37,30 +37,30 @@ test('não parte o valor assinado no `=` interno', () => {
   expect(merged).toBe('access-token=s:abc==.hmac')
 })
 
-test('fora de um ciclo de requisição não há escopo', () => {
+test('when outside a request cycle, there is no scope', () => {
   expect(requestScope()).toBeUndefined()
 })
 
-test('o escopo é visível de dentro e some ao sair', () => {
+test('makes the scope visible from inside and gone on exit', () => {
   const inside = runInRequestScope(() => requestScope())
 
   expect(inside).toEqual({ renewal: null })
   expect(requestScope()).toBeUndefined()
 })
 
-test('duas execuções concorrentes não compartilham escopo', async () => {
-  // É o caso que motiva o arquivo: dois visitantes atendidos pelo mesmo
-  // processo de SSR ao mesmo tempo. Se o escopo vazasse de um para o outro, a
-  // renovação de token de um seria reusada pelo outro - e o backend rotaciona,
-  // então o segundo terminaria com um cookie que já não vale.
-  async function visitor(marca: string) {
+test('does not share scope between two concurrent runs', async () => {
+  // This is the case that motivates the file: two visitors served by the same
+  // SSR process at the same time. If the scope leaked from one to the other, one's
+  // token renewal would be reused by the other - and the backend rotates,
+  // so the second would end up with a cookie that is no longer valid.
+  async function visitor(mark: string) {
     return runInRequestScope(async () => {
       const scope = requestScope()
       if (!scope) throw new Error('esperava escopo dentro de runInRequestScope')
-      scope.renewal = Promise.resolve(marca)
+      scope.renewal = Promise.resolve(mark)
 
-      // Cede o turno: sem o AsyncLocalStorage, é aqui que o outro visitante
-      // sobrescreveria o estado deste.
+      // Yields the turn: without AsyncLocalStorage, this is where the other visitor
+      // would overwrite this one's state.
       await new Promise((resolve) => setTimeout(resolve, 0))
 
       const after = requestScope()

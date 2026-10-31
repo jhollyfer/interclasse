@@ -3,9 +3,9 @@ import { UPLOAD_STATUSES } from '../../enums/upload-status.js'
 import { paginationFields, sortFields, z } from '../../validator.js'
 
 /**
- * Metadados do upload, nunca bytes. Par de caminho e nome do VineJS de
- * `backend/app/validators/storages/files.validator.ts`. O teto de `size` vem do
- * ambiente do servidor e só ele o cobra.
+ * Upload metadata, never bytes. Mirror (path and name) of the VineJS one in
+ * `backend/app/validators/storages/files.validator.ts`. The `size` ceiling comes from
+ * the server environment and only it enforces it.
  */
 export const StoragesFileCreateValidator = z.object({
   fileName: z.string().trim().min(1).max(255),
@@ -13,7 +13,7 @@ export const StoragesFileCreateValidator = z.object({
   size: z.number().int().min(1),
 })
 
-/** O `ETag` de cada parte enviada; ausente é upload de parte única. */
+/** The `ETag` of each uploaded part; absent means a single-part upload. */
 export const StoragesFileCompleteValidator = z.object({
   parts: z
     .array(

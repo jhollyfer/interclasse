@@ -17,7 +17,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, AdministratorAnnouncementShowResponse>
 
-/** Apaga de vez. Aviso vencido não tem o que restaurar. */
+/** Deletes for good. An expired announcement has nothing to restore. */
 @inject()
 export default class AdministratorAnnouncementDeleteUseCase {
   constructor(

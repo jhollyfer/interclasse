@@ -3,11 +3,11 @@ import { DateTime } from 'luxon'
 import { AnnouncementFactory } from '#database/factories/announcement.factory'
 
 /**
- * Três avisos em datas diferentes, um deles fixado e o mais antigo de todos.
+ * Three announcements on different dates, one of them pinned and the oldest of all.
  *
- * A ordem padrão do painel e do site é "fixados primeiro, depois do mais novo
- * ao mais antigo": com o fixado sendo também o mais velho, uma listagem que
- * esquecesse o `pinned` o mandaria para o fim, e o teste perceberia.
+ * The default order of the panel and the site is "pinned first, then newest to
+ * oldest": with the pinned one also being the oldest, a listing that forgot `pinned`
+ * would send it to the end, and the test would notice.
  */
 export async function announcementTimeline() {
   const pinned = await AnnouncementFactory.apply('pinned')

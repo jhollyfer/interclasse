@@ -5,32 +5,32 @@ import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
 /**
- * Constroi todo service e toda policy pelo container, e reprova o que nao sobe.
+ * Builds every service and policy through the container, and fails what does not boot.
  *
- * O `no-restricted-syntax` do ESLint ja recusa `new Serviço()` no codigo, mas
- * ele so olha a chamada. O defeito que sobra e do outro lado: a classe declara
- * uma dependencia que o container nao sabe resolver, e isso so aparece na
- * primeira requisicao que a usa - que pode ser uma rota que ninguem exercita em
- * teste. Aqui todas sao construidas de uma vez, no boot.
+ * ESLint's `no-restricted-syntax` already refuses `new Service()` in the code, but it
+ * only looks at the call. The remaining defect is on the other side: the class declares
+ * a dependency the container cannot resolve, and that only shows up on the first
+ * request that uses it - which may be a route nobody exercises in a test. Here all of
+ * them are built at once, at boot.
  *
- * A lista sai de `readdir`, e nao escrita a mao: e a lista manual que faz
- * servico novo escapar da checagem no dia em que alguem esquece de anota-lo.
+ * The list comes from `readdir`, not written by hand: a manual list is what lets a new
+ * service escape the check the day someone forgets to annotate it.
  *
- * Nao chama metodo nenhum: construir e o que se quer provar. Metodo toca banco,
- * bucket e SMTP, e este comando roda no CI, onde nada disso existe.
+ * It calls no method: building is what we want to prove. A method touches the
+ * database, bucket and SMTP, and this command runs in CI, where none of that exists.
  */
 export default class DiCheck extends BaseCommand {
   static override commandName = 'di:check'
   static override description =
-    'Constroi todo service e policy pelo container e reprova o que nao sobe'
+    'Builds every service and policy through the container and fails whatever does not start'
 
   static override options: CommandOptions = { startApp: true }
 
   private async classesIn(directory: string, suffix: string): Promise<string[]> {
     const dirPath = join(this.app.appRoot.pathname, 'app', directory)
 
-    // Recursivo: service mora em `services/<nome>/<nome>.service.ts`
-    // (_standards/architecture.md §3); policy continua plana.
+    // Recursive: a service lives in `services/<name>/<name>.service.ts`
+    // (_standards/architecture.md §3); policy stays flat.
     const entries = await readdir(dirPath, { recursive: true })
 
     return entries.filter((name) => name.endsWith(suffix))
@@ -66,13 +66,13 @@ export default class DiCheck extends BaseCommand {
 
     if (failures.length > 0) {
       this.logger.error(
-        `di:check: ${failures.length} de ${targets.length} nao sobem pelo container`,
+        `di:check: ${failures.length} of ${targets.length} do not start through the container`,
       )
       for (const failure of failures) this.logger.error(`  ${failure}`)
       this.exitCode = 1
       return
     }
 
-    this.logger.success(`di:check: ${targets.length} classes construidas pelo container.`)
+    this.logger.success(`di:check: ${targets.length} classes built through the container.`)
   }
 }

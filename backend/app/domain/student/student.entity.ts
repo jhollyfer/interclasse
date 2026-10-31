@@ -11,14 +11,14 @@ export type StudentProps = {
 }
 
 /**
- * O aluno de uma turma. Só vira atleta quando inscrito numa modalidade, e
- * inscrito numa modalidade já sorteada não sai (`_standards/domain.md` §1).
- * A turma entra por id: é outro agregado.
+ * The student of a classroom. Only becomes an athlete when enrolled in a sport, and
+ * enrolled in an already drawn sport they do not leave (`_standards/domain.md` §1).
+ * The classroom enters by id: it is another aggregate.
  */
 export class Student {
   private constructor(private readonly props: StudentProps) {}
 
-  /** Nascimento. O id e o relógio chegam de fora: o domínio não faz I/O. */
+  /** Birth. The id and the clock come from outside: the domain does no I/O. */
   static create(input: {
     readonly id: string
     readonly classroomId: string
@@ -34,18 +34,18 @@ export class Student {
         classroomId: input.classroomId,
         name,
         createdAt: input.now,
-        // Nasce com a edição carimbada, como a linha do banco nasce.
+        // Born with the edit stamped, the way the database row is born.
         updatedAt: input.now,
       }),
     )
   }
 
-  /** Reidratação pelo repository: o dado passou pelas invariantes ao ser gravado. */
+  /** Rehydration by the repository: the data passed through the invariants when it was saved. */
   static restore(props: StudentProps): Student {
     return new Student({ ...props })
   }
 
-  /** Corrige o nome. Trocar o aluno de turma é apagar e cadastrar na outra. */
+  /** Fixes the name. Moving the student to another classroom is delete and register in the other. */
   rename(name: string, now: Date): Either<StudentError, Student> {
     const trimmed = name.trim()
     if (trimmed.length === 0) return left({ code: 'STUDENT_NAME_EMPTY' })
@@ -56,7 +56,7 @@ export class Student {
     return right(this)
   }
 
-  /** Tirar da turma recusa se o aluno joga numa modalidade já sorteada. */
+  /** Removing from the classroom refuses if the student plays in an already drawn sport. */
   remove(context: { readonly inDrawnSport: boolean }): Either<StudentError, Student> {
     if (context.inDrawnSport) return left({ code: 'STUDENT_IN_COMPETITION' })
 

@@ -7,7 +7,7 @@ import { BracketUnitFixtures } from '#tests/bracket-unit-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('storefront/brackets > paginate (unit)', () => {
-  test('lista as chaves por nome de modalidade', async ({ assert }) => {
+  test('lists the brackets by sport name', async ({ assert }) => {
     const brackets = MemoryRepositories.brackets()
     const useCase = await makeWithMemory(
       StorefrontBracketPaginateUseCase,

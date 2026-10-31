@@ -2,7 +2,7 @@ import { vine, paginationFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
 /**
- * As turmas do conselheiro, com busca pelo nome. Par do Zod de
+ * The advisor's classrooms, with search by name. Mirror of the Zod one in
  * `shared/src/validators/advisor/classrooms.validator.ts`.
  */
 export const AdvisorClassroomPaginateValidator = vine.create({

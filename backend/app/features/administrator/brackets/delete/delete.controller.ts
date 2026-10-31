@@ -10,9 +10,9 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdministratorBracketDeleteController {
   static docs = defineDocs({
     description:
-      '**Irreversível**: apaga a chave com todos os times, partidas e placares, e reabre as ' +
-      'inscrições da modalidade naquela categoria. É o caminho para refazer um sorteio.\n\n' +
-      'Chave com placar lançado responde `409`: desfaça os placares antes.',
+      '**Irreversible**: deletes the bracket with all teams, matches and scores, and reopens the ' +
+      'enrollments of the sport in that category. It is the way to redo a draw.\n\n' +
+      'A bracket with a recorded score responds `409`: undo the scores first.',
   })
 
   constructor(private readonly useCase: AdministratorBracketDeleteUseCase) {}

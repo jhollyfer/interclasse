@@ -3,11 +3,11 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { requireRole } from '../-components/require-role'
 
-// Só o conselheiro: o administrador abre a mesma turma em
-// `/administrator/classrooms/$id`, com o "voltar" para a lista dele.
+// Advisor only: the administrator opens the same classroom at
+// `/administrator/classrooms/$id`, with "voltar" to their list.
 const ROLES = [USER_ROLE.ADVISOR]
 
-/** Só o papel da área entra; os outros voltam à própria tela inicial. */
+/** Only the area's role gets in; the others go back to their own home screen. */
 export const Route = createFileRoute('/_private/advisor')({
   beforeLoad: ({ context }) => requireRole(context.account.role, ROLES),
   component: Outlet,

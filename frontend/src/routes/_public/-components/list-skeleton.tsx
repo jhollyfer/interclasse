@@ -5,9 +5,9 @@ import { Skeleton } from '#/components/ui/skeleton'
 import { Section, SectionHeader } from './section'
 
 /**
- * O esqueleto de uma listagem pública, para o `pendingComponent` da rota: o
- * título e os cartões no tamanho da tela final, no lugar de um quadro em
- * branco entre o clique e a resposta (`frontend.md` §5).
+ * A public listing's skeleton, for the route's `pendingComponent`: the
+ * title and cards at the final screen's size, in place of a blank frame
+ * between the click and the response (`frontend.md` §5).
  */
 export function ListSkeleton(): React.JSX.Element {
   return (

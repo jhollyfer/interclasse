@@ -20,7 +20,7 @@ afterEach(() => {
 })
 
 describe('LocaleSwitch', () => {
-  it('o gatilho tem nome acessível e mostra o idioma atual', () => {
+  it('gives the trigger an accessible name and shows the current language', () => {
     render(<LocaleSwitch />)
 
     const trigger = screen.getByRole('button', {
@@ -30,7 +30,7 @@ describe('LocaleSwitch', () => {
     expect(trigger.textContent).toContain('pt-BR')
   })
 
-  it('lista os três idiomas e marca o atual', async () => {
+  it('lists the three languages and marks the current one', async () => {
     render(<LocaleSwitch />)
 
     await userEvent.click(
@@ -47,7 +47,7 @@ describe('LocaleSwitch', () => {
     ).toBe('true')
   })
 
-  it('escolher outro idioma chama o setLocale dele', async () => {
+  it('when another language is chosen, calls its setLocale', async () => {
     render(<LocaleSwitch />)
 
     await userEvent.click(

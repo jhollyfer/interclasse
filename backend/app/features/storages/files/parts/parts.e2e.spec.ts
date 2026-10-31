@@ -13,20 +13,20 @@ import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the
+ * form that submitted it, and ownership authorizes nothing. What rules is the state
+ * (`PENDING` or `UPLOADED`) and the live reference.
  */
 
 /**
- * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
- * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
+ * Content of a non-final part. S3 refuses less than 5 MB
+ * (`EntityTooSmall`), and `PART_SIZE` is what the server promises per part.
  */
 const FULL_PART = pngBytes(PART_SIZE, 65)
 
 const SMALL = pngBytes(1024)
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -39,7 +39,7 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 async function put(url: string, content: Uint8Array): Promise<string> {
   const response = await fetch(url, {
     method: 'PUT',
@@ -52,7 +52,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
   return response.headers.get('etag') ?? ''
 }
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
@@ -72,12 +72,12 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
   return body(completed)
 }
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 test.group('storages > parts', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lista o que subiu e assina só o que falta', async ({ client, assert }) => {
+  test('lists what was uploaded and signs only what is missing', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -88,7 +88,7 @@ test.group('storages > parts', (group) => {
 
     assert.equal(opened.totalParts, 3)
 
-    // Sobe as duas primeiras e "cai" antes da terceira.
+    // Uploads the first two and "drops" before the third.
     await put(opened.parts[0].url, FULL_PART)
     await put(opened.parts[1].url, FULL_PART)
 
@@ -110,7 +110,7 @@ test.group('storages > parts', (group) => {
     assert.equal(resumed.partSize, PART_SIZE)
   })
 
-  test('a URL devolvida sobe de verdade - reassinar não pode dar endereço quebrado', async ({
+  test('the returned URL really uploads - re-signing cannot give a broken address', async ({
     client,
     assert,
   }) => {
@@ -131,7 +131,7 @@ test.group('storages > parts', (group) => {
     assert.lengthOf(body(after).uploaded, 1)
   })
 
-  test('arquivo já confirmado responde com as listas vazias', async ({ client, assert }) => {
+  test('an already confirmed file responds with empty lists', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -147,13 +147,13 @@ test.group('storages > parts', (group) => {
 test.group('storages > parts > acesso e identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem sessão responde 401', async ({ client }) => {
+  test('without a session responds 401', async ({ client }) => {
     const response = await client.get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
 
     response.assertStatus(401)
   })
 
-  test('id inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent id responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -164,7 +164,7 @@ test.group('storages > parts > acesso e identificador', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/storages/x/parts').cookies(session)

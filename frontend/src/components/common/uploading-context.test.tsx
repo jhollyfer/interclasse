@@ -25,7 +25,7 @@ function Status(): React.JSX.Element {
 }
 
 describe('UploadingProvider', () => {
-  it('livre enquanto nenhum campo está enviando', () => {
+  it('is free while no field is uploading', () => {
     render(
       <UploadingProvider>
         <Field active={false} />
@@ -36,7 +36,7 @@ describe('UploadingProvider', () => {
     expect(screen.getByText('livre')).toBeTruthy()
   })
 
-  it('um campo enviando trava, e terminar libera', () => {
+  it('when a field is uploading, locks, and finishing releases', () => {
     const { rerender } = render(
       <UploadingProvider>
         <Field active />
@@ -56,7 +56,7 @@ describe('UploadingProvider', () => {
     expect(screen.getByText('livre')).toBeTruthy()
   })
 
-  it('com dois campos, só libera quando o último termina', () => {
+  it('with two fields, releases only when the last one finishes', () => {
     const { rerender } = render(
       <UploadingProvider>
         <Field active />
@@ -76,7 +76,7 @@ describe('UploadingProvider', () => {
     expect(screen.getByText('enviando')).toBeTruthy()
   })
 
-  it('desmontar o campo em voo libera o cadeado', () => {
+  it('when the in-flight field unmounts, releases the lock', () => {
     const { rerender } = render(
       <UploadingProvider>
         <Field active />

@@ -1,10 +1,10 @@
 import { z } from '../../validator.js'
 
 /**
- * O "Sobre" para o site anônimo: o recorte da configuração (`GET
- * /storefront/site`). Do regulamento sai só o que o botão de baixar precisa -
- * a URL assinada, o nome e o tamanho -, sem o caminho no bucket nem o id do
- * upload.
+ * The "About" for the anonymous site: the slice of the configuration (`GET
+ * /storefront/site`). Of the regulation only what the download button needs comes out -
+ * the signed URL, the name and the size -, without the path in the bucket or the
+ * upload id.
  */
 export const StorefrontSiteShowResponse = z.object({
   about: z.string().nullable(),

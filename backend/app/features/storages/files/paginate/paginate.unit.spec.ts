@@ -14,7 +14,7 @@ async function setup() {
 }
 
 test.group('storages/files > paginate (unit)', () => {
-  test('lista a primeira página, vinte por vez', async ({ assert }) => {
+  test('lists the first page, twenty at a time', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile('1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b61'))
 
@@ -24,7 +24,7 @@ test.group('storages/files > paginate (unit)', () => {
     assert.equal(page.meta.perPage, 20)
   })
 
-  test('filtra por status', async ({ assert }) => {
+  test('filters by status', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile('1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b61'))
     await storages.save(pendingFile({ id: '2e3d4c5b-6a7f-4e9d-8c1b-2a3f4e5d6c72' }))
@@ -37,10 +37,10 @@ test.group('storages/files > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 STORAGES_FILE_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 STORAGES_FILE_PAGINATE_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     storages.paginate = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({})

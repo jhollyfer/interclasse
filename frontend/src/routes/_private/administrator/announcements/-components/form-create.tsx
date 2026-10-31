@@ -43,8 +43,8 @@ export function AnnouncementFormCreate(): React.JSX.Element {
     alsoInvalidate: DEPENDENTS.announcements,
     backTo: '/administrator/announcements',
     success: () => m.admin_announcements_published(),
-    // Aviso repetido não é recusado pela API: sem `retry`, reenviar duplicaria
-    // o aviso, e por isso o formulário não oferece "Tentar de novo".
+    // A repeated announcement is not refused by the API: without `retry`, resending would duplicate
+    // the announcement, and that is why the form does not offer "Tentar de novo".
     payload: (values) => values,
   })
 

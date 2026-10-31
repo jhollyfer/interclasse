@@ -4,17 +4,17 @@ import { join } from 'node:path'
 import { test } from '@japa/runner'
 
 /**
- * A rede "vitrine só leitura" (_standards/backend.md §7): rota anônima que não é
- * `GET` só existe se estiver na lista declarada abaixo, e nada sob `/storefront`
- * escreve. Lê o baseline de autorização, que é o que o `authz:check` já cobra
- * contra o `openapi.json`.
+ * The "read-only storefront" net (_standards/backend.md §7): an anonymous route that is not
+ * `GET` only exists if it is in the list declared below, and nothing under `/storefront`
+ * writes. It reads the authorization baseline, which is what `authz:check` already enforces
+ * against `openapi.json`.
  */
 const BASELINE: Record<string, string> = JSON.parse(
   readFileSync(join(import.meta.dirname, 'authz-baseline.json'), 'utf-8'),
 )
-const ANONYMOUS = 'anonima'
+const ANONYMOUS = 'anonymous'
 
-/** As escritas anônimas que existem por desenho: entrar e renovar a sessão pelo cookie de refresh. */
+/** The anonymous writes that exist by design: signing in and renewing the session through the refresh cookie. */
 const DECLARED_ANONYMOUS_WRITES = [
   'POST /authentication/refresh',
   'POST /authentication/sign-in',
@@ -27,8 +27,8 @@ function routesWhere(predicate: (route: string, protection: string) => boolean):
     .sort()
 }
 
-test.group('rotas públicas (unit)', () => {
-  test('rota anônima que não é GET está na lista declarada', ({ assert }) => {
+test.group('public routes (unit)', () => {
+  test('an anonymous route that is not GET is in the declared list', ({ assert }) => {
     const writes = routesWhere(
       (route, protection) => protection === ANONYMOUS && !route.startsWith('GET '),
     )
@@ -36,7 +36,7 @@ test.group('rotas públicas (unit)', () => {
     assert.deepEqual(writes, [...DECLARED_ANONYMOUS_WRITES])
   })
 
-  test('nada sob /storefront escreve', ({ assert }) => {
+  test('nothing under /storefront writes', ({ assert }) => {
     const writes = routesWhere(
       (route) => route.includes(' /storefront') && !route.startsWith('GET '),
     )
@@ -44,7 +44,9 @@ test.group('rotas públicas (unit)', () => {
     assert.deepEqual(writes, [])
   })
 
-  test('a varredura enxerga a vitrine: sem alvo, o guard não guardaria', ({ assert }) => {
+  test('the scan sees the storefront: without a target, the guard would not guard', ({
+    assert,
+  }) => {
     const storefront = routesWhere((route) => route.includes(' /storefront'))
 
     assert.isAbove(storefront.length, 0)

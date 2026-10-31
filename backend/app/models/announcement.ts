@@ -1,4 +1,4 @@
 import { AnnouncementSchema } from '#database/schema'
 
-/** Aviso dos jogos: troca de horário, local, regra. */
+/** Games announcement: schedule change, venue, rule. */
 export default class Announcement extends AnnouncementSchema {}

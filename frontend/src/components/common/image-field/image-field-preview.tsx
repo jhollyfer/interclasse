@@ -10,15 +10,15 @@ type ImageFieldPreviewProps = Readonly<
   Merge<
     Omit<React.ComponentProps<typeof Avatar>, 'alt' | 'children'>,
     {
-      /** O texto alternativo da imagem. Acessibilidade, não markup - segue prop. */
+      /** The image's alternative text. Accessibility, not markup - stays a prop. */
       alt: string
-      /** A sigla que aparece enquanto não há imagem. */
+      /** The initials shown while there is no image. */
       children: React.ReactNode
     }
   >
 >
 
-/** O quadrado com a imagem atual, ou a sigla enquanto não há nenhuma. */
+/** The square with the current image, or the initials while there is none. */
 export function ImageFieldPreview({
   alt,
   className,

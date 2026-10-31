@@ -3,8 +3,8 @@ import factory from '@adonisjs/lucid/factories'
 import MatchCard from '#models/match-card'
 
 /**
- * Cartão de uma partida. `matchId`, `teamId` e `studentId` vêm sempre do teste
- * (`merge`), porque o cartão só existe preso a uma partida, um time e um aluno.
+ * Card of a match. `matchId`, `teamId` and `studentId` always come from the test
+ * (`merge`), because the card only exists tied to a match, a team and a student.
  */
 export const MatchCardFactory = factory
   .define(MatchCard, () => ({ color: 'YELLOW' as const }))

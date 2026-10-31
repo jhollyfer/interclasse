@@ -23,8 +23,8 @@ import { m } from '#/paraglide/messages'
 import { ADMINISTRATOR_REMOVALS } from '../index'
 
 /**
- * Os avisos de atleta tirado de modalidade, com o motivo que o conselheiro
- * escreveu. Os pendentes vêm primeiro; "Ciente" tira o aviso do contador.
+ * The notices of an athlete removed from a sport, with the reason the advisor
+ * wrote. Pending ones come first; "Ciente" takes the notice off the counter.
  */
 export function RemovalsPage(): React.JSX.Element {
   const { data, isPending } = useQuery(

@@ -3,7 +3,7 @@ import type { Merge } from '@interclasse/shared'
 import { validateStorefrontSearch } from '#/lib/list-search'
 import type { StorefrontSearch } from '#/lib/list-search'
 
-/** Os filtros da tabela de jogos vivem na URL: o link compartilhado abre o mesmo recorte. */
+/** The match table's filters live in the URL: the shared link opens the same subset. */
 export type GamesSearch = Merge<
   StorefrontSearch,
   { sportId?: string; category?: string; status?: string }

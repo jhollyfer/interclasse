@@ -13,26 +13,26 @@ import type { SportError } from '#domain/sport/sport.errors'
 import { MemoryPagination } from '#core/memory-pagination'
 
 /**
- * A segunda implementação de verdade, para o teste unitário do use-case
- * (`_standards/domain.md` §5.3). Guarda cópias: o teste não altera o "banco"
- * por referência.
+ * The second real implementation, for the use case unit test
+ * (`_standards/domain.md` §5.3). It keeps copies: the test does not change the "database"
+ * by reference.
  */
-/** O sinal da comparação por sentido de ordenação. */
+/** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
 export class SportMemoryRepository extends SportRepository {
   private readonly rows = new Map<string, SportProps>()
-  /** O elenco inscrito de cada turma, por modalidade: o que o teste arranja. */
+  /** The enrolled roster of each classroom, per sport: what the test arranges. */
   private readonly rosters = new Map<string, number[]>()
   private readonly used = new Set<string>()
 
-  /** Arranjo do teste: elencos já inscritos nesta modalidade. */
+  /** Test arrangement: rosters already enrolled in this sport. */
   withRosters(sportId: string, sizes: number[]): this {
     this.rosters.set(sportId, sizes)
     return this
   }
 
-  /** Arranjo do teste: a modalidade tem inscrição ou chave. */
+  /** Test arrangement: the sport has an enrollment or a bracket. */
   markInUse(sportId: string): this {
     this.used.add(sportId)
     return this
@@ -64,7 +64,7 @@ export class SportMemoryRepository extends SportRepository {
     const taken = [...this.rows.values()].some(
       (row) => row.id !== snapshot.id && (row.name === snapshot.name || row.slug === snapshot.slug),
     )
-    // Os `unique` de nome e slug, como o banco os garante.
+    // The name and slug `unique`s, as the database guarantees them.
     if (taken) return left({ code: 'SPORT_ALREADY_EXISTS' })
 
     this.rows.set(snapshot.id, snapshot)

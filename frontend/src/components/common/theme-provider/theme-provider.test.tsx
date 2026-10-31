@@ -32,7 +32,7 @@ function Probe() {
 }
 
 describe('ThemeProvider', () => {
-  it('começa com o tema que o loader leu do cookie', () => {
+  it('starts with the theme the loader read from the cookie', () => {
     render(
       <ThemeProvider theme="light">
         <Probe />
@@ -42,7 +42,7 @@ describe('ThemeProvider', () => {
     expect(screen.getByRole('status').textContent).toBe('light')
   })
 
-  it('setTheme grava o cookie, troca a classe do html e atualiza o estado', async () => {
+  it('when setTheme is called, saves the cookie, swaps the html class and updates the state', async () => {
     render(
       <ThemeProvider theme="light">
         <Probe />
@@ -56,7 +56,7 @@ describe('ThemeProvider', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 
-  it('fora do provider o erro diz qual consumidor ficou sem ele', () => {
+  it('when outside the provider, the error says which consumer is without it', () => {
     expect(() => render(<Probe />)).toThrow('Probe')
   })
 })

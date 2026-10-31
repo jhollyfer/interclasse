@@ -17,10 +17,10 @@ import { applyMutationError } from '#/lib/form-errors'
 import { useMutationForm } from './use-mutation-form'
 
 /**
- * A fiação do formulário que não é tela (diálogo de placar, sorteio, login):
- * invalidar, avisar e só então chamar o `onSuccess` da tela. O `typecheck` não vê
- * a ordem trocada nem o aviso esquecido (`frontend.md` §11.1). A tela de
- * criar/editar, que ainda navega, tem o teste dela em `use-resource-form.test.ts`.
+ * The wiring of the form that is not a screen (score dialog, draw, login):
+ * invalidate, notify and only then call the screen's `onSuccess`. `typecheck` does
+ * not see the swapped order or the forgotten notice (`frontend.md` §11.1). The
+ * create/edit screen, which still navigates, has its test in `use-resource-form.test.ts`.
  */
 
 const invalidateQueries = vi.fn()
@@ -29,14 +29,14 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('#/lib/form-errors', () => ({ applyMutationError: vi.fn() }))
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate: vi.fn() }),
-  // O bloqueio de navegação não é o assunto: precisa de router montado.
+  // Navigation blocking is not the subject: it needs a mounted router.
   useBlocker: vi.fn(),
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),
 }))
 vi.mock('@hookform/resolvers/zod', () => ({
-  // O resolver não é o assunto: aceita o que vier e devolve sem erro.
+  // The resolver is not the subject: it accepts whatever comes and returns no error.
   zodResolver: () => (values: unknown) => ({ values, errors: {} }),
 }))
 
@@ -45,7 +45,7 @@ type SavedRecord = { id: string; name: string }
 
 const NameValidator = z.object({ name: z.string() })
 
-/** O quarto argumento dos callbacks; o hook não o lê. */
+/** The callbacks' fourth argument; the hook does not read it. */
 const CONTEXT = fromPartial<MutationFunctionContext>({})
 
 const SAVED: SavedRecord = { id: '7', name: 'Ana' }
@@ -88,7 +88,7 @@ beforeEach(() => {
 })
 
 describe('useMutationForm', () => {
-  it('invalida antes de chamar o onSuccess da tela', async () => {
+  it('invalidates before calling the screen onSuccess', async () => {
     const order: string[] = []
     invalidateQueries.mockImplementation(() => {
       order.push('invalidate')
@@ -106,7 +106,7 @@ describe('useMutationForm', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['scores'] })
   })
 
-  it('avisa com o texto fixo, ou com o que cita o registro salvo', async () => {
+  it('notifies with the fixed text, or with the one citing the saved record', async () => {
     const fixed = setup()
     await fixed
       .options()
@@ -123,7 +123,7 @@ describe('useMutationForm', () => {
     expect(toast.success).toHaveBeenNthCalledWith(2, 'Ana salva.')
   })
 
-  it('não avisa quando o formulário não declara texto de sucesso', async () => {
+  it('does not notify when the form declares no success text', async () => {
     const { options } = setup({ success: undefined })
 
     await options()?.onSuccess?.(SAVED, { name: 'Ana' }, undefined, CONTEXT)
@@ -131,7 +131,7 @@ describe('useMutationForm', () => {
     expect(toast.success).not.toHaveBeenCalled()
   })
 
-  it('limpa o erro de rodapé e manda o payload transformado', () => {
+  it('clears the footer error and sends the transformed payload', () => {
     const { result, mutate } = setup({
       payload: (values: Values) => ({ name: values.name.toUpperCase() }),
     })
@@ -143,7 +143,7 @@ describe('useMutationForm', () => {
     expect(mutate).toHaveBeenCalledWith({ name: 'ANA' })
   })
 
-  it('leva o erro da API aos campos que o formulário declara', () => {
+  it('carries the API error to the fields the form declares', () => {
     const { options } = setup()
     const error = new HTTPError({
       message: 'Erro interno',

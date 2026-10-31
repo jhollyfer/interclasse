@@ -10,8 +10,8 @@ import { PageValidator } from '#core/validator'
 export default class StorefrontPhotoPaginateController {
   static docs = defineDocs({
     description:
-      'As fotos aprovadas para o carrossel, da mais nova à mais antiga. A `url` é ' +
-      'assinada e vence em minutos.',
+      'The photos approved for the carousel, newest to oldest. The `url` is ' +
+      'signed and expires in minutes.',
   })
 
   constructor(private readonly useCase: StorefrontPhotoPaginateUseCase) {}

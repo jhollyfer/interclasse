@@ -4,20 +4,20 @@ import { describe, expect, it } from 'vitest'
 import { IMAGE_MIMETYPES, isStorageMimetype } from './mimetype'
 
 describe('isStorageMimetype', () => {
-  it('reconhece cada tipo da lista do shared', () => {
+  it('recognizes each type in the shared list', () => {
     for (const mimetype of STORAGE_MIMETYPES) {
       expect(isStorageMimetype(mimetype)).toBe(true)
     }
   })
 
-  it('recusa o que está fora da lista, inclusive vazio', () => {
+  it('refuses what is outside the list, empty included', () => {
     expect(isStorageMimetype('application/x-msdownload')).toBe(false)
     expect(isStorageMimetype('')).toBe(false)
   })
 })
 
 describe('IMAGE_MIMETYPES', () => {
-  it('guarda só tipos de imagem, todos aceitos pelo storage', () => {
+  it('keeps only image types, all accepted by the storage', () => {
     expect(IMAGE_MIMETYPES.length).toBeGreaterThan(0)
 
     for (const mimetype of IMAGE_MIMETYPES) {

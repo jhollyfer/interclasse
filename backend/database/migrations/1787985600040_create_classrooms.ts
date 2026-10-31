@@ -7,15 +7,15 @@ export default class extends BaseSchema {
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
-      // "9º A". Único: é o nome que aparece no placar, e duas turmas com o mesmo
-      // nome seriam indistinguíveis na tabela de jogos.
+      // "9º A". Unique: it is the name that appears on the scoreboard, and two classrooms with the same
+      // name would be indistinguishable in the match table.
       table.string('name', 20).notNullable().unique()
       table.smallint('grade').notNullable()
-      // Derivada de `grade` no caso de uso, e gravada para a chave filtrar sem
-      // repetir a regra em SQL.
+      // Derived from `grade` in the use case, and stored so the bracket filters without
+      // repeating the rule in SQL.
       table.enum('category', CATEGORIES).notNullable()
-      // `SET NULL`: apagar a conta do professor não apaga a turma, que fica sem
-      // conselheiro até o administrador indicar outro.
+      // `SET NULL`: deleting the teacher's account does not delete the classroom, which stays without an
+      // advisor until the administrator names another.
       table
         .uuid('advisor_id')
         .nullable()
@@ -23,8 +23,8 @@ export default class extends BaseSchema {
         .inTable('users')
         .onDelete('SET NULL')
         .index()
-      // Único: o representante enxerga "a própria turma", no singular. Dois
-      // vínculos tornariam a pergunta ambígua.
+      // Unique: the representative sees "their own classroom", in the singular. Two
+      // links would make the question ambiguous.
       table
         .uuid('representative_id')
         .nullable()

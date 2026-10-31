@@ -15,7 +15,10 @@ import {
 test.group('cards > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lança o cartão no time do atleta e devolve com a partida', async ({ client, assert }) => {
+  test('records the card on the athlete team and returns it with the match', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const { match, awayTeam, awayStudent } = await matchWithTeams()
 
@@ -31,22 +34,25 @@ test.group('cards > create', (group) => {
     assert.lengthOf(await Stored.cards(), 1)
   })
 
-  test('atleta de turma que não joga a partida responde 422', async ({ client, assert }) => {
+  test('athlete from a classroom that does not play the match responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const { match } = await matchWithTeams()
-    const intruso = await StudentFactory.with('classroom').create()
+    const intruder = await StudentFactory.with('classroom').create()
 
     const response = await client
       .post('/administrator/cards')
       .cookies(session)
-      .json({ matchId: match.id, studentId: intruso.id, color: 'RED' })
+      .json({ matchId: match.id, studentId: intruder.id, color: 'RED' })
 
     response.assertStatus(422)
     assert.equal(body(response).code, 'STUDENT_NOT_IN_MATCH')
     assert.lengthOf(await Stored.cards(), 0)
   })
 
-  test('partida inexistente responde 422', async ({ client, assert }) => {
+  test('nonexistent match responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { homeStudent } = await matchWithTeams()
 
@@ -59,7 +65,7 @@ test.group('cards > create', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
   })
 
-  test('conselheiro responde 403', async ({ client }) => {
+  test('advisor responds 403', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
     const { match, homeStudent } = await matchWithTeams()
 
@@ -72,10 +78,10 @@ test.group('cards > create', (group) => {
   })
 })
 
-test.group('administrator/cards/create > acesso e validação', (group) => {
+test.group('administrator/cards/create > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.post('/administrator/cards')
 
     response.assertStatus(401)

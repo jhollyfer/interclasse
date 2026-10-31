@@ -16,23 +16,23 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Apaga um arquivo órfão: o binário no bucket e a linha em `storages`.
+ * Deletes an orphan file: the binary in the bucket and the row in `storages`.
  *
- * Existe para fechar o buraco que o upload abre. O `POST /storages` registra o
- * arquivo **antes** de o formulário ser salvo (é o que evita um payload que
- * referencia um arquivo que falhou ao subir), então todo anexo escolhido e
- * depois removido da tela ficaria no bucket para sempre.
+ * It exists to close the hole that the upload opens. `POST /storages` registers the
+ * file **before** the form is saved (which avoids a payload that
+ * references a file that failed to upload), so every attachment chosen and
+ * then removed from the screen would stay in the bucket forever.
  *
- * Serve aos dois estados. `PENDING` é upload em andamento, e apagá-lo é
- * **cancelar**: o multipart é abortado, e é isso que faz as partes já enviadas
- * sumirem. Sem o aborto elas ficam penduradas para sempre - não aparecem na
- * listagem de objetos, e continuam sendo cobradas. `UPLOADED` é o arquivo
- * pronto, e aí vale a regra de referência da entidade.
+ * It serves both states. `PENDING` is an upload in progress, and deleting it is
+ * **cancelling**: the multipart is aborted, and that is what makes the parts already sent
+ * disappear. Without the abort they hang forever - they do not show up in the
+ * object listing, and keep being billed. `UPLOADED` is the finished
+ * file, and then the entity reference rule applies.
  *
- * **Só apaga o que ninguém usa.** `storages` é registro neutro e compartilhado
- * - o arquivo não pertence ao formulário que o enviou -, então a posse não
- * serve de autorização: quem conhecesse um uuid furaria o avatar de outro
- * usuário. Referenciado é `409`, e a mensagem diz onde.
+ * **Only deletes what nobody uses.** `storages` is a neutral, shared record
+ * - the file does not belong to the form that submitted it -, so ownership does not
+ * serve as authorization: whoever knew a uuid would puncture another user's
+ * avatar. Referenced is `409`, and the message says where.
  */
 @inject()
 export default class StoragesFileDeleteUseCase {
@@ -73,13 +73,13 @@ export default class StoragesFileDeleteUseCase {
   }
 
   /**
-   * Cancela um upload em andamento.
+   * Cancels an upload in progress.
    *
-   * O objeto final não existe ainda - as partes vivem sob o `uploadId`, e é o
-   * aborto que as descarta. No upload de parte única não há aborto, e o que
-   * pode existir é o objeto inteiro, quando o `PUT` chegou a completar antes do
-   * cancelamento; apagá-lo pode não encontrar nada, e não encontrar é o caso
-   * comum.
+   * The final object does not exist yet - the parts live under the `uploadId`, and it is the
+   * abort that discards them. In a single-part upload there is no abort, and what
+   * may exist is the whole object, when the `PUT` managed to complete before the
+   * cancellation; deleting it may find nothing, and finding nothing is the
+   * common one.
    */
   private async cancel(storage: Storage): Promise<void> {
     const { path, uploadId } = storage.snapshot()
@@ -92,7 +92,7 @@ export default class StoragesFileDeleteUseCase {
     try {
       await this.bucket.discard(path)
     } catch {
-      // Não encontrar o objeto é o caso comum, e é o resultado que se queria.
+      // Not finding the object is the common case, and it is the result that was wanted.
     }
   }
 }

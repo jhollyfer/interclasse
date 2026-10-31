@@ -3,26 +3,26 @@ import { test } from '@japa/runner'
 import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
 /**
- * Sair tem de valer no servidor, e não só na tela.
+ * Signing out must hold on the server, not just on screen.
  *
- * `backend-old` não tinha sign-out: o token era um JWT no corpo, guardado pelo
- * cliente, e "sair" era o navegador esquecê-lo - o token seguia válido até
- * vencer. Aqui o token é uma linha em `auth_access_tokens`, e apagá-la é o que
- * torna a sessão irrecuperável.
+ * `backend-old` had no sign-out: the token was a JWT in the body, kept by the
+ * client, and "signing out" was the browser forgetting it - the token stayed valid until
+ * it expired. Here the token is a row in `auth_access_tokens`, and deleting it is what
+ * makes the session unrecoverable.
  */
-test.group('autenticação > sign-out', (group) => {
+test.group('authentication > sign-out', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sign-out invalida a sessão em curso', async ({ client }) => {
+  test('sign-out invalidates the running session', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const saida = await client.post('/authentication/sign-out').cookies(session)
+    const signOut = await client.post('/authentication/sign-out').cookies(session)
 
-    saida.assertStatus(204)
+    signOut.assertStatus(204)
 
-    // O mesmo cookie de acesso, agora sem a linha que o sustentava.
-    const repetida = await client.post('/authentication/sign-out').cookies(session)
+    // The same access cookie, now without the row that backed it.
+    const duplicate = await client.post('/authentication/sign-out').cookies(session)
 
-    repetida.assertStatus(401)
+    duplicate.assertStatus(401)
   })
 })

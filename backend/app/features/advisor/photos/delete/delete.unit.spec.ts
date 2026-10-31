@@ -21,7 +21,7 @@ async function setup() {
     sender: PHOTO_SENDER.ADVISOR,
     now: new Date(),
   })
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
   await photos.save(created.value)
   const useCase = await makeWithMemory(AdvisorPhotoDeleteUseCase, [[PhotoRepository, photos]])
 
@@ -29,7 +29,7 @@ async function setup() {
 }
 
 test.group('advisor/photos > delete (unit)', () => {
-  test('o conselheiro apaga a própria foto', async ({ assert }) => {
+  test('the advisor deletes their own photo', async ({ assert }) => {
     const { photos, photo, owner, useCase } = await setup()
 
     const result = await useCase.execute({ id: photo.id, actor: owner })
@@ -38,7 +38,7 @@ test.group('advisor/photos > delete (unit)', () => {
     assert.isNull(await photos.findById(photo.id))
   })
 
-  test('foto de outro conselheiro é 404 e fica', async ({ assert }) => {
+  test('photo from another advisor is 404 and stays', async ({ assert }) => {
     const { photos, photo, useCase } = await setup()
 
     const result = await useCase.execute({ id: photo.id, actor: memoryAuthor() })
@@ -47,7 +47,7 @@ test.group('advisor/photos > delete (unit)', () => {
     assert.isNotNull(await photos.findById(photo.id))
   })
 
-  test('o administrador apaga qualquer uma', async ({ assert }) => {
+  test('the administrator deletes any one', async ({ assert }) => {
     const { photos, photo, useCase } = await setup()
 
     const result = await useCase.execute({

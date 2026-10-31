@@ -15,7 +15,7 @@ import {
 test.group('cards > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('apaga o cartão e responde 204', async ({ client, assert }) => {
+  test('deletes the card and responds 204', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { match, homeTeam, homeStudent } = await matchWithTeams()
     const card = await MatchCardFactory.merge({
@@ -31,7 +31,7 @@ test.group('cards > delete', (group) => {
     assert.isNull(await Stored.card(card.id))
   })
 
-  test('cartão inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent card responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.delete(`/administrator/cards/${randomUUID()}`).cookies(session)
@@ -41,10 +41,10 @@ test.group('cards > delete', (group) => {
   })
 })
 
-test.group('administrator/cards/delete > acesso e validação', (group) => {
+test.group('administrator/cards/delete > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.delete(
       '/administrator/cards/00000000-0000-4000-8000-000000000000',
     )
@@ -52,7 +52,7 @@ test.group('administrator/cards/delete > acesso e validação', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -62,7 +62,7 @@ test.group('administrator/cards/delete > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/administrator/cards/nao-e-uuid').cookies(admin)

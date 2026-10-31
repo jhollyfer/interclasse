@@ -13,8 +13,8 @@ import {
 export default class AdministratorClassroomPaginateController {
   static docs = defineDocs({
     description:
-      '`?category` separa Fundamental 1 de Fundamental 2, `?search` filtra pelo nome. ' +
-      `\`?sort\` aceita ${CLASSROOM_SORT_COLUMNS.join(', ')}. Padrão: ordenada por nome.`,
+      '`?category` separates Fundamental 1 from Fundamental 2, `?search` filters by name. ' +
+      `\`?sort\` accepts ${CLASSROOM_SORT_COLUMNS.join(', ')}. Default: ordered by name.`,
   })
 
   constructor(private readonly useCase: AdministratorClassroomPaginateUseCase) {}

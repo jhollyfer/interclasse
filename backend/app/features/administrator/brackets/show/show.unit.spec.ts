@@ -18,13 +18,13 @@ async function setup() {
 }
 
 test.group('administrator/brackets > show (unit)', () => {
-  test('devolve a chave inteira com os nomes das turmas', async ({ assert }) => {
+  test('returns the whole bracket with the classroom names', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { bracket, sport } = await BracketUnitFixtures.drawn(brackets)
 
     const result = await useCase.execute({ id: bracket.id })
 
-    if (result.isLeft()) throw new Error('chave deveria existir')
+    if (result.isLeft()) throw new Error('bracket should exist')
     assert.deepInclude(result.value, { status: BRACKET_STATUS.KNOCKOUT, championTeamId: null })
     assert.equal(result.value.sport.name, sport.name)
     const semis = result.value.matches.filter((m) => m.phase === MATCH_PHASE.SEMI)
@@ -32,7 +32,7 @@ test.group('administrator/brackets > show (unit)', () => {
     assert.isTrue(semis.every((match) => match.homeName !== null && match.awayName !== null))
   })
 
-  test('chave inexistente é 404 BRACKET_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent bracket is 404 BRACKET_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })

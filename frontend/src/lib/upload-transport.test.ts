@@ -4,13 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UploadPartError, putPart } from './upload-transport'
 
 /**
- * O `XMLHttpRequest` não existe no ambiente de teste (roda em node), então cada
- * teste roteiriza o que o bucket responde. É o único jeito de exercitar a
- * retentativa: o que está sob teste é a decisão de insistir ou não, e ela
- * depende exatamente do status que volta.
+ * `XMLHttpRequest` does not exist in the test environment (it runs in node), so each
+ * test scripts what the bucket answers. It is the only way to exercise the
+ * retry: what is under test is the decision to insist or not, and it
+ * depends exactly on the status that comes back.
  *
- * Relógio falso porque o backoff espera de verdade - meio segundo dobrando a
- * cada tentativa deixaria a suíte lenta por nada.
+ * Fake clock because the backoff really waits - half a second doubling on
+ * every attempt would make the suite slow for nothing.
  */
 
 type Script =
@@ -18,7 +18,7 @@ type Script =
   | { kind: 'ok-sem-etag' }
   | { kind: 'status'; status: number }
   | { kind: 'rede' }
-  /** Nunca responde: é o que dispara o relógio de silêncio. */
+  /** Never answers: it is what fires the silence clock. */
   | { kind: 'mudo' }
 
 let scripts: Array<Script> = []
@@ -84,16 +84,16 @@ class FakeXHR {
 
 const BODY = new Blob(['x'.repeat(10)])
 
-/** Roda o relógio o bastante para atravessar backoff e respostas pendentes. */
+/** Runs the clock enough to cross backoff and pending responses. */
 async function settle(ms = 60_000): Promise<void> {
   await vi.advanceTimersByTimeAsync(ms)
 }
 
 /**
- * Nos testes de recusa, a expectativa é montada **antes** de o relógio andar:
- * `expect(...).rejects` é o que instala o `catch` da promise, e deixá-lo para
- * depois do `settle()` faz a rejeição acontecer com ninguém escutando - o node
- * a denuncia como `unhandledRejection` mesmo com o teste passando.
+ * In the refusal tests, the expectation is built **before** the clock moves:
+ * `expect(...).rejects` is what installs the promise's `catch`, and leaving it for
+ * after `settle()` makes the rejection happen with nobody listening - node
+ * reports it as `unhandledRejection` even though the test passes.
  */
 
 beforeEach(() => {
@@ -109,7 +109,7 @@ afterEach(() => {
 })
 
 describe('putPart', () => {
-  it('devolve o ETag quando o bucket aceita de primeira', async () => {
+  it('returns the ETag when the bucket accepts on the first try', async () => {
     scripts = [{ kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY)
@@ -120,7 +120,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('insiste depois de um 503 e vence na tentativa seguinte', async () => {
+  it('insists after a 503 and succeeds on the next attempt', async () => {
     scripts = [
       { kind: 'status', status: 503 },
       { kind: 'ok', etag: '"abc"' },
@@ -134,7 +134,7 @@ describe('putPart', () => {
     expect(sent).toBe(2)
   })
 
-  it('insiste depois de falha de rede - é a queda curta que ela existe para cobrir', async () => {
+  it('insists after a network failure - the short drop it exists to cover', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY)
@@ -146,11 +146,11 @@ describe('putPart', () => {
   })
 
   /**
-   * Assinatura expirada não melhora com insistência. Quem conserta isso é o
-   * lote seguinte de `GET /storages/:id/parts`, que traz URLs novas - repetir
-   * aqui só gastaria as tentativas antes de chegar lá.
+   * An expired signature does not improve with insistence. Whoever fixes this is the
+   * next batch of `GET /storages/:id/parts`, which brings new URLs - repeating
+   * here would only spend the attempts before getting there.
    */
-  it('não insiste em 403', async () => {
+  it('does not insist on 403', async () => {
     scripts = [
       { kind: 'status', status: 403 },
       { kind: 'ok', etag: '"abc"' },
@@ -166,7 +166,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('não insiste quando o ETag não veio - o CORS não se conserta repetindo', async () => {
+  it('does not insist when the ETag did not come - CORS is not fixed by repeating', async () => {
     scripts = [{ kind: 'ok-sem-etag' }, { kind: 'ok', etag: '"abc"' }]
 
     const refused = expect(
@@ -179,7 +179,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('respeita o teto de tentativas', async () => {
+  it('respects the attempt cap', async () => {
     scripts = [
       { kind: 'rede' },
       { kind: 'rede' },
@@ -197,7 +197,7 @@ describe('putPart', () => {
     expect(sent).toBe(3)
   })
 
-  it('não insiste depois de cancelado', async () => {
+  it('does not insist after cancelled', async () => {
     scripts = [{ kind: 'mudo' }]
 
     const controller = new AbortController()
@@ -213,7 +213,7 @@ describe('putPart', () => {
     expect(sent).toBe(1)
   })
 
-  it('cancelar durante a espera do backoff interrompe na hora', async () => {
+  it('when cancelled during the backoff wait, interrupts at once', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const controller = new AbortController()
@@ -221,7 +221,7 @@ describe('putPart', () => {
       putPart('https://bucket/parte/1', BODY, { signal: controller.signal }),
     ).rejects.toThrow(/cancelado/)
 
-    // Tempo de a primeira tentativa falhar, mas não de o backoff terminar.
+    // Time for the first attempt to fail, but not for the backoff to finish.
     await vi.advanceTimersByTimeAsync(1)
 
     controller.abort()
@@ -233,11 +233,11 @@ describe('putPart', () => {
   })
 
   /**
-   * Conexão que para de responder sem fechar. O `onerror` do XHR pode demorar
-   * muito a perceber isso - o relógio de silêncio é o que transforma a espera
-   * infinita numa tentativa perdida, que aí sim é refeita.
+   * A connection that stops answering without closing. XHR's `onerror` can take a
+   * long time to notice that - the silence clock is what turns the
+   * infinite wait into a lost attempt, which is then redone.
    */
-  it('desiste da tentativa muda e refaz', async () => {
+  it('gives up on the silent attempt and redoes it', async () => {
     scripts = [{ kind: 'mudo' }, { kind: 'ok', etag: '"abc"' }]
 
     const promise = putPart('https://bucket/parte/1', BODY, {
@@ -251,10 +251,10 @@ describe('putPart', () => {
   })
 
   /**
-   * Sem o zero, o contador de bytes do chamador guardaria o que a tentativa
-   * perdida já tinha somado, e a barra passaria de 100% ao reenviar a parte.
+   * Without the zero, the caller's byte counter would keep what the lost attempt
+   * had already added, and the bar would go past 100% when resending the part.
    */
-  it('zera o progresso antes de reenviar', async () => {
+  it('zeroes the progress before resending', async () => {
     scripts = [{ kind: 'rede' }, { kind: 'ok', etag: '"abc"' }]
 
     const reported: Array<number> = []

@@ -1,14 +1,14 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 /**
- * Uma linha só em `site_settings`, garantida pelo banco (_standards/backend.md
- * §4.4): o índice único sobre a expressão constante `(true)` faz toda linha
- * colidir com a outra. Sem ele, duas primeiras leituras simultâneas criavam duas
- * linhas, e a tela passava a mostrar uma ao acaso.
+ * A single row in `site_settings`, guaranteed by the database (_standards/backend.md
+ * §4.4): the unique index over the constant expression `(true)` makes every row
+ * collide with the other. Without it, two simultaneous first reads created two
+ * rows, and the screen started showing one at random.
  *
- * Não apaga dado: se a tabela já tiver mais de uma linha, o índice não entra e o
- * `migration:run` falha, para a organização escolher qual manter à mão. Apagar a
- * "sobra" aqui seria contração implícita (§4.13).
+ * It does not delete data: if the table already has more than one row, the index is not added and
+ * `migration:run` fails, so the organization picks which to keep by hand. Deleting the
+ * "leftover" here would be an implicit contraction (§4.13).
  */
 export default class extends BaseSchema {
   protected tableName = 'site_settings'

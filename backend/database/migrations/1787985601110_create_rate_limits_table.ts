@@ -1,12 +1,12 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 /**
- * O contador de tentativas do `@adonisjs/limiter`.
+ * The attempt counter of `@adonisjs/limiter`.
  *
- * O formato das colunas é do pacote, e não nosso: ele lê e escreve por conta
- * própria, sem model Lucid. Por isso também não há `deleted_at` nem os
- * timestamps do resto do schema - a linha some quando expira
- * (`clearExpiredByTimeout`), e uma linha de contador não é registro do domínio.
+ * The column format is the package's, not ours: it reads and writes on its
+ * own, without a Lucid model. That is also why there is no `deleted_at` nor the
+ * timestamps of the rest of the schema - the row disappears when it expires
+ * (`clearExpiredByTimeout`), and a counter row is not a domain record.
  */
 export default class extends BaseSchema {
   protected tableName = 'rate_limits'

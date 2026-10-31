@@ -10,12 +10,12 @@ import {
 import type { SitemapEntry } from '#/lib/sitemap'
 
 /**
- * O `sitemap.xml` é rota de servidor, e não arquivo de `public/`: a URL
- * absoluta depende do ambiente (`frontend.md` §9.7). A lógica pura mora em
+ * `sitemap.xml` is a server route, and not a `public/` file: the absolute
+ * URL depends on the environment (`frontend.md` §9.7). The pure logic lives in
  * `lib/sitemap.ts`.
  *
- * Cada fonte de dado num `try` próprio: a API fora do ar tira as chaves do
- * mapa, mas as páginas fixas continuam nele.
+ * Each data source in its own `try`: the API being down removes the brackets from the
+ * map, but the fixed pages stay in it.
  * _doc-lib/tanstack-start.md#guide/server-routes.
  */
 export const Route = createFileRoute('/sitemap.xml')({
@@ -25,14 +25,14 @@ export const Route = createFileRoute('/sitemap.xml')({
         const entries: Array<SitemapEntry> = [...SITEMAP_STATIC_ENTRIES]
 
         try {
-          // Todas as chaves de uma vez, como a listagem pública: cinco
-          // modalidades x duas categorias cabem em 100.
+          // All brackets at once, like the public listing: five
+          // sports x two categories fit in 100.
           const brackets = await new QueryClient().query(
             storefrontBracketsQueryOptions({ perPage: 100 }),
           )
           entries.push(...bracketEntries(brackets.data))
         } catch {
-          // Sem as chaves, o mapa segue com as páginas fixas.
+          // Without the brackets, the map carries on with the fixed pages.
         }
 
         return new Response(sitemapXml(entries), {

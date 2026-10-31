@@ -7,21 +7,21 @@ import type { Actor } from '@interclasse/shared'
 import type { User } from '#domain/user/user.entity'
 
 /**
- * Quem pode operar qual conta no painel.
+ * Who can operate which account in the panel.
  *
- * É a metade que o `role.middleware` não consegue expressar. Ele olha só o papel
- * de **quem chama**, e a regra aqui depende de **quem é o alvo**: um
- * administrador opera contas, mas não a própria por este recurso.
+ * It is the half that `role.middleware` cannot express. It looks only at the role
+ * of **whoever calls**, and the rule here depends on **who the target is**: an
+ * administrator operates accounts, but not their own through this resource.
  *
- * `BasePolicy` do Bouncer, checada pelo controller com `ctx.bouncer`
+ * Bouncer's `BasePolicy`, checked by the controller with `ctx.bouncer`
  * (_standards/backend.md §4.6, _doc-lib/adonisjs.md#guides/auth/authorization).
- * Recebe `(actor, conta | null)`: conta inexistente nega com `404`, o mesmo
- * `USER_NOT_FOUND` do use-case. A negação vira `AuthorizationException`, que o
- * `handler.ts` traduz para o envelope; o identificador de tradução é o `code`.
- * A mensagem sai pelo `I18n` da requisição.
+ * It receives `(actor, account | null)`: a nonexistent account denies with `404`, the same
+ * `USER_NOT_FOUND` as the use case. The denial becomes `AuthorizationException`, which
+ * `handler.ts` translates into the envelope; the translation identifier is the `code`.
+ * The message comes out through the request's `I18n`.
  *
- * **Sem regra de dono**: aqui os papéis são `ADMINISTRATOR`, `ADVISOR` e
- * `REPRESENTATIVE`, e não há `OWNER` a proteger.
+ * **No owner rule**: here the roles are `ADMINISTRATOR`, `ADVISOR` and
+ * `REPRESENTATIVE`, and there is no `OWNER` to protect.
  */
 @inject()
 export default class UserPolicy extends BasePolicy {
@@ -30,12 +30,12 @@ export default class UserPolicy extends BasePolicy {
   }
 
   /**
-   * Papel e status da própria conta não se trocam por aqui: sem a guarda um
-   * administrador se rebaixa ou se marca `INACTIVE` e perde o painel. Nome e
-   * e-mail continuam editáveis, porque nenhum dos dois tranca ninguém para fora.
+   * The role and status of the account itself are not changed through here: without the guard an
+   * administrator demotes themselves or marks themselves `INACTIVE` and loses the panel. Name and
+   * e-mail remain editable, because neither locks anyone out.
    *
-   * A presença do campo basta, sem comparar com o valor atual: mandar o próprio
-   * papel de volta não é edição.
+   * The presence of the field is enough, without comparing with the current value: sending
+   * the same role back is not an edit.
    */
   update(
     actor: Actor,

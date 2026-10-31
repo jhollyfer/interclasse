@@ -32,10 +32,10 @@ import { SessionLucidRepository } from '#repositories/session/session.lucid.repo
 import { SessionRepository } from '#repositories/session/session.repository'
 
 /**
- * O composition root da persistência (`_standards/architecture.md` §2,
- * `solid.md` §2): liga cada contrato de `app/repositories/` à implementação
- * Lucid. O use-case recebe o contrato pelo construtor e nunca sabe qual é; o
- * teste unitário passa a implementação em memória direto.
+ * The persistence composition root (`_standards/architecture.md` §2,
+ * `solid.md` §2): binds each contract in `app/repositories/` to its Lucid
+ * implementation. The use case receives the contract in the constructor and never
+ * knows which one it is; the unit test passes the in-memory implementation directly.
  */
 export default class RepositoryProvider {
   constructor(protected app: ApplicationService) {}

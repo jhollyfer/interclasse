@@ -36,7 +36,7 @@ async function setup() {
 }
 
 test.group('administrator/classrooms > create (unit)', () => {
-  test('cadastra com a categoria derivada do ano', async ({ assert }) => {
+  test('registers with the category derived from the year', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: '4º A', grade: 4 })
@@ -45,7 +45,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { name: '4º A', grade: 4, category: 'F1' })
   })
 
-  test('devolve conselheiro e representante aninhados', async ({ assert }) => {
+  test('returns nested advisor and representative', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -60,7 +60,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.equal(result.isRight() && result.value.representative?.id, REPRESENTATIVE)
   })
 
-  test('nome repetido é 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
+  test('repeated name is 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ name: '4º A', grade: 4 })
 
@@ -69,7 +69,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'CLASSROOM_ALREADY_EXISTS' })
   })
 
-  test('conta que não existe é 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
+  test('account that does not exist is 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -81,7 +81,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'ADVISOR_NOT_FOUND' })
   })
 
-  test('representante indicado como conselheiro é 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
+  test('representative given as advisor is 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: '4º A', grade: 4, advisorId: REPRESENTATIVE })
@@ -89,7 +89,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'ADVISOR_NOT_FOUND' })
   })
 
-  test('conselheiro de outra turma é 409 ADVISOR_TAKEN', async ({ assert }) => {
+  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ name: '4º A', grade: 4, advisorId: ADVISOR })
 
@@ -98,7 +98,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'ADVISOR_TAKEN' })
   })
 
-  test('representante de outra turma é 409 REPRESENTATIVE_TAKEN', async ({ assert }) => {
+  test('representative of another classroom is 409 REPRESENTATIVE_TAKEN', async ({ assert }) => {
     const { useCase } = await setup()
     await useCase.execute({ name: '4º A', grade: 4, representativeId: REPRESENTATIVE })
 
@@ -111,7 +111,7 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'REPRESENTATIVE_TAKEN' })
   })
 
-  test('ano fora do 3º ao 9º é 422 CLASSROOM_INVALID_GRADE', async ({ assert }) => {
+  test('year outside 3rd to 9th is 422 CLASSROOM_INVALID_GRADE', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: '1º A', grade: 1 })

@@ -19,7 +19,7 @@ import type { AdvisorClassroomPaginatePayload } from '#validators/advisor/classr
 type Payload = Merge<AdvisorClassroomPaginatePayload, { actor: Actor }>
 type Response = Either<HTTPException, Paginated<AdvisorClassroomShowResponse>>
 
-/** As turmas ao alcance de quem age: o administrador vê todas, o conselheiro a dele. */
+/** The classrooms within reach of whoever acts: the administrator sees all, the advisor their own. */
 @inject()
 export default class AdvisorClassroomPaginateUseCase {
   constructor(

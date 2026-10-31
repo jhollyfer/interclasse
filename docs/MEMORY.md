@@ -18,6 +18,8 @@
 
 Fase 7 feita na branch `frente-regua-adacaibs` (sem push): migration no *Post-deployment* (#252), shards do e2e do backend e Vitest em dois projetos (#253), `maiyu-guard` (#254), arquivos de apoio nas casas novas (#256), z-index com o dropdown acima do modal (#257), checks com `file`/`section` e `reason` (#258), gerador de OpenAPI lendo o `*-refusal.ts` (#259) e `.env` em inglês (#260). Portões locais: backend 465 unit + 692 e2e, depcruise limpo; frontend 414+ unit, build e ciclos; Playwright 14/14; sync sem divergência. Os workflows novos não rodaram (sem Actions).
 
+Tarefa 8.3 feita na branch `frente-8-3` (sem push): frontend, E2E e scripts em inglês (comentários, títulos de teste, identificadores, mensagens de erro de desenvolvedor), rotas públicas `/standings`, `/matches`, `/announcements`, `/about` e `/dashboard` sem redirect. Portões: `check`, 419 unit, `format:check`, build, ciclos e Playwright 14/14.
+
 ## Próximos passos
 
 1. Abrir o PR da fase 7 e conferir a matriz `e2e` (3 shards) do `main-check-backend.yml` no primeiro run; o nome dos checks mudou (`Backend - E2E 1/3`…), então ajustar a proteção da `main` se ela exige o nome antigo.

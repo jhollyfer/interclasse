@@ -36,13 +36,13 @@ const FORM_ID = 'user-update'
 export function UserFormEdit(): React.JSX.Element {
   const { id } = route.useParams()
 
-  // `useSuspenseQuery` e não `useQuery`: o `loader` da rota já garantiu o
-  // registro com a mesma chave, e é ele quem trata o 404 e a falha.
+  // `useSuspenseQuery` and not `useQuery`: the route's `loader` already guaranteed the
+  // record with the same key, and it is the one that handles the 404 and the failure.
   const { data: user } = useSuspenseQuery(userQueryOptions(id))
 
-  // Os três parâmetros explícitos, como na criação. O payload é o da
-  // **atualização** com o `id` no caminho, que é a forma que `useUserUpdateMutation`
-  // recebe.
+  // The three parameters are explicit, as in creation. The payload is the
+  // **update** one with the `id` in the path, which is the shape `useUserUpdateMutation`
+  // receives.
   const { form, onSubmit, shell } = useResourceForm<
     UserFormType,
     AdministratorUserShowResponse,
@@ -50,23 +50,23 @@ export function UserFormEdit(): React.JSX.Element {
   >({
     formId: FORM_ID,
     /**
-     * O validator de **atualização**, e é a exceção do painel - os outros seis
-     * recursos validam a edição com o de criação, para o usuário não apagar um
-     * campo obrigatório em silêncio.
+     * The **update** validator, and it is the dashboard's exception - the other six
+     * resources validate the edit with the create one, so the user does not erase a
+     * required field silently.
      *
-     * Aqui não dá: o campo de senha em branco significa "não trocar", e é o
-     * `.optional()` que permite isso. Validar com o de criação exigiria uma
-     * senha nova a cada troca de e-mail, e ninguém conseguiria editar uma conta
-     * sem redefinir a senha dela. É o que a referência faz em
-     * `administrators/-components/form-edit.tsx`, pelo mesmo motivo.
+     * It cannot be done here: a blank password field means "do not change", and it is
+     * `.optional()` that allows that. Validating with the create one would require a new
+     * password on every e-mail change, and nobody could edit an account
+     * without resetting its password. It is what the reference does in
+     * `administrators/-components/form-edit.tsx`, for the same reason.
      */
     validator: AdministratorUserUpdateValidator,
-    // Sem `defaults`: o registro chega da query e `values` já é o objeto
-    // completo. Não há estado inicial a declarar que `values` não sobrescreva
-    // no render seguinte.
+    // No `defaults`: the record arrives from the query and `values` is already the complete
+    // object. There is no initial state to declare that `values` would not overwrite
+    // on the next render.
     //
-    // `values`, e não um `useEffect` com `form.reset`: os dados da query chegam
-    // depois do primeiro render, quando `defaultValues` já congelou.
+    // `values`, and not a `useEffect` with `form.reset`: the query data arrives
+    // after the first render, when `defaultValues` has already frozen.
     values: {
       name: user.name,
       email: user.email,
@@ -80,15 +80,15 @@ export function UserFormEdit(): React.JSX.Element {
     backTo: '/administrator/users/$id',
     backParams: { id },
     success: (updated) => m.admin_users_saved_ok({ name: updated.name }),
-    // Reenviar um `PUT` é seguro: ele escreve o mesmo registro, e não um novo.
+    // Resending a `PUT` is safe: it writes the same record, and not a new one.
     retry: 'user-update-error',
     /**
-     * A senha em branco é **omitida** do corpo, e nunca enviada vazia.
+     * A blank password is **omitted** from the body, and never sent empty.
      *
-     * É a armadilha do recurso: o `requiredIfExists` e o `confirmed` do VineJS
-     * olham a **chave**, não o valor. `password: ''` vira `null`, a chave
-     * permanece, e a API passa a exigir a confirmação de quem não quis trocar
-     * senha. A confirmação segue a senha - sozinha ela não tem o que confirmar.
+     * It is the resource's trap: VineJS's `requiredIfExists` and `confirmed`
+     * look at the **key**, not the value. `password: ''` becomes `null`, the key
+     * stays, and the API starts demanding confirmation from someone who did not want to change
+     * the password. The confirmation follows the password - alone it has nothing to confirm.
      */
     payload: ({ password, passwordConfirmation, ...rest }) => {
       if (!password) return { ...rest, id }

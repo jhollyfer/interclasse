@@ -18,7 +18,7 @@ import type { ConfirmHandle } from '#/lib/dialog-handle'
 import { m } from '#/paraglide/messages'
 
 type RowActionsItemProps = Readonly<{
-  /** O handle do alerta que este item abre (`createConfirmHandle`). */
+  /** The handle of the alert this item opens (`createConfirmHandle`). */
   handle: ConfirmHandle
 }>
 
@@ -35,10 +35,10 @@ type MenuConfirmProps = Readonly<
 >
 
 /**
- * Item de menu que pede confirmação.
+ * A menu item that asks for confirmation.
  *
- * O item só abre o alerta: `handle.open(null)` no clique, e o menu fecha como
- * em qualquer item. O alerta é `RowActionsConfirm`, irmão do menu.
+ * The item only opens the alert: `handle.open(null)` on click, and the menu closes like
+ * any item. The alert is `RowActionsConfirm`, a sibling of the menu.
  */
 function MenuConfirm({
   slot,
@@ -64,23 +64,23 @@ function MenuConfirm({
 
 type RowActionsConfirmProps = Readonly<{
   handle: ConfirmHandle
-  /** A mutation da linha, já com o id: `() => archive.mutate(row.id)`. */
+  /** The row's mutation, already with the id: `() => archive.mutate(row.id)`. */
   onConfirm: () => void
-  /** O texto do botão que confirma. */
+  /** The text of the button that confirms. */
   confirmLabel: string
-  /** Ação sem volta pinta o botão de confirmar de vermelho. */
+  /** An irreversible action paints the confirm button red. */
   destructive?: boolean
   /**
-   * `ConfirmDialogTitle` e `ConfirmDialogDescription`.
+   * `ConfirmDialogTitle` and `ConfirmDialogDescription`.
    *
-   * O texto fica com a tela porque é dela: umas listagens dizem o efeito
-   * concreto ("sai da vitrine na hora") e outras a frase genérica. Fixar aqui
-   * obrigaria a genérica em todas.
+   * The text stays with the screen because it is the screen's: some listings state the concrete
+   * effect ("sai da vitrine na hora") and others the generic sentence. Fixing it here
+   * would force the generic one on all of them.
    */
   children: React.ReactNode
 }>
 
-/** O alerta de um item de menu, para o `dialogs` do `RowActions`. */
+/** A menu item's alert, for `RowActions`' `dialogs`. */
 export function RowActionsConfirm({
   handle,
   onConfirm,
@@ -103,7 +103,7 @@ export function RowActionsConfirm({
   )
 }
 
-/** Arquivar a linha. Só aparece no que ainda não está arquivado. */
+/** Archive the row. Only appears on what is not yet archived. */
 export function RowActionsArchive(
   props: RowActionsItemProps,
 ): React.JSX.Element {
@@ -117,7 +117,7 @@ export function RowActionsArchive(
   )
 }
 
-/** Tirar a linha da lixeira. Só aparece no que está arquivado. */
+/** Take the row out of the trash. Only appears on what is archived. */
 export function RowActionsUnarchive(
   props: RowActionsItemProps,
 ): React.JSX.Element {
@@ -135,17 +135,17 @@ type RowActionsDeleteProps = Readonly<
   Merge<
     RowActionsItemProps,
     {
-      /** O texto do item. "Excluir" por padrão. */
+      /** The item's text. "Excluir" by default. */
       label?: string
     }
   >
 >
 
 /**
- * Apagar a linha de vez. Só no que já está arquivado e só para quem pode.
+ * Delete the row for good. Only on what is already archived and only for whoever may.
  *
- * O use-case recusa o registro vivo com `409` e o código `<RECURSO>_NOT_ARCHIVED`
- * (spec do backend, item 7): oferecer o item fora daí é oferecer um erro.
+ * The use-case refuses a live record with `409` and the code `<RESOURCE>_NOT_ARCHIVED`
+ * (backend spec, item 7): offering the item outside that is offering an error.
  */
 export function RowActionsDelete({
   label = m.common_delete(),

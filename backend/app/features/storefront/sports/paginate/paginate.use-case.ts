@@ -18,7 +18,7 @@ import type { PaginationPayload } from '#core/validator'
 type Payload = PaginationPayload
 type Response = Either<HTTPException, Paginated<StorefrontSportShowResponse>>
 
-/** As modalidades do site, em ordem de nome. */
+/** The site sports, in name order. */
 @inject()
 export default class StorefrontSportPaginateUseCase {
   constructor(

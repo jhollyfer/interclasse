@@ -1,36 +1,36 @@
 import type { Merge, SortDirection, TrashedMode } from '@interclasse/shared'
 
 /**
- * Os filtros de qualquer listagem do painel, na URL.
+ * The filters of any dashboard listing, in the URL.
  *
- * Na URL, e não em `useState`, porque é o que sobrevive ao F5 e ao link
- * compartilhado - a tabela na página 2 com um filtro aplicado tem que voltar
- * igual.
+ * In the URL, and not in `useState`, because it is what survives F5 and the shared
+ * link - the table on page 2 with a filter applied has to come back
+ * the same.
  *
- * À mão, e não com os validators de listagem do `shared/`: o `validateSearch`
- * do roteador precisa devolver o objeto limpo, descartando o parâmetro inválido
- * em vez de lançar, e aqui o filtro vem de uma URL que qualquer um edita.
+ * By hand, and not with the `shared/` listing validators: the router's `validateSearch`
+ * has to return the clean object, discarding the invalid parameter
+ * instead of throwing, and here the filter comes from a URL that anyone can edit.
  *
- * Mora fora de `routes/` para poder ser testado sem que o gerador da árvore
- * trate o arquivo de teste como uma rota.
+ * Lives outside `routes/` so it can be tested without the tree generator
+ * treating the test file as a route.
  */
 
 /**
- * Os valores são literais, e `SORT_DIRECTION`/`TRASHED_MODE` de `@interclasse/shared`
- * entram só como **tipo**. Não é descuido: este arquivo é importado por toda
- * rota que declara `validateSearch`, então ele cai no chunk do router, enquanto
- * o enum mora com o resto do vocabulário. Ler o enum aqui, em escopo de módulo,
- * cria uma aresta entre os dois chunks - e o Rolldown não garante que o grafo de
- * chunks seja acíclico. Num ciclo, o chunk do vocabulário ainda não terminou de
- * avaliar quando esta linha roda, e o objeto vale `undefined`:
+ * The values are literals, and `@interclasse/shared`'s `SORT_DIRECTION`/`TRASHED_MODE`
+ * enter only as a **type**. It is not an oversight: this file is imported by every
+ * route that declares `validateSearch`, so it falls into the router chunk, while
+ * the enum lives with the rest of the vocabulary. Reading the enum here, at module scope,
+ * creates an edge between the two chunks - and Rolldown does not guarantee that the chunk
+ * graph is acyclic. In a cycle, the vocabulary chunk has not finished
+ * evaluating when this line runs, and the object is `undefined`:
  *
  *     TypeError: Cannot read properties of undefined (reading 'ONLY')
  *
- * O build passa verde e só o primeiro SSR em produção descobre. `import type`
- * some no build e a aresta com ele. A anotação é o que segura a duplicação: se
- * `TRASHED_MODE.ONLY` mudar de valor, `'only'` deixa de ser atribuível a
- * `TrashedMode` e o `tsc` acusa. `list-search.test.ts` confronta os dois mapas
- * com o enum de verdade.
+ * The build passes green and only the first SSR in production finds out. `import type`
+ * vanishes in the build and the edge with it. The annotation is what holds the duplication:
+ * if `TRASHED_MODE.ONLY` changes value, `'only'` stops being assignable to
+ * `TrashedMode` and `tsc` complains. `list-search.test.ts` checks both maps
+ * against the real enum.
  */
 const SORT_DIRECTIONS: Record<string, SortDirection | undefined> = {
   asc: 'asc',
@@ -43,8 +43,8 @@ const TRASHED_MODES: Record<string, TrashedMode | undefined> = {
 }
 
 /**
- * O que a URL não precisa carregar: a página 1 é a página sem `?page`.
- * `stripSearchParams` tira o parâmetro igual ao padrão da URL gerada.
+ * What the URL does not need to carry: page 1 is the page without `?page`.
+ * `stripSearchParams` removes the parameter equal to the default from the generated URL.
  * _doc-lib/tanstack-router.md#how-to/validate-search-params.
  */
 export const LIST_SEARCH_DEFAULTS = { page: 1 }
@@ -55,16 +55,16 @@ export type ListSearch = {
   search?: string
   trashed?: TrashedMode
   /**
-   * A coluna da ordem. **Não** é validada contra uma lista aqui: cada recurso
-   * aceita as suas, quem fecha a lista é o `sortFields()` do backend, e repetir
-   * as listas de sete recursos no cliente seria garantir que as duas
-   * divergissem. Coluna inválida volta 422 apontando o campo.
+   * The sort column. It is **not** validated against a list here: each resource
+   * accepts its own, whoever closes the list is the backend's `sortFields()`, and repeating
+   * the lists of seven resources on the client would guarantee that the two
+   * diverge. An invalid column returns 422 pointing at the field.
    */
   sort?: string
   direction?: SortDirection
 }
 
-/** Search param chega como string na URL e como número na navegação tipada. */
+/** A search param arrives as a string in the URL and as a number in typed navigation. */
 function positive(value: unknown): number | undefined {
   const parsed = Number(value)
 
@@ -88,12 +88,12 @@ export function validateListSearch(
   if (page) result.page = page
 
   const perPage = positive(search.perPage)
-  // O backend recusa acima de 100; deixar passar viraria 422 numa navegação.
+  // The backend refuses above 100; letting it through would become a 422 on a navigation.
   if (perPage && perPage <= 100) result.perPage = perPage
 
   const term = text(search.search)
-  // O teto de `paginationFields()`. Um termo colado da área de transferência
-  // passa dos 100 caracteres sem esforço, e o 422 apareceria como busca quebrada.
+  // The cap of `paginationFields()`. A term pasted from the clipboard easily
+  // goes past 100 characters, and the 422 would show up as a broken search.
   if (term) result.search = term.slice(0, 100)
 
   const trashed = TRASHED_MODES[String(search.trashed)]
@@ -102,8 +102,8 @@ export function validateListSearch(
   const sort = text(search.sort)
   if (sort) result.sort = sort
 
-  // `direction` sem `sort` não ordena nada; deixá-la passar sozinha só sujaria
-  // a URL com um parâmetro sem efeito.
+  // `direction` without `sort` sorts nothing; letting it through alone would only dirty
+  // the URL with a parameter with no effect.
   const direction = SORT_DIRECTIONS[String(search.direction)]
   if (sort && direction) result.direction = direction
 
@@ -111,17 +111,17 @@ export function validateListSearch(
 }
 
 /**
- * As listagens que somam um filtro próprio ao conjunto padrão - `?status` em
- * depoimentos e em usuários, `?mimetype` na biblioteca de arquivos,
- * `?category` em notícias. O extra é sempre texto: uuid e enum chegam como
- * string na URL, e quem recusa valor inválido é a API, com 422 apontando o
- * campo.
+ * The listings that add a filter of their own to the default set - `?status` on
+ * testimonials and users, `?mimetype` on the file library,
+ * `?category` on news. The extra is always text: uuid and enum arrive as a
+ * string in the URL, and whoever refuses an invalid value is the API, with 422 pointing at
+ * the field.
  */
 export function withExtra<TKey extends string, TNumeric extends string = never>(
   keys: ReadonlyArray<TKey>,
   /**
-   * As chaves que são número na URL. Separadas porque `?size=abc` tem de sumir,
-   * e não virar a string `'abc'` numa requisição que o backend recusaria com
+   * The keys that are numbers in the URL. Separate because `?size=abc` has to vanish,
+   * and not become the string `'abc'` in a request that the backend would refuse with
    * 422.
    */
   numericKeys: ReadonlyArray<TNumeric> = [],
@@ -138,45 +138,45 @@ export function withExtra<TKey extends string, TNumeric extends string = never>(
 
     for (const key of numericKeys) {
       const parsed = Number(search[key])
-      // `0` é filtro legítimo, então a condição é sobre ser inteiro
-      // não-negativo, e não sobre ser verdadeiro.
+      // `0` is a legitimate filter, so the condition is about being a non-negative
+      // integer, and not about being truthy.
       if (Number.isInteger(parsed) && parsed >= 0) numeric[key] = parsed
     }
 
-    // Os extras são montados à parte e espalhados: escrever direto no objeto
-    // combinado exigiria uma asserção para provar ao compilador que a chave
-    // genérica cabe ali, e asserção é o que este projeto não usa.
+    // The extras are built separately and spread: writing directly into the combined
+    // object would require an assertion to prove to the compiler that the generic
+    // key fits there, and assertions are what this project does not use.
     return { ...validateListSearch(search), ...extra, ...numeric }
   }
 }
 
 /**
- * Os filtros da vitrine pública.
+ * The public storefront's filters.
  *
- * Separado de `ListSearch` porque **não tem `trashed`**: `/storefront` nunca
- * enxerga registro arquivado - `StorefrontVisibilityService` filtra
- * `deleted_at IS NULL` antes de qualquer parâmetro -, e o `trashedField()` fica
- * fora dos validators de lá. Deixar a chave na tipagem seria prometer um
- * recorte que a URL aceita, o cliente manda e o backend recusa com 422.
+ * Separate from `ListSearch` because it **has no `trashed`**: `/storefront` never
+ * sees an archived record - `StorefrontVisibilityService` filters
+ * `deleted_at IS NULL` before any parameter -, and the `trashedField()` stays
+ * out of the validators there. Leaving the key in the typing would be promising a
+ * filter that the URL accepts, the client sends and the backend refuses with 422.
  *
- * O resto é igual: `page`, `perPage`, `search`, `sort` e `direction`. Quem fecha
- * a lista de colunas ordenáveis é o `sortFields()` de cada recurso no backend,
- * como no painel.
+ * The rest is the same: `page`, `perPage`, `search`, `sort` and `direction`. Whoever closes
+ * the list of sortable columns is each resource's `sortFields()` in the backend,
+ * as on the dashboard.
  */
 export type StorefrontSearch = Omit<ListSearch, 'trashed'>
 
 /**
- * A validação do search de uma tela pública.
+ * The search validation of a public screen.
  *
- * É `validateListSearch` **menos `trashed`**, e nada mais. Escrever a versão
- * completa e recortar depois, em vez de repetir os cinco campos aqui, é o que
- * mantém uma regra só: o teto de 100 do `perPage`, o corte do termo em 100
- * caracteres e a recusa de `direction` sem `sort` valem igual nas duas
- * superfícies, e duplicá-los garantiria que uma delas envelhecesse sozinha.
+ * It is `validateListSearch` **minus `trashed`**, and nothing more. Writing the full
+ * version and trimming afterwards, instead of repeating the five fields here, is what
+ * keeps a single rule: the `perPage` cap of 100, the cut of the term at 100
+ * characters and the refusal of `direction` without `sort` hold equally on both
+ * surfaces, and duplicating them would guarantee that one of them aged on its own.
  *
- * `sort` e `direction` ficam: `/storefront/notices` e `/storefront/events`
- * declaram as próprias colunas ordenáveis, e a ordem escolhida é recorte de
- * URL como qualquer outro.
+ * `sort` and `direction` stay: `/storefront/notices` and `/storefront/events`
+ * declare their own sortable columns, and the chosen order is a URL filter
+ * like any other.
  */
 export function validateStorefrontSearch(
   search: Record<string, unknown>,
@@ -187,10 +187,10 @@ export function validateStorefrontSearch(
 }
 
 /**
- * Os filtros próprios de cada listagem, por cima dos que toda listagem tem.
+ * Each listing's own filters, on top of those every listing has.
  *
- * Os valores são `string` e não o enum do domínio: quem sai da URL é texto, e
- * quem recusa valor fora da lista é a API, com 422 apontando o campo.
+ * The values are `string` and not the domain enum: what comes out of the URL is text, and
+ * whoever refuses a value outside the list is the API, with 422 pointing at the field.
  */
 export type UserListSearch = Merge<
   ListSearch,
@@ -228,18 +228,18 @@ export type CardListSearch = Merge<
 export type RemovalListSearch = Merge<ListSearch, { pending?: boolean }>
 
 /**
- * Monta a query string ignorando o que não foi preenchido.
+ * Builds the query string ignoring what was not filled in.
  *
- * Descarta por falsidade e não por `!== undefined`: o valor pode chegar `null`
- * (o search param existe e está limpo) ou `''`, e `String(null)` viraria o texto
- * "null" no filtro. `page` e `perPage` são `min(1)` no validator, mas número é
- * testado por tipo e não por verdade - um filtro numérico que aceite `0` não
- * pode sumir por ser falso.
+ * Discards by falsiness and not by `!== undefined`: the value may arrive `null`
+ * (the search param exists and is clean) or `''`, and `String(null)` would become the text
+ * "null" in the filter. `page` and `perPage` are `min(1)` in the validator, but a number is
+ * tested by type and not by truth - a numeric filter that accepts `0` must
+ * not vanish for being falsy.
  *
- * Aceita toda forma de filtro do painel e a da vitrine. Tipar só como
- * `ListSearch` compilaria -
- * todo campo dela é opcional, então as demais passam por assinabilidade -, mas a
- * assinatura estaria mentindo sobre quem entra aqui.
+ * It accepts every dashboard filter shape and the storefront's. Typing only as
+ * `ListSearch` would compile -
+ * every field of it is optional, so the others pass by assignability -, but the
+ * signature would be lying about who enters here.
  */
 export function queryString(params: Record<string, unknown>): string {
   const entries = Object.entries(params).filter(

@@ -12,25 +12,25 @@ function match(partial: Partial<AdministratorMatchPaginateResponse>) {
 }
 
 describe('scoreOf', () => {
-  it('partida encerrada mostra o placar', () => {
+  it('when a match is finished, shows the score', () => {
     expect(
       scoreOf(match({ status: 'FINISHED', homeScore: 3, awayScore: 1 })),
     ).toBe('3 x 1')
   })
 
-  it('partida que não terminou mostra só o x', () => {
+  it('when a match has not finished, shows only the x', () => {
     expect(scoreOf(match({ status: 'SCHEDULED' }))).toBe('x')
   })
 })
 
 describe('phaseLabel', () => {
-  it('traduz a fase pelo mapa de rótulos', () => {
+  it('translates the round through the label map', () => {
     expect(phaseLabel({ phase: 'FINAL' })).toBe(MATCH_PHASE_LABELS.FINAL)
   })
 })
 
 describe('groupByDay', () => {
-  it('agrupa jogos do mesmo dia da escola, na ordem recebida', () => {
+  it('groups matches of the same school day, in the order received', () => {
     const days = groupByDay([
       match({ id: 'a', scheduledAt: '2026-10-16T12:30:00.000Z' }),
       match({ id: 'b', scheduledAt: '2026-10-16T15:00:00.000Z' }),
@@ -41,8 +41,8 @@ describe('groupByDay', () => {
     expect(days[0]?.matches.map((item) => item.id)).toEqual(['a', 'b'])
   })
 
-  it('a virada do dia usa o relógio da escola, e não o UTC', () => {
-    // 02:00 UTC de 17/10 ainda é 22:00 de 16/10 em Manaus.
+  it('when the day rolls over, uses the school clock and not UTC', () => {
+    // 02:00 UTC on 10/17 is still 22:00 on 10/16 in Manaus.
     const days = groupByDay([
       match({ id: 'a', scheduledAt: '2026-10-17T02:00:00.000Z' }),
     ])
@@ -50,7 +50,7 @@ describe('groupByDay', () => {
     expect(days[0]?.key).toBe('2026-10-16')
   })
 
-  it('jogo sem horário vai para um grupo próprio', () => {
+  it('puts a match without a time in a group of its own', () => {
     const days = groupByDay([match({ id: 'a', scheduledAt: null })])
 
     expect(days).toHaveLength(1)

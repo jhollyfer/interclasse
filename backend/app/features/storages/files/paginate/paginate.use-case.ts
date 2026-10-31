@@ -20,11 +20,11 @@ type Payload = StoragesFilePaginatePayload
 type Response = Either<HTTPException, Paginated<StoragesFileShowResponse>>
 
 /**
- * A biblioteca de arquivos do painel.
+ * The panel file library.
  *
- * `backend-old` tinha `GET /storage/paginate`, e a tela que a consome
- * (`files/page.tsx`) sobreviveu à migração - sem esta ação ela ficaria sem
- * backend.
+ * `backend-old` had `GET /storage/paginate`, and the screen that consumes it
+ * (`files/page.tsx`) survived the migration - without this action it would be left without
+ * a backend.
  */
 @inject()
 export default class StoragesFilePaginateUseCase {
@@ -36,8 +36,8 @@ export default class StoragesFilePaginateUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      // `recentFirst` e não `sortOrder`: numa biblioteca de arquivos o que
-      // interessa é o que acabou de subir. É a ordem que `backend-old` dava.
+      // `recentFirst` and not `sortOrder`: in a file library what
+      // matters is what has just been uploaded. It is the order `backend-old` gave.
       const [sort, direction] = recentFirst(payload)
 
       const page = await this.storages.paginate({

@@ -11,7 +11,7 @@ function empty(): SiteSetting {
 }
 
 test.group('SiteSetting', () => {
-  test('nasce com tudo vazio', ({ assert }) => {
+  test('is born with everything empty', ({ assert }) => {
     assert.deepEqual(empty().snapshot(), {
       id: 'site',
       about: null,
@@ -26,7 +26,7 @@ test.group('SiteSetting', () => {
     })
   })
 
-  test('ausente não mexe e null apaga', ({ assert }) => {
+  test('absent leaves alone and null erases', ({ assert }) => {
     const setting = empty()
     setting.update({ organizer: 'Professores', edition: 3 }, { regulation: null, now: LATER })
 
@@ -36,7 +36,7 @@ test.group('SiteSetting', () => {
     assert.deepInclude(setting.snapshot(), { organizer: null, edition: 3, updatedAt: LATER })
   })
 
-  test('aceita regulamento em PDF', ({ assert }) => {
+  test('accepts the rulebook as a PDF', ({ assert }) => {
     const setting = empty()
 
     const result = setting.update(
@@ -48,7 +48,7 @@ test.group('SiteSetting', () => {
     assert.equal(setting.snapshot().regulationId, FILE_ID)
   })
 
-  test('recusa regulamento que não achou', ({ assert }) => {
+  test('refuses a regulation that was not found', ({ assert }) => {
     const setting = empty()
 
     const result = setting.update({ regulationId: FILE_ID }, { regulation: null, now: LATER })
@@ -57,7 +57,7 @@ test.group('SiteSetting', () => {
     assert.isNull(setting.snapshot().regulationId)
   })
 
-  test('recusa regulamento que não é PDF e não grava nada', ({ assert }) => {
+  test('refuses a regulation that is not a PDF and writes nothing', ({ assert }) => {
     const setting = empty()
 
     const result = setting.update(
@@ -69,7 +69,7 @@ test.group('SiteSetting', () => {
     assert.deepInclude(setting.snapshot(), { regulationId: null, edition: null })
   })
 
-  test('tirar o regulamento com null não confere arquivo', ({ assert }) => {
+  test('removing the regulation with null does not check a file', ({ assert }) => {
     const setting = empty()
     setting.update(
       { regulationId: FILE_ID },
@@ -82,7 +82,7 @@ test.group('SiteSetting', () => {
     assert.isNull(setting.snapshot().regulationId)
   })
 
-  test('replacesRegulation só vale para id novo', ({ assert }) => {
+  test('replacesRegulation only holds for a new id', ({ assert }) => {
     const setting = empty()
 
     assert.isTrue(setting.replacesRegulation(FILE_ID))

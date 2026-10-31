@@ -4,7 +4,7 @@ import { RefusalBase, type RefusalTable } from '#features/_shared.refusal.base'
 import HTTPException from '#exceptions/http.exception'
 import type { StorageError } from '#domain/storage/storage.errors'
 
-/** Cada recusa do arquivo como resposta HTTP (`_standards/domain.md` §2). */
+/** Each refusal of the file as an HTTP response (`_standards/domain.md` §2). */
 export class FileRefusal extends RefusalBase {
   private static readonly TABLE = {
     STORAGE_SIZE_MISMATCH: (fact, i18n) =>
@@ -29,9 +29,9 @@ export class FileRefusal extends RefusalBase {
   }
 
   /**
-   * Anexar um arquivo que não existe, foi removido ou ainda está `PENDING` é
-   * `422` apontando o campo, nunca `404` nem `500`, porque quem mandou o id
-   * errado foi o payload. Vale para todo recurso que anexa arquivo.
+   * Attaching a file that does not exist, was removed or is still `PENDING` is
+   * `422` pointing at the field, never `404` nor `500`, because whoever sent the wrong
+   * id was the payload. It holds for every resource that attaches a file.
    */
   static attachmentNotFound(field: string, i18n: I18n): HTTPException {
     return HTTPException.UnprocessableEntity(i18n.t('files.not_found'), 'STORAGE_NOT_FOUND', {

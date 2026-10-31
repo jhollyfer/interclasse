@@ -8,14 +8,14 @@ import {
 } from './list-search'
 
 /**
- * O recorte de lixeira. Vale um teste próprio porque os valores aceitos são
- * **literais** em `list-search.ts`, e não `TRASHED_MODE.X`: ler o enum ali cria
- * uma aresta entre o chunk do router e o chunk do vocabulário, e num grafo de
- * chunks cíclico ela devolve `undefined` no SSR. A duplicação é intencional, e
- * é aqui que ela é confrontada com a fonte.
+ * The trash filter. It deserves a test of its own because the accepted values are
+ * **literals** in `list-search.ts`, and not `TRASHED_MODE.X`: reading the enum there creates
+ * an edge between the router chunk and the vocabulary chunk, and in a cyclic
+ * chunk graph it returns `undefined` on SSR. The duplication is intentional, and
+ * this is where it is checked against the source.
  */
-describe('validateListSearch, recorte de lixeira', () => {
-  it('aceita os dois modos que o enum declara', () => {
+describe('validateListSearch, trash filter', () => {
+  it('accepts the two modes the enum declares', () => {
     expect(validateListSearch({ trashed: TRASHED_MODE.ONLY })).toEqual({
       trashed: 'only',
     })
@@ -24,16 +24,16 @@ describe('validateListSearch, recorte de lixeira', () => {
     })
   })
 
-  it('descarta modo inventado, caixa alta e ausência', () => {
-    // O backend compara em minúsculo; `'ONLY'` seria 422, e não lixeira vazia.
+  it('drops an invented mode, upper case and absence', () => {
+    // The backend compares in lowercase; `'ONLY'` would be a 422, and not an empty trash.
     expect(validateListSearch({ trashed: 'ONLY' })).toEqual({})
     expect(validateListSearch({ trashed: 'lixo' })).toEqual({})
     expect(validateListSearch({})).toEqual({})
   })
 })
 
-describe('validateListSearch, ordenação', () => {
-  it('aceita as duas direções que o enum declara', () => {
+describe('validateListSearch, sorting', () => {
+  it('accepts the two directions the enum declares', () => {
     expect(
       validateListSearch({ sort: 'name', direction: SORT_DIRECTION.ASC }),
     ).toEqual({ sort: 'name', direction: 'asc' })
@@ -42,24 +42,24 @@ describe('validateListSearch, ordenação', () => {
     ).toEqual({ sort: 'name', direction: 'desc' })
   })
 
-  it('cai no padrão quando a direção não existe, em vez de propagá-la', () => {
+  it('falls back to the default when the direction does not exist, instead of propagating it', () => {
     expect(
       validateListSearch({ sort: 'name', direction: 'ascending' }),
     ).toEqual({ sort: 'name' })
   })
 
-  // `direction` sozinha não ordena nada, e sujaria a URL com um parâmetro sem
-  // efeito.
-  it('descarta a direção sem coluna', () => {
+  // `direction` alone sorts nothing, and would dirty the URL with a parameter with no
+  // effect.
+  it('drops a direction without a column', () => {
     expect(validateListSearch({ direction: 'desc' })).toEqual({})
   })
 
   /**
-   * A coluna passa crua de propósito: cada recurso fecha a lista dele no
-   * `sortFields()` do backend, e repetir as listas aqui garantiria divergência.
-   * Coluna inválida volta 422 apontando o campo.
+   * The column passes through raw on purpose: each resource closes its list in the
+   * backend's `sortFields()`, and repeating the lists here would guarantee divergence.
+   * An invalid column returns 422 pointing at the field.
    */
-  it('deixa a coluna passar sem conferir contra lista nenhuma', () => {
+  it('lets the column through without checking it against any list', () => {
     expect(validateListSearch({ sort: 'rating' })).toEqual({ sort: 'rating' })
     expect(validateListSearch({ sort: 'coluna-inventada' })).toEqual({
       sort: 'coluna-inventada',
@@ -67,41 +67,41 @@ describe('validateListSearch, ordenação', () => {
   })
 })
 
-describe('validateListSearch, paginação', () => {
-  it('aceita o que a URL traz como string', () => {
+describe('validateListSearch, pagination', () => {
+  it('accepts what the URL brings as a string', () => {
     expect(validateListSearch({ page: '2', perPage: '50' })).toEqual({
       page: 2,
       perPage: 50,
     })
   })
 
-  it('descarta página fora dos limites do backend', () => {
+  it('drops a page outside the backend limits', () => {
     expect(validateListSearch({ page: 0 })).toEqual({})
     expect(validateListSearch({ page: -1 })).toEqual({})
     expect(validateListSearch({ page: 1.5 })).toEqual({})
     expect(validateListSearch({ page: 'abc' })).toEqual({})
   })
 
-  // O backend recusa acima de 100; deixar passar viraria 422 numa navegação.
+  // The backend refuses above 100; letting it through would become a 422 on a navigation.
   it('descarta perPage acima do teto', () => {
     expect(validateListSearch({ perPage: 101 })).toEqual({})
     expect(validateListSearch({ perPage: 100 })).toEqual({ perPage: 100 })
   })
 
-  it('corta a busca no teto de paginationFields()', () => {
+  it('cuts the search at the paginationFields() cap', () => {
     expect(validateListSearch({ search: 'a'.repeat(150) }).search).toHaveLength(
       100,
     )
   })
 
-  it('descarta busca vazia e busca que não é texto', () => {
+  it('drops an empty search and a search that is not text', () => {
     expect(validateListSearch({ search: '' })).toEqual({})
     expect(validateListSearch({ search: 42 })).toEqual({})
   })
 })
 
 describe('withExtra', () => {
-  it('aceita a chave extra junto do conjunto padrão', () => {
+  it('accepts the extra key together with the default set', () => {
     const validate = withExtra(['status'])
 
     expect(validate({ page: 2, status: 'PENDING' })).toEqual({
@@ -110,7 +110,7 @@ describe('withExtra', () => {
     })
   })
 
-  it('ignora chave que não foi declarada', () => {
+  it('ignores a key that was not declared', () => {
     const validate = withExtra(['status'])
 
     expect(validate({ status: 'PENDING', mimetype: 'image/png' })).toEqual({
@@ -118,15 +118,15 @@ describe('withExtra', () => {
     })
   })
 
-  it('ignora a chave declarada quando ela vem vazia', () => {
+  it('ignores the declared key when it comes empty', () => {
     const validate = withExtra(['status'])
 
     expect(validate({ status: '' })).toStrictEqual({})
   })
 
-  // `?size=abc` tem de sumir, e não virar a string `'abc'` numa requisição que
-  // o backend recusaria com 422.
-  it('separa a chave numérica e descarta o que não é inteiro não-negativo', () => {
+  // `?size=abc` has to vanish, and not become the string `'abc'` in a request that
+  // the backend would refuse with 422.
+  it('separates the numeric key and drops what is not a non-negative integer', () => {
     const validate = withExtra([], ['size'])
 
     expect(validate({ size: '0' })).toEqual({ size: 0 })
@@ -137,9 +137,9 @@ describe('withExtra', () => {
 })
 
 describe('validateStorefrontSearch', () => {
-  // `/storefront` nunca enxerga registro arquivado: deixar a chave passar seria
-  // prometer na URL um recorte que o backend recusa com 422.
-  it('descarta trashed e mantém o resto do recorte', () => {
+  // `/storefront` never sees an archived record: letting the key through would be
+  // promising in the URL a filter that the backend refuses with 422.
+  it('drops trashed and keeps the rest of the filter', () => {
     expect(
       validateStorefrontSearch({
         page: 2,

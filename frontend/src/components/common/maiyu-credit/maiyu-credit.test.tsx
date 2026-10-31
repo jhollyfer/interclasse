@@ -8,7 +8,7 @@ import { MaiyuCredit } from './index'
 afterEach(cleanup)
 
 describe('MaiyuCredit', () => {
-  it('o link da Maiyu abre em outra aba sem vazar o opener', () => {
+  it('opens the Maiyu link in another tab without leaking the opener', () => {
     render(<MaiyuCredit />)
     const link = screen.getByRole('link', { name: 'Maiyu' })
 
@@ -17,7 +17,7 @@ describe('MaiyuCredit', () => {
     expect(link.getAttribute('rel')).toContain('noreferrer')
   })
 
-  it('aceita classe extra no parágrafo', () => {
+  it('accepts an extra class on the paragraph', () => {
     const { container } = render(<MaiyuCredit className="extra" />)
 
     expect(

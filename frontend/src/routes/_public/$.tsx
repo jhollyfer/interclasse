@@ -5,25 +5,25 @@ import { pageHead } from '#/lib/page-head'
 import { m } from '#/paraglide/messages'
 
 /**
- * O endereço público que não existe (VI-05).
+ * The public address that does not exist (VI-05).
  *
- * O `defaultNotFoundComponent` do `router.tsx` desenha a mesma tela, e desenha
- * **fora** de qualquer casca: um endereço que não casa com rota nenhuma nunca
- * chega ao `_public`, então o cabeçalho e o rodapé da vitrine não estão
- * montados quando ele responde. Quem erra o endereço fica sem menu, sem marca
- * e sem rodapé - sem saída que não seja o botão de voltar.
+ * The `defaultNotFoundComponent` in `router.tsx` draws the same screen, and draws it
+ * **outside** any shell: an address that matches no route never
+ * reaches `_public`, so the storefront's header and footer are not
+ * mounted when it answers. Whoever gets the address wrong is left without menu, without brand
+ * and without footer - with no exit other than the back button.
  *
- * Esta rota-curinga é o que traz a tela para dentro da casca: `$` casa com o
- * que sobrou, e por ser filha de `_public` ela vem com cabeçalho e rodapé. O
- * botão continua indo para a home, que é a saída certa para quem estava na
- * vitrine.
+ * This catch-all route is what brings the screen inside the shell: `$` matches
+ * what is left, and being a child of `_public` it comes with header and footer. The
+ * button still goes to the home, which is the right exit for whoever was in
+ * the storefront.
  *
- * **Sem arquivo `.lazy`, e é decisão**: a tela é um componente que já está no
- * pacote - dividi-la em duas requisições custaria uma ida ao servidor para
- * carregar seis linhas.
+ * **No `.lazy` file, and it is a decision**: the screen is a component that is already in
+ * the bundle - splitting it into two requests would cost a trip to the server
+ * to load six lines.
  *
- * `noindex` porque o endereço não existe: sem ele o buscador guardaria a URL
- * errada com uma resposta de sucesso.
+ * `noindex` because the address does not exist: without it the search engine would keep the
+ * wrong URL with a success response.
  */
 export const Route = createFileRoute('/_public/$')({
   head: ({ match }) =>
@@ -32,8 +32,8 @@ export const Route = createFileRoute('/_public/$')({
       pathname: match.pathname,
       noindex: true,
     }),
-  // `min-h` menor que o padrão: dentro da casca a tela divide a altura com o
-  // cabeçalho e o rodapé, e `min-h-dvh` empurraria o rodapé para fora da
-  // primeira dobra.
+  // `min-h` smaller than the default: inside the shell the screen shares the height with the
+  // header and footer, and `min-h-dvh` would push the footer out of the
+  // first fold.
   component: () => <NotFoundPage className="min-h-stage-sm" />,
 })

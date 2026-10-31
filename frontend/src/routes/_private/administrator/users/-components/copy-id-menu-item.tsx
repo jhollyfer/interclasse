@@ -10,15 +10,15 @@ type CopyIdMenuItemProps = Readonly<{
 }>
 
 /**
- * "Copiar ID" no menu de uma linha.
+ * "Copiar ID" in a row's menu.
  *
- * O id não aparece em coluna nenhuma - é uuid, ocuparia a largura de duas
- * colunas úteis e ninguém o lê. Mas ele é o que abre o registro pela URL, o que
- * se cola num chamado de suporte e o que se leva para uma consulta no banco, e
- * sem isto o caminho era abrir o detalhe e copiar da barra de endereços.
+ * The id appears in no column - it is a uuid, it would take the width of two useful
+ * columns and nobody reads it. But it is what opens the record by URL, what
+ * gets pasted in a support ticket and what is taken to a database query, and
+ * without this the path was to open the detail and copy from the address bar.
  *
- * Componente e não uma linha em cada tela: são oito menus, e a alternativa era
- * o mesmo `writeText` com o mesmo toast copiado oito vezes.
+ * A component and not a line on each screen: there are eight menus, and the alternative was
+ * the same `writeText` with the same toast copied eight times.
  */
 export function CopyIdMenuItem({ id }: CopyIdMenuItemProps): React.JSX.Element {
   async function copy(): Promise<void> {

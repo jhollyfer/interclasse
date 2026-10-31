@@ -1,9 +1,9 @@
 /**
- * Se a conta pode entrar. Nome genérico: é o par ativo/inativo, e nada nele é
- * específico de usuário.
+ * Whether the account can sign in. Generic name: it is the active/inactive pair, and
+ * nothing in it is specific to users.
  *
- * Chave e valor em caixa alta: o valor do enum é identificador, não texto de
- * interface - o rótulo em português é do frontend.
+ * Key and value in upper case: the enum value is an identifier, not interface text -
+ * the Portuguese label belongs to the frontend.
  */
 export const ACTIVE_STATUS = {
   ACTIVE: 'ACTIVE',

@@ -21,28 +21,28 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorBracketCreatePayload } from '#validators/administrator/brackets.validator'
 
 type Payload = AdministratorBracketCreatePayload
-/** `created` falso quando a chave já existia: o controller responde 200, não 201. */
+/** `created` false when the bracket already existed: the controller responds 200, not 201. */
 type Drawn = { bracket: AdministratorBracketCreateResponse; created: boolean }
 type Response = Either<HTTPException, Drawn>
 
 /**
- * O sorteio: a entidade monta a chave de mata-mata inteira, da primeira fase à
- * final, e o repository a grava.
+ * The draw: the entity builds the whole knockout bracket, from the first phase to the
+ * final, and the repository saves it.
  *
- * Tudo numa unidade de trabalho, com a linha da modalidade travada: a inscrição
- * trava a mesma linha antes de gravar, então uma lista salva no meio do sorteio
- * não entra depois da leitura das turmas. Uma chave com metade das partidas
- * gravadas seria pior que nenhuma, porque travaria as inscrições.
+ * All in one unit of work, with the sport row locked: the enrollment
+ * locks the same row before saving, so a list saved in the middle of the draw
+ * does not enter after the classrooms were read. A bracket with half of the matches
+ * saved would be worse than none, because it would lock the enrollments.
  *
- * Idempotente pela chave natural, modalidade e categoria (índice único em
- * `brackets`): sortear de novo devolve a chave já sorteada, sem erro e sem novo
- * sorteio (_standards/backend.md §4.11). É o que deixa o navegador repetir o
- * pedido quando a rede cai depois do commit. Refazer o sorteio continua sendo
- * apagar e sortear.
+ * Idempotent by the natural key, sport and category (unique index on
+ * `brackets`): drawing again returns the already drawn bracket, with no error and no new
+ * draw (_standards/backend.md §4.11). It is what lets the browser repeat the
+ * request when the network drops after the commit. Redoing the draw remains
+ * deleting and drawing.
  */
 @inject()
 export default class AdministratorBracketCreateUseCase {
-  /** Aleatoriedade criptográfica: um sorteio previsível seria um sorteio contestável. */
+  /** Cryptographic randomness: a predictable draw would be a contestable draw. */
   private static readonly random: Random = (max) => randomInt(max)
 
   constructor(
@@ -55,8 +55,8 @@ export default class AdministratorBracketCreateUseCase {
     try {
       const result = await this.unit.run(() => this.draw(payload))
 
-      // Dois sorteios ao mesmo tempo: o segundo perde no `unique` de modalidade e
-      // categoria (o `save` devolve o fato), e a resposta é a mesma do sorteio repetido.
+      // Two simultaneous draws: the second loses on the sport and category `unique`
+      // (`save` returns the fact), and the response is the same as the repeated draw.
       if (result.isLeft() && result.value.code === 'BRACKET_ALREADY_EXISTS') {
         const existing = await this.existing(payload)
         if (existing) return right(existing)
@@ -112,7 +112,7 @@ export default class AdministratorBracketCreateUseCase {
     return right({ bracket: BracketPresenter.created(drawn.value, sport), created: true })
   }
 
-  /** A chave que o sorteio concorrente gravou primeiro. */
+  /** The bracket that the concurrent draw saved first. */
   private async existing(payload: Payload): Promise<Drawn | null> {
     const sport = await this.brackets.findSport(payload.sportId)
     const bracket = await this.brackets.findBySportAndCategory(payload.sportId, payload.category)

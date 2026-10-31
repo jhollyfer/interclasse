@@ -7,26 +7,26 @@ import { USER_ROLE, type Actor, type UserRole } from '@interclasse/shared'
 import type { Storage } from '#domain/storage/storage.entity'
 
 /**
- * Quem baixa qual arquivo pela rota de download.
+ * Who downloads which file through the download route.
  *
- * A rota existe porque o atributo `download` de um `<a>` é ignorado entre
- * origens; ela não é um caminho alternativo de leitura. O que o site mostra sai
- * por `url` assinada, derivada na leitura do recurso que a contém - e quem
- * chega àquele recurso já passou pela autorização dele.
+ * The route exists because the `download` attribute of an `<a>` is ignored across
+ * origins; it is not an alternative read path. What the site shows comes out
+ * through a signed `url`, derived on reading the resource that contains it - and whoever
+ * reaches that resource has already passed its authorization.
  *
- * O administrador baixa tudo. Os demais papéis alcançam só o que é deles - hoje,
- * o próprio avatar, que o `actor` já carrega, sem consulta (a policy não vai ao
- * banco além do alvo, _standards/architecture.md §2). Fechado por omissão.
+ * The administrator downloads everything. The other roles reach only what is theirs - today,
+ * their own avatar, which the `actor` already carries, without a query (the policy does not go to
+ * the database beyond the target, _standards/architecture.md §2). Closed by default.
  *
- * Recebe `(actor, arquivo | null)`. A negação é `404` e não `403`, a mesma
- * resposta de arquivo inexistente: um 403 confirmaria a quem sonda que aquele
- * uuid existe (_standards/backend.md §4.6).
+ * It receives `(actor, file | null)`. The denial is `404` and not `403`, the same
+ * response as a nonexistent file: a 403 would confirm to whoever probes that this
+ * uuid exists (_standards/backend.md §4.6).
  */
 
 /**
- * Quem opera o painel administrativo, e não só a própria turma. À parte de
- * `USER_ROLES` para que papel novo nasça de fora: entraria em `USER_ROLE` sem
- * entrar aqui, e ficaria de fora da checagem por omissão.
+ * Who operates the administrative panel, and not only their own classroom. Apart from
+ * `USER_ROLES` so a new role is born outside: it would enter `USER_ROLE` without
+ * entering here, and would be left out of the default check.
  */
 const STAFF_USER_ROLES: ReadonlyArray<UserRole> = [USER_ROLE.ADMINISTRATOR]
 

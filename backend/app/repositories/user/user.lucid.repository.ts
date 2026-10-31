@@ -70,8 +70,8 @@ export class UserLucidRepository extends UserRepository {
     const { id, createdAt, updatedAt, deletedAt, ...columns } = user.snapshot()
 
     try {
-      // A senha vai como está: o hook do model cifra quando ela mudou, e o hash
-      // já gravado volta igual e não é cifrado de novo.
+      // The password goes as is: the model hook hashes when it changed, and the hash
+      // already saved comes back equal and is not hashed again.
       await UserModel.updateOrCreate(
         { id },
         {
@@ -116,8 +116,8 @@ export class UserLucidRepository extends UserRepository {
     if (criteria.role) query.where('role', criteria.role)
     if (criteria.status) query.where('status', criteria.status)
 
-    // O `OR` vai dentro de uma subquery: solto, ele escaparia do `AND` do filtro
-    // de lixeira, de papel e de status, e traria conta arquivada na listagem padrão.
+    // The `OR` goes inside a subquery: loose, it would escape the filter's `AND`
+    // of trash, role and status, and bring an archived account into the default listing.
     if (criteria.search) {
       const search = `%${criteria.search}%`
 

@@ -9,7 +9,8 @@ import { AdvisorStudentCreateValidator } from '#validators/advisor/students.vali
 @inject()
 export default class AdvisorStudentCreateController {
   static docs = defineDocs({
-    description: 'Cadastra o aluno numa turma do conselheiro. Turma alheia responde `404`.',
+    description:
+      'Registers the student in an advisor classroom. A foreign classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorStudentCreateUseCase) {}

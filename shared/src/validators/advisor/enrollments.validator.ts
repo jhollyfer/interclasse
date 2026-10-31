@@ -1,8 +1,8 @@
 import { athleteListFields, z } from '../../validator.js'
 
 /**
- * A lista de atletas de uma turma, como o conselheiro a lê e a troca. Par do
- * VineJS de `backend/app/validators/advisor/enrollments.validator.ts`.
+ * The athlete list of a classroom, as the advisor reads and replaces it. Mirror of
+ * the VineJS one in `backend/app/validators/advisor/enrollments.validator.ts`.
  */
 export const AdvisorEnrollmentShowValidator = z.object({
   classroomId: z.uuid(),
@@ -11,7 +11,7 @@ export const AdvisorEnrollmentShowValidator = z.object({
 export const AdvisorEnrollmentUpdateValidator = z.object({
   classroomId: z.uuid(),
   ...athleteListFields(),
-  /** O motivo, quando a lista nova tira alguém da atual. */
+  /** The reason, when the new list removes someone from the current one. */
   reason: z.string().trim().min(5).max(500).optional(),
 })
 

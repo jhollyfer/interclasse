@@ -12,9 +12,9 @@ import { UserFactory } from '#database/factories/user.factory'
 import UserModel from '#models/user'
 
 /**
- * O mesmo contrato nas duas implementações (`_standards/domain.md` §5.4): é o
- * que garante que o unitário do use-case, que roda na de memória, não passa
- * contra um dublê que mente.
+ * The same contract in both implementations (`_standards/domain.md` §5.4): it is what
+ * guarantees that the use case unit test, which runs on the in-memory one, does not pass
+ * against a lying double.
  */
 const IMPLEMENTATIONS = {
   lucid: () => app.container.make(StorageLucidRepository),
@@ -43,60 +43,60 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`StorageRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save e findById devolvem o mesmo arquivo', async ({ assert }) => {
+    test('save and findById return the same file', async ({ assert }) => {
       const repository = await make()
-      const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91', 'capa.png')
+      const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91', 'cover.png')
 
-      await repository.save(capa)
+      await repository.save(cover)
 
-      const found = await repository.findById(capa.id)
-      assert.deepEqual(found?.snapshot(), capa.snapshot())
+      const found = await repository.findById(cover.id)
+      assert.deepEqual(found?.snapshot(), cover.snapshot())
       assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('save de novo atualiza o mesmo arquivo', async ({ assert }) => {
+    test('saving again updates the same file', async ({ assert }) => {
       const repository = await make()
-      const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a92', 'capa.png', false)
-      await repository.save(capa)
+      const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a92', 'cover.png', false)
+      await repository.save(cover)
 
-      capa.complete({ contentLength: 1024, head: PNG_HEAD }, NOW)
-      await repository.save(capa)
+      cover.complete({ contentLength: 1024, head: PNG_HEAD }, NOW)
+      await repository.save(cover)
 
-      const updated = await repository.findById(capa.id)
+      const updated = await repository.findById(cover.id)
       assert.equal(updated?.snapshot().status, 'UPLOADED')
     })
 
-    test('detail traz o registro na forma da resposta, sem a url', async ({ assert }) => {
+    test('detail brings the record in the response shape, without the url', async ({ assert }) => {
       const repository = await make()
-      const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a93', 'capa.png')
-      await repository.save(capa)
+      const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a93', 'cover.png')
+      await repository.save(cover)
 
-      const detail = await repository.detail(capa.id)
+      const detail = await repository.detail(cover.id)
 
-      assert.deepInclude(detail, { id: capa.id, originalName: 'capa.png', status: 'UPLOADED' })
+      assert.deepInclude(detail, { id: cover.id, originalName: 'cover.png', status: 'UPLOADED' })
       assert.notProperty(detail, 'url')
       assert.isNull(await repository.detail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
     })
 
-    test('detailsOf traz só os arquivos vivos dos ids', async ({ assert }) => {
+    test('detailsOf brings only the live files of the ids', async ({ assert }) => {
       const repository = await make()
-      const capa = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a94', 'capa.png')
-      await repository.save(capa)
+      const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a94', 'cover.png')
+      await repository.save(cover)
 
       const details = await repository.detailsOf([
-        capa.id,
-        capa.id,
+        cover.id,
+        cover.id,
         '0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f',
       ])
 
       assert.deepEqual(
         details.map((item) => item.id),
-        [capa.id],
+        [cover.id],
       )
       assert.deepEqual(await repository.detailsOf([]), [])
     })
 
-    test('areAttachable só aceita arquivo confirmado e existente', async ({ assert }) => {
+    test('areAttachable only accepts a confirmed and existing file', async ({ assert }) => {
       const repository = await make()
       const ok = file('7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c11', 'ok.png')
       const pending = file('7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c12', 'pendente.png', false)
@@ -109,7 +109,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isFalse(await repository.areAttachable(['0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f']))
     })
 
-    test('paginate busca, filtra por status e ordena', async ({ assert }) => {
+    test('paginate searches, filters by status and sorts', async ({ assert }) => {
       const repository = await make()
       await repository.save(file('1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b61', 'zeta.png'))
       await repository.save(file('2e3d4c5b-6a7f-4e9d-8c1b-2a3f4e5d6c72', 'alfa.png'))
@@ -141,14 +141,14 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('delete tira o arquivo', async ({ assert }) => {
+    test('delete removes the file', async ({ assert }) => {
       const repository = await make()
-      const capa = file('5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d', 'capa.png')
-      await repository.save(capa)
+      const cover = file('5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d', 'cover.png')
+      await repository.save(cover)
 
-      await repository.delete(capa)
+      await repository.delete(cover)
 
-      assert.isNull(await repository.findById(capa.id))
+      assert.isNull(await repository.findById(cover.id))
     })
   })
 }
@@ -156,16 +156,16 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 test.group('StorageRepository (lucid) > usedBy', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lista o avatar de usuário que aponta para o arquivo', async ({ assert }) => {
+  test('lists the user avatar that points to the file', async ({ assert }) => {
     const repository = await app.container.make(StorageLucidRepository)
-    const capa = file('6b7c8d9e-0f1a-4b2c-9d3e-4f5a6b7c8d9e', 'avatar.png')
-    await repository.save(capa)
+    const cover = file('6b7c8d9e-0f1a-4b2c-9d3e-4f5a6b7c8d9e', 'avatar.png')
+    await repository.save(cover)
 
-    assert.deepEqual(await repository.usedBy(capa.id), [])
+    assert.deepEqual(await repository.usedBy(cover.id), [])
 
     const user = await UserFactory.create()
-    await UserModel.query().where('id', user.id).update({ avatarId: capa.id })
+    await UserModel.query().where('id', user.id).update({ avatarId: cover.id })
 
-    assert.deepEqual(await repository.usedBy(capa.id), ['avatar de usuário'])
+    assert.deepEqual(await repository.usedBy(cover.id), ['avatar de usuário'])
   })
 })

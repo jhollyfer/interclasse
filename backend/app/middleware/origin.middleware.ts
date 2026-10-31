@@ -5,24 +5,24 @@ import HTTPException from '#exceptions/http.exception'
 import { corsOrigins } from '#config/cors'
 
 /**
- * A barreira de CSRF da API, que autentica por cookie.
+ * The CSRF barrier of the API, which authenticates by cookie.
  *
- * `SameSite=Lax` não basta: um subdomínio irmão comprometido é *same-site* e
- * envia o cookie. Por isso todo método que não é `GET`/`HEAD`/`OPTIONS` confere
- * a origem contra a mesma allowlist do CORS, **antes do bodyparser**
+ * `SameSite=Lax` is not enough: a compromised sibling subdomain is *same-site* and
+ * sends the cookie. So every method that is not `GET`/`HEAD`/`OPTIONS` checks
+ * the origin against the same allowlist as CORS, **before the bodyparser**
  * (_standards/backend.md §4.10).
  *
- * A checagem não olha `Content-Type` nem corpo: `text/plain`, `multipart/form-data`
- * e `POST` vazio cruzam sites sem preflight, e são justamente o vetor.
+ * The check looks at neither `Content-Type` nor body: `text/plain`, `multipart/form-data`
+ * and an empty `POST` cross sites without preflight, and they are precisely the vector.
  *
- * - `Origin` presente: precisa estar na allowlist.
- * - `Origin` ausente: vale o `Sec-Fetch-Site` do navegador, só `same-origin` ou
+ * - `Origin` present: must be in the allowlist.
+ * - `Origin` absent: the browser's `Sec-Fetch-Site` applies, only `same-origin` or
  *   `none`.
- * - Nenhum dos dois: recusa. Cliente servidor a servidor legítimo entra por rota
- *   própria com assinatura, não por exceção aqui.
+ * - Neither: refuse. A legitimate server-to-server client enters through its own
+ *   signed route, not through an exception here.
  *
- * Vale em todo ambiente, desenvolvimento incluso: `CORS_ORIGINS` do `.env`
- * lista o frontend local.
+ * Holds in every environment, development included: `CORS_ORIGINS` in `.env`
+ * lists the local frontend.
  */
 export default class OriginMiddleware {
   private static readonly SAFE_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD', 'OPTIONS'])
