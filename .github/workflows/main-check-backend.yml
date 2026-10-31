@@ -165,7 +165,7 @@ jobs:
               -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
               -v "$PWD/backend/infra/minio:/setup:ro" \
               --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
-              -c '/setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}-test"'; then
+              -c 'sh /setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}-test"'; then
               exit 0
             fi
             sleep 2
