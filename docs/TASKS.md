@@ -83,7 +83,7 @@ Nada vira exceção local: a régua muda e volta pelo sync.
 
 | Item | Situação |
 |---|---|
-| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-so-model-da-conta` no `scripts/depcruise.config.ts`. `pnpm depcruise` sem violação |
+| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-only-account-model` no `scripts/depcruise.config.ts`. `pnpm depcruise` sem violação |
 | Spec de comando Ace em `commands/_<nome>.command.e2e.spec.ts` | Na régua (decisão #248, maiyu-pattern#4) |
 | Modelos de `docs/` sem "desvio aceito" | Na régua (maiyu-pattern#4) |
 | `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |

@@ -1,21 +1,21 @@
 /**
- * Cobra as convencoes de `_standards/backend.md` e `_standards/architecture.md` que o ESLint nao alcanca.
+ * Enforces the conventions of `_standards/backend.md` and `_standards/architecture.md` that ESLint does not reach.
  *
- * O ESLint ja cobra as quatro regras de escrita (ternario, `any`, `as`,
- * `interface`) e a proibicao de `new` em servico. O que sobra e o que depende de
- * saber *onde* o arquivo esta e *como ele se chama* — nome de classe derivado do
- * caminho, camada que nao pode importar outra, envelope de paginacao, escopo de
- * soft delete. Regra de lint nao resolve isso sem inventar um plugin; um script
- * de 300 linhas resolve.
+ * ESLint already enforces the four writing rules (ternary, `any`, `as`,
+ * `interface`) and the ban on `new` in a service. What remains is what depends on
+ * knowing *where* the file is and *what it is called* - class name derived from the
+ * path, a layer that cannot import another, pagination envelope, soft delete
+ * scope. A lint rule does not solve this without inventing a plugin; a 300-line
+ * script does.
  *
- * Cada regra aponta a secao da regua que a origina, para que a mensagem de erro
- * leve a decisao junto e nao so ao sintoma. O que e deste projeto - isencoes
- * nomeadas, chaves de ambiente fora do leitor, arquivos de FORMA - mora em
+ * Each rule points to the section of the ruler that originates it, so that the error message
+ * carries the decision along and not only the symptom. What belongs to this project - named
+ * exemptions, environment keys outside the reader, SHAPE files - lives in
  * `scripts/pattern-check.config.ts`.
  *
- * Uso:
- *   node --import @poppinss/ts-exec scripts/pattern-check.ts            # reprova
- *   node --import @poppinss/ts-exec scripts/pattern-check.ts --report   # so mede
+ * Usage:
+ *   node --import @poppinss/ts-exec scripts/pattern-check.ts            # fails
+ *   node --import @poppinss/ts-exec scripts/pattern-check.ts --report   # only measures
  */
 
 import { access, readdir, readFile } from 'node:fs/promises'
@@ -33,7 +33,7 @@ type Finding = {
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
-/** Diretorios que a regua exige mesmo vazios. Secao 1.1. */
+/** Directories the ruler requires even when empty. Section 1.1. */
 const REQUIRED_DIRECTORIES = [
   'app/core',
   'app/features',
@@ -70,8 +70,8 @@ async function tsFiles(dir: string): Promise<string[]> {
 }
 
 /**
- * Remove comentario de linha e de bloco antes de casar padrao. Sem isto, todo
- * exemplo dentro de um JSDoc — e este projeto tem muitos — viraria violacao.
+ * Removes line and block comments before matching a pattern. Without this, every
+ * example inside a JSDoc - and this project has many - would become a violation.
  */
 function withoutComments(source: string): string {
   const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, (chunk) => chunk.replace(/[^\n]/g, ' '))
@@ -106,10 +106,10 @@ function pascal(segment: string): string {
 }
 
 /**
- * O singular provavel de um segmento de diretorio.
+ * The probable singular of a directory segment.
  *
- * Heuristica, e assumida como tal: e por isso que ela nao decide sozinha - a
- * regra aceita o segmento com e sem ela.
+ * A heuristic, and assumed as such: that is why it does not decide alone - the
+ * rule accepts the segment with and without it.
  */
 function singular(segment: string): string {
   if (segment.endsWith('ies')) return `${segment.slice(0, -3)}y`
@@ -119,16 +119,16 @@ function singular(segment: string): string {
 }
 
 /**
- * Os nomes que o caminho autoriza: um com o ultimo diretorio como esta no disco,
- * outro com ele no singular. Fora de `app/features/` nao ha caminho de onde
- * derivar, e a regra nao se aplica.
+ * The names the path authorizes: one with the last directory as it is on disk,
+ * another with it in the singular. Outside `app/features/` there is no path to
+ * derive from, and the rule does not apply.
  */
 function derivedNames(relativePath: string, suffix: string): string[] {
   const inside = relativePath.split('app/features/')[1]
   if (inside === undefined) return []
 
   const parts = inside.split('/')
-  // A pasta da acao repete o verbo e nao entra no nome da classe:
+  // The action folder repeats the verb and does not enter the class name:
   // `administrator/users/archive/archive.controller.ts` -> `AdministratorUserArchiveController`.
   const folder = parts[parts.length - 2]
   const file = basename(relativePath).replace(/\.(controller|use-case)\.ts$/, '')
@@ -152,10 +152,10 @@ function derivedNames(relativePath: string, suffix: string): string[] {
 type Rule = {
   name: string
   section: string
-  /** Casa no fonte ja sem comentarios. */
+  /** Matches on the source already stripped of comments. */
   pattern: RegExp
   message: string
-  /** Quando presente, a regra so roda nos arquivos cujo caminho casa. */
+  /** When present, the rule only runs on files whose path matches. */
   scope?: RegExp
 }
 
@@ -163,8 +163,8 @@ const RULES: Rule[] = [
   {
     name: 'policy-outside-bouncer',
     section: '4.6',
-    // A policy e checada pelo controller com `ctx.bouncer.with(Policy)`; o caso
-    // de uso recebe o registro ja autorizado e nao conhece policy nenhuma.
+    // The policy is checked by the controller with `ctx.bouncer.with(Policy)`; the use
+    // case receives the already authorized record and knows no policy at all.
     scope: /\.use-case\.ts$/,
     pattern: /from\s+'#policies\//,
     message:
@@ -181,8 +181,8 @@ const RULES: Rule[] = [
   {
     name: 'vine-outside-core',
     section: '4.4',
-    // O `vine` configurado (mensagens pt-BR, transform de data) sai de
-    // `#core/validator`; importar a lib direto pula essa configuracao.
+    // The configured `vine` (pt-BR messages, date transform) comes from
+    // `#core/validator`; importing the lib directly skips that configuration.
     scope: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
     pattern: /from\s+'@vinejs\/vine'/,
     message: 'import `vine` (and `Infer`) from `#core/validator`, never from `@vinejs/vine`',
@@ -190,8 +190,8 @@ const RULES: Rule[] = [
   {
     name: 'validator-outside-resource',
     section: '4.4',
-    // `app/core/` fica de fora: `response.ts` declara em VineJS o contrato de
-    // resposta que nao deriva de model, e isso nao e validator de entrada.
+    // `app/core/` is left out: `response.ts` declares in VineJS the response
+    // contract that does not derive from a model, and that is not an input validator.
     scope: /^app\/(?!core\/).*(?<!\.validator)\.ts$/,
     pattern: /\bvine\.create\(/,
     message:
@@ -223,8 +223,8 @@ const RULES: Rule[] = [
     name: 'throw-in-use-case-or-repository',
     section: '4.2',
     scope: /\.(?:use-case|lucid\.repository|memory\.repository)\.ts$/,
-    // `throw error` relanca o que o `catch` recebeu (o repository so reconhece a
-    // violacao de unique e relanca o resto); o que a regua proibe e criar a falha.
+    // `throw error` rethrows what the `catch` received (the repository only recognizes the
+    // unique violation and rethrows the rest); what the ruler forbids is creating the failure.
     pattern: /\bthrow\s+(?!error\b)/,
     message:
       'a business failure is `left(...)`, never `throw`; the repository returns `null` or the fact, and the use case decides',
@@ -240,10 +240,10 @@ const RULES: Rule[] = [
   {
     name: 'shared-with-io',
     section: '4.9',
-    // `_shared.<tema>.ts` e so funcao pura; a base de template method
-    // (`_shared.<tema>.base.ts`) injeta o que precisa e fica de fora.
+    // `_shared.<theme>.ts` is pure function only; the template method base
+    // (`_shared.<theme>.base.ts`) injects what it needs and is left out.
     scope: /_shared\.[^/]*(?<!\.base)\.ts$/,
-    // `import type` fica de fora: tipo some na compilação e não faz I/O.
+    // `import type` is left out: a type vanishes at compilation and does no I/O.
     pattern:
       /^(?!import type\b).*from\s+'(?:#models\/|#repositories\/|#services\/|@adonisjs\/lucid|@adonisjs\/drive|node:fs|@adonisjs\/core\/services\/db)/,
     message:
@@ -260,9 +260,9 @@ const RULES: Rule[] = [
     name: 'service-imports-feature',
     section: '1.3',
     scope: /app\/services\//,
-    // `#features/_shared.<tema>` fica de fora: e o lugar declarado da funcao pura
-    // compartilhada, e importa-la nao acopla o service a nenhuma feature. O que a
-    // regra recusa e depender de um modulo — `#features/administrator/...`.
+    // `#features/_shared.<theme>` is left out: it is the declared place of the shared
+    // pure function, and importing it couples the service to no feature. What the
+    // rule refuses is depending on a module - `#features/administrator/...`.
     pattern: /from\s+'#features\/(?!_shared\.)/,
     message: '`app/services/` does not import from a features module (only from `_shared.<theme>`)',
   },
@@ -289,18 +289,18 @@ function applyRules(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * A classe exportada deriva do caminho inteiro, e nao so do verbo.
+ * The exported class derives from the whole path, and not only from the verb.
  *
- * O sufixo sozinho deixava passar o que mais aparecia: `EnrollmentUpdateController`
- * num arquivo de `administrator/enrollments/` termina em `UpdateController` e
- * mesmo assim perde o modulo. Sem o modulo o nome nao diz de qual grupo de rota a
- * classe e - e `administrator/enrollments` e `storefront/enrollments` sao dois
- * casos de uso diferentes sobre a mesma tabela, com autorizacao diferente.
+ * The suffix alone let through what appeared most: `EnrollmentUpdateController`
+ * in a file of `administrator/enrollments/` ends in `UpdateController` and
+ * still loses the module. Without the module the name does not say which route group the
+ * class belongs to - and `administrator/enrollments` and `storefront/enrollments` are two
+ * different use cases over the same table, with different authorization.
  *
- * A singularizacao continua sendo heuristica, e por isso ela **nao decide**: a
- * regra aceita tanto o segmento como esta no disco quanto a forma singular dele.
- * As duas derivam do caminho de forma deterministica; qual das duas o projeto usa
- * e escolha de estilo, e nenhuma delas permite esquecer o modulo.
+ * Singularization remains a heuristic, and so it **does not decide**: the
+ * rule accepts both the segment as it is on disk and its singular form.
+ * Both derive from the path deterministically; which of the two the project uses
+ * is a style choice, and neither lets the module be forgotten.
  */
 function checkClassName(relativePath: string, source: string): Finding[] {
   const isController = relativePath.endsWith('.controller.ts')
@@ -332,13 +332,13 @@ function checkClassName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * Acao e pasta, sempre: `<recurso>/<acao>/<acao>.{controller,use-case,spec}.ts`
- * (_standards/architecture.md §3). E onde a spec da acao mora e onde quem procura
- * "arquivar usuario" encontra tudo.
+ * Action is a folder, always: `<resource>/<action>/<action>.{controller,use-case,spec}.ts`
+ * (_standards/architecture.md §3). It is where the action spec lives and where whoever looks for
+ * "archive user" finds everything.
  */
 function checkActionFolder(relativePath: string): Finding[] {
   if (!relativePath.startsWith('app/features/')) return []
-  // A sonda de vida e infra pura, sem modulo nem recurso (arquitetura.md §7).
+  // The liveness probe is pure infra, with no module or resource (architecture.md §7).
   if (relativePath === 'app/features/health-check.controller.ts') return []
   const match = /([a-z-]+)\.(?:controller|use-case)\.ts$/.exec(relativePath)
   if (match === null) return []
@@ -356,9 +356,9 @@ function checkActionFolder(relativePath: string): Finding[] {
 }
 
 /**
- * Uma feature nao importa de outra (secao 1.3): o compartilhado vai para
- * `_shared.<tema>` ou para um service. O dono de um arquivo e o recurso -
- * `administrator/users` -, ou o modulo quando ele e o proprio recurso
+ * A feature does not import from another (section 1.3): what is shared goes to
+ * `_shared.<theme>` or to a service. The owner of a file is the resource -
+ * `administrator/users` -, or the module when it is the resource itself
  * (`account`, `storages`).
  */
 function checkCrossFeatureImport(relativePath: string, source: string): Finding[] {
@@ -390,9 +390,9 @@ function checkCrossFeatureImport(relativePath: string, source: string): Finding[
 }
 
 /**
- * Validator de recurso: todo export `*Validator` comeca pelo recurso no
- * singular e termina na acao - `UserCreateValidator` em `users/users.validator.ts`
- * (_standards/backend.md §3 e §4.4).
+ * Resource validator: every `*Validator` export starts with the resource in the
+ * singular and ends with the action - `UserCreateValidator` in `users/users.validator.ts`
+ * (_standards/backend.md §3 and §4.4).
  */
 function checkValidatorName(relativePath: string, source: string): Finding[] {
   const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativePath)
@@ -415,10 +415,10 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * Paridade VineJS x Zod (_standards/architecture.md §10): todo validator de
- * `shared/src/validators/<modulo>/<recurso>.validator.ts` tem o par em
- * `app/validators/<modulo>/<recurso>.validator.ts`, com os mesmos nomes de
- * `*Validator`. Sem o `shared/` ao lado, a regra nao roda.
+ * VineJS x Zod parity (_standards/architecture.md §10): every validator in
+ * `shared/src/validators/<module>/<resource>.validator.ts` has its pair in
+ * `app/validators/<module>/<resource>.validator.ts`, with the same
+ * `*Validator` names. Without the `shared/` next to it, the rule does not run.
  */
 async function checkValidatorParity(sources: Map<string, string>): Promise<Finding[]> {
   const sharedRoot = resolve(ROOT, '../shared/src/validators')
@@ -431,7 +431,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
     const pair = `app/validators/${logical}`
     const backSource = sources.get(pair)
     const sharedSource = withoutComments(await readFile(file, 'utf8'))
-    // Schema que não é de request (o `ActorSchema`) não tem par VineJS.
+    // A schema that is not a request (the `ActorSchema`) has no VineJS pair.
     if (!/export\s+const\s+\w+Validator\b/.test(sharedSource)) continue
     if (backSource === undefined) {
       findings.push({
@@ -458,7 +458,7 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
   return findings
 }
 
-/** Model em `app/models/` usa kebab-case. Secao 3. */
+/** A model in `app/models/` uses kebab-case. Section 3. */
 function checkModelName(relativePath: string): Finding[] {
   if (!relativePath.startsWith('app/models/')) return []
   if (!basename(relativePath).includes('_')) return []
@@ -475,14 +475,14 @@ function checkModelName(relativePath: string): Finding[] {
 }
 
 /**
- * Toda chave lida por `env.get()` e declarada no schema, e vice-versa. Secao 6.
+ * Every key read by `env.get()` is declared in the schema, and vice versa. Section 6.
  *
- * Chave declarada que nenhum codigo le e chave morta, e sai. A excecao e o que
- * nunca passa pelo leitor - `PORT` e `HOST` (lidas por `@adonisjs/core`),
- * `NODE_ENV` e `TZ` -, listado em `envOutsideReader` da config com `reason`.
+ * A declared key that no code reads is a dead key, and goes away. The exception is what
+ * never goes through the reader - `PORT` and `HOST` (read by `@adonisjs/core`),
+ * `NODE_ENV` and `TZ` -, listed in `envOutsideReader` of the config with `reason`.
  *
- * A leitura ignora comentario: um bloco de driver comentado em `config/` nao e
- * uma chave de verdade.
+ * The reading ignores comments: a commented driver block in `config/` is not
+ * a real key.
  */
 async function checkEnv(files: string[]): Promise<Finding[]> {
   const schema = await readFile(join(ROOT, 'start/env.ts'), 'utf8').catch(() => '')
@@ -553,12 +553,12 @@ async function checkDirectories(): Promise<Finding[]> {
 }
 
 /**
- * Um caminho do config, como o de `use-case` sob `app/features`, virando
- * expressao.
+ * A config path, like the `use-case` one under `app/features`, turned into an
+ * expression.
  *
- * Duas estrelas seguidas de barra casam qualquer profundidade, inclusive
- * nenhuma; uma estrela sozinha casa dentro de um segmento so. E o minimo que os
- * tres caminhos da lista pedem.
+ * Two stars followed by a slash match any depth, including
+ * none; a single star matches within one segment only. It is the minimum that the
+ * three paths in the list ask for.
  */
 function pathPattern(glob: string): RegExp {
   const body = glob
@@ -569,16 +569,16 @@ function pathPattern(glob: string): RegExp {
 }
 
 /**
- * Toda entrada de `newAllowlist` descreve um uso que existe.
+ * Every `newAllowlist` entry describes a use that exists.
  *
- * O ESLint ja recusa `new X()` onde `X` termina em Service, UseCase, Policy ou
- * Controller (secao 2.1). O config e onde as excecoes ficam nomeadas com o
- * `reason` ao lado, e o que se cobra aqui e o outro lado da lista: entrada sem uso.
+ * ESLint already refuses `new X()` where `X` ends in Service, UseCase, Policy or
+ * Controller (section 2.1). The config is where the exceptions stay named with the
+ * `reason` beside them, and what is charged here is the other side of the list: an entry with no use.
  *
- * Existe porque a lista era letra morta — nenhuma funcao a lia. Uma excecao que
- * ninguem exerce nao e excecao, e uma afirmacao falsa sobre o codigo; e quem le
- * a regua acredita nela. Foi assim que `Bouncer` ficou anos na lista descrevendo
- * uma chamada que nenhum caso de uso fazia.
+ * It exists because the list was dead letter - no function read it. An exception that
+ * nobody exercises is not an exception, and it is a false statement about the code; and whoever reads
+ * the ruler believes it. That is how `Bouncer` stayed years in the list describing
+ * a call that no use case made.
  */
 async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[]> {
   const findings: Finding[] = []
@@ -609,18 +609,18 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
 }
 
 /**
- * Soft delete passa por `withScopes(notDeleted)`, nunca por `whereNull` escrito
- * a mao.
+ * Soft delete goes through `withScopes(notDeleted)`, never through a hand-written
+ * `whereNull`.
  *
- * A regra da secao 4.8, cobrada. Eram 273 repeticoes nos tres projetos quando
- * ela nasceu, e o custo delas nao era o teclado: filtro escrito a mao depende de
- * alguem lembrar, e a consulta que esquece devolve registro arquivado sem
- * avisar. Centralizado, nao ha o que esquecer.
+ * The rule of section 4.8, enforced. There were 273 repetitions across the three projects when
+ * it was born, and their cost was not the keyboard: a hand-written filter depends on
+ * someone remembering, and the query that forgets returns an archived record without
+ * warning. Centralized, there is nothing to forget.
  *
- * `app/models/` fica de fora porque e la que o scope mora - e o corpo dele que
- * escreve o `whereNull`, uma vez. As demais excecoes sao nomeadas em
- * `softDeleteExempt` no config, e sao sempre a mesma situacao: consulta sobre
- * `LucidModel` generico, tipo em que scope nomeado nao existe.
+ * `app/models/` is left out because that is where the scope lives - and it is its body that
+ * writes the `whereNull`, once. The other exceptions are named in
+ * `softDeleteExempt` in the config, and are always the same situation: a query over a
+ * generic `LucidModel`, a type where a named scope does not exist.
  */
 async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]> {
   const exempt = new Set(CONFIG.softDeleteExempt)
@@ -649,16 +649,16 @@ async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]>
 }
 
 /**
- * Os caminhos FORMA do config existem neste repositorio.
+ * The SHAPE paths of the config exist in this repository.
  *
- * FORMA e a categoria do meio da secao 5: mesma API publica e mesma estrutura,
- * conteudo por dominio. `sync:check` nao os cobra por sha256 justamente porque o
- * conteudo difere - e por isso ninguem cobrava nada, e um projeto podia perder o
- * arquivo inteiro sem reprovar.
+ * SHAPE is the middle category of section 5: same public API and same structure,
+ * content per domain. `sync:check` does not charge them by sha256 precisely because the
+ * content differs - and for that reason nobody charged anything, and a project could lose the
+ * whole file without failing.
  *
- * Presenca e o que da para cobrar sem inventar: se `app/services/slug/slug.service.ts`
- * sumir de um dos tres, a regra aponta em vez de a diferenca aparecer no dia em
- * que alguem for procurar o service que os irmaos tem.
+ * Presence is what can be charged without inventing: if `app/services/slug/slug.service.ts`
+ * disappears from one of the three, the rule points at it instead of the difference showing up on the day
+ * someone goes looking for the service the siblings have.
  */
 async function exists(filePath: string): Promise<boolean> {
   try {
@@ -688,19 +688,19 @@ async function checkShape(): Promise<Finding[]> {
 }
 
 /**
- * O caso de uso declara `type Payload` e `type Response = Either<...>`.
+ * The use case declares `type Payload` and `type Response = Either<...>`.
  *
- * Nao e estetica: os dois tipos sao o contrato do caso de uso, e sao o que faz o
- * controller irmao e o `openapi/introspect.ts` saberem o que entra e o que sai.
- * Usar o tipo do validator direto na assinatura funciona ate o dia em que o caso
- * de uso precisa de um campo a mais - `actor`, quase sempre -, e ai a mudanca
- * acontece na assinatura em vez de no alias, onde ninguem procura.
+ * It is not aesthetics: the two types are the contract of the use case, and they are what makes the
+ * sibling controller and `openapi/introspect.ts` know what goes in and what comes out.
+ * Using the validator type directly in the signature works until the day the use
+ * case needs one more field - `actor`, almost always -, and then the change
+ * happens in the signature instead of in the alias, where nobody looks.
  *
- * `type Payload` so e exigido quando `execute` recebe alguma coisa: um caso de
- * uso sem entrada nao tem payload que declarar, e exigir o alias vazio seria
- * cerimonia.
+ * `type Payload` is only required when `execute` receives something: a use case
+ * without input has no payload to declare, and requiring the empty alias would be
+ * ceremony.
  *
- * Nao coberto por `_doc-lib/` - e convencao deste padrao, secao 4.2.
+ * Not covered by `_doc-lib/` - it is a convention of this standard, section 4.2.
  */
 function checkUseCaseShape(relativePath: string, source: string): Finding[] {
   if (!relativePath.endsWith('.use-case.ts')) return []
@@ -738,15 +738,15 @@ function checkUseCaseShape(relativePath: string, source: string): Finding[] {
   return findings
 }
 
-/** O singular de recurso que o codigo de 500 usa (`matches` -> `MATCH`). */
+/** The resource singular that the 500 code uses (`matches` -> `MATCH`). */
 function singularCode(resource: string): string {
   return singular(resource).toUpperCase().replaceAll('-', '_')
 }
 
 /**
- * A tag de log e o codigo de 500 do caso de uso derivam do caminho (secao 3):
- * `[<modulo>/<recurso> > <acao>][error]` e `<MODULO>_<RECURSO>_<ACAO>_ERROR`,
- * sempre com o modulo.
+ * The log tag and the use case's 500 code derive from the path (section 3):
+ * `[<module>/<resource> > <action>][error]` and `<MODULE>_<RESOURCE>_<ACTION>_ERROR`,
+ * always with the module.
  */
 function checkUseCaseNames(relativePath: string, source: string): Finding[] {
   const match = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/\3\.use-case\.ts$/.exec(relativePath)
@@ -784,9 +784,9 @@ function checkUseCaseNames(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * O `actor` no payload tem esse nome, e nenhum outro (secao 4.3): `user`,
- * `userId`, `createdBy` e `ownerId` sao o mesmo dado escapando da policy
- * `(actor, target)`.
+ * The `actor` in the payload has this name, and no other (section 4.3): `user`,
+ * `userId`, `createdBy` and `ownerId` are the same data escaping the
+ * `(actor, target)` policy.
  */
 function checkActorName(relativePath: string, source: string): Finding[] {
   if (!relativePath.endsWith('.use-case.ts')) return []
@@ -810,8 +810,8 @@ function checkActorName(relativePath: string, source: string): Finding[] {
 }
 
 /**
- * Rota com regra por registro (alem de posse) checa `ctx.bouncer` no controller:
- * a lista `BOUNCER_REQUIRED` e dado do projeto (secao 4.6).
+ * A route with a per-record rule (beyond ownership) checks `ctx.bouncer` in the controller:
+ * the `BOUNCER_REQUIRED` list is project data (section 4.6).
  */
 function checkBouncerRequired(sources: Map<string, string>): Finding[] {
   const findings: Finding[] = []
@@ -843,8 +843,8 @@ function checkBouncerRequired(sources: Map<string, string>): Finding[] {
 }
 
 /**
- * Uma acao nao importa outra por caminho relativo (secao 1.3): o que as duas
- * usam sobe para `_shared.<tema>`, para o presenter do recurso ou para o dominio.
+ * An action does not import another by relative path (section 1.3): what the two
+ * use goes up to `_shared.<theme>`, to the resource presenter or to the domain.
  */
 function checkRelativeImportBetweenActions(relativePath: string, source: string): Finding[] {
   const own = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(relativePath)
@@ -874,20 +874,20 @@ function checkRelativeImportBetweenActions(relativePath: string, source: string)
 }
 
 /**
- * Todo controller e alcancavel por alguma rota.
+ * Every controller is reachable by some route.
  *
- * O registro em `.adonisjs/server/controllers.ts` e derivado do **sistema de
- * arquivos**, e nao das rotas: existir ali nao quer dizer estar exposto. E os
- * outros guardas leem o `openapi.json`, que so tem rota registrada - entao um
- * recurso inteiro sem rota passava por todos eles.
+ * The registry in `.adonisjs/server/controllers.ts` is derived from the **file
+ * system**, and not from the routes: existing there does not mean being exposed. And the
+ * other guards read `openapi.json`, which only has registered routes - so an
+ * entire resource with no route passed through all of them.
  *
- * Passou: quatro controllers e quatro casos de uso de avaliacao de cliente, num
- * projeto onde a contagem ainda fechava por coincidencia (234 controllers, 234
- * operacoes, porque quatro controllers roteados serviam duas rotas cada).
+ * It happened: four controllers and four client-evaluation use cases, in a
+ * project where the count still matched by coincidence (234 controllers, 234
+ * operations, because four routed controllers served two routes each).
  *
- * Codigo inalcancavel nao e neutro. Aquele tinha derivado do padrao enquanto
- * ninguem via - usava `userId: string` onde a secao 4.3 pede o objeto `User` -,
- * e um dia ressurgiria parecendo pronto.
+ * Unreachable code is not neutral. That one had drifted from the standard while
+ * nobody was looking - it used `userId: string` where section 4.3 asks for the `User` object -,
+ * and one day it would resurface looking ready.
  */
 async function checkRoute(files: string[]): Promise<Finding[]> {
   const routes = await readFile(join(ROOT, 'start/routes.ts'), 'utf8')
@@ -904,10 +904,10 @@ async function checkRoute(files: string[]): Promise<Finding[]> {
     const verb = pascal((parts[parts.length - 1] ?? '').replace('.controller.ts', ''))
     const key = ['controllers', ...parts.slice(0, -1).map(camel), verb].join('.')
 
-    // Limite de identificador, e nao `includes`: `controllers.account.profile.Show`
-    // casaria dentro de `controllers.account.profile.ShowX`, e a regra daria verde para
-    // um controller que nenhuma rota alcanca. Foi o que o sensor pegou na
-    // primeira versao desta funcao.
+    // An identifier boundary, and not `includes`: `controllers.account.profile.Show`
+    // would match inside `controllers.account.profile.ShowX`, and the rule would give green for
+    // a controller that no route reaches. It is what the sensor caught in the
+    // first version of this function.
     const reference = new RegExp(`${key.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`)
 
     if (reference.test(routes)) continue

@@ -2,49 +2,49 @@ import { BaseCommand, flags } from '@adonisjs/core/ace'
 import { DateTime } from 'luxon'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
-/** Quantas horas um `PENDING` pode ficar de pé antes de ser considerado abandonado. */
+/** How many hours a `PENDING` may stay up before it is considered abandoned. */
 const DEFAULT_HOURS = 24
 
 /**
- * Apaga os uploads que começaram e nunca terminaram.
+ * Deletes the uploads that started and never finished.
  *
- * O upload tem três passos e o binário não passa por aqui:
- * `POST /storages` grava a linha `PENDING` e assina as URLs, o cliente sobe as
- * partes direto no bucket, e `POST /storages/:id/complete` confirma. Quem fecha
- * a aba no meio nunca chega no terceiro passo, e nada mais volta àquela linha -
- * o `DELETE` é o cancelamento explícito, e ninguém o chama por um upload já
- * esquecido.
+ * The upload has three steps and the binary does not pass through here:
+ * `POST /storages` writes the `PENDING` row and signs the URLs, the client uploads the
+ * parts straight to the bucket, and `POST /storages/:id/complete` confirms. Whoever
+ * closes the tab midway never reaches the third step, and nothing else returns to that
+ * row - `DELETE` is the explicit cancellation, and nobody calls it for an upload
+ * already forgotten.
  *
- * O que fica não é só uma linha morta. As partes já enviadas vivem sob o
- * `uploadId`, não aparecem na listagem de objetos do bucket, e continuam sendo
- * cobradas - é lixo que só o aborto do multipart alcança. Sem esta varredura a
- * máquina de estado nunca fecha: `PENDING` é o único estado do qual não se sai.
+ * What is left is not just a dead row. The parts already sent live under the
+ * `uploadId`, do not show in the bucket's object listing, and keep being billed -
+ * it is garbage only the multipart abort reaches. Without this sweep the state
+ * machine never closes: `PENDING` is the only state one never leaves.
  *
- * Reusa `StoragesFileDeleteUseCase` em vez de repetir o aborto aqui: apagar um
- * `PENDING` é exatamente o que o `DELETE` já faz, e duas implementações da
- * mesma coisa é uma que fica para trás. A regra de referência não atrapalha -
- * `assertExist` recusa anexar o que não está `UPLOADED`, então um `PENDING`
- * não tem como estar em uso.
+ * Reuses `StoragesFileDeleteUseCase` instead of repeating the abort here: deleting a
+ * `PENDING` is exactly what `DELETE` already does, and two implementations of the
+ * same thing leaves one behind. The reference rule is no obstacle -
+ * `assertExist` refuses to attach what is not `UPLOADED`, so a `PENDING`
+ * cannot be in use.
  *
- * Não há agendador dentro da aplicação: isto é um comando, e quem o repete é o
- * ambiente (cron do host, `CronJob` do Kubernetes). Rodar em duas réplicas ao
- * mesmo tempo é inofensivo - a segunda encontra a linha já apagada e conta
- * como ausente.
+ * There is no scheduler inside the application: this is a command, and whoever
+ * repeats it is the environment (host cron, Kubernetes `CronJob`). Running on two
+ * replicas at the same time is harmless - the second finds the row already deleted
+ * and counts it as absent.
  */
 export default class StoragesPrune extends BaseCommand {
   static override commandName = 'storages:prune'
   static override description =
-    'Apaga os uploads PENDING abandonados e aborta o multipart de cada um'
+    'Deletes the abandoned PENDING uploads and aborts the multipart of each one'
 
   static override options: CommandOptions = { startApp: true }
 
   @flags.number({
-    description: `Idade mínima, em horas, para considerar um PENDING abandonado (padrão: ${DEFAULT_HOURS})`,
+    description: `Minimum age, in hours, to consider a PENDING abandoned (default: ${DEFAULT_HOURS})`,
   })
   declare hours: number
 
   @flags.boolean({
-    description: 'Lista o que seria apagado sem apagar nada',
+    description: 'Lists what would be deleted without deleting anything',
   })
   declare dryRun: boolean
 
@@ -57,14 +57,14 @@ export default class StoragesPrune extends BaseCommand {
     const hours = this.hours ?? DEFAULT_HOURS
     const cutoff = DateTime.now().minus({ hours })
 
-    // A ordem das colunas é a do índice `storages_status_created_at_index`.
+    // The column order is that of the index `storages_status_created_at_index`.
     const abandoned = await Storage.query()
       .where('status', UPLOAD_STATUS.PENDING)
       .where('createdAt', '<', cutoff.toSQL() ?? '')
       .orderBy('createdAt', 'asc')
 
     if (abandoned.length === 0) {
-      this.logger.info(`Nenhum upload PENDING com mais de ${hours}h.`)
+      this.logger.info(`No PENDING upload older than ${hours}h.`)
       return
     }
 
@@ -73,7 +73,7 @@ export default class StoragesPrune extends BaseCommand {
         this.logger.info(`${storage.id} ${storage.originalName} (${storage.createdAt?.toISO()})`)
       }
 
-      this.logger.info(`${abandoned.length} upload(s) seriam apagados. Nada foi tocado.`)
+      this.logger.info(`${abandoned.length} upload(s) would be deleted. Nothing was touched.`)
       return
     }
 
@@ -83,9 +83,9 @@ export default class StoragesPrune extends BaseCommand {
     let failed = 0
 
     for (const storage of abandoned) {
-      // Um erro numa linha não derruba o lote: o bucket pode recusar o aborto
-      // de um `uploadId` que ele já não conhece, e a varredura seguinte não
-      // teria como passar da primeira linha se isso a interrompesse.
+      // An error on one row does not bring down the batch: the bucket may refuse to abort
+      // an `uploadId` it no longer knows, and the next sweep would never get past the
+      // first row if that interrupted it.
       try {
         const result = await useCase.execute({ id: storage.id })
 
@@ -102,14 +102,14 @@ export default class StoragesPrune extends BaseCommand {
       }
     }
 
-    this.logger.success(`${removed} upload(s) apagados, ${failed} com erro.`)
+    this.logger.success(`${removed} upload(s) deleted, ${failed} failed.`)
 
     if (failed > 0) this.exitCode = 1
   }
 
   /**
-   * A mensagem de um erro qualquer, para log: `catch` entrega `unknown`, e
-   * interpolar um não-`Error` direto no template sairia `[object Object]`.
+   * The message of any error, for logging: `catch` hands over `unknown`, and
+   * interpolating a non-`Error` straight into the template would come out `[object Object]`.
    */
   private messageOf(error: unknown): string {
     if (error instanceof Error) return error.message

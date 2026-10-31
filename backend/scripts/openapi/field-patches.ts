@@ -1,57 +1,57 @@
 import type { SchemaObject } from '#core/openapi/types'
 
 /**
- * Correções de documentação para as regras compartilhadas de `#core/validator`.
+ * Documentation fixes for the shared rules of `#core/validator`.
  *
- * Moram num lugar só, e não dentro de cada controller, porque a divergência é do
- * helper: quem mudar `password()` vê a correção junto das demais, em vez de
- * descobrir por um documento errado meses depois.
+ * They live in one place, and not inside each controller, because the divergence belongs to the
+ * helper: whoever changes `password()` sees the fix next to the others, instead of
+ * finding out through a wrong document months later.
  *
- * O gerador aplica estas correções por **nome de campo**, em qualquer payload
- * onde o campo apareça. Três validators usam `password()`; declarar o conserto
- * em três controllers era garantir que o quarto nascesse errado.
+ * The generator applies these fixes by **field name**, in any payload
+ * where the field appears. Three validators use `password()`; declaring the repair
+ * in three controllers would guarantee the fourth was born wrong.
  */
 
 /**
- * Um campo cujo schema derivado precisa ser corrigido, e o campo companheiro
- * que ele arrasta para o payload.
+ * A field whose derived schema needs to be fixed, and the companion field
+ * it drags into the payload.
  */
 export type FieldPatch = {
   schema?: SchemaObject
   companion?: {
     name: string
     schema: SchemaObject
-    /** O companheiro é obrigatório exatamente quando o campo original é. */
+    /** The companion is required exactly when the original field is. */
     followsRequired: boolean
   }
 }
 
 /**
- * O que `password()` valida e o JSON Schema não conta.
+ * What `password()` validates and JSON Schema does not tell.
  *
- * Duas perdas, as duas medidas na saída do VineJS 4.4.0:
+ * Two losses, both measured on the VineJS 4.4.0 output:
  *
- * 1. Os quatro `.regex()` - minúscula, maiúscula, dígito e especial - viram um
- *    `pattern` só, o último. O documento afirmaria que `abcdefg!` passa.
- *    `allOf` expressa a conjunção que o campo realmente exige.
- * 2. `passwordConfirmation` não existe no schema gerado: `.confirmed()` lê o
- *    campo do input cru, então ele nunca entra no payload validado - mas é
- *    obrigatório na requisição.
+ * 1. The four `.regex()` - lowercase, uppercase, digit and special - become a
+ *    single `pattern`, the last one. The document would claim that `abcdefg!` passes.
+ *    `allOf` expresses the conjunction the field really requires.
+ * 2. `passwordConfirmation` does not exist in the generated schema: `.confirmed()` reads the
+ *    field from the raw input, so it never enters the validated payload - but it is
+ *    required in the request.
  */
 export const FIELD_PATCHES: Record<string, FieldPatch> = {
   /**
-   * `vine.date()` sai como `{}` vazio, e o fallback de `schema.ts` o completa
-   * com `date-time` - que é o certo para `createdAt` e errado aqui. Coluna
-   * `date` guarda o dia, o Lucid a serializa por `toISODate()`, e a resposta documenta `format: "date"`.
-   * Sem esta correção o mesmo campo sairia `date-time` na entrada e `date` na
-   * saída, e um cliente gerado do documento mandaria o instante completo que o
-   * validador recusa.
+   * `vine.date()` comes out as an empty `{}`, and the `schema.ts` fallback completes it
+   * with `date-time` - which is right for `createdAt` and wrong here. A `date`
+   * column stores the day, Lucid serializes it with `toISODate()`, and the response documents `format: "date"`.
+   * Without this fix the same field would come out `date-time` on input and `date` on
+   * output, and a client generated from the document would send the full instant the
+   * validator refuses.
    */
   date: {
     schema: {
       type: 'string',
       format: 'date',
-      description: 'Data no formato `YYYY-MM-DD`.',
+      description: 'Date in the `YYYY-MM-DD` format.',
     },
   },
   password: {
@@ -60,7 +60,7 @@ export const FIELD_PATCHES: Record<string, FieldPatch> = {
       minLength: 8,
       maxLength: 32,
       description:
-        'Exige ao menos uma minúscula, uma maiúscula, um dígito e um caractere especial.',
+        'Requires at least one lowercase letter, one uppercase letter, one digit and one special character.',
       allOf: [
         { pattern: '[a-z]' },
         { pattern: '[A-Z]' },
@@ -70,7 +70,7 @@ export const FIELD_PATCHES: Record<string, FieldPatch> = {
     },
     companion: {
       name: 'passwordConfirmation',
-      schema: { type: 'string', description: 'Repetição exata de `password`.' },
+      schema: { type: 'string', description: 'Exact repetition of `password`.' },
       followsRequired: true,
     },
   },

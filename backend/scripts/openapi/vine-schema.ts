@@ -4,21 +4,21 @@ import type { FieldPatch } from '#scripts/openapi/field-patches'
 import type { DocumentedValidator, OpenAPIParameter, SchemaObject } from '#core/openapi/types'
 
 /**
- * VineJS -> JSON Schema publicável.
+ * VineJS -> publishable JSON Schema.
  *
- * `validator.toJSONSchema()` faz o trabalho pesado, mas tem lacunas medidas: um
- * `vine.date()` sai como `{}` vazio, e um `{}` vazio num documento OpenAPI
- * significa "qualquer coisa" - ou seja, o campo passaria a existir na
- * documentação sem contrato nenhum. Aqui esse buraco é tapado onde dá e
- * denunciado onde não dá.
+ * `validator.toJSONSchema()` does the heavy lifting, but it has measured gaps: a
+ * `vine.date()` comes out as an empty `{}`, and an empty `{}` in an OpenAPI document
+ * means "anything" - that is, the field would start to exist in the
+ * documentation with no contract at all. Here that hole is plugged where possible and
+ * reported where not.
  *
- * A correção é possível porque `toJSON()` expõe a árvore interna do VineJS, com
- * a mesma forma do schema gerado: objeto tem `properties`, array tem `each`, e a
- * folha guarda o `subtype` que o JSON Schema perdeu. Percorrer as duas em
- * paralelo devolve o tipo ao campo.
+ * The fix is possible because `toJSON()` exposes the VineJS internal tree, with
+ * the same shape as the generated schema: an object has `properties`, an array has `each`, and
+ * the leaf keeps the `subtype` that JSON Schema lost. Walking both in
+ * parallel gives the type back to the field.
  */
 
-/** Nó da árvore interna do VineJS, só com o que a travessia usa. */
+/** Node of the VineJS internal tree, with only what the traversal uses. */
 type VineNode = {
   type?: string
   subtype?: string
@@ -31,19 +31,19 @@ type VineNode = {
 
 export class VineSchema {
   /**
-   * Subtipos que o VineJS não sabe expressar em JSON Schema.
+   * Subtypes that VineJS cannot express in JSON Schema.
    *
-   * `date`: `vine.date()` produz `{}`, e `vine.date().nullable()` produz
-   * `{ "type": "null" }` - que é pior, porque afirma que o campo *só* pode ser
-   * nulo. O valor sai serializado como ISO 8601 pelo `DateTime` do Luxon, então
-   * `date-time` é o formato honesto.
+   * `date`: `vine.date()` produces `{}`, and `vine.date().nullable()` produces
+   * `{ "type": "null" }` - which is worse, because it claims the field can *only* be
+   * null. The value comes out serialized as ISO 8601 by Luxon's `DateTime`, so
+   * `date-time` is the honest format.
    *
-   * `multipartFile`: `vine.file()` é uma extensão do bodyparser do AdonisJS
-   * (`VineMultipartFile`), e o VineJS não tem como representar um binário em JSON
-   * Schema - sai `{}`. O nome do subtipo é o que a classe declara. `string` com
-   * `format: 'binary'` é como OpenAPI 3.1 descreve upload, e é também o que faz o
-   * gerador documentar a operação como `multipart/form-data` em vez de JSON
-   * (`requestContentType` em `document.ts`).
+   * `multipartFile`: `vine.file()` is an extension of the AdonisJS bodyparser
+   * (`VineMultipartFile`), and VineJS has no way to represent a binary in JSON
+   * Schema - it comes out `{}`. The subtype name is what the class declares. `string` with
+   * `format: 'binary'` is how OpenAPI 3.1 describes an upload, and it is also what makes the
+   * generator document the operation as `multipart/form-data` instead of JSON
+   * (`requestContentType` in `document.ts`).
    */
   private static readonly SUBTYPE_FALLBACKS: Record<
     string,
@@ -54,8 +54,8 @@ export class VineSchema {
   }
 
   /**
-   * O schema que substitui o que o VineJS não soube gerar, preservando a
-   * nulidade declarada no próprio nó.
+   * The schema that replaces what VineJS could not generate, preserving the
+   * nullability declared on the node itself.
    */
   private static fallbackFor(node: VineNode | undefined): SchemaObject | undefined {
     const fallback = VineSchema.SUBTYPE_FALLBACKS[node?.subtype ?? '']
@@ -71,8 +71,8 @@ export class VineSchema {
   }
 
   /**
-   * Um schema é inútil quando não diz nada (`{}`) ou quando só diz `null` - os dois
-   * casos que `vine.date()` produz.
+   * A schema is useless when it says nothing (`{}`) or when it only says `null` - the two
+   * cases that `vine.date()` produces.
    */
   private static isUninformative(schema: SchemaObject): boolean {
     if (Object.keys(schema).length === 0) return true
@@ -81,13 +81,13 @@ export class VineSchema {
   }
 
   /**
-   * `vine.boolean()` vira um `enum` com as nove representações que ele aceita -
+   * `vine.boolean()` becomes an `enum` with the nine representations it accepts -
    * `["1", 1, "true", true, "on", "0", 0, "false", false]`.
    *
-   * É verdade e é inútil: quem lê a documentação vê uma lista de nove valores no
-   * lugar de "booleano", e quem gera cliente tipado recebe uma união dessas nove
-   * literais em vez de `boolean`. O tipo é `boolean`; a tolerância a formulário
-   * HTML vira descrição.
+   * It is true and it is useless: whoever reads the documentation sees a list of nine values in
+   * place of "boolean", and whoever generates a typed client receives a union of those nine
+   * literals instead of `boolean`. The type is `boolean`; the tolerance for an
+   * HTML form becomes the description.
    */
   private static readonly BOOLEAN_COERCIONS = new Set<unknown>([
     '1',
@@ -119,8 +119,8 @@ export class VineSchema {
   }
 
   /**
-   * A raiz da árvore interna. `toJSON().schema` é um nó `root` que embrulha o
-   * objeto de verdade.
+   * The root of the internal tree. `toJSON().schema` is a `root` node that wraps the
+   * real object.
    */
   private static rootNode(validator: DocumentedValidator): VineNode | undefined {
     const { schema } = validator.toJSON()
@@ -131,7 +131,7 @@ export class VineSchema {
     return schema
   }
 
-  /** Indexa os filhos de um nó objeto por nome de campo. */
+  /** Indexes the children of an object node by field name. */
   private static childrenByField(node: VineNode | undefined): Map<string, VineNode> {
     const children = new Map<string, VineNode>()
 
@@ -147,9 +147,9 @@ export class VineSchema {
   }
 
   /**
-   * Percorre schema e árvore interna juntos, devolvendo um schema novo com os
-   * campos sem tipo resolvidos. Todo campo que continuar sem tipo vira aviso
-   * nomeando rota e caminho - em `--strict`, o comando falha por causa dele.
+   * Walks the schema and the internal tree together, returning a new schema with the
+   * untyped fields resolved. Every field that stays untyped becomes a warning
+   * naming route and path - under `--strict`, the command fails because of it.
    */
   private static patch(
     schema: SchemaObject,
@@ -164,8 +164,8 @@ export class VineSchema {
       if (fallback) return fallback
 
       warnings.push(
-        `${context}: o campo \`${path || '(raiz)'}\` saiu sem tipo do VineJS. ` +
-          'Descreva-o em `overrides` para ele não ir ao documento como "qualquer coisa".',
+        `${context}: field \`${path || '(root)'}\` came out untyped from VineJS. ` +
+          'Describe it in `overrides` so it does not go into the document as "anything".',
       )
 
       return schema
@@ -175,7 +175,7 @@ export class VineSchema {
       return {
         type: 'boolean',
         description:
-          'Aceita também as representações de formulário HTML: `"1"`, `"true"`, `"on"`, `"0"` e `"false"`.',
+          'Also accepts the HTML form representations: `"1"`, `"true"`, `"on"`, `"0"` and `"false"`.',
       }
     }
 
@@ -201,8 +201,8 @@ export class VineSchema {
       patched.properties = properties
     }
 
-    // `items` como tupla (array de schemas) não é gerado pelo VineJS hoje; a
-    // travessia ignora esse formato em vez de fingir que o entende.
+    // `items` as a tuple (array of schemas) is not generated by VineJS today; the
+    // traversal ignores that format instead of pretending to understand it.
     if (!Array.isArray(schema.items) && VineSchema.isSchemaObject(schema.items)) {
       patched.items = VineSchema.patch(schema.items, node?.each, context, `${path}[]`, warnings)
     }
@@ -210,7 +210,7 @@ export class VineSchema {
     return patched
   }
 
-  /** O schema publicável de um validator, já corrigido. */
+  /** The publishable schema of a validator, already fixed. */
   static toSchema(
     validator: DocumentedValidator,
     context: string,
@@ -226,11 +226,11 @@ export class VineSchema {
   }
 
   /**
-   * Sobrepõe o schema declarado em `overrides` ao derivado.
+   * Overlays the schema declared in `overrides` onto the derived one.
    *
-   * `properties` combina chave a chave e `required` faz união, para um override
-   * poder acrescentar um campo sem reescrever o objeto inteiro - que é
-   * exatamente o caso do `passwordConfirmation`.
+   * `properties` merges key by key and `required` takes the union, so an override
+   * can add a field without rewriting the whole object - which is
+   * exactly the case of `passwordConfirmation`.
    */
   static mergeSchema(base: SchemaObject, override: SchemaObject | undefined): SchemaObject {
     if (!override) return base
@@ -249,12 +249,12 @@ export class VineSchema {
   }
 
   /**
-   * Aplica as correções por nome de campo sobre um payload já derivado.
+   * Applies the per-field-name fixes onto an already derived payload.
    *
-   * É o conserto do que o VineJS não expressa, mas aplicado onde o campo estiver,
-   * em vez de repetido em cada controller que use a regra. O campo companheiro
-   * herda a obrigatoriedade do original: `password` opcional numa atualização não
-   * pode arrastar um `passwordConfirmation` obrigatório.
+   * It is the repair of what VineJS does not express, but applied wherever the field is,
+   * instead of repeated in every controller that uses the rule. The companion field
+   * inherits the requiredness of the original: an optional `password` in an update
+   * cannot drag in a required `passwordConfirmation`.
    */
   static applyFieldPatches(
     schema: SchemaObject,
@@ -288,15 +288,15 @@ export class VineSchema {
   }
 
   // ---------------------------------------------------------------------------
-  // Parâmetros
+  // Parameters
   // ---------------------------------------------------------------------------
 
   /**
-   * Quebra o schema de um objeto nos parâmetros correspondentes.
+   * Splits the schema of an object into the matching parameters.
    *
-   * Query string e parâmetros de caminho são declarados como um validator só - do
-   * mesmo jeito que o controller os valida - mas o OpenAPI os quer achatados, um
-   * por campo.
+   * Query string and path parameters are declared as a single validator - the
+   * same way the controller validates them - but OpenAPI wants them flattened, one
+   * per field.
    */
   static toParameters(schema: SchemaObject, location: 'path' | 'query'): OpenAPIParameter[] {
     const parameters: OpenAPIParameter[] = []
@@ -308,7 +308,7 @@ export class VineSchema {
       parameters.push({
         name,
         in: location,
-        // Parâmetro de caminho é sempre obrigatório: sem ele a rota nem casa.
+        // A path parameter is always required: without it the route does not even match.
         required: location === 'path' || required.includes(name),
         schema: definition,
       })
@@ -318,16 +318,16 @@ export class VineSchema {
   }
 
   // ---------------------------------------------------------------------------
-  // Paginação
+  // Pagination
   // ---------------------------------------------------------------------------
 
   /**
-   * Espelha `PaginationMeta` de `app/core/entity.ts`. Entra uma vez em
-   * `components.schemas` e é referenciado por toda listagem.
+   * Mirrors `PaginationMeta` of `app/core/entity.ts`. It enters `components.schemas`
+   * once and is referenced by every listing.
    */
   static readonly PAGINATION_META_SCHEMA: SchemaObject = {
     type: 'object',
-    description: 'Metadados da página, como o paginator do Lucid os devolve.',
+    description: 'Page metadata, as the Lucid paginator returns it.',
     properties: {
       total: { type: 'integer' },
       perPage: { type: 'integer' },
@@ -354,7 +354,7 @@ export class VineSchema {
 
   static readonly PAGINATION_META_REF = '#/components/schemas/PaginationMeta'
 
-  /** O envelope `{ meta, data }` em volta do schema do item. */
+  /** The `{ meta, data }` envelope around the item schema. */
   static paginatedSchema(item: SchemaObject): SchemaObject {
     return {
       type: 'object',

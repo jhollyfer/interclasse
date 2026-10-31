@@ -6,34 +6,35 @@ import type { CommandOptions } from '@adonisjs/core/types/ace'
 const OUTPUT = 'openapi.json'
 
 /**
- * Gera `openapi.json` a partir das rotas reais e dos schemas VineJS.
+ * Generates `openapi.json` from the real routes and the VineJS schemas.
  *
- * O documento é um arquivo commitado, não uma resposta montada na hora: assim
- * ele aparece no diff do PR, o CI consegue recusar um contrato que mudou sem
- * querer, e quem gera cliente tipado não precisa subir o servidor.
+ * The document is a committed file, not a response built on the fly: this way it
+ * shows up in the PR diff, CI can refuse a contract that changed by accident, and
+ * whoever generates a typed client does not need to start the server.
  *
- * O `--check` é a única guarda contra a falha silenciosa do gerador: renomear o
- * export de um validator sem mexer no controller não quebra o build - o
- * `loadValidator` engole a falha e a operação perde o payload no documento sem
- * dizer nada. Comparar o documento gerado com o commitado é o que transforma
- * essa perda em build vermelho.
+ * `--check` is the only guard against the generator's silent failure: renaming a
+ * validator export without touching the controller does not break the build - the
+ * `loadValidator` swallows the failure and the operation loses its payload in the
+ * document without saying anything. Comparing the generated document with the committed
+ * one is what turns that loss into a red build.
  *
- * `startApp` é obrigatório - sem ele o comando roda sem container, e não há
- * router nem controllers para inspecionar.
+ * `startApp` is required - without it the command runs with no container, and there
+ * is no router or controllers to inspect.
  */
 export default class OpenapiGenerate extends BaseCommand {
   static override commandName = 'openapi:generate'
-  static override description = 'Gera o documento OpenAPI a partir das rotas e dos schemas VineJS'
+  static override description =
+    'Generates the OpenAPI document from the routes and the VineJS schemas'
 
   static override options: CommandOptions = { startApp: true }
 
   @flags.boolean({
-    description: 'Não escreve nada: compara com o arquivo em disco e falha se divergir',
+    description: 'Writes nothing: compares with the file on disk and fails if it differs',
   })
   declare check: boolean
 
   @flags.boolean({
-    description: 'Trata avisos como erro. Use quando toda rota já tiver `static docs`',
+    description: 'Treats warnings as errors. Use when every route already has `static docs`',
   })
   declare strict: boolean
 
@@ -46,10 +47,10 @@ export default class OpenapiGenerate extends BaseCommand {
 
     for (const warning of warnings) this.logger.warning(warning)
 
-    this.logger.info(`${documented} de ${total} operações com a resposta descrita.`)
+    this.logger.info(`${documented} of ${total} operations with the response described.`)
 
     if (this.strict && warnings.length > 0) {
-      this.logger.error(`${warnings.length} aviso(s) com --strict. Nada foi escrito.`)
+      this.logger.error(`${warnings.length} warning(s) with --strict. Nothing was written.`)
       this.exitCode = 1
       return
     }
@@ -60,12 +61,12 @@ export default class OpenapiGenerate extends BaseCommand {
     }
 
     await writeFile(destination, serialized, 'utf-8')
-    this.logger.success(`${OUTPUT} escrito com ${Object.keys(document.paths).length} caminhos.`)
+    this.logger.success(`${OUTPUT} written with ${Object.keys(document.paths).length} paths.`)
   }
 
   /**
-   * Compara sem escrever. É o modo do CI: o build falha quando alguém mexeu numa
-   * rota, num validator ou num bloco `docs` e não regerou o documento.
+   * Compares without writing. It is the CI mode: the build fails when someone touched a
+   * route, a validator or a `docs` block and did not regenerate the document.
    */
   async compare(destination: string, expected: string) {
     let current
@@ -73,18 +74,18 @@ export default class OpenapiGenerate extends BaseCommand {
     try {
       current = await readFile(destination, 'utf-8')
     } catch {
-      this.logger.error(`${OUTPUT} não existe. Rode \`node ace openapi:generate\`.`)
+      this.logger.error(`${OUTPUT} does not exist. Run \`node ace openapi:generate\`.`)
       this.exitCode = 1
       return
     }
 
     if (current === expected) {
-      this.logger.success(`${OUTPUT} está atualizado.`)
+      this.logger.success(`${OUTPUT} is up to date.`)
       return
     }
 
     this.logger.error(
-      `${OUTPUT} está desatualizado. Rode \`node ace openapi:generate\` e commite o resultado.`,
+      `${OUTPUT} is out of date. Run \`node ace openapi:generate\` and commit the result.`,
     )
     this.exitCode = 1
   }

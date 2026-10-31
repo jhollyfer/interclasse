@@ -5,14 +5,14 @@ import { test } from '@japa/runner'
 import { introspect } from './introspect.ts'
 
 /**
- * O gerador lê também o `_shared.<recurso>-refusal.ts` que o use-case importa
- * (`_standards/openapi.md`, "erros-do-use-case", `DECISIONS.md` #259): o
- * controller não declara o que o tradutor já diz.
+ * The generator also reads the `_shared.<resource>-refusal.ts` that the use case imports
+ * (`_standards/openapi.md`, "erros-do-use-case", `DECISIONS.md` #259): the
+ * controller does not declare what the translator already says.
  */
 const FEATURES = join(import.meta.dirname, '../../app/features')
 
 test.group('scripts > openapi > introspect (unit)', () => {
-  test('lê do tradutor o código que o fato do use-case produz', async ({ assert }) => {
+  test('reads from the translator the code the use-case fact produces', async ({ assert }) => {
     const found = await introspect(
       join(FEATURES, 'administrator/sports/update/update.controller.ts'),
     )
@@ -22,7 +22,7 @@ test.group('scripts > openapi > introspect (unit)', () => {
     assert.include(codes, 'SPORT_INVALID_LIMITS')
   })
 
-  test('segue a base `_shared` do use-case até o tradutor', async ({ assert }) => {
+  test('follows the use case `_shared` base to the translator', async ({ assert }) => {
     const found = await introspect(join(FEATURES, 'advisor/photos/create/create.controller.ts'))
     const errors = found?.errors ?? []
 
@@ -32,7 +32,7 @@ test.group('scripts > openapi > introspect (unit)', () => {
     )
   })
 
-  test('traz a mensagem em pt-BR da chave do tradutor', async ({ assert }) => {
+  test('brings the pt-BR message of the translator key', async ({ assert }) => {
     const found = await introspect(
       join(FEATURES, 'administrator/sports/create/create.controller.ts'),
     )

@@ -1,8 +1,8 @@
 /**
- * Só as regras de camada de `_standards/architecture.md` §2 e `no-circular`
- * (`domain.md` §8). Toda regra de `forbidden` leva `severity: 'error'`: o padrão
- * é `warn`, e o código de saída é o número de violações `error`, então regra sem
- * severidade passa o CI verde (_doc-lib/dependency-cruiser.md#doc/rules-reference.md).
+ * Only the layer rules of `_standards/architecture.md` §2 and `no-circular`
+ * (`domain.md` §8). Every `forbidden` rule carries `severity: 'error'`: the default
+ * is `warn`, and the exit code is the number of `error` violations, so a rule without
+ * severity passes CI green (_doc-lib/dependency-cruiser.md#doc/rules-reference.md).
  */
 import type { IConfiguration } from 'dependency-cruiser'
 
@@ -10,14 +10,14 @@ const config: IConfiguration = {
   forbidden: [
     {
       name: 'no-circular',
-      comment: 'Ciclo entre módulos (domain.md §8).',
+      comment: 'Cycle between modules (domain.md §8).',
       severity: 'error',
       from: {},
       to: { circular: true },
     },
     {
-      name: 'core-sem-camada',
-      comment: 'core/ só importa shared (architecture.md §2).',
+      name: 'core-no-layer',
+      comment: 'core/ only imports shared (architecture.md §2).',
       severity: 'error',
       from: { path: '^app/core/' },
       to: {
@@ -25,8 +25,8 @@ const config: IConfiguration = {
       },
     },
     {
-      name: 'domain-sem-infra',
-      comment: 'domain/ importa core e shared; nunca model, repository, service ou HTTP.',
+      name: 'domain-no-infra',
+      comment: 'domain/ imports core and shared; never a model, repository, service or HTTP.',
       severity: 'error',
       from: { path: '^app/domain/' },
       to: {
@@ -34,31 +34,31 @@ const config: IConfiguration = {
       },
     },
     {
-      name: 'repositories-sem-regra',
-      comment: 'repositories/ importa domain, models e core; nunca regra de negócio nem HTTP.',
+      name: 'repositories-no-rules',
+      comment: 'repositories/ imports domain, models and core; never business rules or HTTP.',
       severity: 'error',
       from: { path: '^app/repositories/' },
       to: { path: '^app/(services|policies|middleware|features|exceptions)/' },
     },
     {
-      name: 'models-so-em-repositories',
+      name: 'models-only-in-repositories',
       comment:
-        'models/ só é importado por repositories/ (e por outro model; o guard tem regra própria).',
+        'models/ is only imported by repositories/ (and by another model; the guard has its own rule).',
       severity: 'error',
       from: { path: '^app/', pathNot: '^app/(repositories|models|guards)/' },
       to: { path: '^app/models/' },
     },
     {
-      name: 'guard-so-model-da-conta',
+      name: 'guard-only-account-model',
       comment:
-        'O guard importa só o model da conta: o GuardContract<User> do @adonisjs/auth exige (architecture.md §2, DECISIONS.md #247).',
+        'The guard imports only the account model: the GuardContract<User> of @adonisjs/auth requires it (architecture.md §2, DECISIONS.md #247).',
       severity: 'error',
       from: { path: '^app/guards/' },
       to: { path: '^app/models/', pathNot: '^app/models/user\\.ts$' },
     },
     {
-      name: 'models-so-core',
-      comment: 'models/ importa só core.',
+      name: 'models-only-core',
+      comment: 'models/ imports only core.',
       severity: 'error',
       from: { path: '^app/models/' },
       to: {
@@ -66,8 +66,8 @@ const config: IConfiguration = {
       },
     },
     {
-      name: 'services-sem-regra',
-      comment: 'services/ importa core e shared; nunca regra de negócio nem features/.',
+      name: 'services-no-rules',
+      comment: 'services/ imports core and shared; never business rules or features/.',
       severity: 'error',
       from: { path: '^app/services/' },
       to: {
@@ -75,22 +75,22 @@ const config: IConfiguration = {
       },
     },
     {
-      name: 'policies-sem-banco',
-      comment: 'policies/ importa core e domain; nunca consulta banco por conta própria.',
+      name: 'policies-no-database',
+      comment: 'policies/ imports core and domain; never queries the database on its own.',
       severity: 'error',
       from: { path: '^app/policies/' },
       to: { path: '^app/(repositories|models|services|middleware|features)/' },
     },
     {
-      name: 'middleware-sem-feature',
-      comment: 'middleware/ não carrega regra de uma feature.',
+      name: 'middleware-no-feature',
+      comment: 'middleware/ carries no rule of a feature.',
       severity: 'error',
       from: { path: '^app/middleware/' },
       to: { path: '^app/features/' },
     },
     {
-      name: 'features-sem-implementacao',
-      comment: 'features/ usa o contrato; nunca model nem implementação concreta.',
+      name: 'features-no-implementation',
+      comment: 'features/ uses the contract; never a model or a concrete implementation.',
       severity: 'error',
       from: { path: '^app/features/' },
       to: {
@@ -102,8 +102,8 @@ const config: IConfiguration = {
       },
     },
     {
-      name: 'features-sem-outra-feature',
-      comment: 'Uma feature não importa outra; o que é comum sobe para _shared.',
+      name: 'features-no-other-feature',
+      comment: 'A feature does not import another; what is common goes up to _shared.',
       severity: 'error',
       from: { path: '^app/features/([^/]+)/' },
       to: { path: '^app/features/', pathNot: ['^app/features/$1/', '/_shared[./]'] },
@@ -111,11 +111,11 @@ const config: IConfiguration = {
   ],
   options: {
     doNotFollow: { path: 'node_modules' },
-    // Sem isto o `import type` some do grafo, e a camada passa a depender de
-    // outra só por tipo sem ninguém ver (_doc-lib/dependency-cruiser.md#doc/options-reference.md).
+    // Without this the `import type` disappears from the graph, and a layer starts depending on
+    // another by type alone with nobody seeing it (_doc-lib/dependency-cruiser.md#doc/options-reference.md).
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.depcruise.json' },
-    // O alias `#camada/*` vem do campo `imports` do package.json.
+    // The `#layer/*` alias comes from the `imports` field of package.json.
     enhancedResolveOptions: {
       exportsFields: ['exports'],
       conditionNames: ['import', 'require', 'node', 'default', 'types'],

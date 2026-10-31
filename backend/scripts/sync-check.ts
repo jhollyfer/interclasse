@@ -1,19 +1,19 @@
 /**
- * Cobra a cópia local da régua contra o upstream (`jhollyfer/maiyu-pattern`).
+ * Checks the local copy of the ruler against the upstream (`jhollyfer/maiyu-pattern`).
  *
- * `_standards/`, `_doc-lib/`, `SKILLS-MAP.md` e as skills da casa em `.claude/skills/`
- * não se editam aqui: vêm de `node <upstream>/scripts/sync-to-project.mjs <raiz>`.
- * Este script só delega ao `--check` do próprio upstream, para que a régua de
- * comparação seja uma só (_standards/backend.md §10 e §11).
+ * `_standards/`, `_doc-lib/`, `SKILLS-MAP.md` and the house skills in `.claude/skills/`
+ * are not edited here: they come from `node <upstream>/scripts/sync-to-project.mjs <root>`.
+ * This script only delegates to the upstream's own `--check`, so that the comparison
+ * ruler is a single one (_standards/backend.md §10 and §11).
  *
- * Onde fica o upstream, nesta ordem:
- *   1. `MAIYU_PATTERN_DIR`, quando definido;
- *   2. `maiyu-pattern/` ao lado do repositório (`../../maiyu-pattern` a partir de `backend/`).
+ * Where the upstream is, in this order:
+ *   1. `MAIYU_PATTERN_DIR`, when defined;
+ *   2. `maiyu-pattern/` next to the repository (`../../maiyu-pattern` from `backend/`).
  *
- * Conferência local, fora do CI. Sem upstream à mão o script avisa e sai 0: o
- * repositório é privado, e quem não tem acesso a ele ainda precisa rodar `pnpm check`.
+ * Local check, outside CI. Without an upstream at hand the script warns and exits 0: the
+ * repository is private, and whoever has no access to it still needs to run `pnpm check`.
  *
- * Uso:
+ * Usage:
  *   node --import @poppinss/ts-exec scripts/sync-check.ts
  */
 
@@ -28,7 +28,7 @@ const upstream = process.env.MAIYU_PATTERN_DIR ?? resolve(ROOT, '..', 'maiyu-pat
 const script = join(upstream, 'scripts', 'sync-to-project.mjs')
 
 if (!existsSync(script)) {
-  console.log(`sync:check (isolado): upstream não encontrado em ${upstream}; nada comparado.`)
+  console.log(`sync:check (isolated): upstream not found at ${upstream}; nothing compared.`)
   process.exit(0)
 }
 

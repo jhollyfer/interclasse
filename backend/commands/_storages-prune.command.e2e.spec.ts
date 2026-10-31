@@ -16,20 +16,20 @@ import type { Session } from '#tests/http-fixtures'
 import { ageStorage, pngBytes, storageExists } from '#tests/storages-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the form that sent it,
+ * and ownership authorizes nothing. What rules is the state (`PENDING` or `UPLOADED`)
+ * and the live reference.
  */
 
 /**
- * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
- * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
+ * Content of a non-final part. S3 refuses less than 5 MB
+ * (`EntityTooSmall`), and `PART_SIZE` is what the server promises per part.
  */
 const FULL_PART = pngBytes(PART_SIZE, 65)
 
 const SMALL = pngBytes(1024)
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -42,7 +42,7 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 async function put(url: string, content: Uint8Array): Promise<string> {
   const response = await fetch(url, {
     method: 'PUT',
@@ -50,12 +50,12 @@ async function put(url: string, content: Uint8Array): Promise<string> {
     headers: { 'Content-Type': 'image/png' },
   })
 
-  if (!response.ok) throw new Error(`PUT respondeu ${response.status}`)
+  if (!response.ok) throw new Error(`PUT answered ${response.status}`)
 
   return response.headers.get('etag') ?? ''
 }
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
@@ -75,20 +75,20 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
   return body(completed)
 }
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 /**
- * A varredura de `PENDING` abandonado (`node ace storages:prune`).
+ * The sweep of abandoned `PENDING` (`node ace storages:prune`).
  *
- * `PENDING` é o único estado do qual não se sai sozinho: quem fecha a aba no
- * meio do upload nunca chama o `complete` nem o `DELETE`, e a linha fica de pé
- * com as partes penduradas no bucket, invisíveis na listagem de objetos e
- * cobradas mesmo assim. É o comando que fecha a máquina de estado.
+ * `PENDING` is the only state one never leaves on one's own: whoever closes the tab
+ * mid-upload never calls `complete` or `DELETE`, and the row stays up with the
+ * parts hanging in the bucket, invisible in the object listing and billed
+ * anyway. It is the command that closes the state machine.
  */
 test.group('storages > prune', (group) => {
   group.each.setup(() => resetDatabase())
 
-  /** Envelhece a linha no banco: é a idade que o comando usa para decidir. */
+  /** Ages the row in the database: it is the age the command uses to decide. */
   const age = ageStorage
 
   async function prune(...args: Array<string>) {
@@ -100,7 +100,7 @@ test.group('storages > prune', (group) => {
     return command
   }
 
-  test('apaga o PENDING velho e aborta o multipart dele', async ({ client, assert }) => {
+  test('deletes the old PENDING and aborts its multipart', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const multipart = await app.container.make(MultipartContract)
 
@@ -110,8 +110,8 @@ test.group('storages > prune', (group) => {
       size: PART_SIZE + SMALL.byteLength,
     })
 
-    // Uma parte sobe e a outra não: é o abandono no meio do caminho, e são
-    // essas partes órfãs que só o aborto alcança.
+    // One part goes up and the other does not: it is the abandonment midway, and these
+    // orphan parts are what only the abort reaches.
     await put(opened.parts[0].url, FULL_PART)
     await age(opened.storage.id, 48)
 
@@ -120,12 +120,12 @@ test.group('storages > prune', (group) => {
     command.assertSucceeded()
 
     assert.isFalse(await storageExists(opened.storage.id))
-    // Listar as partes de um upload abortado é erro, e não lista vazia - é a
-    // diferença entre "abortado" e "aberto e sem parte nenhuma".
+    // Listing the parts of an aborted upload is an error, not an empty list - it is the
+    // difference between "aborted" and "open with no part at all".
     await assert.rejects(() => multipart.listParts(opened.storage.path, opened.uploadId))
   })
 
-  test('não toca no PENDING recente', async ({ client, assert }) => {
+  test('does not touch a recent PENDING', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -141,7 +141,7 @@ test.group('storages > prune', (group) => {
     assert.isTrue(await storageExists(opened.storage.id))
   })
 
-  test('não toca no UPLOADED, por mais velho que seja', async ({ client, assert }) => {
+  test('does not touch UPLOADED, however old it is', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -155,7 +155,7 @@ test.group('storages > prune', (group) => {
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
-  test('--hours ajusta o corte', async ({ client, assert }) => {
+  test('--hours adjusts the cutoff', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -166,7 +166,7 @@ test.group('storages > prune', (group) => {
 
     await age(opened.storage.id, 2)
 
-    // Sobrevive ao padrão de 24h e não sobrevive a um corte de uma hora.
+    // Survives the 24h default and does not survive a one-hour cutoff.
     await prune()
     assert.isTrue(await storageExists(opened.storage.id))
 
@@ -174,7 +174,7 @@ test.group('storages > prune', (group) => {
     assert.isFalse(await storageExists(opened.storage.id))
   })
 
-  test('--dry-run lista sem apagar', async ({ client, assert }) => {
+  test('--dry-run lists without deleting', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {

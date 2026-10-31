@@ -1,29 +1,29 @@
 /**
- * As exceções e os dados do projeto que o `pattern:check` lê
- * (`_standards/backend.md` §10). Toda exceção leva o `reason`; exceção sem uso
- * reprova (`_standards/architecture.md` §6).
+ * The exceptions and project data that `pattern:check` reads
+ * (`_standards/backend.md` §10). Every exception carries the `reason`; an unused exception
+ * fails (`_standards/architecture.md` §6).
  */
 
-/** Uma exceção nomeada de `new` em classe que não é service nem use-case. */
+/** A named `new` exception in a class that is neither a service nor a use case. */
 export type NewException = {
-  /** O símbolo construído com `new`. */
+  /** The symbol built with `new`. */
   readonly symbol: string
-  /** Onde o uso vive. Aceita `**` e `*`. */
+  /** Where the use lives. Accepts `**` and `*`. */
   readonly file: string
-  /** Por que aquele `new` é legítimo. */
+  /** Why that `new` is legitimate. */
   readonly reason: string
 }
 
 export type PatternCheckConfig = {
-  /** Chave de ambiente que nunca passa por `env.get()`, com o reason. §6. */
+  /** Environment key that never goes through `env.get()`, with the reason. §6. */
   readonly envOutsideReader: Readonly<Record<string, string>>
   readonly newAllowlist: ReadonlyArray<NewException>
   readonly softDeleteExempt: ReadonlyArray<string>
-  /** Arquivos de FORMA: a mesma API em todo projeto, conteúdo por domínio. */
+  /** SHAPE files: the same API in every project, content per domain. */
   readonly shape: ReadonlyArray<string>
   /**
-   * Controllers cuja regra por registro não é só posse: o `ctx.bouncer` é
-   * obrigatório neles (`_standards/backend.md` §4.6).
+   * Controllers whose per-record rule is not only ownership: `ctx.bouncer` is
+   * mandatory in them (`_standards/backend.md` §4.6).
    */
   readonly BOUNCER_REQUIRED: ReadonlyArray<string>
 }
@@ -31,21 +31,21 @@ export type PatternCheckConfig = {
 export const CONFIG: PatternCheckConfig = {
   envOutsideReader: {
     NODE_ENV:
-      'lida como `process.env.NODE_ENV` pelo carregador do Adonis e por `bin/test.ts`, antes de existir serviço de env',
-    PORT: 'lida como `process.env.PORT` por `@adonisjs/core` ao subir o servidor HTTP',
-    HOST: 'lida como `process.env.HOST` por `@adonisjs/core` ao subir o servidor HTTP',
-    TZ: 'lida como `process.env.TZ` pelo próprio Node; define o fuso do processo',
+      'read as `process.env.NODE_ENV` by the Adonis loader and by `bin/test.ts`, before any env service exists',
+    PORT: 'read as `process.env.PORT` by `@adonisjs/core` when starting the HTTP server',
+    HOST: 'read as `process.env.HOST` by `@adonisjs/core` when starting the HTTP server',
+    TZ: 'read as `process.env.TZ` by Node itself; defines the process time zone',
   },
   newAllowlist: [
     {
       symbol: 'CookieAccessTokensGuard',
       file: 'app/guards/cookie-access-tokens.guard.ts',
-      reason: 'factory exigida por config/auth.ts; recebe o HttpContext da requisição',
+      reason: 'factory required by config/auth.ts; receives the request HttpContext',
     },
     {
       symbol: 'SimpleMessagesProvider',
       file: 'app/core/validator.ts',
-      reason: 'API do VineJS, atribuída a vine.messagesProvider no boot',
+      reason: 'VineJS API, assigned to vine.messagesProvider at boot',
     },
   ],
   softDeleteExempt: [],
