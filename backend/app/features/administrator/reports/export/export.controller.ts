@@ -9,10 +9,10 @@ import { defineDocs } from '#core/openapi/types'
 @inject()
 export default class AdministratorReportExportController {
   static docs = defineDocs({
-    summary: 'Baixar relatório em CSV',
+    summary: 'Download report as CSV',
     description:
-      'O relatório por turma em CSV (UTF-8 com BOM, separado por `;`), que o Excel em ' +
-      'português abre direto em colunas. A última linha é o total.',
+      'The per-classroom report as CSV (UTF-8 with BOM, separated by `;`), which Excel in ' +
+      'Portuguese opens straight into columns. The last row is the total.',
     overrides: {
       responses: { 200: { type: 'string', description: 'O arquivo CSV.' } },
     },

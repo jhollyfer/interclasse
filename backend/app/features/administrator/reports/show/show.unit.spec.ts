@@ -26,12 +26,12 @@ async function setup() {
 }
 
 test.group('administrator/reports > show (unit)', () => {
-  test('conta no total, por categoria, por modalidade e por turma', async ({ assert }) => {
+  test('counts in total, by category, by sport and by classroom', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute()
 
-    if (result.isLeft()) throw new Error('esperava o relatório')
+    if (result.isLeft()) throw new Error('expected the report')
     assert.deepEqual(result.value.totals, {
       classrooms: 2,
       students: 2,
@@ -43,7 +43,7 @@ test.group('administrator/reports > show (unit)', () => {
     })
     assert.deepInclude(result.value.byCategory[1], { category: CATEGORY.F2, athletes: 1 })
     assert.deepInclude(result.value.bySport[0], { athletes: 1, classrooms: 1 })
-    // Em ordem de ano: o 3º antes do 7º.
+    // In year order: the 3rd before the 7th.
     assert.deepEqual(
       result.value.classrooms.map((classroom) => classroom.name),
       ['3º Z', '7º A'],

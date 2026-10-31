@@ -1,10 +1,10 @@
 import type { AdministratorReportShowResponse } from '@interclasse/shared'
 
-/** Os textos do arquivo, já no idioma da requisição (`_standards/i18n.md`). */
+/** The file texts, already in the request language (`_standards/i18n.md`). */
 export type ReportPresenterLabels = {
   readonly header: ReadonlyArray<string>
   readonly total: string
-  /** O texto da célula de turmas na linha de total. */
+  /** The text of the classrooms cell in the total row. */
   readonly totalClassrooms: (count: number) => string
   readonly category: (
     category: AdministratorReportShowResponse['classrooms'][number]['category'],
@@ -12,15 +12,15 @@ export type ReportPresenterLabels = {
 }
 
 /**
- * `;` e não `,`: é o separador que o Excel em português abre direto em colunas,
- * sem assistente de importação - a vírgula lá é o decimal.
+ * `;` and not `,`: it is the separator that Excel in Portuguese opens straight into columns,
+ * without an import wizard - the comma there is the decimal.
  */
 const SEPARATOR = ';'
 
 /**
- * O relatório como CSV para baixar e abrir no Excel: uma linha por turma e a
- * linha de total no fim. Classe pura, sem I/O nem idioma próprio: o texto vem
- * pronto em `labels`, e o use-case é quem o busca no i18n.
+ * The report as CSV to download and open in Excel: one row per classroom and the
+ * total row at the end. A pure class, with no I/O nor language of its own: the text comes
+ * ready in `labels`, and the use case is the one that fetches it from i18n.
  */
 export class ReportPresenter {
   static csv(report: AdministratorReportShowResponse, labels: ReportPresenterLabels): string {
@@ -43,8 +43,8 @@ export class ReportPresenter {
       String(report.totals.sports),
     ]
 
-    // O BOM na frente: sem ele o Excel lê o arquivo como Latin-1, e "3º" e
-    // "Conceição" viram lixo.
+    // The BOM up front: without it Excel reads the file as Latin-1, and "3º" and
+    // "Conceição" turn into garbage.
     return '\uFEFF'.concat(
       [[...labels.header], ...rows, total]
         .map((line) => line.map((cell) => ReportPresenter.cell(cell)).join(SEPARATOR))
@@ -53,10 +53,10 @@ export class ReportPresenter {
   }
 
   /**
-   * Uma célula: entre aspas, aspas dobradas, e com apóstrofo na frente do que
-   * começa como fórmula (`=`, `+`, `-`, `@`, tab ou CR). Nome de turma ou de
-   * pessoa é texto digitado por gente, e sem isso viraria fórmula executada ao
-   * abrir a planilha (injeção de CSV).
+   * A cell: quoted, quotes doubled, and with an apostrophe in front of what
+   * starts as a formula (`=`, `+`, `-`, `@`, tab or CR). A classroom or person
+   * name is text typed by people, and without this it would become a formula executed on
+   * opening the spreadsheet (CSV injection).
    */
   private static cell(value: string): string {
     let text = value
