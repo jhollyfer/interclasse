@@ -12,6 +12,7 @@ import { defineConfig } from 'vitest/config'
 // ou DOM e por isso precisa de ambiente próprio por arquivo
 // (_doc-lib/vitest.md#improving-performance, `tooling.md` §10.6).
 const STATEFUL = [
+  'src/env.test.ts',
   'src/hooks/**/*.test.ts',
   'src/integrations/**/*.test.ts',
   'src/lib/form-errors.test.ts',
