@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** fases 1 a 6 feitas, CI verde na `main` e régua sincronizada — atualizado 2026-10-31
+**Resumo:** fases 1 a 7 feitas (a 7 na branch, sem PR ainda) — atualizado 2026-10-31
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -108,7 +108,7 @@ Primeira execução real dos workflows da fase 5, PR a PR.
 | 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5 sincronizado |
 | 6.7 | API do E2E em produção e seeds de demonstração pelo workspace | Alta | Feita | #22; primeiro run inteiro verde |
 
-## Fase 7 · Régua: lições do adacaibs (0/9)
+## Fase 7 · Régua: lições do adacaibs (9/10)
 
 Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/10), sem exceção local.
 
@@ -116,7 +116,7 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 |---|---|---|---|---|
 | 7.1 | `maiyu-guard` habilitado e `AGENTS.md` da raiz no modelo novo | Alta | Feita | #254 |
 | 7.2 | Migration no *Post-deployment command* do Coolify | Alta | Feita | #252; `docs/ENV.md`, `docs/ARCHITECTURE.md` §9.1, Dockerfile, workflows |
-| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | Feita | #256; `architecture.md` §3.4 |
+| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | Feita | #256; `architecture.md` §3.4. Movidos: `.editorconfig`, `scripts/depcruise.config.ts`, `core/transaction-context.ts`, `paraglide.config.ts`, `get-theme.ts`, `devtools.tsx`. Sem arquivo novo por não haver uso: `.gitleaks.toml` (o gitleaks roda sem allowlist), `core/translation.ts` e `core/same-site.ts` (o projeto injeta o `I18n` e o `sameSite` é `lax` fixo em `config/cookie.ts`) |
 | 7.4 | Campos dos checks em inglês e `reason` nas exceções | Média | Feita | #258 |
 | 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | Feita | #259; o gerador usa o tipo do fato (`Refusal.http(fato)`), então o que o tipo de domínio declara largo aparece largo no `openapi.json` (ex.: `ensureDeletable(): Either<BracketError, …>`). Estreitar o left por operação fica como 7.10 |
 | 7.6 | `.env.example` e `.env.test` em inglês | Baixa | Feita | #260 |
