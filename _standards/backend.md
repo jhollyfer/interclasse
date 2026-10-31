@@ -968,8 +968,12 @@ export abstract class PaymentGatewayContract {
   `storages:prune --dry-run` limpa o pendente abandonado.
 - **Tamanho e extensão no validator** antes de assinar; a URL de escrita prende **tipo e tamanho** na
   assinatura com `signableHeaders: new Set(['content-type', 'content-length'])` no `getSignedUrl` do
-  `@aws-sdk/s3-request-presigner` (o mesmo vale para a URL de cada parte do multipart, com o tamanho da
-  parte). Sem isso o storage aceita qualquer tipo: o padrão do SDK não assina `content-type`, e a
+  `@aws-sdk/s3-request-presigner`, e o cliente manda o `Content-Type` do arquivo no `PUT` (no navegador,
+  `file.slice(início, fim, file.type)`: `Blob` sem tipo sai sem o header e o S3 recusa). A URL de cada
+  parte do multipart prende **só o tamanho** (`new Set(['content-length'])`): o `UploadPart` não tem
+  tipo e a parte sobe sem `Content-Type`, então assinar `content-type` ali declara um header ausente e o
+  S3 de verdade recusa com "headers present in the request which were not signed" (o moto aceita e
+  esconde o erro). Sem isso o storage aceita qualquer tipo: o padrão do SDK não assina `content-type`, e a
   FlyDrive 2.2 (`getSignedUploadUrl` do driver S3) chama o `getSignedUrl` sem `signableHeaders`; com
   ela, a assinatura passa pelo `urlBuilder.generateSignedUploadURL` do disco. Provado no MinIO de teste
   em 2026-10-14: sem a opção, `PUT` de SVG numa URL emitida para PNG deu 200; com ela, tipo errado e

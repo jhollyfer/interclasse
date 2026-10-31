@@ -16,14 +16,13 @@
 
 ## Parou em
 
-Régua aplicada por inteiro (fase 5, #16) e CI rodando de verdade (fase 6, #17 a #20): backend 462 unit + 692/692 e2e e Playwright 14/14 contra o MinIO da release do CI. Régua sincronizada com o maiyu-pattern#4. O maiyu-pattern#5 (autor no CI, assinatura da parte) aguarda merge.
+Tudo fechado: régua aplicada por inteiro (fase 5, #16), CI rodando de verdade e verde na `main` (fase 6, #17 a #22) e régua sincronizada com o maiyu-pattern#5. Backend 462 unit + 692 e2e e Playwright 14/14 contra o MinIO da release do CI.
 
 ## Próximos passos
 
-1. Depois do merge do maiyu-pattern#5: `node <maiyu-pattern>/scripts/sync-to-project.mjs .` e PR do sync.
-2. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
-3. Medir o `size-adjust` das fontes de reserva.
-4. Ajuste visual das turmas quando chegarem os prints do Geison.
+1. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
+2. Medir o `size-adjust` das fontes de reserva.
+3. Ajuste visual das turmas quando chegarem os prints do Geison.
 
 ## Contexto importante
 

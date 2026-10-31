@@ -564,9 +564,12 @@ não basta: ferramenta de agente injeta o trailer por padrão.
    esac
    ```
 
-3. **CI no PR** (`main-check-*.yml`, passo antes do lint): `git log --format='%an <%ae>%n%B' origin/<base>..HEAD`
-   e o mesmo `grep`; achou trailer de agente ou autor diferente, o job falha. Pega o commit feito
-   com `--no-verify` ou numa máquina sem o hook.
+3. **CI no PR** (`main-check-*.yml`, passo antes do lint):
+   `git log --format='%an <%ae>%n%B' "origin/<base>..${{ github.event.pull_request.head.sha }}"` (por
+   `env:`, nunca interpolado no `run:`) e o mesmo `grep`; achou trailer de agente ou autor diferente,
+   o job falha. Até o head do PR, não até o `HEAD`: no `pull_request` o `HEAD` é o merge sintético que
+   o GitHub cria com o e-mail noreply do autor e reprovaria todo PR. Pega o commit feito com
+   `--no-verify` ou numa máquina sem o hook.
 
 Commit que já entrou com a marca é corrigido reescrevendo o histórico da branch (`git rebase` com
 `--exec`/`filter-branch`), nunca deixado para depois; na `main` compartilhada, só com o dono.
