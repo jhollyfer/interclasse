@@ -7,7 +7,7 @@
 
 | Atualizado | Fase atual                                   | Progresso | Status                                           |
 | ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90%       | Em revisão, branch `claude/modest-planck-jx0izx` |
+| 2026-10-30 | Régua aplicada e pedidos do Geison entregues | 90%       | Concluída, CI verde na `main` |
 
 ## Já feito
 
@@ -16,13 +16,14 @@
 
 ## Parou em
 
-Fase 5 (régua estrita) concluída na branch `refactor/interclasse-regua-estrita`: frentes 5.1 a 5.8 integradas e verificadas (E2E 14/14 duas vezes, backend 462 unit + 691/692 e2e, frontend 413 unit). Workflows e imagens Docker só rodam de verdade no primeiro PR.
+Régua aplicada por inteiro (fase 5, #16) e CI rodando de verdade (fase 6, #17 a #20): backend 462 unit + 692/692 e2e e Playwright 14/14 contra o MinIO da release do CI. Régua sincronizada com o maiyu-pattern#4. O maiyu-pattern#5 (autor no CI, assinatura da parte) aguarda merge.
 
 ## Próximos passos
 
-1. Medir o `size-adjust` das fontes de reserva (resto da 5.7).
-2. Abrir o PR da fase 5 e conferir os workflows novos (Docker e E2E) na primeira execução real.
-3. Antes do deploy: definir `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build) na produção; sem a primeira o site sai `noindex`, sem a segunda o CSP bloqueia o upload.
+1. Depois do merge do maiyu-pattern#5: `node <maiyu-pattern>/scripts/sync-to-project.mjs .` e PR do sync.
+2. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
+3. Medir o `size-adjust` das fontes de reserva.
+4. Ajuste visual das turmas quando chegarem os prints do Geison.
 
 ## Contexto importante
 
@@ -41,6 +42,7 @@ Fase 5 (régua estrita) concluída na branch `refactor/interclasse-regua-estrita
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature        | backend, migration e regra de domínio |
 | 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`)          | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI    |
+| 2026-10-31 | Upload verificado só contra o moto, que aceita qualquer assinatura: a parte assinada com `content-type` e o PUT sem `Content-Type` passaram local e quebraram no MinIO do CI | Teste de upload roda contra o MinIO da release do CI (`backend/infra/minio/`), nunca contra fake de S3 | backend e frontend, upload |
 
 ## Problemas conhecidos
 

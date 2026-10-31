@@ -50,10 +50,11 @@ para feature — e por isso é marcada *(opinião da casa)* onde a doc não fala
 | `core/` | mecanismos transversais do backend: envelope de resposta, OpenAPI, validator do backend (Fastify: o `z` configurado; Adonis: o `vine` do backend) (o `Either` vem de `shared/`; o `HTTPException`, de `exceptions/`) | `shared` | qualquer outra camada do app |
 | `domain/` | entidades com comportamento, value objects do backend, fatos de domínio | `core`, `shared` | model, repository, service, HTTP, framework |
 | `repositories/` | contrato de persistência e suas implementações (ORM e memória) | `domain`, `models`, `core` | regra de negócio, HTTP |
-| `models/` | schema da tabela/coleção (Lucid ou driver Mongo) | `core` | ser importado fora de `repositories/` |
+| `models/` | schema da tabela/coleção (Lucid ou driver Mongo) | `core` | ser importado fora de `repositories/` (e do guard, abaixo) |
 | `services/` | integração externa (e-mail, storage, fila, CEP, CNPJ, pagamento) atrás de contrato | `core`, `shared` | regra de negócio, `features/` |
 | `policies/` | "quem pode" sobre um registro | `core`, `domain` | consultar banco por conta própria |
 | `middleware/` | transversal de requisição (auth, papel, tenant, idioma) | `core`, contratos | regra de uma feature |
+| `guards/` *(Adonis)* | guard de autenticação do framework (§3.2) | `core`, contratos, e o model da conta: o `GuardContract<User>` do `@adonisjs/auth` devolve o model e o provider de tokens mora nele | regra de negócio; qualquer outro model |
 | `features/` | operações: controller + use-case + testes | `domain`, contratos de `repositories/` e `services/`, `policies`, `core`, `exceptions` (`HTTPException`), `shared` | importar outra feature; importar `models/` ou implementação concreta |
 | `exceptions/` | `HTTPException` e a tradução de erro → resposta HTTP | `core` | — |
 
@@ -120,6 +121,7 @@ backend/
 │                   ├── <ação>.unit.spec.ts        # use-case com memory repository + fakes
 │                   └── <ação>.e2e.spec.ts         # rota real, banco real
 ├── commands/<recurso>-<verbo>.command.ts
+├── commands/_<recurso>-<verbo>.command.e2e.spec.ts   # o loader do Ace ignora o que começa com `_`
 ├── config/<nome>.ts                 # só configuração
 ├── database/
 │   ├── migrations/                  # nome do framework (backend.md §3)

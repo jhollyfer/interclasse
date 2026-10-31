@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** fases 1 a 5 feitas; pendências e propostas ao upstream listadas abaixo — atualizado 2026-10-30
+**Resumo:** fases 1 a 6 feitas; aguardando maiyu-pattern#5 e o sync que vem dele — atualizado 2026-10-31
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -77,18 +77,33 @@ tudo o que os `CLAUDE.md` dos apps chamavam de exceção. Cada frente fecha os i
 | 5.7 | Frontend código e UI: ESLint completo (incl. `ui/`), dialogs uncontrolled, Luxon, sem memo manual, pending/notFound, SEO, tokens (z-index, texto, tema por cookie), cabeçalhos do Nitro, busca infinita, testes | Alta | Parcial | B4, C3, T4, SEC-9, 4.3 feitos; teste de toda peça de `components/common`, `BreadcrumbList` e `SportsEvent` na chave pública, grades arbitrárias como `@utility` e o pedido de motivo da remoção por handle feitos; falta o `size-adjust` das fontes de reserva medido e o E2E (5.8) |
 | 5.8 | Verificação final: todos os portões, suíte e2e do backend e E2E Playwright | Alta | Feita | E2E 14/14 duas vezes seguidas (2,3 min); backend 462 unit + 691/692 e2e (falha só do moto, que não expira URL); frontend 413 unit, build, ciclos; shared 21; depcruise só com o guard (proposta ao upstream) |
 
-### Propostas ao upstream (`maiyu-pattern`) e pendências da 5.5
+### Propostas ao upstream (`maiyu-pattern`)
 
-Nada disto vira exceção local: a régua é que muda, ou o código muda depois.
+Nada vira exceção local: a régua muda e volta pelo sync.
 
-| Item | Motivo | Proposta |
-|---|---|---|
-| `app/guards/cookie-access-tokens.guard.ts` importa `#models/user` (`models-so-em-repositories`), a única violação do `pnpm depcruise` | O contrato do guard do `@adonisjs/auth` devolve o model (`GuardContract<User>`) e `User.accessTokens` é o provider do pacote; `architecture.md` §2 lista `guards/` na árvore mas não dá a ele uma linha de camada | A régua dizer qual camada o guard ocupa e que ele pode importar o model de autenticação (a exceção declarada de `backend.md` §4.7), ou o guard passar a ler a conta por um repository |
-| Spec do comando `storages:prune` em `commands/_storages-prune.command.e2e.spec.ts` | O Ace carrega todo arquivo de `commands/` como comando e ignora o que começa com `_` (`@adonisjs/ace` FsLoader); `architecture.md` §3 não prevê spec em `commands/` | A régua prever o nome da spec de comando |
-| `USER_ALREADY_ARCHIVED` e `USER_NOT_ARCHIVED` não saem por HTTP em arquivar e restaurar | O use-case lê só a conta viva (ou só a arquivada) e responde 404; a tabela de ciclo de vida de `backend.md` §7 pede 409 de estado | Decidir se arquivar duas vezes é 404 (hoje, testado) ou 409, e então alinhar use-case e spec |
-| `account/profile/show` sem 404 por HTTP | O guard já recusa conta arquivada com 401 antes do use-case; o 404 do use-case só existe na corrida entre guard e leitura, coberto no unitário | Nenhuma: caso não alcançável pela rota |
+| Item | Situação |
+|---|---|
+| Guard importa o model da conta (`GuardContract<User>` do `@adonisjs/auth`) | Na régua (decisão #247, maiyu-pattern#4); aqui, regra `guard-so-model-da-conta` no `.dependency-cruiser.cjs`. `pnpm depcruise` sem violação |
+| Spec de comando Ace em `commands/_<nome>.command.e2e.spec.ts` | Na régua (decisão #248, maiyu-pattern#4) |
+| Modelos de `docs/` sem "desvio aceito" | Na régua (maiyu-pattern#4) |
+| `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |
+| Passo de autor do CI até o head do PR | Proposto em maiyu-pattern#5 (decisão #250); aqui desde o #18 |
+| Parte do multipart assina só o tamanho; arquivo inteiro sobe com `Content-Type` | Proposto em maiyu-pattern#5 (decisão #251); aqui no #20 |
 
-Resolvido na 5.5b: a assinatura da URL de leitura saiu dos repositories de arquivo, foto, site e usuário (o use-case assina por `StorageContract.withUrl`, `architecture.md` §2); a isenção de `*.spec.ts` saiu do `.dependency-cruiser.cjs`.
+Resolvidos aqui: arquivar e restaurar respondem 409 de estado (`USER_ALREADY_ARCHIVED`, `USER_NOT_ARCHIVED`); `account/profile/show` não tem 404 alcançável pela rota (o guard responde 401 antes), coberto no unitário.
+
+## Fase 6 · CI de verdade (6/6)
+
+Primeira execução real dos workflows da fase 5, PR a PR.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 6.1 | `pnpm/setup` v3 lê o pnpm travado no lockfile | Alta | Feita | #17 |
+| 6.2 | Passo de autor até o head do PR, Prettier no header, guard no depcruise | Alta | Feita | #18 |
+| 6.3 | Setup do MinIO de teste pelo `sh` | Alta | Feita | #19 |
+| 6.4 | Upload aceito pelo S3 de verdade (parte sem tipo, arquivo inteiro com `Content-Type`) | Alta | Feita | #20; e2e 692/692 e Playwright 14/14 contra MinIO da release do CI |
+| 6.5 | Régua sincronizada com o maiyu-pattern#4 | Média | Feita | sync sem divergência |
+| 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5, aguarda merge e sync |
 
 ## Fase N · Ideias (fora do escopo atual)
 

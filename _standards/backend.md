@@ -1259,9 +1259,9 @@ HTTP.
   limpeza entre testes por `testUtils.db().truncate()` (`_doc-lib/adonisjs.md#guides/testing/resetting-state-between-tests`);
   no Fastify a guarda mora no `globalSetup` do Vitest (`_doc-lib/vitest.md#config/globalsetup`). Mock só do que é externo (gateway, e-mail, API de terceiro); banco,
   regra e policy rodam de verdade.
-- **O `it` é a frase do comportamento**, em pt-BR, no formato "quando …, …" ("quando o mesmo
-  evento chega 2 vezes, libera o plano 1 vez só"). O dono lê e aprova a frase; o corpo é do agente
-  (`_doc-lib/japa.md#docs/grouping-tests`, `_doc-lib/vitest.md#api/test`).
+- **O `it` é a frase do comportamento**, em inglês (`typescript.md` §12), no formato "when …, …"
+  ("when the same event arrives twice, releases the plan once"). O dono lê e aprova a frase; o
+  corpo é do agente (`_doc-lib/japa.md#docs/grouping-tests`, `_doc-lib/vitest.md#api/test`).
 - Meta: **≥ 2,0 specs de asserção por controller**, medida por relatório *(opinião da casa)*.
 
 **Redes obrigatórias** (meta-specs que cobram o que ninguém lembra), ao lado do que cobrem:
