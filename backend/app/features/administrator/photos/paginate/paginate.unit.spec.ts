@@ -16,7 +16,7 @@ async function setup() {
   const photos = memoryPhotos(storage, author)
   const send = async (sender: PhotoSender) => {
     const created = Photo.create({ id: randomUUID(), storage, author, sender, now: new Date() })
-    if (created.isLeft()) throw new Error('arranjo inválido')
+    if (created.isLeft()) throw new Error('invalid arrangement')
     await photos.save(created.value)
   }
   await send(PHOTO_SENDER.ADVISOR)
@@ -29,7 +29,7 @@ async function setup() {
 }
 
 test.group('administrator/photos > paginate (unit)', () => {
-  test('lista todas, com quem enviou', async ({ assert }) => {
+  test('lists all of them, with who submitted', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
@@ -39,7 +39,7 @@ test.group('administrator/photos > paginate (unit)', () => {
     assert.isNotNull(result.isRight() && result.value.data[0]?.author)
   })
 
-  test('?status=PENDING é a fila de revisão', async ({ assert }) => {
+  test('?status=PENDING is the review queue', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ status: PHOTO_STATUS.PENDING })

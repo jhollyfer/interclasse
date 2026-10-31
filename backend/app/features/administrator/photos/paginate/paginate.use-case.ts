@@ -19,7 +19,7 @@ import type { AdministratorPhotoPaginatePayload } from '#validators/administrato
 type Payload = AdministratorPhotoPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorPhotoShowResponse>>
 
-/** Todas as fotos, com quem enviou. `?status=PENDING` é a fila de revisão. */
+/** All photos, with who submitted them. `?status=PENDING` is the review queue. */
 @inject()
 export default class AdministratorPhotoPaginateUseCase extends PhotoReadBase {
   constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {

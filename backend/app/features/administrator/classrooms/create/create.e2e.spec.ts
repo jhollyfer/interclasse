@@ -11,42 +11,45 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * O caminho dos jogos de ponta a ponta, por HTTP: turmas, alunos, inscrições,
- * sorteio, placar, mata-mata e o site.
+ * The games path from end to end, over HTTP: classrooms, students, enrollments,
+ * draw, score, knockout and the site.
  *
- * Um arquivo só porque as etapas dependem umas das outras - o sorteio precisa
- * de inscrição, o mata-mata precisa de placar -, e espalhá-las repetiria toda a
- * montagem em cada spec.
+ * A single file because the steps depend on one another - the draw needs
+ * enrollment, the knockout needs a score -, and spreading them would repeat the whole
+ * setup in each spec.
  */
 
-/** Cria `total` turmas do 6º ao 9º, cada uma com um aluno inscrito na modalidade. */
+/** Creates `total` classrooms from the 6th to the 9th grade, each with a student enrolled in the sport. */
 
-test.group('jogos > turmas', (group) => {
+test.group('games > classrooms', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a categoria sai do ano, e nome repetido é 409', async ({ client, assert }) => {
+  test('the category comes from the year, and a repeated name is 409', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const quinto = await client
+    const fifth = await client
       .post('/administrator/classrooms')
       .cookies(admin)
       .json({ name: '5º A', grade: 5 })
-    const sexto = await client
+    const sixth = await client
       .post('/administrator/classrooms')
       .cookies(admin)
       .json({ name: '6º A', grade: 6 })
-    const repetido = await client
+    const duplicate = await client
       .post('/administrator/classrooms')
       .cookies(admin)
       .json({ name: '6º A', grade: 6 })
 
-    assert.equal(body(quinto).category, CATEGORY.F1)
-    assert.equal(body(sexto).category, CATEGORY.F2)
-    repetido.assertStatus(409)
-    assert.equal(body(repetido).code, 'CLASSROOM_ALREADY_EXISTS')
+    assert.equal(body(fifth).category, CATEGORY.F1)
+    assert.equal(body(sixth).category, CATEGORY.F2)
+    duplicate.assertStatus(409)
+    assert.equal(body(duplicate).code, 'CLASSROOM_ALREADY_EXISTS')
   })
 
-  test('conselheiro precisa ter o papel de conselheiro', async ({ client, assert }) => {
+  test('advisor must have the advisor role', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const { user } = await signInWithFactory(client, 'representative')
 
@@ -60,16 +63,16 @@ test.group('jogos > turmas', (group) => {
   })
 })
 
-test.group('administrator/classrooms/create > acesso e validação', (group) => {
+test.group('administrator/classrooms/create > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.post('/administrator/classrooms')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.post('/administrator/classrooms').cookies(advisor)
@@ -81,7 +84,7 @@ test.group('administrator/classrooms/create > acesso e validação', (group) => 
 test.group('administrator/classrooms/create > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('nome vazio e ano fora do 3º ao 9º respondem 422 apontando os campos, e nada é gravado', async ({
+  test('empty name and year outside 3rd to 9th respond 422 pointing at the fields, and nothing is saved', async ({
     client,
     assert,
   }) => {

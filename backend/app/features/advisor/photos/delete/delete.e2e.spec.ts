@@ -14,7 +14,7 @@ const NOT_FOUND_ID = '00000000-0000-4000-8000-000000000000'
 test.group('advisor/photos > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('204: o conselheiro apaga a própria foto', async ({ client, assert }) => {
+  test('204: the advisor deletes their own photo', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
     const sent = await client.post('/advisor/photos').cookies(advisor).json({ storageId: image.id })
@@ -27,7 +27,7 @@ test.group('advisor/photos > delete', (group) => {
     assert.lengthOf(body(mine).data, 0)
   })
 
-  test('204: a organização apaga a foto de qualquer conselheiro', async ({ client }) => {
+  test('204: the organization deletes the photo of any advisor', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
@@ -38,13 +38,13 @@ test.group('advisor/photos > delete', (group) => {
     response.assertStatus(204)
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.delete(`/advisor/photos/${NOT_FOUND_ID}`)
 
     response.assertStatus(401)
   })
 
-  test('403: representante não apaga foto', async ({ client }) => {
+  test('403: representative does not delete a photo', async ({ client }) => {
     const { session } = await signInWithFactory(client, 'representative')
 
     const response = await client.delete(`/advisor/photos/${NOT_FOUND_ID}`).cookies(session)
@@ -52,7 +52,7 @@ test.group('advisor/photos > delete', (group) => {
     response.assertStatus(403)
   })
 
-  test('404: foto inexistente', async ({ client, assert }) => {
+  test('404: nonexistent photo', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.delete(`/advisor/photos/${NOT_FOUND_ID}`).cookies(advisor)
@@ -61,7 +61,7 @@ test.group('advisor/photos > delete', (group) => {
     assert.equal(body(response).code, 'PHOTO_NOT_FOUND')
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.delete('/advisor/photos/nao-e-uuid').cookies(advisor)

@@ -13,7 +13,10 @@ const NOT_FOUND_ID = '00000000-0000-4000-8000-000000000000'
 test.group('administrator/photos > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('201: a foto da organização nasce aprovada, com o autor', async ({ client, assert }) => {
+  test('201: the organization photo is born approved, with the author', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const image = await StorageFactory.create()
 
@@ -28,7 +31,7 @@ test.group('administrator/photos > create', (group) => {
     assert.equal(body(response).storage.id, image.id)
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const image = await StorageFactory.create()
 
     const response = await client.post('/administrator/photos').json({ storageId: image.id })
@@ -36,7 +39,7 @@ test.group('administrator/photos > create', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não usa a rota da organização', async ({ client }) => {
+  test('403: advisor does not use the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
 
@@ -48,7 +51,7 @@ test.group('administrator/photos > create', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: sem storageId', async ({ client, assert }) => {
+  test('422: without storageId', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.post('/administrator/photos').cookies(admin).json({})
@@ -57,7 +60,7 @@ test.group('administrator/photos > create', (group) => {
     assert.property(body(response).errors, 'storageId')
   })
 
-  test('422: arquivo inexistente', async ({ client, assert }) => {
+  test('422: nonexistent file', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -69,7 +72,7 @@ test.group('administrator/photos > create', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('422: arquivo que não é imagem', async ({ client, assert }) => {
+  test('422: file that is not an image', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
 

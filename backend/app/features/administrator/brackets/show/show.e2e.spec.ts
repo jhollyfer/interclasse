@@ -14,7 +14,10 @@ import {
 test.group('brackets > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a chave sai inteira, com a modalidade e o nome das turmas', async ({ client, assert }) => {
+  test('the bracket comes out whole, with the sport and the classroom names', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { sport, bracket } = await drawnBracket(client, admin, 4)
 
@@ -25,7 +28,7 @@ test.group('brackets > show', (group) => {
     assert.equal(body(response).status, BRACKET_STATUS.KNOCKOUT)
     assert.equal(body(response).sport.id, sport.id)
     assert.isNull(body(response).championTeamId)
-    // 4 turmas: duas semifinais e a final, na ordem de rodada e posição.
+    // 4 classrooms: two semifinals and the final, in round and position order.
     assert.deepEqual(
       body(response).matches.map((match: { phase: string }) => match.phase),
       [MATCH_PHASE.SEMI, MATCH_PHASE.SEMI, MATCH_PHASE.FINAL],
@@ -36,7 +39,7 @@ test.group('brackets > show', (group) => {
     assert.isNull(semi.homeScore)
   })
 
-  test('chave que não existe responde 404', async ({ client, assert }) => {
+  test('bracket that does not exist responds 404', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get(`/administrator/brackets/${randomUUID()}`).cookies(admin)
@@ -45,7 +48,7 @@ test.group('brackets > show', (group) => {
     assert.equal(body(response).code, 'BRACKET_NOT_FOUND')
   })
 
-  test('id fora do formato uuid responde 422', async ({ client, assert }) => {
+  test('id outside the uuid format responds 422', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/brackets/nao-e-uuid').cookies(admin)
@@ -54,15 +57,15 @@ test.group('brackets > show', (group) => {
     assert.property(body(response).errors, 'id')
   })
 
-  test('sem sessão é 401, e o conselheiro recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/brackets/${randomUUID()}`
 
-    const anonimo = await client.get(url)
-    const conselheiro = await client.get(url).cookies(advisor)
+    const anonymous = await client.get(url)
+    const advisorSession = await client.get(url).cookies(advisor)
 
-    anonimo.assertStatus(401)
-    conselheiro.assertStatus(403)
-    assert.equal(body(conselheiro).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    advisorSession.assertStatus(403)
+    assert.equal(body(advisorSession).code, 'ACCESS_DENIED')
   })
 })

@@ -15,7 +15,7 @@ import {
 test.group('students > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o conselheiro cadastra aluno na própria turma', async ({ client, assert }) => {
+  test('the advisor registers a student in their own classroom', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -30,16 +30,16 @@ test.group('students > create', (group) => {
     assert.isNotNull(await Stored.student(body(response).id))
   })
 
-  test('turma de outro conselheiro responde 404, como se não existisse', async ({
+  test('classroom of another advisor responds 404, as if it did not exist', async ({
     client,
     assert,
   }) => {
     const { classroom } = await signInAsAdvisorOfClassroom(client)
-    const outro = await signInWithFactory(client)
+    const other = await signInWithFactory(client)
 
     const response = await client
       .post('/advisor/students')
-      .cookies(outro.session)
+      .cookies(other.session)
       .json({ classroomId: classroom.id, name: 'João' })
 
     response.assertStatus(404)
@@ -47,7 +47,7 @@ test.group('students > create', (group) => {
     assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
-  test('turma inexistente responde o mesmo 404', async ({ client, assert }) => {
+  test('nonexistent classroom responds the same 404', async ({ client, assert }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -59,7 +59,7 @@ test.group('students > create', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('o administrador cadastra em qualquer turma', async ({ client, assert }) => {
+  test('the administrator registers in any classroom', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
 
@@ -72,7 +72,7 @@ test.group('students > create', (group) => {
     assert.equal(body(response).classroomId, classroom.id)
   })
 
-  test('nome vazio responde 422 apontando o campo', async ({ client, assert }) => {
+  test('empty name responds 422 pointing at the field', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -84,19 +84,19 @@ test.group('students > create', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('sem sessão é 401, e o representante recebe 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
     const classroom = await ClassroomFactory.create()
-    const representante = await signInWithFactory(client, 'representative')
+    const representative = await signInWithFactory(client, 'representative')
     const payload = { classroomId: classroom.id, name: 'Caio' }
 
-    const anonimo = await client.post('/advisor/students').json(payload)
-    const negado = await client
+    const anonymous = await client.post('/advisor/students').json(payload)
+    const denied = await client
       .post('/advisor/students')
-      .cookies(representante.session)
+      .cookies(representative.session)
       .json(payload)
 
-    anonimo.assertStatus(401)
-    negado.assertStatus(403)
-    assert.equal(body(negado).code, 'ACCESS_DENIED')
+    anonymous.assertStatus(401)
+    denied.assertStatus(403)
+    assert.equal(body(denied).code, 'ACCESS_DENIED')
   })
 })

@@ -20,9 +20,9 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, AdministratorMatchUnscoreResponse>
 
 /**
- * O caminho de volta do placar: lançado errado, ele sai, e o vencedor sai junto
- * da partida seguinte (regras da entidade). Só desfaz o que ainda não andou. A
- * mesma trava do placar: os dois mexem na partida seguinte.
+ * The way back for the score: recorded wrong, it goes, and the winner leaves with it
+ * the next match (entity rules). It only undoes what has not moved on. The
+ * same lock as the score: both touch the next match.
  */
 @inject()
 export default class AdministratorMatchUnscoreUseCase {

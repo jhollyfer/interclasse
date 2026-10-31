@@ -8,7 +8,7 @@ import { SessionRepository } from '#repositories/session/session.repository'
 
 type Payload = {
   readonly actor: Actor
-  /** O token de acesso que autenticou esta requisição. */
+  /** The access token that authenticated this request. */
   readonly accessTokenId?: string
   readonly refreshToken?: string
 }
@@ -27,9 +27,9 @@ export default class AuthenticationSessionSignOutUseCase {
       if (accessTokenId) await this.sessions.revoke(actor.id, accessTokenId)
 
       if (refreshToken) {
-        // Token de refresh ilegível não impede a saída: os cookies são
-        // limpos de qualquer forma pelo controller. `readRefresh` já devolve
-        // `null` para o ilegível e para o que não é de refresh.
+        // An unreadable refresh token does not prevent sign-out: the cookies are
+        // cleared anyway by the controller. `readRefresh` already returns
+        // `null` for the unreadable one and for what is not a refresh token.
         const grant = await this.sessions.readRefresh(refreshToken)
 
         if (grant) await this.sessions.revoke(actor.id, grant.identifier)

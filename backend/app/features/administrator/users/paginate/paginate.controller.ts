@@ -10,15 +10,15 @@ import { AdministratorUserPaginateValidator } from '#validators/administrator/us
 @inject()
 export default class AdministratorUserPaginateController {
   static docs = defineDocs({
-    summary: 'Listar usuários',
+    summary: 'List users',
     description:
-      'Listagem paginada. `?role` e `?status` são os dois recortes da tela, `?search` filtra ' +
-      'por nome e e-mail, e `?trashed` alcança os arquivados.\n\n' +
-      'A senha não sai aqui nem em resposta nenhuma da API.\n\n' +
-      // A lista sai da própria tupla: escrita à mão, a documentação passaria a
-      // prometer uma coluna no dia em que alguém a tirasse do validator.
-      `\`?sort\` aceita ${USER_SORT_COLUMNS.join(', ')} e \`?direction\` aceita asc ou desc. ` +
-      'Padrão: página 1, 20 por página, ordenada por nome crescente.',
+      'Paginated listing. `?role` and `?status` are the two cuts of the screen, `?search` filters ' +
+      'by name and email, and `?trashed` reaches the archived ones.\n\n' +
+      'The password does not come out here nor in any API response.\n\n' +
+      // The list comes from the tuple itself: written by hand, the documentation would start
+      // promising a column the day someone removed it from the validator.
+      `\`?sort\` accepts ${USER_SORT_COLUMNS.join(', ')} and \`?direction\` accepts asc or desc. ` +
+      'Default: page 1, 20 per page, ordered by name ascending.',
   })
 
   constructor(private readonly useCase: AdministratorUserPaginateUseCase) {}

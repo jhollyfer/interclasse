@@ -13,12 +13,12 @@ type Payload = AuthenticationSessionSignInPayload
 type Response = Either<HTTPException, SessionTokens>
 
 /**
- * Abre a sessão. Conta inexistente, senha errada, conta arquivada e conta
- * inativa recebem o mesmo `401`: a resposta não confirma que a conta existiu
- * nem por que foi recusada.
+ * Opens the session. Nonexistent account, wrong password, archived account and inactive
+ * account get the same `401`: the response does not confirm that the account existed
+ * nor why it was refused.
  *
- * Nada do payload é registrado em log aqui: `backend-old` imprimia a senha
- * recebida no `console.log` do caso de uso de sign-in.
+ * Nothing from the payload is logged here: `backend-old` printed the received
+ * password in the sign-in use case's `console.log`.
  */
 @inject()
 export default class AuthenticationSessionSignInUseCase {
@@ -30,12 +30,12 @@ export default class AuthenticationSessionSignInUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      // Viva ou arquivada: quem decide se entra é a conta, depois de a senha
-      // ser conferida.
+      // Alive or archived: whether it gets in is decided by the account, after the password
+      // is checked.
       const user = await this.users.findByEmail(payload.email)
 
-      // Conta inexistente também gasta o tempo de uma cifra, para a resposta
-      // não revelar pelo relógio que o e-mail não está cadastrado.
+      // A nonexistent account also spends the time of a hash, so the response
+      // does not reveal by the clock that the email is not registered.
       if (!user) {
         await hash.make(payload.password)
 
@@ -57,8 +57,8 @@ export default class AuthenticationSessionSignInUseCase {
 
       return right(tokens)
     } catch (error) {
-      // Só credencial errada vira 401. Qualquer outra falha (banco fora, por
-      // exemplo) continua sendo erro de servidor - não vale mentir 401.
+      // Only a wrong credential becomes 401. Any other failure (database down, for
+      // example) remains a server error - it is not worth lying with 401.
       logger.error({ err: error }, '[authentication/sessions > sign-in][error]')
 
       return left(

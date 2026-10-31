@@ -13,8 +13,8 @@ import {
 export default class AdministratorAnnouncementPaginateController {
   static docs = defineDocs({
     description:
-      `\`?sort\` aceita ${ANNOUNCEMENT_SORT_COLUMNS.join(', ')}. ` +
-      'Padrão: fixados primeiro, depois do mais novo ao mais antigo.',
+      `\`?sort\` accepts ${ANNOUNCEMENT_SORT_COLUMNS.join(', ')}. ` +
+      'Default: pinned first, then newest to oldest.',
   })
 
   constructor(private readonly useCase: AdministratorAnnouncementPaginateUseCase) {}

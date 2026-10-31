@@ -11,22 +11,22 @@ import { PART_SIZE, PRESIGNED_BATCH } from '#services/multipart/multipart.contra
 @inject()
 export default class StoragesFilePartsController {
   static docs = defineDocs({
-    summary: 'Retomar upload de arquivo',
+    summary: 'Resume file upload',
     responses: { 200: StoragesFileUploadResponse },
     description:
-      'De onde continuar: em `uploaded`, o que o bucket já recebeu; em `parts`, URL nova para ' +
-      'o que falta.\n\n' +
-      'Serve a dois casos que são o mesmo problema. **Retomada**: a conexão caiu no meio, e ' +
-      'sem isto a única saída seria recomeçar do zero. **Próximo lote**: as URLs saem de ' +
-      // Os dois números saem das constantes do serviço: escritos à mão, a
-      // documentação passaria a mentir no dia em que um deles mudasse.
-      `${PRESIGNED_BATCH} em ${PRESIGNED_BATCH}, porque assinar tudo de uma vez seria centenas ` +
-      `de kilobytes de JSON antes de o primeiro byte subir. Cada parte tem ${PART_SIZE} bytes.` +
+      'Where to continue from: in `uploaded`, what the bucket has already received; in `parts`, a new URL for ' +
+      'what is missing.\n\n' +
+      'It serves two cases that are the same problem. **Resume**: the connection dropped midway, and ' +
+      'without this the only way out would be to start over. **Next batch**: the URLs come out ' +
+      // Both numbers come from the service constants: written by hand, the
+      // documentation would start lying the day one of them changed.
+      `${PRESIGNED_BATCH} at a time, because signing everything at once would be hundreds ` +
+      `of kilobytes of JSON before the first byte goes up. Each part has ${PART_SIZE} bytes.` +
       '\n\n' +
-      'Assinar de novo é o ponto, e não um efeito colateral: URL assinada expira, e um upload ' +
-      'que durou mais que a validade encontra aqui um endereço novo para a mesma parte.\n\n' +
-      'Arquivo já confirmado responde `200` com as duas listas vazias - quem pergunta é um ' +
-      'cliente retomando, e ler o `status` e parar é o desfecho certo.',
+      'Signing again is the point, not a side effect: a signed URL expires, and an upload ' +
+      'that lasted longer than the validity finds here a new address for the same part.\n\n' +
+      'An already confirmed file responds `200` with both lists empty - whoever asks is a ' +
+      'resuming client, and reading the `status` and stopping is the right outcome.',
   })
 
   constructor(private readonly useCase: StoragesFilePartsUseCase) {}

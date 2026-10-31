@@ -20,11 +20,11 @@ type Payload = AdministratorUserPaginatePayload
 type Response = Either<HTTPException, Paginated<AdministratorUserShowResponse>>
 
 /**
- * A listagem enxerga os três papéis, sem recorte fixo: não há um `OWNER` que
- * precise ficar de fora, e é este recurso que gerencia administradores,
- * conselheiros e representantes.
+ * The listing sees the three roles, with no fixed cut: there is no `OWNER` that
+ * must stay out, and it is this resource that manages administrators,
+ * advisors and representatives.
  *
- * A senha não sai daqui: a resposta do `shared/` não a tem.
+ * The password does not come out of here: the `shared/` response does not have it.
  */
 @inject()
 export default class AdministratorUserPaginateUseCase {

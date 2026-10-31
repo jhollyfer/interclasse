@@ -16,20 +16,20 @@ import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the
+ * form that submitted it, and ownership authorizes nothing. What rules is the state
+ * (`PENDING` or `UPLOADED`) and the live reference.
  */
 
 /**
- * Conteúdo de uma parte não-final. O S3 recusa menos de 5 MB
- * (`EntityTooSmall`), e `PART_SIZE` é o que o servidor promete por parte.
+ * Content of a non-final part. S3 refuses less than 5 MB
+ * (`EntityTooSmall`), and `PART_SIZE` is what the server promises per part.
  */
 const FULL_PART = pngBytes(PART_SIZE, 65)
 
 const SMALL = pngBytes(1024)
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -42,7 +42,7 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 async function put(url: string, content: Uint8Array): Promise<string> {
   const response = await fetch(url, {
     method: 'PUT',
@@ -55,7 +55,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
   return response.headers.get('etag') ?? ''
 }
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
@@ -75,17 +75,20 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
   return body(completed)
 }
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 test.group('storages > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('apaga o arquivo órfão, e o binário some do bucket junto', async ({ client, assert }) => {
+  test('deletes the orphan file, and the binary vanishes from the bucket along with it', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    // O binário existe antes: sem esta asserção, um `delete` que não apagasse
-    // nada passaria pela de baixo por vacuidade.
+    // The binary exists beforehand: without this assertion, a `delete` that deleted
+    // nothing would pass the one below vacuously.
     assert.isTrue(await drive.use().exists(storage.path))
 
     const response = await client.delete(`/storages/${storage.id}`).cookies(session)
@@ -96,7 +99,7 @@ test.group('storages > delete', (group) => {
     assert.isFalse(await drive.use().exists(storage.path))
   })
 
-  test('cancela um upload em andamento e descarta as partes', async ({ client, assert }) => {
+  test('cancels an upload in progress and discards the parts', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -112,12 +115,12 @@ test.group('storages > delete', (group) => {
     response.assertStatus(204)
 
     assert.isNull(await Stored.storage(opened.storage.id))
-    // O upload deixou de existir: pedir a retomada dele agora é 404.
+    // The upload ceased to exist: asking to resume it now is 404.
     const resumed = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
     resumed.assertStatus(404)
   })
 
-  test('recusa com 409 o arquivo em uso como avatar', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as an avatar', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -129,12 +132,12 @@ test.group('storages > delete', (group) => {
     response.assertStatus(409)
     assert.equal(body(response).code, 'STORAGE_IN_USE')
 
-    // O 409 não pode ser um "apagou e reclamou": registro e binário seguem lá.
+    // The 409 cannot be a "deleted and complained": record and binary are still there.
     assert.isNotNull(await Stored.storage(storage.id))
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
-  test('recusa com 409 o arquivo em uso como foto da galeria', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as a gallery photo', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -151,7 +154,7 @@ test.group('storages > delete', (group) => {
     assert.isNotNull(await Stored.storage(storage.id))
   })
 
-  test('recusa com 409 o arquivo em uso como regulamento do site', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as the site regulation', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
 
@@ -168,7 +171,7 @@ test.group('storages > delete', (group) => {
     assert.isNotNull(await Stored.storage(pdf.id))
   })
 
-  test('volta a aceitar depois de o anexo ser desvinculado', async ({ client, assert }) => {
+  test('accepts again after the attachment is unlinked', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -181,7 +184,7 @@ test.group('storages > delete', (group) => {
     assert.isNull(await Stored.storage(storage.id))
   })
 
-  test('responde 404 para id inexistente', async ({ client, assert }) => {
+  test('responds 404 for a nonexistent id', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -192,7 +195,7 @@ test.group('storages > delete', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('exige sessão', async ({ client }) => {
+  test('requires a session', async ({ client }) => {
     const response = await client.delete('/storages/00000000-0000-4000-8000-000000000000')
 
     response.assertStatus(401)
@@ -202,7 +205,7 @@ test.group('storages > delete', (group) => {
 test.group('storages > delete > identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/storages/x').cookies(session)

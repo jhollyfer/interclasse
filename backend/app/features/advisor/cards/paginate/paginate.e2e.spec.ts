@@ -8,7 +8,7 @@ import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 test.group('advisor cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o conselheiro vê os cartões da própria turma', async ({ client, assert }) => {
+  test('the advisor sees the cards of their own classroom', async ({ client, assert }) => {
     const { user, session } = await signInWithFactory(client)
     const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } = await matchWithTeams()
     home.advisorId = user.id
@@ -28,7 +28,7 @@ test.group('advisor cards > paginate', (group) => {
     assert.equal(body(response).data[0].color, 'RED')
   })
 
-  test('turma alheia responde 404', async ({ client, assert }) => {
+  test('foreign classroom responds 404', async ({ client, assert }) => {
     const { session } = await signInWithFactory(client)
     const { away } = await matchWithTeams()
 
@@ -42,10 +42,12 @@ test.group('advisor cards > paginate', (group) => {
   })
 })
 
-test.group('advisor/cards/paginate > acesso e validação', (group) => {
+test.group('advisor/cards/paginate > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('sem sessão responde 401, e o representante responde 403', async ({ client }) => {
+  test('without a session responds 401, and the representative responds 403', async ({
+    client,
+  }) => {
     const { session } = await signInAsRepresentativeOfClassroom(client)
 
     const anonymous = await client.get('/advisor/cards')
@@ -55,7 +57,7 @@ test.group('advisor/cards/paginate > acesso e validação', (group) => {
     forbidden.assertStatus(403)
   })
 
-  test('sem a turma, ou com a turma malformada, responde 422 apontando o campo', async ({
+  test('without the classroom, or with a malformed classroom, responds 422 pointing at the field', async ({
     client,
     assert,
   }) => {

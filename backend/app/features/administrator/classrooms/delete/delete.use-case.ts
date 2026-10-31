@@ -13,9 +13,9 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Apaga a turma de vez. Sem lixeira: turma é cadastro da organização, refeito
- * em segundos, e alunos e inscrições vão junto por `CASCADE`. A turma que já está
- * numa chave sorteada fica (regra da entidade).
+ * Deletes the classroom for good. No trash: a classroom is an organization registry, redone
+ * in seconds, and students and enrollments go along via `CASCADE`. A classroom already in
+ * a drawn bracket stays (entity rule).
  */
 @inject()
 export default class AdministratorClassroomDeleteUseCase {

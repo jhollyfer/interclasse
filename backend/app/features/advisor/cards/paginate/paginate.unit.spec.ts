@@ -37,11 +37,11 @@ async function setup() {
     awayTeamId: semi?.awayTeamId ?? null,
     studentTeamId: semi?.homeTeamId ?? null,
   })
-  if (launched.isLeft()) throw new Error('cartão inválido no arranjo')
+  if (launched.isLeft()) throw new Error('invalid card in the arrangement')
   await cards.save(launched.value)
 
   const classroomId = home?.classroomId ?? ''
-  // A turma do conselheiro: é por ela que o use-case confere a posse.
+  // The advisor's classroom: the use case checks ownership through it.
   await classrooms.save(
     Classroom.restore({
       id: classroomId,
@@ -59,19 +59,19 @@ async function setup() {
 }
 
 test.group('advisor/cards > paginate (unit)', () => {
-  test('lista só os cartões dos atletas da turma', async ({ assert }) => {
+  test('lists only the cards of the classroom athletes', async ({ assert }) => {
     const { useCase, card, classroomId } = await setup()
 
     const result = await useCase.execute({ classroomId, actor: ADVISOR })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.deepEqual(
       result.value.data.map((item) => item.id),
       [card.id],
     )
   })
 
-  test('turma alheia é 404 como a inexistente', async ({ assert }) => {
+  test('foreign classroom is 404 like the nonexistent one', async ({ assert }) => {
     const { useCase, classroomId } = await setup()
 
     const other = await useCase.execute({

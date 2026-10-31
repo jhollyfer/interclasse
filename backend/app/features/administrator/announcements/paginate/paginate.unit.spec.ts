@@ -34,7 +34,7 @@ async function setup() {
 }
 
 test.group('administrator/announcements > paginate (unit)', () => {
-  test('sem ordem pedida, fixados primeiro', async ({ assert }) => {
+  test('without a requested order, pinned first', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
@@ -45,7 +45,7 @@ test.group('administrator/announcements > paginate (unit)', () => {
     ])
   })
 
-  test('com ordem pedida, o fixado não passa na frente', async ({ assert }) => {
+  test('with a requested order, the pinned one does not go in front', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ sort: 'title', direction: 'desc' })
@@ -56,7 +56,7 @@ test.group('administrator/announcements > paginate (unit)', () => {
     ])
   })
 
-  test('busca pelo título', async ({ assert }) => {
+  test('search by title', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ sort: 'createdAt', direction: 'desc', search: 'rec' })

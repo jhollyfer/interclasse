@@ -37,7 +37,7 @@ async function setup() {
 }
 
 test.group('administrator/cards > create (unit)', () => {
-  test('lança o cartão com o time da turma do atleta', async ({ assert }) => {
+  test('records the card with the team of the athlete classroom', async ({ assert }) => {
     const { cards, useCase, semi, playing } = await setup()
 
     const result = await useCase.execute({
@@ -47,7 +47,7 @@ test.group('administrator/cards > create (unit)', () => {
       note: 'Falta dura',
     })
 
-    if (result.isLeft()) throw new Error('cartão deveria ser aceito')
+    if (result.isLeft()) throw new Error('card should be accepted')
     assert.deepInclude(result.value, {
       matchId: semi.id,
       studentId: playing.id,
@@ -59,7 +59,7 @@ test.group('administrator/cards > create (unit)', () => {
     assert.isNotNull(await cards.findById(result.value.id))
   })
 
-  test('partida inexistente é 422 MATCH_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent match is 422 MATCH_NOT_FOUND', async ({ assert }) => {
     const { useCase, playing } = await setup()
 
     const result = await useCase.execute({
@@ -71,7 +71,7 @@ test.group('administrator/cards > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'MATCH_NOT_FOUND' })
   })
 
-  test('partida sem os dois times é 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
+  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
     const { useCase, final, playing } = await setup()
 
     const result = await useCase.execute({
@@ -83,7 +83,9 @@ test.group('administrator/cards > create (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'MATCH_TEAMS_PENDING' })
   })
 
-  test('atleta de fora da partida é 422 STUDENT_NOT_IN_MATCH e não grava', async ({ assert }) => {
+  test('athlete from outside the match is 422 STUDENT_NOT_IN_MATCH and does not save', async ({
+    assert,
+  }) => {
     const { cards, useCase, semi, outsider } = await setup()
 
     const result = await useCase.execute({
@@ -97,7 +99,7 @@ test.group('administrator/cards > create (unit)', () => {
     assert.equal(page.meta.total, 0)
   })
 
-  test('atleta inexistente é 422 STUDENT_NOT_IN_MATCH', async ({ assert }) => {
+  test('nonexistent athlete is 422 STUDENT_NOT_IN_MATCH', async ({ assert }) => {
     const { useCase, semi } = await setup()
 
     const result = await useCase.execute({

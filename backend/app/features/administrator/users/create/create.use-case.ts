@@ -18,12 +18,12 @@ type Payload = AdministratorUserCreatePayload
 type Response = Either<HTTPException, AdministratorUserShowResponse>
 
 /**
- * Cria a conta. Único caminho de criação de usuário na API - não há cadastro
- * público -, e por isso o papel vem sempre explícito no payload.
+ * Creates the account. The only way to create a user in the API - there is no public
+ * sign-up -, and so the role always comes explicit in the payload.
  *
- * A senha entra em texto puro e sai cifrada: quem cifra é a persistência (hook
- * do model). Passar o hash daqui geraria um hash de hash e nenhum login
- * funcionaria.
+ * The password comes in plain text and goes out hashed: the persistence does the hashing (model
+ * hook). Passing the hash from here would produce a hash of a hash and no login
+ * would work.
  */
 @inject()
 export default class AdministratorUserCreateUseCase {
@@ -36,17 +36,17 @@ export default class AdministratorUserCreateUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      // A foto é conferida **antes** de qualquer escrita: `avatar_id` é chave
-      // estrangeira, e sem isto um uuid inexistente estouraria a constraint e
-      // viraria `500` em vez de `422` apontando o campo.
+      // The photo is checked **before** any write: `avatar_id` is a foreign
+      // key, and without this a nonexistent uuid would blow the constraint and
+      // become a `500` instead of a `422` pointing at the field.
       if (payload.avatarId && !(await this.storages.areAttachable([payload.avatarId])))
         return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
-      // Busca **sem** filtrar arquivados: o `unique` de `email` vale para a
-      // tabela inteira, então conta arquivada continua ocupando o e-mail e é
-      // reativada com os dados novos, em vez de inserir de novo e esbarrar no
-      // índice. Reativar preserva `id` e `created_at`, e dispensa uma guarda de
-      // colisão no `unarchive`.
+      // Searches **without** filtering archived: the `unique` on `email` holds for the
+      // whole table, so an archived account keeps occupying the email and is
+      // reactivated with the new data, instead of inserting again and hitting the
+      // index. Reactivating preserves `id` and `created_at`, and spares a collision
+      // guard in `unarchive`.
       const existing = await this.users.findByEmail(payload.email)
       const now = new Date()
       let user = User.create({ id: randomUUID(), ...payload, now })
@@ -61,8 +61,8 @@ export default class AdministratorUserCreateUseCase {
       const saved = await this.users.save(user)
       if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
-      // Recarrega antes de responder: `status` vem de `DEFAULT` no banco quando
-      // não foi informado, e a foto vem com a URL.
+      // Reload before responding: `status` comes from the database `DEFAULT` when it
+      // was not given, and the photo comes with the URL.
       const detail = await this.users.detail(user.id)
       if (!detail)
         return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))

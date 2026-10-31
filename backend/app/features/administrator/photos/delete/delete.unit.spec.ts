@@ -19,7 +19,7 @@ async function setup() {
     sender: PHOTO_SENDER.ADMINISTRATOR,
     now: new Date(),
   })
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
   await photos.save(created.value)
   const useCase = await makeWithMemory(AdministratorPhotoDeleteUseCase, [[PhotoRepository, photos]])
 
@@ -27,7 +27,7 @@ async function setup() {
 }
 
 test.group('administrator/photos > delete (unit)', () => {
-  test('apaga a foto', async ({ assert }) => {
+  test('deletes the photo', async ({ assert }) => {
     const { photos, photo, useCase } = await setup()
 
     const result = await useCase.execute({ id: photo.id })
@@ -36,7 +36,7 @@ test.group('administrator/photos > delete (unit)', () => {
     assert.isNull(await photos.findById(photo.id))
   })
 
-  test('inexistente é 404 PHOTO_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent is 404 PHOTO_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })

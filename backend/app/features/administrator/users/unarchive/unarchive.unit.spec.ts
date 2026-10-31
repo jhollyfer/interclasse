@@ -16,7 +16,7 @@ async function setup() {
 }
 
 test.group('administrator/users > unarchive (unit)', () => {
-  test('tira a conta da lixeira', async ({ assert }) => {
+  test('takes the account out of the trash', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
 
@@ -26,7 +26,7 @@ test.group('administrator/users > unarchive (unit)', () => {
     assert.isNotNull(await users.findById(USER_ID))
   })
 
-  test('conta viva é 409 USER_NOT_ARCHIVED e inexistente é 404 USER_NOT_FOUND', async ({
+  test('live account is 409 USER_NOT_ARCHIVED and nonexistent is 404 USER_NOT_FOUND', async ({
     assert,
   }) => {
     const { users, useCase } = await setup()
@@ -39,11 +39,11 @@ test.group('administrator/users > unarchive (unit)', () => {
     assert.deepInclude(missing.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_USER_UNARCHIVE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_UNARCHIVE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
     users.save = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: USER_ID })

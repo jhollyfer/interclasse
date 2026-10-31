@@ -10,9 +10,9 @@ import { StorageContract } from '#services/storage/storage.contract'
 type Response = Either<HTTPException, StorefrontSiteShowResponse>
 
 /**
- * O "Sobre" e o regulamento para o site anônimo. Do arquivo sai só o que o
- * botão de baixar precisa - a URL assinada, o nome e o tamanho -, sem o
- * caminho no bucket nem o id do upload.
+ * The "About" and the regulation for the anonymous site. Only what the download
+ * button needs leaves the file - the signed URL, the name and the size -, without the
+ * path in the bucket or the upload id.
  */
 @inject()
 export default class StorefrontSiteShowUseCase {

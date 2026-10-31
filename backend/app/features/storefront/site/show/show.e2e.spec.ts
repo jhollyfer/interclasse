@@ -6,7 +6,7 @@ import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fi
 test.group('storefront/site > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: anônimo lê o site, sem regulamento enquanto não houver PDF', async ({
+  test('200: anonymous reads the site, without regulation while there is no PDF', async ({
     client,
     assert,
   }) => {
@@ -16,7 +16,7 @@ test.group('storefront/site > show', (group) => {
     assert.isNull(body(response).regulation)
   })
 
-  test('200: com PDF, entrega nome, tamanho e URL, sem id nem caminho', async ({
+  test('200: with a PDF, delivers name, size and URL, without id or path', async ({
     client,
     assert,
   }) => {

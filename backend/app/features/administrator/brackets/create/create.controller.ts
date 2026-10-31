@@ -9,17 +9,17 @@ import { AdministratorBracketCreateValidator } from '#validators/administrator/b
 @inject()
 export default class AdministratorBracketCreateController {
   static docs = defineDocs({
-    summary: 'Sortear chave',
+    summary: 'Draw bracket',
     description:
-      'O sorteio da modalidade numa categoria. Entram as turmas da categoria com ao menos ' +
-      '`minAthletes` inscritos; elas são embaralhadas e a chave de mata-mata é montada ' +
-      'inteira, da primeira fase à final.\n\n' +
-      'Quando o número de turmas não fecha uma potência de dois (4, 8, 16), as que sobram ' +
-      'ficam de folga e entram direto na fase seguinte. Até 16 turmas por chave.\n\n' +
-      'Depois do sorteio as inscrições da modalidade naquela categoria travam. Para refazer, ' +
-      'apague a chave.\n\n' +
-      'Idempotente por modalidade e categoria: se a chave já existe, a resposta é 200 com ' +
-      'ela, sem novo sorteio - o reenvio depois de uma queda de rede leva à mesma chave.',
+      'The draw of the sport in a category. The classrooms of the category with at least ' +
+      '`minAthletes` enrolled enter; they are shuffled and the knockout bracket is built ' +
+      'whole, from the first phase to the final.\n\n' +
+      'When the number of classrooms does not fill a power of two (4, 8, 16), the ones left over ' +
+      'get a bye and go straight into the next phase. Up to 16 classrooms per bracket.\n\n' +
+      'After the draw the enrollments of the sport in that category lock. To redo it, ' +
+      'delete the bracket.\n\n' +
+      'Idempotent per sport and category: if the bracket already exists, the response is 200 with ' +
+      'it, without a new draw - a resend after a network drop leads to the same bracket.',
   })
 
   constructor(private readonly useCase: AdministratorBracketCreateUseCase) {}

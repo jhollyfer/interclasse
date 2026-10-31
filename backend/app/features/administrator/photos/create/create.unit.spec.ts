@@ -17,7 +17,7 @@ async function setup(mimetype = 'image/png') {
 }
 
 test.group('administrator/photos > create (unit)', () => {
-  test('a foto da organização nasce aprovada por quem a enviou', async ({ assert }) => {
+  test('the organization photo is born approved by whoever submitted it', async ({ assert }) => {
     const { storage, actor, useCase } = await setup()
 
     const result = await useCase.execute({ storageId: storage.id, caption: 'Final', actor })
@@ -30,7 +30,7 @@ test.group('administrator/photos > create (unit)', () => {
     })
   })
 
-  test('arquivo que não é imagem é 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
+  test('file that is not an image is 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
     const { storage, actor, useCase } = await setup('application/pdf')
 
     const result = await useCase.execute({ storageId: storage.id, actor })
@@ -38,7 +38,7 @@ test.group('administrator/photos > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'PHOTO_NOT_IMAGE' })
   })
 
-  test('arquivo inexistente é 422 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 422 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { actor, useCase } = await setup()
 
     const result = await useCase.execute({

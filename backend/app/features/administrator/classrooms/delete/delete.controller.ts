@@ -10,8 +10,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdministratorClassroomDeleteController {
   static docs = defineDocs({
     description:
-      '**Irreversível**: apaga a turma com os alunos e as inscrições dela. Turma que já está ' +
-      'numa chave sorteada responde `409` - apague a chave antes.',
+      '**Irreversible**: deletes the classroom with its students and their enrollments. A classroom already ' +
+      'in a drawn bracket responds `409` - delete the bracket first.',
   })
 
   constructor(private readonly useCase: AdministratorClassroomDeleteUseCase) {}

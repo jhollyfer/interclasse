@@ -18,7 +18,7 @@ import type { PaginationPayload } from '#core/validator'
 type Payload = PaginationPayload
 type Response = Either<HTTPException, Paginated<StorefrontAnnouncementShowResponse>>
 
-/** Os avisos do site: fixados primeiro, depois do mais novo ao mais antigo. */
+/** The site announcements: pinned first, then newest to oldest. */
 @inject()
 export default class StorefrontAnnouncementPaginateUseCase {
   constructor(

@@ -12,23 +12,23 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Apaga a conta de vez. Só aceita usuário já arquivado - o caminho para a
- * lixeira é `PATCH /:id/archive`, e exigir a passagem por lá é o que impede um
- * clique de perder a conta sem escala intermediária (regra da entidade).
+ * Deletes the account for good. Only accepts an already archived user - the path to the
+ * trash is `PATCH /:id/archive`, and requiring the passage through there is what stops a
+ * click from losing the account without an intermediate step (entity rule).
  *
- * A busca **não** filtra a lixeira, senão usuário vivo e inexistente cairiam no
- * mesmo `404` e o cliente não saberia qual dos dois aconteceu.
+ * The search does **not** filter the trash, otherwise a live and a nonexistent user would fall into the
+ * same `404` and the client would not know which of the two happened.
  *
- * Sem contagem de referências, apesar de `users` ser o único alvo de chave
- * estrangeira do esquema: quem aponta é `auth_access_tokens`, com `CASCADE`, e
- * token não é dado de negócio - é credencial viva, que precisa mesmo ir junto.
- * Nenhuma tabela de conteúdo guarda autor, então não há o que orfanar. O avatar
- * em `storages` fica, porque a chave é `SET NULL` e o binário é neutro.
+ * No reference count, even though `users` is the only foreign key target of the
+ * schema: what points at it is `auth_access_tokens`, with `CASCADE`, and a
+ * token is not business data - it is a live credential, which must indeed go along.
+ * No content table keeps an author, so there is nothing to orphan. The avatar
+ * in `storages` stays, because the key is `SET NULL` and the binary is neutral.
  *
- * A própria conta não passa por aqui, e a guarda vem antes da exigência de
- * arquivamento: a própria conta também não é arquivável, então sem a guarda a
- * resposta seria `409` - que descreve o estado do registro e não a regra que o
- * protege.
+ * The own account does not pass through here, and the guard comes before the archiving
+ * requirement: the own account is also not archivable, so without the guard the
+ * response would be `409` - which describes the record state and not the rule that
+ * protects.
  */
 @inject()
 export default class AdministratorUserDeleteUseCase {

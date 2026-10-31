@@ -11,7 +11,7 @@ import {
 test.group('administrator/site > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: o site com o regulamento e a URL assinada', async ({ client, assert }) => {
+  test('200: the site with the regulation and the signed URL', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
     const pdf = await StorageFactory.merge({
       mimetype: 'application/pdf',
@@ -27,7 +27,7 @@ test.group('administrator/site > show', (group) => {
     assert.isString(body(response).regulation.url)
   })
 
-  test('200: sem regulamento, regulation é nulo', async ({ client, assert }) => {
+  test('200: without a regulation, regulation is null', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/site').cookies(admin)
@@ -36,13 +36,13 @@ test.group('administrator/site > show', (group) => {
     assert.isNull(body(response).regulation)
   })
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/site')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não lê a configuração do site', async ({ client }) => {
+  test('403: advisor does not read the site configuration', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/site').cookies(advisor)

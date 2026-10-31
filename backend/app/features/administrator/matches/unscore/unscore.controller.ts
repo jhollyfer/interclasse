@@ -9,11 +9,11 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorMatchUnscoreController {
   static docs = defineDocs({
-    summary: 'Desfazer placar',
+    summary: 'Undo score',
     description:
-      'Apaga o placar e devolve a partida para "a jogar". O vencedor sai da vaga da ' +
-      'partida seguinte, e uma final desfeita reabre a chave. Recusado com `409` quando a ' +
-      'partida seguinte já tem placar: desfaça-a antes.',
+      'Deletes the score and returns the match to "to play". The winner leaves the slot of the ' +
+      'next match, and an undone final reopens the bracket. Refused with `409` when the ' +
+      'next match already has a score: undo it first.',
   })
 
   constructor(private readonly useCase: AdministratorMatchUnscoreUseCase) {}

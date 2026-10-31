@@ -3,10 +3,10 @@ import { test } from '@japa/runner'
 import { COOKIE_TOKEN } from '#config/cookie'
 import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
 
-test.group('autenticação > refresh', (group) => {
+test.group('authentication > refresh', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('renova a sessão e devolve um par de tokens novo', async ({ client, assert }) => {
+  test('refreshes the session and returns a new token pair', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.post('/authentication/refresh').cookies(session)
@@ -16,7 +16,7 @@ test.group('autenticação > refresh', (group) => {
     assert.notEqual(response.cookie(COOKIE_TOKEN.REFRESH)?.value, session[COOKIE_TOKEN.REFRESH])
   })
 
-  test('sem cookie de refresh responde 401', async ({ client }) => {
+  test('without a refresh cookie responds 401', async ({ client }) => {
     const response = await client.post('/authentication/refresh')
 
     response.assertStatus(401)

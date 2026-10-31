@@ -13,7 +13,7 @@ import {
 test.group('sports > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('devolve a modalidade com os limites de atletas', async ({ client, assert }) => {
+  test('returns the sport with the athlete limits', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.merge({ minAthletes: 3, maxAthletes: 9 }).create()
 
@@ -27,7 +27,7 @@ test.group('sports > show', (group) => {
     assert.equal(body(response).maxAthletes, 9)
   })
 
-  test('modalidade inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent sport responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get(`/administrator/sports/${randomUUID()}`).cookies(session)
@@ -36,7 +36,7 @@ test.group('sports > show', (group) => {
     assert.equal(body(response).code, 'SPORT_NOT_FOUND')
   })
 
-  test('id que não é uuid responde 422', async ({ client, assert }) => {
+  test('id that is not a uuid responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/sports/futsal').cookies(session)
@@ -45,7 +45,7 @@ test.group('sports > show', (group) => {
     assert.property(body(response).errors, 'id')
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const sport = await SportFactory.create()
 
     const anonymous = await client.get(`/administrator/sports/${sport.id}`)

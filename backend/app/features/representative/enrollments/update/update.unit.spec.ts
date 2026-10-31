@@ -31,7 +31,7 @@ async function setup() {
 }
 
 test.group('representative/enrollments > update (unit)', () => {
-  test('inscreve alunos da própria turma', async ({ assert }) => {
+  test('enrolls students of the own classroom', async ({ assert }) => {
     const { useCase } = await setup()
 
     const board = rightOf(
@@ -48,7 +48,9 @@ test.group('representative/enrollments > update (unit)', () => {
     )
   })
 
-  test('tirar atleta é 403 ENROLLMENT_REMOVAL_FORBIDDEN e a lista fica', async ({ assert }) => {
+  test('removing an athlete is 403 ENROLLMENT_REMOVAL_FORBIDDEN and the list stays', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
     enrollments.withList(KEY, [ENROLLMENT_IDS.ana])
 
@@ -63,7 +65,7 @@ test.group('representative/enrollments > update (unit)', () => {
     assert.deepEqual(stored.snapshot().studentIds, [ENROLLMENT_IDS.ana])
   })
 
-  test('modalidade já sorteada é 409 ENROLLMENT_LOCKED', async ({ assert }) => {
+  test('an already drawn sport is 409 ENROLLMENT_LOCKED', async ({ assert }) => {
     const { enrollments, useCase } = await setup()
     enrollments.markDrawn('F2', ENROLLMENT_IDS.sport)
 
@@ -76,7 +78,7 @@ test.group('representative/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'ENROLLMENT_LOCKED' })
   })
 
-  test('sem turma vinculada é 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('without a linked classroom is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -88,10 +90,10 @@ test.group('representative/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
     const { enrollments, useCase } = await setup()
     enrollments.findSport = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({

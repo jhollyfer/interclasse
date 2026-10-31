@@ -9,7 +9,7 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorAnnouncementDeleteController {
   static docs = defineDocs({
-    description: '**Irreversível**: o aviso some do site na hora.',
+    description: '**Irreversible**: the announcement disappears from the site right away.',
   })
 
   constructor(private readonly useCase: AdministratorAnnouncementDeleteUseCase) {}

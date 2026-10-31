@@ -10,8 +10,8 @@ import { AdministratorCardCreateValidator } from '#validators/administrator/card
 export default class AdministratorCardCreateController {
   static docs = defineDocs({
     description:
-      'Lança um cartão amarelo ou vermelho para um atleta numa partida. O atleta tem que ser ' +
-      'de uma das duas turmas da partida.',
+      'Records a yellow or red card for an athlete in a match. The athlete must be ' +
+      'from one of the two classrooms of the match.',
   })
 
   constructor(private readonly useCase: AdministratorCardCreateUseCase) {}

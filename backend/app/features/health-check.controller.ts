@@ -1,14 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
 /**
- * Sonda de vida do container: `GET /health-check` (_standards/architecture.md §7).
+ * Container liveness probe: `GET /health-check` (_standards/architecture.md §7).
  *
- * Responde apenas "o processo está de pé e aceitando requisição", que é o que o
- * orquestrador precisa para decidir se manda tráfego. Sem auth, sem banco e sem
- * detalhe de infraestrutura: o `/health/ready` do `@adonisjs/core/health`
- * reporta disco, memória e conexões, e a própria documentação avisa que essa
- * resposta precisa de header secreto. Uma sonda que exige segredo é uma sonda a
- * menos. `no-store` para nenhum proxy responder por um processo que já caiu.
+ * Answers only "the process is up and accepting requests", which is what the
+ * orchestrator needs to decide whether to send traffic. No auth, no database and no
+ * infrastructure detail: `/health/ready` from `@adonisjs/core/health`
+ * reports disk, memory and connections, and its own documentation warns that this
+ * response needs a secret header. A probe that demands a secret is one probe
+ * fewer. `no-store` so no proxy answers for a process that has already died.
  */
 export default class HealthCheckController {
   handle(context: HttpContext) {

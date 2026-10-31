@@ -25,7 +25,7 @@ async function setup() {
 }
 
 test.group('representative/enrollments > show (unit)', () => {
-  test('a matriz da turma que ele representa', async ({ assert }) => {
+  test('the matrix of the classroom they represent', async ({ assert }) => {
     const { useCase } = await setup()
 
     const board = rightOf(await useCase.execute({ actor: REPRESENTATIVE_ACTOR }))
@@ -34,7 +34,7 @@ test.group('representative/enrollments > show (unit)', () => {
     assert.lengthOf(board.students, 2)
   })
 
-  test('modalidade já sorteada vem travada para o representante', async ({ assert }) => {
+  test('an already drawn sport comes locked for the representative', async ({ assert }) => {
     const { enrollments, useCase } = await setup()
     enrollments.markDrawn('F2', ENROLLMENT_IDS.sport)
 
@@ -43,7 +43,7 @@ test.group('representative/enrollments > show (unit)', () => {
     assert.isTrue(board.sports[0]?.locked)
   })
 
-  test('sem turma vinculada é 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('without a linked classroom is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -53,10 +53,10 @@ test.group('representative/enrollments > show (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 REPRESENTATIVE_ENROLLMENT_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 REPRESENTATIVE_ENROLLMENT_SHOW_ERROR', async ({ assert }) => {
     const { enrollments, useCase } = await setup()
     enrollments.board = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ actor: REPRESENTATIVE_ACTOR })

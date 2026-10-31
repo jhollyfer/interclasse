@@ -10,8 +10,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdministratorSportDeleteController {
   static docs = defineDocs({
     description:
-      '**Irreversível**. Modalidade com atletas inscritos ou chave sorteada responde `409`: ' +
-      'apagá-la perderia as listas que as turmas montaram.',
+      '**Irreversible**. A sport with enrolled athletes or a drawn bracket responds `409`: ' +
+      'deleting it would lose the lists the classrooms built.',
   })
 
   constructor(private readonly useCase: AdministratorSportDeleteUseCase) {}

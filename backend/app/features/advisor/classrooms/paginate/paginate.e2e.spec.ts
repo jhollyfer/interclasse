@@ -9,10 +9,10 @@ import {
   signInWithFactory,
 } from '#tests/http-fixtures'
 
-test.group('classrooms > paginate (conselheiro)', (group) => {
+test.group('classrooms > paginate (advisor)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o conselheiro vê só a turma que aconselha', async ({ client, assert }) => {
+  test('the advisor sees only the classroom they advise', async ({ client, assert }) => {
     const { user, session } = await signInWithFactory(client)
     await ClassroomFactory.merge({ name: '9º B', advisorId: user.id }).create()
     await ClassroomFactory.merge({ name: '7º A' }).create()
@@ -28,7 +28,7 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
     )
   })
 
-  test('conselheiro sem turma recebe lista vazia, mesmo havendo turmas de outro', async ({
+  test('advisor without a classroom receives an empty list, even when other classrooms exist', async ({
     client,
     assert,
   }) => {
@@ -43,7 +43,7 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
     assert.equal(body(response).meta.total, 0)
   })
 
-  test('o administrador vê todas', async ({ client, assert }) => {
+  test('the administrator sees all of them', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const { user } = await signInWithFactory(client)
     await ClassroomFactory.merge({ advisorId: user.id }).create()
@@ -55,24 +55,27 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
     assert.lengthOf(body(response).data, 2)
   })
 
-  test('`?search` filtra pelo nome dentro do escopo', async ({ client, assert }) => {
+  test('`?search` filters by name within the scope', async ({ client, assert }) => {
     const { user, session } = await signInWithFactory(client)
     await ClassroomFactory.merge({ name: '6º B', advisorId: user.id }).create()
-    // Casa a busca, mas é de outro conselheiro: o escopo vale antes do filtro.
+    // Matches the search, but belongs to another advisor: scope applies before the filter.
     await ClassroomFactory.merge({ name: '7º B' }).create()
 
-    const casa = await client.get('/advisor/classrooms').qs({ search: 'B' }).cookies(session)
-    const nada = await client.get('/advisor/classrooms').qs({ search: 'A' }).cookies(session)
+    const matching = await client.get('/advisor/classrooms').qs({ search: 'B' }).cookies(session)
+    const nothing = await client.get('/advisor/classrooms').qs({ search: 'A' }).cookies(session)
 
-    casa.assertStatus(200)
+    matching.assertStatus(200)
     assert.deepEqual(
-      body(casa).data.map((classroom: { name: string }) => classroom.name),
+      body(matching).data.map((classroom: { name: string }) => classroom.name),
       ['6º B'],
     )
-    assert.lengthOf(body(nada).data, 0)
+    assert.lengthOf(body(nothing).data, 0)
   })
 
-  test('sem sessão responde 401, representante responde 403', async ({ client, assert }) => {
+  test('without a session responds 401, representative responds 403', async ({
+    client,
+    assert,
+  }) => {
     const anonymous = await client.get('/advisor/classrooms')
     anonymous.assertStatus(401)
 
@@ -87,7 +90,7 @@ test.group('classrooms > paginate (conselheiro)', (group) => {
 test.group('advisor/classrooms/paginate > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('página malformada responde 422 apontando o campo', async ({ client, assert }) => {
+  test('malformed page responds 422 pointing at the field', async ({ client, assert }) => {
     const { session } = await signInWithFactory(client)
 
     const response = await client.get('/advisor/classrooms').qs({ page: 'x' }).cookies(session)

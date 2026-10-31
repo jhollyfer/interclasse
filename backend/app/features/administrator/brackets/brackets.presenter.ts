@@ -6,12 +6,12 @@ import type {
 import type { Bracket } from '#domain/bracket/bracket.entity'
 
 /**
- * A chave na forma da resposta do `shared/` (`_standards/architecture.md` §10):
- * o presenter é tipado pelo mesmo schema que o OpenAPI e o frontend leem, então
- * campo que não está nele não chega à resposta.
+ * The bracket in the shape of the `shared/` response (`_standards/architecture.md` §10):
+ * the presenter is typed by the same schema that OpenAPI and the frontend read, so
+ * a field that is not in it does not reach the response.
  */
 export class BracketPresenter {
-  /** A chave com a modalidade: a forma da lista, do sorteio e do sorteio repetido. */
+  /** The bracket with the sport: the shape of the list, the draw and the repeated draw. */
   static created(
     bracket: Bracket,
     sport: AdministratorSportShowResponse,

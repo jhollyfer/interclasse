@@ -20,8 +20,8 @@ type Payload = Merge<AdministratorClassroomUpdatePayload, IdentifierPayload>
 type Response = Either<HTTPException, AdministratorClassroomShowResponse>
 
 /**
- * Renomeia, muda o ano e os vínculos. Campo ausente é "não mexer". A entidade
- * confere só o vínculo que mudou e recusa a troca de categoria da turma sorteada.
+ * Renames, changes the year and the links. A missing field means "leave alone". The entity
+ * checks only the link that changed and refuses the category change of a drawn classroom.
  */
 @inject()
 export default class AdministratorClassroomUpdateUseCase {
@@ -42,7 +42,7 @@ export default class AdministratorClassroomUpdateUseCase {
         return left(ClassroomRefusal.http({ code: 'CLASSROOM_ALREADY_EXISTS' }, this.i18n))
 
       const facts = await this.classrooms.peopleFacts(classroom.changedLinks(changes), id)
-      // Só vale perguntar do sorteio quando o ano levaria a turma a outra categoria.
+      // Only worth asking about the draw when the year would take the classroom to another category.
       const inCompetition =
         classroom.changesCategoryWith(changes.grade) && (await this.classrooms.isInCompetition(id))
 

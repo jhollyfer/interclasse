@@ -9,17 +9,17 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class StoragesFileDeleteController {
   static docs = defineDocs({
-    summary: 'Apagar arquivo do armazenamento',
+    summary: 'Delete storage file',
     description:
-      '**Irreversível**: apaga o binário no bucket e a linha em `storages`.\n\n' +
-      'Só apaga arquivo **órfão**. O arquivo é um registro neutro e compartilhado - ele não ' +
-      'pertence ao formulário que o enviou -, então quem o referencia é quem manda: arquivo ' +
-      'em uso por outro registro (hoje, o avatar de um usuário) responde `409`, com a origem na ' +
-      'mensagem. Desvincule primeiro, apague depois.\n\n' +
-      'Arquivo ainda `PENDING` é cancelamento de upload: o multipart é abortado, e é isso que ' +
-      'faz as partes já enviadas sumirem do bucket.\n\n' +
-      'É o par do `POST /storages`, que grava o arquivo antes de o formulário ser salvo: sem ' +
-      'esta rota, todo anexo escolhido e removido da tela ficaria no bucket para sempre.',
+      '**Irreversible**: deletes the binary in the bucket and the row in `storages`.\n\n' +
+      'Only deletes an **orphan** file. The file is a neutral, shared record - it does not ' +
+      'belong to the form that submitted it -, so whoever references it rules: a file ' +
+      'in use by another record (today, a user avatar) responds `409`, with the origin in the ' +
+      'message. Unlink first, delete after.\n\n' +
+      'A file still `PENDING` is an upload cancellation: the multipart is aborted, and that is what ' +
+      'makes the parts already sent disappear from the bucket.\n\n' +
+      'It is the pair of `POST /storages`, which saves the file before the form is saved: without ' +
+      'this route, every attachment chosen and then removed from the screen would stay in the bucket forever.',
   })
 
   constructor(private readonly useCase: StoragesFileDeleteUseCase) {}

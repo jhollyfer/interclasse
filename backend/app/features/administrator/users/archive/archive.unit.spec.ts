@@ -22,7 +22,7 @@ async function setup() {
 }
 
 test.group('administrator/users > archive (unit)', () => {
-  test('arquiva, derruba as sessões e solta as turmas', async ({ assert }) => {
+  test('archives, drops the sessions and releases the classrooms', async ({ assert }) => {
     const { users, sessions, classrooms, useCase } = await setup()
     await seedUser(users)
 
@@ -35,7 +35,7 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [USER_ID])
   })
 
-  test('arquivar duas vezes responde 409 USER_ALREADY_ARCHIVED na segunda', async ({ assert }) => {
+  test('archiving twice responds 409 USER_ALREADY_ARCHIVED on the second', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     await useCase.execute({ id: USER_ID })
@@ -45,7 +45,7 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepInclude(second.value, { status: 409, code: 'USER_ALREADY_ARCHIVED' })
   })
 
-  test('conta inexistente não revoga nem solta nada', async ({ assert }) => {
+  test('nonexistent account neither revokes nor releases anything', async ({ assert }) => {
     const { sessions, classrooms, useCase } = await setup()
 
     const result = await useCase.execute({ id: USER_ID })
@@ -55,11 +55,11 @@ test.group('administrator/users > archive (unit)', () => {
     assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_USER_ARCHIVE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_ARCHIVE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: USER_ID })

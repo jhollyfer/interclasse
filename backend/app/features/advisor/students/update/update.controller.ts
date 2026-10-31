@@ -10,7 +10,7 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdvisorStudentUpdateController {
   static docs = defineDocs({
-    description: 'Corrige o nome. Aluno de turma alheia responde `404`.',
+    description: 'Fixes the name. A student from a foreign classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorStudentUpdateUseCase) {}

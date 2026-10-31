@@ -14,7 +14,7 @@ async function setup() {
 }
 
 test.group('storages/files > show (unit)', () => {
-  test('devolve o registro com a url', async ({ assert }) => {
+  test('returns the record with the url', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())
 
@@ -24,7 +24,7 @@ test.group('storages/files > show (unit)', () => {
     assert.isString(file.url)
   })
 
-  test('arquivo inexistente é 404 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 404 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: FILE_ID })
@@ -32,10 +32,10 @@ test.group('storages/files > show (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 STORAGES_FILE_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 STORAGES_FILE_SHOW_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     storages.detail = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: FILE_ID })

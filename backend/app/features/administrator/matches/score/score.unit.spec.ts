@@ -17,18 +17,18 @@ async function setup(total = 4) {
   const matches = bracket.snapshot().matches
   const semi = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)
   const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
-  if (!semi || !final) throw new Error('partidas ausentes no arranjo')
+  if (!semi || !final) throw new Error('matches missing in the arrangement')
 
   return { brackets, useCase, bracket, semi, final }
 }
 
 test.group('administrator/matches > score (unit)', () => {
-  test('lança o placar e leva o vencedor à partida seguinte', async ({ assert }) => {
+  test('records the score and takes the winner to the next match', async ({ assert }) => {
     const { brackets, useCase, bracket, semi } = await setup()
 
     const result = await useCase.execute({ id: semi.id, homeScore: 2, awayScore: 1 })
 
-    if (result.isLeft()) throw new Error('placar deveria ser aceito')
+    if (result.isLeft()) throw new Error('score should be accepted')
     assert.deepInclude(result.value, {
       status: MATCH_STATUS.FINISHED,
       homeScore: 2,
@@ -40,7 +40,7 @@ test.group('administrator/matches > score (unit)', () => {
     assert.equal(final?.homeTeamId, semi.homeTeamId)
   })
 
-  test('a final encerra a chave', async ({ assert }) => {
+  test('the final ends the bracket', async ({ assert }) => {
     const brackets = MemoryRepositories.brackets()
     const useCase = await makeWithMemory(
       AdministratorMatchScoreUseCase,
@@ -56,7 +56,7 @@ test.group('administrator/matches > score (unit)', () => {
     assert.equal(saved?.champion(), final?.homeTeamId)
   })
 
-  test('partida inexistente é 404 MATCH_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent match is 404 MATCH_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -68,7 +68,7 @@ test.group('administrator/matches > score (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'MATCH_NOT_FOUND' })
   })
 
-  test('partida sem os dois times é 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
+  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
     const { useCase, final } = await setup()
 
     const result = await useCase.execute({ id: final.id, homeScore: 1, awayScore: 0 })
@@ -76,7 +76,9 @@ test.group('administrator/matches > score (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'MATCH_TEAMS_PENDING' })
   })
 
-  test('empate sem vencedor é 422 MATCH_WINNER_REQUIRED e não grava', async ({ assert }) => {
+  test('draw without a winner is 422 MATCH_WINNER_REQUIRED and does not save', async ({
+    assert,
+  }) => {
     const { brackets, useCase, bracket, semi } = await setup()
 
     const result = await useCase.execute({ id: semi.id, homeScore: 1, awayScore: 1 })
@@ -87,7 +89,7 @@ test.group('administrator/matches > score (unit)', () => {
     assert.equal(unchanged?.status, MATCH_STATUS.SCHEDULED)
   })
 
-  test('empate com o vencedor dos pênaltis avança esse time', async ({ assert }) => {
+  test('draw with the penalty winner advances that team', async ({ assert }) => {
     const { useCase, semi } = await setup()
 
     const result = await useCase.execute({
@@ -97,11 +99,11 @@ test.group('administrator/matches > score (unit)', () => {
       winnerTeamId: semi.awayTeamId ?? '',
     })
 
-    if (result.isLeft()) throw new Error('placar deveria ser aceito')
+    if (result.isLeft()) throw new Error('score should be accepted')
     assert.equal(result.value.winnerTeamId, semi.awayTeamId)
   })
 
-  test('corrigir o vencedor com a seguinte já jogada é 409 NEXT_MATCH_PLAYED', async ({
+  test('correcting the winner with the next one already played is 409 NEXT_MATCH_PLAYED', async ({
     assert,
   }) => {
     const { brackets, useCase, bracket, semi, final } = await setup()

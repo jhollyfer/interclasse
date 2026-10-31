@@ -26,7 +26,7 @@ async function setup(names: string[]) {
 }
 
 test.group('administrator/reports > export (unit)', () => {
-  test('abre no Excel: BOM, ponto e vírgula, aspas e linha de total', async ({ assert }) => {
+  test('opens in Excel: BOM, semicolon, quotes and total row', async ({ assert }) => {
     const { useCase } = await setup(['7º A', '7º B'])
 
     const result = await useCase.execute()
@@ -38,14 +38,14 @@ test.group('administrator/reports > export (unit)', () => {
     assert.equal(lines.at(-1), '"Total";"2 turmas";"";"";"0";"0";"0"')
   })
 
-  test('célula que começa como fórmula ganha apóstrofo', async ({ assert }) => {
+  test('a cell that starts as a formula gets an apostrophe', async ({ assert }) => {
     const { useCase } = await setup(['=1+1', '+2', '-3', '@x', '\tTab', '\rCR'])
 
     const result = await useCase.execute()
 
     if (result.isLeft()) throw new Error('esperava o CSV')
     const cells = result.value.split('\r\n').map((line) => line.split(';')[0])
-    // A linha 0 é o cabeçalho; as classes saem em ordem de nome.
+    // Row 0 is the header; the classes come out in name order.
     assert.includeMembers(cells, [`"'=1+1"`, `"'+2"`, `"'-3"`, `"'@x"`, `"'\tTab"`])
     assert.include(result.value, `"'\rCR"`)
   })

@@ -7,7 +7,7 @@ import { body, resetDatabase } from '#tests/http-fixtures'
 test.group('announcements > paginate (site)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('responde sem sessão: fixados primeiro, depois do mais novo', async ({ client, assert }) => {
+  test('responds without a session: pinned first, then newest', async ({ client, assert }) => {
     const { pinned, older, newest } = await announcementTimeline()
 
     const response = await client.get('/storefront/announcements')
@@ -21,7 +21,7 @@ test.group('announcements > paginate (site)', (group) => {
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('cada item traz título, corpo e destaque', async ({ client, assert }) => {
+  test('each item carries title, body and highlight', async ({ client, assert }) => {
     const announcement = await AnnouncementFactory.create()
 
     const response = await client.get('/storefront/announcements')
@@ -33,7 +33,7 @@ test.group('announcements > paginate (site)', (group) => {
     assert.isFalse(body(response).data[0].pinned)
   })
 
-  test('?search recorta pelo título', async ({ client, assert }) => {
+  test('?search narrows by title', async ({ client, assert }) => {
     const match = await AnnouncementFactory.merge({ title: 'Chuva adia a final' }).create()
     await AnnouncementFactory.merge({ title: 'Abertura dos jogos' }).create()
 
@@ -44,7 +44,7 @@ test.group('announcements > paginate (site)', (group) => {
     assert.equal(body(response).data[0].id, match.id)
   })
 
-  test('?page sem número válido responde 422', async ({ client, assert }) => {
+  test('?page without a valid number responds 422', async ({ client, assert }) => {
     const response = await client.get('/storefront/announcements').qs({ page: 0 })
 
     response.assertStatus(422)

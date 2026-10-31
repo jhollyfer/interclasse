@@ -10,9 +10,9 @@ import { RepresentativeEnrollmentUpdateValidator } from '#validators/representat
 export default class RepresentativeEnrollmentUpdateController {
   static docs = defineDocs({
     description:
-      'Acrescenta atletas da própria turma numa modalidade: a lista enviada é a nova lista ' +
-      'inteira, e precisa conter todos os atletas já inscritos - tirar alguém é do professor ' +
-      'conselheiro (`403`). Só alunos da turma; depois do sorteio, `409`.',
+      'Adds athletes from the own classroom to a sport: the list sent is the whole new list, ' +
+      'and must contain every athlete already enrolled - removing someone is for the advisor ' +
+      'teacher (`403`). Only students of the classroom; after the draw, `409`.',
   })
 
   constructor(private readonly useCase: RepresentativeEnrollmentUpdateUseCase) {}

@@ -9,14 +9,14 @@ import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 @inject()
 export default class AuthenticationSessionSignOutController {
   static docs = defineDocs({
-    summary: 'Encerrar sessão',
+    summary: 'End session',
     description:
-      'Encerra a sessão **no servidor**, e não só na tela: apaga o token de acesso atual e o de ' +
-      'refresh, depois limpa os dois cookies. Responde `204` sem corpo.\n\n' +
-      'Token de refresh ilegível não impede a saída - os cookies são limpos de qualquer forma, ' +
-      'porque o resultado que a pessoa pediu é ficar sem sessão.\n\n' +
-      'Apaga só os tokens desta sessão. Derrubar **todas** é consequência de trocar e-mail ou ' +
-      'senha em `PUT /account`, não desta rota.',
+      'Ends the session **on the server**, not just on screen: deletes the current access token and the refresh token, ' +
+      'then clears both cookies. Responds `204` without a body.\n\n' +
+      'An unreadable refresh token does not prevent sign-out - the cookies are cleared anyway, ' +
+      'because the result the person asked for is to be without a session.\n\n' +
+      'It deletes only the tokens of this session. Dropping **all** of them is a consequence of changing email or ' +
+      'password in `PUT /account`, not of this route.',
   })
 
   constructor(private readonly useCase: AuthenticationSessionSignOutUseCase) {}
@@ -33,8 +33,8 @@ export default class AuthenticationSessionSignOutController {
 
     if (result.isLeft()) throw result.value
 
-    // Os MESMOS atributos da emissão, e não `clearCookie` pelado: sem eles o
-    // navegador cria um segundo cookie host-only vazio e o de domínio sobrevive.
+    // The SAME attributes as the issuing, not a bare `clearCookie`: without them the
+    // browser creates a second empty host-only cookie and the domain one survives.
     context.response
       .clearCookie(COOKIE_TOKEN.ACCESS, cookieOptions.clear)
       .clearCookie(COOKIE_TOKEN.REFRESH, cookieOptions.clear)

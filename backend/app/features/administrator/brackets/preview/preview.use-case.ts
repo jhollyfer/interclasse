@@ -16,8 +16,8 @@ type Payload = AdministratorBracketPreviewPayload
 type Response = Either<HTTPException, AdministratorBracketPreviewResponse>
 
 /**
- * A prévia do sorteio: as turmas da categoria e quantos atletas cada uma
- * inscreveu na modalidade. Entra quem chegou ao mínimo - a mesma regra do
+ * The draw preview: the classrooms of the category and how many athletes each one
+ * enrolled in the sport. Whoever reached the minimum enters - the same rule as the
  * `POST /administrator/brackets`.
  */
 @inject()

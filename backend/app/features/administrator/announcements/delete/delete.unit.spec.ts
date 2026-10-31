@@ -22,7 +22,7 @@ async function setup() {
 }
 
 test.group('administrator/announcements > delete (unit)', () => {
-  test('apaga o aviso', async ({ assert }) => {
+  test('deletes the announcement', async ({ assert }) => {
     const { announcements, useCase } = await setup()
 
     const result = await useCase.execute({ id: ID })
@@ -31,7 +31,7 @@ test.group('administrator/announcements > delete (unit)', () => {
     assert.isNull(await announcements.findById(ID))
   })
 
-  test('inexistente é 404 ANNOUNCEMENT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent is 404 ANNOUNCEMENT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })

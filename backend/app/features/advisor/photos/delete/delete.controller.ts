@@ -10,8 +10,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class AdvisorPhotoDeleteController {
   static docs = defineDocs({
     description:
-      'Apaga uma foto que quem está logado enviou, aprovada ou não. Foto de outro ' +
-      'conselheiro responde `404`.',
+      'Deletes a photo that the logged user submitted, approved or not. A photo from another ' +
+      'advisor responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorPhotoDeleteUseCase) {}

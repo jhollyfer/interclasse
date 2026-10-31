@@ -23,22 +23,22 @@ type Payload = Merge<IdentifierPayload, StoragesFileCompletePayload>
 type Response = Either<HTTPException, StoragesFileShowResponse>
 
 /**
- * Fecha o upload: remonta as partes no bucket e marca a linha como `UPLOADED`.
+ * Closes the upload: reassembles the parts in the bucket and marks the row as `UPLOADED`.
  *
- * É aqui que o "declarado" vira "conferido". O `POST /storages` acreditou no
- * tamanho que o cliente informou - não tinha como não acreditar, já que os
- * bytes não passam por aqui -, e é este endpoint que compara o que
- * **de fato** subiu com o que foi prometido (regra da entidade). Divergiu: o
- * objeto é apagado, a linha morre junto, e a resposta é `422`.
+ * This is where "declared" becomes "verified". `POST /storages` trusted the
+ * size the client reported - it had no way not to, since the
+ * bytes do not pass through here -, and this endpoint compares what
+ * **actually** arrived with what was promised (entity rule). If it diverges: the
+ * object is deleted, the row dies with it, and the response is `422`.
  *
- * O `mimetype` não é conferido porque não tem como divergir: ele entra na
- * assinatura da URL, e o bucket recusa um `PUT` cujo `Content-Type` não bata
- * com o que foi assinado. O tamanho, esse não entra - e por isso é o que se
- * confere.
+ * The `mimetype` is not checked because it cannot diverge: it goes into the
+ * URL signature, and the bucket refuses a `PUT` whose `Content-Type` does not match
+ * what was signed. The size, that one does not - and so it is what
+ * checked.
  *
- * Chamar duas vezes é seguro. Um cliente que perdeu a resposta por queda de
- * rede reenvia a confirmação, e a segunda devolve o mesmo registro em vez de
- * um erro de "upload já fechado" que não ajudaria ninguém.
+ * Calling twice is safe. A client that lost the response to a network
+ * drop resends the confirmation, and the second returns the same record instead of
+ * an "upload already closed" error that would help nobody.
  */
 @inject()
 export default class StoragesFileCompleteUseCase {
@@ -94,11 +94,11 @@ export default class StoragesFileCompleteUseCase {
   }
 
   /**
-   * Apaga o que subiu errado, binário e linha.
+   * Deletes what was uploaded wrong, binary and row.
    *
-   * A linha morre junto porque ela não descreve mais nada: um `PENDING` cujo
-   * objeto foi apagado nunca vai poder ser confirmado, e ficaria para sempre
-   * ocupando um id que alguém poderia tentar anexar.
+   * The row dies with it because it no longer describes anything: a `PENDING` whose
+   * object was deleted can never be confirmed, and would stay forever
+   * occupying an id that someone might try to attach.
    */
   private async discard(storage: Storage): Promise<void> {
     try {

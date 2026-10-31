@@ -15,7 +15,7 @@ import {
 test.group('sports > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('trocar o nome troca o slug e mantém o resto', async ({ client, assert }) => {
+  test('changing the name changes the slug and keeps the rest', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.merge({ minAthletes: 2, maxAthletes: 8 }).create()
 
@@ -32,7 +32,7 @@ test.group('sports > update', (group) => {
     assert.equal(body(response).maxAthletes, 8)
   })
 
-  test('manter o próprio nome não é conflito', async ({ client, assert }) => {
+  test('keeping its own name is not a conflict', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
 
@@ -46,7 +46,7 @@ test.group('sports > update', (group) => {
     assert.equal(body(response).maxAthletes, 12)
   })
 
-  test('modalidade inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent sport responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -58,7 +58,7 @@ test.group('sports > update', (group) => {
     assert.equal(body(response).code, 'SPORT_NOT_FOUND')
   })
 
-  test('nome de outra modalidade responde 409', async ({ client, assert }) => {
+  test('name of another sport responds 409', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const other = await SportFactory.create()
     const sport = await SportFactory.create()
@@ -73,11 +73,11 @@ test.group('sports > update', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('o limite parcial é conferido contra o valor gravado', async ({ client, assert }) => {
+  test('the partial limit is checked against the saved value', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.merge({ minAthletes: 5, maxAthletes: 10 }).create()
 
-    // Só o máximo vem no payload; o mínimo de 5 gravado passa a ficar acima dele.
+    // Only the maximum comes in the payload; the saved minimum of 5 ends up above it.
     const response = await client
       .put(`/administrator/sports/${sport.id}`)
       .cookies(session)
@@ -90,7 +90,7 @@ test.group('sports > update', (group) => {
     assert.equal(stored.maxAthletes, 10)
   })
 
-  test('máximo abaixo de uma lista já inscrita responde 409', async ({ client, assert }) => {
+  test('maximum below an already enrolled list responds 409', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.merge({ minAthletes: 1, maxAthletes: 10 }).create()
     await enrollRoster(sport, 5)
@@ -111,7 +111,7 @@ test.group('sports > update', (group) => {
     assert.equal(body(exact).maxAthletes, 5)
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const sport = await SportFactory.create()
 
     const anonymous = await client.put(`/administrator/sports/${sport.id}`).json({ name: 'X' })
@@ -126,7 +126,7 @@ test.group('sports > update', (group) => {
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
   })
 
-  test('nome vazio ou limite nulo responde 422 e não grava', async ({ client, assert }) => {
+  test('empty name or null limit responds 422 and does not save', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
 

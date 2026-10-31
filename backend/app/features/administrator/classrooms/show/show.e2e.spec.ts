@@ -14,7 +14,10 @@ import {
 test.group('classrooms > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('devolve a turma com conselheiro e representante aninhados', async ({ client, assert }) => {
+  test('returns the classroom with nested advisor and representative', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const advisor = await UserFactory.create()
     const representative = await UserFactory.apply('representative').create()
@@ -31,11 +34,11 @@ test.group('classrooms > show', (group) => {
     assert.equal(body(response).category, classroom.category)
     assert.equal(body(response).advisor.id, advisor.id)
     assert.equal(body(response).representative.id, representative.id)
-    // A conta aninhada sai pelo serializer do model: a senha nunca vai junto.
+    // The nested account comes out through the model serializer: the password never goes along.
     assert.notProperty(body(response).advisor, 'password')
   })
 
-  test('turma inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent classroom responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get(`/administrator/classrooms/${randomUUID()}`).cookies(session)
@@ -44,7 +47,7 @@ test.group('classrooms > show', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('identificador que não é uuid responde 422 no campo', async ({ client, assert }) => {
+  test('identifier that is not a uuid responds 422 on the field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/classrooms/nao-e-uuid').cookies(session)
@@ -53,7 +56,7 @@ test.group('classrooms > show', (group) => {
     assert.property(body(response).errors, 'id')
   })
 
-  test('sem sessão responde 401, conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
     const classroom = await ClassroomFactory.create()
 
     const anonymous = await client.get(`/administrator/classrooms/${classroom.id}`)

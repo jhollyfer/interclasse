@@ -12,14 +12,14 @@ import {
 test.group('reports > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('conta turmas, alunos e atletas no total, por categoria e por modalidade', async ({
+  test('counts classrooms, students and athletes in total, by category and by sport', async ({
     client,
     assert,
   }) => {
     const admin = await authenticateAsAdministrator(client)
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 2)
-    // Uma turma do Fundamental 1 sem ninguém inscrito.
+    // A Fundamental 1 classroom with nobody enrolled.
     await ClassroomFactory.merge({ name: '3º Z', grade: 3, category: 'F1' }).create()
 
     const response = await client.get('/administrator/reports').cookies(admin)
@@ -38,7 +38,7 @@ test.group('reports > show', (group) => {
     assert.lengthOf(body(response).classrooms, 3)
   })
 
-  test('o CSV abre no Excel: BOM, ponto e vírgula e fórmula neutralizada', async ({
+  test('the CSV opens in Excel: BOM, semicolon and neutralized formula', async ({
     client,
     assert,
   }) => {
@@ -56,7 +56,7 @@ test.group('reports > show', (group) => {
     assert.include(text, '"Total";"1 turmas"')
   })
 
-  test('só o administrador vê o relatório', async ({ client }) => {
+  test('only the administrator sees the report', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/reports').cookies(advisor)
@@ -65,10 +65,10 @@ test.group('reports > show', (group) => {
   })
 })
 
-test.group('administrator/reports/show > acesso e validação', (group) => {
+test.group('administrator/reports/show > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/reports')
 
     response.assertStatus(401)

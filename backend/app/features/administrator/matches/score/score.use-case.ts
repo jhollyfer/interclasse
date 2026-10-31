@@ -22,10 +22,10 @@ type Payload = Merge<AdministratorMatchScorePayload, IdentifierPayload>
 type Response = Either<HTTPException, AdministratorMatchScoreResponse>
 
 /**
- * O placar, e o que ele move: o vencedor avança para a partida seguinte, e a
- * final encerra a chave (regras da entidade). A linha da chave fica travada na
- * unidade de trabalho: dois placares ao mesmo tempo na mesma chave leriam a
- * mesma partida seguinte e um sobrescreveria o outro.
+ * The score, and what it moves: the winner advances to the next match, and the
+ * final ends the bracket (entity rules). The bracket row stays locked in the
+ * unit of work: two scores at the same time on the same bracket would read the
+ * same next match and one would overwrite the other.
  */
 @inject()
 export default class AdministratorMatchScoreUseCase {

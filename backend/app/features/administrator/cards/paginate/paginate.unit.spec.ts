@@ -30,30 +30,30 @@ async function setup() {
     awayTeamId: semi?.awayTeamId ?? null,
     studentTeamId: semi?.homeTeamId ?? null,
   })
-  if (launched.isLeft()) throw new Error('cartão inválido no arranjo')
+  if (launched.isLeft()) throw new Error('invalid card in the arrangement')
   await cards.save(launched.value)
 
   return { useCase, card: launched.value, student: drawn.students[0] }
 }
 
 test.group('administrator/cards > paginate (unit)', () => {
-  test('lista os cartões com o atleta, o time e a partida', async ({ assert }) => {
+  test('lists the cards with the athlete, the team and the match', async ({ assert }) => {
     const { useCase, card, student } = await setup()
 
     const result = await useCase.execute({})
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.equal(result.value.meta.total, 1)
     assert.equal(result.value.data[0]?.id, card.id)
     assert.equal(result.value.data[0]?.student.name, student?.name)
   })
 
-  test('filtra por atleta', async ({ assert }) => {
+  test('filters by athlete', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ studentId: randomUUID() })
 
-    if (result.isLeft()) throw new Error('lista deveria vir')
+    if (result.isLeft()) throw new Error('list should have come')
     assert.equal(result.value.meta.total, 0)
   })
 })

@@ -4,7 +4,7 @@ import { HttpContextFactory } from '@adonisjs/core/factories/http'
 import { csvDownload } from './_shared.csv.ts'
 
 test.group('features/_shared > csvDownload (unit)', () => {
-  test('define tipo, anexo e no-store, e devolve o conteúdo', ({ assert }) => {
+  test('sets type, attachment and no-store, and returns the content', ({ assert }) => {
     const context = new HttpContextFactory().create()
 
     csvDownload(context.response, 'relatorio.csv', 'a;b')

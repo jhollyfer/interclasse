@@ -16,7 +16,7 @@ async function setup() {
 }
 
 test.group('administrator/users > delete (unit)', () => {
-  test('apaga de vez a conta arquivada', async ({ assert }) => {
+  test('deletes the archived account for good', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
 
@@ -26,7 +26,7 @@ test.group('administrator/users > delete (unit)', () => {
     assert.isNull(await users.findAnyById(USER_ID))
   })
 
-  test('conta viva é 409 USER_NOT_ARCHIVED e continua lá', async ({ assert }) => {
+  test('live account is 409 USER_NOT_ARCHIVED and stays', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
 
@@ -36,7 +36,7 @@ test.group('administrator/users > delete (unit)', () => {
     assert.isNotNull(await users.findById(USER_ID))
   })
 
-  test('conta inexistente é 404 USER_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent account is 404 USER_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: USER_ID })
@@ -44,11 +44,11 @@ test.group('administrator/users > delete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'USER_NOT_FOUND' })
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_USER_DELETE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_DELETE_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
     users.delete = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ id: USER_ID })

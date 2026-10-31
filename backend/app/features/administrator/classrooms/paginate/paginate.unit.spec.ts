@@ -19,7 +19,7 @@ async function setup() {
       { id: `00000000-0000-4000-8000-00000000000${index}`, name, grade, now: new Date() },
       {},
     )
-    if (created.isLeft()) throw new Error('arranjo inválido')
+    if (created.isLeft()) throw new Error('invalid arrangement')
     await classrooms.save(created.value)
   }
   const useCase = await makeWithMemory(AdministratorClassroomPaginateUseCase, [
@@ -30,7 +30,9 @@ async function setup() {
 }
 
 test.group('administrator/classrooms > paginate (unit)', () => {
-  test('sem ?sort a lista sai por nome, com meta e os totais do cartão', async ({ assert }) => {
+  test('without ?sort the list comes out by name, with meta and the card totals', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
@@ -41,7 +43,7 @@ test.group('administrator/classrooms > paginate (unit)', () => {
       '9º B',
     ])
     assert.equal(result.isRight() && result.value.meta.perPage, 20)
-    if (result.isLeft()) throw new Error('lista recusada')
+    if (result.isLeft()) throw new Error('list refused')
     assert.deepInclude(result.value.data[0] ?? {}, {
       studentsCount: 0,
       athletesCount: 0,

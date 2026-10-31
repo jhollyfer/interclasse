@@ -20,7 +20,7 @@ async function setup() {
 }
 
 test.group('authentication/sessions > sign-out (unit)', () => {
-  test('apaga o token de acesso e o de refresh da conta', async ({ assert }) => {
+  test('deletes the account access and refresh tokens', async ({ assert }) => {
     const { sessions, useCase } = await setup()
 
     const result = await useCase.execute({
@@ -30,12 +30,12 @@ test.group('authentication/sessions > sign-out (unit)', () => {
     })
 
     assert.isTrue(result.isRight())
-    // Já apagados: apagar de novo não acha linha nenhuma.
+    // Already deleted: deleting again finds no row.
     assert.isFalse(await sessions.revoke(USER_ID, '7'))
     assert.isFalse(await sessions.revoke(USER_ID, '8'))
   })
 
-  test('refresh ilegível não impede a saída', async ({ assert }) => {
+  test('unreadable refresh does not prevent sign-out', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7', refreshToken: 'lixo' })
@@ -43,7 +43,7 @@ test.group('authentication/sessions > sign-out (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('sem tokens a saída também responde certo', async ({ assert }) => {
+  test('without tokens sign-out also answers correctly', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ actor: ACTOR })
@@ -51,12 +51,12 @@ test.group('authentication/sessions > sign-out (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('falha do bucket de sessão é 500 AUTHENTICATION_SESSION_SIGN_OUT_ERROR', async ({
+  test('session bucket failure is 500 AUTHENTICATION_SESSION_SIGN_OUT_ERROR', async ({
     assert,
   }) => {
     const { sessions, useCase } = await setup()
     sessions.revoke = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7' })

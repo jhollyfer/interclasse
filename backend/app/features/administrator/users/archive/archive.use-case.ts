@@ -15,21 +15,21 @@ type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
 /**
- * Envia a conta para a lixeira. Usuário já arquivado é indistinguível de
- * inexistente (`404`), porque o filtro é o mesmo que toda leitura aplica.
+ * Sends the account to the trash. An already archived user is indistinguishable from
+ * nonexistent (`404`), because the filter is the same one every read applies.
  *
- * Diferente dos recursos de conteúdo, arquivar aqui **também revoga as
- * sessões**: o guard verifica assinatura e validade do token e não conhece
- * `deleted_at`, então sem isto o arquivado seguiria dentro do painel até o
- * token vencer - e arquivar não desligaria ninguém.
+ * Unlike the content resources, archiving here **also revokes the
+ * sessions**: the guard verifies token signature and validity and does not know
+ * `deleted_at`, so without this the archived user would stay inside the panel until the
+ * token expired - and archiving would not switch anyone off.
  *
- * A própria conta não chega aqui: a `UserPolicy`, checada pelo controller com
- * `ctx.bouncer`, a recusa com `403` antes de qualquer leitura. É a guarda de
- * auto-trancamento do projeto de referência, que mantém intocável a conta que
- * ninguém mais consegue restaurar; sem um terceiro papel para reservá-la, aqui
- * o intocável é quem está fazendo a requisição. Como todo administrador vivo é
- * protegido de si mesmo, o último deles nunca cai - a guarda de identidade já
- * entrega o que uma contagem entregaria.
+ * The own account does not get here: `UserPolicy`, checked by the controller with
+ * `ctx.bouncer`, refuses it with `403` before any read. It is the self-lockout guard
+ * of the reference project, which keeps untouchable the account that
+ * nobody else can restore; without a third role to reserve it, here
+ * the untouchable is whoever is making the request. Since every live administrator is
+ * protected from themselves, the last one never falls - the identity guard
+ * delivers what a count would deliver.
  */
 @inject()
 export default class AdministratorUserArchiveUseCase {
@@ -51,14 +51,14 @@ export default class AdministratorUserArchiveUseCase {
       const archived = user.archive(new Date())
       if (archived.isLeft()) return left(UserRefusal.http(archived.value, this.i18n))
 
-      // Arquivar, derrubar as sessões e soltar as turmas caem juntos: soltos, a
-      // falha do segundo passo deixaria a conta arquivada com sessão viva.
+      // Archiving, dropping the sessions and releasing the classrooms land together: apart, the
+      // failure of the second step would leave the account archived with a live session.
       const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
         const saved = await this.users.save(user)
         if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
 
         await this.sessions.revokeAll(id)
-        // Conta arquivada não aconselha nem representa turma nenhuma.
+        // An archived account neither advises nor represents any classroom.
         await this.classrooms.detachAccount(id)
 
         return right(null)

@@ -12,7 +12,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, AdministratorSportShowResponse>
 
-/** Apaga a modalidade sem inscrição nem chave: as duas ficariam sem modalidade. */
+/** Deletes the sport without enrollment or bracket: both would be left without a sport. */
 @inject()
 export default class AdministratorSportDeleteUseCase {
   constructor(

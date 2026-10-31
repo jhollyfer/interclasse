@@ -16,7 +16,7 @@ async function setup() {
 }
 
 test.group('storefront/sports > paginate (unit)', () => {
-  test('lista as modalidades em ordem de nome', async ({ assert }) => {
+  test('lists the sports in name order', async ({ assert }) => {
     const { sports, useCase } = await setup()
     await seedSport(sports, 'Queimada')
     await seedSport(sports, 'Futsal')
@@ -29,10 +29,10 @@ test.group('storefront/sports > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 STOREFRONT_SPORT_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 STOREFRONT_SPORT_PAGINATE_ERROR', async ({ assert }) => {
     const { sports, useCase } = await setup()
     sports.paginate = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({})

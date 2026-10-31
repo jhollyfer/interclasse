@@ -8,10 +8,10 @@ import { defineDocs } from '#core/openapi/types'
 @inject()
 export default class AdministratorSiteShowController {
   static docs = defineDocs({
-    summary: 'Configuração do site',
+    summary: 'Site configuration',
     description:
-      'O texto do "Sobre", a edição, o ano da primeira edição, quem organiza, os ' +
-      'Instagrams e o regulamento em PDF. Campo vazio é o que o site não mostra.',
+      'The "About" text, the edition, the year of the first edition, who organizes, the ' +
+      'Instagrams and the regulation PDF. An empty field is what the site does not show.',
   })
 
   constructor(private readonly useCase: AdministratorSiteShowUseCase) {}

@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('administrator/brackets > create (unit)', () => {
-  test('sorteia a chave inteira e responde com a modalidade', async ({ assert }) => {
+  test('draws the whole bracket and responds with the sport', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C', '8º D'])
 
@@ -32,7 +32,7 @@ test.group('administrator/brackets > create (unit)', () => {
     assert.lengthOf(saved?.snapshot().matches ?? [], 3)
   })
 
-  test('sortear de novo devolve a mesma chave, sem novo sorteio', async ({ assert }) => {
+  test('drawing again returns the same bracket, without a new draw', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C'])
     const first = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
@@ -46,7 +46,7 @@ test.group('administrator/brackets > create (unit)', () => {
     )
   })
 
-  test('modalidade inexistente é 422 SPORT_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent sport is 422 SPORT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -57,7 +57,7 @@ test.group('administrator/brackets > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'SPORT_NOT_FOUND' })
   })
 
-  test('menos de duas turmas com o mínimo é 409 NOT_ENOUGH_TEAMS e não grava', async ({
+  test('fewer than two classrooms with the minimum is 409 NOT_ENOUGH_TEAMS and does not save', async ({
     assert,
   }) => {
     const { brackets, useCase } = await setup()
@@ -69,7 +69,7 @@ test.group('administrator/brackets > create (unit)', () => {
     assert.isNull(await brackets.findBySportAndCategory(sport.id, CATEGORY.F2))
   })
 
-  test('mais de 16 turmas é 409 TOO_MANY_TEAMS', async ({ assert }) => {
+  test('more than 16 classrooms is 409 TOO_MANY_TEAMS', async ({ assert }) => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.enrolled(
       brackets,

@@ -21,8 +21,8 @@ export default class AdministratorUserShowUseCase {
 
   async execute({ id }: Payload): Promise<Response> {
     try {
-      // Usuário arquivado é indistinguível de inexistente aqui, porque o filtro
-      // é o mesmo que a listagem padrão aplica. Para alcançá-lo, liste com
+      // An archived user is indistinguishable from nonexistent here, because the filter
+      // is the same one the default listing applies. To reach it, list with
       // `?trashed`.
       const user = await this.users.detail(id)
 

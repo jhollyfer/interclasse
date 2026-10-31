@@ -1,18 +1,18 @@
 import type { PartToSign } from '#services/multipart/multipart.contract'
 
 /**
- * A conta das partes de um upload: função pura sobre números já em mãos, usada
- * por `create` e `parts` (_standards/typescript.md §6, backend.md §4.9).
+ * The count of an upload's parts: a pure function over numbers already at hand, used
+ * by `create` and `parts` (_standards/typescript.md §6, backend.md §4.9).
  */
 
-/** Em quantas partes um arquivo deste tamanho é fatiado. Nunca menos que uma. */
+/** Into how many parts a file of this size is sliced. Never fewer than one. */
 export function countParts(size: number, partSize: number): number {
   return Math.max(1, Math.ceil(size / partSize))
 }
 
 /**
- * O tamanho em bytes de uma parte: `partSize` em todas, menos a última, que leva
- * o que sobrou. É o que a URL assinada prende em `Content-Length`.
+ * The size in bytes of a part: `partSize` for all but the last, which takes
+ * what is left. It is what the signed URL pins in `Content-Length`.
  */
 export function partSizeOf(totalSize: number, partSize: number, partNumber: number): number {
   const total = countParts(totalSize, partSize)
@@ -22,7 +22,7 @@ export function partSizeOf(totalSize: number, partSize: number, partNumber: numb
   return totalSize - partSize * (total - 1)
 }
 
-/** Os números das partes com o tamanho de cada uma, na forma que o contrato assina. */
+/** The part numbers with the size of each one, in the shape the contract signs. */
 export function sizedParts(
   partNumbers: ReadonlyArray<number>,
   totalSize: number,
@@ -35,11 +35,11 @@ export function sizedParts(
 }
 
 /**
- * Os números das partes que ainda faltam, no máximo um lote.
+ * The numbers of the parts still missing, at most one batch.
  *
- * É o que serve tanto ao começo (`uploaded` vazio, devolve `[1, 2, 3, …]`)
- * quanto à retomada (devolve o buraco). O corte em `batch` (o `PRESIGNED_BATCH` do contrato do multipart) é o que
- * impede um arquivo grande de virar meio megabyte de URLs numa resposta só.
+ * It serves both the start (`uploaded` empty, returns `[1, 2, 3, …]`)
+ * and the resume (returns the gap). The cut at `batch` (the multipart contract's `PRESIGNED_BATCH`) is what
+ * keeps a large file from turning into half a megabyte of URLs in a single response.
  */
 export function pendingParts(input: {
   readonly totalParts: number

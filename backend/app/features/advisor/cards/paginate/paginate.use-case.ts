@@ -21,9 +21,9 @@ type Payload = Merge<AdvisorCardPaginatePayload, { actor: Actor }>
 type Response = Either<HTTPException, Paginated<AdvisorCardPaginateResponse>>
 
 /**
- * Os cartões que os atletas da turma levaram, do mais novo ao mais antigo. A
- * turma alheia é 404 como a inexistente: a posse vai no critério da consulta
- * (`_standards/domain.md` §5.1), não numa conferência depois.
+ * The cards the classroom athletes received, newest to oldest. A
+ * foreign classroom is 404 like the nonexistent one: ownership goes in the query criteria
+ * (`_standards/domain.md` §5.1), not in a check afterwards.
  */
 @inject()
 export default class AdvisorCardPaginateUseCase {

@@ -14,7 +14,7 @@ import {
 test.group('enrollment-removals > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lista os avisos e recorta os pendentes', async ({ client, assert }) => {
+  test('lists the notices and narrows to the pending ones', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
@@ -48,7 +48,7 @@ test.group('enrollment-removals > paginate', (group) => {
     assert.equal(body(pending).meta.total, 1)
   })
 
-  test('conselheiro responde 403', async ({ client }) => {
+  test('advisor responds 403', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/enrollment-removals').cookies(session)
@@ -57,10 +57,10 @@ test.group('enrollment-removals > paginate', (group) => {
   })
 })
 
-test.group('administrator/enrollment-removals/paginate > acesso e validação', (group) => {
+test.group('administrator/enrollment-removals/paginate > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/enrollment-removals')
 
     response.assertStatus(401)
@@ -70,7 +70,10 @@ test.group('administrator/enrollment-removals/paginate > acesso e validação', 
 test.group('administrator/enrollment-removals/paginate > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('filtro por turma malformado responde 422 apontando o campo', async ({ client, assert }) => {
+  test('malformed classroom filter responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client

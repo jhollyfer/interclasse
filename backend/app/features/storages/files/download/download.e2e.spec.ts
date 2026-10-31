@@ -15,14 +15,14 @@ import type { Session } from '#tests/http-fixtures'
 import { pngBytes } from '#tests/storages-fixtures'
 
 /**
- * O arquivo como registro neutro e compartilhado: ele não pertence ao
- * formulário que o enviou, e a posse não autoriza nada. Quem manda é o estado
- * (`PENDING` ou `UPLOADED`) e a referência viva.
+ * The file as a neutral, shared record: it does not belong to the
+ * form that submitted it, and ownership authorizes nothing. What rules is the state
+ * (`PENDING` or `UPLOADED`) and the live reference.
  */
 
 const SMALL = pngBytes(1024)
 
-/** Abre um upload pelo endpoint real e devolve o envelope. */
+/** Opens an upload through the real endpoint and returns the envelope. */
 async function open(
   client: ApiClient,
   session: Session,
@@ -35,7 +35,7 @@ async function open(
   return body(response)
 }
 
-/** Envia uma parte para a URL assinada e devolve o `ETag`. */
+/** Sends a part to the signed URL and returns the `ETag`. */
 async function put(url: string, content: Uint8Array): Promise<string> {
   const response = await fetch(url, {
     method: 'PUT',
@@ -48,7 +48,7 @@ async function put(url: string, content: Uint8Array): Promise<string> {
   return response.headers.get('etag') ?? ''
 }
 
-/** O caminho completo, do zero ao `UPLOADED`, para um arquivo de parte única. */
+/** The whole path, from zero to `UPLOADED`, for a single-part file. */
 async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
@@ -68,28 +68,28 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
   return body(completed)
 }
 
-/** Uma linha de `storages` sem binário nenhum: aqui só o metadado importa. */
+/** A `storages` row with no binary at all: only the metadata matters here. */
 
 test.group('storages > download', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('recusa quem não tem sessão', async ({ client }) => {
+  test('refuses whoever has no session', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    // Com o bucket privado, esta rota é o único caminho para o binário. Aberta,
-    // ela emitia URL assinada para qualquer uuid sem sessão - a porta dos
-    // fundos que o fechamento do bucket deixou aberta.
+    // With the bucket private, this route is the only path to the binary. Open,
+    // it issued a signed URL for any uuid without a session - the back
+    // door the closing of the bucket left open.
     const response = await client.get(`/storages/${storage.id}/download`).redirects(0)
 
     response.assertStatus(401)
   })
 
-  test('redireciona para uma URL temporária do bucket', async ({ client, assert }) => {
+  test('redirects to a temporary bucket URL', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    // Sem seguir o redirect, para ver o que a **aplicação** responde.
+    // Without following the redirect, to see what the **application** responds.
     const response = await client
       .get(`/storages/${storage.id}/download`)
       .cookies(session)
@@ -99,12 +99,15 @@ test.group('storages > download', (group) => {
 
     const location = response.header('location')
 
-    // Assinada e temporária: nunca a URL crua e permanente do objeto.
+    // Signed and temporary: never the raw, permanent URL of the object.
     assert.include(location, 'X-Amz-Signature')
     assert.include(location, 'X-Amz-Expires')
   })
 
-  test('o arquivo chega com o nome original no fim do redirect', async ({ client, assert }) => {
+  test('the file arrives with the original name at the end of the redirect', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -115,28 +118,28 @@ test.group('storages > download', (group) => {
     const disposition = response.header('content-disposition')
 
     assert.include(disposition, 'attachment')
-    // Os dois nomes, como pede a RFC 6266.
+    // Both names, as RFC 6266 asks.
     assert.include(disposition, 'filename="capa.png"')
     assert.include(disposition, "filename*=UTF-8''capa.png")
   })
 
-  test('o conselheiro não baixa arquivo que não é dele: só o administrador opera o acervo', async ({
+  test('the advisor cannot download a file that is not theirs: only the administrator operates the collection', async ({
     client,
   }) => {
-    const administrador = await authenticateAsAdministrator(client)
-    const storage = await upload(client, administrador)
+    const admin = await authenticateAsAdministrator(client)
+    const storage = await upload(client, admin)
 
-    const conselheiro = await authenticateAsAdvisor(client)
+    const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
       .get(`/storages/${storage.id}/download`)
-      .cookies(conselheiro)
+      .cookies(advisor)
       .redirects(0)
 
     response.assertStatus(404)
   })
 
-  test('responde 404 para id inexistente', async ({ client, assert }) => {
+  test('responds 404 for a nonexistent id', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client
       .get('/storages/00000000-0000-4000-8000-000000000000/download')
@@ -148,14 +151,16 @@ test.group('storages > download', (group) => {
 })
 
 /**
- * O header que faz o arquivo chegar com o nome que a pessoa enviou.
+ * The header that makes the file arrive with the name the person uploaded.
  *
- * A RFC 6266 pede os dois nomes: `filename=` só carrega ASCII, e
- * `filename*=UTF-8''` é o que preserva acento. Mandar só um deles quebra
- * metade dos clientes.
+ * RFC 6266 asks for both names: `filename=` carries only ASCII, and
+ * `filename*=UTF-8''` is what preserves accents. Sending only one of them breaks
+ * half of the clients.
  */
 test.group('storages > contentDisposition', () => {
-  test('mantém o acento na versão UTF-8 e o remove na ASCII', async ({ assert }) => {
+  test('keeps the accent in the UTF-8 version and removes it in the ASCII one', async ({
+    assert,
+  }) => {
     const service = await app.container.make(StorageContract)
 
     const header = service.contentDisposition('Relatório Anual.pdf')
@@ -164,7 +169,7 @@ test.group('storages > contentDisposition', () => {
     assert.include(header, "filename*=UTF-8''Relat%C3%B3rio%20Anual.pdf")
   })
 
-  test('neutraliza aspas, que escapariam do header', async ({ assert }) => {
+  test('neutralizes quotes, which would escape the header', async ({ assert }) => {
     const service = await app.container.make(StorageContract)
 
     const header = service.contentDisposition('nota "final".pdf')
@@ -176,7 +181,7 @@ test.group('storages > contentDisposition', () => {
 test.group('storages > download > identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('id malformado responde 422 em vez de 500 do Postgres', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/storages/x/download').cookies(session)

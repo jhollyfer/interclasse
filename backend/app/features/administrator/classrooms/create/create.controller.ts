@@ -10,8 +10,8 @@ import { AdministratorClassroomCreateValidator } from '#validators/administrator
 export default class AdministratorClassroomCreateController {
   static docs = defineDocs({
     description:
-      'A categoria (`F1` ou `F2`) sai do ano e não é enviada. Conselheiro e representante são ' +
-      'opcionais e precisam ter o papel do vínculo; um representante só tem uma turma.',
+      'The category (`F1` or `F2`) comes from the year and is not sent. Advisor and representative are ' +
+      'optional and must have the link role; a representative has only one classroom.',
   })
 
   constructor(private readonly useCase: AdministratorClassroomCreateUseCase) {}

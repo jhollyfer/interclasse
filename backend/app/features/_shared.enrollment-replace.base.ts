@@ -23,20 +23,20 @@ type Replacement = {
   readonly studentIds: readonly string[]
   readonly writer: EnrollmentWriter
   readonly actor: Actor
-  /** Só a tela do representante trava na modalidade já sorteada. */
+  /** Only the representative screen locks on an already drawn sport. */
   readonly lockAfterDraw: boolean
 }
 
 /**
- * O fluxo de trocar a lista de atletas de uma turma, o mesmo para o conselheiro
- * (`/advisor/enrollments`) e para o representante (`/representative/enrollments`):
- * cada use-case descobre a turma do jeito dele e entrega o resto a este passo
- * (template method, `backend.md` §4.2). Quem pode mexer em qual turma **não** é
- * decidido aqui: chega resolvido pelo use-case.
+ * The flow of replacing a classroom's athlete list, the same for the advisor
+ * (`/advisor/enrollments`) and the representative (`/representative/enrollments`):
+ * each use case finds the classroom its own way and hands the rest to this step
+ * (template method, `backend.md` §4.2). Who may touch which classroom is **not**
+ * decided here: it arrives resolved by the use case.
  *
- * Duas escritas, uma unidade de trabalho: a lista nova e os avisos de remoção
- * caem juntos ou nenhum cai. Gravam dois agregados (`Enrollment` e
- * `EnrollmentRemoval`) porque o aviso é a consequência da mesma troca.
+ * Two writes, one unit of work: the new list and the removal notices
+ * land together or neither does. They write two aggregates (`Enrollment` and
+ * `EnrollmentRemoval`) because the notice is the consequence of the same swap.
  */
 export abstract class EnrollmentReplaceBase {
   protected constructor(
@@ -56,8 +56,8 @@ export abstract class EnrollmentReplaceBase {
     const key = { classroomId: input.classroomId, sportId: input.sportId }
 
     const saved = await this.unit.run<HTTPException, true>(async () => {
-      // A mesma trava do sorteio, e a checagem do sorteio só depois dela: lida
-      // antes, a lista podia ser gravada depois de a chave ser fechada.
+      // The same lock as the draw, and the draw check only after it: read
+      // before, the list could be saved after the bracket was closed.
       const enrollment = await this.enrollments.findForUpdate(key)
       const drawn = await this.enrollments.isDrawn(key)
 
@@ -93,9 +93,9 @@ export abstract class EnrollmentReplaceBase {
   }
 
   /**
-   * Cada atleta tirado vira um aviso para a organização, com o motivo. O
-   * representante nunca tira atleta (a entidade recusa), então só o conselheiro
-   * gera aviso.
+   * Each removed athlete becomes a notice to the organization, with the reason. The
+   * representative never removes an athlete (the entity refuses), so only the advisor
+   * generates a notice.
    */
   private removalsOf(
     input: Replacement,

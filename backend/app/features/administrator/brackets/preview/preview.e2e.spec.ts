@@ -15,18 +15,18 @@ import {
 test.group('brackets > preview', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('conta os inscritos de cada turma e diz quem entra', async ({ client, assert }) => {
+  test('counts the enrolled of each classroom and says who enters', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.merge({ minAthletes: 2, maxAthletes: 5 }).create()
-    const [cheia, vazia] = await ClassroomFactory.merge({
+    const [full, empty] = await ClassroomFactory.merge({
       grade: 4,
       category: ClassroomEntity.categoryOf(4),
     }).createMany(2)
-    if (!cheia || !vazia) throw new Error('factory criou menos turmas que o pedido')
-    const alunos = await StudentFactory.merge({ classroomId: cheia.id }).createMany(2)
-    for (const aluno of alunos)
-      await EnrollmentFactory.merge({ studentId: aluno.id, sportId: sport.id }).create()
-    await StudentFactory.merge({ classroomId: vazia.id }).create()
+    if (!full || !empty) throw new Error('factory created fewer classrooms than requested')
+    const students = await StudentFactory.merge({ classroomId: full.id }).createMany(2)
+    for (const student of students)
+      await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
+    await StudentFactory.merge({ classroomId: empty.id }).create()
 
     const response = await client
       .get('/administrator/brackets/preview')
@@ -43,22 +43,22 @@ test.group('brackets > preview', (group) => {
       ]),
     )
     assert.deepEqual(byId, {
-      [cheia.id]: { athletes: 2, eligible: true },
-      [vazia.id]: { athletes: 0, eligible: false },
+      [full.id]: { athletes: 2, eligible: true },
+      [empty.id]: { athletes: 0, eligible: false },
     })
   })
 })
 
-test.group('administrator/brackets/preview > acesso e validação', (group) => {
+test.group('administrator/brackets/preview > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/brackets/preview')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/brackets/preview').cookies(advisor)
@@ -70,7 +70,7 @@ test.group('administrator/brackets/preview > acesso e validação', (group) => {
 test.group('administrator/brackets/preview > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('modalidade malformada e categoria ausente respondem 422 apontando os campos', async ({
+  test('malformed sport and missing category respond 422 pointing at the fields', async ({
     client,
     assert,
   }) => {

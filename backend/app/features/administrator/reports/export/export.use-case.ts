@@ -11,8 +11,8 @@ import HTTPException from '#exceptions/http.exception'
 type Response = Either<HTTPException, string>
 
 /**
- * O relatório em CSV, para baixar e abrir no Excel: uma linha por turma e a
- * linha de total no fim. Os rótulos saem do i18n, no idioma da requisição.
+ * The report as CSV, to download and open in Excel: one row per classroom and the
+ * total row at the end. The labels come from i18n, in the request language.
  */
 @inject()
 export default class AdministratorReportExportUseCase {

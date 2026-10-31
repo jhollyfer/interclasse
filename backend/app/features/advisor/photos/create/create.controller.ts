@@ -9,10 +9,10 @@ import { AdvisorPhotoCreateValidator } from '#validators/advisor/photos.validato
 @inject()
 export default class AdvisorPhotoCreateController {
   static docs = defineDocs({
-    summary: 'Enviar foto',
+    summary: 'Submit photo',
     description:
-      'Uma foto para o carrossel do site. `storageId` é uma imagem já enviada por ' +
-      '`/storages`. Nasce `PENDING`: só aparece no site depois que a organização aprova.',
+      'A photo for the site carousel. `storageId` is an image already uploaded through ' +
+      '`/storages`. Born `PENDING`: it only appears on the site after the organization approves.',
   })
 
   constructor(private readonly useCase: AdvisorPhotoCreateUseCase) {}

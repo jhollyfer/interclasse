@@ -9,12 +9,12 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class StoragesFileShowController {
   static docs = defineDocs({
-    summary: 'Ver um arquivo',
+    summary: 'View a file',
     description:
-      'Devolve o registro nu, sem envelope: o rótulo original, o tipo, o tamanho, o estado do ' +
-      'upload e a `url` derivada.\n\n' +
-      'Vale também para o arquivo ainda `PENDING` - a tela de detalhe é onde se descobre que ' +
-      'um upload ficou pela metade. Quem anexa é que exige `UPLOADED`.',
+      'Returns the bare record, without envelope: the original label, the type, the size, the state of the ' +
+      'upload and the derived `url`.\n\n' +
+      'Also valid for a file still `PENDING` - the detail screen is where one discovers that ' +
+      'an upload was left half-done. Whoever attaches is the one who requires `UPLOADED`.',
   })
 
   constructor(private readonly useCase: StoragesFileShowUseCase) {}

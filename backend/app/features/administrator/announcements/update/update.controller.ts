@@ -10,7 +10,7 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorAnnouncementUpdateController {
   static docs = defineDocs({
-    description: 'Campo ausente é "não mexer": só o que vier no payload muda.',
+    description: 'A missing field means "leave alone": only what comes in the payload changes.',
   })
 
   constructor(private readonly useCase: AdministratorAnnouncementUpdateUseCase) {}

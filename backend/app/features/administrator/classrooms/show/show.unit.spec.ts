@@ -12,7 +12,7 @@ const ID = '9b8a7f6e-5d4c-4b3a-8f2e-1d0c9b8a7f6e'
 async function setup() {
   const classrooms = MemoryRepositories.classrooms()
   const created = Classroom.create({ id: ID, name: '7º A', grade: 7, now: new Date() }, {})
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
   await classrooms.save(created.value)
   const useCase = await makeWithMemory(AdministratorClassroomShowUseCase, [
     [ClassroomRepository, classrooms],
@@ -22,7 +22,7 @@ async function setup() {
 }
 
 test.group('administrator/classrooms > show (unit)', () => {
-  test('devolve a turma na forma da resposta', async ({ assert }) => {
+  test('returns the classroom in the response shape', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: ID })
@@ -36,7 +36,7 @@ test.group('administrator/classrooms > show (unit)', () => {
     })
   })
 
-  test('inexistente é 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })

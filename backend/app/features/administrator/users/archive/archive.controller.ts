@@ -11,16 +11,16 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorUserArchiveController {
   static docs = defineDocs({
-    summary: 'Arquivar usuário',
+    summary: 'Archive user',
     description:
-      'Envia para a lixeira: grava `deletedAt` e **revoga todas as sessões da conta**. O ' +
-      'guard não conhece `deleted_at`, então sem a revogação o arquivado seguiria dentro do ' +
-      'painel até o token vencer.\n\n' +
-      'A conta some das listagens padrão e reaparece com `?trashed=only`. Reversível por ' +
-      '`PATCH /:id/unarchive`. Usuário já arquivado responde `409`.\n\n' +
-      'A **própria** conta responde `403`: arquivar a si mesmo tira do painel quem estava ' +
-      'administrando, e o conserto seria rodar o seeder.',
-    // Declarado à mão porque nasce em outra camada da cadeia: quem nega é a `UserPolicy`.
+      'Sends to the trash: saves `deletedAt` and **revokes all the account sessions**. The ' +
+      'guard does not know `deleted_at`, so without the revocation the archived user would stay inside the ' +
+      'panel until the token expired.\n\n' +
+      'The account disappears from the default listings and reappears with `?trashed=only`. Reversible by ' +
+      '`PATCH /:id/unarchive`. An already archived user responds `409`.\n\n' +
+      'The **own** account responds `403`: archiving oneself removes from the panel whoever was ' +
+      'administering, and the fix would be to run the seeder.',
+    // Declared by hand because it is born in another layer of the chain: it is `UserPolicy` that denies.
     errors: { 403: 'SELF_ARCHIVE_FORBIDDEN' },
   })
 

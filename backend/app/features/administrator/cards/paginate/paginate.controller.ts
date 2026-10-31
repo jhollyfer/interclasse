@@ -10,8 +10,8 @@ import { AdministratorCardPaginateValidator } from '#validators/administrator/ca
 export default class AdministratorCardPaginateController {
   static docs = defineDocs({
     description:
-      'Os cartões lançados, do mais novo ao mais antigo, com o atleta, o time e a partida. ' +
-      'Filtra por partida, turma ou atleta.',
+      'The recorded cards, newest to oldest, with the athlete, the team and the match. ' +
+      'Filters by match, classroom or athlete.',
   })
 
   constructor(private readonly useCase: AdministratorCardPaginateUseCase) {}

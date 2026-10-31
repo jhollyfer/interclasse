@@ -15,12 +15,12 @@ import {
   authenticateAsAdvisor,
 } from '#tests/http-fixtures'
 
-/** Um arquivo já confirmado, que é o único estado que `assertExist` aceita. */
+/** An already confirmed file, which is the only state `assertExist` accepts. */
 
 /**
- * O payload de criação. `passwordConfirmation` acompanha a senha porque a regra
- * de força compartilhada exige `confirmed` - o campo é lido do input cru e não
- * chega ao banco.
+ * The creation payload. `passwordConfirmation` accompanies the password because the shared
+ * strength rule requires `confirmed` - the field is read from the raw input and does not
+ * reach the database.
  */
 const payload = {
   name: 'Nova Pessoa',
@@ -30,40 +30,43 @@ const payload = {
   role: USER_ROLE.ADVISOR,
 }
 
-test.group('administrador > users > criação', (group) => {
+test.group('administrator > users > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a conta nasce ACTIVE e sem senha na resposta', async ({ client, assert }) => {
+  test('the account is born ACTIVE and without a password in the response', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.post('/administrator/users').cookies(session).json(payload)
 
     response.assertStatus(201)
     assert.equal(body(response).role, USER_ROLE.ADVISOR)
-    // A coluna tem `DEFAULT 'ACTIVE'` e o payload não escreve a chave ausente.
+    // The column has `DEFAULT 'ACTIVE'` and the payload does not write the missing key.
     assert.equal(body(response).status, ACTIVE_STATUS.ACTIVE)
     assert.notProperty(body(response), 'password')
   })
 
-  test('a senha é gravada cifrada e serve para entrar', async ({ client, assert }) => {
+  test('the password is saved hashed and works to sign in', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const criado = await client.post('/administrator/users').cookies(session).json(payload)
-    criado.assertStatus(201)
+    const created = await client.post('/administrator/users').cookies(session).json(payload)
+    created.assertStatus(201)
 
-    // O mixin `withAuthFinder` cifra no save: gravar o texto puro deixaria a
-    // senha legível no banco, e um hash de hash não deixaria ninguém entrar.
-    const user = await Stored.userOrFail(body(criado).id)
+    // The `withAuthFinder` mixin hashes on save: saving the plain text would leave the
+    // password readable in the database, and a hash of a hash would let nobody in.
+    const user = await Stored.userOrFail(body(created).id)
     assert.notEqual(user.password, payload.password)
 
-    const entrada = await client
+    const input = await client
       .post('/authentication/sign-in')
       .json({ email: payload.email, password: payload.password })
 
-    entrada.assertStatus(204)
+    input.assertStatus(204)
   })
 
-  test('e-mail de conta viva responde 409 apontando o campo', async ({ client, assert }) => {
+  test('email of a live account responds 409 pointing at the field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -76,13 +79,13 @@ test.group('administrador > users > criação', (group) => {
     assert.property(body(response).errors, 'email')
   })
 
-  test('e-mail de conta arquivada reativa a linha em vez de estourar o unique', async ({
+  test('email of an archived account reactivates the row instead of blowing the unique', async ({
     client,
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const arquivado = await UserFactory.merge({
+    const archived = await UserFactory.merge({
       email: payload.email,
       deletedAt: DateTime.now(),
     }).create()
@@ -90,16 +93,16 @@ test.group('administrador > users > criação', (group) => {
     const response = await client.post('/administrator/users').cookies(session).json(payload)
 
     response.assertStatus(201)
-    // Mesma linha: `email` é `UNIQUE` global e a remoção é lógica, então
-    // inserir de novo esbarraria no índice e viraria 500.
-    assert.equal(body(response).id, arquivado.id)
+    // Same row: `email` is a global `UNIQUE` and removal is logical, so
+    // inserting again would hit the index and become a 500.
+    assert.equal(body(response).id, archived.id)
     assert.isNull(body(response).deletedAt)
 
     const [{ count }] = await db.from('users').where('email', payload.email).count('* as count')
     assert.equal(Number(count), 1)
   })
 
-  test('senha fraca responde 422 apontando o campo', async ({ client, assert }) => {
+  test('weak password responds 422 pointing at the field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -111,20 +114,20 @@ test.group('administrador > users > criação', (group) => {
     assert.property(body(response).errors, 'password')
   })
 
-  test('role ausente responde 422: o papel é sempre explícito', async ({ client, assert }) => {
+  test('missing role responds 422: the role is always explicit', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const { role: _semPapel, ...semRole } = payload
+    const { role: _noRole, ...noRole } = payload
 
-    const response = await client.post('/administrator/users').cookies(session).json(semRole)
+    const response = await client.post('/administrator/users').cookies(session).json(noRole)
 
     response.assertStatus(422)
-    // `backend-old` caía em ADMINISTRATOR por omissão, e um caminho de criação
-    // esquecido gravava o papel mais poderoso em silêncio.
+    // `backend-old` fell back to ADMINISTRATOR by omission, and a forgotten creation path
+    // silently saved the most powerful role.
     assert.property(body(response).errors, 'role')
   })
 
-  test('foto inexistente responde 422 apontando o campo e antes de gravar', async ({
+  test('nonexistent photo responds 422 pointing at the field and before saving', async ({
     client,
     assert,
   }) => {
@@ -144,16 +147,16 @@ test.group('administrador > users > criação', (group) => {
   })
 })
 
-test.group('administrator/users/create > acesso e validação', (group) => {
+test.group('administrator/users/create > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.post('/administrator/users')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.post('/administrator/users').cookies(advisor)

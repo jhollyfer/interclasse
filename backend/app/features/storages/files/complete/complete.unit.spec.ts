@@ -26,7 +26,7 @@ async function setup() {
 }
 
 test.group('storages/files > complete (unit)', () => {
-  test('confere o tamanho no bucket e passa a UPLOADED', async ({ assert }) => {
+  test('checks the size in the bucket and becomes UPLOADED', async ({ assert }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(pendingFile())
     bucket.put('capa.png', { contentLength: 1024 })
@@ -36,7 +36,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.deepInclude(rightOf(result), { status: 'UPLOADED', uploadId: null })
   })
 
-  test('multipart pede ao bucket para remontar as partes', async ({ assert }) => {
+  test('multipart asks the bucket to reassemble the parts', async ({ assert }) => {
     const { storages, bucket, multipart, useCase } = await setup()
     await storages.save(pendingFile({ uploadId: 'up' }))
     bucket.put('capa.png', { contentLength: 1024 })
@@ -46,7 +46,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.deepEqual(multipart.completed, ['capa.png'])
   })
 
-  test('tamanho diferente do declarado apaga binário e linha: 422 STORAGE_SIZE_MISMATCH', async ({
+  test('size different from the declared deletes binary and row: 422 STORAGE_SIZE_MISMATCH', async ({
     assert,
   }) => {
     const { storages, bucket, useCase } = await setup()
@@ -60,7 +60,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('.png com bytes de SVG apaga binário e linha: 422 STORAGE_CONTENT_MISMATCH', async ({
+  test('.png with SVG bytes deletes binary and row: 422 STORAGE_CONTENT_MISMATCH', async ({
     assert,
   }) => {
     const { storages, bucket, useCase } = await setup()
@@ -74,7 +74,9 @@ test.group('storages/files > complete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('confirmar de novo devolve o mesmo registro sem consultar o bucket', async ({ assert }) => {
+  test('confirming again returns the same record without querying the bucket', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())
 
@@ -83,7 +85,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.equal(rightOf(result).status, 'UPLOADED')
   })
 
-  test('arquivo inexistente é 404 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent file is 404 STORAGE_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: FILE_ID })
@@ -91,7 +93,7 @@ test.group('storages/files > complete (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('falha do bucket é 500 STORAGES_FILE_COMPLETE_ERROR', async ({ assert }) => {
+  test('bucket failure is 500 STORAGES_FILE_COMPLETE_ERROR', async ({ assert }) => {
     const { storages, useCase } = await setup()
     await storages.save(pendingFile())
 

@@ -9,10 +9,10 @@ import { AdministratorPhotoCreateValidator } from '#validators/administrator/pho
 @inject()
 export default class AdministratorPhotoCreateController {
   static docs = defineDocs({
-    summary: 'Publicar foto',
+    summary: 'Publish photo',
     description:
-      'Uma foto para o carrossel do site, já aprovada. `storageId` é uma imagem já ' +
-      'enviada por `/storages`.',
+      'A photo for the site carousel, already approved. `storageId` is an image already ' +
+      'uploaded through `/storages`.',
   })
 
   constructor(private readonly useCase: AdministratorPhotoCreateUseCase) {}

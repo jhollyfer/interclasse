@@ -15,7 +15,7 @@ async function setup() {
 }
 
 test.group('account/profile > show (unit)', () => {
-  test('devolve a própria conta, sem a senha', async ({ assert }) => {
+  test('returns the own account, without the password', async ({ assert }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
 
@@ -27,10 +27,10 @@ test.group('account/profile > show (unit)', () => {
     assert.notProperty(profile, 'password')
   })
 
-  test('falha do repositório é 500 ACCOUNT_PROFILE_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ACCOUNT_PROFILE_SHOW_ERROR', async ({ assert }) => {
     const { users, useCase } = await setup()
     users.detail = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({

@@ -13,7 +13,7 @@ import {
 test.group('administrador > users > leitura', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a foto sai aninhada e a senha não sai', async ({ client, assert }) => {
+  test('the photo comes out nested and the password does not', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const avatar = await StorageFactory.create()
 
@@ -26,7 +26,7 @@ test.group('administrador > users > leitura', (group) => {
     assert.notProperty(body(response), 'password')
   })
 
-  test('usuário arquivado responde 404', async ({ client }) => {
+  test('archived user responds 404', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ deletedAt: DateTime.now() }).create()
 
@@ -36,16 +36,16 @@ test.group('administrador > users > leitura', (group) => {
   })
 })
 
-test.group('administrator/users/show > acesso e validação', (group) => {
+test.group('administrator/users/show > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get('/administrator/users/00000000-0000-4000-8000-000000000000')
 
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -55,7 +55,7 @@ test.group('administrator/users/show > acesso e validação', (group) => {
     response.assertStatus(403)
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/users/nao-e-uuid').cookies(admin)

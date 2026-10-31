@@ -10,13 +10,13 @@ import { COOKIE_TOKEN, cookieOptions } from '#config/cookie'
 @inject()
 export default class AuthenticationSessionSignInController {
   static docs = defineDocs({
-    summary: 'Abrir sessão',
+    summary: 'Open session',
     description:
-      'Abre a sessão. Responde `204` **sem corpo**: o que importa é o `Set-Cookie` com o par ' +
-      'de tokens `httpOnly`. O cliente nunca manipula o token, e nenhum dado do ' +
-      'usuário viaja dentro dele.\n\n' +
-      'A falha é **indistinguível por causa**: senha errada, conta inativa e conta arquivada ' +
-      'devolvem o mesmo `401`. É o que impede descobrir, pela resposta, quais e-mails existem.',
+      'Opens the session. Responds `204` **without a body**: what matters is the `Set-Cookie` with the `httpOnly` ' +
+      'token pair. The client never handles the token, and no user ' +
+      'data travels inside it.\n\n' +
+      'The failure is **indistinguishable by cause**: wrong password, inactive account and archived account ' +
+      'return the same `401`. That is what prevents discovering, from the response, which emails exist.',
   })
 
   constructor(private readonly useCase: AuthenticationSessionSignInUseCase) {}

@@ -14,7 +14,10 @@ import {
 test.group('matches > athletes', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('devolve os alunos das duas turmas, com o inscrito marcado', async ({ client, assert }) => {
+  test('returns the students of both classrooms, with the enrolled marked', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const { bracket, match, homeTeam, homeStudent, awayStudent } = await matchWithTeams()
     await EnrollmentFactory.merge({ studentId: homeStudent.id, sportId: bracket.sportId }).create()
@@ -34,7 +37,7 @@ test.group('matches > athletes', (group) => {
     ])
   })
 
-  test('partida inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent match responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -46,10 +49,10 @@ test.group('matches > athletes', (group) => {
   })
 })
 
-test.group('administrator/matches/athletes > acesso e validação', (group) => {
+test.group('administrator/matches/athletes > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.get(
       '/administrator/matches/00000000-0000-4000-8000-000000000000/athletes',
     )
@@ -57,7 +60,7 @@ test.group('administrator/matches/athletes > acesso e validação', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -71,10 +74,7 @@ test.group('administrator/matches/athletes > acesso e validação', (group) => {
 test.group('administrator/matches/athletes > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('id de partida malformado responde 422 em vez de 500 do Postgres', async ({
-    client,
-    assert,
-  }) => {
+  test('malformed match id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/matches/x/athletes').cookies(admin)

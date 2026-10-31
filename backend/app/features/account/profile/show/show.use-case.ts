@@ -17,11 +17,11 @@ type Payload = { actor: Actor }
 type Response = Either<HTTPException, AccountProfileShowResponse>
 
 /**
- * A leitura da própria conta: o `actor` da sessão (_standards/backend.md §4.3).
+ * Reading the own account: the session `actor` (_standards/backend.md §4.3).
  *
- * O guard já leu a conta nesta requisição, com o filtro de arquivado e de
- * inativo - quem foi arquivado não chega até aqui. O que se lê de novo é a
- * conta com o avatar, a `url` dele já assinada.
+ * The guard already read the account in this request, with the archived and
+ * inactive filter - whoever was archived does not get here. What is read again is the
+ * account with the avatar, its `url` already signed.
  */
 @inject()
 export default class AccountProfileShowUseCase {

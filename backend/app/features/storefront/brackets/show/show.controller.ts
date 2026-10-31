@@ -10,8 +10,8 @@ import { IdentifierValidator } from '#core/validator'
 export default class StorefrontBracketShowController {
   static docs = defineDocs({
     description:
-      'Sem sessão. A chave inteira: todas as partidas de cada fase, com os nomes das turmas ' +
-      'e o campeão quando a final termina.',
+      'Without a session. The whole bracket: every match of each phase, with the classroom names ' +
+      'and the champion when the final ends.',
   })
 
   constructor(private readonly useCase: StorefrontBracketShowUseCase) {}

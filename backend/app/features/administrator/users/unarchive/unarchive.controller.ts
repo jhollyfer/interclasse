@@ -9,10 +9,10 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorUserUnarchiveController {
   static docs = defineDocs({
-    summary: 'Restaurar usuário',
+    summary: 'Restore user',
     description:
-      'Tira da lixeira: zera `deletedAt`. Só aceita usuário arquivado - um usuário vivo ' +
-      'responde `409`. Nenhuma sessão é recriada: quem foi restaurado entra de novo pelo ' +
+      'Takes out of the trash: zeroes `deletedAt`. Only accepts an archived user - a live user ' +
+      'responds `409`. No session is recreated: whoever was restored signs in again through ' +
       'sign-in.',
   })
 

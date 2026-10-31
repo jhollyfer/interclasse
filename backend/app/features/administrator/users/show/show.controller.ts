@@ -9,10 +9,10 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorUserShowController {
   static docs = defineDocs({
-    summary: 'Ver um usuário',
+    summary: 'View a user',
     description:
-      'Devolve o objeto nu, sem envelope, com a foto aninhada e **sem a senha**. Usuário ' +
-      'arquivado não é encontrado aqui - para alcançá-lo, liste com `?trashed`.',
+      'Returns the bare object, without envelope, with the nested photo and **without the password**. An ' +
+      'archived user is not found here - to reach it, list with `?trashed`.',
   })
 
   constructor(private readonly useCase: AdministratorUserShowUseCase) {}

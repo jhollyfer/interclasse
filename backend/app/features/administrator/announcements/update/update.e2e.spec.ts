@@ -14,7 +14,7 @@ import {
 test.group('announcements > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('payload parcial não apaga o campo ausente', async ({ client, assert }) => {
+  test('partial payload does not erase the missing field', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -30,7 +30,7 @@ test.group('announcements > update', (group) => {
     assert.isFalse(body(response).pinned)
   })
 
-  test('fixar e desafixar troca só o destaque', async ({ client, assert }) => {
+  test('pinning and unpinning changes only the highlight', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -50,7 +50,7 @@ test.group('announcements > update', (group) => {
     assert.equal(body(unpinned).title, announcement.title)
   })
 
-  test('aviso inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent announcement responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -62,7 +62,7 @@ test.group('announcements > update', (group) => {
     assert.equal(body(response).code, 'ANNOUNCEMENT_NOT_FOUND')
   })
 
-  test('título acima de 160 caracteres responde 422 e não grava', async ({ client, assert }) => {
+  test('title above 160 characters responds 422 and does not save', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -77,16 +77,16 @@ test.group('announcements > update', (group) => {
     assert.equal(stored.title, announcement.title)
   })
 
-  test('título vazio, só de espaços ou nulo responde 422 e não grava', async ({
+  test('empty, whitespace-only or null title responds 422 and does not save', async ({
     client,
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
-    // O bodyparser apara e converte `''` em `null`; sem `notNull()`, o
-    // `optional()` tirava o `null` do payload e a resposta era 200 com o
-    // título antigo.
+    // The bodyparser trims and converts `''` into `null`; without `notNull()`, the
+    // `optional()` removed the `null` from the payload and the response was 200 with the
+    // old title.
     for (const title of ['', '   ', null]) {
       const response = await client
         .put(`/administrator/announcements/${announcement.id}`)
@@ -100,7 +100,7 @@ test.group('announcements > update', (group) => {
     assert.equal(stored.title, announcement.title)
   })
 
-  test('sem sessão responde 401 e conselheiro responde 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
     const announcement = await AnnouncementFactory.create()
 
     const anonymous = await client

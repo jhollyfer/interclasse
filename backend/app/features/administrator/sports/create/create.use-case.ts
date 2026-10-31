@@ -16,7 +16,7 @@ import type { AdministratorSportCreatePayload } from '#validators/administrator/
 type Payload = AdministratorSportCreatePayload
 type Response = Either<HTTPException, AdministratorSportShowResponse>
 
-/** Cadastra a modalidade: a entidade confere os limites, o repository a unicidade. */
+/** Registers the sport: the entity checks the limits, the repository the uniqueness. */
 @inject()
 export default class AdministratorSportCreateUseCase {
   constructor(

@@ -5,9 +5,9 @@ import HTTPException from '#exceptions/http.exception'
 import type { SportError } from '#domain/sport/sport.errors'
 
 /**
- * Cada recusa da modalidade como resposta HTTP (`_standards/domain.md` §2). O
- * 409 do nome repetido é o da checagem antes de gravar e o da corrida no
- * `unique`, que o repository devolve como fato.
+ * Each refusal of the sport as an HTTP response (`_standards/domain.md` §2). The
+ * 409 of the repeated name is the one of the check before saving and the one of the race on the
+ * `unique`, which the repository returns as a fact.
  */
 export class SportRefusal extends RefusalBase {
   private static readonly TABLE = {

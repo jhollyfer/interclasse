@@ -22,7 +22,7 @@ async function setup() {
       sender: PHOTO_SENDER.ADVISOR,
       now: new Date(),
     })
-    if (created.isLeft()) throw new Error('arranjo inválido')
+    if (created.isLeft()) throw new Error('invalid arrangement')
     await photos.save(created.value)
   }
   const useCase = await makeWithMemory(AdvisorPhotoPaginateUseCase, [[PhotoRepository, photos]])
@@ -31,7 +31,7 @@ async function setup() {
 }
 
 test.group('advisor/photos > paginate (unit)', () => {
-  test('lista só as fotos de quem está logado', async ({ assert }) => {
+  test('lists only the photos of whoever is logged in', async ({ assert }) => {
     const { mine, useCase } = await setup()
 
     const result = await useCase.execute({ actor: mine })

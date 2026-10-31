@@ -1,20 +1,23 @@
 import { test } from '@japa/runner'
 
-/** `GET /health-check`: a sonda de vida do container. Sem sessão, sem banco. */
+/** `GET /health-check`: the container liveness probe. No session, no database. */
 test.group('health-check', () => {
-  test('a sonda responde ok e não conta nada da infraestrutura', async ({ client, assert }) => {
+  test('the probe answers ok and reveals nothing about the infrastructure', async ({
+    client,
+    assert,
+  }) => {
     const response = await client.get('/health-check')
 
     response.assertStatus(200)
 
-    // Igualdade profunda, e não `assertBodyContains`: o que se afirma é que o
-    // corpo é **só** isto. Uso de disco, memória ou contagem de conexões numa
-    // sonda pública seria informação de infraestrutura de graça para quem pedir.
+    // Deep equality, not `assertBodyContains`: what is asserted is that the
+    // body is **only** this. Disk usage, memory or connection counts on a
+    // public probe would be free infrastructure information for anyone who asks.
     assert.deepEqual(response.body(), { status: 'ok' })
     assert.equal(response.header('cache-control'), 'no-store')
   })
 
-  test('a sonda não exige sessão', async ({ client }) => {
+  test('the probe does not require a session', async ({ client }) => {
     const response = await client.get('/health-check').redirects(0)
 
     response.assertStatus(200)

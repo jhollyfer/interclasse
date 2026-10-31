@@ -10,7 +10,7 @@ import type { IdentifierPayload } from '#core/validator'
 type Payload = IdentifierPayload
 type Response = Either<HTTPException, null>
 
-/** Apaga o cartão lançado por engano. */
+/** Deletes the card recorded by mistake. */
 @inject()
 export default class AdministratorCardDeleteUseCase {
   constructor(

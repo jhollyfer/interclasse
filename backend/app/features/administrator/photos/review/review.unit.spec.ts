@@ -22,7 +22,7 @@ async function setup() {
     sender: PHOTO_SENDER.ADVISOR,
     now: new Date(),
   })
-  if (created.isLeft()) throw new Error('arranjo inválido')
+  if (created.isLeft()) throw new Error('invalid arrangement')
   await photos.save(created.value)
   const useCase = await makeWithMemory(AdministratorPhotoReviewUseCase, [[PhotoRepository, photos]])
 
@@ -30,7 +30,7 @@ async function setup() {
 }
 
 test.group('administrator/photos > review (unit)', () => {
-  test('aprova e depois recusa: a decisão se refaz', async ({ assert }) => {
+  test('approves and then rejects: the decision can be redone', async ({ assert }) => {
     const { photo, admin, useCase } = await setup()
 
     const approved = await useCase.execute({
@@ -48,7 +48,7 @@ test.group('administrator/photos > review (unit)', () => {
     assert.deepInclude(rejected.value, { status: PHOTO_STATUS.REJECTED })
   })
 
-  test('foto inexistente é 404 PHOTO_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent photo is 404 PHOTO_NOT_FOUND', async ({ assert }) => {
     const { admin, useCase } = await setup()
 
     const result = await useCase.execute({

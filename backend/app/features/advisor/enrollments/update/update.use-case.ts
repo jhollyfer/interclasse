@@ -21,10 +21,10 @@ type Payload = Merge<AdvisorEnrollmentUpdatePayload, { actor: Actor }>
 type Response = Either<HTTPException, AdvisorEnrollmentShowResponse>
 
 /**
- * Troca a lista de atletas da turma numa modalidade. O conselheiro mexe a
- * qualquer momento, inclusive depois do sorteio; tirar atleta exige o motivo,
- * que vira aviso para a organização. O fluxo é o da base compartilhada com o
- * representante.
+ * Replaces the classroom athlete list in a sport. The advisor can touch it at
+ * any moment, including after the draw; removing an athlete requires the reason,
+ * which becomes a notice for the organization. The flow is the one of the base shared with the
+ * representative.
  */
 @inject()
 export default class AdvisorEnrollmentUpdateUseCase extends EnrollmentReplaceBase {
@@ -40,7 +40,7 @@ export default class AdvisorEnrollmentUpdateUseCase extends EnrollmentReplaceBas
 
   async execute({ classroomId, sportId, studentIds, reason, actor }: Payload): Promise<Response> {
     try {
-      // `404` também para a turma de outro conselheiro: o alcance entra na consulta.
+      // `404` also for another advisor's classroom: the scope goes into the query.
       const classroom = await this.classrooms.findOwned({ id: classroomId, actor })
       if (!classroom)
         return left(
