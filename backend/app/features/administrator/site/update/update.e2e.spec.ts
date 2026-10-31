@@ -11,7 +11,7 @@ import {
 test.group('site > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('grava o "Sobre" e o regulamento, e o site anônimo lê os dois', async ({
+  test('saves the "About" and the regulation, and the anonymous site reads both', async ({
     client,
     assert,
   }) => {
@@ -39,11 +39,11 @@ test.group('site > update', (group) => {
     assert.equal(body(site).firstEditionYear, 2025)
     assert.equal(body(site).regulation.originalName, 'regulamento.pdf')
     assert.isString(body(site).regulation.url)
-    // O site anônimo não vê o caminho no bucket.
+    // The anonymous site does not see the path in the bucket.
     assert.notProperty(body(site).regulation, 'path')
   })
 
-  test('regulamento que não é PDF responde 422', async ({ client, assert }) => {
+  test('regulation that is not a PDF responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const image = await StorageFactory.create()
 
@@ -56,7 +56,7 @@ test.group('site > update', (group) => {
     assert.equal(body(response).code, 'REGULATION_NOT_PDF')
   })
 
-  test('null apaga o campo e ausente não mexe', async ({ client, assert }) => {
+  test('null erases the field and missing does not touch', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     await client
       .put('/administrator/site')
@@ -73,7 +73,7 @@ test.group('site > update', (group) => {
     assert.equal(body(response).edition, 3)
   })
 
-  test('sem conta de administrador é 403', async ({ client }) => {
+  test('without an administrator account is 403', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.put('/administrator/site').cookies(advisor).json({ edition: 1 })
@@ -82,10 +82,10 @@ test.group('site > update', (group) => {
   })
 })
 
-test.group('administrator/site/update > acesso e validação', (group) => {
+test.group('administrator/site/update > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.put('/administrator/site')
 
     response.assertStatus(401)

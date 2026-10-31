@@ -15,8 +15,8 @@ type Payload = AdministratorSiteUpdatePayload
 type Response = Either<HTTPException, AdministratorSiteShowResponse>
 
 /**
- * Grava o que veio no payload. O regulamento é conferido pela entidade (arquivo
- * já enviado e em PDF); o use-case só busca o arquivo e traduz a recusa.
+ * Saves what came in the payload. The regulation is checked by the entity (file
+ * already uploaded and a PDF); the use case only fetches the file and translates the refusal.
  */
 @inject()
 export default class AdministratorSiteUpdateUseCase {

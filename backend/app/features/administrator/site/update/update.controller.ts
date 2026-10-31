@@ -9,10 +9,10 @@ import { AdministratorSiteUpdateValidator } from '#validators/administrator/site
 @inject()
 export default class AdministratorSiteUpdateController {
   static docs = defineDocs({
-    summary: 'Atualizar configuração do site',
+    summary: 'Update site configuration',
     description:
-      'Campo ausente é "não mexer"; `null` apaga. `regulationId` é um arquivo já ' +
-      'enviado por `/storages` e precisa ser PDF.',
+      'A missing field means "leave alone"; `null` erases. `regulationId` is a file already ' +
+      'uploaded through `/storages` and must be a PDF.',
   })
 
   constructor(private readonly useCase: AdministratorSiteUpdateUseCase) {}

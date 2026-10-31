@@ -4,7 +4,7 @@ import { RefusalBase, type RefusalTable } from '#features/_shared.refusal.base'
 import HTTPException from '#exceptions/http.exception'
 import type { SiteSettingError } from '#domain/site-setting/site-setting.errors'
 
-/** Cada recusa da configuração do site como resposta HTTP (`_standards/domain.md` §2). */
+/** Each refusal of the site configuration as an HTTP response (`_standards/domain.md` §2). */
 export class SiteRefusal extends RefusalBase {
   private static readonly TABLE = {
     STORAGE_NOT_FOUND: (_fact, i18n) =>

@@ -7,7 +7,9 @@ import { MemoryRepositories } from '#tests/memory-fixtures'
 import { makeWithMemory } from '#tests/container-fixtures'
 
 test.group('administrator/site > show (unit)', () => {
-  test('na primeira leitura devolve a configuração vazia, sem regulamento', async ({ assert }) => {
+  test('on the first read returns the empty configuration, without a regulation', async ({
+    assert,
+  }) => {
     const useCase = await makeWithMemory(AdministratorSiteShowUseCase, [
       [SiteSettingRepository, MemoryRepositories.siteSettings()],
     ])
