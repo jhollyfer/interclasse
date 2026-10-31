@@ -8,13 +8,13 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * `GET /documentation`: a referência navegável sobre `/openapi.json`. Mesma
- * proteção do documento que ela lê - para quem não opera, a rota não existe.
+ * `GET /documentation`: the browsable reference over `/openapi.json`. Same
+ * protection as the document it reads - for whoever does not operate, the route does not exist.
  */
 test.group('reference > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('a página de referência é servida como HTML para quem opera', async ({ client, assert }) => {
+  test('the reference page is served as HTML to the operator', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/documentation').cookies(session)
 
@@ -23,13 +23,13 @@ test.group('reference > show', (group) => {
     assert.include(response.text(), '/openapi.json')
   })
 
-  test('sem sessão responde 404, e não 401 nem 403', async ({ client }) => {
+  test('without a session responds 404, not 401 nor 403', async ({ client }) => {
     const response = await client.get('/documentation').redirects(0)
 
     response.assertStatus(404)
   })
 
-  test('quem não opera a instalação também recebe 404', async ({ client, assert }) => {
+  test('whoever does not operate the installation also gets 404', async ({ client, assert }) => {
     const session = await authenticateAsAdvisor(client)
     const response = await client.get('/documentation').cookies(session)
 

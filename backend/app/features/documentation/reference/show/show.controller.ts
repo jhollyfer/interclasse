@@ -4,8 +4,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import DocumentationReferenceShowUseCase from './show.use-case.ts'
 
 /**
- * `GET /documentation`: a referência navegável. Fica em `openapi.ignore` e
- * atrás de `middleware.documentation()`, como o documento que ela lê.
+ * `GET /documentation`: the browsable reference. Lives in `openapi.ignore` and
+ * behind `middleware.documentation()`, like the document it reads.
  */
 @inject()
 export default class DocumentationReferenceShowController {

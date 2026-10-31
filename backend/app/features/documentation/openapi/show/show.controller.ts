@@ -4,8 +4,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import DocumentationOpenapiShowUseCase from './show.use-case.ts'
 
 /**
- * `GET /openapi.json`: o documento da API. Fica em `openapi.ignore` - o
- * documento não se documenta - e atrás de `middleware.documentation()`.
+ * `GET /openapi.json`: the API document. Lives in `openapi.ignore` - the
+ * document does not document itself - and behind `middleware.documentation()`.
  */
 @inject()
 export default class DocumentationOpenapiShowController {

@@ -7,7 +7,7 @@ import openapi from '#config/openapi'
 
 type Response = Either<HTTPException, string>
 
-/** A referência navegável (Scalar) sobre `/openapi.json`. Montar a página não faz I/O. */
+/** The browsable reference (Scalar) over `/openapi.json`. Building the page does no I/O. */
 @inject()
 export default class DocumentationReferenceShowUseCase {
   async execute(): Promise<Response> {

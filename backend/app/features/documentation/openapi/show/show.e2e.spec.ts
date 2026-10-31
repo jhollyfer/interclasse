@@ -8,14 +8,14 @@ import {
 } from '#tests/http-fixtures'
 
 /**
- * `GET /openapi.json`. Exige sessão de quem opera a instalação, mas não pode
- * dizer isso: 401 e 403 confirmariam que a rota existe e que há um papel que a
- * alcança. Para quem não pode ver, ela simplesmente não está lá - 404.
+ * `GET /openapi.json`. Requires the session of whoever operates the installation, but must not
+ * say so: 401 and 403 would confirm that the route exists and that a role reaches
+ * it. For whoever cannot see it, it is simply not there - 404.
  */
 test.group('openapi > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('o documento é servido como JSON para quem opera', async ({ client, assert }) => {
+  test('the document is served as JSON to the operator', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/openapi.json').cookies(session)
 
@@ -24,28 +24,28 @@ test.group('openapi > show', (group) => {
     assert.equal(body(response).openapi, '3.1.0')
   })
 
-  test('nenhuma rota de serviço aparece no documento', async ({ client, assert }) => {
+  test('no service route appears in the document', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/openapi.json').cookies(session)
 
     response.assertStatus(200)
 
-    for (const caminho of ['/health-check', '/openapi.json', '/documentation']) {
+    for (const path of ['/health-check', '/openapi.json', '/documentation']) {
       assert.notProperty(
         body(response).paths,
-        caminho,
-        `${caminho} está documentado, e não é operação de API`,
+        path,
+        `${path} is documented, and it is not an API operation`,
       )
     }
   })
 
-  test('sem sessão responde 404, e não 401 nem 403', async ({ client }) => {
+  test('without a session responds 404, not 401 nor 403', async ({ client }) => {
     const response = await client.get('/openapi.json').redirects(0)
 
     response.assertStatus(404)
   })
 
-  test('quem não opera a instalação também recebe 404', async ({ client, assert }) => {
+  test('whoever does not operate the installation also gets 404', async ({ client, assert }) => {
     const session = await authenticateAsAdvisor(client)
     const response = await client.get('/openapi.json').cookies(session)
 
