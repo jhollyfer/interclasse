@@ -113,8 +113,8 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 7.1 | `maiyu-guard` habilitado e `AGENTS.md` da raiz no modelo novo | Alta | Feita | #254 |
-| 7.2 | Migration no *Post-deployment command* do Coolify | Alta | Em andamento | #252; `docs/ENV.md`, `docs/ARCHITECTURE.md` §9.1, Dockerfile, workflows |
-| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | A fazer | #256; `architecture.md` §3.4 |
+| 7.2 | Migration no *Post-deployment command* do Coolify | Alta | Feita | #252; `docs/ENV.md`, `docs/ARCHITECTURE.md` §9.1, Dockerfile, workflows |
+| 7.3 | Casa dos arquivos de apoio (`.editorconfig`, `.gitleaks.toml`, `.prettierignore`, depcruise, `infra/`, `core/`) | Alta | Em andamento | #256; `architecture.md` §3.4 |
 | 7.4 | Campos dos checks em inglês e `reason` nas exceções | Média | A fazer | #258 |
 | 7.5 | OpenAPI lê o `*-refusal.ts`; `errors:` só para o que nasce em outra camada | Média | A fazer | #259 |
 | 7.6 | `.env.example` e `.env.test` em inglês | Baixa | A fazer | #260 |

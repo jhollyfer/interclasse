@@ -113,7 +113,7 @@ roda `truncate()` entre os testes.
 |---|---|---|
 | Desenvolvimento | `backend/.env` copiado de `backend/.env.example`; `docker compose up -d` sobe Postgres (5434) e MinIO (9004 e 9005) | portas deslocadas de propósito |
 | Teste | `backend/.env.test` (versionado) | banco `interclasse_test` e bucket `interclasse-test`, descartáveis |
-| Produção | painel do Coolify, uma aplicação para a API e outra para o site | nunca em arquivo no servidor de build |
+| Produção | painel do Coolify, uma aplicação para a API e outra para o site | nunca em arquivo no servidor de build. A migration roda no *Post-deployment command* da API (`node ace migration:run --force`), com o *Pre-deployment* vazio |
 
 Secrets de CI no repositório: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COOLIFY_TOKEN`.
 

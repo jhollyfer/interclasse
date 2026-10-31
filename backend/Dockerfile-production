@@ -71,7 +71,7 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 # A saída do `node ace build` na raiz de /app e o `node_modules` do deploy ao
-# lado: o mesmo layout da imagem anterior, então o comando de pré-deploy da
+# lado: o mesmo layout da imagem anterior, então o comando de deploy da
 # plataforma (`node ace migration:run --force`) e o CMD não mudam.
 COPY --from=builder --chown=node:node /out/build ./
 COPY --from=builder --chown=node:node /out/node_modules ./node_modules
@@ -90,6 +90,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -fsS http://127.0.0.1:3333/health-check || exit 1
 
 # Sem ENTRYPOINT: migration não roda no start do container. Quem migra é o
-# comando de pré-deploy da plataforma (`node ace migration:run --force`), para
-# que subir uma réplica não seja o mesmo evento que alterar o schema.
+# comando de deploy da plataforma, o Post-deployment command do Coolify
+# (`node ace migration:run --force`), para que subir uma réplica não seja o
+# mesmo evento que alterar o schema.
 CMD ["node", "bin/server.js"]
