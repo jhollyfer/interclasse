@@ -9,10 +9,10 @@ import { AdministratorEnrollmentRemovalPaginateValidator } from '#validators/adm
 @inject()
 export default class AdministratorEnrollmentRemovalPaginateController {
   static docs = defineDocs({
-    summary: 'Listar avisos de remoção de atleta',
+    summary: 'List athlete removal notices',
     description:
-      'Cada atleta que o conselheiro tirou de uma modalidade, com o motivo. ' +
-      '`?pending=true` traz só os que ainda não tiveram ciência.',
+      'Each athlete the advisor removed from a sport, with the reason. ' +
+      '`?pending=true` brings only those not yet acknowledged.',
   })
 
   constructor(private readonly useCase: AdministratorEnrollmentRemovalPaginateUseCase) {}

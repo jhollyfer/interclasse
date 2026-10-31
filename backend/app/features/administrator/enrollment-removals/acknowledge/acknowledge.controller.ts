@@ -9,8 +9,9 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorEnrollmentRemovalAcknowledgeController {
   static docs = defineDocs({
-    summary: 'Dar ciência de remoção de atleta',
-    description: 'Marca o aviso como lido. Repetir não muda a data da primeira ciência.',
+    summary: 'Acknowledge athlete removal',
+    description:
+      'Marks the notice as read. Repeating does not change the date of the first acknowledgement.',
   })
 
   constructor(private readonly useCase: AdministratorEnrollmentRemovalAcknowledgeUseCase) {}

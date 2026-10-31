@@ -18,7 +18,7 @@ async function setup() {
 }
 
 test.group('administrator/enrollment-removals > paginate (unit)', () => {
-  test('lista os pendentes antes dos lidos', async ({ assert }) => {
+  test('lists the pending ones before the read ones', async ({ assert }) => {
     const { removals, useCase } = await setup()
     const read = await seedRemoval(removals, { role: USER_ROLE.ADMINISTRATOR })
     const pending = await seedRemoval(removals, { at: new Date('2026-10-28T12:00:00.000Z') })
@@ -31,7 +31,7 @@ test.group('administrator/enrollment-removals > paginate (unit)', () => {
     )
   })
 
-  test('pending filtra só os pendentes', async ({ assert }) => {
+  test('pending filters only the pending ones', async ({ assert }) => {
     const { removals, useCase } = await setup()
     await seedRemoval(removals, { role: USER_ROLE.ADMINISTRATOR })
     const pending = await seedRemoval(removals)
@@ -44,12 +44,12 @@ test.group('administrator/enrollment-removals > paginate (unit)', () => {
     )
   })
 
-  test('falha do repositório é 500 ADMINISTRATOR_ENROLLMENT_REMOVAL_PAGINATE_ERROR', async ({
+  test('repository failure is 500 ADMINISTRATOR_ENROLLMENT_REMOVAL_PAGINATE_ERROR', async ({
     assert,
   }) => {
     const { removals, useCase } = await setup()
     removals.paginate = async () => {
-      throw new Error('banco fora')
+      throw new Error('database down')
     }
 
     const result = await useCase.execute({})

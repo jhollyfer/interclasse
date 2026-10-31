@@ -15,7 +15,7 @@ import {
 test.group('enrollment-removals > acknowledge', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('dá ciência, e repetir mantém a primeira data', async ({ client, assert }) => {
+  test('acknowledges, and repeating keeps the first date', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
@@ -39,7 +39,7 @@ test.group('enrollment-removals > acknowledge', (group) => {
     assert.equal(body(second).acknowledgedAt, body(first).acknowledgedAt)
   })
 
-  test('aviso inexistente responde 404', async ({ client, assert }) => {
+  test('nonexistent notice responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -51,10 +51,10 @@ test.group('enrollment-removals > acknowledge', (group) => {
   })
 })
 
-test.group('administrator/enrollment-removals/acknowledge > acesso e validação', (group) => {
+test.group('administrator/enrollment-removals/acknowledge > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('401: sem sessão', async ({ client }) => {
+  test('401: without a session', async ({ client }) => {
     const response = await client.patch(
       '/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge',
     )
@@ -62,7 +62,7 @@ test.group('administrator/enrollment-removals/acknowledge > acesso e validação
     response.assertStatus(401)
   })
 
-  test('403: conselheiro não alcança a rota da organização', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -72,7 +72,7 @@ test.group('administrator/enrollment-removals/acknowledge > acesso e validação
     response.assertStatus(403)
   })
 
-  test('422: id que não é uuid', async ({ client }) => {
+  test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client
