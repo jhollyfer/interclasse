@@ -14,7 +14,7 @@ export function useTheme(consumer: string): ThemeContextValue {
   const context = React.use(ThemeContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`ThemeProvider\``)
+    throw new Error(`\`${consumer}\` must be used within \`ThemeProvider\``)
   }
 
   return context

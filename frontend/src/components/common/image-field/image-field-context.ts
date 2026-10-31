@@ -47,7 +47,7 @@ export function useImageFieldContext(consumer: string): ImageFieldContextValue {
   const context = React.use(ImageFieldContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`ImageField\``)
+    throw new Error(`\`${consumer}\` must be used within \`ImageField\``)
   }
 
   return context

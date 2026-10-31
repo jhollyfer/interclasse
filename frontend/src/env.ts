@@ -33,11 +33,11 @@ function publicUrl(
   if (!value) return fallback
 
   if (!URL.canParse(value)) {
-    throw new Error(`${name} não é uma URL: "${value}".`)
+    throw new Error(`${name} is not a URL: "${value}".`)
   }
 
   if (value.endsWith('/')) {
-    throw new Error(`${name} não pode terminar em "/": "${value}".`)
+    throw new Error(`${name} must not end with "/": "${value}".`)
   }
 
   return value

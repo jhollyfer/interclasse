@@ -26,7 +26,7 @@ export function useRichEditorContext(consumer: string): RichEditorContextValue {
   const context = React.use(RichEditorContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`RichEditor\``)
+    throw new Error(`\`${consumer}\` must be used within \`RichEditor\``)
   }
 
   return context

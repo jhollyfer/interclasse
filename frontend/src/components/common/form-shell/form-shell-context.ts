@@ -43,7 +43,7 @@ export function useFormShellContext(consumer: string): FormShellContextValue {
   const context = React.use(FormShellContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`FormShell\``)
+    throw new Error(`\`${consumer}\` must be used within \`FormShell\``)
   }
 
   return context

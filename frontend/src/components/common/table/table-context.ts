@@ -53,7 +53,7 @@ export function useTableContext(consumer: string): TableContextValue {
   const context = React.use(TableContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`Table\``)
+    throw new Error(`\`${consumer}\` must be used within \`Table\``)
   }
 
   return context

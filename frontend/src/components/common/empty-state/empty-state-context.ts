@@ -27,7 +27,7 @@ export function useEmptyStateContext(consumer: string): EmptyStateContextValue {
   const context = React.use(EmptyStateContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`EmptyState\``)
+    throw new Error(`\`${consumer}\` must be used within \`EmptyState\``)
   }
 
   return context

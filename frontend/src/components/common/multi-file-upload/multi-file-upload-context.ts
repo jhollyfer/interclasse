@@ -46,9 +46,7 @@ export function useMultiFileUploadContext(
   const context = React.use(MultiFileUploadContext)
 
   if (!context) {
-    throw new Error(
-      `\`${consumer}\` precisa estar dentro de \`MultiFileUpload\``,
-    )
+    throw new Error(`\`${consumer}\` must be used within \`MultiFileUpload\``)
   }
 
   return context

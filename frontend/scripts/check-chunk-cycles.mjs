@@ -329,20 +329,18 @@ function main() {
   }
 
   if (cycles.length > 0) {
-    console.log(`${root}: ${cycles.length} ciclo(s) de chunk (informativo).\n`)
+    console.log(`${root}: ${cycles.length} chunk cycle(s) (informational).\n`)
     for (const cycle of cycles)
       console.log(`  ${cycle.map(show).join('\n  -> ')}\n`)
   }
 
   if (hazards.length === 0) {
-    console.log(
-      `${root}: ${files.length} chunks, nenhuma leitura antecipada em ciclo.`,
-    )
+    console.log(`${root}: ${files.length} chunks, no early read in a cycle.`)
     process.exit(0)
   }
 
   console.error(
-    `${root}: ${hazards.length} leitura(s) de binding em ciclo, durante a avaliação do módulo.\n`,
+    `${root}: ${hazards.length} binding read(s) in a cycle, during module evaluation.\n`,
   )
 
   for (const hazard of hazards)
@@ -351,9 +349,9 @@ function main() {
     )
 
   console.error(
-    'O chunk que exporta esses nomes ainda não terminou de avaliar quando estas\n' +
-      'linhas rodam, e o binding vale `undefined`. Adie a leitura: `import type` se\n' +
-      'o import só existe pelo tipo, chamada dentro da função se é valor.',
+    'The chunk that exports these names has not finished evaluating when these\n' +
+      'lines run, and the binding is `undefined`. Defer the read: `import type` if\n' +
+      'the import only exists for the type, a call inside the function if it is a value.',
   )
 
   process.exit(1)

@@ -29,13 +29,13 @@ test('accepts the public URL as it came', async () => {
 test('refuses what is not a URL', async () => {
   vi.stubEnv('VITE_API_URL', 'api.example.com')
 
-  await expect(load()).rejects.toThrow('VITE_API_URL não é uma URL')
+  await expect(load()).rejects.toThrow('VITE_API_URL is not a URL')
 })
 
 test('refuses a trailing slash, which would double the path slash', async () => {
   vi.stubEnv('VITE_API_URL', 'https://api.example.com/')
 
-  await expect(load()).rejects.toThrow('não pode terminar em "/"')
+  await expect(load()).rejects.toThrow('must not end with "/"')
 })
 
 test('without VITE_SITE_URL, falls back to the dev frontend', async () => {
@@ -57,5 +57,5 @@ test('accepts the site public address as it came', async () => {
 test('refuses VITE_SITE_URL with a trailing slash', async () => {
   vi.stubEnv('VITE_SITE_URL', 'https://interclass.maiyu.com.br/')
 
-  await expect(load()).rejects.toThrow('VITE_SITE_URL não pode terminar')
+  await expect(load()).rejects.toThrow('VITE_SITE_URL must not end')
 })

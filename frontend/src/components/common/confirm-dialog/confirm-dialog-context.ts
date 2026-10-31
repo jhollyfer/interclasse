@@ -33,7 +33,7 @@ export function useConfirmDialogContext(
   const context = React.use(ConfirmDialogContext)
 
   if (!context) {
-    throw new Error(`\`${consumer}\` precisa estar dentro de \`ConfirmDialog\``)
+    throw new Error(`\`${consumer}\` must be used within \`ConfirmDialog\``)
   }
 
   return context
