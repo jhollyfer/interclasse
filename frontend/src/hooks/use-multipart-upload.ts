@@ -5,6 +5,7 @@ import {
 
 import { request, HTTPError } from '#/integrations/tanstack-query/http'
 import { missingParts, planParts } from '#/lib/chunking'
+import type { PartPlan } from '#/lib/chunking'
 import { isStorageMimetype } from '#/lib/mimetype'
 import { clearResume, readResume, writeResume } from '#/lib/upload-resume'
 import { putPart } from '#/lib/upload-transport'
@@ -134,6 +135,18 @@ async function open(
 }
 
 /**
+ * O pedaço do arquivo que vai num `PUT`. A URL de arquivo inteiro (sem
+ * `uploadId`) assina o `Content-Type`, e o XHR só o manda se o `Blob` tiver
+ * tipo; a parte de multipart não assina tipo, e mandá-lo seria um cabeçalho
+ * fora da assinatura, que o S3 recusa.
+ */
+function sliceFor(file: File, part: PartPlan, uploadId: string | null): Blob {
+  if (uploadId === null) return file.slice(part.start, part.end, file.type)
+
+  return file.slice(part.start, part.end)
+}
+
+/**
  * Envia o que falta e devolve o `ETag` de cada parte, inclusive das que já
  * estavam lá - a confirmação precisa da lista inteira, e não só do que subiu
  * nesta sessão.
@@ -210,7 +223,7 @@ async function send(
       // exatamente o tamanho planejado (`Blob.slice` de `[start, end)`). O
       // navegador manda o cabeçalho sozinho a partir do `Blob`, e uma parte de
       // outro tamanho voltaria `403` do bucket sem dizer por quê.
-      const blob = file.slice(part.start, part.end)
+      const blob = sliceFor(file, part, initial.uploadId)
 
       if (blob.size !== part.end - part.start) {
         throw new Error(m.upload_error_part_size())

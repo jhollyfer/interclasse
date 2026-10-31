@@ -80,6 +80,35 @@ describe('useMultipartUpload', () => {
     expect(sizes.sort((a, b) => b - a)).toEqual([10, 10, 5])
   })
 
+  it('arquivo inteiro sobe com o tipo, que a URL assina; parte de multipart, sem', async () => {
+    request
+      .mockResolvedValueOnce(
+        plan({
+          uploadId: null,
+          parts: [{ partNumber: 1, url: 'https://bucket/part-1' }],
+        }),
+      )
+      .mockResolvedValueOnce({ id: 's1', status: 'UPLOADED' })
+      .mockResolvedValueOnce(plan())
+      .mockResolvedValueOnce({ id: 's1', status: 'UPLOADED' })
+    const { result } = renderHook(() => useMultipartUpload())
+    const signal = new AbortController().signal
+
+    await result.current.upload(pngOf(5), () => undefined, signal)
+    await result.current.upload(pngOf(25), () => undefined, signal)
+
+    const types = putPart.mock.calls.map((call) => {
+      const body: unknown = call[1]
+      if (!(body instanceof Blob)) throw new Error('o corpo não é um Blob')
+
+      return body.type
+    })
+
+    // O XHR manda o `Content-Type` do Blob: sem ele o bucket recusa a URL de
+    // arquivo inteiro, e com ele recusa a parte, que não assina tipo.
+    expect(types).toEqual(['image/png', '', '', ''])
+  })
+
   it('confirma com os ETags das três partes em ordem', async () => {
     request
       .mockResolvedValueOnce(plan())
