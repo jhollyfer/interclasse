@@ -19,10 +19,10 @@ import { deLocalizeUrl, getLocale, localizeUrl } from './paraglide/runtime'
 import { routeTree } from './routeTree.gen'
 
 /**
- * As mensagens de validação do Zod saem no idioma da tela. Só o cliente valida
- * formulário; no servidor a configuração global do Zod seria dividida entre
- * requisições de idiomas diferentes. `shared.` e não o nome solto: a função não
- * é um hook, e o prefixo `use` do contrato dispararia a regra.
+ * Zod's validation messages come out in the screen's language. Only the client
+ * validates forms; on the server the global Zod configuration would be shared
+ * between requests in different languages. `shared.` and not the bare name: the
+ * function is not a hook, and the contract's `use` prefix would trigger the rule.
  * _doc-lib/tanstack-start.md#guide/environment-functions.
  */
 const applyValidatorLocale = createIsomorphicFn()
@@ -37,8 +37,8 @@ export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
     context,
-    // A árvore de rotas é uma só: `/es/matches` entra como `/matches` e sai com o
-    // prefixo do idioma atual (_doc-lib/tanstack-router.md#guide/url-rewrites).
+    // The route tree is a single one: `/es/matches` comes in as `/matches` and goes out with the
+    // current language's prefix (_doc-lib/tanstack-router.md#guide/url-rewrites).
     rewrite: {
       input: ({ url }) => deLocalizeUrl(url),
       output: ({ url }) => localizeUrl(url),
@@ -49,27 +49,27 @@ export function getRouter() {
     defaultNotFoundComponent: () => <NotFoundPage />,
 
     /*
-     * A saída de tudo que falha e não foi tratado.
+     * The exit for everything that fails and was not handled.
      *
-     * Rota sem `errorComponent` e router sem padrão caem na tela embutida do
-     * TanStack, que em produção é um bloco de texto sem estilo. Ter 404
-     * desenhado e nenhuma tela de erro é o desequilíbrio de sempre: a falha de
-     * rede num `loader` é bem mais frequente que uma URL digitada errada.
+     * A route without `errorComponent` and a router without a default fall to
+     * TanStack's built-in screen, which in production is an unstyled block of
+     * text. Having a designed 404 and no error screen is the usual imbalance: a
+     * network failure in a `loader` is far more frequent than a mistyped URL.
      *
-     * `reset` antes de "voltar ao início": quase todo erro daqui é o `loader`
-     * que não respondeu, e refazer a tentativa resolve sem perder o lugar. O
-     * caminho para casa fica como segunda saída, não como única.
+     * `reset` before "back to the start": almost every error here is a
+     * `loader` that did not answer, and retrying fixes it without losing one's
+     * place. The path home stays as the second exit, not the only one.
      */
     defaultErrorComponent: ({ error, reset }) => {
       /*
-       * O 4xx do `loader` traz mensagem escrita para quem lê a tela - "Esta
-       * notícia foi arquivada", "Evento não encontrado" -, e mostrá-la é o que
-       * separa "a falha é nossa" de "a situação é esta". Sem isto, uma notícia
-       * arquivada pelo editor recebia "Algo quebrou aqui, a falha é nossa" e
-       * quem lia ficava sem saber o que fazer.
+       * A `loader` 4xx carries a message written for whoever reads the screen -
+       * "Esta notícia foi arquivada", "Evento não encontrado" -, and showing it is
+       * what separates "the failure is ours" from "this is the situation". Without it,
+       * a news item archived by the editor received "Algo quebrou aqui, a falha é nossa"
+       * and the reader was left not knowing what to do.
        *
-       * Só 4xx: a mensagem de um 5xx é do servidor para o log, e repeti-la na
-       * tela não ajuda ninguém e pode vazar detalhe de implementação.
+       * 4xx only: a 5xx message is from the server to the log, and repeating it on
+       * screen helps nobody and can leak implementation detail.
        */
       let handled: HTTPError | null = null
       if (

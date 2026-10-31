@@ -1,29 +1,29 @@
 /**
- * As variáveis de build do frontend, lidas uma vez e checadas aqui.
+ * The frontend's build variables, read once and checked here.
  *
- * Só `VITE_*`: o Vite as substitui no bundle em tempo de build, então tudo que
- * passa por este arquivo é público. A checagem é síncrona e à mão, sem schema
- * que resolva promessa - o módulo roda antes de o router montar, e um valor
- * torto tem de parar o boot com a mensagem certa em vez de virar requisição
- * para um endereço quebrado.
+ * `VITE_*` only: Vite substitutes them into the bundle at build time, so
+ * everything that goes through this file is public. The check is synchronous
+ * and by hand, with no schema that resolves a promise - the module runs before
+ * the router mounts, and a bad value must stop the boot with the right message
+ * instead of becoming a request to a broken address.
  *
- * O que é de runtime do servidor (`SERVER_API_URL`) não entra: é lido por
- * requisição dentro do `.server()` de `integrations/tanstack-query/http.ts`.
+ * Server runtime values (`SERVER_API_URL`) do not belong here: they are read per
+ * request inside the `.server()` of `integrations/tanstack-query/http.ts`.
  */
 
-/** Sem `VITE_API_URL`, o `localhost:3333` que o `pnpm dev` do backend sobe. */
+/** Without `VITE_API_URL`, the `localhost:3333` that the backend's `pnpm dev` starts. */
 const DEV_API_URL = 'http://localhost:3333'
 
-/** Sem `VITE_SITE_URL`, o `localhost:3001` que o `pnpm dev` do frontend sobe. */
+/** Without `VITE_SITE_URL`, the `localhost:3001` that the frontend's `pnpm dev` starts. */
 const DEV_SITE_URL = 'http://localhost:3001'
 
 /**
- * Uma URL pública de build: ausente vale o fallback de desenvolvimento, e
- * valor torto para o boot com a mensagem certa.
+ * A public build URL: when absent it takes the development fallback, and a
+ * bad value stops the boot with the right message.
  *
- * Sem barra no fim: `request()` faz `BASE_URL.concat(path)` com o caminho
- * começando em `/` (uma barra viraria `//storefront`), e o `canonical` e o
- * `hreflang` somam o caminho ao endereço do site.
+ * No trailing slash: `request()` does `BASE_URL.concat(path)` with the path
+ * starting with `/` (a slash would become `//storefront`), and `canonical`
+ * and `hreflang` append the path to the site address.
  */
 function publicUrl(
   name: string,
@@ -50,8 +50,8 @@ export const env = {
     DEV_API_URL,
   ),
   /**
-   * O endereço público do site: a base do `canonical`, dos `hreflang` e do
-   * sitemap, que precisam de URL absoluta que o SSR não tem como descobrir.
+   * The site's public address: the base for `canonical`, `hreflang` and the
+   * sitemap, which need an absolute URL that SSR has no way to discover.
    */
   VITE_SITE_URL: publicUrl(
     'VITE_SITE_URL',

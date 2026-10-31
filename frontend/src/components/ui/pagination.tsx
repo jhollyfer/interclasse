@@ -61,7 +61,7 @@ function PaginationLink({
       size={size}
       className={cn(className)}
       render={
-        // eslint-disable-next-line jsx-a11y/anchor-has-content -- o Button injeta o conteúdo pelo `render`
+        // eslint-disable-next-line jsx-a11y/anchor-has-content -- Button injects the content through `render`
         <a
           aria-current={current}
           data-slot="pagination-link"
@@ -80,7 +80,7 @@ function PaginationPrevious({
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
   return (
     <PaginationLink
-      // casa: rótulo traduzido (_standards/i18n.md)
+      // house: translated label (_standards/i18n.md)
       aria-label={m.common_ui_previous_page()}
       size="default"
       className={cn('pl-2!', className)}
@@ -99,7 +99,7 @@ function PaginationNext({
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
   return (
     <PaginationLink
-      // casa: rótulo traduzido (_standards/i18n.md)
+      // house: translated label (_standards/i18n.md)
       aria-label={m.common_ui_next_page()}
       size="default"
       className={cn('pr-2!', className)}

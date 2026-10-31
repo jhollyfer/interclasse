@@ -17,10 +17,10 @@ import { applyMutationError } from '#/lib/form-errors'
 import { useMutationForm } from './use-mutation-form'
 
 /**
- * A fiação do formulário que não é tela (diálogo de placar, sorteio, login):
- * invalidar, avisar e só então chamar o `onSuccess` da tela. O `typecheck` não vê
- * a ordem trocada nem o aviso esquecido (`frontend.md` §11.1). A tela de
- * criar/editar, que ainda navega, tem o teste dela em `use-resource-form.test.ts`.
+ * The wiring of the form that is not a screen (score dialog, draw, login):
+ * invalidate, notify and only then call the screen's `onSuccess`. `typecheck` does
+ * not see the swapped order or the forgotten notice (`frontend.md` §11.1). The
+ * create/edit screen, which still navigates, has its test in `use-resource-form.test.ts`.
  */
 
 const invalidateQueries = vi.fn()
@@ -29,14 +29,14 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('#/lib/form-errors', () => ({ applyMutationError: vi.fn() }))
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate: vi.fn() }),
-  // O bloqueio de navegação não é o assunto: precisa de router montado.
+  // Navigation blocking is not the subject: it needs a mounted router.
   useBlocker: vi.fn(),
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),
 }))
 vi.mock('@hookform/resolvers/zod', () => ({
-  // O resolver não é o assunto: aceita o que vier e devolve sem erro.
+  // The resolver is not the subject: it accepts whatever comes and returns no error.
   zodResolver: () => (values: unknown) => ({ values, errors: {} }),
 }))
 
@@ -45,7 +45,7 @@ type SavedRecord = { id: string; name: string }
 
 const NameValidator = z.object({ name: z.string() })
 
-/** O quarto argumento dos callbacks; o hook não o lê. */
+/** The callbacks' fourth argument; the hook does not read it. */
 const CONTEXT = fromPartial<MutationFunctionContext>({})
 
 const SAVED: SavedRecord = { id: '7', name: 'Ana' }

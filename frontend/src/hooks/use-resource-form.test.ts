@@ -17,16 +17,16 @@ import { applyMutationError } from '#/lib/form-errors'
 import { useResourceForm } from './use-resource-form'
 
 /**
- * O que este teste cobra é a **fiação**, que é tudo o que o hook faz.
+ * What this test checks is the **wiring**, which is everything the hook does.
  *
- * Os formulários de criar e editar dos sete recursos do painel escreveriam essas
- * ligações à mão, e cada uma tem um jeito silencioso de quebrar: o
- * `invalidateQueries` esquecido deixa a listagem com o dado velho, o `navigate`
- * esquecido deixa a pessoa parada num formulário já salvo, o `retry` oferecido
- * num cadastro que insere direto duplica o registro, e o `payload` sem o id
- * manda um `PUT` que a API recusa. Nenhuma delas aparece no `typecheck`.
+ * The create and edit forms of the seven dashboard resources would write these
+ * connections by hand, and each has a silent way to break: a forgotten
+ * `invalidateQueries` leaves the listing with stale data, a forgotten `navigate`
+ * leaves the person stuck on an already saved form, a `retry` offered on a
+ * create that inserts directly duplicates the record, and a `payload` without
+ * the id sends a `PUT` the API refuses. None of them shows up in `typecheck`.
  *
- * É o único teste do repositório que precisa de DOM, por causa do `renderHook`.
+ * It is the only test in the repository that needs a DOM, because of `renderHook`.
  */
 
 const navigate = vi.fn()
@@ -36,14 +36,14 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 vi.mock('#/lib/form-errors', () => ({ applyMutationError: vi.fn() }))
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate }),
-  // O bloqueio de navegação não é o assunto: precisa de router montado.
+  // Navigation blocking is not the subject: it needs a mounted router.
   useBlocker: vi.fn(),
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries }),
 }))
 vi.mock('@hookform/resolvers/zod', () => ({
-  // O resolver não é o assunto: aceita o que vier e devolve sem erro.
+  // The resolver is not the subject: it accepts whatever comes and returns no error.
   zodResolver: () => (values: unknown) => ({ values, errors: {} }),
 }))
 
@@ -55,10 +55,10 @@ const FIELDS = ['name'] as const
 
 const NameValidator = z.object({ name: z.string() })
 
-/** O quarto argumento dos callbacks; o hook não o lê. */
+/** The callbacks' fourth argument; the hook does not read it. */
 const CONTEXT = fromPartial<MutationFunctionContext>({})
 
-/** A mutation do recurso, reduzida ao que o hook usa dela. */
+/** The resource's mutation, reduced to what the hook uses of it. */
 function mutationStub() {
   const mutate = vi.fn()
   type Options = Omit<

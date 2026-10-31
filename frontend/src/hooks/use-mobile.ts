@@ -2,7 +2,7 @@ import * as React from 'react'
 
 const MOBILE_BREAKPOINT = 768
 
-/** O `lg` do Tailwind: abaixo dele a barra lateral começa recolhida. */
+/** Tailwind's `lg`: below it the sidebar starts collapsed. */
 export const TABLET_BREAKPOINT = 1024
 
 function subscribeResize(onChange: () => void): () => void {
@@ -11,9 +11,9 @@ function subscribeResize(onChange: () => void): () => void {
 }
 
 /**
- * Se a janela é mais estreita que `breakpoint` (px). No servidor e no primeiro
- * render da hidratação responde `false` (desktop), o default que o
- * `useIsMobile` sempre teve.
+ * Whether the window is narrower than `breakpoint` (px). On the server and on
+ * the hydration's first render it answers `false` (desktop), the default
+ * `useIsMobile` has always had.
  */
 export function useIsBelow(breakpoint: number): boolean {
   return React.useSyncExternalStore(

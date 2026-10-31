@@ -25,22 +25,22 @@ type UseResourceFormOptions<
     | 'onSuccess'
   >,
   Readonly<{
-    /** O id do `<form>`, que liga o `Salvar` do cabeçalho ao formulário que rola. */
+    /** The `<form>` id, which links the header's `Salvar` to the scrolling form. */
     formId: string
-    /** A chave do próprio recurso, invalidada no sucesso. */
+    /** The resource's own key, invalidated on success. */
     invalidate: QueryKey
     /**
-     * Outras chaves que o registro alimenta: o nome de uma turma aparece no
-     * placar, então salvar turma também invalida jogos e o site.
+     * Other keys the record feeds: a classroom's name shows up in the
+     * scoreboard, so saving a classroom also invalidates matches and the site.
      */
     alsoInvalidate?: ReadonlyArray<QueryKey>
-    /** Para onde volta depois de salvar, e para onde apontam a seta e o `Descartar`. */
+    /** Where it goes back to after saving, and where the arrow and `Descartar` point. */
     backTo: LinkProps['to']
     backParams?: LinkProps['params']
     /**
-     * O que fazer depois de salvar, no lugar de voltar para `backTo`. É o caso
-     * do perfil: trocar e-mail ou senha derruba a sessão, e o destino passa a
-     * ser o login.
+     * What to do after saving, instead of going back to `backTo`. This is the
+     * profile case: changing e-mail or password drops the session, and the
+     * destination becomes the login.
      */
     onSuccess?: UseMutationFormOptions<TValues, TRecord, TPayload>['onSuccess']
   }>
@@ -53,7 +53,7 @@ type UseResourceFormReturn<
 > = Merge<
   Omit<UseMutationFormReturn<TValues, TRecord, TPayload>, 'shell'>,
   Readonly<{
-    /** As quatro props do `FormShell`, prontas para espalhar. */
+    /** The `FormShell`'s four props, ready to spread. */
     shell: {
       readonly formId: string
       readonly backTo: LinkProps['to']
@@ -64,18 +64,18 @@ type UseResourceFormReturn<
 >
 
 /**
- * A fiação de um formulário de criar ou editar do painel: `useMutationForm`
- * mais a volta para `backTo` e as props do `FormShell`.
+ * The wiring of a dashboard create or edit form: `useMutationForm` plus the
+ * return to `backTo` and the `FormShell` props.
  *
- * Ele não desenha nada: o casco visual continua sendo `common/form-shell/`, e
- * os campos continuam no `form-fields.tsx` de cada pasta.
+ * It draws nothing: the visual shell remains `common/form-shell/`, and the
+ * fields remain in each folder's `form-fields.tsx`.
  *
- * **A edição valida com o validator de criação, e não com o de atualização.** O
- * de atualização é todo `.optional()` - correto para a API, porque o `PUT` é
- * parcial, e péssimo como regra de tela: o usuário apagaria o nome, o
- * formulário aprovaria, a API leria o campo vazio como "não mexer" e o nome
- * ficaria o antigo sem aviso nenhum. O payload continua válido para o `PUT`
- * justamente porque lá tudo é opcional.
+ * **Editing validates with the create validator, not the update one.** The
+ * update one is all `.optional()` - right for the API, because `PUT` is
+ * partial, and terrible as a screen rule: the user would erase the name, the
+ * form would approve it, the API would read the empty field as "leave alone"
+ * and the name would stay the old one with no warning at all. The payload
+ * stays valid for `PUT` precisely because everything there is optional.
  */
 export function useResourceForm<
   TValues extends FieldValues,

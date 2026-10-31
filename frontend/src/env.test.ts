@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
-/** O módulo lê o ambiente no topo: cada caso o carrega de novo. */
+/** The module reads the environment at the top: each case loads it again. */
 async function load() {
   vi.resetModules()
   return await import('./env')

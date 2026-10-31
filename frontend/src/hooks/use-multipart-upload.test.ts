@@ -76,7 +76,7 @@ describe('useMultipartUpload', () => {
       return body.size
     })
 
-    // Duas partes cheias e a sobra: é o Content-Length que o backend assina.
+    // Two full parts and the remainder: this is the Content-Length the backend signs.
     expect(sizes.sort((a, b) => b - a)).toEqual([10, 10, 5])
   })
 
@@ -104,8 +104,8 @@ describe('useMultipartUpload', () => {
       return body.type
     })
 
-    // O XHR manda o `Content-Type` do Blob: sem ele o bucket recusa a URL de
-    // arquivo inteiro, e com ele recusa a parte, que não assina tipo.
+    // XHR sends the Blob's `Content-Type`: without it the bucket refuses the
+    // whole-file URL, and with it the bucket refuses the part, which signs no type.
     expect(types).toEqual(['image/png', '', '', ''])
   })
 

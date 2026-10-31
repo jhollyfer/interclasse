@@ -40,11 +40,11 @@ const buttonVariants = cva(
   },
 )
 
-// `useRender` em vez do `Button` do Base UI: aquele primitivo garante semântica
-// de botão, e por isso avisa toda vez que o `render` entrega um `<a>`. Como a
-// maior parte dos usos aqui é justamente link com cara de botão, o caminho que
-// a doc do próprio Base UI recomenda é estilizar o `<a>` direto - que é o que
-// sobra ao trocar o primitivo pelo hook.
+// `useRender` instead of Base UI's `Button`: that primitive guarantees button
+// semantics, and so it warns every time `render` hands it an `<a>`. Since most
+// uses here are precisely links styled as buttons, the path Base UI's own docs
+// recommend is to style the `<a>` directly - which is what is left once the
+// primitive is swapped for the hook.
 function Button({
   className,
   variant = 'default',
@@ -53,7 +53,7 @@ function Button({
   ...props
 }: useRender.ComponentProps<'button'> & VariantProps<typeof buttonVariants>) {
   const defaults: { type?: 'button' } = {}
-  // casa: sem `render`, o elemento nativo precisa de `type="button"`
+  // house: without `render`, the native element needs `type="button"`
   if (!render) defaults.type = 'button'
 
   return useRender({
@@ -62,9 +62,9 @@ function Button({
     state: { slot: 'button' },
     props: mergeProps<'button'>(
       {
-        // O primitivo forçava `type="button"` no elemento nativo. Sem este
-        // default, botão sem `type` dentro de um `<form>` passaria a submeter.
-        // Com `render`, quem decide é o elemento de destino.
+        // The primitive forced `type="button"` on the native element. Without
+        // this default, a button without `type` inside a `<form>` would submit.
+        // With `render`, the target element decides.
         ...defaults,
         className: cn(buttonVariants({ variant, size, className })),
       },

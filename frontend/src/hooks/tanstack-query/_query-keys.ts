@@ -1,15 +1,15 @@
 import type { ListSearch, StorefrontSearch } from '#/lib/list-search'
 
 /**
- * As chaves de cache, num lugar só, com uma seção por módulo da API
- * (`queryKeys.<módulo>.<recurso>`), como os validators e as rotas do backend.
+ * The cache keys, in one place, with one section per API module
+ * (`queryKeys.<module>.<resource>`), like the backend's validators and routes.
  *
- * `list` é a tabela (paginação clássica, filtro na URL) e `detail` é um
- * registro só. Todo recurso começa pelo prefixo `all`, e invalidar por ele
- * cobre lista e detalhe de uma vez; o `all` do módulo cobre o módulo inteiro.
+ * `list` is the table (classic pagination, filter in the URL) and `detail` is a
+ * single record. Every resource starts with the `all` prefix, and invalidating
+ * by it covers list and detail at once; the module's `all` covers the whole module.
  *
- * Módulo sem leitura em cache (`authentication`, `storages`) não tem seção:
- * chave que ninguém lê nem invalida é só nome a mais.
+ * A module with no cached read (`authentication`, `storages`) has no section:
+ * a key nobody reads or invalidates is just an extra name.
  */
 export const queryKeys = {
   account: {
@@ -20,15 +20,15 @@ export const queryKeys = {
 
   administrator: {
     all: ['administrator'] as const,
-    /** A configuração do site: uma só, sem parâmetro. */
+    /** The site configuration: a single one, no parameter. */
     site: ['administrator', 'site'] as const,
-    /** O relatório: um só, sem parâmetro. */
+    /** The report: a single one, no parameter. */
     reports: ['administrator', 'reports'] as const,
     users: {
       all: ['administrator', 'users'] as const,
       list: (params: ListSearch) =>
         ['administrator', 'users', 'list', params] as const,
-      /** A busca do combobox: páginas de 20, filtro no servidor. */
+      /** The combobox search: pages of 20, filtered on the server. */
       infinite: (params: ListSearch) =>
         ['administrator', 'users', 'infinite', params] as const,
       detail: (id: string) => ['administrator', 'users', 'detail', id] as const,
@@ -44,7 +44,7 @@ export const queryKeys = {
       all: ['administrator', 'sports'] as const,
       list: (params: ListSearch) =>
         ['administrator', 'sports', 'list', params] as const,
-      /** A busca do combobox: páginas de 20, filtro no servidor. */
+      /** The combobox search: pages of 20, filtered on the server. */
       infinite: (params: ListSearch) =>
         ['administrator', 'sports', 'infinite', params] as const,
       detail: (id: string) =>
@@ -123,7 +123,7 @@ export const queryKeys = {
     all: ['representative'] as const,
     enrollments: {
       all: ['representative', 'enrollments'] as const,
-      /** A turma sai da sessão: não há parâmetro. */
+      /** The classroom comes from the session: there is no parameter. */
       board: ['representative', 'enrollments', 'board'] as const,
     },
   },
@@ -159,8 +159,8 @@ export const queryKeys = {
 }
 
 /**
- * Chave e partida invalidam juntas: placar muda a classificação, e sorteio
- * cria partidas.
+ * Bracket and match invalidate together: a score changes the standings, and a
+ * draw creates matches.
  */
 export const GAME_KEYS = [
   queryKeys.administrator.brackets.all,
@@ -170,12 +170,12 @@ export const GAME_KEYS = [
 ] as const
 
 /**
- * O que mais muda quando um recurso muda, além dele mesmo.
+ * What else changes when a resource changes, besides itself.
  *
- * Num lugar só porque a dependência é do domínio, e não da tela: turma
- * renomeada muda o placar e o site; modalidade mexe nas inscrições; sorteio
- * trava inscrições e cria jogos. Espalhada por cada formulário, uma tela
- * esqueceria uma chave e mostraria dado velho.
+ * In one place because the dependency belongs to the domain, not to the screen:
+ * a renamed classroom changes the scoreboard and the site; a sport touches
+ * enrollments; a draw locks enrollments and creates matches. Scattered across
+ * each form, a screen would forget a key and show stale data.
  */
 export const DEPENDENTS = {
   classrooms: [
@@ -192,7 +192,7 @@ export const DEPENDENTS = {
   ],
   announcements: [queryKeys.storefront.all],
   site: [queryKeys.storefront.all],
-  /** Foto enviada, aprovada ou apagada muda as três listas e o carrossel. */
+  /** A photo that is uploaded, approved or deleted changes the three lists and the carousel. */
   photos: [
     queryKeys.administrator.photos.all,
     queryKeys.advisor.photos.all,

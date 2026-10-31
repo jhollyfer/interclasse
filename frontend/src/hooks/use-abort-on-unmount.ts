@@ -1,13 +1,13 @@
 import * as React from 'react'
 
 /**
- * Um `AbortSignal` novo por chamada, todos abortados quando o componente sai
- * de cena.
+ * A new `AbortSignal` per call, all aborted when the component leaves the
+ * stage.
  *
- * Um por envio porque um controller abortado não volta a valer: reaproveitá-lo
- * faria o envio seguinte nascer cancelado. Sair da tela no meio de um upload
- * deixava as partes subindo até o fim, gastando banda por um arquivo que já não
- * interessava a ninguém.
+ * One per upload because an aborted controller does not become valid again:
+ * reusing it would make the next upload start cancelled. Leaving the screen
+ * mid-upload used to leave the parts uploading to the end, spending bandwidth
+ * on a file nobody cared about any more.
  */
 export function useAbortOnUnmount(): () => AbortSignal {
   const controllers = React.useRef(new Set<AbortController>())

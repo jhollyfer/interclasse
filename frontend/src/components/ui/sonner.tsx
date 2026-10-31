@@ -14,7 +14,7 @@ import { useTheme } from '#/components/common/theme-provider'
 import type { CssVars } from '#/lib/css-vars'
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // casa: tema do cookie da casa no lugar do `next-themes`
+  // house: the house theme cookie in place of `next-themes`
   const { theme } = useTheme('Toaster')
   const style: CssVars = {
     '--normal-bg': 'var(--popover)',

@@ -3,9 +3,9 @@ import { useBlocker } from '@tanstack/react-router'
 import { m } from '#/paraglide/messages'
 
 /**
- * Pergunta antes de sair de um formulário com alteração não salva (`frontend.md`
- * §4): navegação do router passa pelo `confirm`, e fechar a aba ou recarregar
- * cai no `beforeunload` do navegador.
+ * Asks before leaving a form with unsaved changes (`frontend.md`
+ * §4): router navigation goes through `confirm`, and closing the tab or reloading
+ * falls to the browser's `beforeunload`.
  * _doc-lib/tanstack-router.md#guide/navigation-blocking.
  */
 export function useUnsavedChangesBlocker(isDirty: boolean): void {
