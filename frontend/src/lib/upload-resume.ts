@@ -8,15 +8,15 @@ import {
 } from './local-store'
 
 /**
- * O que o upload precisa lembrar para sobreviver a um reload.
+ * What the upload needs to remember to survive a reload.
  *
- * Sem isto, a retomada só cobre a queda de rede: o `storageId` fica numa
- * variável de componente, e recarregar a página o perde. O upload continuaria
- * existindo no servidor, aberto e invisível, e o usuário recomeçaria do zero um
- * arquivo que já está 90% no bucket.
+ * Without this, resuming only covers a network drop: the `storageId` lives in
+ * a component variable, and reloading the page loses it. The upload would keep
+ * existing on the server, open and invisible, and the user would restart from zero a
+ * file that is already 90% in the bucket.
  *
- * `localStorage` e não a query cache do TanStack: o que se quer é justamente o
- * que atravessa o recarregamento, e a cache não atravessa.
+ * `localStorage` and not TanStack's query cache: what is wanted is precisely
+ * what crosses the reload, and the cache does not.
  */
 
 export type ResumeEntry = Omit<UploadResume, 'savedAt'>
@@ -24,27 +24,27 @@ export type ResumeEntry = Omit<UploadResume, 'savedAt'>
 const THEME_PREFIX = 'upload:'
 
 /**
- * Quanto tempo uma retomada continua fazendo sentido, em ms.
+ * How long a resume keeps making sense, in ms.
  *
- * Vinte e quatro horas porque é a janela do `node ace storages:prune`: passado
- * isso o servidor já apagou o upload abandonado, e a entrada aponta para um
- * `storageId` que não existe mais. Sem o prazo ela ficava para sempre - quem
- * fecha a aba no meio de um envio nunca volta para limpá-la, e a única coisa
- * que a removia era o `404` de uma retomada que o usuário precisava tentar.
+ * Twenty-four hours because it is the window of `node ace storages:prune`: after
+ * that the server has already deleted the abandoned upload, and the entry points to a
+ * `storageId` that no longer exists. Without the deadline it stayed forever - whoever
+ * closes the tab mid-upload never comes back to clean it, and the only thing
+ * that removed it was the `404` of a resume the user had to attempt.
  */
 const TTL = 24 * 60 * 60 * 1000
 
 /**
- * A identidade de um arquivo local, para reencontrar o upload dele.
+ * A local file's identity, to find its upload again.
  *
- * Nome, tamanho e data de modificação - o que a File API dá sem ler o conteúdo.
- * Não é um hash: calcular um hash de um arquivo grande custa tanto quanto
- * enviá-lo, e o que se quer aqui é reconhecer "é o mesmo arquivo que eu estava
- * mandando há um minuto", não provar identidade contra o mundo.
+ * Name, size and modification date - what the File API gives without reading the content.
+ * It is not a hash: computing a hash of a large file costs as much as
+ * sending it, and what is wanted here is to recognize "it is the same file I was
+ * sending a minute ago", not to prove identity against the world.
  *
- * O risco é reconhecer como igual um arquivo trocado que coincida nos três
- * campos. A confirmação pega o caso: o tamanho declarado no servidor não vai
- * bater com o que subiu, e a resposta é `422`.
+ * The risk is recognizing as equal a swapped file that matches on all three
+ * fields. The confirmation catches the case: the size declared on the server will not
+ * match what went up, and the answer is `422`.
  */
 export function resumeTheme(file: File): string {
   return `${THEME_PREFIX}${file.name}:${file.size}:${file.lastModified}`
@@ -65,8 +65,8 @@ export function readResume(file: File): ResumeEntry | null {
     return null
   }
 
-  // Sem o `savedAt`: ele é contabilidade deste módulo, não parte do que o
-  // upload precisa saber para retomar.
+  // Without `savedAt`: it is this module's bookkeeping, not part of what the
+  // upload needs to know to resume.
   return {
     storageId: entry.storageId,
     uploadId: entry.uploadId,
@@ -84,13 +84,13 @@ export function clearResume(file: File): void {
 }
 
 /**
- * Apaga as retomadas vencidas de **todos** os arquivos, e não só a do que está
- * sendo enviado agora.
+ * Deletes the expired resumes of **all** files, and not only the one of the file
+ * being sent now.
  *
- * `readResume` só alcança a entrada de um arquivo que o usuário tentou de novo,
- * e a maioria não é tentada de novo - é justamente por isso que elas se
- * acumulam. A varredura vai junto da escrita porque é o único momento em que
- * este módulo é chamado sabendo que vai mexer no disco de qualquer jeito.
+ * `readResume` only reaches the entry of a file the user tried again,
+ * and most are not tried again - that is exactly why they
+ * pile up. The sweep goes together with the write because it is the only moment when
+ * this module is called knowing it is going to touch the disk anyway.
  */
 function sweep(): void {
   for (const theme of listLocalThemes(THEME_PREFIX)) {
@@ -100,7 +100,7 @@ function sweep(): void {
       fallback: null,
     })
 
-    // Ilegível conta como vencida: não há como retomar a partir dela.
+    // Unreadable counts as expired: there is no way to resume from it.
     if (!entry || expired(entry)) removeLocal(theme)
   }
 }

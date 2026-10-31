@@ -5,12 +5,12 @@ import es from '../../messages/es.json'
 import ptBR from '../../messages/pt-BR.json'
 
 /**
- * O que é da casa nos arquivos de mensagem (`_standards/i18n.md` §4). O resto
- * (tradução faltando, variável desconhecida, plural) é do `inlang check`.
+ * What belongs to the house in the message files (`_standards/i18n.md` §4). The rest
+ * (missing translation, unknown variable, plural) belongs to `inlang check`.
  */
 const FILES = { 'pt-BR': ptBR, es, en }
 
-/** Os textos de uma mensagem, inclusive os das variantes de plural. */
+/** A message's texts, including those of the plural variants. */
 function texts(value: unknown): Array<string> {
   if (typeof value === 'string') return [value]
   if (Array.isArray(value)) return value.flatMap(texts)

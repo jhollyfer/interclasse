@@ -42,7 +42,7 @@ export const studentsQueryOptions = (params: StudentListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** A matriz aluno x modalidade de uma turma do conselheiro. */
+/** The student x sport matrix of an advisor's classroom. */
 export const advisorCardsQueryOptions = (
   params: Merge<ListSearch, { classroomId: string }>,
 ) =>
@@ -70,7 +70,7 @@ export const advisorEnrollmentsQueryOptions = (classroomId: string) =>
       ),
   })
 
-/** As fotos que o conselheiro enviou, com a decisão de cada uma. */
+/** The photos the advisor uploaded, with each one's decision. */
 export const advisorPhotosQueryOptions = (params: ListSearch) =>
   queryOptions({
     queryKey: queryKeys.advisor.photos.list(params),

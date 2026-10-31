@@ -9,9 +9,9 @@ import {
 } from './upload-resume'
 
 /**
- * O `localStorage` não existe no ambiente de teste (roda em node), que é o
- * mesmo caso do SSR - e é justamente o caso que o módulo tem de sobreviver.
- * Cada teste monta o seu.
+ * `localStorage` does not exist in the test environment (it runs in node), which is the
+ * same case as SSR - and it is precisely the case the module has to survive.
+ * Each test builds its own.
  */
 function withStorage() {
   const data = new Map<string, string>()
@@ -113,9 +113,9 @@ describe('readResume', () => {
 })
 
 /**
- * A entrada tem prazo porque o servidor também tem: passadas 24h o
- * `storages:prune` já apagou o upload abandonado, e a retomada aponta para um
- * `storageId` que não existe mais.
+ * The entry has a deadline because the server does too: after 24h
+ * `storages:prune` has already deleted the abandoned upload, and resuming points to a
+ * `storageId` that no longer exists.
  */
 describe('validade', () => {
   it('é nulo depois de vencer', () => {
@@ -148,8 +148,8 @@ describe('validade', () => {
 
     vi.setSystemTime(Date.now() + 25 * 60 * 60 * 1000)
 
-    // Ninguém vai tentar `velho.pdf` de novo: se a varredura não o alcançar na
-    // escrita de outro arquivo, ele fica no disco para sempre.
+    // Nobody will try `velho.pdf` again: if the sweep does not reach it when
+    // another file is written, it stays on disk forever.
     writeResume(FILE, ENTRY)
 
     expect(data.has(keyOf(velho))).toBe(false)

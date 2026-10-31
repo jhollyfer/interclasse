@@ -3,13 +3,13 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 /**
- * As ferramentas de desenvolvimento, só em desenvolvimento. Os dois painéis de
- * dentro já se anulam sozinhos fora dele - `TanStackRouterDevtoolsPanel` e
- * `ReactQueryDevtoolsPanel` viram função vazia quando `NODE_ENV !==
- * 'development'` -, mas a casca `TanStackDevtools` não tem essa guarda: sem a
- * linha do `import.meta.env.DEV` o botão flutuante das ferramentas aparece por
- * cima da vitrine para quem entrou para ler uma notícia, e o núcleo
- * `@tanstack/devtools` vai junto no bundle.
+ * The development tools, in development only. The two panels
+ * inside already turn themselves off outside it - `TanStackRouterDevtoolsPanel` and
+ * `ReactQueryDevtoolsPanel` become an empty function when `NODE_ENV !==
+ * 'development'` -, but the `TanStackDevtools` shell has no such guard: without the
+ * `import.meta.env.DEV` line the tools' floating button shows up on top of the
+ * storefront for someone who came to read a news item, and the `@tanstack/devtools`
+ * core goes along in the bundle.
  */
 export function AppDevtools(): React.JSX.Element | null {
   if (!import.meta.env.DEV) return null

@@ -19,7 +19,7 @@ type FormValues = { name: string; position: string }
 
 const FIELDS = ['name', 'position'] as const
 
-/** Só `setError` é usado; o resto do formulário não entra nesta conta. */
+/** Only `setError` is used; the rest of the form does not enter this calculation. */
 function formStub() {
   const setError = vi.fn()
 
@@ -29,7 +29,7 @@ function formStub() {
   }
 }
 
-/** O texto de 5xx: a mensagem do servidor é para o log, não para a tela. */
+/** The 5xx text: the server's message is for the log, not for the screen. */
 const SERVER_MESSAGE = 'O servidor não conseguiu concluir. Tente de novo.'
 
 function httpError(errors?: Record<string, string>, status = 422) {
@@ -164,9 +164,9 @@ describe('applyMutationError', () => {
   it('criação que insere direto não passa `retry`: o 5xx cai no rodapé', () => {
     const { form, setError } = formStub()
 
-    // `POST /administrator/testimonials` insere sem checar duplicata, então um
-    // 500 pode ter vindo depois da escrita e o reenvio criaria o segundo
-    // depoimento. Quem chama simplesmente não passa `retry`.
+    // `POST /administrator/testimonials` inserts without checking for duplicates, so a
+    // 500 may have come after the write and the resend would create a second
+    // testimonial. The caller simply does not pass `retry`.
     applyMutationError({
       form,
       error: httpError(undefined, 500),

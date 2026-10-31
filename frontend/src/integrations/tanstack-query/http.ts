@@ -1,10 +1,10 @@
 /**
- * O espelho no frontend do `HTTPException` do backend: o mesmo corpo, os
- * mesmos status, os mesmos `code`s.
+ * The frontend mirror of the backend's `HTTPException`: the same body, the
+ * same statuses, the same `code`s.
  *
- * Existe porque `fetch` só rejeita em falha de rede - 401, 422 e 500 chegam
- * como promessa resolvida. Sem passar por `request`, um `mutationFn` trata
- * "senha errada" como sucesso e o `onError` do hook nunca é chamado.
+ * It exists because `fetch` only rejects on network failure - 401, 422 and 500 arrive
+ * as a resolved promise. Without going through `request`, a `mutationFn` treats
+ * "wrong password" as success and the hook's `onError` is never called.
  */
 
 import type { z } from '@interclasse/shared'
@@ -17,12 +17,12 @@ import { getLocale } from '#/paraglide/runtime'
 import * as server from './http.server'
 
 /**
- * O corpo de erro que toda rota da API devolve. Espelha
- * `HTTPExceptionPayload` em `backend/app/exceptions/http.exception.ts`.
+ * The error body that every API route returns. Mirrors
+ * `HTTPExceptionPayload` in `backend/app/exceptions/http.exception.ts`.
  *
- * `errors` é `Record<string, string>` e não `Record<string, Array<string>>`: o
- * handler do backend guarda **a primeira** mensagem de cada campo, e não a
- * lista. Tratar como array aqui faria a tela imprimir `[object Object]`.
+ * `errors` is `Record<string, string>` and not `Record<string, Array<string>>`: the
+ * backend handler keeps **the first** message of each field, and not
+ * the list. Treating it as an array here would make the screen print `[object Object]`.
  */
 export type IHTTPErrorBody = {
   message: string
@@ -32,11 +32,11 @@ export type IHTTPErrorBody = {
 }
 
 /**
- * Status HTTP que o frontend distingue. Não é a lista inteira do backend - é
- * o que muda o comportamento da UI. O resto cai na faixa (`>= 500`).
+ * HTTP statuses the frontend distinguishes. It is not the backend's whole list - it is
+ * what changes the UI's behavior. The rest falls into the range (`>= 500`).
  */
 export const HTTPStatus = {
-  /** Não houve resposta: DNS, CORS, backend fora do ar, requisição abortada. */
+  /** There was no response: DNS, CORS, backend down, aborted request. */
   NETWORK: 0,
   NO_CONTENT: 204,
   BAD_REQUEST: 400,
@@ -53,43 +53,43 @@ export const HTTPStatus = {
 } as const
 
 /**
- * Os `code`s que mudam o que a tela faz, conforme `backend/openapi.json`.
- * Comparar por `code` e não por mensagem: a mensagem é texto de UI e muda.
+ * The `code`s that change what the screen does, per `backend/openapi.json`.
+ * Compare by `code` and not by message: the message is UI text and changes.
  *
- * Não é a lista inteira do backend, de propósito: os `*_LIST_ERROR`,
- * `*_SHOW_ERROR` e companhia são 500 com nome de rota, e quem os trata é a
- * faixa `isServerError`, não um `if` por recurso.
+ * It is not the backend's whole list, on purpose: the `*_LIST_ERROR`,
+ * `*_SHOW_ERROR` and company are 500s named after a route, and whoever handles them is the
+ * `isServerError` range, not an `if` per resource.
  */
 export const HTTPErrorCode = {
-  /** 401 do sign-in: e-mail ou senha errados. **Não** merece refresh. */
+  /** Sign-in 401: wrong e-mail or password. Does **not** deserve a refresh. */
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   /**
-   * Sessão ausente ou expirada, vindo do guard
-   * (`backend/app/guards/cookie-access-tokens.guard.ts`). É o único 401 que
-   * merece um refresh: o `INVALID_CREDENTIALS` do sign-in também é 401, e
-   * renovar token por causa de senha errada seria um pedido a mais por engano.
+   * Missing or expired session, coming from the guard
+   * (`backend/app/guards/cookie-access-tokens.guard.ts`). It is the only 401 that
+   * deserves a refresh: sign-in's `INVALID_CREDENTIALS` is also a 401, and
+   * renewing a token because of a wrong password would be one request too many by mistake.
    */
   AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
-  /** 403 do middleware de papel: tem sessão, não tem o papel exigido. */
+  /** Role middleware 403: has a session, lacks the required role. */
   ACCESS_DENIED: 'ACCESS_DENIED',
-  /** 422 de `PUT /account`: a senha atual não confere. */
+  /** `PUT /account` 422: the current password does not match. */
   CURRENT_PASSWORD_INVALID: 'CURRENT_PASSWORD_INVALID',
-  /** 403 de `DELETE /administrator/users/:id`: ninguém apaga a si mesmo. */
+  /** `DELETE /administrator/users/:id` 403: nobody deletes themselves. */
   SELF_DELETE_FORBIDDEN: 'SELF_DELETE_FORBIDDEN',
   USER_ALREADY_EXISTS: 'USER_ALREADY_EXISTS',
   /**
-   * 409 de `DELETE /storages/:id`: alguém referencia o arquivo. É o que faz o
-   * campo de imagem poder apagar o órfão sem furar a imagem de outro cadastro.
+   * `DELETE /storages/:id` 409: someone references the file. It is what lets the
+   * image field delete the orphan without breaking another record's image.
    */
   STORAGE_IN_USE: 'STORAGE_IN_USE',
-  /** 422 de `POST /storages/:id/complete`: o objeto no bucket não bate. */
+  /** `POST /storages/:id/complete` 422: the object in the bucket does not match. */
   STORAGE_SIZE_MISMATCH: 'STORAGE_SIZE_MISMATCH',
-  /** Local, não vem do servidor: falha de rede normalizada. */
+  /** Local, does not come from the server: normalized network failure. */
   NETWORK_ERROR: 'NETWORK_ERROR',
-  /** Local: resposta de erro sem corpo JSON válido (proxy, HTML de erro). */
+  /** Local: error response without a valid JSON body (proxy, error HTML). */
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-  /** Local: o corpo de sucesso não bate com o schema `*Response` do `shared/`. */
+  /** Local: the success body does not match the `*Response` schema from `shared/`. */
   INVALID_RESPONSE: 'INVALID_RESPONSE',
 } as const
 
@@ -106,64 +106,64 @@ export class HTTPError extends Error {
     this.errors = body.errors
   }
 
-  /** Erro atribuível a campos do payload - 422 com `errors` preenchido. */
+  /** An error attributable to payload fields - 422 with `errors` filled in. */
   get isFieldError(): boolean {
     return Boolean(this.errors && Object.keys(this.errors).length > 0)
   }
 
-  /** Culpa do servidor ou da rede: 5xx e o status sintético 0. */
+  /** The server's or the network's fault: 5xx and the synthetic status 0. */
   get isServerError(): boolean {
     return this.status >= 500 || this.status === HTTPStatus.NETWORK
   }
 }
 
 /**
- * A raiz **pública** da API: o endereço que o navegador de quem acessa alcança.
+ * The API's **public** root: the address that the browser of whoever visits can reach.
  *
- * Exportada porque nem tudo que aponta para ela passa por `request()`: o `href`
- * de um download (`GET /storages/:id/download`, que exige sessão e a recebe pelo
- * cookie de mesmo site) e o `src` de uma imagem são o navegador buscando direto,
- * sem `fetch` no meio.
+ * Exported because not everything that points at it goes through `request()`: the `href`
+ * of a download (`GET /storages/:id/download`, which requires a session and gets it from
+ * the same-site cookie) and an image's `src` are the browser fetching directly,
+ * with no `fetch` in between.
  *
- * **Estes usos precisam do endereço público mesmo quando o valor é montado no
- * SSR**, porque o que sai é HTML que o navegador vai seguir depois. Por isso
- * eles ficam nesta constante e não em `baseUrl()` abaixo: um `href` com o
- * endereço interno seria renderizado no servidor e daria link morto no cliente.
+ * **These uses need the public address even when the value is built in
+ * SSR**, because what comes out is HTML that the browser will follow later. That is why
+ * they stay in this constant and not in `baseUrl()` below: an `href` with the
+ * internal address would be rendered on the server and give a dead link on the client.
  */
 export const BASE_URL = env.VITE_API_URL
 
 /**
- * A raiz da API **para quem está fazendo a requisição agora**, que não é a mesma
- * dos dois lados.
+ * The API root **for whoever is making the request right now**, which is not the same
+ * on both sides.
  *
- * O `VITE_API_URL` é embutido no bundle e serve o navegador. Só que no SSR quem
- * chama a API é o Nitro, e obrigá-lo a usar o endereço público faz a requisição
- * sair para a internet e voltar - passando por DNS, TLS e pelo proxy da borda -
- * para alcançar um serviço que quase sempre está na mesma rede. Em produção isso
- * é a maior parte do tempo de uma primeira navegação.
+ * `VITE_API_URL` is embedded in the bundle and serves the browser. But in SSR whoever
+ * calls the API is Nitro, and forcing it to use the public address makes the request
+ * go out to the internet and come back - through DNS, TLS and the edge proxy -
+ * to reach a service that is almost always on the same network. In production that
+ * is most of the time of a first navigation.
  *
- * `SERVER_API_URL` é a saída: sem o prefixo `VITE_` de propósito, para nunca
- * entrar no bundle do navegador. Ausente, tudo segue como antes - o servidor
- * usa o endereço público, que é o comportamento que este arquivo sempre teve.
+ * `SERVER_API_URL` is the way out: without the `VITE_` prefix on purpose, so it never
+ * enters the browser bundle. When absent, everything proceeds as before - the server
+ * uses the public address, which is the behavior this file has always had.
  *
- * **`process.env` é lido dentro do `.server()`, e não no escopo do módulo.** Em
- * runtime de borda as variáveis são injetadas por requisição, e um `const` no
- * topo do arquivo roda antes de o ambiente existir e congela `undefined` - o
- * tipo de falha que só aparece em produção. Ver a seção de variáveis de ambiente
- * em `_doc-lib/tanstack-start.md`.
+ * **`process.env` is read inside `.server()`, and not at module scope.** In an edge
+ * runtime the variables are injected per request, and a `const` at the top of the file
+ * runs before the environment exists and freezes `undefined` - the kind of
+ * failure that only shows up in production. See the environment variables section
+ * in `_doc-lib/tanstack-start.md`.
  *
- * `createIsomorphicFn` e não `typeof window`: o ramo de servidor some do bundle
- * do cliente junto com o que ele importa.
+ * `createIsomorphicFn` and not `typeof window`: the server branch disappears from the
+ * client bundle together with what it imports.
  */
 const baseUrl = createIsomorphicFn()
   .client((): string => BASE_URL)
   .server((): string => process.env.SERVER_API_URL ?? BASE_URL)
 
 /**
- * No navegador não há nada a fazer: `credentials: 'include'` já leva e traz o
- * cookie, e a especificação proíbe montar o header `Cookie` na mão. No servidor
- * de SSR, quem tem o cookie é o navegador - uma camada acima - e o repasse é
- * obrigatório. Ver `http.server.ts`.
+ * In the browser there is nothing to do: `credentials: 'include'` already carries the
+ * cookie both ways, and the specification forbids building the `Cookie` header by hand. On the SSR
+ * server, whoever holds the cookie is the browser - one layer above - and forwarding is
+ * mandatory. See `http.server.ts`.
  */
 const inboundCookie = createIsomorphicFn()
   .client((): string | undefined => undefined)
@@ -174,33 +174,32 @@ const applySetCookie = createIsomorphicFn()
   .server(server.applySetCookie)
 
 /**
- * O prazo de uma requisição à API, em milissegundos.
+ * An API request's deadline, in milliseconds.
  *
- * Não havia prazo nenhum: o único `signal` que chegava ao `fetch` era o do
- * TanStack Query, e ele aborta quando o componente **desmonta**, não quando o
- * tempo passa. Sem teto, um servidor que aceita a conexão e não responde deixa a
- * promessa pendurada até o limite do sistema operacional, que em Node é da ordem
- * de minutos.
+ * There was no deadline at all: the only `signal` that reached `fetch` was TanStack Query's,
+ * and it aborts when the component **unmounts**, not when time passes. Without a cap, a
+ * server that accepts the connection and does not answer leaves the promise hanging until
+ * the operating system's limit, which in Node is on the order of minutes.
  *
- * No navegador isso é uma tela parada. No SSR é pior: `beforeLoad` e `loader`
- * rodam dentro do ciclo de requisição do Nitro, então a resposta HTML inteira
- * fica presa esperando - e quem acessa recebe uma aba girando, sem nada.
+ * In the browser that is a frozen screen. In SSR it is worse: `beforeLoad` and `loader`
+ * run inside Nitro's request cycle, so the whole HTML response
+ * stays stuck waiting - and whoever visits gets a spinning tab, with nothing.
  *
- * 15s é folgado de propósito. Este número não existe para apertar o caso comum,
- * e sim para a patologia; quem impõe o ritmo normal é o `retry` de
+ * 15s is generous on purpose. This number does not exist to squeeze the common case,
+ * but for the pathology; what sets the normal pace is the `retry` in
  * `query-context.ts`.
  */
 const TIMEOUT = 15_000
 
 /**
- * O `signal` do chamador somado ao prazo. Vence o primeiro que abortar.
+ * The caller's `signal` added to the deadline. The first one to abort wins.
  *
- * `AbortSignal.any` e não um `AbortController` à mão: os dois motivos de aborto
- * são independentes - o componente desmontou, ou o tempo acabou - e qualquer um
- * deles precisa valer. Escolher um só perderia o outro.
+ * `AbortSignal.any` and not an `AbortController` by hand: the two reasons for aborting are
+ * independent - the component unmounted, or time ran out - and either of them
+ * has to hold. Choosing only one would lose the other.
  *
- * O timer de `AbortSignal.timeout` não segura o processo vivo e é coletado junto
- * com o signal, então não há o que limpar aqui.
+ * The `AbortSignal.timeout` timer does not keep the process alive and is collected together
+ * with the signal, so there is nothing to clean up here.
  */
 function deadline(signal?: AbortSignal | null): AbortSignal {
   const timeout = AbortSignal.timeout(TIMEOUT)
@@ -211,9 +210,9 @@ function deadline(signal?: AbortSignal | null): AbortSignal {
 }
 
 /**
- * O corpo de erro como chegou, campo a campo: o que não tem o tipo esperado
- * fica de fora e cai no fallback de `perform`. Proxy e HTML de erro não seguem
- * o envelope da API, e o `.json()` devolve o que vier.
+ * The error body as it arrived, field by field: whatever does not have the expected type
+ * is left out and falls into `perform`'s fallback. Proxy and error HTML do not follow
+ * the API envelope, and `.json()` returns whatever comes.
  */
 function errorBody(value: unknown): Partial<IHTTPErrorBody> {
   if (typeof value !== 'object' || value === null) return {}
@@ -240,31 +239,31 @@ function errorBody(value: unknown): Partial<IHTTPErrorBody> {
   return body
 }
 
-/** O que `request` usa internamente e nenhum chamador de fora precisa passar. */
+/** What `request` uses internally and no outside caller needs to pass. */
 type RequestRetry = {
-  /** Cookie a usar no lugar do de entrada: o resultado de um refresh no SSR. */
+  /** Cookie to use in place of the incoming one: the result of a refresh in SSR. */
   cookie?: string
-  /** Trava do refresh, para o próprio refresh e o replay não dispararem outro. */
+  /** Refresh lock, so the refresh itself and the replay do not fire another. */
   skipRefresh?: boolean
-  /** Recebe o header `Cookie` atualizado quando a resposta traz `Set-Cookie`. */
+  /** Receives the updated `Cookie` header when the response carries `Set-Cookie`. */
   onSetCookie?: (cookie: string | undefined) => void
 }
 
 /**
- * Uma renovação por vez. O backend rotaciona: `refresh.use-case.ts` apaga o
- * refresh token antigo ao emitir o novo, então cinco queries que tomam 401
- * juntas e disparam cinco refreshes gastariam o mesmo token cinco vezes, e
- * quatro delas levariam a sessão embora.
+ * One renewal at a time. The backend rotates: `refresh.use-case.ts` deletes the old
+ * refresh token when issuing the new one, so five queries that take a 401
+ * together and fire five refreshes would spend the same token five times, and
+ * four of them would take the session away.
  *
- * "Por vez" precisa de um dono, e o dono é diferente de cada lado. No navegador
- * é o processo: um usuário, uma aba, e a variável de módulo abaixo basta. No
- * servidor de SSR o módulo é compartilhado por todos os visitantes atendidos ao
- * mesmo tempo, e ali o dono é a **requisição** - o escopo que
- * `runInRequestScope` abre em `http.server.ts`, a partir do middleware de
+ * "At a time" needs an owner, and the owner is different on each side. In the browser
+ * it is the process: one user, one tab, and the module variable below suffices. On the
+ * SSR server the module is shared by every visitor served at the
+ * same time, and there the owner is the **request** - the scope that
+ * `runInRequestScope` opens in `http.server.ts`, from the middleware in
  * `src/start.ts`.
  *
- * `createIsomorphicFn` é o que entrega a versão certa a cada lado, e o ramo de
- * servidor some do bundle do cliente junto com o import dele.
+ * `createIsomorphicFn` is what delivers the right version to each side, and the server
+ * branch disappears from the client bundle together with its import.
  */
 let clientRenewal: Promise<string | undefined> | null = null
 
@@ -278,9 +277,9 @@ const setPendingRenewal = createIsomorphicFn()
   })
   .server((pending: Promise<string | undefined> | null) => {
     const scope = server.requestScope()
-    // Fora de um ciclo de requisição - teste, script - não há escopo aberto, e
-    // a renovação simplesmente não é compartilhada. Deduplicar é otimização,
-    // não correção: cada chamada ainda renova por conta própria.
+    // Outside a request cycle - test, script - there is no open scope, and
+    // the renewal is simply not shared. Deduplicating is an optimization,
+    // not correctness: each call still renews on its own.
     if (scope) scope.renewal = pending
   })
 
@@ -320,16 +319,16 @@ async function refresh(
 }
 
 /**
- * `fetch` com duas garantias a mais: resposta de erro vira exceção, e sessão
- * expirada é renovada sem que a tela perceba. Todo caminho de falha - rede,
- * corpo ilegível, erro da API - sai daqui como `HTTPError` com `status`
- * preenchido, então quem trata nunca precisa de `instanceof`.
+ * `fetch` with two extra guarantees: an error response becomes an exception, and an
+ * expired session is renewed without the screen noticing. Every failure path - network,
+ * unreadable body, API error - leaves here as an `HTTPError` with `status`
+ * filled in, so whoever handles it never needs `instanceof`.
  *
- * Não há token em `localStorage`, `sessionStorage` ou `document.cookie`: os
- * dois cookies do backend são `httpOnly` e assinados, e o JavaScript da página
- * não os lê nem os escreve. Quem está logado se descobre perguntando à API.
+ * There is no token in `localStorage`, `sessionStorage` or `document.cookie`: the
+ * backend's two cookies are `httpOnly` and signed, and the page's JavaScript
+ * neither reads nor writes them. Who is logged in is discovered by asking the API.
  *
- * Devolve a resposta já aprovada; ler (ou não) o corpo é com `request` e `send`.
+ * Returns the already approved response; reading (or not) the body is up to `request` and `send`.
  */
 async function perform(
   path: string,
@@ -339,25 +338,25 @@ async function perform(
   const cookie = retry?.cookie ?? inboundCookie()
 
   /**
-   * `FormData` monta o próprio `Content-Type`, com o `boundary` que separa as
-   * partes. Declarar `application/json` por cima faria o servidor procurar o
-   * boundary num cabeçalho que não o tem, e o corpo chegaria vazio.
+   * `FormData` builds its own `Content-Type`, with the `boundary` that separates the
+   * parts. Declaring `application/json` on top would make the server look for the
+   * boundary in a header that does not have it, and the body would arrive empty.
    *
-   * Aqui e não em cada chamador: nenhuma rota do Ciclo 1 manda `FormData` - o
-   * binário vai do navegador direto ao bucket -, e um `Content-Type` esquecido
-   * num envio futuro falharia do mesmo jeito.
+   * Here and not in every caller: no Cycle 1 route sends `FormData` - the
+   * binary goes from the browser straight to the bucket -, and a forgotten `Content-Type`
+   * in a future upload would fail the same way.
    */
-  // O idioma da tela vai junto (_standards/i18n.md §2): a API responde a
-  // mensagem de erro e a 422 nele. `Accept-Language` é cabeçalho da lista
-  // segura do CORS, então não cobra preflight. No SSR, `getLocale()` lê o idioma
-  // da requisição que o middleware do Paraglide abriu.
+  // The screen's language goes along (_standards/i18n.md §2): the API answers the
+  // error message and the 422 in it. `Accept-Language` is a header on CORS's safe
+  // list, so it does not trigger a preflight. In SSR, `getLocale()` reads the language
+  // of the request that Paraglide's middleware opened.
   const headers: Record<string, string> = { 'Accept-Language': getLocale() }
   //
-  // `init?.body &&` na frente: sem corpo não há tipo de conteúdo a declarar, e
-  // um `Content-Type: application/json` num GET é cabeçalho que não descreve
-  // nada. Pior que inútil - é o que faz um GET simples deixar de ser requisição
-  // CORS simples e passar a exigir preflight, ou seja um `OPTIONS` a mais antes
-  // de cada leitura.
+  // `init?.body &&` in front: without a body there is no content type to declare, and
+  // a `Content-Type: application/json` on a GET is a header that describes
+  // nothing. Worse than useless - it is what stops a simple GET from being a simple
+  // CORS request and makes it require a preflight, that is an extra `OPTIONS` before
+  // each read.
   if (init?.body && !(init.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json'
   }
@@ -367,11 +366,11 @@ async function perform(
   try {
     response = await fetch(baseUrl().concat(path), {
       ...init,
-      // O sign-in responde 204 e devolve os tokens em cookie
-      // (`app/services/cookie.ts`). Sem isto o login "funciona" e não autentica.
+      // Sign-in answers 204 and returns the tokens in cookies
+      // (`app/services/cookie.ts`). Without this login "works" and does not authenticate.
       credentials: 'include',
-      // Depois do spread de `init`, senão o `signal` do chamador sobrescreveria
-      // o prazo e a requisição voltaria a não ter teto.
+      // After the spread of `init`, otherwise the caller's `signal` would overwrite
+      // the deadline and the request would again have no cap.
       signal: deadline(init?.signal),
       headers: {
         ...headers,
@@ -380,7 +379,7 @@ async function perform(
       },
     })
   } catch {
-    // `fetch` só rejeita aqui: sem resposta, logo sem status real.
+    // `fetch` only rejects here: no response, hence no real status.
     throw new HTTPError({
       message: m.common_error_network(),
       status: HTTPStatus.NETWORK,
@@ -388,15 +387,15 @@ async function perform(
     })
   }
 
-  // Fora do `?.` do callback de propósito: o encadeamento opcional não avalia
-  // o argumento quando o callback não existe, e o repasse do `Set-Cookie` ao
-  // navegador vale para toda resposta, não só para a do refresh.
+  // Outside the callback's `?.` on purpose: optional chaining does not evaluate
+  // the argument when the callback does not exist, and forwarding `Set-Cookie` to the
+  // browser holds for every response, not only the refresh's.
   const renewedCookie = applySetCookie(cookie, response)
   retry?.onSetCookie?.(renewedCookie)
 
   if (!response.ok) {
-    // Corpo ilegível (HTML de proxy, resposta vazia) vira um HTTPError com o
-    // status real mesmo assim - a UI nunca recebe um erro sem `status`.
+    // An unreadable body (proxy HTML, empty response) becomes an HTTPError with the
+    // real status all the same - the UI never receives an error without `status`.
     let body: Partial<IHTTPErrorBody> | null = null
 
     try {
@@ -410,8 +409,8 @@ async function perform(
       body?.code === HTTPErrorCode.AUTHENTICATION_REQUIRED &&
       !retry?.skipRefresh
     ) {
-      // Se o refresh também falhar, o `HTTPError` dele sobe daqui e o guard da
-      // rota trata como não autenticado - que é exatamente o que é.
+      // If the refresh fails too, its `HTTPError` bubbles up from here and the route's guard
+      // treats it as unauthenticated - which is exactly what it is.
       const renewed = await renew(cookie)
       return await perform(path, init, {
         cookie: renewed,
@@ -431,10 +430,10 @@ async function perform(
 }
 
 /**
- * Requisição que devolve um registro: o corpo `unknown` vira tipo aqui, e só
- * aqui, pelo schema `*Response` de `@interclasse/shared` (`frontend.md` §3.3).
- * Corpo fora do contrato é falha de servidor (`BAD_GATEWAY`), nunca um dado
- * torto que estoura na tela.
+ * A request that returns a record: the `unknown` body becomes a type here, and only
+ * here, through `@interclasse/shared`'s `*Response` schema (`frontend.md` §3.3).
+ * A body outside the contract is a server failure (`BAD_GATEWAY`), never a
+ * crooked datum that blows up on screen.
  */
 export async function request<TSchema extends z.ZodType>(
   path: string,
@@ -444,8 +443,8 @@ export async function request<TSchema extends z.ZodType>(
 ): Promise<z.infer<TSchema>> {
   const response = await perform(path, init, retry)
 
-  // Quem pede um registro e recebe 204 está chamando a rota errada - e `.json()`
-  // estouraria com um `SyntaxError`, fora do contrato de sempre `HTTPError`.
+  // Whoever asks for a record and receives 204 is calling the wrong route - and `.json()`
+  // would blow up with a `SyntaxError`, outside the contract of always `HTTPError`.
   if (response.status === HTTPStatus.NO_CONTENT) {
     throw new HTTPError({
       message: m.common_error_empty_response(),
@@ -468,8 +467,8 @@ export async function request<TSchema extends z.ZodType>(
 }
 
 /**
- * Requisição sem retorno: sign-in, sign-out, arquivamento, exclusão e purge.
- * Respondem 204, e o corpo nunca é lido - `.json()` estouraria em corpo vazio.
+ * A request with no return: sign-in, sign-out, archive, delete and purge.
+ * They answer 204, and the body is never read - `.json()` would blow up on an empty body.
  */
 export async function send(
   path: string,

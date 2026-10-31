@@ -18,8 +18,8 @@ test('rotula os segmentos fixos e não linka a página atual', () => {
 })
 
 test('não linka prefixo que não casou com rota', () => {
-  // Só o match da listagem existe, então o primeiro item fica texto e não vira
-  // um link para 404.
+  // Only the listing's match exists, so the first item stays text and does not become
+  // a link to a 404.
   const crumbs = buildBreadcrumbs([
     {
       fullPath: '/administrator/sports/$id',

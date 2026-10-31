@@ -2,9 +2,9 @@ import { STORAGE_MIMETYPES } from '@interclasse/shared'
 import type { StorageMimetype } from '@interclasse/shared'
 
 /**
- * O que a tela faz com a lista de tipos de `@interclasse/shared`: reconhecer
- * o tipo escolhido e recortar os de imagem, para o cliente recusar antes de
- * gastar uma requisição (a recusa que vale continua sendo a do servidor).
+ * What the screen does with `@interclasse/shared`'s list of types: recognize
+ * the chosen type and trim to the image ones, so the client refuses before
+ * spending a request (the refusal that counts remains the server's).
  */
 
 export function isStorageMimetype(value: string): value is StorageMimetype {
@@ -12,9 +12,9 @@ export function isStorageMimetype(value: string): value is StorageMimetype {
 }
 
 /**
- * O recorte de imagem, que vira o `accept` do seletor nativo e a recusa antes
- * do `POST /storages`. Sai da lista inteira, e não de uma string escrita à
- * mão: uma cópia manual sairia dela na primeira mudança do backend.
+ * The image subset, which becomes the native picker's `accept` and the refusal before
+ * `POST /storages`. It comes from the whole list, and not from a hand-written
+ * string: a manual copy would drift from it at the first backend change.
  */
 export const IMAGE_MIMETYPES = STORAGE_MIMETYPES.filter((mimetype) =>
   mimetype.startsWith('image/'),

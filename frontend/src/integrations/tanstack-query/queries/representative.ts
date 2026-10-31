@@ -5,7 +5,7 @@ import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 
 import { request } from '../http'
 
-/** A matriz da turma do representante. A turma sai da sessão: chave `null`. */
+/** The representative's classroom matrix. The classroom comes from the session: `null` key. */
 export const representativeEnrollmentsQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.representative.enrollments.board,

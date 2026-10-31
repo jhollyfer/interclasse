@@ -7,7 +7,7 @@ import type { MutationProps } from '#/hooks/tanstack-query/_mutation-props'
 import type { HTTPError } from '../http'
 import { request } from '../http'
 
-/** A mesma troca, na turma do representante - que sai da sessão. */
+/** The same replacement, on the representative's classroom - which comes from the session. */
 export function useRepresentativeEnrollmentUpdateMutation(
   options?: MutationProps<
     RepresentativeEnrollmentShowResponse,

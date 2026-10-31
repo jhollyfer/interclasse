@@ -43,10 +43,10 @@ import {
 } from './labels'
 
 /**
- * O `satisfies` de `labels.ts` já cobra rótulo para todo valor em tempo de
- * compilação, mas quem lê o rótulo lê da API, e a API manda `string` larga. Este
- * teste percorre o enum de verdade e falha quando um valor novo entra sem
- * rótulo - o `satisfies` só falharia se alguém rodasse o `tsc`.
+ * The `satisfies` in `labels.ts` already demands a label for every value at compile
+ * time, but whoever reads the label reads it from the API, and the API sends a wide `string`. This
+ * test walks the real enum and fails when a new value enters without a
+ * label - `satisfies` would only fail if someone ran `tsc`.
  */
 describe.each([
   [
@@ -85,8 +85,8 @@ describe.each([
       for (const map of maps) expect(map[value]).toBeDefined()
     })
 
-    // O reverso: rótulo órfão é rótulo de valor que o enum já não tem, e ele
-    // some da tela sem que ninguém note.
+    // The reverse: an orphan label is the label of a value the enum no longer has, and it
+    // vanishes from the screen without anyone noticing.
     it('não guarda rótulo órfão', () => {
       for (const map of maps)
         expect(Object.keys(map).sort()).toEqual([...values].sort())
@@ -95,8 +95,8 @@ describe.each([
 )
 
 describe('acesso a rótulo', () => {
-  // O acesso é sempre `LABELS[valor] ?? valor`: um valor que o backend passe a
-  // devolver antes de a tela conhecê-lo aparece cru, e não derruba a página.
+  // Access is always `LABELS[value] ?? value`: a value that the backend starts to
+  // return before the screen knows it shows up raw, and does not bring the page down.
   it('não lança para valor fora do enum', () => {
     expect(MATCH_PHASE_LABELS['INVENTADO'] ?? 'INVENTADO').toBe('INVENTADO')
   })
@@ -108,22 +108,22 @@ describe('rótulos escolhidos', () => {
     expect(ACCOUNT_STATUS_LABELS.ACTIVE).toBe('Ativo')
   })
 
-  // Chave encerrada tem campeão: é o único estado de vitória da tela.
+  // A closed bracket has a champion: it is the screen's only victory state.
   it('marca a chave encerrada como sucesso', () => {
     expect(BRACKET_STATUS_VARIANTS.FINISHED).toBe('success')
     expect(MATCH_STATUS_VARIANTS.FINISHED).toBe('success')
   })
 
-  // `PENDING` de arquivo não é "aguardando aprovação": é upload que não
-  // confirmou, e o backend recusa anexá-lo.
+  // A file's `PENDING` is not "aguardando aprovação": it is an upload that did not
+  // confirm, and the backend refuses to attach it.
   it('não chama arquivo incompleto de pendente', () => {
     expect(UPLOAD_STATUS_LABELS.PENDING).toBe('Incompleto')
   })
 })
 
 /**
- * As iniciais do avatar. Uma regra só, para não haver duas divergentes - uma
- * pegando as duas primeiras palavras e outra a primeira e a última.
+ * The avatar initials. A single rule, so there are not two divergent ones - one
+ * taking the first two words and another the first and the last.
  */
 describe('initials', () => {
   it('junta a primeira letra do primeiro nome e do último', () => {
@@ -131,7 +131,7 @@ describe('initials', () => {
   })
 
   it('devolve uma inicial só para nome de uma palavra', () => {
-    // Repetir a primeira como sobrenome sairia "MM" para "Matheus".
+    // Repeating the first as a surname would give "MM" for "Matheus".
     expect(initials('Matheus')).toBe('M')
   })
 
@@ -148,9 +148,9 @@ describe('initials', () => {
 
 describe('formatDate', () => {
   it('formata em pt-BR no fuso da escola', () => {
-    // Fuso fixo de propósito: formatar no fuso de quem roda o teste faria a
-    // suíte passar num lugar e falhar em outro - que é a divergência de
-    // hidratação que a função existe para evitar. 13h UTC é 9h em Manaus.
+    // Fixed time zone on purpose: formatting in the time zone of whoever runs the test would make the
+    // suite pass in one place and fail in another - which is the hydration
+    // divergence the function exists to avoid. 1pm UTC is 9am in Manaus.
     expect(formatDate('2026-03-14T13:05:00.000Z')).toBe('14/03/2026, 09:05')
   })
 
@@ -160,10 +160,10 @@ describe('formatDate', () => {
 })
 
 /**
- * O tamanho do arquivo na coluna da biblioteca e no detalhe.
+ * A file's size in the library column and in the detail.
  *
- * Base 1024, uma casa decimal, e para de subir em MB: o teto por arquivo do
- * projeto está longe do gigabyte.
+ * Base 1024, one decimal place, and stops climbing at MB: the project's per-file cap
+ * is far from a gigabyte.
  */
 describe('formatBytes', () => {
   it('mostra byte cru abaixo de 1 KiB', () => {
@@ -181,15 +181,15 @@ describe('formatBytes', () => {
     expect(formatBytes(3.5 * 1024 * 1024)).toBe('3,5 MB')
   })
 
-  // Sem ramo de GB de propósito: um arquivo desse tamanho não passa pelo
-  // `UPLOAD_MAX_SIZE`, e a unidade que nunca aparece é um ramo nunca exercido.
+  // No GB branch on purpose: a file of that size does not pass
+  // `UPLOAD_MAX_SIZE`, and a unit that never shows up is a branch never exercised.
   it('continua em MB para arquivo grande', () => {
     expect(formatBytes(2 * 1024 * 1024 * 1024)).toBe('2.048,0 MB')
   })
 })
 
 test('agenda no relógio da escola, qualquer que seja o fuso do navegador', () => {
-  // Manaus é UTC-4 o ano inteiro.
+  // Manaus is UTC-4 all year round.
   expect(fromSchoolInput('2026-12-14T08:30')).toBe('2026-12-14T12:30:00.000Z')
   expect(toSchoolInput('2026-12-14T12:30:00.000Z')).toBe('2026-12-14T08:30')
   expect(toSchoolInput(fromSchoolInput('2026-12-01T07:30'))).toBe(
@@ -199,7 +199,7 @@ test('agenda no relógio da escola, qualquer que seja o fuso do navegador', () =
 })
 
 describe('datas da agenda, no fuso da escola', () => {
-  // 12:30 UTC é 08:30 em Manaus (UTC-4), seja qual for o fuso de quem roda.
+  // 12:30 UTC is 08:30 in Manaus (UTC-4), whatever the time zone of whoever runs it.
   const INSTANT = '2026-10-16T12:30:00.000Z'
 
   it('formatTime mostra a hora da escola, ou o relógio vazio', () => {
@@ -218,8 +218,8 @@ describe('datas da agenda, no fuso da escola', () => {
 })
 
 /**
- * Os rótulos seguem o idioma atual a cada leitura (`_standards/i18n.md` §2):
- * o mapa é o mesmo objeto, e o texto sai do `getLocale()` de cada acesso.
+ * Labels follow the current language on each read (`_standards/i18n.md` §2):
+ * the map is the same object, and the text comes from `getLocale()` on each access.
  */
 describe('idioma dos rótulos', () => {
   afterEach(() => {

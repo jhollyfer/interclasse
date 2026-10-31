@@ -38,8 +38,8 @@ import { queryString } from '#/lib/list-search'
 import { request } from '../http'
 
 /**
- * `keepPreviousData` não é enfeite: sem ele, trocar de página passa por
- * `pending` e a tabela inteira esvazia no meio da navegação.
+ * `keepPreviousData` is not decoration: without it, changing page goes through
+ * `pending` and the whole table empties in the middle of the navigation.
  */
 export const usersQueryOptions = (params: UserListSearch) =>
   queryOptions({
@@ -56,8 +56,8 @@ export const usersQueryOptions = (params: UserListSearch) =>
   })
 
 /**
- * As contas de um papel, página a página, para o combobox com busca no
- * servidor (`frontend.md` §2.1). `page` é o `pageParam`, e fica fora da chave.
+ * The accounts of a role, page by page, for the combobox with server search
+ * (`frontend.md` §2.1). `page` is the `pageParam`, and stays out of the key.
  */
 export const usersInfiniteQueryOptions = (params: UserListSearch) =>
   infiniteQueryOptions({
@@ -79,7 +79,7 @@ export const usersInfiniteQueryOptions = (params: UserListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** O corpo vem nu, sem envelope - é o que o controller devolve. */
+/** The body comes bare, with no envelope - it is what the controller returns. */
 export const userQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.users.detail(id),
@@ -126,7 +126,7 @@ export const sportsQueryOptions = (params: ListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** As modalidades, página a página, para o combobox com busca no servidor. */
+/** The sports, page by page, for the combobox with server search. */
 export const sportsInfiniteQueryOptions = (params: ListSearch) =>
   infiniteQueryOptions({
     queryKey: queryKeys.administrator.sports.infinite(params),
@@ -195,7 +195,7 @@ export const bracketsQueryOptions = (params: BracketListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** A chave inteira, com a classificação calculada do placar. */
+/** The whole bracket, with the standings computed from the score. */
 export const bracketQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.detail(id),
@@ -221,7 +221,7 @@ export const matchesQueryOptions = (params: MatchListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** Quem entraria no sorteio agora. Só consulta: o sorteio é o `POST`. */
+/** Who would enter the draw right now. Query only: the draw is the `POST`. */
 export const bracketPreviewQueryOptions = (sportId: string, category: string) =>
   queryOptions({
     queryKey: queryKeys.administrator.brackets.preview(sportId, category),
@@ -233,7 +233,7 @@ export const bracketPreviewQueryOptions = (sportId: string, category: string) =>
         AdministratorBracketPreviewResponse,
         { signal },
       ),
-    // A prévia muda a cada lista salva pelas turmas: o diálogo sempre relê.
+    // The preview changes with every list the classrooms save: the dialog always rereads.
     staleTime: 0,
   })
 
@@ -272,7 +272,7 @@ export const enrollmentRemovalsQueryOptions = (params: RemovalListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** As fotos enviadas, para a revisão da organização. `?status` recorta a fila. */
+/** The uploaded photos, for the organization's review. `?status` trims the queue. */
 export const photosQueryOptions = (params: PhotoListSearch) =>
   queryOptions({
     queryKey: queryKeys.administrator.photos.list(params),
@@ -285,7 +285,7 @@ export const photosQueryOptions = (params: PhotoListSearch) =>
     placeholderData: keepPreviousData,
   })
 
-/** Os números dos jogos. Sempre do momento: o relatório é para fechar a edição. */
+/** The match numbers. Always current: the report is for closing the edition. */
 export const reportQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.reports,
@@ -296,7 +296,7 @@ export const reportQueryOptions = () =>
     staleTime: 0,
   })
 
-/** A configuração do site no painel. */
+/** The site configuration on the dashboard. */
 export const siteQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.administrator.site,

@@ -29,7 +29,7 @@ test('parte de um header ausente', () => {
 })
 
 test('não parte o valor assinado no `=` interno', () => {
-  // O valor assinado do AdonisJS é base64 e pode terminar em `=`.
+  // AdonisJS's signed value is base64 and can end in `=`.
   const merged = mergeCookieHeader(undefined, [
     'access-token=s:abc==.hmac; Path=/',
   ])
@@ -49,18 +49,18 @@ test('o escopo é visível de dentro e some ao sair', () => {
 })
 
 test('duas execuções concorrentes não compartilham escopo', async () => {
-  // É o caso que motiva o arquivo: dois visitantes atendidos pelo mesmo
-  // processo de SSR ao mesmo tempo. Se o escopo vazasse de um para o outro, a
-  // renovação de token de um seria reusada pelo outro - e o backend rotaciona,
-  // então o segundo terminaria com um cookie que já não vale.
+  // This is the case that motivates the file: two visitors served by the same
+  // SSR process at the same time. If the scope leaked from one to the other, one's
+  // token renewal would be reused by the other - and the backend rotates,
+  // so the second would end up with a cookie that is no longer valid.
   async function visitor(marca: string) {
     return runInRequestScope(async () => {
       const scope = requestScope()
       if (!scope) throw new Error('esperava escopo dentro de runInRequestScope')
       scope.renewal = Promise.resolve(marca)
 
-      // Cede o turno: sem o AsyncLocalStorage, é aqui que o outro visitante
-      // sobrescreveria o estado deste.
+      // Yields the turn: without AsyncLocalStorage, this is where the other visitor
+      // would overwrite this one's state.
       await new Promise((resolve) => setTimeout(resolve, 0))
 
       const after = requestScope()

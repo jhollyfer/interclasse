@@ -1,13 +1,13 @@
 /**
- * Do que o `<input>` entrega para o que o schema do `shared/` espera.
+ * From what the `<input>` delivers to what the `shared/` schema expects.
  *
- * O Zod não converte `''` em ausente como o VineJS fazia
- * (`convertEmptyStringsToNull`): campo apagado chega como texto vazio, e
- * `.min(8)` ou `.regex()` o recusariam. A conversão fica no campo, no
- * `onChange`, e o valor do formulário já nasce na forma do contrato.
+ * Zod does not convert `''` to absent the way VineJS did
+ * (`convertEmptyStringsToNull`): an erased field arrives as empty text, and
+ * `.min(8)` or `.regex()` would refuse it. The conversion stays in the field, in
+ * `onChange`, and the form's value is already born in the contract's shape.
  */
 
-/** Texto apagado vira `null`: apaga o dado em vez de gravar `''`. */
+/** Erased text becomes `null`: it deletes the data instead of saving `''`. */
 export function blankToNull(value: string): string | null {
   if (value.trim() === '') return null
 
@@ -21,7 +21,7 @@ export function blankToUndefined(value: string): string | undefined {
   return value
 }
 
-/** Número apagado (`valueAsNumber` é `NaN`) vira `null`. */
+/** An erased number (`valueAsNumber` is `NaN`) becomes `null`. */
 export function nanToNull(value: number): number | null {
   if (Number.isNaN(value)) return null
 

@@ -2,12 +2,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import type { QueryKey } from '@tanstack/react-query'
 
 /**
- * Invalida várias famílias de chave de uma vez, e só resolve quando todas
- * resolveram. Um lugar só para o `Promise.all` sobre `invalidateQueries` que
- * cada mutation com dependentes (`DEPENDENTS` em `_query-keys.ts`) repetia.
+ * Invalidates several key families at once, and only resolves when all of them
+ * resolved. One place for the `Promise.all` over `invalidateQueries` that
+ * every mutation with dependents (`DEPENDENTS` in `_query-keys.ts`) repeated.
  *
- * O `queryClient` vem do provider, que é o mesmo do contexto do router
- * (`setupRouterSsrQueryIntegration` em `router.tsx`): o cache é um só.
+ * The `queryClient` comes from the provider, which is the same as the router context's
+ * (`setupRouterSsrQueryIntegration` in `router.tsx`): the cache is a single one.
  */
 export function useInvalidate(): (
   queryKeys: ReadonlyArray<QueryKey>,

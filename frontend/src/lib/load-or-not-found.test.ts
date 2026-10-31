@@ -9,7 +9,7 @@ function failure(status: number): HTTPError {
   return new HTTPError({ message: 'falha', status, code: 'X' })
 }
 
-/** Captura a rejeição já como `unknown`, sem `.catch((e) => e)` tipado. */
+/** Captures the rejection as `unknown`, without a typed `.catch((e) => e)`. */
 async function rejection(promise: Promise<unknown>): Promise<unknown> {
   try {
     await promise

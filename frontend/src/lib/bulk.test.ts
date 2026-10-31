@@ -12,7 +12,7 @@ describe('runBulk', () => {
     })
 
     expect(outcome).toEqual({ done: 2, failed: 2 })
-    // O ponto de usar `allSettled`: a falha do 2 não impediu o 3 e o 4.
+    // The point of using `allSettled`: item 2's failure did not stop 3 and 4.
     expect(tocados).toEqual([1, 2, 3, 4])
   })
 

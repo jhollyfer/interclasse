@@ -1,30 +1,30 @@
 /**
- * A trilha do painel, derivada das rotas que casaram.
+ * The dashboard trail, derived from the routes that matched.
  *
- * Das rotas, e não do `location.pathname` sozinho, por um motivo só: um caminho
- * partido em segmentos produz destinos que não existem, e um link para eles
- * levaria a 404. O conjunto de `pathname` das rotas casadas responde quais
- * prefixos são navegáveis de verdade, então só esses viram link.
+ * From the routes, and not from `location.pathname` alone, for a single reason: a path
+ * split into segments produces destinations that do not exist, and a link to them
+ * would lead to a 404. The set of matched routes' `pathname` answers which
+ * prefixes are really navigable, so only those become links.
  *
- * Mora fora de `routes/` para poder ser testado sem que o gerador da árvore
- * trate o arquivo de teste como uma rota - mesmo motivo de `list-search.ts`.
+ * Lives outside `routes/` so it can be tested without the tree generator
+ * treating the test file as a route - same reason as `list-search.ts`.
  */
 
 import { m } from '#/paraglide/messages'
 
 export type Crumb = {
   label: string
-  /** Ausente quando o prefixo não é uma rota, ou quando é a página atual. */
+  /** Absent when the prefix is not a route, or when it is the current page. */
   to?: string
 }
 
 /**
- * O rótulo de cada segmento fixo do caminho. Lookup object pelo mesmo motivo de
- * `labels.ts`: segmento novo sem rótulo aqui aparece cru, e não some.
+ * The label of each fixed path segment. A lookup object for the same reason as
+ * `labels.ts`: a new segment without a label here shows up raw, and does not vanish.
  *
- * Os seis recursos do Ciclo 2 já estão na lista. Rótulo de segmento não custa
- * rota nenhuma - ele só é lido quando o caminho existe -, e escrevê-los agora
- * evita que a tela de chaves nasça com "brackets" na trilha.
+ * The six Cycle 2 resources are already in the list. A segment label costs
+ * no route at all - it is only read when the path exists -, and writing them now
+ * keeps the brackets screen from being born with "brackets" in the trail.
  */
 const SEGMENT_LABELS: Record<string, string | undefined> = {
   get administrator() {
@@ -84,18 +84,18 @@ function segments(path: string): Array<string> {
   return path.split('/').filter(Boolean)
 }
 
-/** O que o roteador chama de match, reduzido ao que a trilha precisa. */
+/** What the router calls a match, reduced to what the trail needs. */
 export type BreadcrumbMatch = {
-  /** Com os parâmetros por preencher: `/administrator/testimonials/$id`. */
+  /** With the parameters still to fill in: `/administrator/testimonials/$id`. */
   fullPath: string
-  /** Com os parâmetros preenchidos: `/administrator/testimonials/abc-123`. */
+  /** With the parameters filled in: `/administrator/testimonials/abc-123`. */
   pathname: string
 }
 
 /**
- * `fullPath` e `pathname` andam em paralelo: o primeiro diz se o segmento é
- * parâmetro (`$id`) e o segundo diz o valor dele. É o par que permite rotular
- * "Detalhe" onde há um uuid, em vez de imprimir o uuid na trilha.
+ * `fullPath` and `pathname` run in parallel: the first says whether the segment is a
+ * parameter (`$id`) and the second says its value. It is the pair that allows labeling
+ * "Detalhe" where there is a uuid, instead of printing the uuid in the trail.
  */
 export function buildBreadcrumbs(
   matches: ReadonlyArray<BreadcrumbMatch>,
@@ -118,13 +118,13 @@ export function buildBreadcrumbs(
 
     let label = SEGMENT_LABELS[token] ?? value
 
-    // Parâmetro de identificador: o uuid não diz nada a quem lê.
+    // Identifier parameter: the uuid says nothing to whoever reads.
     if (token.startsWith('$')) label = m.label_breadcrumb_detail()
 
     const crumb: Crumb = { label }
 
-    // A página atual nunca é link, e prefixo que não casou com rota nenhuma
-    // também não.
+    // The current page is never a link, and a prefix that matched no route
+    // is not either.
     if (index < actual.length - 1 && navigable.has(to)) crumb.to = to
 
     crumbs.push(crumb)
@@ -134,16 +134,16 @@ export function buildBreadcrumbs(
 }
 
 /**
- * O título da aba no painel, tirado da mesma trilha: do mais específico para o
- * mais geral, "Detalhe · Chaves". O "Painel" da raiz só aparece sozinho - em
- * toda aba ele seria ruído, e é a parte que some quando a aba encolhe.
+ * The tab title on the dashboard, taken from the same trail: from the most specific to
+ * the most general, "Detalhe · Chaves". The root's "Painel" only shows up alone - on
+ * every tab it would be noise, and it is the part that goes away when the tab shrinks.
  */
 export function breadcrumbTitle(crumbs: ReadonlyArray<Crumb>): string {
   const labels = crumbs.map((crumb) => crumb.label)
-  // "Detalhe" no meio ("Editar · Detalhe · Avisos") não diz nada; só vale
-  // quando é a própria página.
-  // O "Painel" da raiz sai; a raiz de outro papel ("Minhas turmas") fica, ou
-  // a aba do conselheiro diria só "Detalhe".
+  // "Detalhe" in the middle ("Editar · Detalhe · Avisos") says nothing; it only
+  // counts when it is the page itself.
+  // The root's "Painel" goes out; another role's root ("Minhas turmas") stays, or
+  // the advisor's tab would say just "Detalhe".
   let start = 0
   if (labels[0] === m.label_breadcrumb_panel()) start = 1
   const specific = labels

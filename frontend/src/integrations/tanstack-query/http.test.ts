@@ -4,15 +4,15 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { HTTPError, HTTPErrorCode, HTTPStatus, request, send } from './http'
 import { runInRequestScope } from './http.server'
 
-/** O schema que aceita tudo: aqui o que se mede é o transporte, não o contrato. */
+/** The schema that accepts everything: what is measured here is the transport, not the contract. */
 const ANY = z.unknown()
 
 /**
- * Responde 401 com o `code` do guard em toda rota privada, e 204 no refresh,
- * contando quantas vezes o refresh foi chamado.
+ * Answers 401 with the guard's `code` on every private route, and 204 on refresh,
+ * counting how many times refresh was called.
  *
- * O 401 do replay é de propósito: o que está sendo medido é quantas renovações
- * saem, não se a segunda tentativa passa.
+ * The replay's 401 is on purpose: what is being measured is how many renewals
+ * go out, not whether the second attempt passes.
  */
 function respondExpired() {
   const refreshes: Array<string> = []
@@ -50,7 +50,7 @@ function respond(status: number, body?: unknown) {
   )
 }
 
-/** Captura a rejeição já tipada - `.catch((e) => e)` devolveria `unknown`. */
+/** Captures the already typed rejection - `.catch((e) => e)` would return `unknown`. */
 async function rejection(promise: Promise<unknown>): Promise<HTTPError> {
   try {
     await promise
@@ -72,9 +72,9 @@ test('toda requisição leva o cookie da sessão', async () => {
 
   await request('/account', ANY)
 
-  // O cookie é `httpOnly` e assinado: o JavaScript não o lê nem o escreve, e
-  // sem `credentials: 'include'` ele simplesmente não sai do navegador - o
-  // login "funciona" e nenhuma tela seguinte autentica.
+  // The cookie is `httpOnly` and signed: JavaScript neither reads nor writes it, and
+  // without `credentials: 'include'` it simply does not leave the browser - login
+  // "works" and no following screen authenticates.
   const init = fetcher.mock.calls[0]?.[1]
   expect(init?.credentials).toBe('include')
 })
@@ -98,8 +98,8 @@ test('422 vira erro de campo', async () => {
     message: 'Dados inválidos',
     status: 422,
     code: HTTPErrorCode.VALIDATION_ERROR,
-    // Uma mensagem por campo, e não um array: é o que o handler do backend
-    // monta em `app/exceptions/handler.ts`.
+    // One message per field, not an array: it is what the backend's handler
+    // builds in `app/exceptions/handler.ts`.
     errors: { email: 'O campo email deve ser um e-mail válido' },
   })
 
@@ -136,8 +136,8 @@ test('401 de credencial inválida não dispara refresh', async () => {
 
   await rejection(request('/authentication/sign-in', ANY))
 
-  // Senha errada e sessão expirada são os dois 401 do backend, e só o segundo
-  // tem token a renovar. Renovar aqui seria um pedido a mais por engano.
+  // A wrong password and an expired session are the backend's two 401s, and only the second
+  // has a token to renew. Renewing here would be one request too many by mistake.
   const refreshes = fetcher.mock.calls.filter(([input]) =>
     String(input).includes('/authentication/refresh'),
   )
@@ -188,9 +188,9 @@ test('401 do guard renova a sessão e repete a requisição uma vez só', async 
 
   expect(refreshes).toHaveLength(1)
 
-  // Duas idas a `/account`: a original e o replay. A terceira não existe porque
-  // o replay carrega `skipRefresh`, e é ela que separa "renovar" de "renovar
-  // para sempre".
+  // Two trips to `/account`: the original and the replay. A third does not exist because
+  // the replay carries `skipRefresh`, and that is what separates "renew" from "renew
+  // forever".
   const calls = vi
     .mocked(globalThis.fetch)
     .mock.calls.filter(([input]) => String(input).includes('/account'))
@@ -209,16 +209,16 @@ test('no mesmo escopo, cinco 401 simultâneos renovam uma vez só', async () => 
     await Promise.all(pending)
   })
 
-  // O backend apaga o refresh token antigo ao emitir o novo: cinco renovações
-  // gastariam o mesmo token cinco vezes, e quatro derrubariam a sessão.
+  // The backend deletes the old refresh token when issuing the new one: five renewals
+  // would spend the same token five times, and four would take the session down.
   expect(refreshes).toHaveLength(1)
 })
 
 test('escopos diferentes renovam cada um por conta própria', async () => {
   const refreshes = respondExpired()
 
-  // São dois visitantes, com cookies diferentes. Compartilhar a renovação entre
-  // eles daria a um o token do outro.
+  // They are two visitors, with different cookies. Sharing the renewal between
+  // them would give one the other's token.
   await Promise.all([
     runInRequestScope(() => rejection(request('/account', ANY))),
     runInRequestScope(() => rejection(request('/account', ANY))),
@@ -232,8 +232,8 @@ test('FormData monta o próprio Content-Type', async () => {
 
   await request('/storages', ANY, { method: 'POST', body: new FormData() })
 
-  // Declarar `application/json` por cima faria o servidor procurar o `boundary`
-  // num cabeçalho que não o tem, e o corpo chegaria vazio.
+  // Declaring `application/json` on top would make the server look for the `boundary`
+  // in a header that does not have it, and the body would arrive empty.
   const init = fetcher.mock.calls[0]?.[1]
   expect(new Headers(init?.headers).get('Content-Type')).toBeNull()
 })
@@ -258,14 +258,14 @@ test('o signal do queryFn chega ao fetch', async () => {
 
   await request('/account', ANY, { signal: controller.signal })
 
-  // O `signal` vem de graça no `RequestInit`, mas só se `request` não o perder
-  // ao montar as próprias opções - que é o que este teste tranca. Sem ele,
-  // query que desmonta antes de resolver não cancela nada.
+  // The `signal` comes for free in `RequestInit`, but only if `request` does not lose it
+  // when building its own options - which is what this test locks. Without it,
+  // a query that unmounts before resolving cancels nothing.
   //
-  // O objeto não é o do chamador: `request` o combina com o prazo de `TIMEOUT`
-  // por `AbortSignal.any`. O que precisa continuar valendo é o efeito, e é o
-  // efeito que se afere - comparar identidade trancaria a implementação, não o
-  // comportamento.
+  // The object is not the caller's: `request` combines it with the `TIMEOUT` deadline
+  // through `AbortSignal.any`. What has to keep holding is the effect, and it is
+  // the effect that is measured - comparing identity would lock the implementation, not the
+  // behavior.
   const init = fetcher.mock.calls[0]?.[1]
   expect(init?.signal?.aborted).toBe(false)
 
@@ -278,9 +278,9 @@ test('a requisição tem prazo mesmo sem signal do chamador', async () => {
 
   await request('/account', ANY)
 
-  // Sem prazo, um servidor que aceita a conexão e não responde deixa a promessa
-  // pendurada até o limite do sistema operacional - e no SSR isso prende a
-  // resposta HTML inteira. O `signal` existe mesmo quando ninguém passou um.
+  // Without a deadline, a server that accepts the connection and does not answer leaves the promise
+  // hanging until the operating system's limit - and in SSR that holds the whole
+  // HTML response. The `signal` exists even when nobody passed one.
   const init = fetcher.mock.calls[0]?.[1]
   expect(init?.signal).toBeInstanceOf(AbortSignal)
   expect(init?.signal?.aborted).toBe(false)
@@ -294,18 +294,18 @@ test('o signal sobrevive ao replay depois do refresh', async () => {
     rejection(request('/account', ANY, { signal: controller.signal })),
   )
 
-  // O replay reusa o `init` original. Perder o signal aqui deixaria a segunda
-  // tentativa rodando depois de a tela já ter desmontado.
+  // The replay reuses the original `init`. Losing the signal here would leave the second
+  // attempt running after the screen has already unmounted.
   const replay = vi
     .mocked(globalThis.fetch)
     .mock.calls.filter(([input]) => String(input).includes('/account'))
 
   expect(replay).toHaveLength(2)
 
-  // Idem o teste acima: cada tentativa recebe o signal do chamador combinado com
-  // o próprio prazo, então o que se afere é o efeito. As duas precisam abortar
-  // juntas - um replay que sobrevivesse ao desmonte é exatamente o vazamento
-  // que este teste existe para pegar.
+  // Same as the test above: each attempt receives the caller's signal combined with
+  // its own deadline, so what is measured is the effect. Both must abort
+  // together - a replay that survived the unmount is exactly the leak
+  // this test exists to catch.
   for (const [, init] of replay) expect(init?.signal?.aborted).toBe(false)
 
   controller.abort()

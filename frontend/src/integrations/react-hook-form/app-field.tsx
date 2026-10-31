@@ -12,13 +12,13 @@ import { Alert, AlertDescription } from '#/components/ui/alert'
 import { Field, FieldError, FieldLabel } from '#/components/ui/field'
 import { errorId, invalidProps } from '#/lib/form-a11y'
 
-/** O que o controle de um campo recebe para se ligar ao rótulo e ao erro. */
+/** What a field's control receives to bind itself to the label and the error. */
 export type AppFieldBinding<
   TValues extends FieldValues,
   TName extends FieldPath<TValues>,
 > = Readonly<{
   field: ControllerRenderProps<TValues, TName>
-  /** Espalhe no controle: liga o `<label>` e marca o campo inválido. */
+  /** Spread on the control: links the `<label>` and marks the field invalid. */
   control: Readonly<{
     id: string
     'aria-invalid': boolean
@@ -32,21 +32,21 @@ type AppFieldProps<
 > = Readonly<{
   control: Control<TValues>
   name: TName
-  /** O `id` do controle, que o `<label>` aponta. */
+  /** The control's `id`, which the `<label>` points at. */
   id: string
   label: React.ReactNode
-  /** O controle e o que vier depois dele (descrição), a partir do binding. */
+  /** The control and whatever comes after it (description), from the binding. */
   children: (binding: AppFieldBinding<TValues, TName>) => React.ReactNode
 }>
 
 /**
- * Um campo do formulário: `Controller` do React Hook Form, rótulo, controle e
- * a mensagem de erro do validator, sempre na mesma ordem.
+ * A form field: React Hook Form's `Controller`, label, control and
+ * the validator's error message, always in the same order.
  *
- * Os formulários escreviam esse bloco à mão em cada campo - `data-invalid` no
- * `Field`, `htmlFor` igual ao `id`, `aria-invalid` no controle, `FieldError`
- * só quando inválido -, e cada cópia era uma chance de esquecer uma das quatro.
- * O controle continua sendo de quem usa: input, textarea, combobox, número.
+ * Forms used to write this block by hand in every field - `data-invalid` on
+ * `Field`, `htmlFor` equal to the `id`, `aria-invalid` on the control, `FieldError`
+ * only when invalid -, and each copy was a chance to forget one of the four.
+ * The control still belongs to whoever uses it: input, textarea, combobox, number.
  */
 export function AppField<
   TValues extends FieldValues,
@@ -79,8 +79,8 @@ export function AppField<
 }
 
 /**
- * O erro do formulário inteiro (`root`): o que a API recusou sem apontar um
- * campo. Nada aparece enquanto não houver erro.
+ * The whole form's error (`root`): what the API refused without pointing at a
+ * field. Nothing appears while there is no error.
  */
 export function AppFormRootError<TValues extends FieldValues>({
   form,

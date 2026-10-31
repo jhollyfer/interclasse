@@ -7,16 +7,16 @@ import type { HTTPError } from '../http'
 import { send } from '../http'
 
 /**
- * Entra. Responde `204` e entrega os dois tokens em `Set-Cookie`, `httpOnly` -
- * não há nada a guardar na tela, e quem passa a saber quem está logado é o
+ * Signs in. Answers `204` and delivers the two tokens in `Set-Cookie`, `httpOnly` -
+ * there is nothing to store on screen, and whoever comes to know who is logged in is
  * `GET /account`.
  */
 export function useAuthenticationSignInMutation(
   options?: MutationProps<void, AuthenticationSessionSignInPayload>,
 ) {
-  // Os generics ficam explícitos: são eles que dão tipo contextual aos
-  // callbacks do chamador. A regra "tipe a queryFn, não o hook" vale para
-  // query, onde `select` e `data` dependem da inferência em cadeia.
+  // The generics stay explicit: they are what gives contextual typing to the
+  // caller's callbacks. The "type the queryFn, not the hook" rule holds for
+  // queries, where `select` and `data` depend on chained inference.
   return useMutation<void, HTTPError, AuthenticationSessionSignInPayload>({
     ...options,
     mutationFn: async function (payload) {
@@ -28,7 +28,7 @@ export function useAuthenticationSignInMutation(
   })
 }
 
-/** Encerra a sessão no servidor, e não só na tela. */
+/** Ends the session on the server, and not only on screen. */
 export function useAuthenticationSignOutMutation(
   options?: MutationProps<void, void>,
 ) {

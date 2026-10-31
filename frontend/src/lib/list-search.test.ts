@@ -8,11 +8,11 @@ import {
 } from './list-search'
 
 /**
- * O recorte de lixeira. Vale um teste próprio porque os valores aceitos são
- * **literais** em `list-search.ts`, e não `TRASHED_MODE.X`: ler o enum ali cria
- * uma aresta entre o chunk do router e o chunk do vocabulário, e num grafo de
- * chunks cíclico ela devolve `undefined` no SSR. A duplicação é intencional, e
- * é aqui que ela é confrontada com a fonte.
+ * The trash filter. It deserves a test of its own because the accepted values are
+ * **literals** in `list-search.ts`, and not `TRASHED_MODE.X`: reading the enum there creates
+ * an edge between the router chunk and the vocabulary chunk, and in a cyclic
+ * chunk graph it returns `undefined` on SSR. The duplication is intentional, and
+ * this is where it is checked against the source.
  */
 describe('validateListSearch, recorte de lixeira', () => {
   it('aceita os dois modos que o enum declara', () => {
@@ -25,7 +25,7 @@ describe('validateListSearch, recorte de lixeira', () => {
   })
 
   it('descarta modo inventado, caixa alta e ausência', () => {
-    // O backend compara em minúsculo; `'ONLY'` seria 422, e não lixeira vazia.
+    // The backend compares in lowercase; `'ONLY'` would be a 422, and not an empty trash.
     expect(validateListSearch({ trashed: 'ONLY' })).toEqual({})
     expect(validateListSearch({ trashed: 'lixo' })).toEqual({})
     expect(validateListSearch({})).toEqual({})
@@ -48,16 +48,16 @@ describe('validateListSearch, ordenação', () => {
     ).toEqual({ sort: 'name' })
   })
 
-  // `direction` sozinha não ordena nada, e sujaria a URL com um parâmetro sem
-  // efeito.
+  // `direction` alone sorts nothing, and would dirty the URL with a parameter with no
+  // effect.
   it('descarta a direção sem coluna', () => {
     expect(validateListSearch({ direction: 'desc' })).toEqual({})
   })
 
   /**
-   * A coluna passa crua de propósito: cada recurso fecha a lista dele no
-   * `sortFields()` do backend, e repetir as listas aqui garantiria divergência.
-   * Coluna inválida volta 422 apontando o campo.
+   * The column passes through raw on purpose: each resource closes its list in the
+   * backend's `sortFields()`, and repeating the lists here would guarantee divergence.
+   * An invalid column returns 422 pointing at the field.
    */
   it('deixa a coluna passar sem conferir contra lista nenhuma', () => {
     expect(validateListSearch({ sort: 'rating' })).toEqual({ sort: 'rating' })
@@ -82,7 +82,7 @@ describe('validateListSearch, paginação', () => {
     expect(validateListSearch({ page: 'abc' })).toEqual({})
   })
 
-  // O backend recusa acima de 100; deixar passar viraria 422 numa navegação.
+  // The backend refuses above 100; letting it through would become a 422 on a navigation.
   it('descarta perPage acima do teto', () => {
     expect(validateListSearch({ perPage: 101 })).toEqual({})
     expect(validateListSearch({ perPage: 100 })).toEqual({ perPage: 100 })
@@ -124,8 +124,8 @@ describe('withExtra', () => {
     expect(validate({ status: '' })).toStrictEqual({})
   })
 
-  // `?size=abc` tem de sumir, e não virar a string `'abc'` numa requisição que
-  // o backend recusaria com 422.
+  // `?size=abc` has to vanish, and not become the string `'abc'` in a request that
+  // the backend would refuse with 422.
   it('separa a chave numérica e descarta o que não é inteiro não-negativo', () => {
     const validate = withExtra([], ['size'])
 
@@ -137,8 +137,8 @@ describe('withExtra', () => {
 })
 
 describe('validateStorefrontSearch', () => {
-  // `/storefront` nunca enxerga registro arquivado: deixar a chave passar seria
-  // prometer na URL um recorte que o backend recusa com 422.
+  // `/storefront` never sees an archived record: letting the key through would be
+  // promising in the URL a filter that the backend refuses with 422.
   it('descarta trashed e mantém o resto do recorte', () => {
     expect(
       validateStorefrontSearch({

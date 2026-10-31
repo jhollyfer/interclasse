@@ -11,7 +11,7 @@ import {
 
 const Schema = z.object({ open: z.boolean() })
 
-/** O `localStorage` não existe no node (o caso do SSR): cada teste monta o seu. */
+/** `localStorage` does not exist in node (the SSR case): each test builds its own. */
 function withStorage() {
   const data = new Map<string, string>()
 

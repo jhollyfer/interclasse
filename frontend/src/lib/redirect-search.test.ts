@@ -14,7 +14,7 @@ test('aceita caminho interno', () => {
 })
 
 test('recusa destino externo', () => {
-  // Cada um destes leva o usuário para fora logo depois de ele digitar a senha.
+  // Each of these takes the user off-site right after typing the password.
   const attacks = [
     'https://evil.com',
     'http://evil.com',
