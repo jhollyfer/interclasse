@@ -300,7 +300,7 @@ sozinho; cachear store só de job confiável.
 casos (`tooling.md` §9).
 
 ```yaml
-- uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+- uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
   with:
     runtime: node@24
     cache: true

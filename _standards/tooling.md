@@ -650,10 +650,11 @@ container. **O CI nunca chama o `maiyu-pattern`**: nem clone, nem `sync:check`, 
 `devEngines.packageManager` **e** o Node pelo `runtime`, sem `actions/setup-node`; `cache: true`
 guarda o store) e `pnpm install --frozen-lockfile` na raiz, explícito (`install: false` na action)
 para o passo aparecer no log (_doc-lib/pnpm.md#continuous-integration). Action pinada por SHA (§9).
-Lockfile desincronizado é erro de CI, nunca resolvido por um install que reescreve o lock.
+A v3 instala o pnpm travado no `pnpm-lock.yaml` quando o `devEngines` dá faixa; a v2 baixava o último
+da faixa e reprovava a própria conferência quando o pnpm trocava para a versão do lock. Lockfile desincronizado é erro de CI, nunca resolvido por um install que reescreve o lock.
 
 ```yaml
-- uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+- uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
   with:
     runtime: node@24
     cache: true
