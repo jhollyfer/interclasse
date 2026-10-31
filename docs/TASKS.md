@@ -6,7 +6,7 @@
 > `.specs/features/<feature>/tasks.md`; aqui a linha aponta para lá.
 > Atualiza no mesmo commit em que a tarefa começa ou termina.
 
-**Resumo:** fases 1 a 6 feitas; aguardando maiyu-pattern#5 e o sync que vem dele — atualizado 2026-10-31
+**Resumo:** fases 1 a 6 feitas, CI verde na `main` e régua sincronizada — atualizado 2026-10-31
 
 Status: `A fazer` · `Em andamento` · `Feita` · `Bloqueada` (com motivo nas notas).
 Prioridade: `Alta` · `Média` · `Baixa`.
@@ -87,12 +87,12 @@ Nada vira exceção local: a régua muda e volta pelo sync.
 | Spec de comando Ace em `commands/_<nome>.command.e2e.spec.ts` | Na régua (decisão #248, maiyu-pattern#4) |
 | Modelos de `docs/` sem "desvio aceito" | Na régua (maiyu-pattern#4) |
 | `pnpm/setup` v3 | Na régua (decisão #249, maiyu-pattern#4) |
-| Passo de autor do CI até o head do PR | Proposto em maiyu-pattern#5 (decisão #250); aqui desde o #18 |
-| Parte do multipart assina só o tamanho; arquivo inteiro sobe com `Content-Type` | Proposto em maiyu-pattern#5 (decisão #251); aqui no #20 |
+| Passo de autor do CI até o head do PR | Na régua (decisão #250, maiyu-pattern#5); aqui desde o #18 |
+| Parte do multipart assina só o tamanho; arquivo inteiro sobe com `Content-Type` | Na régua (decisão #251, maiyu-pattern#5); aqui no #20 |
 
 Resolvidos aqui: arquivar e restaurar respondem 409 de estado (`USER_ALREADY_ARCHIVED`, `USER_NOT_ARCHIVED`); `account/profile/show` não tem 404 alcançável pela rota (o guard responde 401 antes), coberto no unitário.
 
-## Fase 6 · CI de verdade (6/6)
+## Fase 6 · CI de verdade (7/7)
 
 Primeira execução real dos workflows da fase 5, PR a PR.
 
@@ -103,7 +103,8 @@ Primeira execução real dos workflows da fase 5, PR a PR.
 | 6.3 | Setup do MinIO de teste pelo `sh` | Alta | Feita | #19 |
 | 6.4 | Upload aceito pelo S3 de verdade (parte sem tipo, arquivo inteiro com `Content-Type`) | Alta | Feita | #20; e2e 692/692 e Playwright 14/14 contra MinIO da release do CI |
 | 6.5 | Régua sincronizada com o maiyu-pattern#4 | Média | Feita | sync sem divergência |
-| 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5, aguarda merge e sync |
+| 6.6 | Régua com autor no CI e assinatura da parte | Média | Feita | maiyu-pattern#5 sincronizado |
+| 6.7 | API do E2E em produção e seeds de demonstração pelo workspace | Alta | Feita | #22; primeiro run inteiro verde |
 
 ## Fase N · Ideias (fora do escopo atual)
 
