@@ -1,5 +1,4 @@
 import type { Merge } from '@interclasse/shared'
-import { TrophyIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import * as React from 'react'
 
@@ -12,7 +11,7 @@ type NotFoundPageProps = Readonly<
     Omit<React.ComponentProps<'div'>, 'code'>,
     {
       /**
-       * The giant number on the dark panel. `404` by default because that is what the
+       * The status code, small, above the title. `404` by default because that is what the
        * page was born for; the router's error boundary passes `500`, and without
        * this parameter it would announce "404" for a server failure.
        */
@@ -42,34 +41,26 @@ export function NotFoundPage({
   return (
     <div
       data-slot="not-found-page"
-      className={cn('grid min-h-stage grid-cols-1 md:grid-cols-2', className)}
+      className={cn(
+        'container mx-auto flex min-h-stage-sm flex-col justify-center px-4 py-12',
+        className,
+      )}
       {...props}
     >
-      <div className="flex flex-col justify-center bg-background px-8 py-12 md:px-16">
-        {children ?? (
-          <>
-            <NotFoundPageTitle>{m.common_not_found_title()}</NotFoundPageTitle>
-            <NotFoundPageSubtitle>
-              {m.common_not_found_subtitle()}
-            </NotFoundPageSubtitle>
-            <NotFoundPageDescription>
-              {m.common_not_found_description()}
-            </NotFoundPageDescription>
-            <NotFoundPageActions>
-              <NotFoundPageHomeButton />
-            </NotFoundPageActions>
-          </>
-        )}
-      </div>
-
-      {/* The site's scoreboard, not a generic black panel: the trophy on top,
-          the code below, neither covering the other. */}
-      <div className="hero relative flex h-stage-half flex-col items-center justify-center gap-4 overflow-hidden text-brand-ink-foreground md:h-auto md:rounded-l-3xl">
-        <TrophyIcon className="text-brand size-16 md:size-20" weight="fill" />
-        <span className="font-display text-brand text-error-code leading-none font-extrabold italic select-none md:text-error-code-lg">
-          {code}
-        </span>
-      </div>
+      <p className="font-display text-primary text-2xl font-extrabold italic">
+        {code}
+      </p>
+      {children ?? (
+        <>
+          <NotFoundPageTitle>{m.common_not_found_title()}</NotFoundPageTitle>
+          <NotFoundPageDescription>
+            {m.common_not_found_description()}
+          </NotFoundPageDescription>
+          <NotFoundPageActions>
+            <NotFoundPageHomeButton />
+          </NotFoundPageActions>
+        </>
+      )}
     </div>
   )
 }
@@ -160,7 +151,7 @@ export function NotFoundPageHomeButton({
     <Button
       data-slot="not-found-page-home-button"
       size="lg"
-      className="w-fit"
+      className="h-11 w-fit px-5 text-sm"
       render={<Link to={to}>{children}</Link>}
     />
   )
