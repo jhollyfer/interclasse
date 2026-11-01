@@ -120,10 +120,22 @@ export function BracketTree({
   const numbers = numbering(bracket.matches)
 
   return (
-    <div className="-mx-4 overflow-x-auto px-4 pb-2">
-      <ol className="flex min-w-max gap-6">
+    // On a phone each round is nearly the full width and snaps to the start, so one
+    // round is read at a time and the edge of the next one shows there is more.
+    // The region is a scroll container, so it needs a name and keyboard focus.
+    <div
+      role="region"
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region needs keyboard focus (axe scrollable-region-focusable, WCAG 2.1.1)
+      tabIndex={0}
+      aria-label={m.common_bracket_region_label()}
+      className="-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 pb-2 md:snap-proximity"
+    >
+      <ol className="flex min-w-max gap-4 md:gap-6">
         {tree.map((column) => (
-          <li key={column.round} className="flex w-56 flex-col">
+          <li
+            key={column.round}
+            className="flex w-72 shrink-0 snap-start flex-col md:w-56"
+          >
             <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
               {MATCH_PHASE_LABELS[column.phase ?? ''] ??
                 m.common_bracket_round({ round: column.round })}
@@ -167,7 +179,7 @@ export function BracketTree({
             </ul>
           </li>
         ))}
-        <li className="flex w-44 flex-col">
+        <li className="flex w-72 shrink-0 snap-start flex-col md:w-44">
           <h3 className="font-display mb-3 text-lg font-extrabold uppercase italic">
             {m.common_bracket_champion()}
           </h3>
