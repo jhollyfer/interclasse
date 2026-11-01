@@ -24,6 +24,7 @@ import {
 import { Separator } from '#/components/ui/separator'
 import { SidebarTrigger } from '#/components/ui/sidebar'
 import { buildBreadcrumbs } from '#/lib/breadcrumbs'
+import { cn } from '#/lib/cn'
 import { createConfirmHandle } from '#/lib/dialog-handle'
 import { initials } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
@@ -48,19 +49,28 @@ function Trail(): React.JSX.Element {
   const matches = useMatches()
   const crumbs = buildBreadcrumbs(matches)
 
+  // Below `sm` only the last level fits: the others are hidden, not cut mid-word.
+  const lastIndex = crumbs.length - 1
+
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
+    <Breadcrumb className="min-w-0">
+      <BreadcrumbList className="flex-nowrap">
         {crumbs.map((crumb, index) => (
           <React.Fragment key={crumb.label.concat(String(index))}>
-            {index > 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem>
+            {index > 0 && <BreadcrumbSeparator className="max-sm:hidden" />}
+            <BreadcrumbItem
+              className={cn(index < lastIndex && 'max-sm:hidden')}
+            >
               {crumb.to && (
                 <BreadcrumbLink render={<Link to={crumb.to} />}>
                   {crumb.label}
                 </BreadcrumbLink>
               )}
-              {!crumb.to && <BreadcrumbPage>{crumb.label}</BreadcrumbPage>}
+              {!crumb.to && (
+                <BreadcrumbPage className="truncate">
+                  {crumb.label}
+                </BreadcrumbPage>
+              )}
             </BreadcrumbItem>
           </React.Fragment>
         ))}
@@ -87,7 +97,7 @@ function AccountMenu(): React.JSX.Element {
         `render`, and not nesting: the trigger is already a `<button>`, and another button
         inside it would be a button inside a button - a hydration error.
       */}
-        <DropdownMenuTrigger className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted">
+        <DropdownMenuTrigger className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full py-1 pr-2 pl-1 md:min-h-0 md:min-w-0 md:justify-start transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted">
           <Avatar className="size-7">
             <AvatarImage src={account.avatar?.url} alt="" />
             <AvatarFallback
@@ -147,15 +157,15 @@ function AccountMenu(): React.JSX.Element {
 export function Header(): React.JSX.Element {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b">
-      <div className="flex items-center gap-2 px-4">
+      <div className="flex min-w-0 items-center gap-2 px-2 sm:px-4">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"
-          className="mr-2 data-[orientation=vertical]:h-4"
+          className="mr-2 max-sm:hidden data-[orientation=vertical]:h-4"
         />
         <Trail />
       </div>
-      <div className="ml-auto flex items-center gap-2 px-4">
+      <div className="ml-auto flex shrink-0 items-center gap-1 px-2 sm:gap-2 sm:px-4">
         <LocaleSwitch />
         <ThemeToggle />
         <AccountMenu />

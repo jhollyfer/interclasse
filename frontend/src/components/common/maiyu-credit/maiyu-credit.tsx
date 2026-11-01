@@ -11,6 +11,8 @@ import { m } from '#/paraglide/messages'
  * Lives in `common` because every layout shows it - the site, the dashboard and the sign-in.
  * The color comes from whoever uses it (`className`): the site's footer is dark, the dashboard's
  * follows the theme.
+ *
+ * One discreet line on a phone: the tagline only shows from `sm` up.
  */
 export function MaiyuCredit({
   className,
@@ -20,7 +22,10 @@ export function MaiyuCredit({
     <p
       data-slot="maiyu-credit"
       {...rest}
-      className={cn('flex items-center justify-center gap-2', className)}
+      className={cn(
+        'flex items-center justify-center gap-2 text-center',
+        className,
+      )}
     >
       <Picture
         src={maiyuLogo}
@@ -40,7 +45,9 @@ export function MaiyuCredit({
         >
           Maiyu
         </a>
-        . {m.common_maiyu_credit_tagline()}.
+        <span className="max-sm:hidden">
+          . {m.common_maiyu_credit_tagline()}.
+        </span>
       </span>
     </p>
   )
