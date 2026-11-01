@@ -135,6 +135,18 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, saídas de scripts e identificadores em inglês; `pnpm check`, `depcruise`, shared e E2E (692) verdes |
 | 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Feita | sem redirect; `/painel` virou `/dashboard`. Comentários, títulos de teste, identificadores, configs e mensagens de erro de desenvolvedor em inglês; Playwright 14/14 |
 
+## Fase 9 · Responsivo em todos os perfis e interface sem cara de IA (0/5)
+
+Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela genérica, `humanizer` no texto.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 9.0 | Diagnóstico: screenshots de toda rota por perfil em 375/768/1280, claro e escuro | Alta | Em andamento | |
+| 9.1 | Site público responsivo e com identidade | Alta | Em andamento | |
+| 9.2 | Painel do administrador responsivo | Alta | Em andamento | |
+| 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Em andamento | |
+| 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Em andamento | |
+
 ## Fase N · Ideias (fora do escopo atual)
 
 - Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10
