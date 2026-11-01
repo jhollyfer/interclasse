@@ -2,9 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import * as React from 'react'
 
-import logo512 from '#/assets/logo-512.png'
 import { Agenda } from '#/components/common/match-agenda'
-import { Picture } from '#/components/common/picture'
 import {
   storefrontAnnouncementsQueryOptions,
   storefrontBracketsQueryOptions,
@@ -47,25 +45,14 @@ export function HomePage(): React.JSX.Element {
   return (
     <>
       <section className="hero text-brand-ink-foreground">
-        <div className="container mx-auto grid items-center gap-10 px-4 py-12 md:grid-cols-hero md:py-20">
-          <div className="flex flex-col gap-5">
-            <Picture
-              src={logo512}
-              alt={m.public_logo_alt()}
-              width={144}
-              height={144}
-              className="size-28 md:size-36"
-              placement="lcp"
-            />
+        <div className="container mx-auto grid items-start gap-6 px-4 py-8 md:grid-cols-hero md:gap-10 md:py-12">
+          <div className="flex flex-col gap-4">
             <p className="text-brand font-semibold">
               {m.public_home_edition()}
             </p>
-            <h1 className="font-display pb-1 text-5xl leading-display font-extrabold uppercase italic md:text-6xl">
+            <h1 className="font-display leading-display text-5xl font-extrabold uppercase italic md:text-6xl">
               {m.public_home_title()}
             </h1>
-            <p className="max-w-md text-lg text-brand-ink-foreground/80">
-              {m.public_home_lead()}
-            </p>
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/matches"

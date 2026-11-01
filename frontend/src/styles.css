@@ -569,13 +569,7 @@
   }
 
   .hero {
-    background:
-      radial-gradient(
-        circle at 80% 20%,
-        rgb(255 212 0 / 0.18),
-        transparent 40%
-      ),
-      linear-gradient(135deg, var(--field), var(--brand-ink));
+    background: var(--brand-ink);
   }
 
   .skew-button {
