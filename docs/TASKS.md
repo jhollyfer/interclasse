@@ -147,6 +147,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 | 9.2 | Painel do administrador responsivo | Alta | Feita | Linhas de jogo em coluna com botões em grade, relatório com `dl` válido e 2 destaques, tabelas em região focável, zona de perigo na chave, salvar do site fixo, `EnrollmentBoard` em blocos recolhíveis; sem rolagem horizontal nem violação do axe em 375/768/1280 |
 | 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Feita | Login sem enfeite nem frase de vitrine e com o formulário no topo no celular; menu do representante em um grupo só (atletas e perfil); perfil sem ícones decorativos; erros de campo legíveis no celular. Detalhe da turma e quadro de inscrição ficam na 9.2 |
 | 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Feita | 29 rotas × 375/768/1280 sem rolagem lateral, alvos de 44 px e axe limpo; representante na suíte; 3 textos revisados nos 3 idiomas |
+| 9.5 | Ajustes finais: contraste do Salvar, selo Maiyu no celular, teste de telas nos dois temas | Média | Feita | Salvar desabilitado a 70%; o "selo" era o botão do TanStack Devtools, que só existe em dev; teste de telas com passe escuro em 375 px (120 testes) |
 
 ## Fase N · Ideias (fora do escopo atual)
 

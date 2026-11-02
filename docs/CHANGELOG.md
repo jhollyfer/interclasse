@@ -18,6 +18,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado
 
+- O botão Salvar da inscrição de atletas fica legível no tema escuro mesmo quando não há nada para salvar.
 - Todas as telas cabem no celular, do site público ao painel: botões e campos com 44 px para o dedo, diálogos que sobem do rodapé e tabelas que viram cartões.
 - Site público mais limpo: início sem logo repetida, faixa de resultados que se rola com o dedo ou o teclado, chave com uma fase por vez no celular e página de erro curta.
 - Login sem enfeite e com o formulário no topo no celular; menu do representante com atletas e perfil juntos.

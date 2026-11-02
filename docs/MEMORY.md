@@ -18,9 +18,11 @@
 
 Fase 9 feita na branch `feat/frontend-responsivo`: todos os perfis (visitante, administrador, conselheiro, representante) responsivos de 375 a 1280 px. Kit com controles de 44 px no celular, diálogo em folha de baixo, tabela em cartão, barra de salvar fixa; site público sem enfeite (hero, 404, avisos, faixa de resultados rolável, chave por fase); painel com relatório de `dl` válido e inscrição em blocos recolhíveis; login sem frase de vitrine; textos revisados com o humanizer. `e2e/responsive.spec.ts` verde (91 testes: 29 rotas × 3 larguras + 4 logins), Playwright de fluxo verde, `check`, unit, `format:check`, build e ciclos verdes.
 
+Tarefa 9.5 na branch `fix/frontend-ajustes-fase-9`: Salvar desabilitado da inscrição legível no escuro e `responsive.spec.ts` com passe escuro em 375 px (33/33 local). A "bolha" no canto inferior direito era o TanStack Devtools, só de desenvolvimento.
+
 ## Próximos passos
 
-1. Abrir o PR da fase 9 e acompanhar o CI (o E2E do frontend ganhou a conta do representante).
+1. Abrir o PR da 9.5 e acompanhar o CI.
 2. Deploy do #25: o smoke test deu 503; aguarda os logs do Coolify.
 3. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
 4. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). No painel, migration no *Post-deployment command* e *Pre-deployment* vazio. Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
