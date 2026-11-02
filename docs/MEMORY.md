@@ -20,6 +20,8 @@ Fase 7 feita na branch `frente-regua-adacaibs` (sem push): migration no *Post-de
 
 Tarefa 8.3 feita na branch `frente-8-3` (sem push): frontend, E2E e scripts em inglês (comentários, títulos de teste, identificadores, mensagens de erro de desenvolvedor), rotas públicas `/standings`, `/matches`, `/announcements`, `/about` e `/dashboard` sem redirect. Portões: `check`, 419 unit, `format:check`, build, ciclos e Playwright 14/14.
 
+Tarefa 9.1 feita na branch `frente-9-1` (sem push): site público com avisos fixados sem faixa lateral, faixa de resultados rolável e focável (sem marquee), hero sem logo repetida, 404 curta, chave por fase no celular (`snap-x`, região focável) e alvos de 44 px no cabeçalho, rodapé e links de seção. Axe sem violação nas rotas públicas em 375/768/1280, claro e escuro.
+
 ## Próximos passos
 
 1. Abrir o PR da fase 7 e conferir a matriz `e2e` (3 shards) do `main-check-backend.yml` no primeiro run; o nome dos checks mudou (`Backend - E2E 1/3`…), então ajustar a proteção da `main` se ela exige o nome antigo.

@@ -142,7 +142,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 9.0 | Diagnóstico: screenshots de toda rota por perfil em 375/768/1280, claro e escuro | Alta | Em andamento | |
-| 9.1 | Site público responsivo e com identidade | Alta | Em andamento | |
+| 9.1 | Site público responsivo e com identidade | Alta | Feita | Avisos sem faixa colorida, faixa de resultados rolável, hero sem logo repetida, 404 curta, chave por fase no celular, alvos de 44 px |
 | 9.2 | Painel do administrador responsivo | Alta | Em andamento | |
 | 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Em andamento | |
 | 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Em andamento | |
