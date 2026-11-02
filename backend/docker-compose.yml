@@ -42,7 +42,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-interclasse-root-secret}
       # O navegador envia cada parte direto para cá: sem CORS liberado, o
       # preflight do PUT morre antes de qualquer byte sair. Lista explícita.
-      MINIO_API_CORS_ALLOW_ORIGIN: ${STORAGE_CORS_ORIGIN:-http://localhost:3001,http://localhost:3010}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${CORS_ORIGINS:-http://localhost:3001,http://localhost:3010}
       # Multipart abandonado some sozinho.
       MINIO_API_STALE_UPLOADS_EXPIRY: 24h
       MINIO_API_STALE_UPLOADS_CLEANUP_INTERVAL: 6h
