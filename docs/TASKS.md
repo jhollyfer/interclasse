@@ -135,7 +135,7 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, saídas de scripts e identificadores em inglês; `pnpm check`, `depcruise`, shared e E2E (692) verdes |
 | 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Feita | sem redirect; `/painel` virou `/dashboard`. Comentários, títulos de teste, identificadores, configs e mensagens de erro de desenvolvedor em inglês; Playwright 14/14 |
 
-## Fase 9 · Responsivo em todos os perfis e interface sem cara de IA (0/5)
+## Fase 9 · Responsivo em todos os perfis e interface sem cara de IA (6/6)
 
 Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela genérica, `humanizer` no texto.
 
@@ -148,6 +148,17 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 | 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Feita | Login sem enfeite nem frase de vitrine e com o formulário no topo no celular; menu do representante em um grupo só (atletas e perfil); perfil sem ícones decorativos; erros de campo legíveis no celular. Detalhe da turma e quadro de inscrição ficam na 9.2 |
 | 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Feita | 29 rotas × 375/768/1280 sem rolagem lateral, alvos de 44 px e axe limpo; representante na suíte; 3 textos revisados nos 3 idiomas |
 | 9.5 | Ajustes finais: contraste do Salvar, selo Maiyu no celular, teste de telas nos dois temas | Média | Feita | Salvar desabilitado a 70%; o "selo" era o botão do TanStack Devtools, que só existe em dev; teste de telas com passe escuro em 375 px (120 testes) |
+
+## Fase 10 · Régua nova do maiyu-pattern: catálogo de ambiente, CI rápido e viewports (0/4)
+
+Pedido do dono, 02/11: pull do maiyu-pattern e aplicação estrita (DECISIONS #261 a #274 do upstream).
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 10.1 | Catálogo de ambiente (#271): `.env.example` pelo modelo, `SEED_OWNER_*`, `E2E_OWNER_*`, `e2e/support/env.ts` | Alta | Em andamento | `SEED_DEMO_PASSWORD` e `E2E_DEMO_PASSWORD` entram primeiro no catálogo do upstream |
+| 10.2 | CI rápido e deploy (#262, #272, #273, #274): matriz do Playwright, job `changes`, secrets de nome fixo, healthcheck com `wget` | Alta | Em andamento | |
+| 10.3 | Frontend (#265 a #270): projetos `mobile`/`tablet`/`desktop`, `touch-targets.spec`, kit com `sm:`, tipografia fluida, lista contra cara de gerador, contador exato | Alta | Em andamento | |
+| 10.4 | Integração, portões, Playwright nos 3 projetos e PR | Alta | Em andamento | |
 
 ## Fase N · Ideias (fora do escopo atual)
 

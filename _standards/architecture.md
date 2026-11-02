@@ -74,7 +74,7 @@ controller → use-case → domain
 ```
 backend/
 ├── package.json  tsconfig.json  eslint.config.js  prettier.config.js  .prettierignore
-├── tsconfig.depcruise.json          # §3.4: o `paths` que o dependency-cruiser lê (tsconfig.json só tem `imports`)
+├── tsconfig.depcruise.json          # §3.4: só quando o alias vem de `paths`; alias por `imports` dispensa
 ├── Dockerfile-production  .dockerignore  docker-compose.yml   # compose = só infra local
 ├── .env.example  .env.test                                     # backend.md §6
 ├── openapi.json                                                # artefato commitado (openapi.md)
@@ -247,17 +247,18 @@ Arquivo que não é código de camada também tem casa. O que não está aqui ne
 | `.editorconfig` | raiz do repositório, um só | vale para os três pacotes; nenhum pacote tem o seu |
 | `.gitleaks.toml` | raiz, só se o projeto usa `gitleaks` (`tooling.md` §7) | allowlist com o motivo de cada entrada |
 | `.prettierignore` | um por pacote (`backend/`, `frontend/`, `shared/`) | só gerados e saída de build: o `.gitignore` da raiz não alcança o pacote onde o Prettier roda. Página do Prettier sobre `.prettierignore` não conferida |
-| `tsconfig.depcruise.json` | raiz do backend | estende `tsconfig.json` e repete o alias em `paths` para o dependency-cruiser; o `tsConfig` dele só lê `compilerOptions` (_doc-lib/dependency-cruiser.md#doc/options-reference.md) |
+| `tsconfig.depcruise.json` | raiz do backend, só quando o alias do app não resolve pelo `tsConfig` | estende `tsconfig.json` e repete o alias em `paths`; o `tsConfig` do dependency-cruiser só lê `compilerOptions` (_doc-lib/dependency-cruiser.md#doc/options-reference.md). Com o alias no campo `imports` do `package.json` (Fastify), o `tsConfig` apontando para o `tsconfig.json` e as `conditionNames` do `enhancedResolveOptions` já resolvem: o arquivo não existe, para o alias não ficar em dois lugares (`DECISIONS.md` #263) |
 | `scripts/depcruise.config.ts` | `backend/scripts/` | `depcruise app --config scripts/depcruise.config.ts` (_doc-lib/dependency-cruiser.md#doc/cli.md) |
 | `backend/infra/<serviço>/` | Dockerfile e script do serviço de teste local; CORS e política de provedor em `infra/<provedor>-<tema>.json` | nunca produção (`tooling.md` §8.3) |
 | `backend/.adonisjs/` | versionado | a doc manda commitar (_doc-lib/adonisjs.md#folder-structure) |
 | `backend/tmp/` | ignorada, sem `.gitkeep` | a doc manda ignorar (§3.2) |
 | `app/core/<tema>.<unit\|e2e>.spec.ts` | `app/core/` | spec de configuração ou de recurso sem arquivo-casa; nome pelo tema |
-| `scripts/openapi/errors.ts` | `backend/scripts/openapi/` | componentes de erro compartilhados (`openapi.md` #erros-do-use-case) |
+| `scripts/openapi/errors.ts` | `backend/scripts/openapi/` | componentes de erro compartilhados do gerador estático (`openapi.md` #erros-do-use-case). Quando o kernel registra os componentes em runtime (`addSchema` do Fastify), eles moram em `app/core/openapi/`: `app/` não importa de `scripts/` (`DECISIONS.md` #264) |
 | `shared/src/merge.ts` | `shared/src/` | o utilitário `Merge` (`typescript.md` §8), exportado pelo `index.ts` |
 | `shared/src/validators/client/<nome>.validator.ts` | `shared/src/validators/client/` | schema de dado que nasce e fica no navegador (`localStorage`, retomada de upload), sem recurso par no backend; vale o resto de §9 |
 | `shared/src/<tema>-fixtures.ts` | `shared/src/`, fora do `tsconfig.build.json` | helper de teste usado por 2+ specs; mesmo molde de `tests/<tema>-fixtures.ts` do backend |
 | `frontend/project.inlang/paraglide.config.ts` | `project.inlang/` | opções do compilador, lidas pelo plugin do Vite e pela CLI: uma config só para as duas não divergirem (_doc-lib/paraglide.md#/vite, https://paraglidejs.com/vite, aberta em 2026-10-31) |
+| `frontend/e2e/support/<tema>.md` | `e2e/support/` | dado que a suíte do e2e lê (roteiro de fluxos com ids, inventário de cobertura que uma trava confere): fica ao lado da suíte; `docs/TEST-PLAN.md` aponta para ele e não copia, porque `docs/` é conjunto fechado (`documentation.md` §1) (`DECISIONS.md` #261) |
 | `frontend/src/vite-env.d.ts` | `src/` | tipa as `VITE_*` de `import.meta.env`; sem ele `env.ts` lê `any` |
 | `frontend/src/integrations/theme/` | `integrations/theme/get-theme.ts` | cookie de tema lido no servidor (`frontend.md` §6) |
 | `frontend/src/integrations/tanstack-query/devtools.tsx` | ao lado do cliente HTTP | as devtools, carregadas só em desenvolvimento |
@@ -273,7 +274,7 @@ frontend/
 ├── project.inlang/{settings.json, paraglide.config.ts}  messages/{pt-BR,es,en}.json   # i18n.md, §3.4
 ├── .prettierignore
 ├── scripts/check-chunk-cycles.mjs (+ .test.ts)
-├── e2e/{playwright.config.ts, <fluxo>.spec.ts, support/{test.ts, <tema>.ts}}
+├── e2e/{playwright.config.ts, <fluxo>.spec.ts, support/{test.ts, <tema>.ts, <tema>.md}}
 └── src/
     ├── router.tsx  start.ts  env.ts  vite-env.d.ts  styles.css
     ├── server.ts                    # paraglideMiddleware(req, () => handler.fetch(req)), i18n.md §2

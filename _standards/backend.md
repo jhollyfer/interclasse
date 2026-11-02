@@ -1201,10 +1201,18 @@ stack e que as seções acima não fechavam. Cada item completa a seção citada
 
 Um só leitor, `start/env.ts` (`Env.create` no Adonis; leitor síncrono no Fastify,
 `architecture.md` §5), com blocos nesta ordem: `# Node` · `# App` · `# Session` · `# CORS` ·
-`# Database` · `# Storage` · `# Seeding` · `# Mail` · `# Site URL` · `# Queue`, e depois os
-blocos de domínio do projeto. Chave da casa tem o mesmo nome, validador e comentário em todo
-projeto. **Nome de bloco e comentário do `.env.example` e do `.env.test` são em inglês**
+`# Database` · `# Storage` · `# Seeding` · `# Mail` · `# Queue` · `# JWT`. Chave da casa tem o mesmo
+nome, validador e comentário em todo projeto. **Nome de bloco e comentário do `.env.example` e do `.env.test` são em inglês**
 (`typescript.md` §12, `DECISIONS.md` #260); o texto em português é o `docs/ENV.md`.
+
+**O modelo é a fonte.** `_templates/backend/.env.example` e `_templates/frontend/.env.example` são o
+mesmo arquivo em todo projeto: mesmas chaves, mesma ordem, mesmos blocos e comentários. Só o valor de
+exemplo é do projeto (porta, banco, bucket). Recurso extra (e-mail, Redis, JWT) vem num bloco
+`# --- optional: <nome> ---` que o projeto inclui inteiro ou não inclui (`client-url`, `compose-minio`,
+`mail`, `queue`, `jwt`, `compose-ports`). O
+`sync-to-project.mjs --check` compara a lista de chaves e reprova chave a mais, a menos ou fora de ordem
+(`env-diverge:`), também no perfil `--perfil=codigo`. Chave que o modelo não tem não existe: entra
+primeiro no catálogo abaixo e no modelo, depois no projeto (`DECISIONS.md` #271).
 
 Regras:
 
@@ -1227,6 +1235,154 @@ Regras:
   leitor de ENV; configuração que vem do banco (preferência da instância) é repository.
 - `.env` e variantes de ambiente real **não são versionados**. Versionam-se `.env.example` e
   `.env.test`; o segundo só tem endereço de container local e senha de banco de teste.
+
+### 6.1 Nome da chave
+
+O nome é o mesmo em todo projeto, backend e frontend. Chave nova que não está no catálogo (§6.2)
+entra primeiro aqui, por decisão, e só depois no projeto. Fonte da regra: a doc dá o mecanismo (o
+`Env.create` declara e valida, `_doc-lib/adonisjs.md#configuration`, https://docs.adonisjs.com/configuration;
+`VITE_` decide o que vai ao navegador, `_doc-lib/vitejs.md#env-and-mode`, https://vite.dev/guide/env-and-mode;
+`trustProxy` do Fastify aceita string de IP/CIDR separados por vírgula,
+`_doc-lib/fastify.md#Reference/Server`, https://fastify.dev/docs/latest/Reference/Server/). Os nomes e
+as regras abaixo são *(opinião da casa)*: nenhuma dessas páginas fixa nome de chave.
+
+- `SCREAMING_SNAKE`: letras maiúsculas, dígitos e `_`.
+- **Prefixo por domínio**: `DATABASE_`, `STORAGE_`, `MAIL_`, `SEED_`, `E2E_`, `VITE_` (web). A chave de
+  um recurso começa pelo nome do recurso, para agrupar no arquivo e no painel da hospedagem.
+- **Nada de fornecedor no nome.** `STORAGE_*`, não `R2_*` nem `S3_*`; `DATABASE_URL`, não `NEON_URL`;
+  `MAIL_*`, não `MAILTRAP_*`. O código depende do protocolo (S3, Postgres, SMTP), e trocar de
+  fornecedor muda o valor, nunca o nome.
+- **Lista no plural, separada por vírgula, sem espaço**: `CORS_ORIGINS`, `TRUSTED_PROXIES`.
+- **Booleano é `true` ou `false`**, minúsculo. `1`, `yes` e `on` não existem.
+- **Tamanho em bytes**, inteiro (`UPLOAD_MAX_SIZE=1073741824`); a unidade não vai no nome nem no valor.
+- **URL sem barra final.** O código concatena caminhos que começam com `/`.
+- **`VITE_` só para o que pode ir ao navegador** (`frontend.md` §3.3). O que o servidor do frontend lê
+  em tempo de execução e não pode ir ao bundle não leva o prefixo (`SERVER_API_URL`).
+- **Mesma coisa, mesmo nome.** O teto de upload é `UPLOAD_MAX_SIZE` na API e `VITE_UPLOAD_MAX_SIZE` no
+  web (espelho); a conta do semeador é `SEED_OWNER_*` e o E2E a reusa como `E2E_OWNER_*`. Sinônimo
+  (`CORS_ORIGIN`, `VITE_API_BASE_URL`, `TRUST_PROXY`) é desvio.
+- **Chave removida sai do `.env.example`, do `.env.test`, do `env.ts`, do `docs/ENV.md` e do
+  workflow no mesmo commit.**
+
+### 6.2 Catálogo
+
+Uma tabela por bloco, na ordem em que o `start/env.ts` lê (a do `.env.example`). Colunas: App é quem
+lê (`api`, `web`, `e2e`); Obrigatória é o que derruba o boot quando falta; Segredo é o que nunca vai
+para o Git. O `docs/ENV.md` do projeto repete as linhas que ele usa, com exemplo e valor de produção;
+nome e significado vêm daqui.
+
+**`# Node`**
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `NODE_ENV` | api | sim | não | `development`, `production` ou `test` |
+| `PORT` | api | sim | não | porta HTTP |
+| `HOST` | api | sim | não | interface de escuta; `0.0.0.0` em container |
+| `TZ` | api | não | não | fuso do processo; `UTC` em todo ambiente |
+
+**`# App`**
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `LOG_LEVEL` | api | sim | não | nível do logger |
+| `APP_KEY` | api | sim | sim | chave de cifra (Adonis) |
+| `APP_SERVER_URL` | api | sim | não | endereço público da API |
+| `APP_CLIENT_URL` | api | só com app e API em sites diferentes | não | origem pública do web; decide o `sameSite` do cookie (§4.10) |
+| `TRUSTED_PROXIES` | api | em produção atrás de proxy | não | proxies cujo `X-Forwarded-For` vale; lista de endereços, CIDR e `loopback`, `linklocal`, `uniquelocal`; ausente vale `loopback`; nunca `true` |
+
+`TRUSTED_PROXIES=uniquelocal` é o valor da casa para a rede interna do Coolify/Traefik: cobre as
+faixas privadas (10/8, 172.16/12, 192.168/16, fc00::/7) sem listar a rede de cada servidor. Com a
+**Cloudflare** na frente do Traefik, o `X-Forwarded-For` chega com o IP da Cloudflare no meio da
+cadeia, e `uniquelocal` sozinho para antes dela: o `request.ip()` sai como IP da borda e os limites por
+IP viram globais. Nesse caso a lista inclui as faixas publicadas pela Cloudflare (renovadas por
+quem opera o deploy, em `docs/ARCHITECTURE.md`), ou o proxy de borda reescreve o cabeçalho. Cloudflare
+(https://developers.cloudflare.com/fundamentals/reference/http-headers/): página oficial não conferida.
+As palavras `loopback`, `linklocal` e `uniquelocal` são do `proxy-addr` por baixo do Adonis e do Fastify;
+a página do Fastify consultada só documenta IP/CIDR, então o uso das palavras é *(opinião da casa)*.
+
+**`# Session`** e **`# CORS`** (a borda do navegador)
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `COOKIE_DOMAIN` | api | em produção com web e API em hosts irmãos | não | `Domain` do cookie de sessão; o menor domínio que cobre os dois hosts (§4.10) |
+| `CORS_ORIGINS` | api | fora de dev | não | origens do navegador aceitas, separadas por vírgula, nunca `*`; ausente fora de dev recusa todo cross-origin |
+
+**`# Database`**
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `DATABASE_URL` | api | sim | sim | conexão com o Postgres |
+| `DATABASE_SSL` | api | não | não | TLS na conexão; ausente é **desligado**; `true` em banco gerenciado |
+
+**`# Storage`** (bucket S3-compatível, o mesmo em todo ambiente; MinIO em dev e teste)
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `UPLOAD_MAX_SIZE` | api | sim | não | teto por arquivo, em bytes, sem default |
+| `STORAGE_KEY` | api | sim | sim | chave de acesso; no MinIO local, o usuário de escopo mínimo, nunca o root |
+| `STORAGE_SECRET` | api | sim | sim | segredo de acesso |
+| `STORAGE_BUCKET` | api | sim | não | nome do bucket, privado |
+| `STORAGE_ENDPOINT` | api | sim | não | endpoint S3-compatível |
+| `STORAGE_FORCE_PATH_STYLE` | api | não | não | `true` só para MinIO; em R2, S3 e Spaces fica ausente |
+
+**`# Seeding`**
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `SEED_OWNER_EMAIL` | api | não | não | e-mail do primeiro administrador criado pelo seeder |
+| `SEED_OWNER_PASSWORD` | api | só para semear | sim | senha dele; sem ela o seeder para |
+
+`OWNER` aqui é "dono da instalação", o primeiro administrador, e o nome não muda com o papel que o
+projeto der a ele. Semente de outro perfil (`SEED_DEMO_PASSWORD`) não tem chave: não há chave de
+projeto, e o que o catálogo não cobre entra primeiro aqui.
+
+**`# Mail`**, **`# Queue`** e **`# JWT`** (opcionais, por recurso: só onde o recurso existe)
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `MAIL_FROM` | api | onde há e-mail | não | remetente |
+| `SMTP_HOST` | api | onde há e-mail | não | servidor SMTP; porta, usuário e senha não estão no catálogo: entram aqui e no modelo (bloco `mail`) na primeira vez que um projeto os ler |
+| `REDIS_URL` | api | não | sim | cache, fila e store do rate limit; ausente usa o banco |
+| `JWT_PRIVATE_KEY` | api | no Fastify com RS256 | sim | chave privada de assinatura (`backend-fastify.md`, sessão); nunca no YAML do CI, só em `secrets.*` |
+
+**Web** (`frontend/src/env.ts`, `frontend.md` §3.3)
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `VITE_API_URL` | web | sim no build | não | raiz pública da API no bundle; ausente só vale em dev |
+| `SERVER_API_URL` | web | não | não | endereço da API visto pelo SSR (rede interna), lido por requisição, sem `VITE_`; ausente usa `VITE_API_URL` |
+| `VITE_SITE_URL` | web | sim no build, se o site tem `sitemap.xml` | não | origem pública do site, para as URLs absolutas do `sitemap.xml` e do `robots.txt` |
+| `VITE_UPLOAD_MAX_SIZE` | web | não | não | espelho de `UPLOAD_MAX_SIZE`; ausente, o cliente não recusa por tamanho e o `422` do servidor diz o limite |
+
+**E2E** (`e2e/support/env.ts`, Playwright; sem default: falta uma e a execução para dizendo qual)
+
+| Nome | App | Obrigatória | Segredo | Significado |
+|---|---|---|---|---|
+| `E2E_BASE_URL` | e2e | ao rodar o E2E | não | origem do web sob teste |
+| `E2E_API_URL` | e2e | ao rodar o E2E | não | raiz da API, para as fixtures |
+| `E2E_OWNER_EMAIL` | e2e | ao rodar o E2E | não | conta do `auth.setup.ts`; a do seeder |
+| `E2E_OWNER_PASSWORD` | e2e | ao rodar o E2E | sim | senha dela; no CI, gerada a cada execução |
+| `E2E_SHOTS_DIR` | e2e | não | não | pasta fora do repositório para capturas de tela; ausente, não grava |
+
+**Só do `docker-compose.yml`** (não passam pelo leitor de ENV): `DB_PORT`, `STORAGE_PORT`,
+`STORAGE_CONSOLE_PORT`, `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`. O CORS do MinIO local sai de
+`CORS_ORIGINS`. No modelo são os blocos opcionais `compose-minio` (`MINIO_ROOT_*`) e `compose-ports`
+(`*_PORT`). **Não existe chave de domínio do projeto**: o que o catálogo não cobre entra primeiro
+aqui e no modelo (§6, `DECISIONS.md` #271).
+
+### 6.3 Migração dos nomes antigos
+
+Cada linha vira item em `_findings/<projeto>.md` (seção "Chaves de ambiente") e tarefa no sync do projeto.
+
+| Nome antigo | Nome da casa | Por quê | Onde aparece |
+|---|---|---|---|
+| `CORS_ORIGIN` | `CORS_ORIGINS` | lista é plural | academy, interclasse, simple-hub |
+| `VITE_API_BASE_URL` | `VITE_API_URL` | um nome para o endereço da API no navegador | lowcodejs, matiscraft |
+| `TRUST_PROXY` (`'true'`) | `TRUSTED_PROXIES` (lista) | `true` confia em qualquer um e o cliente forja o IP | exemplo de `_doc-lib/fastify.md#Reference/Server`; nenhum projeto o lê hoje |
+| `SESSION_DRIVER` | (sai) | sem sessão no servidor a chave é morta | adacaibs, já removida |
+| `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | `STORAGE_BUCKET`, `STORAGE_KEY`, `STORAGE_SECRET` | sem fornecedor no nome | exemplo antigo de `tooling.md` §8 (corrigido) |
+| `APP_URL` | `APP_SERVER_URL` | a API é o servidor; o web é `APP_CLIENT_URL` | modelo antigo de `_templates/docs/ENV.md` (corrigido) |
+| `SEED_OWNER_*` renomeado pelo papel do projeto | `SEED_OWNER_*` | `OWNER` é a conta da instalação, não um papel | interclasse (I5 deixa de valer) |
 
 ---
 

@@ -319,6 +319,9 @@ redireciona ao login em 401, com `?redirect=` da tela atual *(opinião da casa)*
   quem visita. O passo de build do CI recebe a variável (`tooling.md` §8).
 - **Dado pessoal não fica em `localStorage`**: sem validade, fica para o próximo usuário do
   computador. Guarde o id e busque o resto na API, ou expire.
+- **Nome das chaves**: `VITE_API_URL`, `VITE_SITE_URL`, `VITE_UPLOAD_MAX_SIZE`, `SERVER_API_URL` e as
+  `E2E_*`, com regra de nome e significado, estão no catálogo de `backend.md` §6.2; chave nova ou
+  sinônimo (`VITE_API_BASE_URL`) não nasce aqui.
 - `src/env.ts` lê só `VITE_*`, uma vez, de forma síncrona, checado à mão (o módulo roda antes do
   router montar). `SERVER_API_URL` é lida por requisição só no ramo `.server()`.
   _doc-lib/vitejs.md#env-and-mode; _doc-lib/tanstack-start.md#guide/environment-variables.
@@ -492,6 +495,12 @@ _doc-lib/shadcn.md#docs/theming, #docs/components-json.
   `--ease-*`, `--animate-*`). Valor arbitrário em classe (`text-[13px]`, `z-[9999]`,
   `-[var(--x)]` repetido) é desvio; valor repetido vira token ou `@utility`.
   _doc-lib/tailwindcss.md#theme, #adding-custom-styles.
+- **Tipografia fluida** *(opinião da casa, `DECISIONS.md` #265)*: a escala `--text-*` do `@theme` guarda
+  o tamanho de desktop como **teto** de um `clamp(mínimo, base + inclinação·vw, teto)`, para o título
+  não quebrar em 320 px nem crescer além do desenho. Corpo e apoio (`body`, `supporting`, `caption`) não
+  encolhem; valor novo mantém o teto e escolhe o mínimo pelo que cabe em 320 px. A doc só diz que
+  `--text-*` gera os utilitários de tamanho e que o valor é qualquer CSS válido; o `clamp()` é escolha
+  da casa. _doc-lib/tailwindcss.md#theme (https://tailwindcss.com/docs/theme, aberta).
 - Nome de token diz papel, não valor (`--text-heading`, nunca `--font-size-16`). z-index é escala
   nomeada em token (`sticky < overlay < modal < dropdown < toast < tooltip`) *(opinião da casa,
   `DECISIONS.md` #257)*: o `dropdown` (popup de select, menu, popover e combobox do Base UI) fica
@@ -1046,6 +1055,15 @@ Meta: WCAG 2.1 AA *(página oficial não conferida; sem `_doc-lib` de WCAG)*. Te
 - Alvo de toque ≥ 44×44 px, por área invisível se preciso *(opinião da casa: AA não exige)*; hover
   nunca é o único caminho para uma função; gesto (arrastar, deslizar) tem alternativa de um
   ponteiro.
+- **44 px no celular vem do kit, nunca caso a caso** *(opinião da casa, `DECISIONS.md` #267)*: os
+  controles de `components/ui/` (botão, campo, select, toggle, paginação, itens de menu) crescem
+  abaixo de `sm` por tamanho responsivo no próprio arquivo (`h-11 sm:h-7`) e voltam ao tamanho denso
+  de `sm` para cima; a tela não ajusta altura de controle. O `touch-targets.spec` (§11.2) cobra 44 px no
+  projeto `mobile`. 24 px é o mínimo do WCAG 2.2 AA (2.5.8): vale só como degrau registrado no
+  `docs/DESIGN.md` do projeto (por exemplo, numa vitrine que ainda não migrou), nunca como padrão.
+  Variante por largura: _doc-lib/tailwindcss.md#responsive-design
+  (https://tailwindcss.com/docs/responsive-design, aberta). O critério 2.5.8 do WCAG não tem entrada
+  em `_doc-lib`: não coberto.
 - Sessão que expira avisa e permite estender.
 
 ### 10.3 Formulário acessível
@@ -1148,6 +1166,22 @@ Valem para qualquer identidade; o `docs/DESIGN.md` do projeto aponta para cá e 
 - Cursor personalizado, rolagem sequestrada, dica "role para baixo".
 - Superfície do navegador sem tema (seleção, scrollbar, caret, anel de foco).
 
+**Cara de gerador de interface** *(opinião da casa, sem página de biblioteca por trás,
+`DECISIONS.md` #269)*: além da lista acima, estes sinais denunciam tela montada por IA e são desvio.
+O `docs/DESIGN.md` do projeto diz o que usa no lugar, na identidade dele.
+
+| Não fazer | Em vez disso |
+|---|---|
+| halo, brilho ou gradiente radial atrás de bloco | fundo liso; sobre foto, um véu só |
+| quadradinho de ícone sobre cada item | número, verbo ou nada |
+| grade de cards iguais repetida em toda seção | hierarquia: destaque e demais, ou o ritmo do tipo de conteúdo |
+| eyebrow em caixa alta com `tracking` largo em toda seção | o título sozinho |
+| botão em pílula repetido | um CTA primário por tela; o resto, link |
+| hover que só faz `scale` | mudança de cor ou de opacidade |
+| texto justificado | alinhado à esquerda, em medida de leitura (§10.4) |
+| entrada animada e escalonada | nenhuma; só transição curta de cor (§10.5) |
+| copy genérica ("Saiba mais", "Fique informado", "com sucesso") | verbo e objeto específicos (§10.7) |
+
 ### 10.9 Gráfico (Recharts pelo `chart` do shadcn)
 
 - **Tipo**: todo gráfico tem o genérico do dado (`<Bar<MonthlyRevenue, number>>`) ou nasce de um
@@ -1237,6 +1271,22 @@ await expect(page.getByRole('alert')).toHaveText(m.posts_archived_conflict())
   ver o esqueleto, offline); sucesso simulado do próprio backend é proibido, porque o E2E existe para
   pegar a costura com ele. Rota não precisa de `unrouteAll`: cada teste recebe contexto novo, e o
   `route` morre com ele.
+- **Viewports** *(opinião da casa, `DECISIONS.md` #266)*: três projetos de viewport rodam os mesmos
+  specs: `mobile` 360×740 com toque (`devices['Pixel 5']` com o viewport trocado), `tablet` 768×1024 e
+  `desktop` 1440×900, cada um dependendo do `setup`. O `responsive.spec.ts` abre toda tela de cada
+  perfil (visitante e cada papel) e reprova rolagem horizontal (`scrollWidth > clientWidth`), texto
+  cortado sem `truncate`/`line-clamp` intencional e violação `serious`/`critical` do axe; o
+  `touch-targets.spec.ts` roda só no `mobile` (§10.2). Projeto, dispositivo e viewport:
+  _doc-lib/playwright.md#docs/test-projects (https://playwright.dev/docs/test-projects, aberta),
+  #docs/emulation (https://playwright.dev/docs/emulation, aberta). Quando roda (fase final do plano,
+  e todo PR no CI): `tooling.md` §7 e §10.1.
+- **Axe ignora o interior de iframe de terceiro** *(opinião da casa, `DECISIONS.md` #268)*: vídeo e
+  player embutidos têm marcação que não é do projeto. A fixture exclui o conteúdo e mantém o próprio
+  `<iframe>` (título, tamanho) checado: `new AxeBuilder({ page }).exclude({ fromFrames: ['iframe', 'body'] })`.
+  O axe-core não está em `_doc-lib`: não coberto. Contexto de `fromFrames`:
+  https://github.com/dequelabs/axe-core/blob/develop/doc/context.md (a página do GitHub responde 403
+  neste ambiente; lido o mesmo arquivo cru em raw.githubusercontent.com, que cita `fromFrames`).
+  O `exclude()` do `AxeBuilder` está em _doc-lib/playwright.md#docs/accessibility-testing.
 - Todo spec termina sem erro de console inesperado (fixture `errors`); fluxo crítico roda
   `@axe-core/playwright` (falha em violação séria ou crítica) e tem um caso com
   `reducedMotion: 'reduce'` e viewport de 320 px.
