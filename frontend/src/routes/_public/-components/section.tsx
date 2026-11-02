@@ -78,7 +78,7 @@ export function SectionMore({
     <Link
       data-slot="section-more"
       to={to}
-      className="text-primary -my-2 inline-block py-2 text-sm font-semibold hover:underline"
+      className="text-primary -my-3 inline-flex min-h-11 items-center text-sm font-semibold hover:underline"
     >
       {children}
     </Link>

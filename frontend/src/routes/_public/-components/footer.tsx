@@ -22,7 +22,7 @@ function InstagramLink({
       target="_blank"
       rel="noreferrer"
       aria-label={ariaLabel}
-      className="flex items-center gap-2 py-1 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
+      className="flex min-h-11 items-center gap-2 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
     >
       <InstagramLogoIcon className="size-5" />@{handle}
     </a>
@@ -50,22 +50,22 @@ export function Footer(): React.JSX.Element {
         </div>
 
         <nav
-          className="flex flex-col gap-2 text-sm"
+          className="flex flex-col text-sm"
           aria-label={m.public_footer_nav_label()}
         >
           {NAVIGATION.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="py-1 text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
+              className="flex min-h-11 items-center text-brand-ink-foreground/70 hover:text-brand-ink-foreground"
             >
               {item.label()}
             </Link>
           ))}
         </nav>
 
-        <div className="flex flex-col gap-1">
-          <RegulationLink className="py-1 text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground" />
+        <div className="flex flex-col">
+          <RegulationLink className="flex min-h-11 items-center text-sm text-brand-ink-foreground/70 hover:text-brand-ink-foreground" />
           {site?.schoolInstagram && (
             <InstagramLink
               handle={site.schoolInstagram}

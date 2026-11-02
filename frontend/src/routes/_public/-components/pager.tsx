@@ -32,7 +32,7 @@ export function Pager({
             ...previous,
             page: page - 1,
           })}
-          className="text-primary px-2 py-2 font-semibold hover:underline"
+          className="text-primary inline-flex min-h-11 items-center px-2 font-semibold hover:underline"
         >
           {m.public_pager_previous()}
         </Link>
@@ -47,7 +47,7 @@ export function Pager({
             ...previous,
             page: page + 1,
           })}
-          className="text-primary px-2 py-2 font-semibold hover:underline"
+          className="text-primary inline-flex min-h-11 items-center px-2 font-semibold hover:underline"
         >
           {m.public_pager_next()}
         </Link>
