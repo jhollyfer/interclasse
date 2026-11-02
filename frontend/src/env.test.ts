@@ -59,3 +59,25 @@ test('refuses VITE_SITE_URL with a trailing slash', async () => {
 
   await expect(load()).rejects.toThrow('VITE_SITE_URL must not end')
 })
+
+test('without VITE_UPLOAD_MAX_SIZE, the ceiling is undefined', async () => {
+  vi.stubEnv('VITE_UPLOAD_MAX_SIZE', '')
+
+  const { env } = await load()
+
+  expect(env.VITE_UPLOAD_MAX_SIZE).toBeUndefined()
+})
+
+test('reads VITE_UPLOAD_MAX_SIZE as bytes', async () => {
+  vi.stubEnv('VITE_UPLOAD_MAX_SIZE', '1073741824')
+
+  const { env } = await load()
+
+  expect(env.VITE_UPLOAD_MAX_SIZE).toBe(1073741824)
+})
+
+test('refuses VITE_UPLOAD_MAX_SIZE that is not a positive integer', async () => {
+  vi.stubEnv('VITE_UPLOAD_MAX_SIZE', '1GB')
+
+  await expect(load()).rejects.toThrow('VITE_UPLOAD_MAX_SIZE is not')
+})

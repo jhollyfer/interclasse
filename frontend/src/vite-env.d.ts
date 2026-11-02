@@ -15,6 +15,7 @@ interface ImportMetaEnv {
   /** AdonisJS API base. Read and checked in `src/env.ts`. */
   readonly VITE_API_URL?: string
   readonly VITE_SITE_URL?: string
+  readonly VITE_UPLOAD_MAX_SIZE?: string
 }
 
 interface ImportMeta {

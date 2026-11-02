@@ -38,4 +38,7 @@ jobs:
     needs: [docker-backend, docker-frontend]
     uses: ./.github/workflows/main-deploy-coolify.yml
     secrets:
+      COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
       COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+      COOLIFY_API_UUID: ${{ secrets.COOLIFY_API_UUID }}
+      COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}

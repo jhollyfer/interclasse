@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { Role } from './support/credentials'
+import type { Role } from './support/env'
 import { waitForHydration } from './support/hydration'
 import { storageStatePath } from './support/session'
 import { expect, test } from './support/test'

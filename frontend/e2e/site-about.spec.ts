@@ -1,4 +1,4 @@
-import { apiUrl, writeHeaders } from './support/credentials'
+import { apiUrl, writeHeaders } from './support/env'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 

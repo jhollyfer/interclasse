@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test as base } from '@playwright/test'
 import type { Browser, BrowserContext, Page } from '@playwright/test'
 
-import type { Role } from './credentials'
+import type { Role } from './env'
 import { storageStatePath } from './session'
 
 type RoleSession = Readonly<{ page: Page; context: BrowserContext }>

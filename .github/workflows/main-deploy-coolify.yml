@@ -3,29 +3,35 @@ name: Deploy to Coolify
 on:
   workflow_call:
     secrets:
+      COOLIFY_URL:
+        required: true
       COOLIFY_TOKEN:
+        required: true
+      COOLIFY_API_UUID:
+        required: true
+      COOLIFY_APP_UUID:
         required: true
 
 permissions:
   contents: read
 
-# Os valores que mudam de projeto para projeto, num lugar só.
-#
-# Os uuids são das APLICAÇÕES no Coolify, e não da instância nem do projeto:
-# estão na URL do painel, em `/project/<projeto>/application/<UUID>`. Uuid de
-# outro projeto não é recusado pelo Coolify - redeploya o projeto errado.
-env:
-  COOLIFY_URL: https://coolify.maiyu.com.br
-  UUID_API: kyjyk4ahdpscxmvurpzcohpg
-  UUID_APP: sqrom3vusao6bwh1fq5du0hs
-  URL_API: https://api-interclass.maiyu.com.br
-  URL_APP: https://interclass.maiyu.com.br
+# Endereço e alvo do deploy vêm de secrets, nunca do YAML (tooling.md §8.3):
+# `COOLIFY_URL` é a base do PAINEL do Coolify, sem caminho, e os uuids são das
+# APLICAÇÕES (fim da URL delas no painel). Uuid de outro projeto não é recusado
+# pelo Coolify - redeploya o projeto errado. Os endereços públicos do smoke
+# test saem do `frontend/.env.production` (`VITE_API_URL`, `VITE_SITE_URL`).
 
 jobs:
   deploy:
     name: Trigger Coolify Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: frontend/.env.production
+          persist-credentials: false
+
       # `-f` reprova quando o Coolify responde erro; sem ele o curl sai 0 em
       # 401 ou 404. POST, e não GET: desde o Coolify v4.2 o GET responde 405.
       #
@@ -34,30 +40,64 @@ jobs:
       # lido e cobrado.
       - name: Dispara o deploy no Coolify
         env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_API_UUID: ${{ secrets.COOLIFY_API_UUID }}
+          COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
         run: |
           set -euo pipefail
+
+          # Secret colado com quebra de linha vira header quebrado.
+          limpar() { printf '%s' "$1" | tr -d '[:space:]'; }
+
+          COOLIFY_URL=$(limpar "${COOLIFY_URL}")
+          COOLIFY_TOKEN=$(limpar "${COOLIFY_TOKEN}")
+          COOLIFY_API_UUID=$(limpar "${COOLIFY_API_UUID}")
+          COOLIFY_APP_UUID=$(limpar "${COOLIFY_APP_UUID}")
+
+          for nome in COOLIFY_URL COOLIFY_TOKEN COOLIFY_API_UUID COOLIFY_APP_UUID; do
+            if [ -z "${!nome}" ]; then
+              echo "O secret ${nome} está vazio." >&2
+              exit 1
+            fi
+          done
+
+          # O painel, e não o site: o host do site responde a rota com o HTML de 404 do app.
+          if printf '%s' "${COOLIFY_URL}" | grep -Eq '^https?://[^/]+/.+'; then
+            echo "COOLIFY_URL deve ser só a base do painel, sem caminho." >&2
+            exit 1
+          fi
 
           disparar() {
             rotulo="$1"
             uuid="$2"
 
-            resposta=$(curl -fsS -X POST \
-              "${COOLIFY_URL}/api/v1/deploy" \
+            status=$(curl -sS -X POST \
+              "${COOLIFY_URL%/}/api/v1/deploy" \
               -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
               -H "Content-Type: application/json" \
-              -d "{\"uuid\":\"${uuid}\",\"force\":false}")
+              -d "{\"uuid\":\"${uuid}\",\"force\":false}" \
+              -o "${RUNNER_TEMP}/coolify.json" -w '%{http_code}')
+            resposta=$(cat "${RUNNER_TEMP}/coolify.json")
 
-            echo "${rotulo}: ${resposta}"
+            echo "${rotulo}: ${status} ${resposta}"
+
+            case "${status}" in
+              2??) ;;
+              *)
+                echo "O Coolify respondeu ${status} ao deploy de ${rotulo}: $(printf '%s' "${resposta}" | head -c 300)" >&2
+                exit 1
+                ;;
+            esac
 
             if ! printf '%s' "${resposta}" | grep -q 'deployment_uuid'; then
-              echo "O Coolify aceitou o pedido de ${rotulo} e não enfileirou implantação nenhuma."
+              echo "O Coolify aceitou o pedido de ${rotulo} e não enfileirou implantação nenhuma." >&2
               exit 1
             fi
           }
 
-          disparar "API" "${UUID_API}"
-          disparar "App" "${UUID_APP}"
+          disparar "API" "${COOLIFY_API_UUID}"
+          disparar "App" "${COOLIFY_APP_UUID}"
 
       # O disparo é assíncrono. A API é cobrada pela vitalidade (`/health-check`, o
       # mesmo do HEALTHCHECK); o App pela REVISÃO, porque o container antigo
@@ -67,6 +107,9 @@ jobs:
       - name: Smoke test
         run: |
           set -euo pipefail
+
+          URL_API=$(sed -n 's/^VITE_API_URL=//p' frontend/.env.production)
+          URL_APP=$(sed -n 's/^VITE_SITE_URL=//p' frontend/.env.production)
 
           for tentativa in $(seq 1 20); do
             if curl -fsS --max-time 10 "${URL_API}/health-check" > /dev/null; then

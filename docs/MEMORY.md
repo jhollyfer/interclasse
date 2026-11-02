@@ -7,7 +7,7 @@
 
 | Atualizado | Fase atual                                   | Progresso | Status                                           |
 | ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| 2026-10-31 | Fase 7: lições do adacaibs (#252 a #260)     | 95%       | Feita na branch, falta PR e CI |
+| 2026-11-02 | Fase 10: chaves de ambiente no catálogo      | 100%      | Feita na branch, falta CI e merge |
 
 ## Já feito
 
@@ -16,15 +16,16 @@
 
 ## Parou em
 
-Fase 9 fechada e mergeada (#26 e #27): todos os perfis (visitante, administrador, conselheiro, representante) responsivos de 375 a 1280 px, sem cara de tela genérica, textos revisados com o humanizer. `e2e/responsive.spec.ts` cobre 29 rotas em 375/768/1280 no tema claro e 375 no escuro (120 testes no CI). A `main` passa em todos os checks; só o smoke test do deploy no Coolify falha (ver Problemas conhecidos).
+Fase 10 (chaves de ambiente no catálogo da régua, `DECISIONS.md` #276) feita na branch `chore/env-catalogo-padrao`, com PR aberto e sem merge. `SEED_OWNER_*` no lugar de `SEED_ADMINISTRATOR_*`; os seeds do administrador e da demonstração ligam pela presença da senha, em qualquer ambiente; contas de demonstração `advisor@example.com`, `advisor-2@example.com`, `representative@example.com`. O E2E lê só `E2E_BASE_URL`, `E2E_API_URL`, `E2E_OWNER_*` e `E2E_DEMO_PASSWORD`. O CSP sai de `src/server.ts`, com `STORAGE_PUBLIC_URL` lida por requisição (substitui `VITE_STORAGE_URL`). O deploy lê os secrets `COOLIFY_URL`, `COOLIFY_TOKEN`, `COOLIFY_API_UUID` e `COOLIFY_APP_UUID`. O E2E (Playwright) não rodou nesta sessão por falta de Docker; o job do CI é a prova.
 
 ## Próximos passos
 
-1. Deploy: a API responde 503 no Coolify desde o #25. Abrir os logs do container da API no último deploy e conferir as variáveis (`CORS_ORIGINS`, `TRUSTED_PROXIES`, `DATABASE_URL`, `STORAGE_*`, `APP_KEY`), o *Post-deployment* (`node ace migration:run --force`) e o healthcheck.
-2. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
-3. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). No painel, migration no *Post-deployment command* e *Pre-deployment* vazio. Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
-4. Medir o `size-adjust` das fontes de reserva.
-5. Ajuste visual das turmas quando chegarem os prints do Geison.
+1. No GitHub, criar os secrets `COOLIFY_URL` (base do painel, sem caminho), `COOLIFY_API_UUID` e `COOLIFY_APP_UUID` (o `COOLIFY_TOKEN` já existe) **antes** do merge: o deploy reprova com o nome do secret vazio.
+2. No Coolify: trocar `SEED_ADMINISTRATOR_*` por `SEED_OWNER_*` na API e `VITE_STORAGE_URL` por `STORAGE_PUBLIC_URL` (runtime, no site). Sem `STORAGE_PUBLIC_URL` o CSP bloqueia o upload.
+3. Deploy: a API responde 503 no Coolify desde o #25. Abrir os logs do container da API no último deploy e conferir as variáveis (`CORS_ORIGINS`, `TRUSTED_PROXIES`, `DATABASE_URL`, `STORAGE_*`, `APP_KEY`), o *Post-deployment* (`node ace migration:run --force`) e o healthcheck.
+4. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
+5. Tela que use `VITE_UPLOAD_MAX_SIZE` (recusa por tamanho no cliente, com texto nos três idiomas); hoje a chave só é lida e validada.
+6. Medir o `size-adjust` das fontes de reserva e ajuste visual das turmas quando chegarem os prints do Geison.
 
 ## Contexto importante
 

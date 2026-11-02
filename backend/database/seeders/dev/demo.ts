@@ -21,12 +21,16 @@ import AdministratorMatchScoreUseCase from '#features/administrator/matches/scor
  * students with real-sounding names, enrollments, drawn brackets, scores entered and
  * a schedule set. It is what is shown to the school before the real games.
  *
- * Development only, and only runs by hand:
+ * Switched on by `SEED_DEMO_PASSWORD` having a value, in any environment
+ * (_standards/backend.md §6.2): absent, it logs one line and skips. Runs by hand:
  *
  *   SEED_DEMO_PASSWORD=<password> pnpm db:seed:demo
  *
  * Lives in `dev/`, without the `.seed.ts` suffix, being a manual demonstration seed
  * (_standards/backend.md §3).
+ *
+ * One account per role, `<role>@example.com`, all sharing the password; the others
+ * are numbered. The E2E reads these e-mails (`frontend/e2e/support/env.ts`).
  *
  * A database that already has a drawn bracket is left alone: the seeder cannot tell a
  * demonstration from a real championship, and deleting the latter is irreversible.
@@ -34,11 +38,23 @@ import AdministratorMatchScoreUseCase from '#features/administrator/matches/scor
  * The draw and the score go through the real use cases, through the container, and
  * not through direct insert: the demonstration shows exactly what the system does.
  */
+/** The first advisor is the account of the role; the others are numbered. */
+function advisorEmail(index: number): string {
+  if (index === 0) return 'advisor@example.com'
+
+  return `advisor-${index + 1}@example.com`
+}
+
+/** The first classroom's representative is the account of the role; the others carry the classroom. */
+function representativeEmail(classroom: Classroom, index: number): string {
+  if (index === 0) return 'representative@example.com'
+
+  return `representative-${classroom.grade}${classroom.name.slice(-1).toLowerCase()}@example.com`
+}
+
 type Stage = 'final' | 'semi' | 'first' | 'drawn'
 
 export default class extends BaseSeeder {
-  static override environment = ['development']
-
   override async run() {
     const password = env.get('SEED_DEMO_PASSWORD')
 
@@ -63,7 +79,7 @@ export default class extends BaseSeeder {
     const classrooms = await Classroom.query().orderBy('grade').orderBy('name')
 
     for (const [index, classroom] of classrooms.entries()) {
-      const representative = await this.representative(classroom, password)
+      const representative = await this.representative(classroom, index, password)
       // One advisor per classroom (unique index): classrooms beyond the number of
       // teachers stay "No advisor", as the real school does
       // while the organization has not named them all.
@@ -81,26 +97,31 @@ export default class extends BaseSeeder {
     await this.championship()
   }
 
-  /** The teacher advisors, one for each of the first classrooms. */
+  /**
+   * The teacher advisors, one for each of the first classrooms. The first is
+   * `advisor@example.com`, the account of the role; the others are numbered.
+   */
   private async advisors(password: string): Promise<User[]> {
-    const people = [
-      ['Raimunda Tananta', 'raimunda.tananta'],
-      ['Joelson Cruz', 'joelson.cruz'],
-      ['Marilene Pinheiro', 'marilene.pinheiro'],
-      ['Adalberto Sampaio', 'adalberto.sampaio'],
-      ['Keila Fernandes', 'keila.fernandes'],
-      ['Ronaldo Picanço', 'ronaldo.picanco'],
+    const names = [
+      'Raimunda Tananta',
+      'Joelson Cruz',
+      'Marilene Pinheiro',
+      'Adalberto Sampaio',
+      'Keila Fernandes',
+      'Ronaldo Picanço',
     ]
 
     const users: User[] = []
 
-    for (const [name, login] of people) {
+    for (const [index, name] of names.entries()) {
+      const email = advisorEmail(index)
+
       users.push(
         await User.updateOrCreate(
-          { email: `${login}@escola.demo` },
+          { email },
           {
             name,
-            email: `${login}@escola.demo`,
+            email,
             password,
             role: USER_ROLE.ADVISOR,
             status: ACTIVE_STATUS.ACTIVE,
@@ -112,15 +133,23 @@ export default class extends BaseSeeder {
     return users
   }
 
-  /** One student representative per classroom, with a login derived from the classroom name. */
-  private async representative(classroom: Classroom, password: string): Promise<User> {
-    const login = `representante.${classroom.grade}${classroom.name.slice(-1).toLowerCase()}`
+  /**
+   * One student representative per classroom. The first classroom is
+   * `representative@example.com`, the account of the role; the others carry the
+   * classroom in the login.
+   */
+  private async representative(
+    classroom: Classroom,
+    index: number,
+    password: string,
+  ): Promise<User> {
+    const email = representativeEmail(classroom, index)
 
     return User.updateOrCreate(
-      { email: `${login}@escola.demo` },
+      { email },
       {
         name: `Representante do ${classroom.name}`,
-        email: `${login}@escola.demo`,
+        email,
         password,
         role: USER_ROLE.REPRESENTATIVE,
         status: ACTIVE_STATUS.ACTIVE,

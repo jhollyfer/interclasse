@@ -2,14 +2,16 @@ import { defineConfig, devices } from '@playwright/test'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { apiUrl, baseUrl } from './support/env'
+
 // `.env.e2e` is optional: in CI the variables come from the environment. It loads before
 // the rest of the config, because `webServer` and `baseURL` read `process.env`.
 const envFile = resolve(import.meta.dirname, '..', '.env.e2e')
 if (existsSync(envFile)) process.loadEnvFile(envFile)
 
-const port = process.env.E2E_PORT ?? '3010'
-const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:3333'
-const baseURL = `http://localhost:${port}`
+// No default: a missing key stops the run and says which (`backend.md` §6.2).
+const baseURL = baseUrl()
+const { port } = new URL(baseURL)
 
 // https://playwright.dev/docs/test-configuration
 export default defineConfig({
@@ -54,7 +56,7 @@ export default defineConfig({
     command: `pnpm exec vite dev --port ${port} --strictPort`,
     cwd: '..',
     url: baseURL,
-    env: { VITE_API_URL: apiUrl },
+    env: { VITE_API_URL: apiUrl() },
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

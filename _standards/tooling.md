@@ -703,12 +703,17 @@ passos e publica o `.output` como artifact):
 6. `test:unit` (Vitest, `src/**/*.test.{ts,tsx}`, `architecture.md` §8)
 7. `build`, e depois `node scripts/check-chunk-cycles.mjs`, que lê `.output/server` e reprova ciclo
    de chunk que quebra o SSR
-8. **Playwright** (`test:e2e`) num job próprio, depois do build, com o backend em container
-   (imagem do próprio commit, banco e serviços como no job do backend):
+8. **Playwright** (`test:e2e`) em job próprio, **em paralelo** ao `check` (sem `needs`: o job faz
+   o próprio build), com o backend em container (banco e serviços como no job do backend):
    `pnpm exec playwright install --with-deps chromium`, sem cache de navegador (a doc não
-   recomenda); `pnpm exec playwright test --workers=1 --add-reporter=github`; relatório HTML como
-   artifact com `if: ${{ !cancelled() }}`, para chegar também quando o teste falha
-   (_doc-lib/playwright.md#docs/ci, #docs/ci-intro)
+   recomenda); **matriz por projeto de viewport** (`strategy.matrix.project: [mobile, tablet,
+   desktop]`, `fail-fast: false`), um job e um banco por projeto, com
+   `pnpm exec playwright test --project=${{ matrix.project }} --workers=1 --add-reporter=github`
+   (o `--project` puxa o `setup` e o teardown pelas `dependencies`,
+   _doc-lib/playwright.md#docs/test-projects); relatório HTML como artifact
+   `playwright-report-<projeto>` com `if: ${{ !cancelled() }}`, para chegar também quando o teste
+   falha (_doc-lib/playwright.md#docs/ci, #docs/ci-intro). O Playwright roda **só no PR**: o
+   reutilizável recebe `e2e: false` no `main.yml`, que já entra com o PR provado
 
 `playwright.config.ts` da casa (_doc-lib/playwright.md#docs/test-configuration):
 `forbidOnly: Boolean(process.env.CI)`, `retries: 0` (padrão da biblioteca; retry sem condição
@@ -723,10 +728,18 @@ ou crítica (_doc-lib/playwright.md#docs/accessibility-testing).
 
 - **`workers` no CI** *(opinião da casa sobre a doc)*: `--workers=1` no passo, como a doc recomenda
   para runner hospedado; a config fica sem ternário (`typescript.md` §13). Paralelismo maior vem por
-  shard, não por worker.
-- **Shard** só quando o job passar do tempo aceitável: cada shard com reporter `blob` e um job final
-  com `merge-reports`; o `github` sai nesse caso, porque com matriz a anotação se multiplica
-  (_doc-lib/playwright.md#docs/test-sharding, #docs/test-reporters).
+  job, não por worker: primeiro a matriz por projeto (cada teste roda num job só, então o `github`
+  não se multiplica).
+- **Shard** (`--shard=x/y`) só quando um projeto sozinho passar do tempo aceitável: cada shard com
+  reporter `blob` e um job final com `merge-reports`; o `github` sai nesse caso, porque a anotação
+  se multiplica (_doc-lib/playwright.md#docs/test-sharding, #docs/test-reporters).
+
+**PR que só mexe em texto não roda a suíte.** O `ci.yml` tem um job `changes` que lista os arquivos
+do PR (`git diff --name-only base...head`) e só chama `main-check-backend` e `main-check-frontend`
+quando algum arquivo **não** casa com `*.md`, `docs/`, `_standards/`, `_doc-lib/`, `.claude/` ou
+`_templates/`. Sem filtro de terceiro: é shell no próprio job. O job pulado aparece como *skipped*,
+o que satisfaz o check obrigatório (página oficial do GitHub não conferida). O job `repository`
+(autoria, audit, segredo) roda sempre.
 
 **`shared/`**: `check` + `test:unit` no mesmo workflow do backend, antes dele.
 
@@ -777,7 +790,8 @@ interativo, e validado rodando lint num arquivo e um teste.
 `main.yml`: `check-backend` ∥ `build-frontend` → `docker-backend` ∥ `docker-frontend` → `deploy`.
 O deploy espera as **duas** imagens: implantar o frontend contra uma API que não passou é publicar
 meia versão. O PR e o push chamam o **mesmo** reutilizável de check: o PR não passa por uma régua
-diferente da do deploy.
+diferente da do deploy. A única diferença é o Playwright, que roda só no PR (`e2e: false` no
+push): o merge entra com o E2E já provado, e repeti-lo atrasa o deploy em uns dez minutos.
 
 ### 8.2 Imagem Docker
 
@@ -802,7 +816,10 @@ diferente da do deploy.
   build**; segredo de placeholder (`APP_KEY`) vai inline no `RUN`, nunca em `ENV`, que vira
   metadado da imagem.
 - Estágio final: só o artefato; o servidor roda como `node` (ou `nitro`), nunca root;
-  `HEALTHCHECK CMD curl -fsS http://127.0.0.1:<porta>/health-check` (`architecture.md` §7).
+  `HEALTHCHECK CMD curl -fsS http://127.0.0.1:<porta>/health-check` (`architecture.md` §7); em
+  imagem alpine sem `curl`, o `wget -q -O /dev/null http://127.0.0.1:<porta>/health-check` do
+  BusyBox, que já vem na imagem: nada de `apk add` no estágio final só para o healthcheck, porque o
+  mirror do Alpine fora do ar derruba o build (`DECISIONS.md` #262).
   Sem volume persistente gravável, `USER node` direto.
 - **Imagem com volume persistente gravável** (disco local de arquivos): `ENTRYPOINT` que sobe
   como root, só acerta o dono do volume (`chown -R node:node <pasta>`) e troca de usuário com
@@ -846,9 +863,28 @@ diferente da do deploy.
 
 ### 8.3 Deploy e prova de revisão
 
-- Disparo do Coolify por `curl -fsS -X POST .../api/v1/deploy` (`-f` reprova 4xx/5xx; `GET`
-  responde 405) e a resposta **precisa** conter `deployment_uuid`: sem ele o pedido foi aceito e
-  nada foi enfileirado (uuid errado ou sem alcance pelo token).
+- Disparo do Coolify por `curl -sS -X POST .../api/v1/deploy -o <arquivo> -w '%{http_code}'`
+  (`GET` responde 405): status fora de 2xx reprova **imprimindo o status e os primeiros 300
+  caracteres do corpo** (a mensagem do Coolify ou o HTML de quem respondeu), nunca `-f` sozinho, que
+  esconde o corpo e deixa um 404 sem causa. A resposta **precisa** conter `deployment_uuid`: sem
+  ele o pedido foi aceito e nada foi enfileirado (uuid errado ou sem alcance pelo token).
+- **Endereço e alvo do deploy em secret, nunca no workflow.** O repositório tem estes secrets
+  no GitHub Actions, com estes nomes:
+
+  | Secret | Valor |
+  |---|---|
+  | `DOCKERHUB_USERNAME` | usuário do Docker Hub (imagens `<usuário>/<projeto>-api` e `-app`) |
+  | `DOCKERHUB_TOKEN` | access token do Docker Hub, com escrita |
+  | `COOLIFY_URL` | base do **painel** do Coolify, sem caminho (`https://coolify.<domínio>`) |
+  | `COOLIFY_TOKEN` | token de API do Coolify, com permissão de deploy |
+  | `COOLIFY_API_UUID` | UUID da aplicação da API (fim da URL da aplicação no painel) |
+  | `COOLIFY_APP_UUID` | UUID da aplicação do frontend |
+
+  O `main.yml` repassa cada um ao workflow reutilizável, que os declara `required`. O passo de
+  deploy tira espaço e quebra de linha de cada valor (`tr -d '[:space:]'`: secret colado com `\n`
+  vira header quebrado), reprova com o nome do secret vazio e com `COOLIFY_URL` que traga caminho
+  (`/api`), antes do `curl`, e monta o endpoint como `${COOLIFY_URL%/}/api/v1/deploy`. URL ou UUID escrito no YAML é desvio: o host do site no lugar
+  do painel responde a rota com o HTML de 404 do app, e o deploy nunca chega ao Coolify.
 - O disparo é assíncrono, então o job termina num **smoke test**: a API responde `200` em
   `/health-check`, e o app serve `/revision.txt` com corpo **igual a `GITHUB_SHA`**. Conferência pelo
   corpo, nunca pelo status: o catch-all de SSR responde `200` com HTML para arquivo ausente.
@@ -923,7 +959,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_API_CORS_ALLOW_ORIGIN: ${APP_URL}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${CORS_ORIGINS:-http://localhost:3000}
       MINIO_API_STALE_UPLOADS_EXPIRY: 24h            # multipart abandonado some sozinho
       MINIO_API_STALE_UPLOADS_CLEANUP_INTERVAL: 6h
     healthcheck:
@@ -945,19 +981,19 @@ services:
 #!/bin/sh
 set -eu
 mc alias set local http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
-mc mb --ignore-existing "local/$S3_BUCKET"
-mc anonymous set none "local/$S3_BUCKET"
+mc mb --ignore-existing "local/$STORAGE_BUCKET"
+mc anonymous set none "local/$STORAGE_BUCKET"
 cat > /tmp/app-policy.json <<JSON
 { "Version": "2012-10-17", "Statement": [{ "Effect": "Allow",
   "Action": ["s3:GetObject","s3:PutObject","s3:DeleteObject","s3:AbortMultipartUpload","s3:ListMultipartUploadParts"],
-  "Resource": ["arn:aws:s3:::$S3_BUCKET/*"] }] }
+  "Resource": ["arn:aws:s3:::$STORAGE_BUCKET/*"] }] }
 JSON
 mc admin policy create local app-rw /tmp/app-policy.json || true
-mc admin user add local "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
-mc admin policy attach local app-rw --user "$S3_ACCESS_KEY" || true
+mc admin user add local "$STORAGE_KEY" "$STORAGE_SECRET"
+mc admin policy attach local app-rw --user "$STORAGE_KEY" || true
 ```
 
-- A aplicação usa `S3_ACCESS_KEY`/`S3_SECRET_KEY` (usuário de escopo mínimo), nunca o root; o root
+- A aplicação usa `STORAGE_KEY`/`STORAGE_SECRET` (usuário de escopo mínimo), nunca o root; o root
   só existe para o setup. Valores de teste no `.env.test`, nunca credencial real.
 - No CI o MinIO sobe por `docker run` da imagem compilada (com cache da camada de build) e o `mc` roda
   o mesmo script; a espera é pelo bucket existir (§7, passo 7).

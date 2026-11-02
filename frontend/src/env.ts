@@ -7,7 +7,7 @@
  * the router mounts, and a bad value must stop the boot with the right message
  * instead of becoming a request to a broken address.
  *
- * Server runtime values (`SERVER_API_URL`) do not belong here: they are read per
+ * Server runtime values (`SERVER_API_URL`, `SITE_ENV`, `STORAGE_PUBLIC_URL`) do not belong here: they are read per
  * request inside the `.server()` of `integrations/tanstack-query/http.ts`.
  */
 
@@ -43,6 +43,25 @@ function publicUrl(
   return value
 }
 
+/**
+ * A per-file ceiling in bytes (`VITE_UPLOAD_MAX_SIZE`, the mirror of the API
+ * `UPLOAD_MAX_SIZE`). Optional: absent, the client does not refuse by size and the
+ * server's 422 says the limit. Present, it must be a positive integer.
+ */
+function optionalBytes(
+  name: string,
+  value: string | undefined,
+): number | undefined {
+  if (!value) return undefined
+
+  const bytes = Number(value)
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) {
+    throw new Error(`${name} is not a positive integer of bytes: "${value}".`)
+  }
+
+  return bytes
+}
+
 export const env = {
   VITE_API_URL: publicUrl(
     'VITE_API_URL',
@@ -57,5 +76,10 @@ export const env = {
     'VITE_SITE_URL',
     import.meta.env.VITE_SITE_URL,
     DEV_SITE_URL,
+  ),
+  /** Mirror of the API `UPLOAD_MAX_SIZE`, in bytes; `undefined` when not set. */
+  VITE_UPLOAD_MAX_SIZE: optionalBytes(
+    'VITE_UPLOAD_MAX_SIZE',
+    import.meta.env.VITE_UPLOAD_MAX_SIZE,
   ),
 } as const
