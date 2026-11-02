@@ -230,7 +230,9 @@ Por isso o código é literal no use-case; catálogo central só nas condições
 status e o mesmo conjunto de `code` apontam para um componente só, nomeado
 `Error<Status><Codes em PascalCase, ordenados>` (`Error404PostNotFound`) — não um schema anônimo
 repetido por rota. O nome, o schema e a descrição desses componentes moram em
-`scripts/openapi/errors.ts`, para o `emit.ts` não crescer com eles (`DECISIONS.md` #256).
+`scripts/openapi/errors.ts`, para o `emit.ts` não crescer com eles (`DECISIONS.md` #256). Se o
+kernel registra esses componentes em runtime (Fastify, `addSchema`), eles moram em
+`app/core/openapi/`, que o gerador também importa; `app/` nunca importa de `scripts/` (#264).
 
 #### seguranca-e-papeis
 código: `scripts/openapi/emit.ts`
