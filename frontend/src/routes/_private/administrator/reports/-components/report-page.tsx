@@ -9,7 +9,6 @@ import {
   PageHeaderTitle,
 } from '#/components/common/page-shell'
 import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import {
   Table,
   TableBody,
@@ -20,6 +19,7 @@ import {
 } from '#/components/ui/table'
 import { BASE_URL } from '#/integrations/tanstack-query/http'
 import { reportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
+import { cn } from '#/lib/cn'
 import { CATEGORY_LABELS, CATEGORY_SHORT_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
 
@@ -30,6 +30,46 @@ import { m } from '#/paraglide/messages'
 const CSV_URL = BASE_URL.concat('/administrator/reports/csv')
 
 /**
+ * A table that scrolls sideways inside its own region. The region takes keyboard focus and a
+ * name, or whoever navigates by keyboard cannot reach the columns that overflow (axe
+ * scrollable-region-focusable, WCAG 2.1.1). The `Table` container stops scrolling so the
+ * region is the only scroller.
+ */
+function ScrollRegion({
+  label,
+  children,
+}: Readonly<{ label: string; children: React.ReactNode }>): React.JSX.Element {
+  return (
+    <div
+      role="region"
+      aria-label={label}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region needs keyboard focus (axe scrollable-region-focusable, WCAG 2.1.1)
+      tabIndex={0}
+      className="focus-visible:ring-ring/30 overflow-x-auto rounded-md focus-visible:ring-2 [&>[data-slot=table-container]]:overflow-visible"
+    >
+      {children}
+    </div>
+  )
+}
+
+function Section({
+  title,
+  children,
+  className,
+}: Readonly<{
+  title: string
+  children: React.ReactNode
+  className?: string
+}>): React.JSX.Element {
+  return (
+    <section className={cn('flex flex-col gap-2', className)}>
+      <h2 className="text-base font-semibold">{title}</h2>
+      {children}
+    </section>
+  )
+}
+
+/**
  * The games' numbers: how many classrooms, students and athletes took part, by
  * category, by sport and by classroom. For closing the edition and accounting
  * for it, on screen or in Excel.
@@ -38,13 +78,18 @@ export function ReportPage(): React.JSX.Element {
   const { data: report } = useSuspenseQuery(reportQueryOptions())
   const { totals } = report
 
+  // Two numbers carry the edition (who played and how many games were played); the others are
+  // reference, in a compact list. Students is left out of the highlights because the
+  // athletes are the students who matter here, and both columns are in the tables below.
   const highlights = [
+    { label: m.admin_common_athletes(), value: totals.athletes },
+    { label: m.admin_reports_matches_played(), value: totals.matchesPlayed },
+  ]
+  const figures = [
     { label: m.admin_common_classrooms(), value: totals.classrooms },
     { label: m.admin_common_students(), value: totals.students },
-    { label: m.admin_common_athletes(), value: totals.athletes },
     { label: m.admin_reports_registrations(), value: totals.enrollments },
     { label: m.admin_common_sports(), value: totals.sports },
-    { label: m.admin_reports_matches_played(), value: totals.matchesPlayed },
     {
       label: m.admin_reports_matches_scheduled(),
       value: totals.matchesScheduled,
@@ -70,25 +115,32 @@ export function ReportPage(): React.JSX.Element {
         </PageHeaderActions>
       </PageHeader>
 
-      <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+      <dl className="grid grid-cols-2 gap-x-6 sm:grid-cols-6">
         {highlights.map((item) => (
-          <Card key={item.label} className="gap-1 py-4">
-            <CardContent>
-              <dt className="text-muted-foreground text-sm">{item.label}</dt>
-              <dd className="font-display text-3xl font-extrabold tabular-nums">
-                {item.value}
-              </dd>
-            </CardContent>
-          </Card>
+          <div
+            key={item.label}
+            className="col-span-1 flex flex-col pb-3 sm:col-span-3"
+          >
+            <dt className="text-muted-foreground text-sm">{item.label}</dt>
+            <dd className="font-display text-4xl font-extrabold tabular-nums">
+              {item.value}
+            </dd>
+          </div>
+        ))}
+        {figures.map((item) => (
+          <div
+            key={item.label}
+            className="col-span-full flex items-baseline justify-between gap-4 border-t py-2 text-sm sm:col-span-3"
+          >
+            <dt className="text-muted-foreground">{item.label}</dt>
+            <dd className="font-semibold tabular-nums">{item.value}</dd>
+          </div>
         ))}
       </dl>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{m.admin_reports_by_category()}</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Section title={m.admin_reports_by_category()}>
+          <ScrollRegion label={m.admin_reports_by_category()}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -126,14 +178,11 @@ export function ReportPage(): React.JSX.Element {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </ScrollRegion>
+        </Section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{m.admin_reports_by_sport()}</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section title={m.admin_reports_by_sport()}>
+          <ScrollRegion label={m.admin_reports_by_sport()}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -160,28 +209,31 @@ export function ReportPage(): React.JSX.Element {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </ScrollRegion>
+        </Section>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{m.admin_reports_by_classroom()}</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Section title={m.admin_reports_by_classroom()}>
+        {/* Advisor, representative and sports are reference: they leave below `md`,
+            where the table would otherwise cut the representative column without a sign. */}
+        <ScrollRegion label={m.admin_reports_by_classroom()}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{m.admin_reports_classroom()}</TableHead>
-                <TableHead>{m.admin_common_advisor()}</TableHead>
-                <TableHead>{m.admin_common_representative()}</TableHead>
+                <TableHead className="max-md:hidden">
+                  {m.admin_common_advisor()}
+                </TableHead>
+                <TableHead className="max-md:hidden">
+                  {m.admin_common_representative()}
+                </TableHead>
                 <TableHead className="text-right">
                   {m.admin_common_students()}
                 </TableHead>
                 <TableHead className="text-right">
                   {m.admin_common_athletes()}
                 </TableHead>
-                <TableHead className="text-right">
+                <TableHead className="text-right max-md:hidden">
                   {m.admin_common_sports()}
                 </TableHead>
               </TableRow>
@@ -195,10 +247,10 @@ export function ReportPage(): React.JSX.Element {
                       {CATEGORY_SHORT_LABELS[row.category]}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="max-md:hidden">
                     {row.advisor ?? m.admin_common_no_advisor()}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="max-md:hidden">
                     {row.representative ?? m.admin_common_no_representative()}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
@@ -207,15 +259,15 @@ export function ReportPage(): React.JSX.Element {
                   <TableCell className="text-right tabular-nums">
                     {row.athletes}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="text-right tabular-nums max-md:hidden">
                     {row.sports}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </ScrollRegion>
+      </Section>
     </div>
   )
 }

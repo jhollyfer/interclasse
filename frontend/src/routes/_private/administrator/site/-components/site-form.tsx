@@ -95,7 +95,11 @@ export function SiteForm(): React.JSX.Element {
         </PageHeaderDescription>
       </PageHeader>
 
-      <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit}>
+      <form
+        method="post"
+        className="flex flex-col gap-4 max-sm:pb-24"
+        onSubmit={onSubmit}
+      >
         <AppFormRootError form={form} />
 
         <Card>
@@ -281,7 +285,9 @@ export function SiteForm(): React.JSX.Element {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
+        {/* On a phone the save bar is fixed at the foot, as in `FormShellActions`: the
+            button was a small target at the end of a long page. */}
+        <div className="flex justify-end max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-sticky max-sm:border-t max-sm:bg-background max-sm:p-3 max-sm:*:flex-1">
           <Button type="submit" disabled={mutation.isPending}>
             {m.admin_common_save()}
           </Button>

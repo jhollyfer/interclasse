@@ -1,10 +1,5 @@
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
-import {
-  CalendarBlankIcon,
-  CardsIcon,
-  TrophyIcon,
-  WarningCircleIcon,
-} from '@phosphor-icons/react'
+import { WarningCircleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import * as React from 'react'
@@ -107,10 +102,10 @@ export function DashboardPage(): React.JSX.Element {
               {toPlay.map((match) => (
                 <li
                   key={match.id}
-                  className="flex flex-wrap items-center gap-2 py-2"
+                  className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:gap-4"
                 >
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="font-medium">
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="font-medium break-words">
                       {m.admin_common_versus({
                         home: match.homeTeam.classroom.name,
                         away: match.awayTeam.classroom.name,
@@ -126,29 +121,32 @@ export function DashboardPage(): React.JSX.Element {
                       })}
                     </span>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => scoreHandle.openWithPayload(toRef(match))}
-                  >
-                    <TrophyIcon />
-                    {m.admin_dashboard_result()}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => scheduleHandle.openWithPayload(toRef(match))}
-                  >
-                    <CalendarBlankIcon />
-                    {m.admin_common_schedule()}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => cardsHandle.openWithPayload(toRef(match))}
-                  >
-                    <CardsIcon />
-                    {m.admin_common_cards()}
-                  </Button>
+                  {/* Three columns below `sm`: the buttons used to share the row with
+                      the title and squeezed it into a ~45px column. */}
+                  <div className="grid grid-cols-3 gap-2 sm:flex sm:shrink-0">
+                    <Button
+                      size="sm"
+                      onClick={() => scoreHandle.openWithPayload(toRef(match))}
+                    >
+                      {m.admin_dashboard_result()}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        scheduleHandle.openWithPayload(toRef(match))
+                      }
+                    >
+                      {m.admin_common_schedule()}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => cardsHandle.openWithPayload(toRef(match))}
+                    >
+                      {m.admin_common_cards()}
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -170,7 +168,7 @@ export function DashboardPage(): React.JSX.Element {
                 key={bracket.id}
                 to="/administrator/brackets/$id"
                 params={{ id: bracket.id }}
-                className="hover:bg-muted flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+                className="hover:bg-muted flex min-h-11 items-center gap-2 rounded-md px-2 py-1.5 text-sm md:min-h-0"
               >
                 <span className="flex-1">
                   {m.admin_common_sport_category({

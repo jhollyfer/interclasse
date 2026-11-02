@@ -450,6 +450,8 @@
   "admin_brackets_understood": "Entendido",
   "admin_brackets_delete_title": "¿Borrar la llave?",
   "admin_brackets_delete_description": "Los equipos y los partidos desaparecen, y las inscripciones de la modalidad se reabren. Así se rehace un sorteo.",
+  "admin_brackets_danger_title": "Zona de peligro",
+  "admin_brackets_danger_description": "Borrar el cuadro deshace el sorteo de esta modalidad y categoría. Un cuadro que ya tiene resultado no se puede borrar.",
   "admin_brackets_champion": "Campeona: {name}",
   "admin_brackets_help": "Los partidos nacen del sorteo. Registra el marcador y el ganador pasa solo a la fase siguiente; si hay empate, indica quién ganó en los penales.",
   "admin_brackets_waiting_teams": "Esperando a los dos equipos",

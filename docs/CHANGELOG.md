@@ -18,6 +18,8 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado
 
+- Painel do administrador no celular: jogos do painel com botões em grade, relatório com dois destaques e tabelas que rolam com o teclado, "Apagar chave" em zona de perigo no fim da chave e salvar do site fixo no rodapé.
+- Inscrição de atletas (administrador, conselheiro e representante): modalidades em blocos recolhíveis, linhas de aluno clicáveis inteiras e botão de salvar sempre à vista.
 - A página pública de uma chave passa a declarar a trilha de navegação (início, classificação, chave) e o evento esportivo para os buscadores.
 - O tema claro/escuro vem de um cookie lido no servidor: a página já abre no tema escolhido, sem piscar.
 - Fora de produção o site responde `noindex` e o `robots.txt` bloqueia tudo; produção precisa de `SITE_ENV=production` (`ENV.md`). Painel e telas de entrada ficam sempre fora dos buscadores.
