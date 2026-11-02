@@ -29,7 +29,7 @@ export function announcementColumns(): TableColumns<AdministratorAnnouncementSho
     },
     {
       accessorKey: 'createdAt',
-      meta: { label: m.admin_announcements_published_on() },
+      meta: { label: m.admin_announcements_published_on(), mobile: 'subtitle' },
       size: 170,
       header: ({ column }) => (
         <TableColumnHeader sortKey="createdAt" column={column}>
