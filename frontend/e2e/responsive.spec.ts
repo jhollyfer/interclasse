@@ -6,7 +6,8 @@ import { storageStatePath } from './support/session'
 import { expect, test } from './support/test'
 
 /**
- * Every static route, per profile, at phone, tablet and desktop width: the page
+ * Every static route, per profile, at phone, tablet and desktop width (and the
+ * phone in dark theme): the page
  * never scrolls sideways, the controls a finger hits are at least 44 px tall on
  * the phone, and axe finds nothing serious (_doc-lib/playwright.md#docs/emulation,
  * _doc-lib/playwright.md#docs/accessibility-testing).
@@ -140,8 +141,20 @@ function storageStateOf(visitor: Visitor): string | undefined {
   return storageStatePath(visitor)
 }
 
-for (const width of WIDTHS) {
-  test.describe(`at ${width}px`, () => {
+/**
+ * Light at every width, and dark only on the phone: rolling sideways and
+ * target size do not depend on the theme, contrast does not depend on the
+ * width, so the dark pass costs one width and not three. Without the theme
+ * cookie the app follows `prefers-color-scheme`, which `colorScheme` emulates
+ * (_doc-lib/playwright.md#docs/emulation).
+ */
+const PASSES = [
+  ...WIDTHS.map((width) => ({ width, colorScheme: 'light' }) as const),
+  { width: PHONE, colorScheme: 'dark' } as const,
+]
+
+for (const { width, colorScheme } of PASSES) {
+  test.describe(`at ${width}px, ${colorScheme}`, () => {
     for (const { visitor, path } of ROUTES) {
       test(`${visitor} sees ${path} fitting the screen`, async ({
         browser,
@@ -150,6 +163,7 @@ for (const width of WIDTHS) {
       }) => {
         const context = await browser.newContext({
           baseURL,
+          colorScheme,
           storageState: storageStateOf(visitor),
         })
         const page = await context.newPage()

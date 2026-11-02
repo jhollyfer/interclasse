@@ -206,8 +206,10 @@ function SportBlock({
               </p>
             )}
           </div>
+          {/* The kit fades a disabled button to 50%; on the dark card that left
+              the outline Save barely legible. 70% still reads as off. */}
           <Button
-            className="sm:shrink-0"
+            className="disabled:opacity-70 sm:shrink-0"
             variant={saveVariant}
             disabled={!dirty || over || isSaving}
             onClick={() =>
