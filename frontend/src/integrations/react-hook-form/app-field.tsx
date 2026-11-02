@@ -90,7 +90,9 @@ export function AppFormRootError<TValues extends FieldValues>({
 
   return (
     <Alert data-slot="app-form-root-error" variant="destructive">
-      <AlertDescription>{root.message}</AlertDescription>
+      <AlertDescription className="text-sm md:text-xs">
+        {root.message}
+      </AlertDescription>
     </Alert>
   )
 }

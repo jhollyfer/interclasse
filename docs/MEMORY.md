@@ -22,6 +22,8 @@ Tarefa 8.3 feita na branch `frente-8-3` (sem push): frontend, E2E e scripts em i
 
 Tarefa 9.1 feita na branch `frente-9-1` (sem push): site público com avisos fixados sem faixa lateral, faixa de resultados rolável e focável (sem marquee), hero sem logo repetida, 404 curta, chave por fase no celular (`snap-x`, região focável) e alvos de 44 px no cabeçalho, rodapé e links de seção. Axe sem violação nas rotas públicas em 375/768/1280, claro e escuro.
 
+Tarefa 9.3 feita na branch `frente-9-3` (sem push): login sem cantos decorativos nem frase de vitrine, formulário no topo no celular; representante com um grupo de menu (atletas e perfil); perfil sem ícones decorativos e com botão de largura total no celular; erros de campo e de formulário em `text-sm` abaixo de `md`. Sem captura do representante (conta de demonstração não entrou no banco local); conselheiro e login capturados em 375/768/1280.
+
 ## Próximos passos
 
 1. Abrir o PR da fase 7 e conferir a matriz `e2e` (3 shards) do `main-check-backend.yml` no primeiro run; o nome dos checks mudou (`Backend - E2E 1/3`…), então ajustar a proteção da `main` se ela exige o nome antigo.

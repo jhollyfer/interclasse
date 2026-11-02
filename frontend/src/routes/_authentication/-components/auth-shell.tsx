@@ -41,9 +41,8 @@ function AuthShell({
  * size, and the light theme's cream washed the amber seal out against the background. It does not
  * invert with the theme - the institutional color is dark in both -, so the column
  * declares its own light ink and the brand inherits it.
- *
- * The two L-shaped corners come from the previous frontend: they are what frames the panel
- * without drawing a border around it.
+
+ * Nothing decorative besides the brand: no corners, no sales phrase.
  */
 function AuthShellAside({
   className,
@@ -56,19 +55,11 @@ function AuthShellAside({
     <aside
       data-slot="auth-shell-aside"
       className={cn(
-        'relative hidden overflow-hidden bg-brand-ink text-primary-foreground lg:col-span-5 lg:flex lg:flex-col lg:justify-center lg:p-8',
+        'hidden overflow-hidden bg-brand-ink text-primary-foreground lg:col-span-5 lg:flex lg:flex-col lg:justify-center lg:p-8',
         className,
       )}
       {...props}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute top-8 right-8 size-16 border-t border-r border-brand/20"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute bottom-8 left-8 size-16 border-b border-l border-brand/20"
-      />
       {children}
     </aside>
   )
@@ -112,20 +103,20 @@ function AuthShellHeader({
       className={cn('flex flex-col gap-1', className)}
       {...props}
     >
-      <h1 className="text-2xl leading-tight font-bold">{title}</h1>
+      <h1 className="font-display text-3xl leading-tight font-extrabold italic">
+        {title}
+      </h1>
       {children && <p className="text-sm text-muted-foreground">{children}</p>}
     </header>
   )
 }
 
 /**
- * The centered core of the side panel: the brand at its size and the phrase under it.
+ * The centered core of the side panel: the brand at its size.
  *
  * Centered on both axes, as in the previous frontend
  * (`frontend-old/components/composition/auth-shell/index.tsx`, `AuthShell.Brand`):
- * the side panel is not a header with content below, it is a single piece - brand and
- * full name - in the middle of a dark rectangle. With the brand hanging from the
- * top it sat against the left corner, far from the phrase that explains it.
+ * the side panel is a single piece - the brand - in the middle of a dark rectangle.
  */
 function AuthShellAsideBody({
   className,
@@ -140,31 +131,6 @@ function AuthShellAsideBody({
       )}
       {...props}
     />
-  )
-}
-
-/** The phrase under the brand: the association's full name. */
-function AuthShellTagline({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'p'>): React.JSX.Element | null {
-  if (!children) return null
-
-  return (
-    <p
-      data-slot="auth-shell-tagline"
-      className={cn(
-        // The same width as the brand above (`max-w-aside` on the sign-in screen):
-        // the two pieces form a single block, and a phrase narrower than the
-        // drawing would read as misaligned instead of centered.
-        'max-w-aside text-center text-sm leading-relaxed font-light tracking-wide text-primary-foreground/60',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </p>
   )
 }
 
@@ -184,8 +150,8 @@ function AuthShellContent({
   return (
     <main
       data-slot="auth-shell-content"
-      // `min-h-dvh` below `lg` too: without a height, `justify-center` had
-      // nothing to center and the form stuck to the top.
+      // Below `lg` the form starts right under the logo band, with normal breathing
+      // room: centering it left ~230px of empty space above it on a phone.
       className="flex min-h-dvh flex-col lg:col-span-7"
       {...props}
     >
@@ -195,13 +161,13 @@ function AuthShellContent({
 
       <div
         className={cn(
-          'm-auto flex w-full max-w-md flex-col gap-8 px-6 py-10',
+          'flex w-full max-w-md flex-col gap-8 px-4 py-8 sm:mx-auto sm:px-6 lg:my-auto lg:py-10',
           className,
         )}
       >
         {children}
       </div>
-      <footer className="text-muted-foreground px-6 py-4 text-xs [&_a]:text-foreground">
+      <footer className="text-muted-foreground mt-auto px-4 py-4 text-xs sm:px-6 [&_a]:text-foreground">
         <MaiyuCredit />
       </footer>
     </main>
@@ -215,5 +181,4 @@ export {
   AuthShellBrand,
   AuthShellContent,
   AuthShellHeader,
-  AuthShellTagline,
 }
