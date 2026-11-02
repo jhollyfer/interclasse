@@ -8,34 +8,28 @@ import User from '#models/user'
  * The first administrator. No endpoint creates an account without a session - the panel is
  * the only user entry door -, so without this seeder a new database
  * would have nowhere to start.
+ *
+ * Switched on by `SEED_OWNER_PASSWORD` having a value, in any environment
+ * (_standards/backend.md §6.2): absent, it logs one line and skips, and the rest of
+ * `db:seed` runs. The e-mail goes with the password.
  */
 export default class extends BaseSeeder {
-  /**
-   * Outside production: there the first administrator is created by hand, and this
-   * record would be just a known default credential with administrator
-   * power.
-   */
-  static override environment = ['development', 'test']
-
   override async run() {
-    const email = env.get('SEED_ADMINISTRATOR_EMAIL') ?? 'administrator@mail.com'
-    const password = env.get('SEED_ADMINISTRATOR_PASSWORD')
+    const email = env.get('SEED_OWNER_EMAIL')
+    const password = env.get('SEED_OWNER_PASSWORD')
+
+    if (!password) {
+      console.info('[owner] SEED_OWNER_PASSWORD missing; administrator seed skipped.')
+      return
+    }
 
     /*
-     * Without a password the seeder stops, and does not invent one.
-     *
-     * It used to be a literal here, and the repository is the wrong place for a
-     * credential: whoever read this file signed in as administrator in every environment
-     * that had run the seeder - production included. A default,
-     * even a "temporary" one, goes back to being exactly that.
-     *
-     * Failing here is safe because the seeder runs by hand: the application starts without this
-     * variable, and only whoever seeds needs it.
+     * A password without an e-mail stops the seeder: there is no safe account to
+     * guess, and a literal e-mail in the code would be a known login.
      */
-    if (!password) {
+    if (!email) {
       throw new Error(
-        'SEED_ADMINISTRATOR_PASSWORD missing. Set a password in the environment before running the seeder: ' +
-          'SEED_ADMINISTRATOR_PASSWORD=<password> node ace db:seed',
+        'SEED_OWNER_EMAIL missing. SEED_OWNER_PASSWORD needs the e-mail of the account.',
       )
     }
 

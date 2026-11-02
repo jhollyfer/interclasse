@@ -133,15 +133,17 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Seeding
   |----------------------------------------------------------------------------
   |
-  | Read by the seeders, and optional because the application starts without them - only whoever
-  | seeds needs them. Without the password the seeder stops instead of creating an account with a
-  | known credential: it used to be a literal in the file, and anyone who
-  | read it owned every environment already seeded.
+  | Each seed is switched on by its key having a value, in any environment
+  | (_standards/backend.md §6.2, "Seed ligado pela chave"): absent skips that seed
+  | with one log line, and the rest of `db:seed` runs. Optional because the
+  | application starts without them - only whoever seeds needs them. No password
+  | has a default: it would be a credential known to anyone who read the repository.
   |
-  | `SEED_DEMO_PASSWORD` is the password of the demo catalog accounts, where
-  | there is such a catalog. Same rule: no default, and the seeder stops without it.
+  | `SEED_OWNER_*` is the first administrator, and the pair goes together: a
+  | password without the e-mail stops the seeder. `SEED_DEMO_PASSWORD` is the shared
+  | password of the demo accounts (one per role) and of the sample content.
   */
-  SEED_ADMINISTRATOR_EMAIL: Env.schema.string.optional(),
-  SEED_ADMINISTRATOR_PASSWORD: Env.schema.string.optional(),
+  SEED_OWNER_EMAIL: Env.schema.string.optional(),
+  SEED_OWNER_PASSWORD: Env.schema.string.optional(),
   SEED_DEMO_PASSWORD: Env.schema.string.optional(),
 })
