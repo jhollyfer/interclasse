@@ -34,14 +34,15 @@ export function LocaleSwitch({
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          'flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold uppercase transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50',
+          // Below `sm` only the icon shows, in a 44px target; the accessible name stays.
+          'flex size-11 items-center justify-center gap-1.5 rounded-full text-xs font-semibold uppercase sm:size-auto sm:px-2 sm:py-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50',
           className,
         )}
       >
         {/* Accessible name from the content, with the visible text inside: WCAG 2.5.3. */}
         <span className="sr-only">{m.locale_switch_label()}</span>
         <TranslateIcon aria-hidden="true" className="size-4" />
-        {getLocale()}
+        <span className="max-sm:sr-only">{getLocale()}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuGroup>

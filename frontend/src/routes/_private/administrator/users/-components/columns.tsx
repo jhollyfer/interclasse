@@ -53,7 +53,7 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
     },
     {
       accessorKey: 'email',
-      meta: { label: m.admin_common_email() },
+      meta: { label: m.admin_common_email(), mobile: 'subtitle' },
       size: 270,
       header: ({ column }) => (
         <TableColumnHeader sortKey="email" column={column}>
@@ -68,7 +68,7 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
     },
     {
       accessorKey: 'role',
-      meta: { label: m.admin_common_role() },
+      meta: { label: m.admin_common_role(), mobile: 'badge' },
       size: 150,
       header: ({ column }) => (
         <TableColumnHeader sortKey="role" column={column}>
@@ -85,7 +85,7 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
     },
     {
       accessorKey: 'status',
-      meta: { label: m.admin_common_status() },
+      meta: { label: m.admin_common_status(), mobile: 'field' },
       size: 150,
       header: ({ column }) => (
         <TableColumnHeader sortKey="status" column={column}>
@@ -103,7 +103,7 @@ export function userColumns(): TableColumns<AdministratorUserShowResponse> {
     },
     {
       accessorKey: 'createdAt',
-      meta: { label: m.admin_common_created_on() },
+      meta: { label: m.admin_common_created_on(), mobile: 'field' },
       size: 160,
       header: ({ column }) => (
         <TableColumnHeader sortKey="createdAt" column={column}>

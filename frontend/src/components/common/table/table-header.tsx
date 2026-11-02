@@ -43,7 +43,7 @@ function TableTitle({
   return (
     <h1
       data-slot="table-title"
-      className={cn('text-2xl font-bold', className)}
+      className={cn('text-2xl leading-tight font-bold break-words', className)}
       {...props}
     >
       {children}
@@ -62,7 +62,7 @@ function TableDescription({
   return (
     <div
       data-slot="table-description"
-      className={cn('text-xs text-muted-foreground', className)}
+      className={cn('text-sm text-muted-foreground', className)}
       {...props}
     >
       {children}

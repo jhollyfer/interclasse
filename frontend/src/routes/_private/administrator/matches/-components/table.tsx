@@ -92,7 +92,7 @@ function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
     {
       id: 'when',
       accessorFn: (row) => row.scheduledAt ?? '',
-      meta: { label: m.admin_common_when() },
+      meta: { label: m.admin_common_when(), mobile: 'subtitle' },
       size: 150,
       header: () => m.admin_common_when(),
       cell: ({ row }) => (
@@ -104,7 +104,7 @@ function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
     {
       id: 'sport',
       accessorFn: (row) => row.bracket.sport.name,
-      meta: { label: m.admin_common_sport() },
+      meta: { label: m.admin_common_sport(), mobile: 'field' },
       size: 170,
       header: () => m.admin_common_sport(),
       cell: ({ row }) => {
@@ -118,14 +118,14 @@ function matchColumns(): TableColumns<AdministratorMatchPaginateResponse> {
     {
       id: 'phase',
       accessorFn: (row) => phaseOf(row),
-      meta: { label: m.admin_common_phase() },
+      meta: { label: m.admin_common_phase(), mobile: 'field' },
       size: 110,
       header: () => m.admin_common_phase(),
       cell: ({ row }) => phaseOf(row.original),
     },
     {
       accessorKey: 'status',
-      meta: { label: m.admin_common_status() },
+      meta: { label: m.admin_common_status(), mobile: 'badge' },
       size: 120,
       header: () => m.admin_common_status(),
       cell: ({ row }) => (

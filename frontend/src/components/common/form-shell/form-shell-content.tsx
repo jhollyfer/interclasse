@@ -38,7 +38,8 @@ export function FormShellContent({
         method="post"
         id={formId}
         className={cn(
-          'mx-auto flex w-full max-w-3xl flex-col gap-4',
+          // `max-sm:pb-24`: room for the fixed save bar (`FormShellActions`).
+          'mx-auto flex w-full max-w-3xl flex-col gap-4 max-sm:pb-24',
           className,
         )}
         {...props}
@@ -71,8 +72,16 @@ export function FormShellCard({
   ...props
 }: FormShellCardProps): React.JSX.Element {
   return (
-    <Card data-slot="form-shell-card">
-      <CardContent className={cn('flex flex-col gap-4', className)} {...props}>
+    <Card
+      data-slot="form-shell-card"
+      // A phone gets the fields on the page itself: a card inside the panel's container
+      // is a box in a box and eats 32px of width.
+      className="max-sm:bg-transparent max-sm:py-0 max-sm:ring-0"
+    >
+      <CardContent
+        className={cn('flex flex-col gap-4 max-sm:px-0', className)}
+        {...props}
+      >
         {children}
       </CardContent>
     </Card>
