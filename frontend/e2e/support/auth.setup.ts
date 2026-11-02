@@ -1,8 +1,8 @@
 import { expect, test as setup } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-import { credentialsOf } from './credentials'
-import type { Role } from './credentials'
+import { credentialsOf } from './env'
+import type { Role } from './env'
 import { waitForHydration } from './hydration'
 import { storageStatePath } from './session'
 

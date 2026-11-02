@@ -1,7 +1,7 @@
 import type { APIRequestContext } from '@playwright/test'
 import { deflateSync, crc32 } from 'node:zlib'
 
-import { apiUrl, writeHeaders } from './support/credentials'
+import { apiUrl, writeHeaders } from './support/env'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 

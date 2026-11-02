@@ -1,4 +1,4 @@
-import { credentialsOf } from './support/credentials'
+import { credentialsOf } from './support/env'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 

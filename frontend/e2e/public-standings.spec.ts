@@ -1,6 +1,6 @@
 import type { APIRequestContext } from '@playwright/test'
 
-import { apiUrl } from './support/credentials'
+import { apiUrl } from './support/env'
 import { waitForHydration } from './support/hydration'
 import { expect, test } from './support/test'
 
