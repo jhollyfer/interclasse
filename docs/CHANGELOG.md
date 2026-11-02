@@ -18,6 +18,9 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado
 
+- Todas as telas cabem no celular, do site público ao painel: botões e campos com 44 px para o dedo, diálogos que sobem do rodapé e tabelas que viram cartões.
+- Site público mais limpo: início sem logo repetida, faixa de resultados que se rola com o dedo ou o teclado, chave com uma fase por vez no celular e página de erro curta.
+- Login sem enfeite e com o formulário no topo no celular; menu do representante com atletas e perfil juntos.
 - Painel do administrador no celular: jogos do painel com botões em grade, relatório com dois destaques e tabelas que rolam com o teclado, "Apagar chave" em zona de perigo no fim da chave e salvar do site fixo no rodapé.
 - Inscrição de atletas (administrador, conselheiro e representante): modalidades em blocos recolhíveis, linhas de aluno clicáveis inteiras e botão de salvar sempre à vista.
 - A página pública de uma chave passa a declarar a trilha de navegação (início, classificação, chave) e o evento esportivo para os buscadores.

@@ -146,7 +146,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 | 9.1 | Site público responsivo e com identidade | Alta | Feita | Avisos sem faixa colorida, faixa de resultados rolável, hero sem logo repetida, 404 curta, chave por fase no celular, alvos de 44 px |
 | 9.2 | Painel do administrador responsivo | Alta | Feita | Linhas de jogo em coluna com botões em grade, relatório com `dl` válido e 2 destaques, tabelas em região focável, zona de perigo na chave, salvar do site fixo, `EnrollmentBoard` em blocos recolhíveis; sem rolagem horizontal nem violação do axe em 375/768/1280 |
 | 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Feita | Login sem enfeite nem frase de vitrine e com o formulário no topo no celular; menu do representante em um grupo só (atletas e perfil); perfil sem ícones decorativos; erros de campo legíveis no celular. Detalhe da turma e quadro de inscrição ficam na 9.2 |
-| 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Em andamento | |
+| 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Feita | 29 rotas × 375/768/1280 sem rolagem lateral, alvos de 44 px e axe limpo; representante na suíte; 3 textos revisados nos 3 idiomas |
 
 ## Fase N · Ideias (fora do escopo atual)
 
