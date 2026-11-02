@@ -30,7 +30,9 @@ export function TableToolbar({
     // the design of a segmented control, not of a bar.
     <div
       data-slot="table-toolbar"
-      className="flex shrink-0 flex-wrap items-center gap-2"
+      // A phone gets a 2-column grid (the search takes the whole row, filters share it);
+      // from `sm` up it is the wrapping row it always was.
+      className="grid shrink-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap"
     >
       {children}
       {isPlaceholderData && <Spinner className="opacity-50" />}

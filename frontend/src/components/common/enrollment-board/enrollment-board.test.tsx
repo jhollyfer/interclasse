@@ -166,4 +166,21 @@ describe('EnrollmentBoard', () => {
 
     expect(screen.getAllByRole('button', { name: /^Salvar / }).length).toBe(2)
   })
+
+  it('opens only the first sport, so the page does not stack every list', () => {
+    const { container } = render(
+      <EnrollmentBoard
+        board={board({
+          sports: [FUTSAL, { ...FUTSAL, id: 'volei', name: 'Vôlei' }],
+        })}
+        onSave={vi.fn()}
+      />,
+    )
+
+    const blocks = container.querySelectorAll('details')
+
+    expect(blocks.length).toBe(2)
+    expect(blocks[0]?.open).toBe(true)
+    expect(blocks[1]?.open).toBe(false)
+  })
 })

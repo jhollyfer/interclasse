@@ -20,5 +20,11 @@ declare module '@tanstack/react-table' {
     label?: string
     /** The column that becomes the card title on mobile. When absent, the first data column. */
     primary?: boolean
+    /**
+     * What the column becomes in the mobile card: the `subtitle` under the title, the
+     * `badge` in the top corner, a `field` of the 2-column grid (the default, capped at
+     * three) or `hidden`. Read by `TableMobileCards`; the desktop table ignores it.
+     */
+    mobile?: 'subtitle' | 'badge' | 'field' | 'hidden'
   }
 }

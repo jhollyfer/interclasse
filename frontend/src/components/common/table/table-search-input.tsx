@@ -85,7 +85,10 @@ export function InputSearch({
   const hasTerm = term.length > 0
 
   return (
-    <InputGroup data-slot="table-search-input" className="w-full sm:w-72">
+    <InputGroup
+      data-slot="table-search-input"
+      className="col-span-full w-full sm:col-auto sm:w-72"
+    >
       {help && (
         <InputGroupAddon>
           <Tooltip>

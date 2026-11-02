@@ -36,7 +36,8 @@ export function TableColumnToggle<TRow extends RowData>({
           <Button
             data-test-id="column-toggle"
             variant="outline"
-            className="ml-auto"
+            // Card mode (below `md`) has no columns to toggle.
+            className="ml-auto max-md:hidden"
           >
             <ColumnsIcon />
             {m.table_columns()}

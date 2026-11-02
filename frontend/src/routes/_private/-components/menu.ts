@@ -132,16 +132,6 @@ const ADVISOR = linkOptions([
   },
 ])
 
-const REPRESENTATIVE = linkOptions([
-  {
-    to: '/representative',
-    get label() {
-      return m.panel_menu_representative_athletes()
-    },
-    icon: ListChecksIcon,
-  },
-])
-
 const ACCOUNT = linkOptions([
   {
     to: '/profile',
@@ -150,6 +140,19 @@ const ACCOUNT = linkOptions([
     },
     icon: IdentificationCardIcon,
   },
+])
+
+const REPRESENTATIVE = linkOptions([
+  {
+    to: '/representative',
+    get label() {
+      return m.panel_menu_representative_athletes()
+    },
+    icon: ListChecksIcon,
+  },
+  // The profile lives in this group: with a single useful destination, a second group
+  // "Conta" holding one item was a menu of two titles for two links.
+  ...ACCOUNT,
 ])
 
 export type MenuItem =
@@ -200,6 +203,8 @@ export const MENU: ReadonlyArray<MenuGroup> = [
       return m.panel_menu_group_account()
     },
     items: ACCOUNT,
+    // The representative already has the profile in their own group.
+    roles: [USER_ROLE.ADMINISTRATOR, USER_ROLE.ADVISOR],
   },
 ]
 

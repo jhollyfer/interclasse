@@ -1,4 +1,5 @@
-export type Role = 'administrator' | 'advisor' | 'secondAdvisor'
+export type Role =
+  'administrator' | 'advisor' | 'secondAdvisor' | 'representative'
 
 export type Credentials = Readonly<{ email: string; password: string }>
 
@@ -6,6 +7,7 @@ const VARIABLES = {
   administrator: ['E2E_ADMIN_EMAIL', 'E2E_ADMIN_PASSWORD'],
   advisor: ['E2E_ADVISOR_EMAIL', 'E2E_ADVISOR_PASSWORD'],
   secondAdvisor: ['E2E_SECOND_ADVISOR_EMAIL', 'E2E_SECOND_ADVISOR_PASSWORD'],
+  representative: ['E2E_REPRESENTATIVE_EMAIL', 'E2E_REPRESENTATIVE_PASSWORD'],
 } as const satisfies Record<Role, readonly [string, string]>
 
 function required(name: string): string {

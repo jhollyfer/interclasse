@@ -33,7 +33,7 @@ export function bracketColumns(): TableColumns<AdministratorBracketPaginateRespo
     },
     {
       accessorKey: 'category',
-      meta: { label: m.admin_common_category() },
+      meta: { label: m.admin_common_category(), mobile: 'subtitle' },
       size: 160,
       header: () => m.admin_common_category(),
       cell: ({ row }) =>
@@ -41,7 +41,7 @@ export function bracketColumns(): TableColumns<AdministratorBracketPaginateRespo
     },
     {
       accessorKey: 'status',
-      meta: { label: m.admin_common_status() },
+      meta: { label: m.admin_common_status(), mobile: 'badge' },
       size: 160,
       header: () => m.admin_common_status(),
       cell: ({ row }) => (
@@ -52,7 +52,7 @@ export function bracketColumns(): TableColumns<AdministratorBracketPaginateRespo
     },
     {
       accessorKey: 'createdAt',
-      meta: { label: m.admin_brackets_drawn_on() },
+      meta: { label: m.admin_brackets_drawn_on(), mobile: 'field' },
       size: 160,
       header: () => m.admin_brackets_drawn_on(),
       cell: ({ row }) => (

@@ -24,3 +24,6 @@ playwright-report
 project.inlang/.lix
 project.inlang/.meta.json
 project.inlang/README.md
+
+# Sessões que o `auth.setup.ts` grava a cada E2E (ignoradas pelo git).
+e2e/.auth

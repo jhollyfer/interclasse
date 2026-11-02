@@ -24,7 +24,6 @@ import {
   AuthShellAsideBody,
   AuthShellContent,
   AuthShellHeader,
-  AuthShellTagline,
 } from '../../-components/auth-shell'
 
 const route = getRouteApi('/_authentication/sign-in/')
@@ -93,10 +92,6 @@ export function SignInForm(): React.JSX.Element {
               placement="lcp"
             />
           </Link>
-          {/* The full name, and the same constant that the root `head`
-              announces: the brand draws the acronym, and this is where it is spoken
-              in full. */}
-          <AuthShellTagline>{m.common_site_description()}</AuthShellTagline>
         </AuthShellAsideBody>
       </AuthShellAside>
 

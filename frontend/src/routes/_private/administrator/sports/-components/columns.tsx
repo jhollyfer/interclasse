@@ -23,7 +23,7 @@ export function sportColumns(): TableColumns<AdministratorSportShowResponse> {
     {
       id: 'athletes',
       accessorFn: (row) => `${row.minAthletes}-${row.maxAthletes}`,
-      meta: { label: m.admin_sports_athletes_per_team() },
+      meta: { label: m.admin_sports_athletes_per_team(), mobile: 'field' },
       size: 180,
       header: () => m.admin_sports_athletes_per_team(),
       cell: ({ row }) => (

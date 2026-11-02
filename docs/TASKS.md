@@ -135,6 +135,19 @@ Aplica ao projeto as decisões #252 a #260 da régua (maiyu-pattern, sync de 31/
 | 8.2 | Backend fora de `features/` e `shared/` em inglês | Média | Feita | Comentários, JSDoc, títulos de teste, saídas de scripts e identificadores em inglês; `pnpm check`, `depcruise`, shared e E2E (692) verdes |
 | 8.3 | Frontend e E2E em inglês, rotas públicas `/standings`, `/matches`, `/announcements`, `/about` | Média | Feita | sem redirect; `/painel` virou `/dashboard`. Comentários, títulos de teste, identificadores, configs e mensagens de erro de desenvolvedor em inglês; Playwright 14/14 |
 
+## Fase 9 · Responsivo em todos os perfis e interface sem cara de IA (0/5)
+
+Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela genérica, `humanizer` no texto.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 9.0 | Diagnóstico: screenshots de toda rota por perfil em 375/768/1280, claro e escuro | Alta | Feita | 76 problemas por rota e perfil, base das frentes 9.K a 9.3 |
+| 9.K | Kit comum responsivo | Alta | Feita | Controles com 44 px no celular, diálogo em folha de baixo, tabela em cartão compacto, barra de salvar fixa, cabeçalho e rodapé do painel compactos |
+| 9.1 | Site público responsivo e com identidade | Alta | Feita | Avisos sem faixa colorida, faixa de resultados rolável, hero sem logo repetida, 404 curta, chave por fase no celular, alvos de 44 px |
+| 9.2 | Painel do administrador responsivo | Alta | Feita | Linhas de jogo em coluna com botões em grade, relatório com `dl` válido e 2 destaques, tabelas em região focável, zona de perigo na chave, salvar do site fixo, `EnrollmentBoard` em blocos recolhíveis; sem rolagem horizontal nem violação do axe em 375/768/1280 |
+| 9.3 | Conselheiro, representante, login, perfil e dashboard responsivos | Alta | Feita | Login sem enfeite nem frase de vitrine e com o formulário no topo no celular; menu do representante em um grupo só (atletas e perfil); perfil sem ícones decorativos; erros de campo legíveis no celular. Detalhe da turma e quadro de inscrição ficam na 9.2 |
+| 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Feita | 29 rotas × 375/768/1280 sem rolagem lateral, alvos de 44 px e axe limpo; representante na suíte; 3 textos revisados nos 3 idiomas |
+
 ## Fase N · Ideias (fora do escopo atual)
 
 - Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10

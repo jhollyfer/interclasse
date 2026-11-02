@@ -11,6 +11,7 @@ import {
 } from '#/components/common/page-shell'
 import { SubmitButton } from '#/components/common/submit-button'
 import { Button } from '#/components/ui/button'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 import { useFormShellContext } from './form-shell-context'
@@ -55,10 +56,23 @@ export function FormShellTitle(
  * The actions on the right. Usually `FormShellDiscard` + `FormShellSubmit`, but a
  * screen that needs one more button writes the button in here.
  */
-export function FormShellActions(
-  props: React.ComponentProps<typeof PageHeaderActions>,
-): React.JSX.Element | null {
-  return <PageHeaderActions data-slot="form-shell-actions" {...props} />
+export function FormShellActions({
+  className,
+  ...props
+}: React.ComponentProps<typeof PageHeaderActions>): React.JSX.Element | null {
+  // On a phone the bar sits fixed at the foot, where the thumb is, and each button takes an
+  // equal share; from `sm` up it is the right side of the header as before. The form
+  // reserves the room below its last field (`FormShellContent`).
+  return (
+    <PageHeaderActions
+      data-slot="form-shell-actions"
+      {...props}
+      className={cn(
+        'max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-sticky max-sm:mt-0 max-sm:flex-nowrap max-sm:border-t max-sm:bg-background max-sm:p-3 max-sm:*:flex-1',
+        className,
+      )}
+    />
+  )
 }
 
 /**

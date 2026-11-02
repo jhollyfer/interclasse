@@ -127,7 +127,7 @@ export function Header(): React.JSX.Element {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
           to="/"
-          className="flex shrink-0 items-center text-brand-ink-foreground"
+          className="flex min-h-11 shrink-0 items-center text-brand-ink-foreground"
         >
           <BrandMark />
         </Link>
@@ -164,7 +164,7 @@ export function Header(): React.JSX.Element {
           aria-expanded={open}
           aria-label={menuLabel}
           onClick={() => setOpen((previous) => !previous)}
-          className="group flex size-8 flex-col items-center justify-center gap-menu-bar text-brand-ink-foreground md:hidden"
+          className="group -mr-2 flex size-11 flex-col items-center justify-center gap-menu-bar text-brand-ink-foreground md:hidden"
         >
           <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:translate-y-menu-bar-shift group-data-open:rotate-45 motion-reduce:transition-none" />
           <span className="block h-px w-5 origin-center bg-current transition-transform duration-200 group-data-open:scale-x-0 motion-reduce:transition-none" />

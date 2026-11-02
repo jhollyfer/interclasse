@@ -30,7 +30,6 @@ import {
 import type { MatchRef } from '#/components/common/match-dialogs'
 import {
   PageHeader,
-  PageHeaderActions,
   PageHeaderBack,
   PageHeaderBadges,
   PageHeaderTitle,
@@ -124,54 +123,6 @@ export function BracketDetailView(): React.JSX.Element {
             {BRACKET_STATUS_LABELS[bracket.status]}
           </Badge>
         </PageHeaderBadges>
-        <PageHeaderActions>
-          <ConfirmDialog
-            destructive
-            onConfirm={() => remove.mutate(bracket.id)}
-            render={
-              <Button variant="destructive">
-                <TrashIcon />
-                {m.admin_brackets_delete_trigger()}
-              </Button>
-            }
-          >
-            {hasResults && (
-              <React.Fragment>
-                <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>
-                    {m.admin_brackets_has_results_title()}
-                  </ConfirmDialogTitle>
-                  <ConfirmDialogDescription>
-                    {m.admin_brackets_has_results_description()}
-                  </ConfirmDialogDescription>
-                </ConfirmDialogHeader>
-                <ConfirmDialogFooter>
-                  <ConfirmDialogCancel>
-                    {m.admin_brackets_understood()}
-                  </ConfirmDialogCancel>
-                </ConfirmDialogFooter>
-              </React.Fragment>
-            )}
-            {!hasResults && (
-              <React.Fragment>
-                <ConfirmDialogHeader>
-                  <ConfirmDialogTitle>
-                    {m.admin_brackets_delete_title()}
-                  </ConfirmDialogTitle>
-                  <ConfirmDialogDescription>
-                    {m.admin_brackets_delete_description()}
-                  </ConfirmDialogDescription>
-                </ConfirmDialogHeader>
-                <ConfirmDialogFooter>
-                  <ConfirmDialogCancel />
-                  <ConfirmDialogConfirm>
-                    {m.admin_brackets_delete_trigger()}
-                  </ConfirmDialogConfirm>
-                </ConfirmDialogFooter>
-              </React.Fragment>
-            )}
-          </ConfirmDialog>
-        </PageHeaderActions>
       </PageHeader>
 
       {champion && (
@@ -238,6 +189,68 @@ export function BracketDetailView(): React.JSX.Element {
           )
         }}
       />
+
+      {/* Danger zone at the end: erasing the bracket is rare and irreversible, so it does not
+          compete with the page's own actions right under the title. */}
+      <section
+        aria-labelledby="bracket-danger"
+        className="mt-6 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex flex-col gap-1">
+          <h2 id="bracket-danger" className="text-base font-semibold">
+            {m.admin_brackets_danger_title()}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {m.admin_brackets_danger_description()}
+          </p>
+        </div>
+        <ConfirmDialog
+          destructive
+          onConfirm={() => remove.mutate(bracket.id)}
+          render={
+            <Button variant="destructive">
+              <TrashIcon />
+              {m.admin_brackets_delete_trigger()}
+            </Button>
+          }
+        >
+          {hasResults && (
+            <React.Fragment>
+              <ConfirmDialogHeader>
+                <ConfirmDialogTitle>
+                  {m.admin_brackets_has_results_title()}
+                </ConfirmDialogTitle>
+                <ConfirmDialogDescription>
+                  {m.admin_brackets_has_results_description()}
+                </ConfirmDialogDescription>
+              </ConfirmDialogHeader>
+              <ConfirmDialogFooter>
+                <ConfirmDialogCancel>
+                  {m.admin_brackets_understood()}
+                </ConfirmDialogCancel>
+              </ConfirmDialogFooter>
+            </React.Fragment>
+          )}
+          {!hasResults && (
+            <React.Fragment>
+              <ConfirmDialogHeader>
+                <ConfirmDialogTitle>
+                  {m.admin_brackets_delete_title()}
+                </ConfirmDialogTitle>
+                <ConfirmDialogDescription>
+                  {m.admin_brackets_delete_description()}
+                </ConfirmDialogDescription>
+              </ConfirmDialogHeader>
+              <ConfirmDialogFooter>
+                <ConfirmDialogCancel />
+                <ConfirmDialogConfirm>
+                  {m.admin_brackets_delete_trigger()}
+                </ConfirmDialogConfirm>
+              </ConfirmDialogFooter>
+            </React.Fragment>
+          )}
+        </ConfirmDialog>
+      </section>
 
       <MatchScoreDialog handle={scoreHandle} />
       <MatchUnscoreDialog handle={unscoreHandle} />

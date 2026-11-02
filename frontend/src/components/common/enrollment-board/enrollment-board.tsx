@@ -1,10 +1,9 @@
 import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
-import { LockSimpleIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, LockSimpleIcon } from '@phosphor-icons/react'
 import * as React from 'react'
 
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Checkbox } from '#/components/ui/checkbox'
 import { m } from '#/paraglide/messages'
 
@@ -29,7 +28,7 @@ type EnrollmentBoardProps = Readonly<{
 }>
 
 /**
- * The athlete list per sport: one card per sport, one checkbox per
+ * The athlete list per sport: one collapsible block per sport, one checkbox per
  * student. Saving sends the whole list for that sport - it is the contract of
  * `PUT /advisor/enrollments` and `PUT /representative/enrollments`.
  *
@@ -59,10 +58,11 @@ export function EnrollmentBoard({
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      {board.sports.map((sport) => (
-        <SportCard
+    <div className="grid items-start gap-3 lg:grid-cols-2">
+      {board.sports.map((sport, index) => (
+        <SportBlock
           key={sport.id}
+          defaultOpen={index === 0}
           sport={sport}
           students={board.students}
           onSave={onSave}
@@ -80,13 +80,28 @@ const COUNT_VARIANT: Record<string, 'warning' | 'neutral'> = {
   false: 'neutral',
 }
 
-function SportCard({
+/** The save button leaves the faded look when there is nothing to save: `outline` keeps its border. */
+const SAVE_VARIANT: Record<string, 'default' | 'outline'> = {
+  true: 'default',
+  false: 'outline',
+}
+
+/**
+ * One sport, as a native `<details>`: with 20 students and 4 sports the page was 80 checkboxes
+ * long, so only the first sport opens and the others fold into one line each. The element keeps
+ * the keyboard, the state and the screen-reader role of a disclosure without a line of script
+ * (`<details>`/`<summary>`, WHATWG HTML), and, unlike a conditional render, keeps what was
+ * ticked and not yet saved when the block closes.
+ */
+function SportBlock({
+  defaultOpen,
   sport,
   students,
   onSave,
   isSaving,
   canRemove,
 }: Readonly<{
+  defaultOpen: boolean
   sport: AdvisorEnrollmentShowResponse['sports'][number]
   students: AdvisorEnrollmentShowResponse['students']
   onSave: EnrollmentBoardProps['onSave']
@@ -123,10 +138,15 @@ function SportCard({
     setSelected(next)
   }
 
+  const saveVariant = SAVE_VARIANT[String(dirty && !over)]
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <CardTitle className="flex-1">{sport.name}</CardTitle>
+    <details
+      open={defaultOpen}
+      className="group/sport bg-card ring-foreground/10 overflow-hidden rounded-lg ring-1"
+    >
+      <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 select-none focus-visible:ring-ring/30 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset">
+        <span className="flex-1 text-sm font-medium">{sport.name}</span>
         {sport.locked && (
           <Badge variant="neutral">
             <LockSimpleIcon />
@@ -145,44 +165,50 @@ function SportCard({
             max: sport.maxAthletes,
           })}
         </Badge>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {students.map((student) => (
-            <li key={student.id}>
-              {/* Locked, whoever was not enrolled looks faded: with the same color as
-                  everything else, the drawn list looked editable. */}
-              <label className="flex items-center gap-2 text-sm has-data-disabled:cursor-not-allowed has-data-disabled:not-has-data-checked:text-muted-foreground">
-                <Checkbox
-                  checked={selected.has(student.id)}
-                  disabled={
-                    sport.locked || (!canRemove && initial.has(student.id))
-                  }
-                  onCheckedChange={(checked) =>
-                    toggle(student.id, checked === true)
-                  }
-                />
-                {student.name}
-              </label>
-            </li>
-          ))}
-        </ul>
-        {over && !sport.locked && (
-          <p className="text-destructive text-xs">
-            {m.common_enrollment_over({
-              count: selected.size - sport.maxAthletes,
-            })}
-          </p>
-        )}
-        {under && !sport.locked && (
-          <p className="text-muted-foreground text-xs">
-            {m.common_enrollment_under()}
-          </p>
-        )}
-        {!sport.locked && (
+        <CaretDownIcon className="text-muted-foreground transition-transform group-open/sport:rotate-180 motion-reduce:transition-none" />
+      </summary>
+      <ul className="grid border-t sm:grid-cols-2">
+        {students.map((student) => (
+          <li key={student.id}>
+            {/* Locked, whoever was not enrolled looks faded: with the same color as
+                everything else, the drawn list looked editable. The whole row is the
+                target (44px), not only the 16px square. */}
+            <label className="hover:bg-muted/50 flex min-h-11 items-center gap-3 px-4 text-sm has-data-disabled:cursor-not-allowed has-data-disabled:not-has-data-checked:text-muted-foreground">
+              <Checkbox
+                checked={selected.has(student.id)}
+                disabled={
+                  sport.locked || (!canRemove && initial.has(student.id))
+                }
+                onCheckedChange={(checked) =>
+                  toggle(student.id, checked === true)
+                }
+              />
+              {student.name}
+            </label>
+          </li>
+        ))}
+      </ul>
+      {!sport.locked && (
+        // Sticky at the foot of the scroll: with 20 students the button used to end
+        // up a screen away from the ticks.
+        <div className="bg-card sticky bottom-0 z-sticky flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            {over && (
+              <p role="alert" className="text-destructive text-xs">
+                {m.common_enrollment_over({
+                  count: selected.size - sport.maxAthletes,
+                })}
+              </p>
+            )}
+            {under && (
+              <p className="text-muted-foreground text-xs">
+                {m.common_enrollment_under()}
+              </p>
+            )}
+          </div>
           <Button
-            className="self-end"
-            size="sm"
+            className="sm:shrink-0"
+            variant={saveVariant}
             disabled={!dirty || over || isSaving}
             onClick={() =>
               onSave(
@@ -199,8 +225,8 @@ function SportCard({
           >
             {m.common_enrollment_save({ name: sport.name })}
           </Button>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </details>
   )
 }

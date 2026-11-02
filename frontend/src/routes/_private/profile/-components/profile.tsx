@@ -1,9 +1,4 @@
-import {
-  EnvelopeSimpleIcon,
-  IdentificationCardIcon,
-  PencilSimpleIcon,
-  ShieldCheckIcon,
-} from '@phosphor-icons/react'
+import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import type * as React from 'react'
@@ -82,6 +77,7 @@ export function Profile(): React.JSX.Element {
         </div>
 
         <Button
+          className="w-full sm:w-auto"
           render={
             <Link to="/profile/edit">
               <PencilSimpleIcon />
@@ -94,25 +90,20 @@ export function Profile(): React.JSX.Element {
       <PageShellContent>
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <IdentificationCardIcon />
+            <CardTitle className="text-base">
               {m.profile_card_title()}
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Detail icon={<IdentificationCardIcon />} label={m.common_name()}>
-              {account.name}
-            </Detail>
-            <Detail icon={<EnvelopeSimpleIcon />} label={m.common_email()}>
-              {account.email}
-            </Detail>
+          <CardContent className="flex flex-col gap-4">
+            <Detail label={m.common_name()}>{account.name}</Detail>
+            <Detail label={m.common_email()}>{account.email}</Detail>
             {/* The password is not shown, not even masked: a "••••••••" suggests that the
                 dashboard knows it, and it does not - the backend stores the hash.
                 What can be said is where to change it. */}
-            <Detail icon={<ShieldCheckIcon />} label={m.common_password()}>
+            <Detail label={m.common_password()}>
               <Link
                 to="/profile/edit"
-                className="text-primary underline-offset-4 hover:underline"
+                className="inline-flex min-h-11 items-center text-primary underline-offset-4 hover:underline md:min-h-0"
               >
                 {m.profile_change_password()}
               </Link>
@@ -125,19 +116,15 @@ export function Profile(): React.JSX.Element {
 }
 
 type DetailProps = Readonly<{
-  icon: React.ReactNode
   label: string
   children: React.ReactNode
 }>
 
-function Detail({ icon, label, children }: DetailProps): React.JSX.Element {
+function Detail({ label, children }: DetailProps): React.JSX.Element {
   return (
-    <div className="flex items-start gap-3">
-      <span className="mt-0.5 text-muted-foreground">{icon}</span>
-      <div className="flex flex-col">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <span className="text-sm">{children}</span>
-      </div>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-sm break-words">{children}</span>
     </div>
   )
 }
