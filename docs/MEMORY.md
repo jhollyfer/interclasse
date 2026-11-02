@@ -22,6 +22,8 @@ Tarefa 8.3 feita na branch `frente-8-3` (sem push): frontend, E2E e scripts em i
 
 Tarefa 9.1 feita na branch `frente-9-1` (sem push): site público com avisos fixados sem faixa lateral, faixa de resultados rolável e focável (sem marquee), hero sem logo repetida, 404 curta, chave por fase no celular (`snap-x`, região focável) e alvos de 44 px no cabeçalho, rodapé e links de seção. Axe sem violação nas rotas públicas em 375/768/1280, claro e escuro.
 
+Tarefa 9.2 feita na branch `frente-9-2` (sem push): painel do administrador sem título espremido nas linhas de jogo, relatório com um `dl` válido (2 destaques, resto em lista), tabelas em região rolável focável, "Apagar chave" numa zona de perigo no fim da página, salvar do site fixo no celular e `EnrollmentBoard` com modalidades em `details` (só a primeira abre), linhas de 44 px e salvar colado ao rodapé. Varredura em 375/768/1280, escuro: sem rolagem horizontal e sem violação do axe nas rotas do administrador. Pendente do kit: o gatilho de `Tabs` mede 37 px no celular (lista de 44 px com 3 px de respiro).
+
 ## Próximos passos
 
 1. Abrir o PR da fase 7 e conferir a matriz `e2e` (3 shards) do `main-check-backend.yml` no primeiro run; o nome dos checks mudou (`Backend - E2E 1/3`…), então ajustar a proteção da `main` se ela exige o nome antigo.
