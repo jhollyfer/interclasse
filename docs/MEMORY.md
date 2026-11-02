@@ -16,18 +16,15 @@
 
 ## Parou em
 
-Fase 9 feita na branch `feat/frontend-responsivo`: todos os perfis (visitante, administrador, conselheiro, representante) responsivos de 375 a 1280 px. Kit com controles de 44 px no celular, diálogo em folha de baixo, tabela em cartão, barra de salvar fixa; site público sem enfeite (hero, 404, avisos, faixa de resultados rolável, chave por fase); painel com relatório de `dl` válido e inscrição em blocos recolhíveis; login sem frase de vitrine; textos revisados com o humanizer. `e2e/responsive.spec.ts` verde (91 testes: 29 rotas × 3 larguras + 4 logins), Playwright de fluxo verde, `check`, unit, `format:check`, build e ciclos verdes.
-
-Tarefa 9.5 na branch `fix/frontend-ajustes-fase-9`: Salvar desabilitado da inscrição legível no escuro e `responsive.spec.ts` com passe escuro em 375 px (33/33 local). A "bolha" no canto inferior direito era o TanStack Devtools, só de desenvolvimento.
+Fase 9 fechada e mergeada (#26 e #27): todos os perfis (visitante, administrador, conselheiro, representante) responsivos de 375 a 1280 px, sem cara de tela genérica, textos revisados com o humanizer. `e2e/responsive.spec.ts` cobre 29 rotas em 375/768/1280 no tema claro e 375 no escuro (120 testes no CI). A `main` passa em todos os checks; só o smoke test do deploy no Coolify falha (ver Problemas conhecidos).
 
 ## Próximos passos
 
-1. Abrir o PR da 9.5 e acompanhar o CI.
-2. Deploy do #25: o smoke test deu 503; aguarda os logs do Coolify.
-3. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
-4. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). No painel, migration no *Post-deployment command* e *Pre-deployment* vazio. Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
-5. Medir o `size-adjust` das fontes de reserva.
-6. Ajuste visual das turmas quando chegarem os prints do Geison.
+1. Deploy: a API responde 503 no Coolify desde o #25. Abrir os logs do container da API no último deploy e conferir as variáveis (`CORS_ORIGINS`, `TRUSTED_PROXIES`, `DATABASE_URL`, `STORAGE_*`, `APP_KEY`), o *Post-deployment* (`node ace migration:run --force`) e o healthcheck.
+2. Tarefa 7.10: estreitar o left dos métodos de domínio por operação, para o `openapi.json` não listar código de outra operação.
+3. Antes do deploy no Coolify: `CORS_ORIGINS`, `TRUSTED_PROXIES`, `SEED_ADMINISTRATOR_*`, `SITE_ENV=production` (runtime) e `VITE_STORAGE_URL` (build). No painel, migration no *Post-deployment command* e *Pre-deployment* vazio. Sem `SITE_ENV` o site sai `noindex`; sem `VITE_STORAGE_URL` o CSP bloqueia o upload. O bucket de produção precisa aceitar `PUT` com `Content-Type` e expor `ETag` no CORS.
+4. Medir o `size-adjust` das fontes de reserva.
+5. Ajuste visual das turmas quando chegarem os prints do Geison.
 
 ## Contexto importante
 
@@ -52,8 +49,7 @@ Tarefa 9.5 na branch `fix/frontend-ajustes-fase-9`: Salvar desabilitado da inscr
 
 | Problema | Onde | Contorno |
 |---|---|---|
-| O projeto ainda escreve comentário, título de teste e mensagem de commit de código em português; `typescript.md` §12 manda inglês | todo o código | desvio antigo, fora da fase 7; migrar por área em fase própria |
-| Dockerfiles, job E2E do frontend e workflows novos escritos sem acesso a Docker daemon nem a GitHub Actions | `.github/workflows/`, `*/Dockerfile-production` | validar no primeiro PR e na tarefa 5.8 |
+| Smoke test do deploy: a API responde 503 por 5 minutos no Coolify desde o #25 (o #24 subiu) | `main-deploy-coolify.yml`, Coolify | entre o #24 e o #25 o boot só mudou em comentário e texto (env, config, migrations e Dockerfile iguais), e a mesma imagem de produção sobe no E2E do CI; a causa está no ambiente do Coolify e só os logs do container confirmam |
 
 ## Links úteis
 
