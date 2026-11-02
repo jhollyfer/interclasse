@@ -14,10 +14,13 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - Excesso de tentativas responde 429 com código estável; erro interno nunca mais devolve a mensagem crua do banco.
 - Upload prende o tamanho de cada parte na URL assinada e confere o conteúdo do arquivo antes de confirmar.
 - Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
-- `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` viram `SEED_ADMINISTRATOR_EMAIL` e `SEED_ADMINISTRATOR_PASSWORD`; `SESSION_DRIVER` deixa de existir.
+- `SESSION_DRIVER` deixa de existir.
 
 ### Alterado
 
+- Chaves de ambiente no catálogo da casa: a conta do primeiro administrador volta a ser `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` (o nome `SEED_ADMINISTRATOR_*` deixa de existir); o seed do administrador e o da demonstração ligam quando a senha tem valor, em qualquer ambiente, e sem ela são pulados com uma linha de log. As contas de demonstração passam a ser `advisor@example.com`, `advisor-2@example.com` e `representative@example.com`, entre outras.
+- `STORAGE_PUBLIC_URL` (lida pelo servidor do site a cada requisição) substitui `VITE_STORAGE_URL` na política de segurança de conteúdo; a mesma imagem serve qualquer ambiente. Quem implanta precisa trocar a variável no Coolify, senão o upload é bloqueado.
+- O deploy lê os secrets `COOLIFY_URL`, `COOLIFY_TOKEN`, `COOLIFY_API_UUID` e `COOLIFY_APP_UUID`, sem endereço nem uuid escritos no workflow.
 - O botão Salvar da inscrição de atletas fica legível no tema escuro mesmo quando não há nada para salvar.
 - Todas as telas cabem no celular, do site público ao painel: botões e campos com 44 px para o dedo, diálogos que sobem do rodapé e tabelas que viram cartões.
 - Site público mais limpo: início sem logo repetida, faixa de resultados que se rola com o dedo ou o teclado, chave com uma fase por vez no celular e página de erro curta.
@@ -27,7 +30,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - A página pública de uma chave passa a declarar a trilha de navegação (início, classificação, chave) e o evento esportivo para os buscadores.
 - O tema claro/escuro vem de um cookie lido no servidor: a página já abre no tema escolhido, sem piscar.
 - Fora de produção o site responde `noindex` e o `robots.txt` bloqueia tudo; produção precisa de `SITE_ENV=production` (`ENV.md`). Painel e telas de entrada ficam sempre fora dos buscadores.
-- O site manda cabeçalhos de segurança (CSP com `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, HSTS); o CSP precisa de `VITE_STORAGE_URL` para o upload de fotos.
+- O site manda cabeçalhos de segurança (CSP com `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, HSTS); o CSP precisa de `STORAGE_PUBLIC_URL` para o upload de fotos.
 - Formulário com alteração não salva pergunta antes de sair da tela.
 - Listas do sorteio e das turmas buscam contas e modalidades no servidor, 20 por vez, com "Carregar mais".
 - Listas mostram um esqueleto enquanto carregam e telas de detalhe têm página própria de "não encontrado".

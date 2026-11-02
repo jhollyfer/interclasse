@@ -190,12 +190,12 @@ Health check: `GET /health-check` na API e no site.
 | `node ace migration:run --force` no *Post-deployment command* da API, com o *Pre-deployment* vazio | Coolify, aplicação da API | o `Dockerfile-production` não tem `ENTRYPOINT`; subir uma réplica não deve alterar o schema. O *Pre-deployment* roda antes do build, no container que está no ar, e é pulado sem container: a migration só rodaria no deploy seguinte (`_standards/tooling.md` §8.2, decisão #252) |
 | `COOKIE_DOMAIN=.maiyu.com.br` e `CORS_ORIGINS=https://interclass.maiyu.com.br` na API | Coolify, variáveis da API | sem `COOKIE_DOMAIN` o cookie nasce host-only da API e o SSR perde a sessão a cada F5 |
 | `SERVER_API_URL` (nome do serviço da API na rede) no site | Coolify, variáveis do site | o SSR chama a API pela rede interna; ausente, usa a URL pública |
-| `SITE_ENV=production` no site | Coolify, variáveis do site | sem ela o site responde `noindex` e o `robots.txt` bloqueia tudo (staging seguro por padrão) |
+| `SITE_ENV=production` e `STORAGE_PUBLIC_URL` no site | Coolify, variáveis do site | lidas por requisição; sem `SITE_ENV` o site responde `noindex` e sem `STORAGE_PUBLIC_URL` o CSP bloqueia o upload. |
 | Healthcheck do painel em `/health-check` | Coolify | o painel sobrepõe o `HEALTHCHECK` do Dockerfile |
 | CORS do bucket com PUT liberado para a origem do site e `ETag` exposto | provedor do storage | sem o `ETag` o upload multipart não fecha |
-| `uuid` das duas aplicações e o `COOLIFY_TOKEN` | `main-deploy-coolify.yml` e secrets do repositório | uuid de outro projeto redeploya o projeto errado |
+| `COOLIFY_URL`, `COOLIFY_TOKEN`, `COOLIFY_API_UUID` e `COOLIFY_APP_UUID` | secrets do repositório | uuid de outro projeto redeploya o projeto errado |
 | `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` | secrets do repositório | publicar as imagens |
-| Semente do administrador (`node ace db:seed`) com `SEED_ADMINISTRATOR_PASSWORD` | à mão, uma vez por ambiente | o seeder para sem a senha |
+| Semente do administrador (`node ace db:seed`) com `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` | à mão, uma vez por ambiente | a senha liga o seed; sem ela é pulado |
 
 ## 10. Escala e limites conhecidos
 
