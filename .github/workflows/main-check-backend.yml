@@ -206,7 +206,7 @@ jobs:
       # responder, e não por `sleep` (tooling.md §7, passo 7).
       - name: Setup MinIO e espera pelo bucket
         env:
-          MINIO_ENDPOINT: http://localhost:9004
+          STORAGE_ENDPOINT: http://localhost:9004
           MINIO_ROOT_USER: ci-minio-root
           MINIO_ROOT_PASSWORD: ci-minio-root-secret
           STORAGE_KEY: interclasse
@@ -215,7 +215,7 @@ jobs:
         run: |
           for _ in $(seq 1 30); do
             if docker run --rm --network host \
-              -e MINIO_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+              -e STORAGE_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
               -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
               -v "$PWD/backend/infra/minio:/setup:ro" \
               --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
