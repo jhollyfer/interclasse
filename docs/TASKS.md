@@ -149,6 +149,14 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 | 9.4 | `responsive.spec.ts` e humanizer nos textos | Alta | Feita | 29 rotas × 375/768/1280 sem rolagem lateral, alvos de 44 px e axe limpo; representante na suíte; 3 textos revisados nos 3 idiomas |
 | 9.5 | Ajustes finais: contraste do Salvar, selo Maiyu no celular, teste de telas nos dois temas | Média | Feita | Salvar desabilitado a 70%; o "selo" era o botão do TanStack Devtools, que só existe em dev; teste de telas com passe escuro em 375 px (120 testes) |
 
+## Fase 10 · Chaves de ambiente no catálogo da régua (0/1)
+
+`DECISIONS.md` #276 do `maiyu-pattern` (PR jhollyfer/maiyu-pattern#16): os quatro projetos da casa terminam com as mesmas chaves, nos mesmos nomes, no backend e no frontend.
+
+| # | Tarefa | Prioridade | Status | Notas |
+|---|---|---|---|---|
+| 10.1 | Chaves de ambiente no catálogo (`backend.md` §6.2): `SEED_OWNER_*`, seed ligado pela chave, `STORAGE_PUBLIC_URL` em runtime, `E2E_OWNER_*` + `E2E_DEMO_PASSWORD`, `E2E_BASE_URL`, secrets do deploy `COOLIFY_*` | Alta | Em andamento | branch `chore/env-catalogo-padrao` |
+
 ## Fase N · Ideias (fora do escopo atual)
 
 - Ajuste visual fino das turmas com os prints do Geison — Geison, 29/10
