@@ -1,6 +1,8 @@
 import type { Page } from '@playwright/test'
 
+import type { Role } from './support/credentials'
 import { waitForHydration } from './support/hydration'
+import { storageStatePath } from './support/session'
 import { expect, test } from './support/test'
 
 /**
@@ -10,7 +12,7 @@ import { expect, test } from './support/test'
  * _doc-lib/playwright.md#docs/accessibility-testing).
  *
  * Routes with an id in the path stay with the flow specs, which create the data
- * they open. The representative has no session in the suite (no seed account).
+ * they open.
  */
 
 const WIDTHS = [375, 768, 1280] as const
@@ -50,6 +52,8 @@ const ADMINISTRATOR_ROUTES = [
 ] as const
 
 const ADVISOR_ROUTES = ['/advisor', '/advisor/photos', '/profile'] as const
+
+const REPRESENTATIVE_ROUTES = ['/representative', '/profile'] as const
 
 /**
  * Controls whose box is the hit area. Links are left out on purpose: a link
@@ -116,44 +120,47 @@ async function measure(page: Page, path: string, width: number): Promise<Fit> {
   return { overflow, small: await smallTargets(page) }
 }
 
+type Visitor = Role | 'visitor'
+
+const ROUTES = [
+  ...PUBLIC_ROUTES.map((path) => ({ visitor: 'visitor', path }) as const),
+  ...ADMINISTRATOR_ROUTES.map(
+    (path) => ({ visitor: 'administrator', path }) as const,
+  ),
+  ...ADVISOR_ROUTES.map((path) => ({ visitor: 'advisor', path }) as const),
+  ...REPRESENTATIVE_ROUTES.map(
+    (path) => ({ visitor: 'representative', path }) as const,
+  ),
+] satisfies ReadonlyArray<Readonly<{ visitor: Visitor; path: string }>>
+
+/** The visitor has no session; every role reuses the one `auth.setup.ts` saved. */
+function storageStateOf(visitor: Visitor): string | undefined {
+  if (visitor === 'visitor') return undefined
+
+  return storageStatePath(visitor)
+}
+
 for (const width of WIDTHS) {
   test.describe(`at ${width}px`, () => {
-    for (const path of PUBLIC_ROUTES) {
-      test(`visitor sees ${path} fitting the screen`, async ({
-        page,
+    for (const { visitor, path } of ROUTES) {
+      test(`${visitor} sees ${path} fitting the screen`, async ({
+        browser,
+        baseURL,
         expectAccessible,
       }) => {
+        const context = await browser.newContext({
+          baseURL,
+          storageState: storageStateOf(visitor),
+        })
+        const page = await context.newPage()
+
         const fit = await measure(page, path, width)
 
         expect(fit.overflow, 'scrolls sideways').toBeLessThanOrEqual(0)
         expect(fit.small, `controls under ${MIN_TARGET}px`).toEqual([])
         await expectAccessible(page)
-      })
-    }
 
-    for (const path of ADMINISTRATOR_ROUTES) {
-      test(`administrator sees ${path} fitting the screen`, async ({
-        administrator: { page },
-        expectAccessible,
-      }) => {
-        const fit = await measure(page, path, width)
-
-        expect(fit.overflow, 'scrolls sideways').toBeLessThanOrEqual(0)
-        expect(fit.small, `controls under ${MIN_TARGET}px`).toEqual([])
-        await expectAccessible(page)
-      })
-    }
-
-    for (const path of ADVISOR_ROUTES) {
-      test(`advisor sees ${path} fitting the screen`, async ({
-        advisor: { page },
-        expectAccessible,
-      }) => {
-        const fit = await measure(page, path, width)
-
-        expect(fit.overflow, 'scrolls sideways').toBeLessThanOrEqual(0)
-        expect(fit.small, `controls under ${MIN_TARGET}px`).toEqual([])
-        await expectAccessible(page)
+        await context.close()
       })
     }
   })

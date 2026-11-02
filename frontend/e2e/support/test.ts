@@ -14,6 +14,8 @@ type Fixtures = Readonly<{
   advisor: RoleSession
   /** Another advisor, from another classroom of the same category (the draw needs two). */
   secondAdvisor: RoleSession
+  /** The seed's student representative of a classroom. */
+  representative: RoleSession
   /**
    * Scans the tab with axe and fails on serious or critical violations
    * (_doc-lib/playwright.md#docs/accessibility-testing). It only catches what
@@ -63,6 +65,11 @@ export const test = base.extend<Fixtures>({
   },
   secondAdvisor: async ({ browser, baseURL }, provide) => {
     const session = await openSession(browser, baseURL, 'secondAdvisor')
+    await provide(session)
+    await session.context.close()
+  },
+  representative: async ({ browser, baseURL }, provide) => {
+    const session = await openSession(browser, baseURL, 'representative')
     await provide(session)
     await session.context.close()
   },

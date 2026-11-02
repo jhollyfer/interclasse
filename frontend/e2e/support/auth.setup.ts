@@ -48,3 +48,11 @@ setup(
     await expect(page).toHaveURL(/\/advisor/)
   },
 )
+
+setup(
+  'when the representative signs in, reaches the representative area',
+  async ({ page }) => {
+    await signIn('representative', 'representative', page)
+    await expect(page).toHaveURL(/\/representative/)
+  },
+)
