@@ -4,7 +4,10 @@ import type {
   Paginated,
 } from '@interclasse/shared'
 
-import type { MatchCard, MatchCardProps } from '#domain/match-card/match-card.entity'
+import type {
+  MatchCard,
+  MatchCardProps,
+} from '#domain/match-card/match-card.entity'
 
 export type CardListCriteria = {
   readonly page: number
@@ -40,7 +43,9 @@ export abstract class MatchCardRepository {
     criteria: CardListCriteria,
   ): Promise<Paginated<AdministratorCardPaginateResponse>>
   /** The card read as the list shows it, or `null` if it does not exist. */
-  abstract findResponse(id: string): Promise<AdministratorCardPaginateResponse | null>
+  abstract findResponse(
+    id: string,
+  ): Promise<AdministratorCardPaginateResponse | null>
 
   /**
    * Builds the card response with the student and the match already read. The team the
@@ -52,7 +57,9 @@ export abstract class MatchCardRepository {
     student: CardStudent,
     match: AdministratorMatchUpdateResponse,
   ): AdministratorCardPaginateResponse | null {
-    const team = [match.homeTeam, match.awayTeam].find((candidate) => candidate?.id === card.teamId)
+    const team = [match.homeTeam, match.awayTeam].find(
+      (candidate) => candidate?.id === card.teamId,
+    )
     if (!team) return null
 
     return {

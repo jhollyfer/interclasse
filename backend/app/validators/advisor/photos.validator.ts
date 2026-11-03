@@ -14,6 +14,10 @@ export const AdvisorPhotoPaginateValidator = vine.create({
   ...pageFields(),
 })
 
-export type AdvisorPhotoCreatePayload = Infer<typeof AdvisorPhotoCreateValidator>
+export type AdvisorPhotoCreatePayload = Infer<
+  typeof AdvisorPhotoCreateValidator
+>
 
-export type AdvisorPhotoPaginatePayload = Infer<typeof AdvisorPhotoPaginateValidator>
+export type AdvisorPhotoPaginatePayload = Infer<
+  typeof AdvisorPhotoPaginateValidator
+>

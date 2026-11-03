@@ -33,7 +33,9 @@ test.group('storefront/site > show (unit)', () => {
     })
   })
 
-  test('the regulation leaves with only URL, name and size', async ({ assert }) => {
+  test('the regulation leaves with only URL, name and size', async ({
+    assert,
+  }) => {
     const settings = MemoryRepositories.siteSettings().withFile({
       id: PDF_ID,
       filename: 'f.pdf',

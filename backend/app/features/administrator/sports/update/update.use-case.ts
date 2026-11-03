@@ -36,17 +36,29 @@ export default class AdministratorSportUpdateUseCase {
     try {
       const sport = await this.sports.findById(id)
       if (!sport)
-        return left(HTTPException.NotFound(this.i18n.t('sports.not_found'), 'SPORT_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('sports.not_found'),
+            'SPORT_NOT_FOUND',
+          ),
+        )
 
       if (
         sport.renamesTo(changes.name) &&
-        (await this.sports.existsByNameOrSlug(changes.name, Slug.from(changes.name).value, id))
+        (await this.sports.existsByNameOrSlug(
+          changes.name,
+          Slug.from(changes.name).value,
+          id,
+        ))
       )
-        return left(SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n))
+        return left(
+          SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n),
+        )
 
       const largestRoster = await this.sports.largestRoster(id)
       const updated = sport.update(changes, { largestRoster, now: new Date() })
-      if (updated.isLeft()) return left(SportRefusal.http(updated.value, this.i18n))
+      if (updated.isLeft())
+        return left(SportRefusal.http(updated.value, this.i18n))
 
       const saved = await this.sports.save(sport)
       if (saved.isLeft()) return left(SportRefusal.http(saved.value, this.i18n))

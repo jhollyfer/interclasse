@@ -8,8 +8,11 @@ import type { Announcement } from '#domain/announcement/announcement.entity'
  * read, so a field that is not in it does not reach the response.
  */
 export class AnnouncementPresenter {
-  static show(announcement: Announcement): AdministratorAnnouncementShowResponse {
-    const { id, title, body, pinned, createdAt, updatedAt } = announcement.snapshot()
+  static show(
+    announcement: Announcement,
+  ): AdministratorAnnouncementShowResponse {
+    const { id, title, body, pinned, createdAt, updatedAt } =
+      announcement.snapshot()
 
     return {
       id,

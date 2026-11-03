@@ -65,7 +65,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`SiteSettingRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('current is born empty and always returns the same row', async ({ assert }) => {
+    test('current is born empty and always returns the same row', async ({
+      assert,
+    }) => {
       const { repository } = await make()
 
       const first = await repository.current()
@@ -107,11 +109,19 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const { repository, addFile } = await make()
       const id = await addFile('application/pdf')
 
-      assert.deepEqual(await repository.findRegulationFile(id), { mimetype: 'application/pdf' })
-      assert.isNull(await repository.findRegulationFile('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.deepEqual(await repository.findRegulationFile(id), {
+        mimetype: 'application/pdf',
+      })
+      assert.isNull(
+        await repository.findRegulationFile(
+          '0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f',
+        ),
+      )
     })
 
-    test('show without a regulation returns regulation null', async ({ assert }) => {
+    test('show without a regulation returns regulation null', async ({
+      assert,
+    }) => {
       const { repository } = await make()
 
       const shown = await repository.show()
@@ -121,7 +131,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(shown.about)
     })
 
-    test('show and showPublic bring the regulation after it is saved', async ({ assert }) => {
+    test('show and showPublic bring the regulation after it is saved', async ({
+      assert,
+    }) => {
       const { repository, addFile } = await make()
       const id = await addFile('application/pdf')
       const setting = await repository.current()

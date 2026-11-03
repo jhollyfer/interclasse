@@ -46,23 +46,32 @@ export default class AdministratorUserArchiveUseCase {
       const user = await this.users.findAnyById(id)
 
       if (!user)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       const archived = user.archive(new Date())
-      if (archived.isLeft()) return left(UserRefusal.http(archived.value, this.i18n))
+      if (archived.isLeft())
+        return left(UserRefusal.http(archived.value, this.i18n))
 
       // Archiving, dropping the sessions and releasing the classrooms land together: apart, the
       // failure of the second step would leave the account archived with a live session.
-      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
-        const saved = await this.users.save(user)
-        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
+      const written = await this.unitOfWork.run(
+        async (): Promise<Either<HTTPException, null>> => {
+          const saved = await this.users.save(user)
+          if (saved.isLeft())
+            return left(UserRefusal.http(saved.value, this.i18n))
 
-        await this.sessions.revokeAll(id)
-        // An archived account neither advises nor represents any classroom.
-        await this.classrooms.detachAccount(id)
+          await this.sessions.revokeAll(id)
+          // An archived account neither advises nor represents any classroom.
+          await this.classrooms.detachAccount(id)
 
-        return right(null)
-      })
+          return right(null)
+        },
+      )
       if (written.isLeft()) return left(written.value)
 
       return right(null)

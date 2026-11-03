@@ -4,7 +4,12 @@ import AdministratorUserPaginateUseCase from './paginate.use-case.ts'
 
 import { UserRepository } from '#repositories/user/user.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
+import {
+  identityDoubles,
+  OTHER_ID,
+  seedUser,
+  USER_ID,
+} from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -17,7 +22,9 @@ async function setup() {
 }
 
 test.group('administrator/users > paginate (unit)', () => {
-  test('lists only the live accounts, by name, twenty per page', async ({ assert }) => {
+  test('lists only the live accounts, by name, twenty per page', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { id: USER_ID, name: 'Zeca', email: 'zeca@mail.com' })
     await seedUser(users, { id: OTHER_ID, name: 'Ana', email: 'ana@mail.com' })
@@ -37,9 +44,16 @@ test.group('administrator/users > paginate (unit)', () => {
     assert.equal(page.meta.perPage, 20)
   })
 
-  test('?trashed=only brings the trash, and role and status narrow', async ({ assert }) => {
+  test('?trashed=only brings the trash, and role and status narrow', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
-    await seedUser(users, { id: USER_ID, name: 'Ana', email: 'ana@mail.com', role: 'ADVISOR' })
+    await seedUser(users, {
+      id: USER_ID,
+      name: 'Ana',
+      email: 'ana@mail.com',
+      role: 'ADVISOR',
+    })
     await seedUser(users, {
       id: OTHER_ID,
       name: 'Bia',
@@ -77,7 +91,9 @@ test.group('administrator/users > paginate (unit)', () => {
     )
   })
 
-  test('repository failure is 500 ADMINISTRATOR_USER_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_PAGINATE_ERROR', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     users.paginate = async () => {
       throw new Error('database down')
@@ -85,6 +101,9 @@ test.group('administrator/users > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_PAGINATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADMINISTRATOR_USER_PAGINATE_ERROR',
+    })
   })
 })

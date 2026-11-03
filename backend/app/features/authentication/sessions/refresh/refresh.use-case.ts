@@ -5,7 +5,10 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionRepository, type SessionTokens } from '#repositories/session/session.repository'
+import {
+  SessionRepository,
+  type SessionTokens,
+} from '#repositories/session/session.repository'
 
 type Payload = {
   readonly refreshToken?: string
@@ -24,7 +27,10 @@ export default class AuthenticationSessionRefreshUseCase {
   async execute(payload: Payload): Promise<Response> {
     if (!payload.refreshToken) {
       return left(
-        HTTPException.Unauthorized(this.i18n.t('sessions.missing'), 'REFRESH_TOKEN_MISSING'),
+        HTTPException.Unauthorized(
+          this.i18n.t('sessions.missing'),
+          'REFRESH_TOKEN_MISSING',
+        ),
       )
     }
 
@@ -44,7 +50,8 @@ export default class AuthenticationSessionRefreshUseCase {
       // deleted the row earns the right to the new pair. Without counting the deleted
       // rows, two simultaneous refreshes would issue two valid pairs from
       // the same token - rotation that does not rotate.
-      if (!(await this.sessions.revoke(user.id, grant.identifier))) return left(this.invalid())
+      if (!(await this.sessions.revoke(user.id, grant.identifier)))
+        return left(this.invalid())
 
       const tokens = await this.sessions.issue(user.id)
       if (!tokens)
@@ -69,6 +76,9 @@ export default class AuthenticationSessionRefreshUseCase {
   }
 
   private invalid(): HTTPException {
-    return HTTPException.Unauthorized(this.i18n.t('sessions.invalid'), 'REFRESH_TOKEN_INVALID')
+    return HTTPException.Unauthorized(
+      this.i18n.t('sessions.invalid'),
+      'REFRESH_TOKEN_INVALID',
+    )
   }
 }

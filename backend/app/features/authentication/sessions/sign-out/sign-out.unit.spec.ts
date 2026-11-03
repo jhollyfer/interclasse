@@ -10,8 +10,14 @@ const ACTOR = { id: USER_ID, role: 'ADVISOR', avatarId: null } as const
 
 async function setup() {
   const doubles = identityDoubles()
-  doubles.sessions.withRefresh('refresh-ok', { userId: USER_ID, identifier: '8' })
-  doubles.sessions.withRefresh('access-id', { userId: USER_ID, identifier: '7' })
+  doubles.sessions.withRefresh('refresh-ok', {
+    userId: USER_ID,
+    identifier: '8',
+  })
+  doubles.sessions.withRefresh('access-id', {
+    userId: USER_ID,
+    identifier: '7',
+  })
   const useCase = await makeWithMemory(AuthenticationSessionSignOutUseCase, [
     [SessionRepository, doubles.sessions],
   ])
@@ -38,7 +44,11 @@ test.group('authentication/sessions > sign-out (unit)', () => {
   test('unreadable refresh does not prevent sign-out', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7', refreshToken: 'lixo' })
+    const result = await useCase.execute({
+      actor: ACTOR,
+      accessTokenId: '7',
+      refreshToken: 'lixo',
+    })
 
     assert.isTrue(result.isRight())
   })
@@ -61,6 +71,9 @@ test.group('authentication/sessions > sign-out (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, accessTokenId: '7' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_OUT_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'AUTHENTICATION_SESSION_SIGN_OUT_ERROR',
+    })
   })
 })

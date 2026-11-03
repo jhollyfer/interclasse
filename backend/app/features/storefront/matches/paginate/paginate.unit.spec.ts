@@ -34,8 +34,16 @@ test.group('storefront/matches > paginate (unit)', () => {
       .snapshot()
       .matches.filter((match) => match.phase === MATCH_PHASE.SEMI)
     const saved = await brackets.findById(bracket.id)
-    saved?.score(first?.id ?? '', { homeScore: 1, awayScore: 0 }, new Date('2026-10-29T13:00:00Z'))
-    saved?.score(second?.id ?? '', { homeScore: 1, awayScore: 0 }, new Date('2026-10-29T14:00:00Z'))
+    saved?.score(
+      first?.id ?? '',
+      { homeScore: 1, awayScore: 0 },
+      new Date('2026-10-29T13:00:00Z'),
+    )
+    saved?.score(
+      second?.id ?? '',
+      { homeScore: 1, awayScore: 0 },
+      new Date('2026-10-29T14:00:00Z'),
+    )
     if (saved) await brackets.save(saved)
 
     const result = await useCase.execute({ status: MATCH_STATUS.FINISHED })

@@ -34,7 +34,9 @@ async function put(url: string, body: Uint8Array): Promise<string> {
   const etag = response.headers.get('etag')
 
   if (!etag) {
-    throw new Error('bucket did not return an ETag - complete would be impossible')
+    throw new Error(
+      'bucket did not return an ETag - complete would be impossible',
+    )
   }
 
   return etag
@@ -85,18 +87,25 @@ test.group('multipart', () => {
 
     const metadata = await drive.use().getMetaData(key)
 
-    assert.equal(metadata.contentLength, FIRST_PART.byteLength + LAST_PART.byteLength)
+    assert.equal(
+      metadata.contentLength,
+      FIRST_PART.byteLength + LAST_PART.byteLength,
+    )
 
     await drive.use().delete(key)
   })
 
-  test('listParts sees only what went up, and that is what resuming uses', async ({ assert }) => {
+  test('listParts sees only what went up, and that is what resuming uses', async ({
+    assert,
+  }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
     const first = item(
-      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: FIRST_PART.byteLength }]),
+      await multipart.signParts(key, uploadId, [
+        { partNumber: 1, size: FIRST_PART.byteLength },
+      ]),
       0,
     )
 
@@ -112,13 +121,17 @@ test.group('multipart', () => {
     await multipart.abort(key, uploadId)
   })
 
-  test('abort discards the parts, and nothing is left occupying the bucket', async ({ assert }) => {
+  test('abort discards the parts, and nothing is left occupying the bucket', async ({
+    assert,
+  }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
     const first = item(
-      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: FIRST_PART.byteLength }]),
+      await multipart.signParts(key, uploadId, [
+        { partNumber: 1, size: FIRST_PART.byteLength },
+      ]),
       0,
     )
 
@@ -131,26 +144,38 @@ test.group('multipart', () => {
     assert.isFalse(await drive.use().exists(key))
   })
 
-  test('a signed URL stops being valid after it expires', async ({ assert }) => {
+  test('a signed URL stops being valid after it expires', async ({
+    assert,
+  }) => {
     const multipart = await app.container.make(MultipartContract)
     const key = `test-${randomUUID()}.bin`
 
     const uploadId = await multipart.initiate(key, 'application/octet-stream')
     const expiring = item(
-      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: LAST_PART.byteLength }], 1),
+      await multipart.signParts(
+        key,
+        uploadId,
+        [{ partNumber: 1, size: LAST_PART.byteLength }],
+        1,
+      ),
       0,
     )
 
     await new Promise((resolve) => setTimeout(resolve, 1_500))
 
-    const refused = await fetch(expiring.url, { method: 'PUT', body: LAST_PART })
+    const refused = await fetch(expiring.url, {
+      method: 'PUT',
+      body: LAST_PART,
+    })
 
     assert.equal(refused.status, 403)
 
     // And the upload is still open: a new URL uploads the same part. It is what
     // `GET /storages/:id/parts` does for whoever was offline for hours.
     const renewed = item(
-      await multipart.signParts(key, uploadId, [{ partNumber: 1, size: LAST_PART.byteLength }]),
+      await multipart.signParts(key, uploadId, [
+        { partNumber: 1, size: LAST_PART.byteLength },
+      ]),
       0,
     )
 

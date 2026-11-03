@@ -41,16 +41,24 @@ export default class RepositoryProvider {
   constructor(protected app: ApplicationService) {}
 
   register() {
-    this.app.container.bind(UnitOfWork, () => this.app.container.make(UnitOfWorkLucid))
+    this.app.container.bind(UnitOfWork, () =>
+      this.app.container.make(UnitOfWorkLucid),
+    )
     this.app.container.bind(AnnouncementRepository, () =>
       this.app.container.make(AnnouncementLucidRepository),
     )
     this.app.container.bind(SiteSettingRepository, () =>
       this.app.container.make(SiteSettingLucidRepository),
     )
-    this.app.container.bind(SportRepository, () => this.app.container.make(SportLucidRepository))
-    this.app.container.bind(PhotoRepository, () => this.app.container.make(PhotoLucidRepository))
-    this.app.container.bind(ReportRepository, () => this.app.container.make(ReportLucidRepository))
+    this.app.container.bind(SportRepository, () =>
+      this.app.container.make(SportLucidRepository),
+    )
+    this.app.container.bind(PhotoRepository, () =>
+      this.app.container.make(PhotoLucidRepository),
+    )
+    this.app.container.bind(ReportRepository, () =>
+      this.app.container.make(ReportLucidRepository),
+    )
     this.app.container.bind(ClassroomRepository, () =>
       this.app.container.make(ClassroomLucidRepository),
     )
@@ -66,7 +74,9 @@ export default class RepositoryProvider {
     this.app.container.bind(StorageRepository, () =>
       this.app.container.make(StorageLucidRepository),
     )
-    this.app.container.bind(UserRepository, () => this.app.container.make(UserLucidRepository))
+    this.app.container.bind(UserRepository, () =>
+      this.app.container.make(UserLucidRepository),
+    )
     this.app.container.bind(SessionRepository, () =>
       this.app.container.make(SessionLucidRepository),
     )

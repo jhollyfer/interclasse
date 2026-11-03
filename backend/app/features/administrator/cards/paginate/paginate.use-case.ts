@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorCardPaginatePayload } from '#validators/administrator/cards.validator'
 
 type Payload = AdministratorCardPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorCardPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorCardPaginateResponse>
+>
 
 /** The recorded cards, newest to oldest. */
 @inject()

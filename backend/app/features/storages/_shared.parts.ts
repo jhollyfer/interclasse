@@ -14,7 +14,11 @@ export function countParts(size: number, partSize: number): number {
  * The size in bytes of a part: `partSize` for all but the last, which takes
  * what is left. It is what the signed URL pins in `Content-Length`.
  */
-export function partSizeOf(totalSize: number, partSize: number, partNumber: number): number {
+export function partSizeOf(
+  totalSize: number,
+  partSize: number,
+  partNumber: number,
+): number {
   const total = countParts(totalSize, partSize)
 
   if (partNumber < total) return partSize

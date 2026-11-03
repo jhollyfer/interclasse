@@ -17,10 +17,16 @@ export default class AdvisorCardPaginateController {
   constructor(private readonly useCase: AdvisorCardPaginateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdvisorCardPaginateValidator, {
-      data: context.request.qs(),
+    const payload = await context.request.validateUsing(
+      AdvisorCardPaginateValidator,
+      {
+        data: context.request.qs(),
+      },
+    )
+    const result = await this.useCase.execute({
+      ...payload,
+      actor: context.actor,
     })
-    const result = await this.useCase.execute({ ...payload, actor: context.actor })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

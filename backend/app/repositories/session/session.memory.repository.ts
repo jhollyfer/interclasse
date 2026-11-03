@@ -25,7 +25,10 @@ export class SessionMemoryRepository extends SessionRepository {
     this.issued.push(userId)
     this.sequence += 1
     const refreshToken = `refresh-${userId}-${this.sequence}`
-    this.refresh.set(refreshToken, { userId, identifier: String(this.sequence) })
+    this.refresh.set(refreshToken, {
+      userId,
+      identifier: String(this.sequence),
+    })
 
     return { accessToken: `access-${userId}-${this.sequence}`, refreshToken }
   }

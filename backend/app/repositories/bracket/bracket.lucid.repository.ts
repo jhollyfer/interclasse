@@ -29,7 +29,11 @@ import SportModel from '#models/sport'
 import StudentModel from '#models/student'
 import TeamModel from '#models/team'
 import { PostgresError } from '#core/postgres-error'
-import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
+import {
+  Bracket,
+  type BracketProps,
+  type MatchProps,
+} from '#domain/bracket/bracket.entity'
 import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
 import { TransactionContext } from '#core/transaction-context'
@@ -47,7 +51,9 @@ export class BracketLucidRepository extends BracketRepository {
       .first()
     if (!row) return null
 
-    const matches = await MatchModel.query({ client: this.transaction.client() })
+    const matches = await MatchModel.query({
+      client: this.transaction.client(),
+    })
       .where('bracketId', row.id)
       .orderBy('round', 'asc')
       .orderBy('position', 'asc')
@@ -66,15 +72,23 @@ export class BracketLucidRepository extends BracketRepository {
 
   async findByMatchIdForUpdate(matchId: string): Promise<Bracket | null> {
     const client = this.transaction.client()
-    const match = await MatchModel.query({ client }).where('id', matchId).first()
+    const match = await MatchModel.query({ client })
+      .where('id', matchId)
+      .first()
     if (!match) return null
 
-    await BracketModel.query({ client }).where('id', match.bracketId).forUpdate().first()
+    await BracketModel.query({ client })
+      .where('id', match.bracketId)
+      .forUpdate()
+      .first()
 
     return this.findById(match.bracketId)
   }
 
-  async findBySportAndCategory(sportId: string, category: Category): Promise<Bracket | null> {
+  async findBySportAndCategory(
+    sportId: string,
+    category: Category,
+  ): Promise<Bracket | null> {
     const row = await BracketModel.query({ client: this.transaction.client() })
       .where('sportId', sportId)
       .where('category', category)
@@ -84,7 +98,9 @@ export class BracketLucidRepository extends BracketRepository {
     return this.findById(row.id)
   }
 
-  async findSport(sportId: string): Promise<AdministratorSportShowResponse | null> {
+  async findSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null> {
     const row = await SportModel.query({ client: this.transaction.client() })
       .where('id', sportId)
       .first()
@@ -93,7 +109,9 @@ export class BracketLucidRepository extends BracketRepository {
     return this.toSportResponse(row)
   }
 
-  async lockSport(sportId: string): Promise<AdministratorSportShowResponse | null> {
+  async lockSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null> {
     const row = await SportModel.query({ client: this.transaction.client() })
       .where('id', sportId)
       .forUpdate()
@@ -122,8 +140,12 @@ export class BracketLucidRepository extends BracketRepository {
     return rows.map((row) => row.id)
   }
 
-  async classroomNames(classroomIds: ReadonlyArray<string>): Promise<Map<string, string>> {
-    const rows = await ClassroomModel.query({ client: this.transaction.client() })
+  async classroomNames(
+    classroomIds: ReadonlyArray<string>,
+  ): Promise<Map<string, string>> {
+    const rows = await ClassroomModel.query({
+      client: this.transaction.client(),
+    })
       .whereIn('id', [...classroomIds])
       .select('id', 'name')
 
@@ -133,7 +155,9 @@ export class BracketLucidRepository extends BracketRepository {
   async save(bracket: Bracket): Promise<Either<BracketError, void>> {
     const client = this.transaction.client()
     const snapshot = bracket.snapshot()
-    const existing = await BracketModel.query({ client }).where('id', snapshot.id).first()
+    const existing = await BracketModel.query({ client })
+      .where('id', snapshot.id)
+      .first()
 
     if (!existing) return this.insert(bracket)
 
@@ -175,44 +199,62 @@ export class BracketLucidRepository extends BracketRepository {
       // In a single `createMany`: one INSERT per match meant up to 15 round trips to the database
       // with the sport row locked.
       await MatchModel.createMany(
-        snapshot.matches.map((match) => this.toMatchColumns(snapshot.id, match)),
+        snapshot.matches.map((match) =>
+          this.toMatchColumns(snapshot.id, match),
+        ),
         { client },
       )
 
       return right(undefined)
     } catch (error) {
-      if (PostgresError.isUniqueViolation(error)) return left({ code: 'BRACKET_ALREADY_EXISTS' })
+      if (PostgresError.isUniqueViolation(error))
+        return left({ code: 'BRACKET_ALREADY_EXISTS' })
 
       throw error
     }
   }
 
   /** What changed in an already saved bracket: the status and the matches. */
-  private async update(existing: BracketModel, snapshot: Readonly<BracketProps>): Promise<void> {
+  private async update(
+    existing: BracketModel,
+    snapshot: Readonly<BracketProps>,
+  ): Promise<void> {
     const client = this.transaction.client()
 
     if (existing.status !== snapshot.status)
       await BracketModel.updateOrCreate(
         { id: snapshot.id },
-        { status: snapshot.status, updatedAt: this.dateOrNull(snapshot.updatedAt) },
+        {
+          status: snapshot.status,
+          updatedAt: this.dateOrNull(snapshot.updatedAt),
+        },
         { client },
       )
 
-    const rows = await MatchModel.query({ client }).where('bracketId', snapshot.id)
+    const rows = await MatchModel.query({ client }).where(
+      'bracketId',
+      snapshot.id,
+    )
     const current = new Map(snapshot.matches.map((match) => [match.id, match]))
 
     for (const row of rows) {
       const match = current.get(row.id)
       if (!match || !this.differs(row, match)) continue
 
-      await MatchModel.updateOrCreate({ id: row.id }, this.toMatchColumns(snapshot.id, match), {
-        client,
-      })
+      await MatchModel.updateOrCreate(
+        { id: row.id },
+        this.toMatchColumns(snapshot.id, match),
+        {
+          client,
+        },
+      )
     }
   }
 
   async delete(bracket: Bracket): Promise<void> {
-    await BracketModel.query({ client: this.transaction.client() }).where('id', bracket.id).delete()
+    await BracketModel.query({ client: this.transaction.client() })
+      .where('id', bracket.id)
+      .delete()
   }
 
   async preview(
@@ -220,24 +262,30 @@ export class BracketLucidRepository extends BracketRepository {
     category: Category,
   ): Promise<AdministratorBracketPreviewResponse | null> {
     const client = this.transaction.client()
-    const sport = await SportModel.query({ client }).where('id', sportId).first()
+    const sport = await SportModel.query({ client })
+      .where('id', sportId)
+      .first()
     if (!sport) return null
 
-    const rows: Array<{ id: string; name: string; grade: number; athletes: string | number }> =
-      await client
-        .from('classrooms')
-        .leftJoin('students', 'students.classroom_id', 'classrooms.id')
-        .leftJoin('enrollments', (join) => {
-          join
-            .on('enrollments.student_id', '=', 'students.id')
-            .andOnVal('enrollments.sport_id', '=', sport.id)
-        })
-        .where('classrooms.category', category)
-        .groupBy('classrooms.id', 'classrooms.name', 'classrooms.grade')
-        .orderBy('classrooms.grade', 'asc')
-        .orderBy('classrooms.name', 'asc')
-        .select('classrooms.id', 'classrooms.name', 'classrooms.grade')
-        .count('enrollments.id as athletes')
+    const rows: Array<{
+      id: string
+      name: string
+      grade: number
+      athletes: string | number
+    }> = await client
+      .from('classrooms')
+      .leftJoin('students', 'students.classroom_id', 'classrooms.id')
+      .leftJoin('enrollments', (join) => {
+        join
+          .on('enrollments.student_id', '=', 'students.id')
+          .andOnVal('enrollments.sport_id', '=', sport.id)
+      })
+      .where('classrooms.category', category)
+      .groupBy('classrooms.id', 'classrooms.name', 'classrooms.grade')
+      .orderBy('classrooms.grade', 'asc')
+      .orderBy('classrooms.name', 'asc')
+      .select('classrooms.id', 'classrooms.name', 'classrooms.grade')
+      .count('enrollments.id as athletes')
 
     const drawn = await BracketModel.query({ client })
       .where('sportId', sport.id)
@@ -251,7 +299,12 @@ export class BracketLucidRepository extends BracketRepository {
       classrooms: rows.map((row) => {
         const athletes = Number(row.athletes)
 
-        return { id: row.id, name: row.name, athletes, eligible: athletes >= sport.minAthletes }
+        return {
+          id: row.id,
+          name: row.name,
+          athletes,
+          eligible: athletes >= sport.minAthletes,
+        }
       }),
     }
   }
@@ -272,7 +325,9 @@ export class BracketLucidRepository extends BracketRepository {
     if (criteria.order === 'sport-name')
       query
         .orderBy(
-          SportModel.query({ client }).whereColumn('sports.id', 'brackets.sport_id').select('name'),
+          SportModel.query({ client })
+            .whereColumn('sports.id', 'brackets.sport_id')
+            .select('name'),
           'asc',
         )
         .orderBy('category', 'asc')
@@ -371,7 +426,9 @@ export class BracketLucidRepository extends BracketRepository {
     )
   }
 
-  async matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null> {
+  async matchAthletes(
+    matchId: string,
+  ): Promise<AdministratorMatchAthletesResponse | null> {
     const client = this.transaction.client()
     const match = await MatchModel.query({ client })
       .where('id', matchId)
@@ -385,7 +442,9 @@ export class BracketLucidRepository extends BracketRepository {
       .first()
     if (!match) return null
 
-    const teams = [match.homeTeam, match.awayTeam].filter((team) => team !== null)
+    const teams = [match.homeTeam, match.awayTeam].filter(
+      (team) => team !== null,
+    )
     const students = await StudentModel.query({ client })
       .whereIn(
         'classroomId',
@@ -433,7 +492,10 @@ export class BracketLucidRepository extends BracketRepository {
       .orderBy('position', 'asc')
   }
 
-  private toEntity(row: BracketModel, matchRows: ReadonlyArray<MatchModel>): Bracket {
+  private toEntity(
+    row: BracketModel,
+    matchRows: ReadonlyArray<MatchModel>,
+  ): Bracket {
     return Bracket.restore({
       id: row.id,
       sportId: row.sportId,
@@ -496,7 +558,8 @@ export class BracketLucidRepository extends BracketRepository {
       row.awayScore !== match.awayScore ||
       row.winnerTeamId !== match.winnerTeamId ||
       row.location !== match.location ||
-      (row.scheduledAt?.toMillis() ?? null) !== (match.scheduledAt?.getTime() ?? null)
+      (row.scheduledAt?.toMillis() ?? null) !==
+        (match.scheduledAt?.getTime() ?? null)
     )
   }
 
@@ -559,7 +622,9 @@ export class BracketLucidRepository extends BracketRepository {
     }
   }
 
-  private toFullTeam(team: TeamModel | null): AdministratorMatchTeamResponse | null {
+  private toFullTeam(
+    team: TeamModel | null,
+  ): AdministratorMatchTeamResponse | null {
     if (!team) return null
 
     return {

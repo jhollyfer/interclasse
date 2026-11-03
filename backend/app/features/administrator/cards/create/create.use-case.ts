@@ -3,7 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorCardCreateResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorCardCreateResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { CardRefusal } from '../_shared.card-refusal.ts'
 
@@ -34,7 +39,9 @@ export default class AdministratorCardCreateUseCase {
   async execute(payload: Payload): Promise<Response> {
     try {
       const bracket = await this.brackets.findByMatchId(payload.matchId)
-      const classroomId = await this.cards.findStudentClassroom(payload.studentId)
+      const classroomId = await this.cards.findStudentClassroom(
+        payload.studentId,
+      )
       const lineup = bracket?.lineupOf(payload.matchId, classroomId)
       if (!lineup)
         return left(
@@ -56,13 +63,19 @@ export default class AdministratorCardCreateUseCase {
         awayTeamId: lineup.awayTeamId,
         studentTeamId: lineup.classroomTeamId,
       })
-      if (launched.isLeft()) return left(CardRefusal.http(launched.value, this.i18n))
+      if (launched.isLeft())
+        return left(CardRefusal.http(launched.value, this.i18n))
 
       await this.cards.save(launched.value)
 
       const response = await this.cards.findResponse(launched.value.id)
       if (!response)
-        return left(HTTPException.NotFound(this.i18n.t('cards.not_found'), 'CARD_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('cards.not_found'),
+            'CARD_NOT_FOUND',
+          ),
+        )
 
       return right(response)
     } catch (error) {

@@ -30,7 +30,10 @@ test.group('photos > review', (group) => {
     const before = await client.get('/storefront/photos')
     assert.lengthOf(body(before).data, 0)
 
-    const queue = await client.get('/administrator/photos').qs({ status: 'PENDING' }).cookies(admin)
+    const queue = await client
+      .get('/administrator/photos')
+      .qs({ status: 'PENDING' })
+      .cookies(admin)
     assert.lengthOf(body(queue).data, 1)
 
     const approved = await client
@@ -66,7 +69,9 @@ test.group('photos > review', (group) => {
 
   test('file that is not an image responds 422', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
-    const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
+    const pdf = await StorageFactory.merge({
+      mimetype: 'application/pdf',
+    }).create()
 
     const response = await client
       .post('/advisor/photos')
@@ -77,7 +82,9 @@ test.group('photos > review', (group) => {
     assert.equal(body(response).code, 'PHOTO_NOT_IMAGE')
   })
 
-  test("advisor does not delete another one's photo: 404", async ({ client }) => {
+  test("advisor does not delete another one's photo: 404", async ({
+    client,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
@@ -86,7 +93,9 @@ test.group('photos > review', (group) => {
       .cookies(admin)
       .json({ storageId: image.id })
 
-    const response = await client.delete(`/advisor/photos/${body(photo).id}`).cookies(advisor)
+    const response = await client
+      .delete(`/advisor/photos/${body(photo).id}`)
+      .cookies(advisor)
 
     response.assertStatus(404)
   })
@@ -103,7 +112,9 @@ test.group('administrator/photos/review > access and validation', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client

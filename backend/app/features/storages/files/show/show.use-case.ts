@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type StoragesFileShowResponse } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Either,
+  type StoragesFileShowResponse,
+} from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage.contract'
@@ -26,7 +31,12 @@ export default class StoragesFileShowUseCase {
       const storage = await this.storages.detail(id)
 
       if (!storage)
-        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('files.not_found'),
+            'STORAGE_NOT_FOUND',
+          ),
+        )
 
       return right(await this.bucket.withUrl(storage))
     } catch (error) {

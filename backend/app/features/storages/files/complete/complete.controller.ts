@@ -30,7 +30,9 @@ export default class StoragesFileCompleteController {
     const { id } = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })
-    const payload = await context.request.validateUsing(StoragesFileCompleteValidator)
+    const payload = await context.request.validateUsing(
+      StoragesFileCompleteValidator,
+    )
     const result = await this.useCase.execute({ ...payload, id })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

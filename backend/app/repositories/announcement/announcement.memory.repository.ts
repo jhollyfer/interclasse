@@ -4,9 +4,15 @@ import type {
   SortDirection,
 } from '@interclasse/shared'
 
-import { AnnouncementRepository, type AnnouncementListCriteria } from './announcement.repository.ts'
+import {
+  AnnouncementRepository,
+  type AnnouncementListCriteria,
+} from './announcement.repository.ts'
 
-import { Announcement, type AnnouncementProps } from '#domain/announcement/announcement.entity'
+import {
+  Announcement,
+  type AnnouncementProps,
+} from '#domain/announcement/announcement.entity'
 import { MemoryPagination } from '#core/memory-pagination'
 
 /** The sign of the comparison by sort direction. */
@@ -67,7 +73,8 @@ export class AnnouncementMemoryRepository extends AnnouncementRepository {
     if (criteria.pinnedFirst && a.pinned && !b.pinned) return -1
     if (criteria.pinnedFirst && !a.pinned && b.pinned) return 1
 
-    if (criteria.sort === 'createdAt') return sign * (a.createdAt.getTime() - b.createdAt.getTime())
+    if (criteria.sort === 'createdAt')
+      return sign * (a.createdAt.getTime() - b.createdAt.getTime())
 
     return sign * a.title.localeCompare(b.title)
   }

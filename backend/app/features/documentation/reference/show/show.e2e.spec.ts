@@ -14,7 +14,10 @@ import {
 test.group('reference > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the reference page is served as HTML to the operator', async ({ client, assert }) => {
+  test('the reference page is served as HTML to the operator', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/documentation').cookies(session)
 
@@ -23,13 +26,18 @@ test.group('reference > show', (group) => {
     assert.include(response.text(), '/openapi.json')
   })
 
-  test('without a session responds 404, not 401 nor 403', async ({ client }) => {
+  test('without a session responds 404, not 401 nor 403', async ({
+    client,
+  }) => {
     const response = await client.get('/documentation').redirects(0)
 
     response.assertStatus(404)
   })
 
-  test('whoever does not operate the installation also gets 404', async ({ client, assert }) => {
+  test('whoever does not operate the installation also gets 404', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdvisor(client)
     const response = await client.get('/documentation').cookies(session)
 

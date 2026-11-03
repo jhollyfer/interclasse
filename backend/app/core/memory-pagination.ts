@@ -6,7 +6,11 @@ import type { Paginated } from '@interclasse/shared'
  * `meta` from the first. Only the in-memory implementations use it.
  */
 export class MemoryPagination {
-  static slice<T>(all: ReadonlyArray<T>, page: number, perPage: number): Paginated<T> {
+  static slice<T>(
+    all: ReadonlyArray<T>,
+    page: number,
+    perPage: number,
+  ): Paginated<T> {
     const start = (page - 1) * perPage
     const lastPage = Math.max(1, Math.ceil(all.length / perPage))
 

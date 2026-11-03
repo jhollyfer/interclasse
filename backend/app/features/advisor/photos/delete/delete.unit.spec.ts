@@ -8,7 +8,11 @@ import AdvisorPhotoDeleteUseCase from './delete.use-case.ts'
 import { Photo, PHOTO_SENDER } from '#domain/photo/photo.entity'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
+import {
+  memoryAuthor,
+  memoryPhotos,
+  memoryStorage,
+} from '#tests/photos-fixtures'
 
 async function setup() {
   const storage = memoryStorage()
@@ -23,7 +27,9 @@ async function setup() {
   })
   if (created.isLeft()) throw new Error('invalid arrangement')
   await photos.save(created.value)
-  const useCase = await makeWithMemory(AdvisorPhotoDeleteUseCase, [[PhotoRepository, photos]])
+  const useCase = await makeWithMemory(AdvisorPhotoDeleteUseCase, [
+    [PhotoRepository, photos],
+  ])
 
   return { photos, photo: created.value, owner, useCase }
 }
@@ -41,7 +47,10 @@ test.group('advisor/photos > delete (unit)', () => {
   test('photo from another advisor is 404 and stays', async ({ assert }) => {
     const { photos, photo, useCase } = await setup()
 
-    const result = await useCase.execute({ id: photo.id, actor: memoryAuthor() })
+    const result = await useCase.execute({
+      id: photo.id,
+      actor: memoryAuthor(),
+    })
 
     assert.deepInclude(result.value, { status: 404, code: 'PHOTO_NOT_FOUND' })
     assert.isNotNull(await photos.findById(photo.id))

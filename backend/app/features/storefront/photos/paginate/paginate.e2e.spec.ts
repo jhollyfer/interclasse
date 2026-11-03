@@ -23,7 +23,10 @@ test.group('storefront/photos > paginate', (group) => {
       .post('/administrator/photos')
       .cookies(admin)
       .json({ storageId: approved.id, caption: 'Aprovada' })
-    await client.post('/advisor/photos').cookies(advisor).json({ storageId: pending.id })
+    await client
+      .post('/advisor/photos')
+      .cookies(advisor)
+      .json({ storageId: pending.id })
 
     const response = await client.get('/storefront/photos')
 

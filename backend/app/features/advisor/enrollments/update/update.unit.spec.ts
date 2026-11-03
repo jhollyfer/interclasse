@@ -17,7 +17,10 @@ import {
 } from '#tests/enrollments-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
-const KEY = { classroomId: ENROLLMENT_IDS.classroom, sportId: ENROLLMENT_IDS.sport }
+const KEY = {
+  classroomId: ENROLLMENT_IDS.classroom,
+  sportId: ENROLLMENT_IDS.sport,
+}
 
 async function setup() {
   const world = enrollmentWorld()
@@ -56,9 +59,16 @@ test.group('advisor/enrollments > update (unit)', () => {
     const { enrollments, useCase } = await setup()
     enrollments.withList(KEY, [ENROLLMENT_IDS.ana])
 
-    const result = await useCase.execute({ ...KEY, studentIds: [], actor: ADVISOR_ACTOR })
+    const result = await useCase.execute({
+      ...KEY,
+      studentIds: [],
+      actor: ADVISOR_ACTOR,
+    })
 
-    assert.deepInclude(result.value, { status: 422, code: 'ENROLLMENT_REASON_REQUIRED' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'ENROLLMENT_REASON_REQUIRED',
+    })
     const stored = await enrollments.findForUpdate(KEY)
     assert.deepEqual(stored.snapshot().studentIds, [ENROLLMENT_IDS.ana])
   })
@@ -85,10 +95,15 @@ test.group('advisor/enrollments > update (unit)', () => {
     const stored = await enrollments.findForUpdate(KEY)
     assert.deepEqual(stored.snapshot().studentIds, [])
     assert.lengthOf(notices, 1)
-    assert.deepInclude(notices[0]?.snapshot(), { studentName: 'Ana', reason: 'Mudou de turno' })
+    assert.deepInclude(notices[0]?.snapshot(), {
+      studentName: 'Ana',
+      reason: 'Mudou de turno',
+    })
   })
 
-  test('above the sport maximum is 422 ENROLLMENT_LIMIT_EXCEEDED', async ({ assert }) => {
+  test('above the sport maximum is 422 ENROLLMENT_LIMIT_EXCEEDED', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -97,7 +112,10 @@ test.group('advisor/enrollments > update (unit)', () => {
       actor: ADVISOR_ACTOR,
     })
 
-    assert.deepInclude(result.value, { status: 422, code: 'ENROLLMENT_LIMIT_EXCEEDED' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'ENROLLMENT_LIMIT_EXCEEDED',
+    })
   })
 
   test('nonexistent sport is 422 SPORT_NOT_FOUND', async ({ assert }) => {
@@ -113,7 +131,9 @@ test.group('advisor/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'SPORT_NOT_FOUND' })
   })
 
-  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -122,17 +142,29 @@ test.group('advisor/enrollments > update (unit)', () => {
       actor: OTHER_ADVISOR_ACTOR,
     })
 
-    assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
+    assert.deepInclude(result.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
   })
 
-  test('repository failure is 500 ADVISOR_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADVISOR_ENROLLMENT_UPDATE_ERROR', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
     enrollments.findSport = async () => {
       throw new Error('database down')
     }
 
-    const result = await useCase.execute({ ...KEY, studentIds: [], actor: ADVISOR_ACTOR })
+    const result = await useCase.execute({
+      ...KEY,
+      studentIds: [],
+      actor: ADVISOR_ACTOR,
+    })
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADVISOR_ENROLLMENT_UPDATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADVISOR_ENROLLMENT_UPDATE_ERROR',
+    })
   })
 })

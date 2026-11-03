@@ -22,14 +22,24 @@ export default class AuthenticationSessionSignInController {
   constructor(private readonly useCase: AuthenticationSessionSignInUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AuthenticationSessionSignInValidator)
+    const payload = await context.request.validateUsing(
+      AuthenticationSessionSignInValidator,
+    )
     const result = await this.useCase.execute(payload)
 
     if (result.isLeft()) throw result.value
 
     context.response
-      .cookie(COOKIE_TOKEN.ACCESS, result.value.accessToken, cookieOptions.access)
-      .cookie(COOKIE_TOKEN.REFRESH, result.value.refreshToken, cookieOptions.refresh)
+      .cookie(
+        COOKIE_TOKEN.ACCESS,
+        result.value.accessToken,
+        cookieOptions.access,
+      )
+      .cookie(
+        COOKIE_TOKEN.REFRESH,
+        result.value.refreshToken,
+        cookieOptions.refresh,
+      )
 
     return context.response.noContent()
   }

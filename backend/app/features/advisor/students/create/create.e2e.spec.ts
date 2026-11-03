@@ -15,7 +15,10 @@ import {
 test.group('students > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the advisor registers a student in their own classroom', async ({ client, assert }) => {
+  test('the advisor registers a student in their own classroom', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -47,7 +50,10 @@ test.group('students > create', (group) => {
     assert.lengthOf(await Stored.studentsOfClassroom(classroom.id), 0)
   })
 
-  test('nonexistent classroom responds the same 404', async ({ client, assert }) => {
+  test('nonexistent classroom responds the same 404', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -59,7 +65,10 @@ test.group('students > create', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('the administrator registers in any classroom', async ({ client, assert }) => {
+  test('the administrator registers in any classroom', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
 
@@ -72,7 +81,10 @@ test.group('students > create', (group) => {
     assert.equal(body(response).classroomId, classroom.id)
   })
 
-  test('empty name responds 422 pointing at the field', async ({ client, assert }) => {
+  test('empty name responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -84,7 +96,10 @@ test.group('students > create', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({
+    client,
+    assert,
+  }) => {
     const classroom = await ClassroomFactory.create()
     const representative = await signInWithFactory(client, 'representative')
     const payload = { classroomId: classroom.id, name: 'Caio' }

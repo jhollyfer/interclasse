@@ -25,7 +25,11 @@ import { TransactionContext } from '#core/transaction-context'
 const REFERENCES = [
   { table: 'users', column: 'avatar_id', label: 'avatar de usuário' },
   { table: 'photos', column: 'storage_id', label: 'foto da galeria' },
-  { table: 'site_settings', column: 'regulation_id', label: 'regulamento do site' },
+  {
+    table: 'site_settings',
+    column: 'regulation_id',
+    label: 'regulamento do site',
+  },
 ] as const
 
 @inject()
@@ -94,7 +98,8 @@ export class StorageLucidRepository extends StorageRepository {
   }
 
   async save(storage: Storage): Promise<void> {
-    const { id, createdAt, updatedAt, deletedAt, ...columns } = storage.snapshot()
+    const { id, createdAt, updatedAt, deletedAt, ...columns } =
+      storage.snapshot()
 
     await StorageModel.updateOrCreate(
       { id },
@@ -109,13 +114,17 @@ export class StorageLucidRepository extends StorageRepository {
   }
 
   async delete(storage: Storage): Promise<void> {
-    await StorageModel.query({ client: this.transaction.client() }).where('id', storage.id).delete()
+    await StorageModel.query({ client: this.transaction.client() })
+      .where('id', storage.id)
+      .delete()
   }
 
-  async paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>> {
-    const query = StorageModel.query({ client: this.transaction.client() }).withScopes((scopes) =>
-      scopes.notDeleted(),
-    )
+  async paginate(
+    criteria: StorageListCriteria,
+  ): Promise<Paginated<StorageFileRead>> {
+    const query = StorageModel.query({
+      client: this.transaction.client(),
+    }).withScopes((scopes) => scopes.notDeleted())
 
     if (criteria.status) query.where('status', criteria.status)
     if (criteria.mimetype) query.where('mimetype', criteria.mimetype)

@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorEnrollmentRemovalPaginatePayload } from '#validators/administrator/enrollment-removals.validator'
 
 type Payload = AdministratorEnrollmentRemovalPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorEnrollmentRemovalShowResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorEnrollmentRemovalShowResponse>
+>
 
 /** The removal notices, newest to oldest, pending first. */
 @inject()
@@ -36,7 +39,10 @@ export default class AdministratorEnrollmentRemovalPaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[administrator/enrollment-removals > paginate][error]')
+      logger.error(
+        { err: error },
+        '[administrator/enrollment-removals > paginate][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

@@ -3,7 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorSportShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorSportShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { SportPresenter } from '../sports.presenter.ts'
 import { SportRefusal } from '../_shared.sport-refusal.ts'
@@ -26,12 +31,24 @@ export default class AdministratorSportCreateUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const created = Sport.create({ id: randomUUID(), ...payload, now: new Date() })
-      if (created.isLeft()) return left(SportRefusal.http(created.value, this.i18n))
+      const created = Sport.create({
+        id: randomUUID(),
+        ...payload,
+        now: new Date(),
+      })
+      if (created.isLeft())
+        return left(SportRefusal.http(created.value, this.i18n))
 
       const sport = created.value
-      if (await this.sports.existsByNameOrSlug(payload.name, sport.snapshot().slug))
-        return left(SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n))
+      if (
+        await this.sports.existsByNameOrSlug(
+          payload.name,
+          sport.snapshot().slug,
+        )
+      )
+        return left(
+          SportRefusal.http({ code: 'SPORT_ALREADY_EXISTS' }, this.i18n),
+        )
 
       const saved = await this.sports.save(sport)
       if (saved.isLeft()) return left(SportRefusal.http(saved.value, this.i18n))

@@ -19,8 +19,12 @@ test.group('matches > athletes', (group) => {
     assert,
   }) => {
     const session = await authenticateAsAdministrator(client)
-    const { bracket, match, homeTeam, homeStudent, awayStudent } = await matchWithTeams()
-    await EnrollmentFactory.merge({ studentId: homeStudent.id, sportId: bracket.sportId }).create()
+    const { bracket, match, homeTeam, homeStudent, awayStudent } =
+      await matchWithTeams()
+    await EnrollmentFactory.merge({
+      studentId: homeStudent.id,
+      sportId: bracket.sportId,
+    }).create()
 
     const response = await client
       .get(`/administrator/matches/${match.id}/athletes`)
@@ -49,35 +53,47 @@ test.group('matches > athletes', (group) => {
   })
 })
 
-test.group('administrator/matches/athletes > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/matches/athletes > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('401: without a session', async ({ client }) => {
-    const response = await client.get(
-      '/administrator/matches/00000000-0000-4000-8000-000000000000/athletes',
-    )
+    test('401: without a session', async ({ client }) => {
+      const response = await client.get(
+        '/administrator/matches/00000000-0000-4000-8000-000000000000/athletes',
+      )
 
-    response.assertStatus(401)
-  })
+      response.assertStatus(401)
+    })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
-    const advisor = await authenticateAsAdvisor(client)
+    test('403: advisor does not reach the organization route', async ({
+      client,
+    }) => {
+      const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client
-      .get('/administrator/matches/00000000-0000-4000-8000-000000000000/athletes')
-      .cookies(advisor)
+      const response = await client
+        .get(
+          '/administrator/matches/00000000-0000-4000-8000-000000000000/athletes',
+        )
+        .cookies(advisor)
 
-    response.assertStatus(403)
-  })
-})
+      response.assertStatus(403)
+    })
+  },
+)
 
 test.group('administrator/matches/athletes > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('malformed match id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed match id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/matches/x/athletes').cookies(admin)
+    const response = await client
+      .get('/administrator/matches/x/athletes')
+      .cookies(admin)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')

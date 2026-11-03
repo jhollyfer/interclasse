@@ -4,7 +4,11 @@ import { test } from '@japa/runner'
 import { BRACKET_STATUS, MATCH_PHASE } from '@interclasse/shared'
 
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 test.group('storefront brackets > show', (group) => {
   group.each.setup(() => resetDatabase())
@@ -20,7 +24,11 @@ test.group('storefront brackets > show', (group) => {
 
     response.assertStatus(200)
     assert.equal(body(response).status, BRACKET_STATUS.KNOCKOUT)
-    assert.deepEqual(body(response).sport, { id: sport.id, name: sport.name, slug: sport.slug })
+    assert.deepEqual(body(response).sport, {
+      id: sport.id,
+      name: sport.name,
+      slug: sport.slug,
+    })
     assert.isNull(body(response).championTeamId)
     // 2 classrooms: straight to the final.
     assert.lengthOf(body(response).matches, 1)
@@ -57,14 +65,20 @@ test.group('storefront brackets > show', (group) => {
     assert.equal(body(response).matches[0].location, 'Quadra')
   })
 
-  test('bracket that does not exist responds 404', async ({ client, assert }) => {
+  test('bracket that does not exist responds 404', async ({
+    client,
+    assert,
+  }) => {
     const response = await client.get(`/storefront/brackets/${randomUUID()}`)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'BRACKET_NOT_FOUND')
   })
 
-  test('id outside the uuid format responds 422', async ({ client, assert }) => {
+  test('id outside the uuid format responds 422', async ({
+    client,
+    assert,
+  }) => {
     const response = await client.get('/storefront/brackets/nao-e-uuid')
 
     response.assertStatus(422)

@@ -52,7 +52,9 @@ export default class StoragesFilePaginateUseCase {
 
       return right({
         meta: page.meta,
-        data: await Promise.all(page.data.map((file) => this.bucket.withUrl(file))),
+        data: await Promise.all(
+          page.data.map((file) => this.bucket.withUrl(file)),
+        ),
       })
     } catch (error) {
       logger.error({ err: error }, '[storages/files > paginate][error]')

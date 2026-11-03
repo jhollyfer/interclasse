@@ -76,7 +76,9 @@ export class Stored {
 
   /** Writes `updatedAt` directly, without the model hook that would rewrite it with now. */
   static async touchMatch(id: string, updatedAt: DateTime) {
-    await MatchModel.query().where('id', id).update({ updatedAt: updatedAt.toSQL() })
+    await MatchModel.query()
+      .where('id', id)
+      .update({ updatedAt: updatedAt.toSQL() })
   }
 
   static removalsOfClassroom(classroomId: string) {

@@ -30,7 +30,12 @@ export default class AdministratorMatchAthletesUseCase {
     try {
       const athletes = await this.brackets.matchAthletes(id)
       if (!athletes)
-        return left(HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('matches.not_found'),
+            'MATCH_NOT_FOUND',
+          ),
+        )
 
       return right(athletes)
     } catch (error) {

@@ -18,8 +18,13 @@ export default class AdministratorPhotoCreateController {
   constructor(private readonly useCase: AdministratorPhotoCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorPhotoCreateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.actor })
+    const payload = await context.request.validateUsing(
+      AdministratorPhotoCreateValidator,
+    )
+    const result = await this.useCase.execute({
+      ...payload,
+      actor: context.actor,
+    })
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)
   }

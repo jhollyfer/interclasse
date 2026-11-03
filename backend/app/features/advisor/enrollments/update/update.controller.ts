@@ -18,8 +18,13 @@ export default class AdvisorEnrollmentUpdateController {
   constructor(private readonly useCase: AdvisorEnrollmentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdvisorEnrollmentUpdateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.actor })
+    const payload = await context.request.validateUsing(
+      AdvisorEnrollmentUpdateValidator,
+    )
+    const result = await this.useCase.execute({
+      ...payload,
+      actor: context.actor,
+    })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

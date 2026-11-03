@@ -17,7 +17,8 @@ export type EnrollmentProps = {
  * does not change the bracket. Removing an athlete requires the reason.
  */
 export type EnrollmentWriter =
-  { readonly role: 'representative' } | { readonly role: 'advisor'; readonly reason?: string }
+  | { readonly role: 'representative' }
+  | { readonly role: 'advisor'; readonly reason?: string }
 
 /** What the list swap left behind: who left it. */
 export type EnrollmentReplaced = { readonly removedStudentIds: string[] }
@@ -43,7 +44,10 @@ export class Enrollment {
    * on who writes.
    */
   replace(
-    input: { readonly studentIds: readonly string[]; readonly writer: EnrollmentWriter },
+    input: {
+      readonly studentIds: readonly string[]
+      readonly writer: EnrollmentWriter
+    },
     context: {
       readonly maxAthletes: number
       readonly classroomStudentIds: readonly string[]
@@ -51,21 +55,31 @@ export class Enrollment {
     },
   ): Either<EnrollmentError, EnrollmentReplaced> {
     if (input.studentIds.length > context.maxAthletes)
-      return left({ code: 'ENROLLMENT_LIMIT_EXCEEDED', maxAthletes: context.maxAthletes })
+      return left({
+        code: 'ENROLLMENT_LIMIT_EXCEEDED',
+        maxAthletes: context.maxAthletes,
+      })
 
     const ofClassroom = new Set(context.classroomStudentIds)
     if (!input.studentIds.every((id) => ofClassroom.has(id)))
       return left({ code: 'ENROLLMENT_STUDENT_NOT_IN_CLASSROOM' })
 
     const kept = new Set(input.studentIds)
-    const removedStudentIds = this.props.studentIds.filter((id) => !kept.has(id))
+    const removedStudentIds = this.props.studentIds.filter(
+      (id) => !kept.has(id),
+    )
 
     if (input.writer.role === 'representative') {
-      if (removedStudentIds.length > 0) return left({ code: 'ENROLLMENT_REMOVAL_FORBIDDEN' })
+      if (removedStudentIds.length > 0)
+        return left({ code: 'ENROLLMENT_REMOVAL_FORBIDDEN' })
       if (context.drawn) return left({ code: 'ENROLLMENT_LOCKED' })
     }
 
-    if (input.writer.role === 'advisor' && removedStudentIds.length > 0 && !input.writer.reason)
+    if (
+      input.writer.role === 'advisor' &&
+      removedStudentIds.length > 0 &&
+      !input.writer.reason
+    )
       return left({ code: 'ENROLLMENT_REASON_REQUIRED' })
 
     this.props.studentIds = [...input.studentIds]

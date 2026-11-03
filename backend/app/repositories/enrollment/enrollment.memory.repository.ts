@@ -1,4 +1,7 @@
-import type { AdvisorEnrollmentShowResponse, Category } from '@interclasse/shared'
+import type {
+  AdvisorEnrollmentShowResponse,
+  Category,
+} from '@interclasse/shared'
 
 import {
   EnrollmentRepository,
@@ -30,7 +33,9 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
   private readonly drawn = new Map<Category, Set<string>>()
 
   /** Test arrangement: the sport exists. */
-  withSport(sport: Pick<SportRow, 'id' | 'name' | 'minAthletes' | 'maxAthletes'>): this {
+  withSport(
+    sport: Pick<SportRow, 'id' | 'name' | 'minAthletes' | 'maxAthletes'>,
+  ): this {
     this.sports.set(sport.id, sport)
     return this
   }
@@ -43,13 +48,19 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
 
   /** Test arrangement: the student belongs to the classroom. */
   withStudent(classroomId: string, student: EnrollmentStudent): this {
-    this.students.set(classroomId, [...(this.students.get(classroomId) ?? []), student])
+    this.students.set(classroomId, [
+      ...(this.students.get(classroomId) ?? []),
+      student,
+    ])
     return this
   }
 
   /** Test arrangement: the sport was already drawn in this category. */
   markDrawn(category: Category, sportId: string): this {
-    this.drawn.set(category, (this.drawn.get(category) ?? new Set()).add(sportId))
+    this.drawn.set(
+      category,
+      (this.drawn.get(category) ?? new Set()).add(sportId),
+    )
     return this
   }
 
@@ -67,7 +78,9 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
   }
 
   async studentsOf(classroomId: string): Promise<EnrollmentStudent[]> {
-    return [...(this.students.get(classroomId) ?? [])].sort((a, b) => a.name.localeCompare(b.name))
+    return [...(this.students.get(classroomId) ?? [])].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    )
   }
 
   async isDrawn(key: EnrollmentKey): Promise<boolean> {
@@ -78,7 +91,10 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
   }
 
   async findForUpdate(key: EnrollmentKey): Promise<Enrollment> {
-    return Enrollment.restore({ ...key, studentIds: [...(this.lists.get(this.keyOf(key)) ?? [])] })
+    return Enrollment.restore({
+      ...key,
+      studentIds: [...(this.lists.get(this.keyOf(key)) ?? [])],
+    })
   }
 
   async save(enrollment: Enrollment): Promise<void> {
@@ -109,7 +125,9 @@ export class EnrollmentMemoryRepository extends EnrollmentRepository {
         id: student.id,
         name: student.name,
         sportIds: [...this.sports.keys()].filter((sportId) =>
-          this.lists.get(this.keyOf({ classroomId: classroom.id, sportId }))?.includes(student.id),
+          this.lists
+            .get(this.keyOf({ classroomId: classroom.id, sportId }))
+            ?.includes(student.id),
         ),
       })),
     }

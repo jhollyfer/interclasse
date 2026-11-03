@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorSportShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorSportShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { SportPresenter } from '../sports.presenter.ts'
 
@@ -24,10 +29,17 @@ export default class AdministratorSportDeleteUseCase {
     try {
       const sport = await this.sports.findById(id)
       if (!sport)
-        return left(HTTPException.NotFound(this.i18n.t('sports.not_found'), 'SPORT_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('sports.not_found'),
+            'SPORT_NOT_FOUND',
+          ),
+        )
 
       if (await this.sports.isInUse(id))
-        return left(HTTPException.Conflict(this.i18n.t('sports.in_use'), 'SPORT_IN_USE'))
+        return left(
+          HTTPException.Conflict(this.i18n.t('sports.in_use'), 'SPORT_IN_USE'),
+        )
 
       await this.sports.delete(sport)
 

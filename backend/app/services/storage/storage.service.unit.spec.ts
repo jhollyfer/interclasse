@@ -9,7 +9,9 @@ async function service(): Promise<StorageContract> {
 }
 
 test.group('services > storage (unit)', () => {
-  test('the key is a uuid with the type extension, for each accepted type', async ({ assert }) => {
+  test('the key is a uuid with the type extension, for each accepted type', async ({
+    assert,
+  }) => {
     const storage = await service()
 
     for (const mimetype of STORAGE_MIMETYPES) {
@@ -49,16 +51,23 @@ test.group('services > storage (unit)', () => {
     assert.include(header, 'filename="a_b_c.png"')
   })
 
-  test('withUrl returns the record with the signed URL of its own path', async ({ assert }) => {
+  test('withUrl returns the record with the signed URL of its own path', async ({
+    assert,
+  }) => {
     const storage = await service()
 
-    const signed = await storage.withUrl({ path: 'a/b.png', originalName: 'b.png' })
+    const signed = await storage.withUrl({
+      path: 'a/b.png',
+      originalName: 'b.png',
+    })
 
     assert.equal(signed.originalName, 'b.png')
     assert.equal(signed.url.split('?')[0]?.endsWith('/a/b.png'), true)
   })
 
-  test('the signed read URL is computed locally and expires', async ({ assert }) => {
+  test('the signed read URL is computed locally and expires', async ({
+    assert,
+  }) => {
     const storage = await service()
 
     const url = new URL(await storage.signedUrl('abc.png'))
@@ -67,7 +76,9 @@ test.group('services > storage (unit)', () => {
     assert.isTrue(url.searchParams.has('X-Amz-Expires'))
   })
 
-  test('the signed download binds the original name to the signature', async ({ assert }) => {
+  test('the signed download binds the original name to the signature', async ({
+    assert,
+  }) => {
     const storage = await service()
 
     const url = new URL(
@@ -78,6 +89,9 @@ test.group('services > storage (unit)', () => {
       }),
     )
 
-    assert.include(url.searchParams.get('response-content-disposition') ?? '', 'foto.png')
+    assert.include(
+      url.searchParams.get('response-content-disposition') ?? '',
+      'foto.png',
+    )
   })
 })

@@ -165,9 +165,9 @@ export function trashedField() {
  * resource sorts by what it has, and a global set would promise in OpenAPI
  * columns that half the listings do not know.
  */
-export function sortFields<const TColumns extends readonly [string, ...string[]]>(
-  columns: TColumns,
-) {
+export function sortFields<
+  const TColumns extends readonly [string, ...string[]],
+>(columns: TColumns) {
   return {
     sort: vine.enum(columns).optional(),
     direction: vine.enum(SORT_DIRECTIONS).optional(),
@@ -210,7 +210,10 @@ export function matchFilterFields() {
 export function athleteListFields() {
   return {
     sportId: vine.string().uuid(),
-    studentIds: vine.array(vine.string().uuid()).distinct().maxLength(LIST_LIMITS.ATHLETES),
+    studentIds: vine
+      .array(vine.string().uuid())
+      .distinct()
+      .maxLength(LIST_LIMITS.ATHLETES),
   }
 }
 
@@ -330,7 +333,7 @@ type FieldLabels = Record<keyof typeof PT_BR_FIELD_LABELS, string>
  */
 export const FIELD_LABELS = {
   'pt-BR': PT_BR_FIELD_LABELS,
-  'es': {
+  es: {
     name: 'el nombre',
     email: 'el correo electrónico',
     password: 'la contraseña',
@@ -387,7 +390,7 @@ export const FIELD_LABELS = {
     direction: 'la dirección del orden',
     trashed: 'el filtro de archivados',
   },
-  'en': {
+  en: {
     name: 'the name',
     email: 'the email',
     password: 'the password',
@@ -453,30 +456,31 @@ const PT_BR_RULE_MESSAGES = {
   // in lower case, and `'em {{ field }}'` would come out as "em a senha". In the other
   // rules the name is omitted: the error is rendered under the labeled field, and in the
   // API it comes indexed by its name.
-  'required': 'Informe {{ field }}',
-  'string': 'Informe {{ field }}',
-  'enum': 'Selecione {{ field }}',
-  'email': 'Informe um e-mail válido',
-  'number': 'Informe um número válido',
-  'boolean': 'Informe verdadeiro ou falso',
-  'array': 'Informe uma lista',
-  'object': 'Informe um objeto',
-  'uuid': 'Selecione uma opção válida',
-  'url': 'Informe um link válido',
-  'minLength': 'Informe ao menos {{ min }} caracteres',
-  'maxLength': 'Informe no máximo {{ max }} caracteres',
-  'min': 'Informe um valor maior ou igual a {{ min }}',
-  'max': 'Informe um valor menor ou igual a {{ max }}',
-  'positive': 'Informe um valor maior que zero',
-  'withoutDecimals': 'Informe um número inteiro',
+  required: 'Informe {{ field }}',
+  string: 'Informe {{ field }}',
+  enum: 'Selecione {{ field }}',
+  email: 'Informe um e-mail válido',
+  number: 'Informe um número válido',
+  boolean: 'Informe verdadeiro ou falso',
+  array: 'Informe uma lista',
+  object: 'Informe um objeto',
+  uuid: 'Selecione uma opção válida',
+  url: 'Informe um link válido',
+  minLength: 'Informe ao menos {{ min }} caracteres',
+  maxLength: 'Informe no máximo {{ max }} caracteres',
+  min: 'Informe um valor maior ou igual a {{ min }}',
+  max: 'Informe um valor menor ou igual a {{ max }}',
+  positive: 'Informe um valor maior que zero',
+  withoutDecimals: 'Informe um número inteiro',
   'array.maxLength': 'Informe no máximo {{ max }} itens',
-  'isoDateTime': 'Informe data e hora em ISO 8601 com fuso',
+  isoDateTime: 'Informe data e hora em ISO 8601 com fuso',
 
   // Password
   // The four `.regex()` of `password()` all report the key
   // `password.regex`, and VineJS stops at the first that fails - there is no way to give
   // a message per character class. Hence the combined message.
-  'password.regex': 'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
+  'password.regex':
+    'A senha precisa de letra minúscula, maiúscula, número e caractere especial',
   'password.minLength': 'A senha deve ter ao menos {{ min }} caracteres',
   'password.maxLength': 'A senha deve ter no máximo {{ max }} caracteres',
   // `confirmed` runs on `password` but reports on `passwordConfirmation`.
@@ -492,52 +496,56 @@ type RuleMessages = Record<keyof typeof PT_BR_RULE_MESSAGES, string>
  */
 export const RULE_MESSAGES = {
   'pt-BR': PT_BR_RULE_MESSAGES,
-  'es': {
-    'required': 'Ingresa {{ field }}',
-    'string': 'Ingresa {{ field }}',
-    'enum': 'Selecciona {{ field }}',
-    'email': 'Ingresa un correo electrónico válido',
-    'number': 'Ingresa un número válido',
-    'boolean': 'Indica verdadero o falso',
-    'array': 'Ingresa una lista',
-    'object': 'Ingresa un objeto',
-    'uuid': 'Selecciona una opción válida',
-    'url': 'Ingresa un enlace válido',
-    'minLength': 'Ingresa al menos {{ min }} caracteres',
-    'maxLength': 'Ingresa como máximo {{ max }} caracteres',
-    'min': 'Ingresa un valor mayor o igual a {{ min }}',
-    'max': 'Ingresa un valor menor o igual a {{ max }}',
-    'positive': 'Ingresa un valor mayor que cero',
-    'withoutDecimals': 'Ingresa un número entero',
+  es: {
+    required: 'Ingresa {{ field }}',
+    string: 'Ingresa {{ field }}',
+    enum: 'Selecciona {{ field }}',
+    email: 'Ingresa un correo electrónico válido',
+    number: 'Ingresa un número válido',
+    boolean: 'Indica verdadero o falso',
+    array: 'Ingresa una lista',
+    object: 'Ingresa un objeto',
+    uuid: 'Selecciona una opción válida',
+    url: 'Ingresa un enlace válido',
+    minLength: 'Ingresa al menos {{ min }} caracteres',
+    maxLength: 'Ingresa como máximo {{ max }} caracteres',
+    min: 'Ingresa un valor mayor o igual a {{ min }}',
+    max: 'Ingresa un valor menor o igual a {{ max }}',
+    positive: 'Ingresa un valor mayor que cero',
+    withoutDecimals: 'Ingresa un número entero',
     'array.maxLength': 'Ingresa como máximo {{ max }} elementos',
-    'isoDateTime': 'Ingresa fecha y hora en ISO 8601 con zona horaria',
-    'password.regex': 'La contraseña necesita minúscula, mayúscula, número y carácter especial',
-    'password.minLength': 'La contraseña debe tener al menos {{ min }} caracteres',
-    'password.maxLength': 'La contraseña debe tener como máximo {{ max }} caracteres',
+    isoDateTime: 'Ingresa fecha y hora en ISO 8601 con zona horaria',
+    'password.regex':
+      'La contraseña necesita minúscula, mayúscula, número y carácter especial',
+    'password.minLength':
+      'La contraseña debe tener al menos {{ min }} caracteres',
+    'password.maxLength':
+      'La contraseña debe tener como máximo {{ max }} caracteres',
     'passwordConfirmation.confirmed': 'Las contraseñas no coinciden',
   },
-  'en': {
-    'required': 'Enter {{ field }}',
-    'string': 'Enter {{ field }}',
-    'enum': 'Select {{ field }}',
-    'email': 'Enter a valid email',
-    'number': 'Enter a valid number',
-    'boolean': 'Enter true or false',
-    'array': 'Enter a list',
-    'object': 'Enter an object',
-    'uuid': 'Select a valid option',
-    'url': 'Enter a valid link',
-    'minLength': 'Enter at least {{ min }} characters',
-    'maxLength': 'Enter at most {{ max }} characters',
-    'min': 'Enter a value greater than or equal to {{ min }}',
-    'max': 'Enter a value less than or equal to {{ max }}',
-    'positive': 'Enter a value greater than zero',
-    'withoutDecimals': 'Enter a whole number',
+  en: {
+    required: 'Enter {{ field }}',
+    string: 'Enter {{ field }}',
+    enum: 'Select {{ field }}',
+    email: 'Enter a valid email',
+    number: 'Enter a valid number',
+    boolean: 'Enter true or false',
+    array: 'Enter a list',
+    object: 'Enter an object',
+    uuid: 'Select a valid option',
+    url: 'Enter a valid link',
+    minLength: 'Enter at least {{ min }} characters',
+    maxLength: 'Enter at most {{ max }} characters',
+    min: 'Enter a value greater than or equal to {{ min }}',
+    max: 'Enter a value less than or equal to {{ max }}',
+    positive: 'Enter a value greater than zero',
+    withoutDecimals: 'Enter a whole number',
     'array.maxLength': 'Enter at most {{ max }} items',
-    'isoDateTime': 'Enter date and time in ISO 8601 with time zone',
+    isoDateTime: 'Enter date and time in ISO 8601 with time zone',
     'password.regex':
       'The password needs a lowercase letter, an uppercase letter, a number and a special character',
-    'password.minLength': 'The password must have at least {{ min }} characters',
+    'password.minLength':
+      'The password must have at least {{ min }} characters',
     'password.maxLength': 'The password must have at most {{ max }} characters',
     'passwordConfirmation.confirmed': 'The passwords do not match',
   },
@@ -549,9 +557,12 @@ export const RULE_MESSAGES = {
  * language applies (_doc-lib/vinejs.md#custom_error_messages).
  */
 export const VALIDATION_MESSAGES = {
-  'pt-BR': new SimpleMessagesProvider(RULE_MESSAGES['pt-BR'], FIELD_LABELS['pt-BR']),
-  'es': new SimpleMessagesProvider(RULE_MESSAGES.es, FIELD_LABELS.es),
-  'en': new SimpleMessagesProvider(RULE_MESSAGES.en, FIELD_LABELS.en),
+  'pt-BR': new SimpleMessagesProvider(
+    RULE_MESSAGES['pt-BR'],
+    FIELD_LABELS['pt-BR'],
+  ),
+  es: new SimpleMessagesProvider(RULE_MESSAGES.es, FIELD_LABELS.es),
+  en: new SimpleMessagesProvider(RULE_MESSAGES.en, FIELD_LABELS.en),
 } satisfies Record<Locale, SimpleMessagesProvider>
 
 vine.messagesProvider = VALIDATION_MESSAGES[BASE_LOCALE]

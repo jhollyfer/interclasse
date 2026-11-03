@@ -2,7 +2,10 @@ import { randomUUID } from 'node:crypto'
 
 import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
-import { CATEGORY, type AdministratorSportShowResponse } from '@interclasse/shared'
+import {
+  CATEGORY,
+  type AdministratorSportShowResponse,
+} from '@interclasse/shared'
 
 import { Bracket } from '#domain/bracket/bracket.entity'
 import { BracketLucidRepository } from '#repositories/bracket/bracket.lucid.repository'
@@ -23,7 +26,10 @@ export type BracketHarness = {
   readonly repository: BracketRepository
   sport(sport: AdministratorSportShowResponse): Promise<void>
   classroom(classroom: ClassroomView): Promise<void>
-  student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void>
+  student(
+    student: StudentView,
+    enrolledIn: ReadonlyArray<string>,
+  ): Promise<void>
 }
 
 export class LucidBracketHarness implements BracketHarness {
@@ -50,7 +56,10 @@ export class LucidBracketHarness implements BracketHarness {
     })
   }
 
-  async student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void> {
+  async student(
+    student: StudentView,
+    enrolledIn: ReadonlyArray<string>,
+  ): Promise<void> {
     await db.table('students').insert({
       id: student.id,
       name: student.name,
@@ -77,7 +86,10 @@ export class MemoryBracketHarness implements BracketHarness {
     this.repository.withClassroom(classroom)
   }
 
-  async student(student: StudentView, enrolledIn: ReadonlyArray<string>): Promise<void> {
+  async student(
+    student: StudentView,
+    enrolledIn: ReadonlyArray<string>,
+  ): Promise<void> {
     this.repository.withStudent(student, enrolledIn)
   }
 }
@@ -86,7 +98,9 @@ export class BracketArrangements {
   static readonly NOW = new Date('2026-10-29T12:00:00.000Z')
 
   static async lucid(): Promise<LucidBracketHarness> {
-    return new LucidBracketHarness(await app.container.make(BracketLucidRepository))
+    return new LucidBracketHarness(
+      await app.container.make(BracketLucidRepository),
+    )
   }
 
   static memory(): MemoryBracketHarness {
@@ -119,7 +133,11 @@ export class BracketArrangements {
   }
 
   /** The sport, `names.length` classrooms with one enrolled athlete each, and the saved draw. */
-  static async drawn(harness: BracketHarness, names: string[], sportName = 'Futsal') {
+  static async drawn(
+    harness: BracketHarness,
+    names: string[],
+    sportName = 'Futsal',
+  ) {
     const sport = BracketArrangements.sport(sportName)
     await harness.sport(sport)
 

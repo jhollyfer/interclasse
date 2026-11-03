@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto'
 
-import { BracketArrangements, MemoryBracketHarness } from '#tests/bracket-harness-fixtures'
+import {
+  BracketArrangements,
+  MemoryBracketHarness,
+} from '#tests/bracket-harness-fixtures'
 import type {
   BracketMemoryRepository,
   StudentView,
@@ -26,8 +29,14 @@ export class BracketUnitFixtures {
   }
 
   /** The same, plus the card, which reads the match through the bracket repository. */
-  static cardBindings(brackets: BracketMemoryRepository, cards: MatchCardMemoryRepository) {
-    return [...BracketUnitFixtures.bindings(brackets), [MatchCardRepository, cards]] as const
+  static cardBindings(
+    brackets: BracketMemoryRepository,
+    cards: MatchCardMemoryRepository,
+  ) {
+    return [
+      ...BracketUnitFixtures.bindings(brackets),
+      [MatchCardRepository, cards],
+    ] as const
   }
 
   /** The in-memory card repository, with the students it only reads. */
@@ -37,13 +46,20 @@ export class BracketUnitFixtures {
   ): MatchCardMemoryRepository {
     const cards = new MatchCardMemoryRepository(brackets)
     for (const student of students)
-      cards.withStudent({ ...student, createdAt: BracketArrangements.NOW, updatedAt: null })
+      cards.withStudent({
+        ...student,
+        createdAt: BracketArrangements.NOW,
+        updatedAt: null,
+      })
 
     return cards
   }
 
   /** The sport and `names.length` classrooms, each with one student enrolled in it. */
-  static async enrolled(brackets: BracketMemoryRepository, names: ReadonlyArray<string>) {
+  static async enrolled(
+    brackets: BracketMemoryRepository,
+    names: ReadonlyArray<string>,
+  ) {
     const harness = new MemoryBracketHarness(brackets)
     const sport = BracketArrangements.sport('Futsal')
     await harness.sport(sport)
@@ -68,7 +84,10 @@ export class BracketUnitFixtures {
   static async drawn(brackets: BracketMemoryRepository, total = 4) {
     return BracketArrangements.drawn(
       new MemoryBracketHarness(brackets),
-      Array.from({ length: total }, (_, index) => `8º ${String.fromCharCode(65 + index)}`),
+      Array.from(
+        { length: total },
+        (_, index) => `8º ${String.fromCharCode(65 + index)}`,
+      ),
     )
   }
 }

@@ -5,7 +5,10 @@ import {
   type Paginated,
 } from '@interclasse/shared'
 
-import { StudentRepository, type StudentListCriteria } from './student.repository.ts'
+import {
+  StudentRepository,
+  type StudentListCriteria,
+} from './student.repository.ts'
 
 import { Student, type StudentProps } from '#domain/student/student.entity'
 import { MemoryPagination } from '#core/memory-pagination'
@@ -55,11 +58,16 @@ export class StudentMemoryRepository extends StudentRepository {
     this.rows.delete(student.id)
   }
 
-  async paginate(criteria: StudentListCriteria): Promise<Paginated<AdvisorStudentShowResponse>> {
+  async paginate(
+    criteria: StudentListCriteria,
+  ): Promise<Paginated<AdvisorStudentShowResponse>> {
     const search = criteria.search?.toLowerCase()
     const all = [...this.rows.values()]
       .filter((row) => this.reaches(criteria.actor, row.classroomId))
-      .filter((row) => !criteria.classroomId || row.classroomId === criteria.classroomId)
+      .filter(
+        (row) =>
+          !criteria.classroomId || row.classroomId === criteria.classroomId,
+      )
       .filter((row) => !search || row.name.toLowerCase().includes(search))
       .sort((a, b) => a.name.localeCompare(b.name))
     const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
@@ -78,6 +86,9 @@ export class StudentMemoryRepository extends StudentRepository {
 
   /** The administrator reaches all classrooms; the others, the one they advise. */
   private reaches(actor: Actor, classroomId: string): boolean {
-    return actor.role === USER_ROLE.ADMINISTRATOR || this.advisors.get(classroomId) === actor.id
+    return (
+      actor.role === USER_ROLE.ADMINISTRATOR ||
+      this.advisors.get(classroomId) === actor.id
+    )
   }
 }

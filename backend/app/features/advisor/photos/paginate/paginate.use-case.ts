@@ -17,7 +17,10 @@ import { PhotoReadBase } from '#features/_shared.photo-read.base'
 import { StorageContract } from '#services/storage/storage.contract'
 import type { AdvisorPhotoPaginatePayload } from '#validators/advisor/photos.validator'
 
-type Payload = Merge<AdvisorPhotoPaginatePayload, { actor: { readonly id: string } }>
+type Payload = Merge<
+  AdvisorPhotoPaginatePayload,
+  { actor: { readonly id: string } }
+>
 type Response = Either<HTTPException, Paginated<AdvisorPhotoShowResponse>>
 
 /** The photos the advisor submitted, with the organization decision on each one. */

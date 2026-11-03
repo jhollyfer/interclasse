@@ -3,7 +3,12 @@ import { CATEGORIES, GRADES } from '@interclasse/shared'
 import { vine, notNull, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
 
-export const CLASSROOM_SORT_COLUMNS = ['name', 'grade', 'category', 'createdAt'] as const
+export const CLASSROOM_SORT_COLUMNS = [
+  'name',
+  'grade',
+  'category',
+  'createdAt',
+] as const
 
 /** The classroom grade. The category comes from it, which is why it is not an input field. */
 export function grade() {
@@ -25,7 +30,13 @@ export const AdministratorClassroomCreateValidator = vine.create({
 
 /** An absent field means "leave alone"; `null` on advisor or representative undoes the link. */
 export const AdministratorClassroomUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(20).optional().use(notNull()),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(20)
+    .optional()
+    .use(notNull()),
   grade: grade().optional().use(notNull()),
   advisorId: vine.string().uuid().nullable().optional(),
   representativeId: vine.string().uuid().nullable().optional(),

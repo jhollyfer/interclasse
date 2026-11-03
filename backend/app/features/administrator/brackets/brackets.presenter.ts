@@ -16,7 +16,8 @@ export class BracketPresenter {
     bracket: Bracket,
     sport: AdministratorSportShowResponse,
   ): AdministratorBracketCreateResponse {
-    const { id, sportId, category, status, createdAt, updatedAt } = bracket.snapshot()
+    const { id, sportId, category, status, createdAt, updatedAt } =
+      bracket.snapshot()
 
     return {
       id,

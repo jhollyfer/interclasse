@@ -27,22 +27,47 @@ test.group('Sport', () => {
     })
 
     assert.isTrue(sport.isRight())
-    assert.equal(sport.isRight() && sport.value.snapshot().slug, 'tenis-de-mesa')
+    assert.equal(
+      sport.isRight() && sport.value.snapshot().slug,
+      'tenis-de-mesa',
+    )
   })
 
-  test('refuses a minimum above the maximum on birth and on change', ({ assert }) => {
-    const born = Sport.create({ id: 'id', name: 'Vôlei', minAthletes: 9, maxAthletes: 6, now: NOW })
-    const changed = futsal().update({ minAthletes: 13 }, { largestRoster: 0, now: NOW })
+  test('refuses a minimum above the maximum on birth and on change', ({
+    assert,
+  }) => {
+    const born = Sport.create({
+      id: 'id',
+      name: 'Vôlei',
+      minAthletes: 9,
+      maxAthletes: 6,
+      now: NOW,
+    })
+    const changed = futsal().update(
+      { minAthletes: 13 },
+      { largestRoster: 0, now: NOW },
+    )
 
     assert.deepEqual(born.value, { code: 'SPORT_INVALID_LIMITS' })
     assert.deepEqual(changed.value, { code: 'SPORT_INVALID_LIMITS' })
   })
 
-  test('the maximum does not go below the largest enrolled roster', ({ assert }) => {
-    const refused = futsal().update({ maxAthletes: 8 }, { largestRoster: 10, now: NOW })
-    const accepted = futsal().update({ maxAthletes: 10 }, { largestRoster: 10, now: NOW })
+  test('the maximum does not go below the largest enrolled roster', ({
+    assert,
+  }) => {
+    const refused = futsal().update(
+      { maxAthletes: 8 },
+      { largestRoster: 10, now: NOW },
+    )
+    const accepted = futsal().update(
+      { maxAthletes: 10 },
+      { largestRoster: 10, now: NOW },
+    )
 
-    assert.deepEqual(refused.value, { code: 'SPORT_ROSTER_ABOVE_LIMIT', largestRoster: 10 })
+    assert.deepEqual(refused.value, {
+      code: 'SPORT_ROSTER_ABOVE_LIMIT',
+      largestRoster: 10,
+    })
     assert.isTrue(accepted.isRight())
   })
 

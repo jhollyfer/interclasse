@@ -22,7 +22,11 @@ export default class AuthenticationSessionSignOutUseCase {
     private readonly i18n: I18n,
   ) {}
 
-  async execute({ actor, accessTokenId, refreshToken }: Payload): Promise<Response> {
+  async execute({
+    actor,
+    accessTokenId,
+    refreshToken,
+  }: Payload): Promise<Response> {
     try {
       if (accessTokenId) await this.sessions.revoke(actor.id, accessTokenId)
 
@@ -37,7 +41,10 @@ export default class AuthenticationSessionSignOutUseCase {
 
       return right(null)
     } catch (error) {
-      logger.error({ err: error }, '[authentication/sessions > sign-out][error]')
+      logger.error(
+        { err: error },
+        '[authentication/sessions > sign-out][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

@@ -17,7 +17,10 @@ import {
 test.group('administrator > users > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('partial payload does not erase the missing field', async ({ client, assert }) => {
+  test('partial payload does not erase the missing field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ name: 'Original' }).create()
 
@@ -99,7 +102,10 @@ test.group('administrator > users > update', (group) => {
     response.assertStatus(404)
   })
 
-  test('null role or empty name responds 422 and does not save', async ({ client, assert }) => {
+  test('null role or empty name responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.merge({ name: 'Original' }).create()
 
@@ -121,12 +127,16 @@ test.group('administrator/users/update > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('401: without a session', async ({ client }) => {
-    const response = await client.put('/administrator/users/00000000-0000-4000-8000-000000000000')
+    const response = await client.put(
+      '/administrator/users/00000000-0000-4000-8000-000000000000',
+    )
 
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client

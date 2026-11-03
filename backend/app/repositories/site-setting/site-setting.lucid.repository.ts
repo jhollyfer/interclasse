@@ -12,7 +12,10 @@ import {
 
 import SiteSettingModel from '#models/site-setting'
 import StorageModel from '#models/storage'
-import { SiteSetting, type RegulationFile } from '#domain/site-setting/site-setting.entity'
+import {
+  SiteSetting,
+  type RegulationFile,
+} from '#domain/site-setting/site-setting.entity'
 import { TransactionContext } from '#core/transaction-context'
 
 @inject()
@@ -111,7 +114,9 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
   private async regulationOf(id: string | null): Promise<StorageModel | null> {
     if (!id) return null
 
-    return StorageModel.query({ client: this.transaction.client() }).where('id', id).first()
+    return StorageModel.query({ client: this.transaction.client() })
+      .where('id', id)
+      .first()
   }
 
   private toEntity(row: SiteSettingModel): SiteSetting {
@@ -129,7 +134,9 @@ export class SiteSettingLucidRepository extends SiteSettingRepository {
     })
   }
 
-  private toRegulationResponse(file: StorageModel | null): SiteSettingRead['regulation'] {
+  private toRegulationResponse(
+    file: StorageModel | null,
+  ): SiteSettingRead['regulation'] {
     if (!file) return null
 
     return {

@@ -21,7 +21,9 @@ export default class AdministratorMatchScoreController {
   constructor(private readonly useCase: AdministratorMatchScoreUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdministratorMatchScoreValidator)
+    const body = await context.request.validateUsing(
+      AdministratorMatchScoreValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

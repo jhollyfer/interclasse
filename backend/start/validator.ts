@@ -15,4 +15,6 @@ import { VALIDATION_MESSAGES } from '#core/validator'
  * base provider applies, which `#core/validator` installs.
  */
 RequestValidator.messagesProvider = (ctx) =>
-  VALIDATION_MESSAGES[LOCALES.find((locale) => locale === ctx.i18n.locale) ?? BASE_LOCALE]
+  VALIDATION_MESSAGES[
+    LOCALES.find((locale) => locale === ctx.i18n.locale) ?? BASE_LOCALE
+  ]

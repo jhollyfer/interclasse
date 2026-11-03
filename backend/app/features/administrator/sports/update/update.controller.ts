@@ -18,7 +18,9 @@ export default class AdministratorSportUpdateController {
   constructor(private readonly useCase: AdministratorSportUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdministratorSportUpdateValidator)
+    const body = await context.request.validateUsing(
+      AdministratorSportUpdateValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

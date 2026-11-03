@@ -61,7 +61,11 @@ export async function enrolledClassrooms(
     const enrollment = await client
       .put('/advisor/enrollments')
       .cookies(admin)
-      .json({ classroomId: body(classroom).id, sportId, studentIds: [body(student).id] })
+      .json({
+        classroomId: body(classroom).id,
+        sportId,
+        studentIds: [body(student).id],
+      })
 
     enrollment.assertStatus(200)
     ids.push(body(classroom).id)
@@ -82,7 +86,11 @@ export async function draw(client: ApiClient, admin: Session, sportId: string) {
 }
 
 /** Sport, `total` enrolled classrooms and the draw, all through the route. */
-export async function drawnBracket(client: ApiClient, admin: Session, total: number) {
+export async function drawnBracket(
+  client: ApiClient,
+  admin: Session,
+  total: number,
+) {
   const sport = await createSport(client, admin)
   const classroomIds = await enrolledClassrooms(client, admin, sport.id, total)
   const bracket = await draw(client, admin, sport.id)
@@ -97,10 +105,13 @@ export async function scoreAll(
   bracketId: string,
   phase: string,
 ) {
-  const detail = await client.get(`/administrator/brackets/${bracketId}`).cookies(admin)
+  const detail = await client
+    .get(`/administrator/brackets/${bracketId}`)
+    .cookies(admin)
 
   for (const match of body(detail).matches) {
-    if (match.phase !== phase || !match.homeTeamId || !match.awayTeamId) continue
+    if (match.phase !== phase || !match.homeTeamId || !match.awayTeamId)
+      continue
 
     const response = await client
       .put(`/administrator/matches/${match.id}/score`)
@@ -117,8 +128,12 @@ export async function scoreAll(
  */
 export async function scheduledMatch() {
   const bracket = await BracketFactory.with('sport').create()
-  const home = await TeamFactory.with('classroom').merge({ bracketId: bracket.id }).create()
-  const away = await TeamFactory.with('classroom').merge({ bracketId: bracket.id }).create()
+  const home = await TeamFactory.with('classroom')
+    .merge({ bracketId: bracket.id })
+    .create()
+  const away = await TeamFactory.with('classroom')
+    .merge({ bracketId: bracket.id })
+    .create()
   const match = await MatchFactory.merge({
     bracketId: bracket.id,
     homeTeamId: home.id,

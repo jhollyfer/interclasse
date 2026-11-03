@@ -14,10 +14,16 @@ const payload = { name: 'Vôlei de Praia', minAthletes: 2, maxAthletes: 4 }
 test.group('sports > create', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('creates the sport with the slug taken from the name', async ({ client, assert }) => {
+  test('creates the sport with the slug taken from the name', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.post('/administrator/sports').cookies(session).json(payload)
+    const response = await client
+      .post('/administrator/sports')
+      .cookies(session)
+      .json(payload)
 
     response.assertStatus(201)
     assert.isString(body(response).id)
@@ -28,7 +34,10 @@ test.group('sports > create', (group) => {
     assert.isNotNull(await Stored.sport(body(response).id))
   })
 
-  test('repeated name responds 409 pointing at the field', async ({ client, assert }) => {
+  test('repeated name responds 409 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const existing = await SportFactory.create()
 
@@ -42,13 +51,22 @@ test.group('sports > create', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('different name with the same slug is also 409', async ({ client, assert }) => {
+  test('different name with the same slug is also 409', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    await SportFactory.merge({ name: 'Volei de Praia', slug: 'volei-de-praia' }).create()
+    await SportFactory.merge({
+      name: 'Volei de Praia',
+      slug: 'volei-de-praia',
+    }).create()
 
     // Accent and case vanish in the slug: both sports would compete for the same
     // address on the site.
-    const response = await client.post('/administrator/sports').cookies(session).json(payload)
+    const response = await client
+      .post('/administrator/sports')
+      .cookies(session)
+      .json(payload)
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'SPORT_ALREADY_EXISTS')
@@ -68,7 +86,10 @@ test.group('sports > create', (group) => {
     assert.isNull(await Stored.sportByName(payload.name))
   })
 
-  test('payload without the required fields responds 422', async ({ client, assert }) => {
+  test('payload without the required fields responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -81,10 +102,16 @@ test.group('sports > create', (group) => {
     assert.property(body(response).errors, 'minAthletes')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const anonymous = await client.post('/administrator/sports').json(payload)
     const advisor = await authenticateAsAdvisor(client)
-    const forbidden = await client.post('/administrator/sports').cookies(advisor).json(payload)
+    const forbidden = await client
+      .post('/administrator/sports')
+      .cookies(advisor)
+      .json(payload)
 
     anonymous.assertStatus(401)
     forbidden.assertStatus(403)

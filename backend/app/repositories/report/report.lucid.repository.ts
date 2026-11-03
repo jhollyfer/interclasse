@@ -22,16 +22,23 @@ export class ReportLucidRepository extends ReportRepository {
 
   async summarize(): Promise<AdministratorReportShowResponse> {
     const client = this.transaction.client()
-    const [classrooms, bySport, enrollments, sports, matches] = await Promise.all([
-      this.classrooms(),
-      this.sports(),
-      client.from('enrollments').count('* as total').first(),
-      client.from('sports').count('* as total').first(),
-      client.from('matches').select('status').count('* as total').groupBy('status'),
-    ])
+    const [classrooms, bySport, enrollments, sports, matches] =
+      await Promise.all([
+        this.classrooms(),
+        this.sports(),
+        client.from('enrollments').count('* as total').first(),
+        client.from('sports').count('* as total').first(),
+        client
+          .from('matches')
+          .select('status')
+          .count('* as total')
+          .groupBy('status'),
+      ])
 
     const played = matches.find((row) => row.status === MATCH_STATUS.FINISHED)
-    const scheduled = matches.find((row) => row.status === MATCH_STATUS.SCHEDULED)
+    const scheduled = matches.find(
+      (row) => row.status === MATCH_STATUS.SCHEDULED,
+    )
 
     return {
       totals: {
@@ -44,7 +51,9 @@ export class ReportLucidRepository extends ReportRepository {
         matchesScheduled: Number(scheduled?.total ?? 0),
       },
       byCategory: CATEGORIES.map((category) => {
-        const rows = classrooms.filter((classroom) => classroom.category === category)
+        const rows = classrooms.filter(
+          (classroom) => classroom.category === category,
+        )
 
         return {
           category,
@@ -58,7 +67,10 @@ export class ReportLucidRepository extends ReportRepository {
     }
   }
 
-  private sum(rows: ReadonlyArray<ClassroomRow>, key: 'students' | 'athletes'): number {
+  private sum(
+    rows: ReadonlyArray<ClassroomRow>,
+    key: 'students' | 'athletes',
+  ): number {
     return rows.reduce((total, row) => total + row[key], 0)
   }
 
@@ -77,7 +89,11 @@ export class ReportLucidRepository extends ReportRepository {
     }> = await client
       .from('classrooms')
       .leftJoin('users as advisors', 'advisors.id', 'classrooms.advisor_id')
-      .leftJoin('users as representatives', 'representatives.id', 'classrooms.representative_id')
+      .leftJoin(
+        'users as representatives',
+        'representatives.id',
+        'classrooms.representative_id',
+      )
       .leftJoin('students', 'students.classroom_id', 'classrooms.id')
       .leftJoin('enrollments', 'enrollments.student_id', 'students.id')
       .groupBy('classrooms.id', 'advisors.name', 'representatives.name')

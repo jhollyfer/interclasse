@@ -60,7 +60,10 @@ export function errorComponentName(status: number, codes: string[]): string {
 }
 
 export function errorSchema(status: number, codes: string[]): SchemaObject {
-  const code: SchemaObject = { type: 'string', description: 'Machine identifier of the failure.' }
+  const code: SchemaObject = {
+    type: 'string',
+    description: 'Machine identifier of the failure.',
+  }
 
   if (codes.length > 0) {
     code.enum = [...codes].sort()
@@ -73,13 +76,17 @@ export function errorSchema(status: number, codes: string[]): SchemaObject {
   return {
     type: 'object',
     properties: {
-      message: { type: 'string', description: 'Message in Portuguese, displayable to the user.' },
+      message: {
+        type: 'string',
+        description: 'Message in Portuguese, displayable to the user.',
+      },
       status: { type: 'integer', enum: [status] },
       code,
       errors: {
         type: 'object',
         additionalProperties: { type: 'string' },
-        description: 'Message per field, when the failure is attributable to payload fields.',
+        description:
+          'Message per field, when the failure is attributable to payload fields.',
       },
     },
     required,

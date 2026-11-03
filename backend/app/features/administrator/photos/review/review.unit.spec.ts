@@ -8,7 +8,11 @@ import AdministratorPhotoReviewUseCase from './review.use-case.ts'
 import { Photo, PHOTO_SENDER } from '#domain/photo/photo.entity'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
+import {
+  memoryAuthor,
+  memoryPhotos,
+  memoryStorage,
+} from '#tests/photos-fixtures'
 
 async function setup() {
   const storage = memoryStorage()
@@ -24,13 +28,17 @@ async function setup() {
   })
   if (created.isLeft()) throw new Error('invalid arrangement')
   await photos.save(created.value)
-  const useCase = await makeWithMemory(AdministratorPhotoReviewUseCase, [[PhotoRepository, photos]])
+  const useCase = await makeWithMemory(AdministratorPhotoReviewUseCase, [
+    [PhotoRepository, photos],
+  ])
 
   return { photo: created.value, admin, useCase }
 }
 
 test.group('administrator/photos > review (unit)', () => {
-  test('approves and then rejects: the decision can be redone', async ({ assert }) => {
+  test('approves and then rejects: the decision can be redone', async ({
+    assert,
+  }) => {
     const { photo, admin, useCase } = await setup()
 
     const approved = await useCase.execute({
@@ -44,7 +52,10 @@ test.group('administrator/photos > review (unit)', () => {
       actor: admin,
     })
 
-    assert.deepInclude(approved.value, { status: PHOTO_STATUS.APPROVED, reviewedById: admin.id })
+    assert.deepInclude(approved.value, {
+      status: PHOTO_STATUS.APPROVED,
+      reviewedById: admin.id,
+    })
     assert.deepInclude(rejected.value, { status: PHOTO_STATUS.REJECTED })
   })
 

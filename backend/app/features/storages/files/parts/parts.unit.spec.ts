@@ -68,7 +68,9 @@ test.group('storages/files > parts (unit)', () => {
     assert.deepEqual(plan.parts, [])
   })
 
-  test('multipart re-signs only the parts that are missing', async ({ assert }) => {
+  test('multipart re-signs only the parts that are missing', async ({
+    assert,
+  }) => {
     const { storages, multipart, useCase } = await setup()
     await storages.save(pendingFile({ uploadId: 'up' }))
     multipart.withUploaded('up', [{ partNumber: 1, size: 10, etag: 'a' }])

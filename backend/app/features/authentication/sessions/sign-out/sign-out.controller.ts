@@ -27,7 +27,8 @@ export default class AuthenticationSessionSignOutController {
 
     const result = await this.useCase.execute({
       actor,
-      accessTokenId: context.auth.user?.currentAccessToken?.identifier.toString(),
+      accessTokenId:
+        context.auth.user?.currentAccessToken?.identifier.toString(),
       refreshToken,
     })
 

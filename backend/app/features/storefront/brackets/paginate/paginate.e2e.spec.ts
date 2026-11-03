@@ -8,9 +8,18 @@ import { body, resetDatabase } from '#tests/http-fixtures'
 test.group('storefront brackets > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('without a session, by sport and then by category', async ({ client, assert }) => {
-    const futsal = await SportFactory.merge({ name: 'Futsal', slug: 'futsal' }).create()
-    const athletics = await SportFactory.merge({ name: 'Atletismo', slug: 'atletismo' }).create()
+  test('without a session, by sport and then by category', async ({
+    client,
+    assert,
+  }) => {
+    const futsal = await SportFactory.merge({
+      name: 'Futsal',
+      slug: 'futsal',
+    }).create()
+    const athletics = await SportFactory.merge({
+      name: 'Atletismo',
+      slug: 'atletismo',
+    }).create()
     const futsalF2 = await BracketFactory.merge({
       sportId: futsal.id,
       category: CATEGORY.F2,
@@ -19,7 +28,9 @@ test.group('storefront brackets > paginate', (group) => {
       sportId: futsal.id,
       category: CATEGORY.F1,
     }).create()
-    const athleticsF1 = await BracketFactory.merge({ sportId: athletics.id }).create()
+    const athleticsF1 = await BracketFactory.merge({
+      sportId: athletics.id,
+    }).create()
 
     const response = await client.get('/storefront/brackets')
 
@@ -34,8 +45,14 @@ test.group('storefront brackets > paginate', (group) => {
 
   test('?sportId and ?category narrow the list', async ({ client, assert }) => {
     const sport = await SportFactory.create()
-    const target = await BracketFactory.merge({ sportId: sport.id, category: CATEGORY.F2 }).create()
-    await BracketFactory.merge({ sportId: sport.id, category: CATEGORY.F1 }).create()
+    const target = await BracketFactory.merge({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    }).create()
+    await BracketFactory.merge({
+      sportId: sport.id,
+      category: CATEGORY.F1,
+    }).create()
     await BracketFactory.with('sport').merge({ category: CATEGORY.F2 }).create()
 
     const response = await client

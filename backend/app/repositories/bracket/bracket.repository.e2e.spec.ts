@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
-import { BRACKET_STATUS, CATEGORY, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
+import {
+  BRACKET_STATUS,
+  CATEGORY,
+  MATCH_PHASE,
+  MATCH_STATUS,
+} from '@interclasse/shared'
 
 import { resetDatabase } from '#tests/http-fixtures'
 import {
@@ -72,11 +77,16 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const [match] = bracket.snapshot().matches
 
       const byMatch = await harness.repository.findByMatchId(match?.id ?? '')
-      const bySport = await harness.repository.findBySportAndCategory(sport.id, CATEGORY.F2)
+      const bySport = await harness.repository.findBySportAndCategory(
+        sport.id,
+        CATEGORY.F2,
+      )
 
       assert.equal(byMatch?.id, bracket.id)
       assert.equal(bySport?.id, bracket.id)
-      assert.isNull(await harness.repository.findBySportAndCategory(sport.id, CATEGORY.F1))
+      assert.isNull(
+        await harness.repository.findBySportAndCategory(sport.id, CATEGORY.F1),
+      )
       assert.isNull(await harness.repository.findByMatchId(randomUUID()))
     })
 
@@ -86,9 +96,14 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B', '8º C', '8º D'])
       const matches = bracket.snapshot().matches
-      const semi = matches.find((m) => m.phase === MATCH_PHASE.SEMI && m.position === 0)
-      const other = matches.find((m) => m.phase === MATCH_PHASE.SEMI && m.position === 1)
-      if (!semi || !other) throw new Error('semifinals missing from the arrangement')
+      const semi = matches.find(
+        (m) => m.phase === MATCH_PHASE.SEMI && m.position === 0,
+      )
+      const other = matches.find(
+        (m) => m.phase === MATCH_PHASE.SEMI && m.position === 1,
+      )
+      if (!semi || !other)
+        throw new Error('semifinals missing from the arrangement')
 
       bracket.score(semi.id, { homeScore: 3, awayScore: 1 }, LATER)
       await harness.repository.save(bracket)
@@ -133,7 +148,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const match = bracket.snapshot().matches[0]
       if (!match) throw new Error('match missing from the arrangement')
 
-      bracket.schedule(match.id, { scheduledAt: LATER, location: 'Quadra 1' }, LATER)
+      bracket.schedule(
+        match.id,
+        { scheduledAt: LATER, location: 'Quadra 1' },
+        LATER,
+      )
       await harness.repository.save(bracket)
       const found = await savedOf(harness, bracket.id)
       const saved = found?.matches[0]
@@ -142,7 +161,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(saved?.location, 'Quadra 1')
     })
 
-    test('delete takes the bracket with teams and matches', async ({ assert }) => {
+    test('delete takes the bracket with teams and matches', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { bracket } = await drawn(harness, ['8º A', '8º B'])
 
@@ -161,11 +182,24 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const short = classroomView('8º B')
       await harness.classroom(full)
       await harness.classroom(short)
-      await harness.student({ id: randomUUID(), name: 'A1', classroomId: full.id }, [sport.id])
-      await harness.student({ id: randomUUID(), name: 'A2', classroomId: full.id }, [sport.id])
-      await harness.student({ id: randomUUID(), name: 'B1', classroomId: short.id }, [sport.id])
+      await harness.student(
+        { id: randomUUID(), name: 'A1', classroomId: full.id },
+        [sport.id],
+      )
+      await harness.student(
+        { id: randomUUID(), name: 'A2', classroomId: full.id },
+        [sport.id],
+      )
+      await harness.student(
+        { id: randomUUID(), name: 'B1', classroomId: short.id },
+        [sport.id],
+      )
 
-      const ids = await harness.repository.eligibleClassroomIds(sport.id, CATEGORY.F2, 2)
+      const ids = await harness.repository.eligibleClassroomIds(
+        sport.id,
+        CATEGORY.F2,
+        2,
+      )
 
       assert.deepEqual(ids, [full.id])
     })
@@ -180,9 +214,18 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const b = classroomView('9º B', 9)
       await harness.classroom(a)
       await harness.classroom(b)
-      await harness.student({ id: randomUUID(), name: 'A1', classroomId: a.id }, [sport.id])
-      await harness.student({ id: randomUUID(), name: 'A2', classroomId: a.id }, [sport.id])
-      await harness.student({ id: randomUUID(), name: 'B1', classroomId: b.id }, [])
+      await harness.student(
+        { id: randomUUID(), name: 'A1', classroomId: a.id },
+        [sport.id],
+      )
+      await harness.student(
+        { id: randomUUID(), name: 'A2', classroomId: a.id },
+        [sport.id],
+      )
+      await harness.student(
+        { id: randomUUID(), name: 'B1', classroomId: b.id },
+        [],
+      )
 
       const preview = await harness.repository.preview(sport.id, CATEGORY.F2)
 
@@ -220,7 +263,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.repository.detail(randomUUID()))
     })
 
-    test('paginate filters and sorts by newest or by sport name', async ({ assert }) => {
+    test('paginate filters and sorts by newest or by sport name', async ({
+      assert,
+    }) => {
       const harness = await make()
       await drawn(harness, ['8º A', '8º B'], 'Vôlei')
       await drawn(harness, ['9º A', '9º B'], 'Basquete')
@@ -249,7 +294,12 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert,
     }) => {
       const harness = await make()
-      const { classrooms } = await drawn(harness, ['8º A', '8º B', '8º C', '8º D'])
+      const { classrooms } = await drawn(harness, [
+        '8º A',
+        '8º B',
+        '8º C',
+        '8º D',
+      ])
 
       const all = await harness.repository.paginateMatches({
         page: 1,
@@ -266,11 +316,10 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       // Two semifinals with both teams; the final does not have an opponent yet.
       assert.equal(all.meta.total, 2)
       assert.equal(ofClassroom.meta.total, 1)
-      assert.deepEqual(Object.keys(all.data[0]?.homeTeam.classroom ?? {}).sort(), [
-        'category',
-        'id',
-        'name',
-      ])
+      assert.deepEqual(
+        Object.keys(all.data[0]?.homeTeam.classroom ?? {}).sort(),
+        ['category', 'id', 'name'],
+      )
     })
 
     test('findMatchResponse brings the match with the whole classrooms and the bracket', async ({
@@ -280,11 +329,16 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const { bracket, sport } = await drawn(harness, ['8º A', '8º B'])
       const match = bracket.snapshot().matches[0]
 
-      const response = await harness.repository.findMatchResponse(match?.id ?? '')
+      const response = await harness.repository.findMatchResponse(
+        match?.id ?? '',
+      )
 
       assert.equal(response?.bracket.sport.name, sport.name)
       assert.sameMembers(
-        [response?.homeTeam?.classroom.name, response?.awayTeam?.classroom.name],
+        [
+          response?.homeTeam?.classroom.name,
+          response?.awayTeam?.classroom.name,
+        ],
         ['8º A', '8º B'],
       )
       assert.property(response?.homeTeam?.classroom, 'grade')
@@ -295,21 +349,27 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert,
     }) => {
       const harness = await make()
-      const { bracket, sport, classrooms } = await drawn(harness, ['8º A', '8º B'])
+      const { bracket, sport, classrooms } = await drawn(harness, [
+        '8º A',
+        '8º B',
+      ])
       const home = classrooms[0]
       if (!home) throw new Error('classroom missing from the arrangement')
       await harness.student(
         { id: randomUUID(), name: 'Aaa fora da lista', classroomId: home.id },
         [],
       )
-      await harness.student({ id: randomUUID(), name: 'Zzz na lista', classroomId: home.id }, [
-        sport.id,
-      ])
+      await harness.student(
+        { id: randomUUID(), name: 'Zzz na lista', classroomId: home.id },
+        [sport.id],
+      )
       const match = bracket.snapshot().matches[0]
 
       const athletes = await harness.repository.matchAthletes(match?.id ?? '')
 
-      const team = athletes?.teams.find((candidate) => candidate.classroomId === home.id)
+      const team = athletes?.teams.find(
+        (candidate) => candidate.classroomId === home.id,
+      )
       assert.lengthOf(athletes?.teams ?? [], 2)
       assert.deepEqual(
         team?.students.map((student) => [student.name, student.enrolled]),

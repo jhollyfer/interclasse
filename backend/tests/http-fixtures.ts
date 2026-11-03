@@ -48,13 +48,16 @@ export async function authenticate(
   email: string,
   password: string,
 ): Promise<Session> {
-  const response = await client.post('/authentication/sign-in').json({ email, password })
+  const response = await client
+    .post('/authentication/sign-in')
+    .json({ email, password })
 
   response.assertStatus(204)
 
   const access = response.cookie(COOKIE_TOKEN.ACCESS)
   const refresh = response.cookie(COOKIE_TOKEN.REFRESH)
-  if (!access || !refresh) throw new Error('session cookie missing from the sign-in response')
+  if (!access || !refresh)
+    throw new Error('session cookie missing from the sign-in response')
 
   return {
     [COOKIE_TOKEN.ACCESS]: access.value,
@@ -63,7 +66,9 @@ export async function authenticate(
 }
 
 /** Shortcut to the seeder administrator's session, which is the most used. */
-export function authenticateAsAdministrator(client: ApiClient): Promise<Session> {
+export function authenticateAsAdministrator(
+  client: ApiClient,
+): Promise<Session> {
   return authenticate(client, ADMINISTRATOR.email, ADMINISTRATOR.password)
 }
 
@@ -72,7 +77,9 @@ export function authenticateAsAdministrator(client: ApiClient): Promise<Session>
  * classroom and nothing of the administrative panel. It is the other side of every
  * panel permission assertion.
  */
-export async function authenticateAsAdvisor(client: ApiClient): Promise<Session> {
+export async function authenticateAsAdvisor(
+  client: ApiClient,
+): Promise<Session> {
   const { session } = await signInWithFactory(client)
 
   return session
@@ -90,7 +97,10 @@ export async function signInWithFactory(
   if (state) factory.apply(state)
   const user = await factory.create()
 
-  return { user, session: await authenticate(client, user.email, FACTORY_PASSWORD) }
+  return {
+    user,
+    session: await authenticate(client, user.email, FACTORY_PASSWORD),
+  }
 }
 
 /**

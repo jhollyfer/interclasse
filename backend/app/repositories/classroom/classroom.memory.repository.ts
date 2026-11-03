@@ -30,7 +30,11 @@ import { MemoryPagination } from '#core/memory-pagination'
 /** The sign of the comparison by sort direction. */
 const SIGN = { asc: 1, desc: -1 } satisfies Record<SortDirection, number>
 
-type Totals = { readonly students: number; readonly athletes: number; readonly sports: number }
+type Totals = {
+  readonly students: number
+  readonly athletes: number
+  readonly sports: number
+}
 
 /**
  * The second real implementation, for the use case unit test
@@ -40,7 +44,10 @@ type Totals = { readonly students: number; readonly athletes: number; readonly s
 export class ClassroomMemoryRepository extends ClassroomRepository {
   private readonly rows = new Map<string, ClassroomProps>()
   /** The accounts the test arranges: what the `users` table would have. */
-  private readonly accounts = new Map<string, AdministratorClassroomPersonResponse>()
+  private readonly accounts = new Map<
+    string,
+    AdministratorClassroomPersonResponse
+  >()
   private readonly totals = new Map<string, Totals>()
   private readonly competing = new Set<string>()
 
@@ -53,7 +60,11 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
   /** Test arrangement: the account was archived. */
   withArchivedAccount(accountId: string): this {
     const account = this.accounts.get(accountId)
-    if (account) this.accounts.set(accountId, { ...account, deletedAt: '2026-10-29T12:00:00.000Z' })
+    if (account)
+      this.accounts.set(accountId, {
+        ...account,
+        deletedAt: '2026-10-29T12:00:00.000Z',
+      })
     return this
   }
 
@@ -87,13 +98,17 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
   }
 
   async findOfRepresentative(accountId: string): Promise<Classroom | null> {
-    const props = [...this.rows.values()].find((row) => row.representativeId === accountId)
+    const props = [...this.rows.values()].find(
+      (row) => row.representativeId === accountId,
+    )
     if (!props) return null
 
     return Classroom.restore(structuredClone(props))
   }
 
-  async findDetail(id: string): Promise<AdministratorClassroomShowResponse | null> {
+  async findDetail(
+    id: string,
+  ): Promise<AdministratorClassroomShowResponse | null> {
     const props = this.rows.get(id)
     if (!props) return null
 
@@ -101,14 +116,19 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
   }
 
   async existsByName(name: string, exceptId?: string): Promise<boolean> {
-    return [...this.rows.values()].some((row) => row.id !== exceptId && row.name === name)
+    return [...this.rows.values()].some(
+      (row) => row.id !== exceptId && row.name === name,
+    )
   }
 
   async peopleFacts(
     links: ClassroomLinks,
     exceptClassroomId?: string,
   ): Promise<ClassroomPeopleFacts> {
-    const facts: { advisor?: ClassroomLinkFacts; representative?: ClassroomLinkFacts } = {}
+    const facts: {
+      advisor?: ClassroomLinkFacts
+      representative?: ClassroomLinkFacts
+    } = {}
 
     if (links.advisorId)
       facts.advisor = this.linkFacts(
@@ -134,10 +154,15 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
 
   async save(classroom: Classroom): Promise<Either<ClassroomError, void>> {
     const snapshot = structuredClone(classroom.snapshot())
-    const others = [...this.rows.values()].filter((row) => row.id !== snapshot.id)
+    const others = [...this.rows.values()].filter(
+      (row) => row.id !== snapshot.id,
+    )
 
     // The three database `unique`s: advisor, representative and name.
-    if (snapshot.advisorId && others.some((row) => row.advisorId === snapshot.advisorId))
+    if (
+      snapshot.advisorId &&
+      others.some((row) => row.advisorId === snapshot.advisorId)
+    )
       return left({ code: 'ADVISOR_TAKEN' })
     if (
       snapshot.representativeId &&
@@ -175,10 +200,18 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     const all = [...this.rows.values()]
       .filter((row) => !criteria.category || row.category === criteria.category)
       .filter((row) => !search || row.name.toLowerCase().includes(search))
-      .sort((a, b) => sign * String(a[criteria.sort]).localeCompare(String(b[criteria.sort])))
+      .sort(
+        (a, b) =>
+          sign *
+          String(a[criteria.sort]).localeCompare(String(b[criteria.sort])),
+      )
 
     return this.page(all, criteria, (props) => {
-      const totals = this.totals.get(props.id) ?? { students: 0, athletes: 0, sports: 0 }
+      const totals = this.totals.get(props.id) ?? {
+        students: 0,
+        athletes: 0,
+        sports: 0,
+      }
 
       return {
         ...this.toResponse(props),
@@ -203,7 +236,9 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
 
   /** The administrator reaches all; the others, the classroom they advise. */
   private reaches(actor: Actor, props: ClassroomProps): boolean {
-    return actor.role === USER_ROLE.ADMINISTRATOR || props.advisorId === actor.id
+    return (
+      actor.role === USER_ROLE.ADMINISTRATOR || props.advisorId === actor.id
+    )
   }
 
   private linkFacts(
@@ -213,7 +248,9 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     exceptClassroomId?: string,
   ): ClassroomLinkFacts {
     const account = this.accounts.get(accountId)
-    const exists = Boolean(account && account.role === role && account.deletedAt === null)
+    const exists = Boolean(
+      account && account.role === role && account.deletedAt === null,
+    )
     const taken = [...this.rows.values()].some(
       (row) => row.id !== exceptClassroomId && row[column] === accountId,
     )
@@ -234,7 +271,9 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     }
   }
 
-  private toResponse(props: ClassroomProps): AdministratorClassroomShowResponse {
+  private toResponse(
+    props: ClassroomProps,
+  ): AdministratorClassroomShowResponse {
     return {
       id: props.id,
       name: props.name,
@@ -249,7 +288,9 @@ export class ClassroomMemoryRepository extends ClassroomRepository {
     }
   }
 
-  private accountOf(accountId: string | null): AdministratorClassroomPersonResponse | null {
+  private accountOf(
+    accountId: string | null,
+  ): AdministratorClassroomPersonResponse | null {
     if (!accountId) return null
 
     return this.accounts.get(accountId) ?? null

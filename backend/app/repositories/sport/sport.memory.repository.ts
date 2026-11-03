@@ -45,7 +45,11 @@ export class SportMemoryRepository extends SportRepository {
     return Sport.restore(structuredClone(props))
   }
 
-  async existsByNameOrSlug(name: string, slug: string, exceptId?: string): Promise<boolean> {
+  async existsByNameOrSlug(
+    name: string,
+    slug: string,
+    exceptId?: string,
+  ): Promise<boolean> {
     return [...this.rows.values()].some(
       (row) => row.id !== exceptId && (row.name === name || row.slug === slug),
     )
@@ -62,7 +66,9 @@ export class SportMemoryRepository extends SportRepository {
   async save(sport: Sport): Promise<Either<SportError, void>> {
     const snapshot = structuredClone(sport.snapshot())
     const taken = [...this.rows.values()].some(
-      (row) => row.id !== snapshot.id && (row.name === snapshot.name || row.slug === snapshot.slug),
+      (row) =>
+        row.id !== snapshot.id &&
+        (row.name === snapshot.name || row.slug === snapshot.slug),
     )
     // The name and slug `unique`s, as the database guarantees them.
     if (taken) return left({ code: 'SPORT_ALREADY_EXISTS' })
@@ -76,12 +82,18 @@ export class SportMemoryRepository extends SportRepository {
     this.rows.delete(sport.id)
   }
 
-  async paginate(criteria: SportListCriteria): Promise<Paginated<AdministratorSportShowResponse>> {
+  async paginate(
+    criteria: SportListCriteria,
+  ): Promise<Paginated<AdministratorSportShowResponse>> {
     const search = criteria.search?.toLowerCase()
     const sign = SIGN[criteria.direction]
     const all = [...this.rows.values()]
       .filter((row) => !search || row.name.toLowerCase().includes(search))
-      .sort((a, b) => sign * String(a[criteria.sort]).localeCompare(String(b[criteria.sort])))
+      .sort(
+        (a, b) =>
+          sign *
+          String(a[criteria.sort]).localeCompare(String(b[criteria.sort])),
+      )
     const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)
 
     return {

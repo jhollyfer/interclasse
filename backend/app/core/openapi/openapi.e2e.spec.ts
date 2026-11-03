@@ -21,7 +21,10 @@ import openapi from '#config/openapi'
  */
 
 type Documento = {
-  paths: Record<string, Record<string, { operationId: string; responses: Record<string, unknown> }>>
+  paths: Record<
+    string,
+    Record<string, { operationId: string; responses: Record<string, unknown> }>
+  >
 }
 
 let document: Documento | undefined
@@ -29,7 +32,9 @@ let document: Documento | undefined
 async function readDocument(): Promise<Documento> {
   if (document) return document
 
-  const read: Documento = JSON.parse(await readFile(app.makePath('openapi.json'), 'utf-8'))
+  const read: Documento = JSON.parse(
+    await readFile(app.makePath('openapi.json'), 'utf-8'),
+  )
   document = read
   return read
 }
@@ -50,7 +55,8 @@ function registeredOperations(): Array<{ path: string; method: string }> {
   for (const route of Object.values(router.toJSON()).flat()) {
     const path = toOpenApiPath(route.pattern)
 
-    if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern)) continue
+    if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern))
+      continue
 
     for (const method of route.methods) {
       if (method === 'HEAD') continue
@@ -65,7 +71,9 @@ function registeredOperations(): Array<{ path: string; method: string }> {
 test.group('documentation > the document describes the router', () => {
   test('every registered route is in the document', async ({ assert }) => {
     const { paths } = await readDocument()
-    const missing = registeredOperations().filter(({ path, method }) => !paths[path]?.[method])
+    const missing = registeredOperations().filter(
+      ({ path, method }) => !paths[path]?.[method],
+    )
 
     // The message lists what is missing instead of just failing: whoever breaks this
     // by renaming a validator needs to know which operation vanished, and `--check`
@@ -79,7 +87,9 @@ test.group('documentation > the document describes the router', () => {
     )
   })
 
-  test('the document does not describe a route that does not exist', async ({ assert }) => {
+  test('the document does not describe a route that does not exist', async ({
+    assert,
+  }) => {
     const { paths } = await readDocument()
     const registered = new Set(
       registeredOperations().map(({ path, method }) => `${method} ${path}`),
@@ -89,14 +99,21 @@ test.group('documentation > the document describes the router', () => {
 
     for (const [path, operations] of Object.entries(paths)) {
       for (const method of Object.keys(operations)) {
-        if (!registered.has(`${method} ${path}`)) extra.push(`${method} ${path}`)
+        if (!registered.has(`${method} ${path}`))
+          extra.push(`${method} ${path}`)
       }
     }
 
-    assert.deepEqual(extra, [], `the document promises what the router does not serve: ${extra}`)
+    assert.deepEqual(
+      extra,
+      [],
+      `the document promises what the router does not serve: ${extra}`,
+    )
   })
 
-  test('no operation is left without a described response', async ({ assert }) => {
+  test('no operation is left without a described response', async ({
+    assert,
+  }) => {
     const { paths } = await readDocument()
     const silent: string[] = []
 
@@ -105,13 +122,19 @@ test.group('documentation > the document describes the router', () => {
         // Only success responses count: the failure ones the generator builds
         // on its own from the route protection, so their being there proves nothing
         // about the contract of whoever called and succeeded.
-        const success = Object.keys(operation.responses).filter((status) => Number(status) < 400)
+        const success = Object.keys(operation.responses).filter(
+          (status) => Number(status) < 400,
+        )
 
         if (success.length === 0) silent.push(`${method.toUpperCase()} ${path}`)
       }
     }
 
-    assert.deepEqual(silent, [], `operations with no success response described: ${silent}`)
+    assert.deepEqual(
+      silent,
+      [],
+      `operations with no success response described: ${silent}`,
+    )
   })
 
   test('each operation identifier is unique', async ({ assert }) => {
@@ -126,7 +149,10 @@ test.group('documentation > the document describes the router', () => {
         // `operationId` is what becomes a function name in a generated client. Two
         // equal ones do not break the document, they break the client - silently,
         // overwriting one of the two.
-        if (previous) repeated.push(`${operation.operationId}: ${previous} e ${method} ${path}`)
+        if (previous)
+          repeated.push(
+            `${operation.operationId}: ${previous} e ${method} ${path}`,
+          )
 
         seen.set(operation.operationId, `${method} ${path}`)
       }

@@ -36,7 +36,10 @@ test.group('sports > paginate', (group) => {
 
   test('?sort e ?direction trocam a ordem', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    await SportFactory.merge([{ name: 'Futsal' }, { name: 'Vôlei' }]).createMany(2)
+    await SportFactory.merge([
+      { name: 'Futsal' },
+      { name: 'Vôlei' },
+    ]).createMany(2)
 
     const response = await client
       .get('/administrator/sports')
@@ -48,7 +51,10 @@ test.group('sports > paginate', (group) => {
     assert.equal(body(response).data[1].name, 'Futsal')
   })
 
-  test('?search narrows by name, case-insensitive', async ({ client, assert }) => {
+  test('?search narrows by name, case-insensitive', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const futsal = await SportFactory.merge({ name: 'Futsal' }).create()
     await SportFactory.merge({ name: 'Vôlei' }).create()
@@ -78,18 +84,26 @@ test.group('sports > paginate', (group) => {
     assert.equal(body(response).meta.lastPage, 2)
   })
 
-  test('?sort outside the closed tuple responds 422', async ({ client, assert }) => {
+  test('?sort outside the closed tuple responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     // In the URL, not in `.qs()`: the Tuyau registry would not let the invalid
     // value compile.
-    const response = await client.get('/administrator/sports?sort=slug').cookies(session)
+    const response = await client
+      .get('/administrator/sports?sort=slug')
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'sort')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const anonymous = await client.get('/administrator/sports')
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client.get('/administrator/sports').cookies(advisor)

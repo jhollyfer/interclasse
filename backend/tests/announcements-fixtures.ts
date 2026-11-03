@@ -11,7 +11,10 @@ import { AnnouncementFactory } from '#database/factories/announcement.factory'
  */
 export async function announcementTimeline() {
   const pinned = await AnnouncementFactory.apply('pinned')
-    .merge({ title: 'Fixado antigo', createdAt: DateTime.now().minus({ days: 3 }) })
+    .merge({
+      title: 'Fixado antigo',
+      createdAt: DateTime.now().minus({ days: 3 }),
+    })
     .create()
   const older = await AnnouncementFactory.merge({
     title: 'Intermediário',

@@ -12,7 +12,9 @@ import { introspect } from './introspect.ts'
 const FEATURES = join(import.meta.dirname, '../../app/features')
 
 test.group('scripts > openapi > introspect (unit)', () => {
-  test('reads from the translator the code the use-case fact produces', async ({ assert }) => {
+  test('reads from the translator the code the use-case fact produces', async ({
+    assert,
+  }) => {
     const found = await introspect(
       join(FEATURES, 'administrator/sports/update/update.controller.ts'),
     )
@@ -22,13 +24,23 @@ test.group('scripts > openapi > introspect (unit)', () => {
     assert.include(codes, 'SPORT_INVALID_LIMITS')
   })
 
-  test('follows the use case `_shared` base to the translator', async ({ assert }) => {
-    const found = await introspect(join(FEATURES, 'advisor/photos/create/create.controller.ts'))
+  test('follows the use case `_shared` base to the translator', async ({
+    assert,
+  }) => {
+    const found = await introspect(
+      join(FEATURES, 'advisor/photos/create/create.controller.ts'),
+    )
     const errors = found?.errors ?? []
 
-    assert.isTrue(errors.some((error) => error.code === 'PHOTO_NOT_IMAGE' && error.status === 422))
     assert.isTrue(
-      errors.some((error) => error.code === 'STORAGE_NOT_FOUND' && error.status === 422),
+      errors.some(
+        (error) => error.code === 'PHOTO_NOT_IMAGE' && error.status === 422,
+      ),
+    )
+    assert.isTrue(
+      errors.some(
+        (error) => error.code === 'STORAGE_NOT_FOUND' && error.status === 422,
+      ),
     )
   })
 
@@ -36,7 +48,9 @@ test.group('scripts > openapi > introspect (unit)', () => {
     const found = await introspect(
       join(FEATURES, 'administrator/sports/create/create.controller.ts'),
     )
-    const conflict = found?.errors.find((error) => error.code === 'SPORT_ALREADY_EXISTS')
+    const conflict = found?.errors.find(
+      (error) => error.code === 'SPORT_ALREADY_EXISTS',
+    )
 
     assert.isString(conflict?.message)
     assert.notInclude(conflict?.message ?? '', 'sports.')

@@ -24,13 +24,18 @@ import { dirname, join, resolve } from 'node:path'
 const BACKEND = resolve(dirname(new URL(import.meta.url).pathname), '..')
 const ROOT = resolve(BACKEND, '..')
 
-const upstream = process.env.MAIYU_PATTERN_DIR ?? resolve(ROOT, '..', 'maiyu-pattern')
+const upstream =
+  process.env.MAIYU_PATTERN_DIR ?? resolve(ROOT, '..', 'maiyu-pattern')
 const script = join(upstream, 'scripts', 'sync-to-project.mjs')
 
 if (!existsSync(script)) {
-  console.log(`sync:check (isolated): upstream not found at ${upstream}; nothing compared.`)
+  console.log(
+    `sync:check (isolated): upstream not found at ${upstream}; nothing compared.`,
+  )
   process.exit(0)
 }
 
-const result = spawnSync(process.execPath, [script, ROOT, '--check'], { stdio: 'inherit' })
+const result = spawnSync(process.execPath, [script, ROOT, '--check'], {
+  stdio: 'inherit',
+})
 process.exitCode = result.status ?? 1

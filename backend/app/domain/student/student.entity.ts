@@ -57,7 +57,9 @@ export class Student {
   }
 
   /** Removing from the classroom refuses if the student plays in an already drawn sport. */
-  remove(context: { readonly inDrawnSport: boolean }): Either<StudentError, Student> {
+  remove(context: {
+    readonly inDrawnSport: boolean
+  }): Either<StudentError, Student> {
     if (context.inDrawnSport) return left({ code: 'STUDENT_IN_COMPETITION' })
 
     return right(this)

@@ -29,12 +29,14 @@ export default class OpenapiGenerate extends BaseCommand {
   static override options: CommandOptions = { startApp: true }
 
   @flags.boolean({
-    description: 'Writes nothing: compares with the file on disk and fails if it differs',
+    description:
+      'Writes nothing: compares with the file on disk and fails if it differs',
   })
   declare check: boolean
 
   @flags.boolean({
-    description: 'Treats warnings as errors. Use when every route already has `static docs`',
+    description:
+      'Treats warnings as errors. Use when every route already has `static docs`',
   })
   declare strict: boolean
 
@@ -47,10 +49,14 @@ export default class OpenapiGenerate extends BaseCommand {
 
     for (const warning of warnings) this.logger.warning(warning)
 
-    this.logger.info(`${documented} of ${total} operations with the response described.`)
+    this.logger.info(
+      `${documented} of ${total} operations with the response described.`,
+    )
 
     if (this.strict && warnings.length > 0) {
-      this.logger.error(`${warnings.length} warning(s) with --strict. Nothing was written.`)
+      this.logger.error(
+        `${warnings.length} warning(s) with --strict. Nothing was written.`,
+      )
       this.exitCode = 1
       return
     }
@@ -61,7 +67,9 @@ export default class OpenapiGenerate extends BaseCommand {
     }
 
     await writeFile(destination, serialized, 'utf-8')
-    this.logger.success(`${OUTPUT} written with ${Object.keys(document.paths).length} paths.`)
+    this.logger.success(
+      `${OUTPUT} written with ${Object.keys(document.paths).length} paths.`,
+    )
   }
 
   /**
@@ -74,7 +82,9 @@ export default class OpenapiGenerate extends BaseCommand {
     try {
       current = await readFile(destination, 'utf-8')
     } catch {
-      this.logger.error(`${OUTPUT} does not exist. Run \`node ace openapi:generate\`.`)
+      this.logger.error(
+        `${OUTPUT} does not exist. Run \`node ace openapi:generate\`.`,
+      )
       this.exitCode = 1
       return
     }

@@ -15,7 +15,9 @@ async function setup(total = 4) {
   )
   const { bracket } = await BracketUnitFixtures.drawn(brackets, total)
   const matches = bracket.snapshot().matches
-  const semi = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)
+  const semi = matches.find(
+    (match) => match.phase === MATCH_PHASE.SEMI && match.position === 0,
+  )
   const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
   if (!semi || !final) throw new Error('matches missing in the arrangement')
 
@@ -23,10 +25,16 @@ async function setup(total = 4) {
 }
 
 test.group('administrator/matches > score (unit)', () => {
-  test('records the score and takes the winner to the next match', async ({ assert }) => {
+  test('records the score and takes the winner to the next match', async ({
+    assert,
+  }) => {
     const { brackets, useCase, bracket, semi } = await setup()
 
-    const result = await useCase.execute({ id: semi.id, homeScore: 2, awayScore: 1 })
+    const result = await useCase.execute({
+      id: semi.id,
+      homeScore: 2,
+      awayScore: 1,
+    })
 
     if (result.isLeft()) throw new Error('score should be accepted')
     assert.deepInclude(result.value, {
@@ -36,7 +44,9 @@ test.group('administrator/matches > score (unit)', () => {
       winnerTeamId: semi.homeTeamId,
     })
     const saved = await brackets.findById(bracket.id)
-    const final = saved?.snapshot().matches.find((match) => match.phase === MATCH_PHASE.FINAL)
+    const final = saved
+      ?.snapshot()
+      .matches.find((match) => match.phase === MATCH_PHASE.FINAL)
     assert.equal(final?.homeTeamId, semi.homeTeamId)
   })
 
@@ -68,12 +78,21 @@ test.group('administrator/matches > score (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'MATCH_NOT_FOUND' })
   })
 
-  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
+  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({
+    assert,
+  }) => {
     const { useCase, final } = await setup()
 
-    const result = await useCase.execute({ id: final.id, homeScore: 1, awayScore: 0 })
+    const result = await useCase.execute({
+      id: final.id,
+      homeScore: 1,
+      awayScore: 0,
+    })
 
-    assert.deepInclude(result.value, { status: 409, code: 'MATCH_TEAMS_PENDING' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'MATCH_TEAMS_PENDING',
+    })
   })
 
   test('draw without a winner is 422 MATCH_WINNER_REQUIRED and does not save', async ({
@@ -81,15 +100,26 @@ test.group('administrator/matches > score (unit)', () => {
   }) => {
     const { brackets, useCase, bracket, semi } = await setup()
 
-    const result = await useCase.execute({ id: semi.id, homeScore: 1, awayScore: 1 })
+    const result = await useCase.execute({
+      id: semi.id,
+      homeScore: 1,
+      awayScore: 1,
+    })
 
-    assert.deepInclude(result.value, { status: 422, code: 'MATCH_WINNER_REQUIRED' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'MATCH_WINNER_REQUIRED',
+    })
     const saved = await brackets.findById(bracket.id)
-    const unchanged = saved?.snapshot().matches.find((match) => match.id === semi.id)
+    const unchanged = saved
+      ?.snapshot()
+      .matches.find((match) => match.id === semi.id)
     assert.equal(unchanged?.status, MATCH_STATUS.SCHEDULED)
   })
 
-  test('draw with the penalty winner advances that team', async ({ assert }) => {
+  test('draw with the penalty winner advances that team', async ({
+    assert,
+  }) => {
     const { useCase, semi } = await setup()
 
     const result = await useCase.execute({
@@ -109,12 +139,18 @@ test.group('administrator/matches > score (unit)', () => {
     const { brackets, useCase, bracket, semi, final } = await setup()
     const other = bracket
       .snapshot()
-      .matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 1)
+      .matches.find(
+        (match) => match.phase === MATCH_PHASE.SEMI && match.position === 1,
+      )
     await useCase.execute({ id: semi.id, homeScore: 2, awayScore: 0 })
     await useCase.execute({ id: other?.id ?? '', homeScore: 2, awayScore: 0 })
     await useCase.execute({ id: final.id, homeScore: 1, awayScore: 0 })
 
-    const result = await useCase.execute({ id: semi.id, homeScore: 0, awayScore: 2 })
+    const result = await useCase.execute({
+      id: semi.id,
+      homeScore: 0,
+      awayScore: 2,
+    })
 
     assert.deepInclude(result.value, { status: 409, code: 'NEXT_MATCH_PLAYED' })
     const saved = await brackets.findById(bracket.id)

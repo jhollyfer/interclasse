@@ -33,10 +33,16 @@ export default class AdministratorUserUnarchiveUseCase {
       const user = await this.users.findAnyById(id)
 
       if (!user)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       const restored = user.unarchive(new Date())
-      if (restored.isLeft()) return left(UserRefusal.http(restored.value, this.i18n))
+      if (restored.isLeft())
+        return left(UserRefusal.http(restored.value, this.i18n))
 
       const saved = await this.users.save(user)
       if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))

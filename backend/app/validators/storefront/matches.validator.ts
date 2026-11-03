@@ -10,4 +10,6 @@ export const StorefrontMatchPaginateValidator = vine.create({
   ...matchFilterFields(),
 })
 
-export type StorefrontMatchPaginatePayload = Infer<typeof StorefrontMatchPaginateValidator>
+export type StorefrontMatchPaginatePayload = Infer<
+  typeof StorefrontMatchPaginateValidator
+>

@@ -19,7 +19,9 @@ export default class AdministratorPhotoReviewController {
   constructor(private readonly useCase: AdministratorPhotoReviewUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdministratorPhotoReviewValidator)
+    const body = await context.request.validateUsing(
+      AdministratorPhotoReviewValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

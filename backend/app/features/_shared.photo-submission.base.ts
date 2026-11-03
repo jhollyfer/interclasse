@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto'
 
 import { type I18n } from '@adonisjs/i18n'
-import { left, right, type AdministratorPhotoShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorPhotoShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { PhotoReadBase } from '#features/_shared.photo-read.base'
 import { PhotoRefusal } from '#features/administrator/photos/_shared.photo-refusal'
@@ -26,7 +31,11 @@ type Submission = {
  * Infrastructure errors bubble up: the use case's try/catch handles them.
  */
 export abstract class PhotoSubmissionBase extends PhotoReadBase {
-  protected constructor(photos: PhotoRepository, bucket: StorageContract, i18n: I18n) {
+  protected constructor(
+    photos: PhotoRepository,
+    bucket: StorageContract,
+    i18n: I18n,
+  ) {
     super(photos, bucket, i18n)
   }
 
@@ -44,12 +53,18 @@ export abstract class PhotoSubmissionBase extends PhotoReadBase {
       sender: input.sender,
       now: new Date(),
     })
-    if (created.isLeft()) return left(PhotoRefusal.http(created.value, this.i18n))
+    if (created.isLeft())
+      return left(PhotoRefusal.http(created.value, this.i18n))
 
     await this.photos.save(created.value)
     const shown = await this.photos.show(created.value.id)
     if (!shown)
-      return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
+      return left(
+        HTTPException.NotFound(
+          this.i18n.t('photos.not_found'),
+          'PHOTO_NOT_FOUND',
+        ),
+      )
 
     return right(await this.signed(shown))
   }

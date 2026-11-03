@@ -36,14 +36,24 @@ export default class AdministratorPhotoReviewUseCase extends PhotoReadBase {
     try {
       const photo = await this.photos.findById(id)
       if (!photo)
-        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('photos.not_found'),
+            'PHOTO_NOT_FOUND',
+          ),
+        )
 
       photo.review({ status, reviewerId: actor.id, now: new Date() })
       await this.photos.save(photo)
 
       const shown = await this.photos.show(id)
       if (!shown)
-        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('photos.not_found'),
+            'PHOTO_NOT_FOUND',
+          ),
+        )
 
       return right(await this.signed(shown))
     } catch (error) {

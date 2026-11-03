@@ -14,6 +14,8 @@ export default class DocumentationOpenapiShowController {
   async handle(context: HttpContext) {
     const result = await this.useCase.execute()
     if (result.isLeft()) throw result.value
-    return context.response.header('content-type', 'application/json').send(result.value)
+    return context.response
+      .header('content-type', 'application/json')
+      .send(result.value)
   }
 }

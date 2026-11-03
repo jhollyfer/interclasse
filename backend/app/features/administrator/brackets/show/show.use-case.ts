@@ -26,7 +26,12 @@ export default class AdministratorBracketShowUseCase {
     try {
       const detail = await this.brackets.detail(id)
       if (!detail)
-        return left(HTTPException.NotFound(this.i18n.t('brackets.not_found'), 'BRACKET_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('brackets.not_found'),
+            'BRACKET_NOT_FOUND',
+          ),
+        )
 
       return right(detail)
     } catch (error) {

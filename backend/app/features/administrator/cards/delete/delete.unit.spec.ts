@@ -25,7 +25,9 @@ async function setup() {
 test.group('administrator/cards > delete (unit)', () => {
   test('deletes the card', async ({ assert }) => {
     const { cards, useCase, drawn } = await setup()
-    const semi = drawn.bracket.snapshot().matches.find((m) => m.phase === MATCH_PHASE.SEMI)
+    const semi = drawn.bracket
+      .snapshot()
+      .matches.find((m) => m.phase === MATCH_PHASE.SEMI)
     const launched = MatchCard.launch({
       id: randomUUID(),
       matchId: semi?.id ?? '',

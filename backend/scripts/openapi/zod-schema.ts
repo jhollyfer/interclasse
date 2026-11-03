@@ -18,15 +18,20 @@ export class ZodSchema {
   static toOpenAPI(schema: z.ZodType): SchemaObject {
     // Zod's JSON Schema type is wider than the document's; the round trip
     // through JSON yields plain data, and the guard narrows without `as`.
-    const json: unknown = JSON.parse(JSON.stringify(z.toJSONSchema(schema, { io: 'output' })))
-    if (!ZodSchema.isObject(json)) throw new Error('Zod JSON Schema is not an object')
+    const json: unknown = JSON.parse(
+      JSON.stringify(z.toJSONSchema(schema, { io: 'output' })),
+    )
+    if (!ZodSchema.isObject(json))
+      throw new Error('Zod JSON Schema is not an object')
 
     const { $schema: _dialect, ...body } = json
 
     return body
   }
 
-  private static isObject(value: unknown): value is SchemaObject & { $schema?: string } {
+  private static isObject(
+    value: unknown,
+  ): value is SchemaObject & { $schema?: string } {
     return typeof value === 'object' && value !== null && !Array.isArray(value)
   }
 }

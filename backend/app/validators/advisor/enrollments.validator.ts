@@ -12,6 +12,10 @@ export const AdvisorEnrollmentUpdateValidator = vine.create({
   reason: vine.string().trim().minLength(5).maxLength(500).optional(),
 })
 
-export type AdvisorEnrollmentShowPayload = Infer<typeof AdvisorEnrollmentShowValidator>
+export type AdvisorEnrollmentShowPayload = Infer<
+  typeof AdvisorEnrollmentShowValidator
+>
 
-export type AdvisorEnrollmentUpdatePayload = Infer<typeof AdvisorEnrollmentUpdateValidator>
+export type AdvisorEnrollmentUpdatePayload = Infer<
+  typeof AdvisorEnrollmentUpdateValidator
+>

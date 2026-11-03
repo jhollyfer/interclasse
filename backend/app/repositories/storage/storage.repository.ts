@@ -42,5 +42,7 @@ export abstract class StorageRepository {
   abstract save(storage: Storage): Promise<void>
   /** Deletes the row for good: `storages` has no trash. */
   abstract delete(storage: Storage): Promise<void>
-  abstract paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>>
+  abstract paginate(
+    criteria: StorageListCriteria,
+  ): Promise<Paginated<StorageFileRead>>
 }

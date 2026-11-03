@@ -5,22 +5,34 @@ import AdministratorPhotoCreateUseCase from './create.use-case.ts'
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
+import {
+  memoryAuthor,
+  memoryPhotos,
+  memoryStorage,
+} from '#tests/photos-fixtures'
 
 async function setup(mimetype = 'image/png') {
   const storage = memoryStorage({ mimetype })
   const actor = memoryAuthor(USER_ROLE.ADMINISTRATOR)
   const photos = memoryPhotos(storage, actor)
-  const useCase = await makeWithMemory(AdministratorPhotoCreateUseCase, [[PhotoRepository, photos]])
+  const useCase = await makeWithMemory(AdministratorPhotoCreateUseCase, [
+    [PhotoRepository, photos],
+  ])
 
   return { storage, actor, useCase }
 }
 
 test.group('administrator/photos > create (unit)', () => {
-  test('the organization photo is born approved by whoever submitted it', async ({ assert }) => {
+  test('the organization photo is born approved by whoever submitted it', async ({
+    assert,
+  }) => {
     const { storage, actor, useCase } = await setup()
 
-    const result = await useCase.execute({ storageId: storage.id, caption: 'Final', actor })
+    const result = await useCase.execute({
+      storageId: storage.id,
+      caption: 'Final',
+      actor,
+    })
 
     assert.isTrue(result.isRight())
     assert.deepInclude(result.value, {
@@ -30,7 +42,9 @@ test.group('administrator/photos > create (unit)', () => {
     })
   })
 
-  test('file that is not an image is 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
+  test('file that is not an image is 422 PHOTO_NOT_IMAGE', async ({
+    assert,
+  }) => {
     const { storage, actor, useCase } = await setup('application/pdf')
 
     const result = await useCase.execute({ storageId: storage.id, actor })

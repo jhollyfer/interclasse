@@ -22,7 +22,12 @@ export default class AdministratorPhotoDeleteUseCase {
     try {
       const photo = await this.photos.findById(id)
       if (!photo)
-        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('photos.not_found'),
+            'PHOTO_NOT_FOUND',
+          ),
+        )
 
       await this.photos.delete(photo)
 

@@ -63,15 +63,22 @@ export abstract class BracketRepository {
    * match and one would overwrite the other. Only holds inside `UnitOfWork.run`.
    */
   abstract findByMatchIdForUpdate(matchId: string): Promise<Bracket | null>
-  abstract findBySportAndCategory(sportId: string, category: Category): Promise<Bracket | null>
-  abstract findSport(sportId: string): Promise<AdministratorSportShowResponse | null>
+  abstract findBySportAndCategory(
+    sportId: string,
+    category: Category,
+  ): Promise<Bracket | null>
+  abstract findSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null>
   /**
    * The sport, with the row locked until the end of the unit of work: the
    * enrollment locks the same row before saving, and without that a list saved in
    * the middle of the draw would be left out of a bracket that already closed enrollments. Only
    * holds inside `UnitOfWork.run`.
    */
-  abstract lockSport(sportId: string): Promise<AdministratorSportShowResponse | null>
+  abstract lockSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null>
   /** The category's classrooms with at least `minAthletes` enrolled in the sport. */
   abstract eligibleClassroomIds(
     sportId: string,
@@ -79,7 +86,9 @@ export abstract class BracketRepository {
     minAthletes: number,
   ): Promise<string[]>
   /** The name of each classroom, by id. */
-  abstract classroomNames(classroomIds: ReadonlyArray<string>): Promise<Map<string, string>>
+  abstract classroomNames(
+    classroomIds: ReadonlyArray<string>,
+  ): Promise<Map<string, string>>
   /** Saves the whole bracket: new, in batch; existing, only what changed. */
   /** Saves the bracket; the already drawn sport and category (the race on the `unique`) come back as `BRACKET_ALREADY_EXISTS`. */
   abstract save(bracket: Bracket): Promise<Either<BracketError, void>>
@@ -105,10 +114,14 @@ export abstract class BracketRepository {
     matchIds: ReadonlyArray<string>,
   ): Promise<Map<string, AdministratorMatchUpdateResponse>>
   /** The students of the match's two classrooms, those enrolled in the sport first. */
-  abstract matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null>
+  abstract matchAthletes(
+    matchId: string,
+  ): Promise<AdministratorMatchAthletesResponse | null>
 
   /** The match with both teams, the whole classrooms and the bracket with the sport. */
-  async findMatchResponse(matchId: string): Promise<AdministratorMatchUpdateResponse | null> {
+  async findMatchResponse(
+    matchId: string,
+  ): Promise<AdministratorMatchUpdateResponse | null> {
     const responses = await this.findMatchResponses([matchId])
 
     return responses.get(matchId) ?? null
@@ -127,8 +140,12 @@ export abstract class BracketRepository {
     const sport = await this.findSport(snapshot.sportId)
     if (!sport) return null
 
-    const names = await this.classroomNames(snapshot.teams.map((team) => team.classroomId))
-    const classroomOf = new Map(snapshot.teams.map((team) => [team.id, team.classroomId]))
+    const names = await this.classroomNames(
+      snapshot.teams.map((team) => team.classroomId),
+    )
+    const classroomOf = new Map(
+      snapshot.teams.map((team) => [team.id, team.classroomId]),
+    )
     const nameOf = (teamId: string | null): string | null => {
       if (teamId === null) return null
       const classroomId = classroomOf.get(teamId)

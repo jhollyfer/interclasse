@@ -56,7 +56,10 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** The whole path, from zero to `UPLOADED`, for a single-part file. */
-async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
+async function upload(
+  client: ApiClient,
+  session: Session,
+): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -91,7 +94,9 @@ test.group('storages > delete', (group) => {
     // nothing would pass the one below vacuously.
     assert.isTrue(await drive.use().exists(storage.path))
 
-    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .delete(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(204)
 
@@ -99,7 +104,10 @@ test.group('storages > delete', (group) => {
     assert.isFalse(await drive.use().exists(storage.path))
   })
 
-  test('cancels an upload in progress and discards the parts', async ({ client, assert }) => {
+  test('cancels an upload in progress and discards the parts', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -110,24 +118,36 @@ test.group('storages > delete', (group) => {
 
     await put(opened.parts[0].url, FULL_PART)
 
-    const response = await client.delete(`/storages/${opened.storage.id}`).cookies(session)
+    const response = await client
+      .delete(`/storages/${opened.storage.id}`)
+      .cookies(session)
 
     response.assertStatus(204)
 
     assert.isNull(await Stored.storage(opened.storage.id))
     // The upload ceased to exist: asking to resume it now is 404.
-    const resumed = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
+    const resumed = await client
+      .get(`/storages/${opened.storage.id}/parts`)
+      .cookies(session)
     resumed.assertStatus(404)
   })
 
-  test('refuses with 409 the file in use as an avatar', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as an avatar', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    const linked = await client.put('/account').cookies(session).json({ avatarId: storage.id })
+    const linked = await client
+      .put('/account')
+      .cookies(session)
+      .json({ avatarId: storage.id })
     linked.assertStatus(200)
 
-    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .delete(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'STORAGE_IN_USE')
@@ -137,7 +157,10 @@ test.group('storages > delete', (group) => {
     assert.isTrue(await drive.use().exists(storage.path))
   })
 
-  test('refuses with 409 the file in use as a gallery photo', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as a gallery photo', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -147,16 +170,23 @@ test.group('storages > delete', (group) => {
       .json({ storageId: storage.id })
     photo.assertStatus(201)
 
-    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .delete(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'STORAGE_IN_USE')
     assert.isNotNull(await Stored.storage(storage.id))
   })
 
-  test('refuses with 409 the file in use as the site regulation', async ({ client, assert }) => {
+  test('refuses with 409 the file in use as the site regulation', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
+    const pdf = await StorageFactory.merge({
+      mimetype: 'application/pdf',
+    }).create()
 
     const linked = await client
       .put('/administrator/site')
@@ -171,14 +201,19 @@ test.group('storages > delete', (group) => {
     assert.isNotNull(await Stored.storage(pdf.id))
   })
 
-  test('accepts again after the attachment is unlinked', async ({ client, assert }) => {
+  test('accepts again after the attachment is unlinked', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
     await client.put('/account').cookies(session).json({ avatarId: storage.id })
     await client.put('/account').cookies(session).json({ avatarId: null })
 
-    const response = await client.delete(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .delete(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(204)
     assert.isNull(await Stored.storage(storage.id))
@@ -196,7 +231,9 @@ test.group('storages > delete', (group) => {
   })
 
   test('requires a session', async ({ client }) => {
-    const response = await client.delete('/storages/00000000-0000-4000-8000-000000000000')
+    const response = await client.delete(
+      '/storages/00000000-0000-4000-8000-000000000000',
+    )
 
     response.assertStatus(401)
   })
@@ -205,7 +242,10 @@ test.group('storages > delete', (group) => {
 test.group('storages > delete > identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.delete('/storages/x').cookies(session)

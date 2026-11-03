@@ -8,6 +8,11 @@ export const SportFactory = factory
   .define(Sport, ({ faker }) => {
     const name = `Modalidade ${faker.string.alphanumeric(8)}`
 
-    return { name, slug: Slug.from(name).value, minAthletes: 1, maxAthletes: 10 }
+    return {
+      name,
+      slug: Slug.from(name).value,
+      minAthletes: 1,
+      maxAthletes: 10,
+    }
   })
   .build()

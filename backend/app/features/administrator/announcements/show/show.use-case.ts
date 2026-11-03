@@ -29,12 +29,18 @@ export default class AdministratorAnnouncementShowUseCase {
       const announcement = await this.announcements.findById(id)
       if (!announcement)
         return left(
-          HTTPException.NotFound(this.i18n.t('announcements.not_found'), 'ANNOUNCEMENT_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('announcements.not_found'),
+            'ANNOUNCEMENT_NOT_FOUND',
+          ),
         )
 
       return right(AnnouncementPresenter.show(announcement))
     } catch (error) {
-      logger.error({ err: error }, '[administrator/announcements > show][error]')
+      logger.error(
+        { err: error },
+        '[administrator/announcements > show][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

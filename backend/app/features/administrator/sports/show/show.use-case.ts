@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorSportShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorSportShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { SportPresenter } from '../sports.presenter.ts'
 
@@ -23,7 +28,12 @@ export default class AdministratorSportShowUseCase {
     try {
       const sport = await this.sports.findById(id)
       if (!sport)
-        return left(HTTPException.NotFound(this.i18n.t('sports.not_found'), 'SPORT_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('sports.not_found'),
+            'SPORT_NOT_FOUND',
+          ),
+        )
 
       return right(SportPresenter.show(sport))
     } catch (error) {

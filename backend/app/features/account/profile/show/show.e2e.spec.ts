@@ -21,7 +21,10 @@ import { Stored } from '#tests/stored-fixtures'
 test.group('account > read', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('valid session responds 200 with the own user', async ({ client, assert }) => {
+  test('valid session responds 200 with the own user', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/account').cookies(session)
@@ -33,7 +36,9 @@ test.group('account > read', (group) => {
     assert.notProperty(body(response), 'password')
   })
 
-  test('archived user with a still valid token responds 401', async ({ client }) => {
+  test('archived user with a still valid token responds 401', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
 

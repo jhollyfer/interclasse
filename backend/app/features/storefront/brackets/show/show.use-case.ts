@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type StorefrontBracketShowResponse } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Either,
+  type StorefrontBracketShowResponse,
+} from '@interclasse/shared'
 
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
@@ -21,7 +26,12 @@ export default class StorefrontBracketShowUseCase {
     try {
       const detail = await this.brackets.detail(id)
       if (!detail)
-        return left(HTTPException.NotFound(this.i18n.t('brackets.not_found'), 'BRACKET_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('brackets.not_found'),
+            'BRACKET_NOT_FOUND',
+          ),
+        )
 
       return right(detail)
     } catch (error) {

@@ -31,7 +31,11 @@ export class SiteSettingMemoryRepository extends SiteSettingRepository {
   }
 
   async current(): Promise<SiteSetting> {
-    if (!this.row) this.row = SiteSetting.create({ id: randomUUID(), now: new Date() }).snapshot()
+    if (!this.row)
+      this.row = SiteSetting.create({
+        id: randomUUID(),
+        now: new Date(),
+      }).snapshot()
 
     return SiteSetting.restore(structuredClone(this.row))
   }

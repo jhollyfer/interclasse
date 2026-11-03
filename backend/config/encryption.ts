@@ -31,5 +31,7 @@ export default encryptionConfig
  * in your application.
  */
 declare module '@adonisjs/core/types' {
-  export interface EncryptorsList extends InferEncryptors<typeof encryptionConfig> {}
+  export interface EncryptorsList extends InferEncryptors<
+    typeof encryptionConfig
+  > {}
 }

@@ -10,13 +10,16 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdvisorStudentUpdateController {
   static docs = defineDocs({
-    description: 'Fixes the name. A student from a foreign classroom responds `404`.',
+    description:
+      'Fixes the name. A student from a foreign classroom responds `404`.',
   })
 
   constructor(private readonly useCase: AdvisorStudentUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdvisorStudentUpdateValidator)
+    const body = await context.request.validateUsing(
+      AdvisorStudentUpdateValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

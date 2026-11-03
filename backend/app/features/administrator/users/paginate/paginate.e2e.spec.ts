@@ -29,10 +29,16 @@ const payload = {
 test.group('administrador > users > listagem', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('without ?trashed the listing hides the archived ones', async ({ client, assert }) => {
+  test('without ?trashed the listing hides the archived ones', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    await UserFactory.merge({ name: 'Arquivado', deletedAt: DateTime.now() }).create()
+    await UserFactory.merge({
+      name: 'Arquivado',
+      deletedAt: DateTime.now(),
+    }).create()
 
     const response = await client.get('/administrator/users').cookies(session)
 
@@ -74,7 +80,10 @@ test.group('administrador > users > listagem', (group) => {
     assert.equal(body(response).data[0].id, inactive.id)
   })
 
-  test('the password does not come out in the listing', async ({ client, assert }) => {
+  test('the password does not come out in the listing', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     await UserFactory.create()
@@ -97,13 +106,18 @@ test.group('administrador > users > listagem', (group) => {
     // The query goes in the URL itself, not in `.qs()`: the Tuyau registry types the
     // object by the closed tuple, and the invalid value this test exists to
     // send would not compile.
-    const response = await client.get('/administrator/users?sort=password').cookies(session)
+    const response = await client
+      .get('/administrator/users?sort=password')
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'sort')
   })
 
-  test('?search does not escape the trash filter', async ({ client, assert }) => {
+  test('?search does not escape the trash filter', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const alive = await UserFactory.merge({ name: 'Joana Ribeiro' }).create()
@@ -136,29 +150,47 @@ test.group('administrador > users > listagem', (group) => {
  * One case per route of the group, not a single one: the middleware is on the subgroup, and a
  * new route born outside it would not be caught by a single assertion.
  */
-test.group('administrator > users > the advisor does not reach the module', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator > users > the advisor does not reach the module',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('advisor gets 403 on every users route', async ({ client, assert }) => {
-    const session = await authenticateAsAdvisor(client)
-    const target = await UserFactory.create()
+    test('advisor gets 403 on every users route', async ({
+      client,
+      assert,
+    }) => {
+      const session = await authenticateAsAdvisor(client)
+      const target = await UserFactory.create()
 
-    const responses = [
-      await client.get('/administrator/users').cookies(session),
-      await client.post('/administrator/users').cookies(session).json(payload),
-      await client.get(`/administrator/users/${target.id}`).cookies(session),
-      await client.put(`/administrator/users/${target.id}`).cookies(session).json({ name: 'X' }),
-      await client.patch(`/administrator/users/${target.id}/archive`).cookies(session),
-      await client.patch(`/administrator/users/${target.id}/unarchive`).cookies(session),
-      await client.delete(`/administrator/users/${target.id}`).cookies(session),
-    ]
+      const responses = [
+        await client.get('/administrator/users').cookies(session),
+        await client
+          .post('/administrator/users')
+          .cookies(session)
+          .json(payload),
+        await client.get(`/administrator/users/${target.id}`).cookies(session),
+        await client
+          .put(`/administrator/users/${target.id}`)
+          .cookies(session)
+          .json({ name: 'X' }),
+        await client
+          .patch(`/administrator/users/${target.id}/archive`)
+          .cookies(session),
+        await client
+          .patch(`/administrator/users/${target.id}/unarchive`)
+          .cookies(session),
+        await client
+          .delete(`/administrator/users/${target.id}`)
+          .cookies(session),
+      ]
 
-    for (const response of responses) {
-      response.assertStatus(403)
-      assert.equal(body(response).code, 'ACCESS_DENIED')
-    }
-  })
-})
+      for (const response of responses) {
+        response.assertStatus(403)
+        assert.equal(body(response).code, 'ACCESS_DENIED')
+      }
+    })
+  },
+)
 
 test.group('administrator/users/paginate > access and validation', (group) => {
   group.each.setup(() => resetDatabase())

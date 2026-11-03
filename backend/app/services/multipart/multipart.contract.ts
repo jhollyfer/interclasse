@@ -59,11 +59,17 @@ export abstract class MultipartContract {
     size: number,
     expiresIn?: number,
   ): Promise<string>
-  abstract listParts(key: string, uploadId: string): Promise<Array<UploadedPart>>
+  abstract listParts(
+    key: string,
+    uploadId: string,
+  ): Promise<Array<UploadedPart>>
   abstract complete(
     key: string,
     uploadId: string,
-    parts: ReadonlyArray<{ readonly partNumber: number; readonly etag: string }>,
+    parts: ReadonlyArray<{
+      readonly partNumber: number
+      readonly etag: string
+    }>,
   ): Promise<void>
   abstract abort(key: string, uploadId: string): Promise<void>
 }

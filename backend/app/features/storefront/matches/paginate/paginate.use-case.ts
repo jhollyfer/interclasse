@@ -11,12 +11,18 @@ import {
   type StorefrontMatchPaginateResponse,
 } from '@interclasse/shared'
 
-import { BracketRepository, type MatchListOrder } from '#repositories/bracket/bracket.repository'
+import {
+  BracketRepository,
+  type MatchListOrder,
+} from '#repositories/bracket/bracket.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { StorefrontMatchPaginatePayload } from '#validators/storefront/matches.validator'
 
 type Payload = StorefrontMatchPaginatePayload
-type Response = Either<HTTPException, Paginated<StorefrontMatchPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<StorefrontMatchPaginateResponse>
+>
 
 @inject()
 export default class StorefrontMatchPaginateUseCase {

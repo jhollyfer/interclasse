@@ -57,7 +57,11 @@ export class PhotoMemoryRepository extends PhotoRepository {
 
   async findUploadedStorage(storageId: string): Promise<PhotoStorage | null> {
     const storage = this.storages.get(storageId)
-    if (!storage || storage.status !== UPLOAD_STATUS.UPLOADED || storage.deletedAt !== null)
+    if (
+      !storage ||
+      storage.status !== UPLOAD_STATUS.UPLOADED ||
+      storage.deletedAt !== null
+    )
       return null
 
     return { id: storage.id, mimetype: storage.mimetype }
@@ -84,17 +88,30 @@ export class PhotoMemoryRepository extends PhotoRepository {
         (!criteria.status || row.status === criteria.status) &&
         (!criteria.authorId || row.authorId === criteria.authorId),
     )
-    const page = MemoryPagination.slice(matching, criteria.page, criteria.perPage)
+    const page = MemoryPagination.slice(
+      matching,
+      criteria.page,
+      criteria.perPage,
+    )
 
-    return { meta: page.meta, data: page.data.flatMap((row) => this.toResponse(row) ?? []) }
+    return {
+      meta: page.meta,
+      data: page.data.flatMap((row) => this.toResponse(row) ?? []),
+    }
   }
 
   async paginateApproved(criteria: {
     readonly page: number
     readonly perPage: number
   }): Promise<Paginated<ApprovedPhotoRead>> {
-    const approved = this.newestFirst().filter((row) => row.status === PHOTO_STATUS.APPROVED)
-    const page = MemoryPagination.slice(approved, criteria.page, criteria.perPage)
+    const approved = this.newestFirst().filter(
+      (row) => row.status === PHOTO_STATUS.APPROVED,
+    )
+    const page = MemoryPagination.slice(
+      approved,
+      criteria.page,
+      criteria.perPage,
+    )
 
     return {
       meta: page.meta,
@@ -108,7 +125,9 @@ export class PhotoMemoryRepository extends PhotoRepository {
   }
 
   private newestFirst(): PhotoProps[] {
-    return [...this.rows.values()].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    return [...this.rows.values()].sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    )
   }
 
   /** A photo without the saved file has no read: the same as Lucid's `join` does. */

@@ -13,15 +13,26 @@ import type { UserError } from '#domain/user/user.errors'
 export class UserRefusal extends RefusalBase {
   private static readonly TABLE = {
     USER_ALREADY_EXISTS: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('users.already_exists'), 'USER_ALREADY_EXISTS', {
-        email: i18n.t('users.email_taken'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('users.already_exists'),
+        'USER_ALREADY_EXISTS',
+        {
+          email: i18n.t('users.email_taken'),
+        },
+      ),
     USER_ALREADY_ARCHIVED: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('users.already_archived'), 'USER_ALREADY_ARCHIVED'),
+      HTTPException.Conflict(
+        i18n.t('users.already_archived'),
+        'USER_ALREADY_ARCHIVED',
+      ),
     USER_NOT_ARCHIVED: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('users.not_archived'), 'USER_NOT_ARCHIVED', {
-        id: i18n.t('users.not_archived_field'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('users.not_archived'),
+        'USER_NOT_ARCHIVED',
+        {
+          id: i18n.t('users.not_archived_field'),
+        },
+      ),
     CURRENT_PASSWORD_INVALID: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
         i18n.t('users.current_password_invalid'),

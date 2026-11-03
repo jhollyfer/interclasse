@@ -9,7 +9,10 @@ import { TransactionContext } from '#core/transaction-context'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /** A write inside the unit, through the client the repositories use. */
-async function insertSport(context: TransactionContext, name: string): Promise<void> {
+async function insertSport(
+  context: TransactionContext,
+  name: string,
+): Promise<void> {
   await context.client().insertQuery().table('sports').insert({
     name,
     slug: name.toLowerCase(),

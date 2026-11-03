@@ -14,8 +14,20 @@ export const AdministratorAnnouncementCreateValidator = vine.create({
 })
 
 export const AdministratorAnnouncementUpdateValidator = vine.create({
-  title: vine.string().trim().minLength(1).maxLength(160).optional().use(notNull()),
-  body: vine.string().trim().minLength(1).maxLength(5000).optional().use(notNull()),
+  title: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(160)
+    .optional()
+    .use(notNull()),
+  body: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(5000)
+    .optional()
+    .use(notNull()),
   pinned: vine.boolean().optional().use(notNull()),
 })
 

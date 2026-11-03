@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage.contract'
 import type { AdministratorPhotoCreatePayload } from '#validators/administrator/photos.validator'
 
-type Payload = Merge<AdministratorPhotoCreatePayload, { actor: { readonly id: string } }>
+type Payload = Merge<
+  AdministratorPhotoCreatePayload,
+  { actor: { readonly id: string } }
+>
 type Response = Either<HTTPException, AdministratorPhotoShowResponse>
 
 /** The organization photo goes straight to the site: it approves itself. */

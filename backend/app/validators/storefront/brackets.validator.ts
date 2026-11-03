@@ -9,4 +9,6 @@ export const StorefrontBracketPaginateValidator = vine.create({
   category: vine.enum(CATEGORIES).optional(),
 })
 
-export type StorefrontBracketPaginatePayload = Infer<typeof StorefrontBracketPaginateValidator>
+export type StorefrontBracketPaginatePayload = Infer<
+  typeof StorefrontBracketPaginateValidator
+>

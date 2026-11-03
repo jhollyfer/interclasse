@@ -20,7 +20,9 @@ async function setup() {
   })
   if (futsal.isLeft()) throw new Error('invalid arrangement')
   await sports.save(futsal.value)
-  const useCase = await makeWithMemory(AdministratorSportUpdateUseCase, [[SportRepository, sports]])
+  const useCase = await makeWithMemory(AdministratorSportUpdateUseCase, [
+    [SportRepository, sports],
+  ])
 
   return { sports, useCase }
 }
@@ -29,7 +31,10 @@ test.group('administrator/sports > update (unit)', () => {
   test('nonexistent sport is 404', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000', name: 'X' })
+    const result = await useCase.execute({
+      id: '00000000-0000-4000-8000-000000000000',
+      name: 'X',
+    })
 
     assert.deepInclude(result.value, { status: 404, code: 'SPORT_NOT_FOUND' })
   })
@@ -39,7 +44,10 @@ test.group('administrator/sports > update (unit)', () => {
 
     const result = await useCase.execute({ id: ID, name: 'Futsal misto' })
 
-    assert.deepInclude(result.value, { name: 'Futsal misto', slug: 'futsal-misto' })
+    assert.deepInclude(result.value, {
+      name: 'Futsal misto',
+      slug: 'futsal-misto',
+    })
   })
 
   test('maximum below the largest roster is 409 with the total on the field', async ({
@@ -50,11 +58,19 @@ test.group('administrator/sports > update (unit)', () => {
 
     const result = await useCase.execute({ id: ID, maxAthletes: 8 })
 
-    assert.deepInclude(result.value, { status: 409, code: 'SPORT_ROSTER_ABOVE_LIMIT' })
-    assert.isTrue(result.isLeft() && String(result.value.errors?.maxAthletes).includes('10'))
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'SPORT_ROSTER_ABOVE_LIMIT',
+    })
+    assert.isTrue(
+      result.isLeft() &&
+        String(result.value.errors?.maxAthletes).includes('10'),
+    )
   })
 
-  test('name of another sport is 409 SPORT_ALREADY_EXISTS', async ({ assert }) => {
+  test('name of another sport is 409 SPORT_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { sports, useCase } = await setup()
     const volleyball = Sport.create({
       id: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
@@ -68,6 +84,9 @@ test.group('administrator/sports > update (unit)', () => {
 
     const result = await useCase.execute({ id: ID, name: 'Vôlei' })
 
-    assert.deepInclude(result.value, { status: 409, code: 'SPORT_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'SPORT_ALREADY_EXISTS',
+    })
   })
 })

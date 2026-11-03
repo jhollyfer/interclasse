@@ -18,7 +18,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdvisorStudentUpdatePayload } from '#validators/advisor/students.validator'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<AdvisorStudentUpdatePayload, Merge<IdentifierPayload, { actor: Actor }>>
+type Payload = Merge<
+  AdvisorStudentUpdatePayload,
+  Merge<IdentifierPayload, { actor: Actor }>
+>
 type Response = Either<HTTPException, AdvisorStudentShowResponse>
 
 @inject()
@@ -32,10 +35,16 @@ export default class AdvisorStudentUpdateUseCase {
     try {
       const student = await this.students.findOwned({ id, actor })
       if (!student)
-        return left(HTTPException.NotFound(this.i18n.t('students.not_found'), 'STUDENT_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('students.not_found'),
+            'STUDENT_NOT_FOUND',
+          ),
+        )
 
       const renamed = student.rename(name, new Date())
-      if (renamed.isLeft()) return left(StudentRefusal.http(renamed.value, this.i18n))
+      if (renamed.isLeft())
+        return left(StudentRefusal.http(renamed.value, this.i18n))
 
       await this.students.save(student)
 

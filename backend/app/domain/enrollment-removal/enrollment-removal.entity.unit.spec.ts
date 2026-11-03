@@ -32,7 +32,10 @@ test.group('EnrollmentRemoval', () => {
   })
 
   test("the administrator's removal is born already read", ({ assert }) => {
-    assert.equal(recordedBy(USER_ROLE.ADMINISTRATOR).snapshot().acknowledgedAt, NOW)
+    assert.equal(
+      recordedBy(USER_ROLE.ADMINISTRATOR).snapshot().acknowledgedAt,
+      NOW,
+    )
   })
 
   test('acknowledging stamps the date', ({ assert }) => {
@@ -41,7 +44,10 @@ test.group('EnrollmentRemoval', () => {
     const result = removal.acknowledge(LATER)
 
     assert.isTrue(result.isRight())
-    assert.deepInclude(removal.snapshot(), { acknowledgedAt: LATER, updatedAt: LATER })
+    assert.deepInclude(removal.snapshot(), {
+      acknowledgedAt: LATER,
+      updatedAt: LATER,
+    })
   })
 
   test('repeating the acknowledgement keeps the first date', ({ assert }) => {
@@ -50,7 +56,9 @@ test.group('EnrollmentRemoval', () => {
 
     const again = removal.acknowledge(new Date('2026-11-01T00:00:00Z'))
 
-    assert.deepEqual(again.value, { code: 'ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED' })
+    assert.deepEqual(again.value, {
+      code: 'ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED',
+    })
     assert.equal(removal.snapshot().acknowledgedAt, LATER)
   })
 })

@@ -22,7 +22,12 @@ export default class AdministratorCardDeleteUseCase {
     try {
       const card = await this.cards.findById(id)
       if (!card)
-        return left(HTTPException.NotFound(this.i18n.t('cards.not_found'), 'CARD_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('cards.not_found'),
+            'CARD_NOT_FOUND',
+          ),
+        )
 
       await this.cards.delete(card)
 

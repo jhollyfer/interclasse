@@ -19,17 +19,30 @@ test.group('administrator/announcements > create (unit)', () => {
   test('publishes unpinned when not asked', async ({ assert }) => {
     const { announcements, useCase } = await setup()
 
-    const result = await useCase.execute({ title: 'Jogo adiado', body: 'Às 15h' })
+    const result = await useCase.execute({
+      title: 'Jogo adiado',
+      body: 'Às 15h',
+    })
 
     assert.isTrue(result.isRight())
-    assert.deepInclude(result.value, { title: 'Jogo adiado', body: 'Às 15h', pinned: false })
-    assert.isNotNull(await announcements.findById(String(result.isRight() && result.value.id)))
+    assert.deepInclude(result.value, {
+      title: 'Jogo adiado',
+      body: 'Às 15h',
+      pinned: false,
+    })
+    assert.isNotNull(
+      await announcements.findById(String(result.isRight() && result.value.id)),
+    )
   })
 
   test('publishes pinned when asked', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ title: 'Regulamento', body: 'Leia', pinned: true })
+    const result = await useCase.execute({
+      title: 'Regulamento',
+      body: 'Leia',
+      pinned: true,
+    })
 
     assert.deepInclude(result.value, { pinned: true })
   })

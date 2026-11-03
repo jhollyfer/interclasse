@@ -42,16 +42,23 @@ test.group('announcements > show', (group) => {
   test('id that is not a uuid responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/announcements/123').cookies(session)
+    const response = await client
+      .get('/administrator/announcements/123')
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const announcement = await AnnouncementFactory.create()
 
-    const anonymous = await client.get(`/administrator/announcements/${announcement.id}`)
+    const anonymous = await client.get(
+      `/administrator/announcements/${announcement.id}`,
+    )
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client
       .get(`/administrator/announcements/${announcement.id}`)

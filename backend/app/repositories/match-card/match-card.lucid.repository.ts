@@ -1,6 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import type { AdministratorCardPaginateResponse, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorCardPaginateResponse,
+  Paginated,
+} from '@interclasse/shared'
 
 import {
   MatchCardRepository,
@@ -10,7 +13,10 @@ import {
 
 import MatchCardModel from '#models/match-card'
 import StudentModel from '#models/student'
-import { MatchCard, type MatchCardProps } from '#domain/match-card/match-card.entity'
+import {
+  MatchCard,
+  type MatchCardProps,
+} from '#domain/match-card/match-card.entity'
 import { BracketRepository } from '#repositories/bracket/bracket.repository'
 import { TransactionContext } from '#core/transaction-context'
 
@@ -24,7 +30,9 @@ export class MatchCardLucidRepository extends MatchCardRepository {
   }
 
   async findById(id: string): Promise<MatchCard | null> {
-    const row = await MatchCardModel.query({ client: this.transaction.client() })
+    const row = await MatchCardModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .first()
     if (!row) return null
@@ -33,7 +41,9 @@ export class MatchCardLucidRepository extends MatchCardRepository {
   }
 
   async findStudentClassroom(studentId: string): Promise<string | null> {
-    const student = await StudentModel.query({ client: this.transaction.client() })
+    const student = await StudentModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', studentId)
       .first()
 
@@ -55,13 +65,17 @@ export class MatchCardLucidRepository extends MatchCardRepository {
   }
 
   async delete(card: MatchCard): Promise<void> {
-    await MatchCardModel.query({ client: this.transaction.client() }).where('id', card.id).delete()
+    await MatchCardModel.query({ client: this.transaction.client() })
+      .where('id', card.id)
+      .delete()
   }
 
   async paginate(
     criteria: CardListCriteria,
   ): Promise<Paginated<AdministratorCardPaginateResponse>> {
-    const query = MatchCardModel.query({ client: this.transaction.client() }).preload('student')
+    const query = MatchCardModel.query({
+      client: this.transaction.client(),
+    }).preload('student')
 
     if (criteria.matchId) query.where('matchId', criteria.matchId)
     if (criteria.studentId) query.where('studentId', criteria.studentId)
@@ -72,7 +86,9 @@ export class MatchCardLucidRepository extends MatchCardRepository {
       })
     }
 
-    const page = await query.orderBy('createdAt', 'desc').paginate(criteria.page, criteria.perPage)
+    const page = await query
+      .orderBy('createdAt', 'desc')
+      .paginate(criteria.page, criteria.perPage)
     const matches = await this.brackets.findMatchResponses([
       ...new Set(page.all().map((row) => row.matchId)),
     ])
@@ -83,13 +99,23 @@ export class MatchCardLucidRepository extends MatchCardRepository {
         const match = matches.get(row.matchId)
         if (!match) return []
 
-        return this.assemble(this.toProps(row), this.toStudent(row.student), match) ?? []
+        return (
+          this.assemble(
+            this.toProps(row),
+            this.toStudent(row.student),
+            match,
+          ) ?? []
+        )
       }),
     }
   }
 
-  async findResponse(id: string): Promise<AdministratorCardPaginateResponse | null> {
-    const row = await MatchCardModel.query({ client: this.transaction.client() })
+  async findResponse(
+    id: string,
+  ): Promise<AdministratorCardPaginateResponse | null> {
+    const row = await MatchCardModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .preload('student')
       .first()

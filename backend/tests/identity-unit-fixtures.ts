@@ -32,7 +32,10 @@ type Seed = {
 }
 
 /** Saves an account in the in-memory repository; the password is `PASSWORD`, hashed on `save`. */
-export async function seedUser(users: UserMemoryRepository, seed: Seed = {}): Promise<User> {
+export async function seedUser(
+  users: UserMemoryRepository,
+  seed: Seed = {},
+): Promise<User> {
   const user = User.create({
     id: seed.id ?? USER_ID,
     name: seed.name ?? 'Ana',
@@ -41,7 +44,8 @@ export async function seedUser(users: UserMemoryRepository, seed: Seed = {}): Pr
     role: seed.role ?? 'ADVISOR',
     now: new Date('2026-10-29T12:00:00Z'),
   })
-  if (seed.inactive) user.update({ status: 'INACTIVE' }, new Date('2026-10-29T12:30:00Z'))
+  if (seed.inactive)
+    user.update({ status: 'INACTIVE' }, new Date('2026-10-29T12:30:00Z'))
   if (seed.archived) user.archive(new Date('2026-10-29T13:00:00Z'))
 
   await users.save(user)

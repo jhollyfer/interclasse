@@ -42,10 +42,15 @@ test.group('classrooms > update', (group) => {
     assert.isNull(body(response).representative)
   })
 
-  test('`null` undoes the link and a missing field leaves it alone', async ({ client, assert }) => {
+  test('`null` undoes the link and a missing field leaves it alone', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const advisor = await UserFactory.create()
-    const classroom = await ClassroomFactory.merge({ advisorId: advisor.id }).create()
+    const classroom = await ClassroomFactory.merge({
+      advisorId: advisor.id,
+    }).create()
 
     const response = await client
       .put(`/administrator/classrooms/${classroom.id}`)
@@ -93,7 +98,10 @@ test.group('classrooms > update', (group) => {
     own.assertStatus(200)
   })
 
-  test('account without the link role responds 422', async ({ client, assert }) => {
+  test('account without the link role responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const representative = await UserFactory.apply('representative').create()
     const advisor = await UserFactory.create()
@@ -114,10 +122,15 @@ test.group('classrooms > update', (group) => {
     assert.equal(body(representativeSession).code, 'REPRESENTATIVE_NOT_FOUND')
   })
 
-  test('representative of another classroom responds 409', async ({ client, assert }) => {
+  test('representative of another classroom responds 409', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const representative = await UserFactory.apply('representative').create()
-    await ClassroomFactory.merge({ representativeId: representative.id }).create()
+    await ClassroomFactory.merge({
+      representativeId: representative.id,
+    }).create()
     const classroom = await ClassroomFactory.create()
 
     const response = await client
@@ -129,7 +142,10 @@ test.group('classrooms > update', (group) => {
     assert.equal(body(response).code, 'REPRESENTATIVE_TAKEN')
   })
 
-  test('advisor of another classroom responds 409', async ({ client, assert }) => {
+  test('advisor of another classroom responds 409', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const advisor = await UserFactory.create()
     await ClassroomFactory.merge({ advisorId: advisor.id }).create()
@@ -167,7 +183,10 @@ test.group('classrooms > update', (group) => {
     assert.equal(body(sameCategory).category, CATEGORY.F2)
   })
 
-  test('year outside the range responds 422 on the field', async ({ client, assert }) => {
+  test('year outside the range responds 422 on the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
 
@@ -180,7 +199,10 @@ test.group('classrooms > update', (group) => {
     assert.property(body(response).errors, 'grade')
   })
 
-  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const classroom = await ClassroomFactory.create()
 
     const anonymous = await client
@@ -199,7 +221,10 @@ test.group('classrooms > update', (group) => {
     assert.equal(untouched.name, classroom.name)
   })
 
-  test('empty name responds 422 and does not save', async ({ client, assert }) => {
+  test('empty name responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
 

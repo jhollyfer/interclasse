@@ -23,7 +23,8 @@ export async function makeWithMemory<TUseCase>(
   if (!bindings.some(([contract]) => contract === StorageContract))
     all.push([StorageContract, new StorageFake()])
 
-  for (const [contract, implementation] of all) app.container.swap(contract, () => implementation)
+  for (const [contract, implementation] of all)
+    app.container.swap(contract, () => implementation)
 
   try {
     return await app.container.make(useCase)

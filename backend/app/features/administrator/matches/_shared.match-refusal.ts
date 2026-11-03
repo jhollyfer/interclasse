@@ -10,7 +10,10 @@ export class MatchRefusal extends RefusalBase {
     MATCH_NOT_FOUND: (_fact, i18n) =>
       HTTPException.NotFound(i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'),
     MATCH_TEAMS_PENDING: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('matches.teams_pending'), 'MATCH_TEAMS_PENDING'),
+      HTTPException.Conflict(
+        i18n.t('matches.teams_pending'),
+        'MATCH_TEAMS_PENDING',
+      ),
     MATCH_WINNER_REQUIRED: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
         i18n.t('matches.winner_required'),
@@ -20,9 +23,15 @@ export class MatchRefusal extends RefusalBase {
     MATCH_NOT_PLAYED: (_fact, i18n) =>
       HTTPException.Conflict(i18n.t('matches.not_played'), 'MATCH_NOT_PLAYED'),
     MATCH_NEXT_PLAYED_ON_SCORE: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('matches.next_played_on_score'), 'NEXT_MATCH_PLAYED'),
+      HTTPException.Conflict(
+        i18n.t('matches.next_played_on_score'),
+        'NEXT_MATCH_PLAYED',
+      ),
     MATCH_NEXT_PLAYED_ON_UNSCORE: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('matches.next_played_on_unscore'), 'NEXT_MATCH_PLAYED'),
+      HTTPException.Conflict(
+        i18n.t('matches.next_played_on_unscore'),
+        'NEXT_MATCH_PLAYED',
+      ),
   } satisfies RefusalTable<MatchError>
 
   static http(error: MatchError, i18n: I18n): HTTPException {

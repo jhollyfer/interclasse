@@ -28,14 +28,22 @@ export class ReportMemoryRepository extends ReportRepository {
   private readonly classroomRows: ClassroomRow[] = []
   private readonly studentRows: Array<{ id: string; classroomId: string }> = []
   private readonly sportRows: Array<{ id: string; name: string }> = []
-  private readonly enrollmentRows: Array<{ studentId: string; sportId: string }> = []
+  private readonly enrollmentRows: Array<{
+    studentId: string
+    sportId: string
+  }> = []
   private readonly matchStatuses: MatchStatus[] = []
 
   /** Test arrangement: a classroom. */
   withClassroom(
-    classroom: Omit<ClassroomRow, 'advisor' | 'representative'> & Partial<ClassroomRow>,
+    classroom: Omit<ClassroomRow, 'advisor' | 'representative'> &
+      Partial<ClassroomRow>,
   ): this {
-    this.classroomRows.push({ advisor: null, representative: null, ...classroom })
+    this.classroomRows.push({
+      advisor: null,
+      representative: null,
+      ...classroom,
+    })
     return this
   }
 
@@ -75,7 +83,9 @@ export class ReportMemoryRepository extends ReportRepository {
         matchesScheduled: this.matchesIn(MATCH_STATUS.SCHEDULED),
       },
       byCategory: CATEGORIES.map((category) => {
-        const rows = classrooms.filter((classroom) => classroom.category === category)
+        const rows = classrooms.filter(
+          (classroom) => classroom.category === category,
+        )
 
         return {
           category,
@@ -95,7 +105,9 @@ export class ReportMemoryRepository extends ReportRepository {
     return [...this.classroomRows]
       .sort((a, b) => a.grade - b.grade || a.name.localeCompare(b.name))
       .map((classroom) => {
-        const students = this.studentRows.filter((student) => student.classroomId === classroom.id)
+        const students = this.studentRows.filter(
+          (student) => student.classroomId === classroom.id,
+        )
         const enrollments = this.enrollmentRows.filter((enrollment) =>
           students.some((student) => student.id === enrollment.studentId),
         )
@@ -107,23 +119,30 @@ export class ReportMemoryRepository extends ReportRepository {
           advisor: classroom.advisor,
           representative: classroom.representative,
           students: students.length,
-          athletes: new Set(enrollments.map((enrollment) => enrollment.studentId)).size,
-          sports: new Set(enrollments.map((enrollment) => enrollment.sportId)).size,
+          athletes: new Set(
+            enrollments.map((enrollment) => enrollment.studentId),
+          ).size,
+          sports: new Set(enrollments.map((enrollment) => enrollment.sportId))
+            .size,
         }
       })
   }
 
   private sportCounts(sport: { id: string; name: string }) {
-    const enrollments = this.enrollmentRows.filter((enrollment) => enrollment.sportId === sport.id)
+    const enrollments = this.enrollmentRows.filter(
+      (enrollment) => enrollment.sportId === sport.id,
+    )
     const classroomIds = enrollments.map(
       (enrollment) =>
-        this.studentRows.find((student) => student.id === enrollment.studentId)?.classroomId,
+        this.studentRows.find((student) => student.id === enrollment.studentId)
+          ?.classroomId,
     )
 
     return {
       id: sport.id,
       name: sport.name,
-      athletes: new Set(enrollments.map((enrollment) => enrollment.studentId)).size,
+      athletes: new Set(enrollments.map((enrollment) => enrollment.studentId))
+        .size,
       classrooms: new Set(classroomIds.filter((id) => id !== undefined)).size,
     }
   }
@@ -132,7 +151,10 @@ export class ReportMemoryRepository extends ReportRepository {
     return this.matchStatuses.filter((candidate) => candidate === status).length
   }
 
-  private sum(rows: ReadonlyArray<Count>, key: 'students' | 'athletes'): number {
+  private sum(
+    rows: ReadonlyArray<Count>,
+    key: 'students' | 'athletes',
+  ): number {
     return rows.reduce((total, row) => total + row[key], 0)
   }
 }

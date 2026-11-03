@@ -16,7 +16,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorClassroomPaginatePayload } from '#validators/administrator/classrooms.validator'
 
 type Payload = AdministratorClassroomPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorClassroomPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorClassroomPaginateResponse>
+>
 
 @inject()
 export default class AdministratorClassroomPaginateUseCase {
@@ -38,7 +41,10 @@ export default class AdministratorClassroomPaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[administrator/classrooms > paginate][error]')
+      logger.error(
+        { err: error },
+        '[administrator/classrooms > paginate][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

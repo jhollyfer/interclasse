@@ -1,4 +1,8 @@
-import type { Actor, AdvisorStudentShowResponse, Paginated } from '@interclasse/shared'
+import type {
+  Actor,
+  AdvisorStudentShowResponse,
+  Paginated,
+} from '@interclasse/shared'
 
 import type { Student } from '#domain/student/student.entity'
 
@@ -30,5 +34,7 @@ export abstract class StudentRepository {
   abstract save(student: Student): Promise<void>
   abstract delete(student: Student): Promise<void>
   /** Lightweight read: the response shape straight from the query, without hydrating an entity. */
-  abstract paginate(criteria: StudentListCriteria): Promise<Paginated<AdvisorStudentShowResponse>>
+  abstract paginate(
+    criteria: StudentListCriteria,
+  ): Promise<Paginated<AdvisorStudentShowResponse>>
 }

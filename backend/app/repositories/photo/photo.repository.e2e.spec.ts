@@ -54,7 +54,12 @@ const IMPLEMENTATIONS = {
         updatedAt: null,
         deletedAt: null,
       })
-      .withAuthor({ id: authorId, name: 'Ana', email: 'ana@mail.com', role: USER_ROLE.ADVISOR })
+      .withAuthor({
+        id: authorId,
+        name: 'Ana',
+        email: 'ana@mail.com',
+        role: USER_ROLE.ADVISOR,
+      })
 
     return { repository, storageId, authorId }
   },
@@ -92,12 +97,16 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(found?.snapshot(), sent.snapshot())
     })
 
-    test('findOwned only finds the photo of whoever uploaded it', async ({ assert }) => {
+    test('findOwned only finds the photo of whoever uploaded it', async ({
+      assert,
+    }) => {
       const arranged = await arrange()
       const sent = photo(arranged, PHOTO_SENDER.ADVISOR, NOW)
       await arranged.repository.save(sent)
 
-      assert.isNotNull(await arranged.repository.findOwned(sent.id, arranged.authorId))
+      assert.isNotNull(
+        await arranged.repository.findOwned(sent.id, arranged.authorId),
+      )
       assert.isNull(await arranged.repository.findOwned(sent.id, randomUUID()))
     })
 
@@ -106,10 +115,13 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
     }) => {
       const arranged = await arrange()
 
-      assert.deepEqual(await arranged.repository.findUploadedStorage(arranged.storageId), {
-        id: arranged.storageId,
-        mimetype: 'image/png',
-      })
+      assert.deepEqual(
+        await arranged.repository.findUploadedStorage(arranged.storageId),
+        {
+          id: arranged.storageId,
+          mimetype: 'image/png',
+        },
+      )
       assert.isNull(await arranged.repository.findUploadedStorage(randomUUID()))
     })
 
@@ -126,10 +138,16 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await arranged.repository.show(randomUUID()))
     })
 
-    test('paginate filters by status and by author, newest to oldest', async ({ assert }) => {
+    test('paginate filters by status and by author, newest to oldest', async ({
+      assert,
+    }) => {
       const arranged = await arrange()
       const older = photo(arranged, PHOTO_SENDER.ADVISOR, NOW)
-      const newer = photo(arranged, PHOTO_SENDER.ADMINISTRATOR, new Date(NOW.getTime() + 1000))
+      const newer = photo(
+        arranged,
+        PHOTO_SENDER.ADMINISTRATOR,
+        new Date(NOW.getTime() + 1000),
+      )
       await arranged.repository.save(older)
       await arranged.repository.save(newer)
 
@@ -156,13 +174,18 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       assert.lengthOf(stranger.data, 0)
     })
 
-    test('paginateApproved lists only the approved ones, without author', async ({ assert }) => {
+    test('paginateApproved lists only the approved ones, without author', async ({
+      assert,
+    }) => {
       const arranged = await arrange()
       await arranged.repository.save(photo(arranged, PHOTO_SENDER.ADVISOR, NOW))
       const approved = photo(arranged, PHOTO_SENDER.ADMINISTRATOR, NOW)
       await arranged.repository.save(approved)
 
-      const page = await arranged.repository.paginateApproved({ page: 1, perPage: 10 })
+      const page = await arranged.repository.paginateApproved({
+        page: 1,
+        perPage: 10,
+      })
 
       assert.deepEqual(
         page.data.map((item) => item.id),

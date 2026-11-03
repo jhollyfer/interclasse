@@ -25,7 +25,9 @@ export default class AdministratorBracketCreateController {
   constructor(private readonly useCase: AdministratorBracketCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorBracketCreateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorBracketCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     const { bracket, created } = result.value

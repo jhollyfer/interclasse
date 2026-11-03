@@ -16,7 +16,9 @@ test.group('validators/administrator/matches > scheduledAt (unit)', () => {
   })
 
   test('null unschedules and arrives as null', async ({ assert }) => {
-    const payload = await AdministratorMatchUpdateValidator.validate({ scheduledAt: null })
+    const payload = await AdministratorMatchUpdateValidator.validate({
+      scheduledAt: null,
+    })
 
     assert.isNull(payload.scheduledAt)
   })
@@ -27,7 +29,10 @@ test.group('validators/administrator/matches > scheduledAt (unit)', () => {
     })
 
     assert.isTrue(DateTime.isDateTime(payload.scheduledAt))
-    assert.equal(payload.scheduledAt?.toUTC().toISO(), '2026-11-03T18:30:00.000Z')
+    assert.equal(
+      payload.scheduledAt?.toUTC().toISO(),
+      '2026-11-03T18:30:00.000Z',
+    )
   })
 
   test('a date without offset is refused', async ({ assert }) => {

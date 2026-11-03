@@ -19,7 +19,9 @@ export default class AdministratorMatchUpdateController {
   constructor(private readonly useCase: AdministratorMatchUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdministratorMatchUpdateValidator)
+    const body = await context.request.validateUsing(
+      AdministratorMatchUpdateValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

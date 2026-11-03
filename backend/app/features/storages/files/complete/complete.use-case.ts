@@ -58,7 +58,8 @@ export default class StoragesFileCompleteUseCase {
       if (!storage.isUploaded()) {
         const { path, uploadId } = storage.snapshot()
 
-        if (uploadId) await this.multipart.complete(path, uploadId, payload.parts ?? [])
+        if (uploadId)
+          await this.multipart.complete(path, uploadId, payload.parts ?? [])
 
         const metadata = await this.bucket.metadata(path)
         const head = await this.bucket.head(path)
@@ -105,11 +106,17 @@ export default class StoragesFileCompleteUseCase {
       await this.bucket.discard(storage.snapshot().path)
       await this.storages.delete(storage)
     } catch (error) {
-      logger.error({ err: error }, '[storages/files > complete][discard][error]')
+      logger.error(
+        { err: error },
+        '[storages/files > complete][discard][error]',
+      )
     }
   }
 
   private notFound(): HTTPException {
-    return HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND')
+    return HTTPException.NotFound(
+      this.i18n.t('files.not_found'),
+      'STORAGE_NOT_FOUND',
+    )
   }
 }

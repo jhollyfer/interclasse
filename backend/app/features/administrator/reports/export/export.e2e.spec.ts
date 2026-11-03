@@ -15,9 +15,15 @@ test.group('administrator/reports > export', (group) => {
     assert,
   }) => {
     const admin = await authenticateAsAdministrator(client)
-    await ClassroomFactory.merge({ name: '3º Z', grade: 3, category: 'F1' }).create()
+    await ClassroomFactory.merge({
+      name: '3º Z',
+      grade: 3,
+      category: 'F1',
+    }).create()
 
-    const response = await client.get('/administrator/reports/csv').cookies(admin)
+    const response = await client
+      .get('/administrator/reports/csv')
+      .cookies(admin)
 
     response.assertStatus(200)
     assert.include(response.header('content-type'), 'text/csv')
@@ -36,7 +42,9 @@ test.group('administrator/reports > export', (group) => {
   test('403: advisor does not download the report', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.get('/administrator/reports/csv').cookies(advisor)
+    const response = await client
+      .get('/administrator/reports/csv')
+      .cookies(advisor)
 
     response.assertStatus(403)
   })

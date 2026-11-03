@@ -30,7 +30,9 @@ test.group('storefront/brackets > show (unit)', () => {
   test('nonexistent bracket is 404 BRACKET_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })
+    const result = await useCase.execute({
+      id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91',
+    })
 
     assert.deepInclude(result.value, { status: 404, code: 'BRACKET_NOT_FOUND' })
   })

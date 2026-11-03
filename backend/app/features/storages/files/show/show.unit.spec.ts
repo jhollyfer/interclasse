@@ -4,11 +4,18 @@ import StoragesFileShowUseCase from './show.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { FILE_ID, rightOf, storageDoubles, uploadedFile } from '#tests/storages-unit-fixtures'
+import {
+  FILE_ID,
+  rightOf,
+  storageDoubles,
+  uploadedFile,
+} from '#tests/storages-unit-fixtures'
 
 async function setup() {
   const { storages } = storageDoubles()
-  const useCase = await makeWithMemory(StoragesFileShowUseCase, [[StorageRepository, storages]])
+  const useCase = await makeWithMemory(StoragesFileShowUseCase, [
+    [StorageRepository, storages],
+  ])
 
   return { storages, useCase }
 }
@@ -20,7 +27,11 @@ test.group('storages/files > show (unit)', () => {
 
     const file = rightOf(await useCase.execute({ id: FILE_ID }))
 
-    assert.deepInclude(file, { id: FILE_ID, originalName: 'capa.png', status: 'UPLOADED' })
+    assert.deepInclude(file, {
+      id: FILE_ID,
+      originalName: 'capa.png',
+      status: 'UPLOADED',
+    })
     assert.isString(file.url)
   })
 
@@ -32,7 +43,9 @@ test.group('storages/files > show (unit)', () => {
     assert.deepInclude(result.value, { status: 404, code: 'STORAGE_NOT_FOUND' })
   })
 
-  test('repository failure is 500 STORAGES_FILE_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 STORAGES_FILE_SHOW_ERROR', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
     storages.detail = async () => {
       throw new Error('database down')
@@ -40,6 +53,9 @@ test.group('storages/files > show (unit)', () => {
 
     const result = await useCase.execute({ id: FILE_ID })
 
-    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_SHOW_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'STORAGES_FILE_SHOW_ERROR',
+    })
   })
 })

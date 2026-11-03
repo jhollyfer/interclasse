@@ -17,7 +17,9 @@ export default class AdministratorCardCreateController {
   constructor(private readonly useCase: AdministratorCardCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorCardCreateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorCardCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

@@ -28,7 +28,10 @@ export class EnrollmentRemovalMemoryRepository extends EnrollmentRemovalReposito
   /** What the notice nests, as the test arranges it from the other tables. */
   private readonly classrooms = new Map<string, Classroom>()
   private readonly sports = new Map<string, Sport>()
-  private readonly actors = new Map<string, AdministratorClassroomPersonResponse>()
+  private readonly actors = new Map<
+    string,
+    AdministratorClassroomPersonResponse
+  >()
 
   /** Test arrangement: the notice's classroom. */
   withClassroom(classroom: Classroom): this {
@@ -63,7 +66,9 @@ export class EnrollmentRemovalMemoryRepository extends EnrollmentRemovalReposito
     for (const removal of removals) await this.save(removal)
   }
 
-  async findDetail(id: string): Promise<AdministratorEnrollmentRemovalShowResponse | null> {
+  async findDetail(
+    id: string,
+  ): Promise<AdministratorEnrollmentRemovalShowResponse | null> {
     const props = this.rows.get(id)
     if (!props) return null
 
@@ -76,12 +81,17 @@ export class EnrollmentRemovalMemoryRepository extends EnrollmentRemovalReposito
     const all = [...this.rows.values()]
       .filter(
         (row) =>
-          criteria.pending === undefined || (row.acknowledgedAt === null) === criteria.pending,
+          criteria.pending === undefined ||
+          (row.acknowledgedAt === null) === criteria.pending,
       )
-      .filter((row) => !criteria.classroomId || row.classroomId === criteria.classroomId)
+      .filter(
+        (row) =>
+          !criteria.classroomId || row.classroomId === criteria.classroomId,
+      )
       .sort(
         (a, b) =>
-          Number(b.acknowledgedAt === null) - Number(a.acknowledgedAt === null) ||
+          Number(b.acknowledgedAt === null) -
+            Number(a.acknowledgedAt === null) ||
           b.createdAt.getTime() - a.createdAt.getTime(),
       )
     const page = MemoryPagination.slice(all, criteria.page, criteria.perPage)

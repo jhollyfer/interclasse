@@ -18,7 +18,9 @@ export default class AdministratorSiteUpdateController {
   constructor(private readonly useCase: AdministratorSiteUpdateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorSiteUpdateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorSiteUpdateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

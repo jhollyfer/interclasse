@@ -11,13 +11,19 @@ import {
 test.group('administrator/site > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('200: the site with the regulation and the signed URL', async ({ client, assert }) => {
+  test('200: the site with the regulation and the signed URL', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const pdf = await StorageFactory.merge({
       mimetype: 'application/pdf',
       originalName: 'regulamento.pdf',
     }).create()
-    await client.put('/administrator/site').cookies(admin).json({ regulationId: pdf.id })
+    await client
+      .put('/administrator/site')
+      .cookies(admin)
+      .json({ regulationId: pdf.id })
 
     const response = await client.get('/administrator/site').cookies(admin)
 
@@ -27,7 +33,10 @@ test.group('administrator/site > show', (group) => {
     assert.isString(body(response).regulation.url)
   })
 
-  test('200: without a regulation, regulation is null', async ({ client, assert }) => {
+  test('200: without a regulation, regulation is null', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
     const response = await client.get('/administrator/site').cookies(admin)
@@ -42,7 +51,9 @@ test.group('administrator/site > show', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not read the site configuration', async ({ client }) => {
+  test('403: advisor does not read the site configuration', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/site').cookies(advisor)

@@ -24,17 +24,28 @@ class Sink extends Writable {
 }
 
 function collectingLogger(sink: Sink) {
-  const config = { ...loggerConfig.loggers.app, transport: undefined, destination: sink }
+  const config = {
+    ...loggerConfig.loggers.app,
+    transport: undefined,
+    destination: sink,
+  }
 
-  return new LoggerManager({ default: 'app', loggers: { app: config } }).use('app')
+  return new LoggerManager({ default: 'app', loggers: { app: config } }).use(
+    'app',
+  )
 }
 
 test.group('config > logger > redaction (unit)', () => {
-  test('the body password does not reach the log, even nested', ({ assert }) => {
+  test('the body password does not reach the log, even nested', ({
+    assert,
+  }) => {
     const sink = new Sink()
 
     collectingLogger(sink).info(
-      { payload: { email: 'ana@mail.com', password: 'Segredo123!' }, password: 'Segredo123!' },
+      {
+        payload: { email: 'ana@mail.com', password: 'Segredo123!' },
+        password: 'Segredo123!',
+      },
       'sign-in',
     )
 

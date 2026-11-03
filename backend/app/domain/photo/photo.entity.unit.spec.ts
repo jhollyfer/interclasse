@@ -33,7 +33,9 @@ test.group('Photo', () => {
     })
   })
 
-  test("the organization's photo is born approved by whoever uploaded it", ({ assert }) => {
+  test("the organization's photo is born approved by whoever uploaded it", ({
+    assert,
+  }) => {
     const photo = send(PHOTO_SENDER.ADMINISTRATOR)
 
     assert.deepInclude(photo.snapshot(), {

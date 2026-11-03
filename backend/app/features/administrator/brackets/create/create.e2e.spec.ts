@@ -46,8 +46,11 @@ test.group('brackets > create', (group) => {
 
     const bracket = await draw(client, admin, sport.id)
     const detail = await client.get(`/storefront/brackets/${bracket.id}`)
-    const matches: Array<{ phase: string; homeTeamId: string | null; awayTeamId: string | null }> =
-      body(detail).matches
+    const matches: Array<{
+      phase: string
+      homeTeamId: string | null
+      awayTeamId: string | null
+    }> = body(detail).matches
 
     const semis = matches.filter((match) => match.phase === MATCH_PHASE.SEMI)
     const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
@@ -69,12 +72,15 @@ test.group('brackets > create', (group) => {
     const [classroomId] = await enrolledClassrooms(client, admin, sport.id, 2)
     await draw(client, admin, sport.id)
 
-    const response = await client.put('/advisor/enrollments').cookies(admin).json({
-      classroomId,
-      sportId: sport.id,
-      studentIds: [],
-      reason: 'Atleta machucado',
-    })
+    const response = await client
+      .put('/advisor/enrollments')
+      .cookies(admin)
+      .json({
+        classroomId,
+        sportId: sport.id,
+        studentIds: [],
+        reason: 'Atleta machucado',
+      })
 
     response.assertStatus(200)
     assert.isTrue(body(response).sports[0].drawn)
@@ -114,10 +120,14 @@ test.group('administrator/brackets/create > access and validation', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.post('/administrator/brackets').cookies(advisor)
+    const response = await client
+      .post('/administrator/brackets')
+      .cookies(advisor)
 
     response.assertStatus(403)
   })

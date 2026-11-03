@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorMatchPaginatePayload } from '#validators/administrator/matches.validator'
 
 type Payload = AdministratorMatchPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorMatchPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorMatchPaginateResponse>
+>
 
 /** The match table: the scheduled ones by time first, then those without a time by round. */
 @inject()

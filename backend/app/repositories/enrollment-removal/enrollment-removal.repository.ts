@@ -1,4 +1,7 @@
-import type { AdministratorEnrollmentRemovalShowResponse, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorEnrollmentRemovalShowResponse,
+  Paginated,
+} from '@interclasse/shared'
 
 import type { EnrollmentRemoval } from '#domain/enrollment-removal/enrollment-removal.entity'
 
@@ -20,7 +23,9 @@ export abstract class EnrollmentRemovalRepository {
   /** The notices of a list swap, in a single write. */
   abstract saveAll(removals: EnrollmentRemoval[]): Promise<void>
   /** Lightweight read: the notice with the classroom, the sport and who removed, straight from the query. */
-  abstract findDetail(id: string): Promise<AdministratorEnrollmentRemovalShowResponse | null>
+  abstract findDetail(
+    id: string,
+  ): Promise<AdministratorEnrollmentRemovalShowResponse | null>
   /** Newest to oldest, pending first. */
   abstract paginate(
     criteria: EnrollmentRemovalListCriteria,

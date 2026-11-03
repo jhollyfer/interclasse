@@ -7,7 +7,11 @@ import AdvisorPhotoPaginateUseCase from './paginate.use-case.ts'
 import { Photo, PHOTO_SENDER } from '#domain/photo/photo.entity'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
+import {
+  memoryAuthor,
+  memoryPhotos,
+  memoryStorage,
+} from '#tests/photos-fixtures'
 
 async function setup() {
   const storage = memoryStorage()
@@ -25,7 +29,9 @@ async function setup() {
     if (created.isLeft()) throw new Error('invalid arrangement')
     await photos.save(created.value)
   }
-  const useCase = await makeWithMemory(AdvisorPhotoPaginateUseCase, [[PhotoRepository, photos]])
+  const useCase = await makeWithMemory(AdvisorPhotoPaginateUseCase, [
+    [PhotoRepository, photos],
+  ])
 
   return { mine, useCase }
 }

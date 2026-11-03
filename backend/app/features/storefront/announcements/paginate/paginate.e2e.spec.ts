@@ -7,21 +7,29 @@ import { body, resetDatabase } from '#tests/http-fixtures'
 test.group('announcements > paginate (site)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('responds without a session: pinned first, then newest', async ({ client, assert }) => {
+  test('responds without a session: pinned first, then newest', async ({
+    client,
+    assert,
+  }) => {
     const { pinned, older, newest } = await announcementTimeline()
 
     const response = await client.get('/storefront/announcements')
 
     response.assertStatus(200)
     assert.deepEqual(
-      body(response).data.map((announcement: { id: string }) => announcement.id),
+      body(response).data.map(
+        (announcement: { id: string }) => announcement.id,
+      ),
       [pinned.id, newest.id, older.id],
     )
     assert.equal(body(response).meta.total, 3)
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('each item carries title, body and highlight', async ({ client, assert }) => {
+  test('each item carries title, body and highlight', async ({
+    client,
+    assert,
+  }) => {
     const announcement = await AnnouncementFactory.create()
 
     const response = await client.get('/storefront/announcements')
@@ -34,18 +42,27 @@ test.group('announcements > paginate (site)', (group) => {
   })
 
   test('?search narrows by title', async ({ client, assert }) => {
-    const match = await AnnouncementFactory.merge({ title: 'Chuva adia a final' }).create()
+    const match = await AnnouncementFactory.merge({
+      title: 'Chuva adia a final',
+    }).create()
     await AnnouncementFactory.merge({ title: 'Abertura dos jogos' }).create()
 
-    const response = await client.get('/storefront/announcements').qs({ search: 'chuva' })
+    const response = await client
+      .get('/storefront/announcements')
+      .qs({ search: 'chuva' })
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)
     assert.equal(body(response).data[0].id, match.id)
   })
 
-  test('?page without a valid number responds 422', async ({ client, assert }) => {
-    const response = await client.get('/storefront/announcements').qs({ page: 0 })
+  test('?page without a valid number responds 422', async ({
+    client,
+    assert,
+  }) => {
+    const response = await client
+      .get('/storefront/announcements')
+      .qs({ page: 0 })
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'page')

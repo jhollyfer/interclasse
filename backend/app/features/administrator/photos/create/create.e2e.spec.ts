@@ -34,12 +34,16 @@ test.group('administrator/photos > create', (group) => {
   test('401: without a session', async ({ client }) => {
     const image = await StorageFactory.create()
 
-    const response = await client.post('/administrator/photos').json({ storageId: image.id })
+    const response = await client
+      .post('/administrator/photos')
+      .json({ storageId: image.id })
 
     response.assertStatus(401)
   })
 
-  test('403: advisor does not use the organization route', async ({ client }) => {
+  test('403: advisor does not use the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const image = await StorageFactory.create()
 
@@ -54,7 +58,10 @@ test.group('administrator/photos > create', (group) => {
   test('422: without storageId', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.post('/administrator/photos').cookies(admin).json({})
+    const response = await client
+      .post('/administrator/photos')
+      .cookies(admin)
+      .json({})
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'storageId')
@@ -74,7 +81,9 @@ test.group('administrator/photos > create', (group) => {
 
   test('422: file that is not an image', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
-    const pdf = await StorageFactory.merge({ mimetype: 'application/pdf' }).create()
+    const pdf = await StorageFactory.merge({
+      mimetype: 'application/pdf',
+    }).create()
 
     const response = await client
       .post('/administrator/photos')

@@ -35,7 +35,10 @@ import {
 test.group('storages > listagem', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the default order is from most recent to oldest', async ({ client, assert }) => {
+  test('the default order is from most recent to oldest', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const older = await storageRow({ originalName: 'antigo.png' })
@@ -64,7 +67,10 @@ test.group('storages > listagem', (group) => {
     await storageRow()
     const pending = await storageRow({ status: UPLOAD_STATUS.PENDING })
 
-    const response = await client.get('/storages').qs({ status: 'PENDING' }).cookies(session)
+    const response = await client
+      .get('/storages')
+      .qs({ status: 'PENDING' })
+      .cookies(session)
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)
@@ -87,7 +93,10 @@ test.group('storages > listagem', (group) => {
     assert.equal(body(response).data[0].id, pdf.id)
   })
 
-  test('?search does not escape the status filter', async ({ client, assert }) => {
+  test('?search does not escape the status filter', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const confirmed = await storageRow({ originalName: 'contrato.pdf' })

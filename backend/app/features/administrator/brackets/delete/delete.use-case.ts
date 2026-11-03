@@ -30,10 +30,16 @@ export default class AdministratorBracketDeleteUseCase {
     try {
       const bracket = await this.brackets.findById(id)
       if (!bracket)
-        return left(HTTPException.NotFound(this.i18n.t('brackets.not_found'), 'BRACKET_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('brackets.not_found'),
+            'BRACKET_NOT_FOUND',
+          ),
+        )
 
       const deletable = bracket.ensureDeletable()
-      if (deletable.isLeft()) return left(BracketRefusal.http(deletable.value, this.i18n))
+      if (deletable.isLeft())
+        return left(BracketRefusal.http(deletable.value, this.i18n))
 
       await this.brackets.delete(bracket)
 

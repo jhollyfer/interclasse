@@ -41,7 +41,10 @@ export default class AdvisorCardPaginateUseCase {
       })
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return right(

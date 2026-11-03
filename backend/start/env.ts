@@ -11,6 +11,8 @@
 
 import { Env } from '@adonisjs/core/env'
 
+import { TrustedProxies } from '#core/trusted-proxies'
+
 /**
  * The single environment reader (_standards/backend.md §6), in blocks in the house
  * order. Every key declared here is read by some `env.get()`, and vice versa -
@@ -53,7 +55,7 @@ export default await Env.create(new URL('../', import.meta.url), {
    * `request.ip()` is the proxy IP and every per-IP limit becomes global. Never
    * `true`: the client would then forge `X-Forwarded-For`.
    */
-  TRUSTED_PROXIES: Env.schema.string.optional(),
+  TRUSTED_PROXIES: TrustedProxies.validate,
 
   /**
    * Origins the browser may use to call this API, separated by

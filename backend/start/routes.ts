@@ -58,13 +58,21 @@ router
  */
 router
   .group(() => {
-    router.get('sports', [controllers.storefront.sports.paginate.Paginate]).as('sports')
     router
-      .get('announcements', [controllers.storefront.announcements.paginate.Paginate])
+      .get('sports', [controllers.storefront.sports.paginate.Paginate])
+      .as('sports')
+    router
+      .get('announcements', [
+        controllers.storefront.announcements.paginate.Paginate,
+      ])
       .as('announcements')
-    router.get('matches', [controllers.storefront.matches.paginate.Paginate]).as('matches')
+    router
+      .get('matches', [controllers.storefront.matches.paginate.Paginate])
+      .as('matches')
     router.get('site', [controllers.storefront.site.show.Show]).as('site')
-    router.get('photos', [controllers.storefront.photos.paginate.Paginate]).as('photos')
+    router
+      .get('photos', [controllers.storefront.photos.paginate.Paginate])
+      .as('photos')
 
     router
       .group(() => {
@@ -113,7 +121,9 @@ router
 router
   .group(() => {
     router.get('/', [controllers.account.profile.show.Show])
-    router.put('/', [controllers.account.profile.update.Update]).use(accountUpdateThrottle)
+    router
+      .put('/', [controllers.account.profile.update.Update])
+      .use(accountUpdateThrottle)
   })
   .prefix('account')
   .as('profile')
@@ -140,7 +150,9 @@ router
 router
   .group(() => {
     router.get('/', [controllers.storages.files.paginate.Paginate])
-    router.post('/', [controllers.storages.files.create.Create]).use(uploadThrottle)
+    router
+      .post('/', [controllers.storages.files.create.Create])
+      .use(uploadThrottle)
     router
       .post(':id/complete', [controllers.storages.files.complete.Complete])
       .as('complete')
@@ -162,7 +174,9 @@ router
     // back door itself, issuing a signed URL for any uuid without a
     // session. The save-file `<a>` keeps working: same-site
     // navigation sends the cookie.
-    router.get(':id/download', [controllers.storages.files.download.Download]).as('download')
+    router
+      .get(':id/download', [controllers.storages.files.download.Download])
+      .as('download')
   })
   .prefix('storages')
   .as('storages')
@@ -179,11 +193,15 @@ router
   .group(() => {
     router
       .group(() => {
-        router.get('/', [controllers.administrator.classrooms.paginate.Paginate])
+        router.get('/', [
+          controllers.administrator.classrooms.paginate.Paginate,
+        ])
         router.post('/', [controllers.administrator.classrooms.create.Create])
         router.get(':id', [controllers.administrator.classrooms.show.Show])
         router.put(':id', [controllers.administrator.classrooms.update.Update])
-        router.delete(':id', [controllers.administrator.classrooms.delete.Delete])
+        router.delete(':id', [
+          controllers.administrator.classrooms.delete.Delete,
+        ])
       })
       .prefix('classrooms')
       .as('classrooms')
@@ -214,7 +232,9 @@ router
       .group(() => {
         router.get('/', [controllers.administrator.photos.paginate.Paginate])
         router.post('/', [controllers.administrator.photos.create.Create])
-        router.put(':id/review', [controllers.administrator.photos.review.Review]).as('review')
+        router
+          .put(':id/review', [controllers.administrator.photos.review.Review])
+          .as('review')
         router.delete(':id', [controllers.administrator.photos.delete.Delete])
       })
       .prefix('photos')
@@ -230,11 +250,19 @@ router
 
     router
       .group(() => {
-        router.get('/', [controllers.administrator.announcements.paginate.Paginate])
-        router.post('/', [controllers.administrator.announcements.create.Create])
+        router.get('/', [
+          controllers.administrator.announcements.paginate.Paginate,
+        ])
+        router.post('/', [
+          controllers.administrator.announcements.create.Create,
+        ])
         router.get(':id', [controllers.administrator.announcements.show.Show])
-        router.put(':id', [controllers.administrator.announcements.update.Update])
-        router.delete(':id', [controllers.administrator.announcements.delete.Delete])
+        router.put(':id', [
+          controllers.administrator.announcements.update.Update,
+        ])
+        router.delete(':id', [
+          controllers.administrator.announcements.delete.Delete,
+        ])
       })
       .prefix('announcements')
       .as('announcements')
@@ -248,7 +276,9 @@ router
         router.get('/', [controllers.administrator.brackets.paginate.Paginate])
         router.post('/', [controllers.administrator.brackets.create.Create])
         // Before `:id`: otherwise `preview` would be read as a bracket id.
-        router.get('preview', [controllers.administrator.brackets.preview.Preview]).as('preview')
+        router
+          .get('preview', [controllers.administrator.brackets.preview.Preview])
+          .as('preview')
         router.get(':id', [controllers.administrator.brackets.show.Show])
         router.delete(':id', [controllers.administrator.brackets.delete.Delete])
       })
@@ -264,12 +294,18 @@ router
       .group(() => {
         router.get('/', [controllers.administrator.matches.paginate.Paginate])
         router.put(':id', [controllers.administrator.matches.update.Update])
-        router.put(':id/score', [controllers.administrator.matches.score.Score]).as('score')
         router
-          .get(':id/athletes', [controllers.administrator.matches.athletes.Athletes])
+          .put(':id/score', [controllers.administrator.matches.score.Score])
+          .as('score')
+        router
+          .get(':id/athletes', [
+            controllers.administrator.matches.athletes.Athletes,
+          ])
           .as('athletes')
         router
-          .delete(':id/score', [controllers.administrator.matches.unscore.Unscore])
+          .delete(':id/score', [
+            controllers.administrator.matches.unscore.Unscore,
+          ])
           .as('unscore')
       })
       .prefix('matches')
@@ -291,10 +327,13 @@ router
      */
     router
       .group(() => {
-        router.get('/', [controllers.administrator.enrollmentRemovals.paginate.Paginate])
+        router.get('/', [
+          controllers.administrator.enrollmentRemovals.paginate.Paginate,
+        ])
         router
           .patch(':id/acknowledge', [
-            controllers.administrator.enrollmentRemovals.acknowledge.Acknowledge,
+            controllers.administrator.enrollmentRemovals.acknowledge
+              .Acknowledge,
           ])
           .as('acknowledge')
       })
@@ -321,12 +360,18 @@ router
         router
           .group(() => {
             router
-              .patch(':id/archive', [controllers.administrator.users.archive.Archive])
+              .patch(':id/archive', [
+                controllers.administrator.users.archive.Archive,
+              ])
               .as('archive')
             router
-              .patch(':id/unarchive', [controllers.administrator.users.unarchive.Unarchive])
+              .patch(':id/unarchive', [
+                controllers.administrator.users.unarchive.Unarchive,
+              ])
               .as('unarchive')
-            router.delete(':id', [controllers.administrator.users.delete.Delete]).as('purge')
+            router
+              .delete(':id', [controllers.administrator.users.delete.Delete])
+              .as('purge')
           })
           .prefix('users')
           .as('users')
@@ -346,8 +391,12 @@ router
  */
 router
   .group(() => {
-    router.get('classrooms', [controllers.advisor.classrooms.paginate.Paginate]).as('classrooms')
-    router.get('cards', [controllers.advisor.cards.paginate.Paginate]).as('cards')
+    router
+      .get('classrooms', [controllers.advisor.classrooms.paginate.Paginate])
+      .as('classrooms')
+    router
+      .get('cards', [controllers.advisor.cards.paginate.Paginate])
+      .as('cards')
 
     router
       .group(() => {

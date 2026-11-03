@@ -40,7 +40,11 @@ const IMPLEMENTATIONS = {
     },
     async classroom(name, grade) {
       const category = Classroom.categoryOf(grade)
-      const classroom = await ClassroomFactory.merge({ name, grade, category }).create()
+      const classroom = await ClassroomFactory.merge({
+        name,
+        grade,
+        category,
+      }).create()
       return { id: classroom.id, name, category }
     },
     async student(classroomId, name) {
@@ -48,7 +52,10 @@ const IMPLEMENTATIONS = {
       return student.id
     },
     async draw(classroom, sportId) {
-      await BracketFactory.merge({ sportId, category: classroom.category }).create()
+      await BracketFactory.merge({
+        sportId,
+        category: classroom.category,
+      }).create()
     },
   }),
   memory: async (): Promise<Harness> => {
@@ -62,7 +69,11 @@ const IMPLEMENTATIONS = {
         return id
       },
       async classroom(name, grade) {
-        const world = { id: randomUUID(), name, category: Classroom.categoryOf(grade) }
+        const world = {
+          id: randomUUID(),
+          name,
+          category: Classroom.categoryOf(grade),
+        }
         repository.withClassroom(world)
         return world
       },
@@ -82,15 +93,22 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`EnrollmentRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('findSport returns the ceiling; a nonexistent sport is null', async ({ assert }) => {
+    test('findSport returns the ceiling; a nonexistent sport is null', async ({
+      assert,
+    }) => {
       const { repository, sport } = await make()
       const futsal = await sport('Futsal', 12)
 
-      assert.deepEqual(await repository.findSport(futsal), { id: futsal, maxAthletes: 12 })
+      assert.deepEqual(await repository.findSport(futsal), {
+        id: futsal,
+        maxAthletes: 12,
+      })
       assert.isNull(await repository.findSport(randomUUID()))
     })
 
-    test('studentsOf lists the classroom students by name', async ({ assert }) => {
+    test('studentsOf lists the classroom students by name', async ({
+      assert,
+    }) => {
       const { repository, classroom, student } = await make()
       const seven = await classroom('7º A', 7)
       const other = await classroom('8º A', 8)
@@ -110,13 +128,21 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const f2 = await classroom('9º A', 9)
       const f1 = await classroom('4º A', 4)
 
-      assert.isFalse(await repository.isDrawn({ classroomId: f2.id, sportId: futsal }))
+      assert.isFalse(
+        await repository.isDrawn({ classroomId: f2.id, sportId: futsal }),
+      )
       await draw(f2, futsal)
-      assert.isTrue(await repository.isDrawn({ classroomId: f2.id, sportId: futsal }))
-      assert.isFalse(await repository.isDrawn({ classroomId: f1.id, sportId: futsal }))
+      assert.isTrue(
+        await repository.isDrawn({ classroomId: f2.id, sportId: futsal }),
+      )
+      assert.isFalse(
+        await repository.isDrawn({ classroomId: f1.id, sportId: futsal }),
+      )
     })
 
-    test('save swaps the classroom list and findForUpdate returns it', async ({ assert }) => {
+    test('save swaps the classroom list and findForUpdate returns it', async ({
+      assert,
+    }) => {
       const { repository, classroom, sport, student } = await make()
       const futsal = await sport('Futsal', 12)
       const seven = await classroom('7º A', 7)
@@ -143,17 +169,32 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const ana = await student(seven.id, 'Ana')
       const caio = await student(eight.id, 'Caio')
       await repository.save(
-        Enrollment.restore({ classroomId: eight.id, sportId: futsal, studentIds: [caio] }),
+        Enrollment.restore({
+          classroomId: eight.id,
+          sportId: futsal,
+          studentIds: [caio],
+        }),
       )
 
       await repository.save(
-        Enrollment.restore({ classroomId: seven.id, sportId: futsal, studentIds: [ana] }),
+        Enrollment.restore({
+          classroomId: seven.id,
+          sportId: futsal,
+          studentIds: [ana],
+        }),
       )
       await repository.save(
-        Enrollment.restore({ classroomId: seven.id, sportId: futsal, studentIds: [] }),
+        Enrollment.restore({
+          classroomId: seven.id,
+          sportId: futsal,
+          studentIds: [],
+        }),
       )
 
-      const kept = await repository.findForUpdate({ classroomId: eight.id, sportId: futsal })
+      const kept = await repository.findForUpdate({
+        classroomId: eight.id,
+        sportId: futsal,
+      })
       assert.deepEqual(kept.snapshot().studentIds, [caio])
     })
 
@@ -167,14 +208,28 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const ana = await student(seven.id, 'Ana')
       await student(seven.id, 'Bia')
       await repository.save(
-        Enrollment.restore({ classroomId: seven.id, sportId: futsal, studentIds: [ana] }),
+        Enrollment.restore({
+          classroomId: seven.id,
+          sportId: futsal,
+          studentIds: [ana],
+        }),
       )
       await draw(seven, futsal)
 
-      const advisor = await repository.board({ classroomId: seven.id, lockAfterDraw: false })
-      const representative = await repository.board({ classroomId: seven.id, lockAfterDraw: true })
+      const advisor = await repository.board({
+        classroomId: seven.id,
+        lockAfterDraw: false,
+      })
+      const representative = await repository.board({
+        classroomId: seven.id,
+        lockAfterDraw: true,
+      })
 
-      assert.deepEqual(advisor?.classroom, { id: seven.id, name: '7º A', category: 'F2' })
+      assert.deepEqual(advisor?.classroom, {
+        id: seven.id,
+        name: '7º A',
+        category: 'F2',
+      })
       assert.deepEqual(
         advisor?.sports.map((item) => [item.id, item.drawn, item.locked]),
         [
@@ -183,7 +238,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         ],
       )
       assert.deepEqual(
-        representative?.sports.map((item) => [item.id, item.drawn, item.locked]),
+        representative?.sports.map((item) => [
+          item.id,
+          item.drawn,
+          item.locked,
+        ]),
         [
           [futsal, true, true],
           [volleyball, false, false],
@@ -201,7 +260,12 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
     test('board of a nonexistent classroom is null', async ({ assert }) => {
       const { repository } = await make()
 
-      assert.isNull(await repository.board({ classroomId: randomUUID(), lockAfterDraw: false }))
+      assert.isNull(
+        await repository.board({
+          classroomId: randomUUID(),
+          lockAfterDraw: false,
+        }),
+      )
     })
   })
 }

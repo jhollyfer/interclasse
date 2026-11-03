@@ -1,4 +1,8 @@
-import { STORAGE_MIMETYPES, STORAGE_SORT_COLUMNS, UPLOAD_STATUSES } from '@interclasse/shared'
+import {
+  STORAGE_MIMETYPES,
+  STORAGE_SORT_COLUMNS,
+  UPLOAD_STATUSES,
+} from '@interclasse/shared'
 
 import { vine, paginationFields, sortFields } from '#core/validator'
 import type { Infer } from '#core/validator'
@@ -26,7 +30,9 @@ export const StoragesFileCreateValidator = vine.create({
   size: vine.number().min(1).max(UPLOAD_MAX_SIZE).withoutDecimals(),
 })
 
-export type StoragesFileCreatePayload = Infer<typeof StoragesFileCreateValidator>
+export type StoragesFileCreatePayload = Infer<
+  typeof StoragesFileCreateValidator
+>
 
 /**
  * What `POST /storages/:id/complete` receives: the `ETag` of each uploaded part.
@@ -45,7 +51,9 @@ export const StoragesFileCompleteValidator = vine.create({
     .optional(),
 })
 
-export type StoragesFileCompletePayload = Infer<typeof StoragesFileCompleteValidator>
+export type StoragesFileCompletePayload = Infer<
+  typeof StoragesFileCompleteValidator
+>
 
 /**
  * What `GET /storages` receives.
@@ -69,4 +77,6 @@ export const StoragesFilePaginateValidator = vine.create({
   ...sortFields(STORAGE_SORT_COLUMNS),
 })
 
-export type StoragesFilePaginatePayload = Infer<typeof StoragesFilePaginateValidator>
+export type StoragesFilePaginatePayload = Infer<
+  typeof StoragesFilePaginateValidator
+>

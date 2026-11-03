@@ -25,7 +25,11 @@ import { corsOrigins } from '#config/cors'
  * lists the local frontend.
  */
 export default class OriginMiddleware {
-  private static readonly SAFE_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD', 'OPTIONS'])
+  private static readonly SAFE_METHODS: ReadonlySet<string> = new Set([
+    'GET',
+    'HEAD',
+    'OPTIONS',
+  ])
 
   private static readonly TRUSTED_FETCH_SITES: ReadonlySet<string> = new Set([
     'same-origin',
@@ -33,11 +37,15 @@ export default class OriginMiddleware {
   ])
 
   async handle(context: HttpContext, next: NextFn) {
-    if (OriginMiddleware.SAFE_METHODS.has(context.request.method())) return next()
+    if (OriginMiddleware.SAFE_METHODS.has(context.request.method()))
+      return next()
 
     if (this.isAllowed(context.request)) return next()
 
-    throw HTTPException.Forbidden(context.i18n.t('errors.origin_not_allowed'), 'ORIGIN_NOT_ALLOWED')
+    throw HTTPException.Forbidden(
+      context.i18n.t('errors.origin_not_allowed'),
+      'ORIGIN_NOT_ALLOWED',
+    )
   }
 
   private isAllowed(request: HttpContext['request']): boolean {

@@ -70,10 +70,14 @@ export default class StoragesPrune extends BaseCommand {
 
     if (this.dryRun) {
       for (const storage of abandoned) {
-        this.logger.info(`${storage.id} ${storage.originalName} (${storage.createdAt?.toISO()})`)
+        this.logger.info(
+          `${storage.id} ${storage.originalName} (${storage.createdAt?.toISO()})`,
+        )
       }
 
-      this.logger.info(`${abandoned.length} upload(s) would be deleted. Nothing was touched.`)
+      this.logger.info(
+        `${abandoned.length} upload(s) would be deleted. Nothing was touched.`,
+      )
       return
     }
 

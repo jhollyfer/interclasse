@@ -40,6 +40,8 @@ export default class StoragePolicy extends BasePolicy {
     if (storage && STAFF_USER_ROLES.includes(actor.role)) return true
     if (storage && actor.avatarId === storage.id) return true
 
-    return AuthorizationResponse.deny(this.i18n.t('files.not_found'), 404).t('STORAGE_NOT_FOUND')
+    return AuthorizationResponse.deny(this.i18n.t('files.not_found'), 404).t(
+      'STORAGE_NOT_FOUND',
+    )
   }
 }

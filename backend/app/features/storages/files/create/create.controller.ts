@@ -1,11 +1,17 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { STORAGE_MIMETYPES, StoragesFileUploadResponse } from '@interclasse/shared'
+import {
+  STORAGE_MIMETYPES,
+  StoragesFileUploadResponse,
+} from '@interclasse/shared'
 
 import StoragesFileCreateUseCase from './create.use-case.ts'
 
 import { defineDocs } from '#core/openapi/types'
-import { StoragesFileCreateValidator, UPLOAD_MAX_SIZE } from '#validators/storages/files.validator'
+import {
+  StoragesFileCreateValidator,
+  UPLOAD_MAX_SIZE,
+} from '#validators/storages/files.validator'
 import { PART_SIZE } from '#services/multipart/multipart.contract'
 
 @inject()
@@ -38,7 +44,9 @@ export default class StoragesFileCreateController {
   constructor(private readonly useCase: StoragesFileCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(StoragesFileCreateValidator)
+    const payload = await context.request.validateUsing(
+      StoragesFileCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

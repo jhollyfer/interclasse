@@ -12,6 +12,8 @@ import type { HttpContext } from '@adonisjs/core/http'
  */
 export default class HealthCheckController {
   handle(context: HttpContext) {
-    return context.response.header('cache-control', 'no-store').ok({ status: 'ok' })
+    return context.response
+      .header('cache-control', 'no-store')
+      .ok({ status: 'ok' })
   }
 }

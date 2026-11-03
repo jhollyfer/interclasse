@@ -1,7 +1,11 @@
 import { test } from '@japa/runner'
 
 import { StorageFactory } from '#database/factories/storage.factory'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 test.group('storefront/site > show', (group) => {
   group.each.setup(() => resetDatabase())
@@ -25,7 +29,10 @@ test.group('storefront/site > show', (group) => {
       mimetype: 'application/pdf',
       originalName: 'regulamento.pdf',
     }).create()
-    await client.put('/administrator/site').cookies(admin).json({ regulationId: pdf.id })
+    await client
+      .put('/administrator/site')
+      .cookies(admin)
+      .json({ regulationId: pdf.id })
 
     const response = await client.get('/storefront/site')
 

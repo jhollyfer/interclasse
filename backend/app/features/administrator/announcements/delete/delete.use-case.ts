@@ -30,14 +30,20 @@ export default class AdministratorAnnouncementDeleteUseCase {
       const announcement = await this.announcements.findById(id)
       if (!announcement)
         return left(
-          HTTPException.NotFound(this.i18n.t('announcements.not_found'), 'ANNOUNCEMENT_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('announcements.not_found'),
+            'ANNOUNCEMENT_NOT_FOUND',
+          ),
         )
 
       await this.announcements.delete(announcement)
 
       return right(AnnouncementPresenter.show(announcement))
     } catch (error) {
-      logger.error({ err: error }, '[administrator/announcements > delete][error]')
+      logger.error(
+        { err: error },
+        '[administrator/announcements > delete][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

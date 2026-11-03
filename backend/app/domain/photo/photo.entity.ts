@@ -1,4 +1,10 @@
-import { PHOTO_STATUS, left, right, type Either, type PhotoStatus } from '@interclasse/shared'
+import {
+  PHOTO_STATUS,
+  left,
+  right,
+  type Either,
+  type PhotoStatus,
+} from '@interclasse/shared'
 
 import type { PhotoError } from './photo.errors.ts'
 
@@ -55,7 +61,8 @@ export class Photo {
     readonly now: Date
   }): Either<PhotoError, Photo> {
     // The carousel is for photos: a PDF or audio in its place would become a broken image.
-    if (!input.storage.mimetype.startsWith('image/')) return left({ code: 'PHOTO_NOT_IMAGE' })
+    if (!input.storage.mimetype.startsWith('image/'))
+      return left({ code: 'PHOTO_NOT_IMAGE' })
 
     const status = BIRTH_STATUS[input.sender]
     // The organization's photo is approved by whoever uploaded it, on the spot.

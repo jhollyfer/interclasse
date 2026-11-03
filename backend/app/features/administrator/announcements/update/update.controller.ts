@@ -10,13 +10,18 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorAnnouncementUpdateController {
   static docs = defineDocs({
-    description: 'A missing field means "leave alone": only what comes in the payload changes.',
+    description:
+      'A missing field means "leave alone": only what comes in the payload changes.',
   })
 
-  constructor(private readonly useCase: AdministratorAnnouncementUpdateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorAnnouncementUpdateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
-    const body = await context.request.validateUsing(AdministratorAnnouncementUpdateValidator)
+    const body = await context.request.validateUsing(
+      AdministratorAnnouncementUpdateValidator,
+    )
     const params = await context.request.validateUsing(IdentifierValidator, {
       data: context.params,
     })

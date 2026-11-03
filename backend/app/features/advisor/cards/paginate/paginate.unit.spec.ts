@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto'
 
 import { test } from '@japa/runner'
-import { CARD_COLOR, CATEGORY, MATCH_PHASE, USER_ROLE } from '@interclasse/shared'
+import {
+  CARD_COLOR,
+  CATEGORY,
+  MATCH_PHASE,
+  USER_ROLE,
+} from '@interclasse/shared'
 
 import AdvisorCardPaginateUseCase from './paginate.use-case.ts'
 
@@ -23,9 +28,15 @@ async function setup() {
     ...BracketUnitFixtures.cardBindings(brackets, cards),
     [ClassroomRepository, classrooms],
   ])
-  const semi = drawn.bracket.snapshot().matches.find((m) => m.phase === MATCH_PHASE.SEMI)
-  const home = drawn.bracket.snapshot().teams.find((team) => team.id === semi?.homeTeamId)
-  const student = drawn.students.find((candidate) => candidate.classroomId === home?.classroomId)
+  const semi = drawn.bracket
+    .snapshot()
+    .matches.find((m) => m.phase === MATCH_PHASE.SEMI)
+  const home = drawn.bracket
+    .snapshot()
+    .teams.find((team) => team.id === semi?.homeTeamId)
+  const student = drawn.students.find(
+    (candidate) => candidate.classroomId === home?.classroomId,
+  )
   const launched = MatchCard.launch({
     id: randomUUID(),
     matchId: semi?.id ?? '',
@@ -71,16 +82,27 @@ test.group('advisor/cards > paginate (unit)', () => {
     )
   })
 
-  test('foreign classroom is 404 like the nonexistent one', async ({ assert }) => {
+  test('foreign classroom is 404 like the nonexistent one', async ({
+    assert,
+  }) => {
     const { useCase, classroomId } = await setup()
 
     const other = await useCase.execute({
       classroomId,
       actor: { id: randomUUID(), role: USER_ROLE.ADVISOR, avatarId: null },
     })
-    const missing = await useCase.execute({ classroomId: randomUUID(), actor: ADVISOR })
+    const missing = await useCase.execute({
+      classroomId: randomUUID(),
+      actor: ADVISOR,
+    })
 
-    assert.deepInclude(other.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
-    assert.deepInclude(missing.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
+    assert.deepInclude(other.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
+    assert.deepInclude(missing.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
   })
 })

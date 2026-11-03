@@ -26,14 +26,20 @@ async function setup() {
 }
 
 test.group('advisor/enrollments > show (unit)', () => {
-  test('the own classroom matrix, with students and sports', async ({ assert }) => {
+  test('the own classroom matrix, with students and sports', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
-    enrollments.withList({ classroomId: ENROLLMENT_IDS.classroom, sportId: ENROLLMENT_IDS.sport }, [
-      ENROLLMENT_IDS.ana,
-    ])
+    enrollments.withList(
+      { classroomId: ENROLLMENT_IDS.classroom, sportId: ENROLLMENT_IDS.sport },
+      [ENROLLMENT_IDS.ana],
+    )
 
     const board = rightOf(
-      await useCase.execute({ classroomId: ENROLLMENT_IDS.classroom, actor: ADVISOR_ACTOR }),
+      await useCase.execute({
+        classroomId: ENROLLMENT_IDS.classroom,
+        actor: ADVISOR_ACTOR,
+      }),
     )
 
     assert.equal(board.classroom.name, '7º A')
@@ -47,7 +53,9 @@ test.group('advisor/enrollments > show (unit)', () => {
     assert.isFalse(board.sports[0]?.locked)
   })
 
-  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('classroom of another advisor is 404 CLASSROOM_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -55,10 +63,15 @@ test.group('advisor/enrollments > show (unit)', () => {
       actor: OTHER_ADVISOR_ACTOR,
     })
 
-    assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
+    assert.deepInclude(result.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
   })
 
-  test('repository failure is 500 ADVISOR_ENROLLMENT_SHOW_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADVISOR_ENROLLMENT_SHOW_ERROR', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
     enrollments.board = async () => {
       throw new Error('database down')
@@ -69,6 +82,9 @@ test.group('advisor/enrollments > show (unit)', () => {
       actor: ADVISOR_ACTOR,
     })
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADVISOR_ENROLLMENT_SHOW_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADVISOR_ENROLLMENT_SHOW_ERROR',
+    })
   })
 })

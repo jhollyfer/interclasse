@@ -15,11 +15,18 @@ export default class RepresentativeEnrollmentUpdateController {
       'teacher (`403`). Only students of the classroom; after the draw, `409`.',
   })
 
-  constructor(private readonly useCase: RepresentativeEnrollmentUpdateUseCase) {}
+  constructor(
+    private readonly useCase: RepresentativeEnrollmentUpdateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(RepresentativeEnrollmentUpdateValidator)
-    const result = await this.useCase.execute({ ...payload, actor: context.actor })
+    const payload = await context.request.validateUsing(
+      RepresentativeEnrollmentUpdateValidator,
+    )
+    const result = await this.useCase.execute({
+      ...payload,
+      actor: context.actor,
+    })
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)
   }

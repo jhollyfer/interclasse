@@ -1,4 +1,10 @@
-import { UPLOAD_STATUS, left, right, type Either, type UploadStatus } from '@interclasse/shared'
+import {
+  UPLOAD_STATUS,
+  left,
+  right,
+  type Either,
+  type UploadStatus,
+} from '@interclasse/shared'
 
 import type { StorageError } from './storage.errors.ts'
 
@@ -9,13 +15,20 @@ import type { StorageError } from './storage.errors.ts'
  * at a position, and all of the list must match; the type matches
  * when some alternative matches.
  */
-type Signature = { readonly offset: number; readonly bytes: ReadonlyArray<number> }
+type Signature = {
+  readonly offset: number
+  readonly bytes: ReadonlyArray<number>
+}
 
 const TEXT = new TextEncoder()
 
-const SIGNATURES: Readonly<Record<string, ReadonlyArray<ReadonlyArray<Signature>>>> = {
+const SIGNATURES: Readonly<
+  Record<string, ReadonlyArray<ReadonlyArray<Signature>>>
+> = {
   'image/jpeg': [[{ offset: 0, bytes: [0xff, 0xd8, 0xff] }]],
-  'image/png': [[{ offset: 0, bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] }]],
+  'image/png': [
+    [{ offset: 0, bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] }],
+  ],
   'image/gif': [
     [{ offset: 0, bytes: Array.from(TEXT.encode('GIF87a')) }],
     [{ offset: 0, bytes: Array.from(TEXT.encode('GIF89a')) }],
@@ -121,7 +134,10 @@ export class Storage {
       })
 
     if (!this.matchesSignature(received.head))
-      return left({ code: 'STORAGE_CONTENT_MISMATCH', mimetype: this.props.mimetype })
+      return left({
+        code: 'STORAGE_CONTENT_MISMATCH',
+        mimetype: this.props.mimetype,
+      })
 
     this.props.status = UPLOAD_STATUS.UPLOADED
     // The upload is over: keeping the identifier would only keep alive a pointer
@@ -152,7 +168,9 @@ export class Storage {
     const alternatives = SIGNATURES[this.props.mimetype] ?? []
 
     return alternatives.some((rules) =>
-      rules.every((rule) => rule.bytes.every((byte, index) => head[rule.offset + index] === byte)),
+      rules.every((rule) =>
+        rule.bytes.every((byte, index) => head[rule.offset + index] === byte),
+      ),
     )
   }
 

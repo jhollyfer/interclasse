@@ -17,7 +17,9 @@ export default class AdministratorAnnouncementPaginateController {
       'Default: pinned first, then newest to oldest.',
   })
 
-  constructor(private readonly useCase: AdministratorAnnouncementPaginateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorAnnouncementPaginateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(

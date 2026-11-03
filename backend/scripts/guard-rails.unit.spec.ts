@@ -19,11 +19,15 @@ type Run = { readonly status: number | null; readonly output: string }
 
 /** Runs a backend script and returns the exit code and everything it printed. */
 function runScript(script: string, env: Record<string, string> = {}): Run {
-  const result = spawnSync(process.execPath, [...TS_EXEC, join(BACKEND, 'scripts', script)], {
-    cwd: BACKEND,
-    env: { ...process.env, ...env },
-    encoding: 'utf-8',
-  })
+  const result = spawnSync(
+    process.execPath,
+    [...TS_EXEC, join(BACKEND, 'scripts', script)],
+    {
+      cwd: BACKEND,
+      env: { ...process.env, ...env },
+      encoding: 'utf-8',
+    },
+  )
 
   return { status: result.status, output: `${result.stdout}${result.stderr}` }
 }
@@ -34,12 +38,17 @@ function tamperedBaseline(change: (baseline: Record<string, string>) => void): {
   readonly cleanup: () => void
 } {
   const directory = mkdtempSync(join(tmpdir(), 'authz-'))
-  const baseline: Record<string, string> = JSON.parse(readFileSync(BASELINE, 'utf-8'))
+  const baseline: Record<string, string> = JSON.parse(
+    readFileSync(BASELINE, 'utf-8'),
+  )
   change(baseline)
   const path = join(directory, 'authz-baseline.json')
   writeFileSync(path, JSON.stringify(baseline))
 
-  return { path, cleanup: () => rmSync(directory, { recursive: true, force: true }) }
+  return {
+    path,
+    cleanup: () => rmSync(directory, { recursive: true, force: true }),
+  }
 }
 
 test.group('scripts > authz-check (unit)', () => {
@@ -50,7 +59,9 @@ test.group('scripts > authz-check (unit)', () => {
     assert.include(run.output, 'no changes')
   })
 
-  test('a route that became public fails and shows up in the report', ({ assert }) => {
+  test('a route that became public fails and shows up in the report', ({
+    assert,
+  }) => {
     const tampered = tamperedBaseline((baseline) => {
       baseline['GET /storefront/site'] = 'ADMINISTRATOR'
     })
@@ -91,7 +102,9 @@ test.group('scripts > authz-check (unit)', () => {
 })
 
 test.group('scripts > pattern-check (unit)', () => {
-  test('the repository complies with the tree, the names and the ENV', ({ assert }) => {
+  test('the repository complies with the tree, the names and the ENV', ({
+    assert,
+  }) => {
     const run = runScript('pattern-check.ts')
 
     assert.equal(run.status, 0, run.output)

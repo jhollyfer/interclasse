@@ -1,7 +1,10 @@
 import { test } from '@japa/runner'
 
 import { StudentFactory } from '#database/factories/student.factory'
-import { signInAsAdvisorOfClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
+import {
+  signInAsAdvisorOfClassroom,
+  classroomWithStudents,
+} from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   body,
@@ -34,7 +37,10 @@ test.group('students > paginate', (group) => {
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('?classroomId of another advisor responds an empty list', async ({ client, assert }) => {
+  test('?classroomId of another advisor responds an empty list', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
     const foreign = await classroomWithStudents(2)
 
@@ -54,14 +60,20 @@ test.group('students > paginate', (group) => {
       { classroomId: classroom.id, name: 'Pedro Lima' },
     ]).createMany(2)
 
-    const response = await client.get('/advisor/students').qs({ search: 'joana' }).cookies(session)
+    const response = await client
+      .get('/advisor/students')
+      .qs({ search: 'joana' })
+      .cookies(session)
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)
     assert.equal(body(response).data[0].name, 'Joana Ribeiro')
   })
 
-  test('the administrator sees the students of all classrooms', async ({ client, assert }) => {
+  test('the administrator sees the students of all classrooms', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     await Promise.all([classroomWithStudents(2), classroomWithStudents(2)])
 
@@ -71,11 +83,16 @@ test.group('students > paginate', (group) => {
     assert.equal(body(response).meta.total, 4)
   })
 
-  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({
+    client,
+    assert,
+  }) => {
     const representative = await signInWithFactory(client, 'representative')
 
     const anonymous = await client.get('/advisor/students')
-    const denied = await client.get('/advisor/students').cookies(representative.session)
+    const denied = await client
+      .get('/advisor/students')
+      .cookies(representative.session)
 
     anonymous.assertStatus(401)
     denied.assertStatus(403)
@@ -92,7 +109,10 @@ test.group('advisor/students/paginate > 422', (group) => {
   }) => {
     const { session } = await signInWithFactory(client)
 
-    const response = await client.get('/advisor/students').qs({ classroomId: 'x' }).cookies(session)
+    const response = await client
+      .get('/advisor/students')
+      .qs({ classroomId: 'x' })
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'classroomId')

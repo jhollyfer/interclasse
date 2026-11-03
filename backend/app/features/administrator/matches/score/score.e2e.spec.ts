@@ -5,7 +5,11 @@ import { BRACKET_STATUS, MATCH_PHASE, MATCH_STATUS } from '@interclasse/shared'
 
 import { MatchFactory } from '#database/factories/match.factory'
 import { Stored } from '#tests/stored-fixtures'
-import { drawnBracket, scheduledMatch, scoreAll } from '#tests/brackets-fixtures'
+import {
+  drawnBracket,
+  scheduledMatch,
+  scoreAll,
+} from '#tests/brackets-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -48,7 +52,9 @@ test.group('matches > score', (group) => {
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
 
-    const before = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const before = await client
+      .get(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
     const final = body(before).matches.find(
       (match: { phase: string }) => match.phase === MATCH_PHASE.FINAL,
     )
@@ -76,7 +82,8 @@ test.group('matches > score', (group) => {
     // Changing the winner of a semifinal after the final was played would rewrite the final.
     const semi = body(after).matches.find(
       (match: { phase: string; winnerTeamId: string; homeTeamId: string }) =>
-        match.phase === MATCH_PHASE.SEMI && match.winnerTeamId === match.homeTeamId,
+        match.phase === MATCH_PHASE.SEMI &&
+        match.winnerTeamId === match.homeTeamId,
     )
     const comeback = await client
       .put(`/administrator/matches/${semi.id}/score`)
@@ -94,8 +101,12 @@ test.group('matches > score', (group) => {
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.FINAL)
-    const played = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
-    const semi = played.matches.find((match: { phase: string }) => match.phase === MATCH_PHASE.SEMI)
+    const played = body(
+      await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin),
+    )
+    const semi = played.matches.find(
+      (match: { phase: string }) => match.phase === MATCH_PHASE.SEMI,
+    )
 
     // 2 x 1 becomes 4 x 0: the home team remains the winner, the final does not change.
     const response = await client
@@ -108,7 +119,10 @@ test.group('matches > score', (group) => {
     assert.equal(body(response).winnerTeamId, semi.homeTeamId)
   })
 
-  test('draw with a winner from outside the match responds 422', async ({ client, assert }) => {
+  test('draw with a winner from outside the match responds 422', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -172,7 +186,10 @@ test.group('matches > score', (group) => {
     assert.equal(bracket.status, BRACKET_STATUS.KNOCKOUT)
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/matches/${randomUUID()}/score`
     const score = { homeScore: 1, awayScore: 0 }

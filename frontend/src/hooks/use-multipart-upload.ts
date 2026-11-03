@@ -59,7 +59,7 @@ export function useMultipartUpload({
     if (!isStorageMimetype(mimetype)) {
       throw new Error(
         m.upload_error_type({
-          type: mimetype || m.upload_unknown_type(),
+          type: file.type || m.upload_unknown_type(),
         }),
       )
     }

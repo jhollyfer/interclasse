@@ -15,7 +15,10 @@ import {
 test.group('enrollment-removals > acknowledge', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('acknowledges, and repeating keeps the first date', async ({ client, assert }) => {
+  test('acknowledges, and repeating keeps the first date', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
@@ -51,34 +54,41 @@ test.group('enrollment-removals > acknowledge', (group) => {
   })
 })
 
-test.group('administrator/enrollment-removals/acknowledge > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/enrollment-removals/acknowledge > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('401: without a session', async ({ client }) => {
-    const response = await client.patch(
-      '/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge',
-    )
+    test('401: without a session', async ({ client }) => {
+      const response = await client.patch(
+        '/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge',
+      )
 
-    response.assertStatus(401)
-  })
+      response.assertStatus(401)
+    })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
-    const advisor = await authenticateAsAdvisor(client)
+    test('403: advisor does not reach the organization route', async ({
+      client,
+    }) => {
+      const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client
-      .patch('/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge')
-      .cookies(advisor)
+      const response = await client
+        .patch(
+          '/administrator/enrollment-removals/00000000-0000-4000-8000-000000000000/acknowledge',
+        )
+        .cookies(advisor)
 
-    response.assertStatus(403)
-  })
+      response.assertStatus(403)
+    })
 
-  test('422: id that is not a uuid', async ({ client }) => {
-    const admin = await authenticateAsAdministrator(client)
+    test('422: id that is not a uuid', async ({ client }) => {
+      const admin = await authenticateAsAdministrator(client)
 
-    const response = await client
-      .patch('/administrator/enrollment-removals/nao-e-uuid/acknowledge')
-      .cookies(admin)
+      const response = await client
+        .patch('/administrator/enrollment-removals/nao-e-uuid/acknowledge')
+        .cookies(admin)
 
-    response.assertStatus(422)
-  })
-})
+      response.assertStatus(422)
+    })
+  },
+)

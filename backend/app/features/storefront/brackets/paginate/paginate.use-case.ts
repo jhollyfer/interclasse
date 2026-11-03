@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { StorefrontBracketPaginatePayload } from '#validators/storefront/brackets.validator'
 
 type Payload = StorefrontBracketPaginatePayload
-type Response = Either<HTTPException, Paginated<StorefrontBracketPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<StorefrontBracketPaginateResponse>
+>
 
 @inject()
 export default class StorefrontBracketPaginateUseCase {

@@ -24,7 +24,9 @@ export default class AdministratorUserCreateController {
   constructor(private readonly useCase: AdministratorUserCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorUserCreateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorUserCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

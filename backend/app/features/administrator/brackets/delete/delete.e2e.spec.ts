@@ -23,18 +23,26 @@ test.group('brackets > delete', (group) => {
     const { bracket } = await drawnBracket(client, admin, 4)
     await scoreAll(client, admin, bracket.id, MATCH_PHASE.SEMI)
 
-    const refusal = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const refusal = await client
+      .delete(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
     refusal.assertStatus(409)
     assert.equal(body(refusal).code, 'BRACKET_HAS_RESULTS')
 
-    const played = body(await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin))
+    const played = body(
+      await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin),
+    )
     for (const match of played.matches) {
       if (match.status !== 'FINISHED') continue
-      const undo = await client.delete(`/administrator/matches/${match.id}/score`).cookies(admin)
+      const undo = await client
+        .delete(`/administrator/matches/${match.id}/score`)
+        .cookies(admin)
       undo.assertStatus(200)
     }
 
-    const deletion = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const deletion = await client
+      .delete(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
     deletion.assertStatus(204)
   })
 
@@ -43,36 +51,55 @@ test.group('brackets > delete', (group) => {
     assert,
   }) => {
     const admin = await authenticateAsAdministrator(client)
-    const { sport, classroomIds, bracket } = await drawnBracket(client, admin, 2)
+    const { sport, classroomIds, bracket } = await drawnBracket(
+      client,
+      admin,
+      2,
+    )
 
-    const response = await client.delete(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const response = await client
+      .delete(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
 
     response.assertStatus(204)
-    const detail = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const detail = await client
+      .get(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
     detail.assertStatus(404)
     assert.lengthOf(await Stored.teamsOfBracket(bracket.id), 0)
     assert.lengthOf(await Stored.matchesOfBracket(bracket.id), 0)
 
     // Without the bracket, the classroom list accepts changes again.
-    const enrollment = await client.put('/advisor/enrollments').cookies(admin).json({
-      classroomId: classroomIds[0],
-      sportId: sport.id,
-      studentIds: [],
-      reason: 'Refazer o sorteio',
-    })
+    const enrollment = await client
+      .put('/advisor/enrollments')
+      .cookies(admin)
+      .json({
+        classroomId: classroomIds[0],
+        sportId: sport.id,
+        studentIds: [],
+        reason: 'Refazer o sorteio',
+      })
     enrollment.assertStatus(200)
   })
 
-  test('bracket that does not exist responds 404', async ({ client, assert }) => {
+  test('bracket that does not exist responds 404', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete(`/administrator/brackets/${randomUUID()}`).cookies(admin)
+    const response = await client
+      .delete(`/administrator/brackets/${randomUUID()}`)
+      .cookies(admin)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'BRACKET_NOT_FOUND')
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/brackets/${randomUUID()}`
 
@@ -91,7 +118,9 @@ test.group('administrator/brackets/delete > access and validation', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/brackets/nao-e-uuid').cookies(admin)
+    const response = await client
+      .delete('/administrator/brackets/nao-e-uuid')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

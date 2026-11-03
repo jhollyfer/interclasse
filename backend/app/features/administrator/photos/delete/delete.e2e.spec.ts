@@ -26,11 +26,16 @@ test.group('administrator/photos > delete', (group) => {
     return body(created).id
   }
 
-  test('204: deletes the photo and it disappears from the list', async ({ client, assert }) => {
+  test('204: deletes the photo and it disappears from the list', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const id = await photoBy(client, admin)
 
-    const response = await client.delete(`/administrator/photos/${id}`).cookies(admin)
+    const response = await client
+      .delete(`/administrator/photos/${id}`)
+      .cookies(admin)
 
     response.assertStatus(204)
 
@@ -39,17 +44,23 @@ test.group('administrator/photos > delete', (group) => {
   })
 
   test('401: without a session', async ({ client }) => {
-    const response = await client.delete(`/administrator/photos/${NOT_FOUND_ID}`)
+    const response = await client.delete(
+      `/administrator/photos/${NOT_FOUND_ID}`,
+    )
 
     response.assertStatus(401)
   })
 
-  test('403: advisor does not delete through the organization route', async ({ client }) => {
+  test('403: advisor does not delete through the organization route', async ({
+    client,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const advisor = await authenticateAsAdvisor(client)
     const id = await photoBy(client, admin)
 
-    const response = await client.delete(`/administrator/photos/${id}`).cookies(advisor)
+    const response = await client
+      .delete(`/administrator/photos/${id}`)
+      .cookies(advisor)
 
     response.assertStatus(403)
   })
@@ -57,7 +68,9 @@ test.group('administrator/photos > delete', (group) => {
   test('404: nonexistent photo', async ({ client, assert }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete(`/administrator/photos/${NOT_FOUND_ID}`).cookies(admin)
+    const response = await client
+      .delete(`/administrator/photos/${NOT_FOUND_ID}`)
+      .cookies(admin)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'PHOTO_NOT_FOUND')
@@ -66,7 +79,9 @@ test.group('administrator/photos > delete', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/photos/nao-e-uuid').cookies(admin)
+    const response = await client
+      .delete('/administrator/photos/nao-e-uuid')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

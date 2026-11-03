@@ -21,13 +21,15 @@ const ISO_DATE_TIME =
  * UTC. dayjs' strict format, in turn, does not read an offset. Hence the text is
  * checked here and converted by Luxon, which respects the received offset.
  */
-const isoDateTimeRule = vine.createRule((value: unknown, _options: undefined, field) => {
-  if (typeof value !== 'string') return
-  if (ISO_DATE_TIME.test(value) && DateTime.fromISO(value).isValid) return
+const isoDateTimeRule = vine.createRule(
+  (value: unknown, _options: undefined, field) => {
+    if (typeof value !== 'string') return
+    if (ISO_DATE_TIME.test(value) && DateTime.fromISO(value).isValid) return
 
-  // The phrase lives in the `core/validator.ts` catalog (key `isoDateTime`), in the three languages.
-  field.report('Informe {{ field }}', 'isoDateTime', field)
-})
+    // The phrase lives in the `core/validator.ts` catalog (key `isoDateTime`), in the three languages.
+    field.report('Informe {{ field }}', 'isoDateTime', field)
+  },
+)
 
 /** The schedule field: ISO with offset, `null` unschedules, absent leaves it alone. */
 export function scheduledAt() {
@@ -66,8 +68,14 @@ export const AdministratorMatchScoreValidator = vine.create({
   winnerTeamId: vine.string().uuid().optional(),
 })
 
-export type AdministratorMatchPaginatePayload = Infer<typeof AdministratorMatchPaginateValidator>
+export type AdministratorMatchPaginatePayload = Infer<
+  typeof AdministratorMatchPaginateValidator
+>
 
-export type AdministratorMatchUpdatePayload = Infer<typeof AdministratorMatchUpdateValidator>
+export type AdministratorMatchUpdatePayload = Infer<
+  typeof AdministratorMatchUpdateValidator
+>
 
-export type AdministratorMatchScorePayload = Infer<typeof AdministratorMatchScoreValidator>
+export type AdministratorMatchScorePayload = Infer<
+  typeof AdministratorMatchScoreValidator
+>

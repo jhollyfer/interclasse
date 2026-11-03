@@ -36,7 +36,9 @@ async function setup() {
 }
 
 test.group('administrator/classrooms > create (unit)', () => {
-  test('registers with the category derived from the year', async ({ assert }) => {
+  test('registers with the category derived from the year', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: '4º A', grade: 4 })
@@ -57,7 +59,10 @@ test.group('administrator/classrooms > create (unit)', () => {
 
     assert.isTrue(result.isRight())
     assert.equal(result.isRight() && result.value.advisor?.id, ADVISOR)
-    assert.equal(result.isRight() && result.value.representative?.id, REPRESENTATIVE)
+    assert.equal(
+      result.isRight() && result.value.representative?.id,
+      REPRESENTATIVE,
+    )
   })
 
   test('repeated name is 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
@@ -66,10 +71,15 @@ test.group('administrator/classrooms > create (unit)', () => {
 
     const result = await useCase.execute({ name: '4º A', grade: 5 })
 
-    assert.deepInclude(result.value, { status: 409, code: 'CLASSROOM_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'CLASSROOM_ALREADY_EXISTS',
+    })
   })
 
-  test('account that does not exist is 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
+  test('account that does not exist is 422 ADVISOR_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -81,26 +91,44 @@ test.group('administrator/classrooms > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'ADVISOR_NOT_FOUND' })
   })
 
-  test('representative given as advisor is 422 ADVISOR_NOT_FOUND', async ({ assert }) => {
+  test('representative given as advisor is 422 ADVISOR_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ name: '4º A', grade: 4, advisorId: REPRESENTATIVE })
+    const result = await useCase.execute({
+      name: '4º A',
+      grade: 4,
+      advisorId: REPRESENTATIVE,
+    })
 
     assert.deepInclude(result.value, { status: 422, code: 'ADVISOR_NOT_FOUND' })
   })
 
-  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({ assert }) => {
+  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
     await useCase.execute({ name: '4º A', grade: 4, advisorId: ADVISOR })
 
-    const result = await useCase.execute({ name: '5º A', grade: 5, advisorId: ADVISOR })
+    const result = await useCase.execute({
+      name: '5º A',
+      grade: 5,
+      advisorId: ADVISOR,
+    })
 
     assert.deepInclude(result.value, { status: 409, code: 'ADVISOR_TAKEN' })
   })
 
-  test('representative of another classroom is 409 REPRESENTATIVE_TAKEN', async ({ assert }) => {
+  test('representative of another classroom is 409 REPRESENTATIVE_TAKEN', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
-    await useCase.execute({ name: '4º A', grade: 4, representativeId: REPRESENTATIVE })
+    await useCase.execute({
+      name: '4º A',
+      grade: 4,
+      representativeId: REPRESENTATIVE,
+    })
 
     const result = await useCase.execute({
       name: '5º A',
@@ -108,14 +136,22 @@ test.group('administrator/classrooms > create (unit)', () => {
       representativeId: REPRESENTATIVE,
     })
 
-    assert.deepInclude(result.value, { status: 409, code: 'REPRESENTATIVE_TAKEN' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'REPRESENTATIVE_TAKEN',
+    })
   })
 
-  test('year outside 3rd to 9th is 422 CLASSROOM_INVALID_GRADE', async ({ assert }) => {
+  test('year outside 3rd to 9th is 422 CLASSROOM_INVALID_GRADE', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ name: '1º A', grade: 1 })
 
-    assert.deepInclude(result.value, { status: 422, code: 'CLASSROOM_INVALID_GRADE' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'CLASSROOM_INVALID_GRADE',
+    })
   })
 })

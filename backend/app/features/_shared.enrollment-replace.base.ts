@@ -69,7 +69,8 @@ export abstract class EnrollmentReplaceBase {
           drawn,
         },
       )
-      if (replaced.isLeft()) return left(EnrollmentRefusal.http(replaced.value, this.i18n))
+      if (replaced.isLeft())
+        return left(EnrollmentRefusal.http(replaced.value, this.i18n))
 
       await this.enrollments.save(enrollment)
       await this.removals.saveAll(
@@ -86,7 +87,10 @@ export abstract class EnrollmentReplaceBase {
     })
     if (!board)
       return left(
-        HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+        HTTPException.NotFound(
+          this.i18n.t('classrooms.not_found'),
+          'CLASSROOM_NOT_FOUND',
+        ),
       )
 
     return right(board)

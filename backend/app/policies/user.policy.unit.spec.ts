@@ -1,6 +1,11 @@
 import { test } from '@japa/runner'
 import { AuthorizationResponse } from '@adonisjs/bouncer'
-import { USER_ROLE, USER_ROLES, type Actor, type UserRole } from '@interclasse/shared'
+import {
+  USER_ROLE,
+  USER_ROLES,
+  type Actor,
+  type UserRole,
+} from '@interclasse/shared'
 
 import UserPolicy from './user.policy.ts'
 
@@ -23,8 +28,12 @@ function accountOf(id: string): User {
   })
 }
 
-function denied(response: unknown): { status: number | undefined; code: string | undefined } {
-  if (!(response instanceof AuthorizationResponse)) return { status: undefined, code: undefined }
+function denied(response: unknown): {
+  status: number | undefined
+  code: string | undefined
+} {
+  if (!(response instanceof AuthorizationResponse))
+    return { status: undefined, code: undefined }
 
   return { status: response.status, code: response.translation?.identifier }
 }
@@ -45,7 +54,9 @@ test.group('policies > user (unit)', () => {
       assert.isTrue(policy.delete(actor, OTHER))
     })
 
-    test(`${role}: the account itself answers 403 on archive and delete`, async ({ assert }) => {
+    test(`${role}: the account itself answers 403 on archive and delete`, async ({
+      assert,
+    }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
 
@@ -65,18 +76,26 @@ test.group('policies > user (unit)', () => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
 
-      assert.deepEqual(denied(policy.update(actor, OWN, { role: USER_ROLE.ADVISOR })), {
-        status: 403,
-        code: 'SELF_ACCESS_FORBIDDEN',
-      })
-      assert.deepEqual(denied(policy.update(actor, OWN, { status: 'INACTIVE' })), {
-        status: 403,
-        code: 'SELF_ACCESS_FORBIDDEN',
-      })
+      assert.deepEqual(
+        denied(policy.update(actor, OWN, { role: USER_ROLE.ADVISOR })),
+        {
+          status: 403,
+          code: 'SELF_ACCESS_FORBIDDEN',
+        },
+      )
+      assert.deepEqual(
+        denied(policy.update(actor, OWN, { status: 'INACTIVE' })),
+        {
+          status: 403,
+          code: 'SELF_ACCESS_FORBIDDEN',
+        },
+      )
       assert.isTrue(policy.update(actor, OWN, {}))
     })
 
-    test(`${role}: a nonexistent account is 404 USER_NOT_FOUND`, async ({ assert }) => {
+    test(`${role}: a nonexistent account is 404 USER_NOT_FOUND`, async ({
+      assert,
+    }) => {
       const policy = await makeWithMemory(UserPolicy, [])
       const actor = actorOf(role)
       const expected = { status: 404, code: 'USER_NOT_FOUND' }

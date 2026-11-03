@@ -5,7 +5,10 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { Stored } from '#tests/stored-fixtures'
-import { drawSport, signInAsAdvisorOfClassroom } from '#tests/classrooms-fixtures'
+import {
+  drawSport,
+  signInAsAdvisorOfClassroom,
+} from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   body,
@@ -25,8 +28,12 @@ test.group('enrollments > update', (group) => {
     const [leaving, entering] = await StudentFactory.merge({
       classroomId: classroom.id,
     }).createMany(2)
-    if (!leaving || !entering) throw new Error('factory created fewer students than requested')
-    await EnrollmentFactory.merge({ studentId: leaving.id, sportId: sport.id }).create()
+    if (!leaving || !entering)
+      throw new Error('factory created fewer students than requested')
+    await EnrollmentFactory.merge({
+      studentId: leaving.id,
+      sportId: sport.id,
+    }).create()
 
     const response = await client
       .put('/advisor/enrollments')
@@ -54,28 +61,43 @@ test.group('enrollments > update', (group) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
     const foreign = await ClassroomFactory.with('advisor').create()
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: foreign.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: foreign.id,
+    }).create()
 
     const response = await client
       .put('/advisor/enrollments')
       .cookies(session)
-      .json({ classroomId: foreign.id, sportId: sport.id, studentIds: [student.id] })
+      .json({
+        classroomId: foreign.id,
+        sportId: sport.id,
+        studentIds: [student.id],
+      })
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
     assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 0)
   })
 
-  test('after the draw the advisor can still replace the list', async ({ client, assert }) => {
+  test('after the draw the advisor can still replace the list', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
     await drawSport(sport, classroom)
 
     const response = await client
       .put('/advisor/enrollments')
       .cookies(session)
-      .json({ classroomId: classroom.id, sportId: sport.id, studentIds: [student.id] })
+      .json({
+        classroomId: classroom.id,
+        sportId: sport.id,
+        studentIds: [student.id],
+      })
 
     response.assertStatus(200)
     assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 1)
@@ -87,8 +109,13 @@ test.group('enrollments > update', (group) => {
   }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
+    await EnrollmentFactory.merge({
+      studentId: student.id,
+      sportId: sport.id,
+    }).create()
 
     const response = await client
       .put('/advisor/enrollments')
@@ -104,17 +131,26 @@ test.group('enrollments > update', (group) => {
     client,
     assert,
   }) => {
-    const { user, session, classroom } = await signInAsAdvisorOfClassroom(client)
+    const { user, session, classroom } =
+      await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
-
-    const response = await client.put('/advisor/enrollments').cookies(session).json({
+    const student = await StudentFactory.merge({
       classroomId: classroom.id,
+    }).create()
+    await EnrollmentFactory.merge({
+      studentId: student.id,
       sportId: sport.id,
-      studentIds: [],
-      reason: 'Mau comportamento com os colegas',
-    })
+    }).create()
+
+    const response = await client
+      .put('/advisor/enrollments')
+      .cookies(session)
+      .json({
+        classroomId: classroom.id,
+        sportId: sport.id,
+        studentIds: [],
+        reason: 'Mau comportamento com os colegas',
+      })
 
     response.assertStatus(200)
     const removals = await Stored.removalsOfClassroom(classroom.id)
@@ -125,19 +161,30 @@ test.group('enrollments > update', (group) => {
     assert.isNull(removals[0]?.acknowledgedAt ?? null)
   })
 
-  test('the removal made by the administrator is born read', async ({ client, assert }) => {
+  test('the removal made by the administrator is born read', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
-
-    const response = await client.put('/advisor/enrollments').cookies(session).json({
+    const student = await StudentFactory.merge({
       classroomId: classroom.id,
+    }).create()
+    await EnrollmentFactory.merge({
+      studentId: student.id,
       sportId: sport.id,
-      studentIds: [],
-      reason: 'Transferido de escola',
-    })
+    }).create()
+
+    const response = await client
+      .put('/advisor/enrollments')
+      .cookies(session)
+      .json({
+        classroomId: classroom.id,
+        sportId: sport.id,
+        studentIds: [],
+        reason: 'Transferido de escola',
+      })
 
     response.assertStatus(200)
     const removal = await Stored.removalOfClassroomOrFail(classroom.id)
@@ -147,7 +194,9 @@ test.group('enrollments > update', (group) => {
   test('above the sport maximum responds 422', async ({ client, assert }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.merge({ maxAthletes: 1 }).create()
-    const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(2)
+    const students = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).createMany(2)
 
     const response = await client
       .put('/advisor/enrollments')
@@ -162,10 +211,15 @@ test.group('enrollments > update', (group) => {
     assert.equal(body(response).code, 'ENROLLMENT_LIMIT_EXCEEDED')
   })
 
-  test('without a session is 401; representative is 403', async ({ client }) => {
+  test('without a session is 401; representative is 403', async ({
+    client,
+  }) => {
     const anonymous = await client.put('/advisor/enrollments').json({})
     const { session } = await signInWithFactory(client, 'representative')
-    const representative = await client.put('/advisor/enrollments').cookies(session).json({})
+    const representative = await client
+      .put('/advisor/enrollments')
+      .cookies(session)
+      .json({})
 
     anonymous.assertStatus(401)
     representative.assertStatus(403)

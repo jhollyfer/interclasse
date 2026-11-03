@@ -42,7 +42,10 @@ export class SiteSetting {
   private constructor(private readonly props: SiteSettingProps) {}
 
   /** Birth: everything empty. The site shows what the organization fills in, nothing invented. */
-  static create(input: { readonly id: string; readonly now: Date }): SiteSetting {
+  static create(input: {
+    readonly id: string
+    readonly now: Date
+  }): SiteSetting {
     return new SiteSetting({
       id: input.id,
       about: null,
@@ -63,7 +66,9 @@ export class SiteSetting {
   }
 
   /** Whether these changes swap the regulation for another file: only then is it worth checking it. */
-  replacesRegulation(regulationId: string | null | undefined): regulationId is string {
+  replacesRegulation(
+    regulationId: string | null | undefined,
+  ): regulationId is string {
     return Boolean(regulationId)
   }
 

@@ -15,7 +15,10 @@ import {
 test.group('openapi > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the document is served as JSON to the operator', async ({ client, assert }) => {
+  test('the document is served as JSON to the operator', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/openapi.json').cookies(session)
 
@@ -24,7 +27,10 @@ test.group('openapi > show', (group) => {
     assert.equal(body(response).openapi, '3.1.0')
   })
 
-  test('no service route appears in the document', async ({ client, assert }) => {
+  test('no service route appears in the document', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const response = await client.get('/openapi.json').cookies(session)
 
@@ -39,13 +45,18 @@ test.group('openapi > show', (group) => {
     }
   })
 
-  test('without a session responds 404, not 401 nor 403', async ({ client }) => {
+  test('without a session responds 404, not 401 nor 403', async ({
+    client,
+  }) => {
     const response = await client.get('/openapi.json').redirects(0)
 
     response.assertStatus(404)
   })
 
-  test('whoever does not operate the installation also gets 404', async ({ client, assert }) => {
+  test('whoever does not operate the installation also gets 404', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdvisor(client)
     const response = await client.get('/openapi.json').cookies(session)
 

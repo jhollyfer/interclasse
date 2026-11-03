@@ -6,8 +6,16 @@ export default class extends BaseSchema {
 
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
-      table.uuid('sport_id').notNullable().references('id').inTable('sports').onDelete('RESTRICT')
+      table
+        .uuid('id')
+        .primary()
+        .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
+      table
+        .uuid('sport_id')
+        .notNullable()
+        .references('id')
+        .inTable('sports')
+        .onDelete('RESTRICT')
       table.enum('category', CATEGORIES).notNullable()
       table.enum('status', BRACKET_STATUSES).notNullable()
       table.timestamp('created_at').notNullable()

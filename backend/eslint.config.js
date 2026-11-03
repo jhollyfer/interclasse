@@ -13,7 +13,9 @@ import importX from 'eslint-plugin-import-x'
  * Precisa ser um objeto próprio no array: no flat config, um objeto só com
  * `ignores` é ignore global.
  */
-const generated = { ignores: ['database/schema.ts', '.adonisjs/**', 'build/**'] }
+const generated = {
+  ignores: ['database/schema.ts', '.adonisjs/**', 'build/**'],
+}
 
 /**
  * As regras de escrita da régua (_standards/tooling.md §4, backend.md §2), cobradas
@@ -28,7 +30,10 @@ const style = {
     // Sem `any` desnecessário: `unknown` + narrowing.
     '@typescript-eslint/no-explicit-any': 'error',
     // Sem `as`; `as const` continua permitido.
-    '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+    '@typescript-eslint/consistent-type-assertions': [
+      'error',
+      { assertionStyle: 'never' },
+    ],
     // Sempre `type`, nunca `interface` (declaration merging fica no bloco abaixo).
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     // Sem `!` non-null: o tipo se estreita com guarda (_standards/typescript.md §1).
@@ -61,7 +66,10 @@ const LUCID_BUILDERS = [
 const typed = {
   files: ['**/*.ts'],
   languageOptions: {
-    parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    parserOptions: {
+      projectService: true,
+      tsconfigRootDir: import.meta.dirname,
+    },
   },
   rules: {
     '@typescript-eslint/no-floating-promises': [
@@ -126,9 +134,14 @@ const imports = {
     'import-x/order': [
       'error',
       {
-        'groups': ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
-        'pathGroups': [{ pattern: '#**', group: 'internal' }],
-        'pathGroupsExcludedImportTypes': ['builtin'],
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          ['parent', 'sibling', 'index'],
+        ],
+        pathGroups: [{ pattern: '#**', group: 'internal' }],
+        pathGroupsExcludedImportTypes: ['builtin'],
         'newlines-between': 'always',
       },
     ],
@@ -148,7 +161,10 @@ export default [
        */
       '@typescript-eslint/naming-convention': [
         'error',
-        { selector: 'variable', format: ['camelCase', 'UPPER_CASE', 'PascalCase'] },
+        {
+          selector: 'variable',
+          format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+        },
         {
           selector: 'variable',
           modifiers: ['unused'],

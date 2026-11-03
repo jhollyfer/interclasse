@@ -40,7 +40,8 @@ export const CONFIG: PatternCheckConfig = {
     {
       symbol: 'CookieAccessTokensGuard',
       file: 'app/guards/cookie-access-tokens.guard.ts',
-      reason: 'factory required by config/auth.ts; receives the request HttpContext',
+      reason:
+        'factory required by config/auth.ts; receives the request HttpContext',
     },
     {
       symbol: 'SimpleMessagesProvider',

@@ -17,7 +17,9 @@ export default class AdministratorSportCreateController {
   constructor(private readonly useCase: AdministratorSportCreateUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorSportCreateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorSportCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

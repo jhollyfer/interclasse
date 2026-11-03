@@ -15,7 +15,9 @@ async function setup() {
     BracketUnitFixtures.bindings(brackets),
   )
   const { bracket } = await BracketUnitFixtures.drawn(brackets)
-  const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)
+  const semi = bracket
+    .snapshot()
+    .matches.find((match) => match.phase === MATCH_PHASE.SEMI)
   if (!semi) throw new Error('semifinal missing in the arrangement')
 
   return { useCase, semi }
@@ -28,7 +30,11 @@ test.group('administrator/matches > update (unit)', () => {
     const { useCase, semi } = await setup()
     const scheduledAt = DateTime.fromISO('2026-11-03T14:30:00-04:00')
 
-    const result = await useCase.execute({ id: semi.id, scheduledAt, location: 'Quadra 1' })
+    const result = await useCase.execute({
+      id: semi.id,
+      scheduledAt,
+      location: 'Quadra 1',
+    })
 
     if (result.isLeft()) throw new Error('schedule should be accepted')
     assert.equal(result.value.location, 'Quadra 1')

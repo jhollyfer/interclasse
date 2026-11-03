@@ -30,7 +30,9 @@ export default class AdministratorMatchUpdateUseCase {
   ) {}
 
   /** Missing stays missing and `null` stays `null`: only a real date becomes `Date`. */
-  private static dateOf(value: DateTime | null | undefined): Date | null | undefined {
+  private static dateOf(
+    value: DateTime | null | undefined,
+  ): Date | null | undefined {
     if (value === undefined) return undefined
     if (value === null) return null
 
@@ -41,21 +43,36 @@ export default class AdministratorMatchUpdateUseCase {
     try {
       const bracket = await this.brackets.findByMatchId(id)
       if (!bracket)
-        return left(HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('matches.not_found'),
+            'MATCH_NOT_FOUND',
+          ),
+        )
 
       const scheduled = bracket.schedule(
         id,
-        { scheduledAt: AdministratorMatchUpdateUseCase.dateOf(scheduledAt), location },
+        {
+          scheduledAt: AdministratorMatchUpdateUseCase.dateOf(scheduledAt),
+          location,
+        },
         new Date(),
       )
-      if (scheduled.isLeft()) return left(MatchRefusal.http(scheduled.value, this.i18n))
+      if (scheduled.isLeft())
+        return left(MatchRefusal.http(scheduled.value, this.i18n))
 
       const saved = await this.brackets.save(bracket)
-      if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
+      if (saved.isLeft())
+        return left(BracketRefusal.http(saved.value, this.i18n))
 
       const response = await this.brackets.findMatchResponse(id)
       if (!response)
-        return left(HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('matches.not_found'),
+            'MATCH_NOT_FOUND',
+          ),
+        )
 
       return right(response)
     } catch (error) {

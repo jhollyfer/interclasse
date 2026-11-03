@@ -18,7 +18,12 @@ function buildAnnouncement(): Announcement {
 
 test.group('Announcement', () => {
   test('is born unpinned when not asked', ({ assert }) => {
-    const announcement = Announcement.create({ id: 'id', title: 'T', body: 'B', now: NOW })
+    const announcement = Announcement.create({
+      id: 'id',
+      title: 'T',
+      body: 'B',
+      now: NOW,
+    })
 
     assert.deepEqual(announcement.snapshot(), {
       id: 'id',
@@ -55,7 +60,9 @@ test.group('Announcement', () => {
     })
   })
 
-  test('editing title and text changes both and keeps the pin', ({ assert }) => {
+  test('editing title and text changes both and keeps the pin', ({
+    assert,
+  }) => {
     const announcement = buildAnnouncement()
 
     announcement.edit({ title: 'Novo', body: 'Outro texto' }, LATER)

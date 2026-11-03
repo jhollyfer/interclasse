@@ -48,11 +48,17 @@ export default class StoragesFileDeleteUseCase {
       const storage = await this.storages.findById(payload.id)
 
       if (!storage)
-        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('files.not_found'),
+            'STORAGE_NOT_FOUND',
+          ),
+        )
 
       const removable = storage.remove(await this.storages.usedBy(storage.id))
 
-      if (removable.isLeft()) return left(FileRefusal.http(removable.value, this.i18n))
+      if (removable.isLeft())
+        return left(FileRefusal.http(removable.value, this.i18n))
 
       if (storage.isPending()) await this.cancel(storage)
       else await this.bucket.discard(storage.snapshot().path)

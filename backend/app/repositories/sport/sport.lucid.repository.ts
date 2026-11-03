@@ -1,7 +1,11 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { left, right } from '@interclasse/shared'
-import type { AdministratorSportShowResponse, Either, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorSportShowResponse,
+  Either,
+  Paginated,
+} from '@interclasse/shared'
 
 import { SportRepository, type SportListCriteria } from './sport.repository.ts'
 
@@ -26,10 +30,16 @@ export class SportLucidRepository extends SportRepository {
     return this.toEntity(row)
   }
 
-  async existsByNameOrSlug(name: string, slug: string, exceptId?: string): Promise<boolean> {
-    const query = SportModel.query({ client: this.transaction.client() }).where((builder) => {
-      builder.where('name', name).orWhere('slug', slug)
-    })
+  async existsByNameOrSlug(
+    name: string,
+    slug: string,
+    exceptId?: string,
+  ): Promise<boolean> {
+    const query = SportModel.query({ client: this.transaction.client() }).where(
+      (builder) => {
+        builder.where('name', name).orWhere('slug', slug)
+      },
+    )
     if (exceptId) query.whereNot('id', exceptId)
 
     return Boolean(await query.first())
@@ -75,17 +85,22 @@ export class SportLucidRepository extends SportRepository {
 
       return right(undefined)
     } catch (error) {
-      if (PostgresError.isUniqueViolation(error)) return left({ code: 'SPORT_ALREADY_EXISTS' })
+      if (PostgresError.isUniqueViolation(error))
+        return left({ code: 'SPORT_ALREADY_EXISTS' })
 
       throw error
     }
   }
 
   async delete(sport: Sport): Promise<void> {
-    await SportModel.query({ client: this.transaction.client() }).where('id', sport.id).delete()
+    await SportModel.query({ client: this.transaction.client() })
+      .where('id', sport.id)
+      .delete()
   }
 
-  async paginate(criteria: SportListCriteria): Promise<Paginated<AdministratorSportShowResponse>> {
+  async paginate(
+    criteria: SportListCriteria,
+  ): Promise<Paginated<AdministratorSportShowResponse>> {
     const query = SportModel.query({ client: this.transaction.client() })
     if (criteria.search) query.whereILike('name', `%${criteria.search}%`)
 

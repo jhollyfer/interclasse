@@ -123,7 +123,8 @@ function collectImports(source: ts.SourceFile): Map<string, string> {
     }
 
     if (bindings && ts.isNamedImports(bindings)) {
-      for (const element of bindings.elements) imports.set(element.name.text, specifier)
+      for (const element of bindings.elements)
+        imports.set(element.name.text, specifier)
     }
   }
 
@@ -141,7 +142,9 @@ function calleeText(call: ts.CallExpression): string {
  * origin is the one the option points to (`context.request.qs()`, `context.params`).
  * `Validator.validate(...)` states the origin in the argument itself.
  */
-function sourceOf(call: ts.CallExpression): 'body' | 'query' | 'params' | undefined {
+function sourceOf(
+  call: ts.CallExpression,
+): 'body' | 'query' | 'params' | undefined {
   const callee = calleeText(call)
 
   if (callee.endsWith('.validateUsing')) {
@@ -198,7 +201,10 @@ function validatorName(call: ts.CallExpression): string | undefined {
 function isValidator(value: unknown): value is DocumentedValidator {
   if (typeof value !== 'object' || value === null) return false
 
-  return 'toJSONSchema' in value && typeof Reflect.get(value, 'toJSONSchema') === 'function'
+  return (
+    'toJSONSchema' in value &&
+    typeof Reflect.get(value, 'toJSONSchema') === 'function'
+  )
 }
 
 /**
@@ -242,7 +248,10 @@ async function loadValidator(
  */
 const PT_BR_MESSAGES: ReadonlyMap<string, string> = (() => {
   const messages = new Map<string, string>()
-  const root = resolve(dirname(new URL(import.meta.url).pathname), '../../resources/lang/pt-BR')
+  const root = resolve(
+    dirname(new URL(import.meta.url).pathname),
+    '../../resources/lang/pt-BR',
+  )
 
   const flatten = function (prefix: string, value: unknown): void {
     if (typeof value === 'string') {
@@ -250,14 +259,18 @@ const PT_BR_MESSAGES: ReadonlyMap<string, string> = (() => {
       return
     }
     if (typeof value !== 'object' || value === null) return
-    for (const [key, nested] of Object.entries(value)) flatten(`${prefix}.${key}`, nested)
+    for (const [key, nested] of Object.entries(value))
+      flatten(`${prefix}.${key}`, nested)
   }
 
   if (!existsSync(root)) return messages
 
   for (const file of readdirSync(root)) {
     if (!file.endsWith('.json')) continue
-    flatten(file.replace('.json', ''), JSON.parse(readFileSync(resolve(root, file), 'utf8')))
+    flatten(
+      file.replace('.json', ''),
+      JSON.parse(readFileSync(resolve(root, file), 'utf8')),
+    )
   }
 
   return messages
@@ -286,7 +299,11 @@ function messageText(node: ts.Expression): string | undefined {
  * Only literal arguments are read. A code built in a variable is not guessed -
  * it would be left out and `--strict` charges for it, which is better than documenting a guess.
  */
-function collectErrors(root: ts.Node, errors: IntrospectedError[], seen: Set<string>): void {
+function collectErrors(
+  root: ts.Node,
+  errors: IntrospectedError[],
+  seen: Set<string>,
+): void {
   walk(root, function (node) {
     if (!ts.isCallExpression(node)) return
 
@@ -319,7 +336,10 @@ function collectErrors(root: ts.Node, errors: IntrospectedError[], seen: Set<str
 // Translator `_shared.<resource>-refusal.ts`
 // ---------------------------------------------------------------------------
 
-const BACKEND_ROOT = resolve(dirname(new URL(import.meta.url).pathname), '../..')
+const BACKEND_ROOT = resolve(
+  dirname(new URL(import.meta.url).pathname),
+  '../..',
+)
 
 const REFUSAL_IMPORT = /_shared\.[a-z-]+-refusal(\.ts)?$/
 
@@ -359,7 +379,9 @@ function factCodes(argument: ts.Expression, checker: ts.TypeChecker): string[] {
 
   if (codeType.isUnion()) members = codeType.types
 
-  return members.filter((member) => member.isStringLiteral()).map((member) => member.value)
+  return members
+    .filter((member) => member.isStringLiteral())
+    .map((member) => member.value)
 }
 
 /** The name of an object key or method, when it is a literal. */
@@ -374,7 +396,9 @@ function entryKey(name: ts.PropertyName): string | undefined {
  * `Refusal.http(fact, i18n)`); from any other static method of the translator, the
  * whole body (`_standards/openapi.md`, "erros-do-use-case").
  */
-async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> {
+async function readRefusalErrors(
+  useCase: string,
+): Promise<IntrospectedError[]> {
   const program = featureProgram()
 
   if (!program) return []
@@ -430,13 +454,15 @@ async function readRefusalErrors(useCase: string): Promise<IntrospectedError[]> 
       if (ts.isPropertyAssignment(node)) {
         const key = entryKey(node.name)
 
-        if (key && entries.has(key)) collectErrors(node.initializer, errors, seen)
+        if (key && entries.has(key))
+          collectErrors(node.initializer, errors, seen)
       }
 
       if (ts.isMethodDeclaration(node)) {
         const key = entryKey(node.name)
 
-        if (key && entries.has(`method:${key}`)) collectErrors(node, errors, seen)
+        if (key && entries.has(`method:${key}`))
+          collectErrors(node, errors, seen)
       }
     })
   }
@@ -449,7 +475,11 @@ function featurePath(specifier: string, from: string): string | undefined {
   let base: string | undefined
 
   if (specifier.startsWith('#features/')) {
-    base = resolve(BACKEND_ROOT, 'app/features', specifier.slice('#features/'.length))
+    base = resolve(
+      BACKEND_ROOT,
+      'app/features',
+      specifier.slice('#features/'.length),
+    )
   }
 
   if (specifier.startsWith('.')) base = resolve(dirname(from), specifier)
@@ -479,7 +509,11 @@ function sharedChain(program: ts.Program, useCase: string): ts.SourceFile[] {
     for (const specifier of collectImports(sourceFile).values()) {
       const path = featurePath(specifier, next)
 
-      if (path && basename(path).startsWith('_shared.') && !REFUSAL_IMPORT.test(specifier)) {
+      if (
+        path &&
+        basename(path).startsWith('_shared.') &&
+        !REFUSAL_IMPORT.test(specifier)
+      ) {
         queue.push(path)
       }
     }
@@ -525,8 +559,13 @@ async function readErrors(file: string): Promise<IntrospectedError[]> {
  * The router stores the text of the whole expression - `"()=>import('#features/...')"` -
  * and not only the specifier, so it is extracted from inside the `import()`.
  */
-export function controllerPath(importExpression: string, appRoot: string): string | undefined {
-  const specifier = importExpression.match(/import\(\s*['"]([^'"]+)['"]\s*\)/)?.[1]
+export function controllerPath(
+  importExpression: string,
+  appRoot: string,
+): string | undefined {
+  const specifier = importExpression.match(
+    /import\(\s*['"]([^'"]+)['"]\s*\)/,
+  )?.[1]
 
   if (!specifier?.startsWith('#features/')) return undefined
 
@@ -565,7 +604,9 @@ export function loadResponseSchema(
   return RESPONSES[key]
 }
 
-export async function introspect(file: string): Promise<Introspection | undefined> {
+export async function introspect(
+  file: string,
+): Promise<Introspection | undefined> {
   let source
 
   try {
@@ -593,7 +634,8 @@ export async function introspect(file: string): Promise<Introspection | undefine
     // `context.response.created(...)` -> 201
     const method = callee.match(/response\.([a-zA-Z]+)$/)?.[1]
 
-    if (method && RESPONSE_STATUS[method]) found.successStatus = RESPONSE_STATUS[method]
+    if (method && RESPONSE_STATUS[method])
+      found.successStatus = RESPONSE_STATUS[method]
 
     const slot = sourceOf(node)
 
@@ -614,7 +656,9 @@ export async function introspect(file: string): Promise<Introspection | undefine
     if (validator) found[slot] = validator
   }
 
-  found.errors = await readErrors(file.replace('.controller.ts', '.use-case.ts'))
+  found.errors = await readErrors(
+    file.replace('.controller.ts', '.use-case.ts'),
+  )
 
   return found
 }

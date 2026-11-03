@@ -4,7 +4,10 @@ import drive from '@adonisjs/drive/services/main'
 import type { ApiClient } from '@japa/api-client'
 import type { StorageMimetype } from '@interclasse/shared'
 
-import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
+import {
+  MultipartContract,
+  PART_SIZE,
+} from '#services/multipart/multipart.contract'
 import StoragesPrune from '#commands/storages-prune.command'
 import {
   authenticateAsAdministrator,
@@ -56,7 +59,10 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** The whole path, from zero to `UPLOADED`, for a single-part file. */
-async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
+async function upload(
+  client: ApiClient,
+  session: Session,
+): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -100,7 +106,10 @@ test.group('storages > prune', (group) => {
     return command
   }
 
-  test('deletes the old PENDING and aborts its multipart', async ({ client, assert }) => {
+  test('deletes the old PENDING and aborts its multipart', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const multipart = await app.container.make(MultipartContract)
 
@@ -122,7 +131,9 @@ test.group('storages > prune', (group) => {
     assert.isFalse(await storageExists(opened.storage.id))
     // Listing the parts of an aborted upload is an error, not an empty list - it is the
     // difference between "aborted" and "open with no part at all".
-    await assert.rejects(() => multipart.listParts(opened.storage.path, opened.uploadId))
+    await assert.rejects(() =>
+      multipart.listParts(opened.storage.path, opened.uploadId),
+    )
   })
 
   test('does not touch a recent PENDING', async ({ client, assert }) => {
@@ -141,7 +152,10 @@ test.group('storages > prune', (group) => {
     assert.isTrue(await storageExists(opened.storage.id))
   })
 
-  test('does not touch UPLOADED, however old it is', async ({ client, assert }) => {
+  test('does not touch UPLOADED, however old it is', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 

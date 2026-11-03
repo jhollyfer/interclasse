@@ -18,26 +18,51 @@ async function setup() {
 }
 
 test.group('administrator/brackets > create (unit)', () => {
-  test('draws the whole bracket and responds with the sport', async ({ assert }) => {
+  test('draws the whole bracket and responds with the sport', async ({
+    assert,
+  }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C', '8º D'])
+    const { sport } = await BracketUnitFixtures.enrolled(brackets, [
+      '8º A',
+      '8º B',
+      '8º C',
+      '8º D',
+    ])
 
-    const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const result = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     assert.isTrue(result.isRight())
     assert.isTrue(result.isRight() && result.value.created)
-    assert.equal(result.isRight() && result.value.bracket.sport.name, sport.name)
+    assert.equal(
+      result.isRight() && result.value.bracket.sport.name,
+      sport.name,
+    )
     const saved = await brackets.findBySportAndCategory(sport.id, CATEGORY.F2)
     assert.lengthOf(saved?.snapshot().teams ?? [], 4)
     assert.lengthOf(saved?.snapshot().matches ?? [], 3)
   })
 
-  test('drawing again returns the same bracket, without a new draw', async ({ assert }) => {
+  test('drawing again returns the same bracket, without a new draw', async ({
+    assert,
+  }) => {
     const { brackets, useCase } = await setup()
-    const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B', '8º C'])
-    const first = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const { sport } = await BracketUnitFixtures.enrolled(brackets, [
+      '8º A',
+      '8º B',
+      '8º C',
+    ])
+    const first = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
-    const again = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const again = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     assert.isTrue(again.isRight() && !again.value.created)
     assert.equal(
@@ -63,7 +88,10 @@ test.group('administrator/brackets > create (unit)', () => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.enrolled(brackets, ['8º A'])
 
-    const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const result = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     assert.deepInclude(result.value, { status: 409, code: 'NOT_ENOUGH_TEAMS' })
     assert.isNull(await brackets.findBySportAndCategory(sport.id, CATEGORY.F2))
@@ -76,7 +104,10 @@ test.group('administrator/brackets > create (unit)', () => {
       Array.from({ length: 17 }, (_, index) => `8º ${index}`),
     )
 
-    const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const result = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     assert.deepInclude(result.value, { status: 409, code: 'TOO_MANY_TEAMS' })
   })

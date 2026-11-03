@@ -5,7 +5,12 @@ import AuthenticationSessionSignInUseCase from './sign-in.use-case.ts'
 import { UserRepository } from '#repositories/user/user.repository'
 import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { identityDoubles, PASSWORD, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
+import {
+  identityDoubles,
+  PASSWORD,
+  seedUser,
+  USER_ID,
+} from '#tests/identity-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -23,7 +28,9 @@ test.group('authentication/sessions > sign-in (unit)', () => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
-    const tokens = rightOf(await useCase.execute({ email: 'ana@mail.com', password: PASSWORD }))
+    const tokens = rightOf(
+      await useCase.execute({ email: 'ana@mail.com', password: PASSWORD }),
+    )
 
     assert.isString(tokens.accessToken)
     assert.deepEqual(sessions.issued, [USER_ID])
@@ -53,7 +60,10 @@ test.group('authentication/sessions > sign-in (unit)', () => {
     ]
 
     for (const result of results) {
-      assert.deepInclude(result.value, { status: 401, code: 'INVALID_CREDENTIALS' })
+      assert.deepInclude(result.value, {
+        status: 401,
+        code: 'INVALID_CREDENTIALS',
+      })
       assert.deepEqual(result.value, results[0]?.value)
     }
     assert.deepEqual(sessions.issued, [])
@@ -67,8 +77,14 @@ test.group('authentication/sessions > sign-in (unit)', () => {
       throw new Error('database down')
     }
 
-    const result = await useCase.execute({ email: 'ana@mail.com', password: PASSWORD })
+    const result = await useCase.execute({
+      email: 'ana@mail.com',
+      password: PASSWORD,
+    })
 
-    assert.deepInclude(result.value, { status: 500, code: 'AUTHENTICATION_SESSION_SIGN_IN_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'AUTHENTICATION_SESSION_SIGN_IN_ERROR',
+    })
   })
 })

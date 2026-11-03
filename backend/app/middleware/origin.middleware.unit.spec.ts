@@ -4,7 +4,10 @@ import { Socket } from 'node:net'
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import i18nManager from '@adonisjs/i18n/services/main'
-import { HttpContextFactory, RequestFactory } from '@adonisjs/core/factories/http'
+import {
+  HttpContextFactory,
+  RequestFactory,
+} from '@adonisjs/core/factories/http'
 import { BASE_LOCALE } from '@interclasse/shared'
 
 import OriginMiddleware from '#middleware/origin.middleware'
@@ -29,7 +32,8 @@ async function run(method: string, headers: Record<string, string>) {
   try {
     await middleware.handle(context, next)
   } catch (error) {
-    if (error instanceof HTTPException) return { reached, status: error.status, code: error.code }
+    if (error instanceof HTTPException)
+      return { reached, status: error.status, code: error.code }
     throw error
   }
 
@@ -43,8 +47,13 @@ test.group('middleware > origin (CSRF, unit)', () => {
     assert.isTrue(result.reached)
   })
 
-  test('a write with an allowlist Origin passes, whatever the Content-Type', async ({ assert }) => {
-    const result = await run('POST', { 'origin': ALLOWED, 'content-type': 'text/plain' })
+  test('a write with an allowlist Origin passes, whatever the Content-Type', async ({
+    assert,
+  }) => {
+    const result = await run('POST', {
+      origin: ALLOWED,
+      'content-type': 'text/plain',
+    })
 
     assert.isTrue(result.reached)
   })
@@ -53,7 +62,7 @@ test.group('middleware > origin (CSRF, unit)', () => {
     assert,
   }) => {
     const result = await run('POST', {
-      'origin': 'http://intruso.example',
+      origin: 'http://intruso.example',
       'content-type': 'application/json',
     })
 
@@ -64,26 +73,32 @@ test.group('middleware > origin (CSRF, unit)', () => {
 
   test('text/plain from another site is refused', async ({ assert }) => {
     const result = await run('POST', {
-      'origin': 'http://intruso.example',
+      origin: 'http://intruso.example',
       'content-type': 'text/plain',
     })
 
     assert.equal(result.code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('without Origin, Sec-Fetch-Site same-origin passes', async ({ assert }) => {
+  test('without Origin, Sec-Fetch-Site same-origin passes', async ({
+    assert,
+  }) => {
     const result = await run('DELETE', { 'sec-fetch-site': 'same-origin' })
 
     assert.isTrue(result.reached)
   })
 
-  test('without Origin, a cross-site Sec-Fetch-Site is refused', async ({ assert }) => {
+  test('without Origin, a cross-site Sec-Fetch-Site is refused', async ({
+    assert,
+  }) => {
     const result = await run('POST', { 'sec-fetch-site': 'cross-site' })
 
     assert.equal(result.code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('a write without Origin and without Sec-Fetch-Site is refused', async ({ assert }) => {
+  test('a write without Origin and without Sec-Fetch-Site is refused', async ({
+    assert,
+  }) => {
     const result = await run('PUT', {})
 
     assert.isFalse(result.reached)

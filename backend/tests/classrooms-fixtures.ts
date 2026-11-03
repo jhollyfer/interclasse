@@ -25,7 +25,9 @@ export async function classroomWithStudents(total: number): Promise<Classroom> {
  */
 export async function signInAsAdvisorOfClassroom(client: ApiClient) {
   const { user, session } = await signInWithFactory(client)
-  const classroom = await ClassroomFactory.merge({ advisorId: user.id }).create()
+  const classroom = await ClassroomFactory.merge({
+    advisorId: user.id,
+  }).create()
 
   return { user, session, classroom }
 }
@@ -36,7 +38,9 @@ export async function signInAsAdvisorOfClassroom(client: ApiClient) {
  */
 export async function signInAsRepresentativeOfClassroom(client: ApiClient) {
   const { user, session } = await signInWithFactory(client, 'representative')
-  const classroom = await ClassroomFactory.merge({ representativeId: user.id }).create()
+  const classroom = await ClassroomFactory.merge({
+    representativeId: user.id,
+  }).create()
 
   return { user, session, classroom }
 }
@@ -46,7 +50,10 @@ export async function signInAsRepresentativeOfClassroom(client: ApiClient) {
  * existing is what locks enrollments.
  */
 export function drawSport(sport: Sport, classroom: Classroom) {
-  return BracketFactory.merge({ sportId: sport.id, category: classroom.category }).create()
+  return BracketFactory.merge({
+    sportId: sport.id,
+    category: classroom.category,
+  }).create()
 }
 
 /**
@@ -63,7 +70,10 @@ export async function drawnClassroom(grade = 7) {
   }).create()
   const bracket = await BracketFactory.with('sport').create()
 
-  await TeamFactory.merge({ bracketId: bracket.id, classroomId: classroom.id }).create()
+  await TeamFactory.merge({
+    bracketId: bracket.id,
+    classroomId: classroom.id,
+  }).create()
 
   return classroom
 }
@@ -78,16 +88,36 @@ export async function matchWithTeams() {
     grade: 3,
     category: ClassroomEntity.categoryOf(3),
   }).createMany(2)
-  if (!home || !away) throw new Error('factory created fewer classrooms than requested')
-  const homeTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: home.id }).create()
-  const awayTeam = await TeamFactory.merge({ bracketId: bracket.id, classroomId: away.id }).create()
+  if (!home || !away)
+    throw new Error('factory created fewer classrooms than requested')
+  const homeTeam = await TeamFactory.merge({
+    bracketId: bracket.id,
+    classroomId: home.id,
+  }).create()
+  const awayTeam = await TeamFactory.merge({
+    bracketId: bracket.id,
+    classroomId: away.id,
+  }).create()
   const match = await MatchFactory.merge({
     bracketId: bracket.id,
     homeTeamId: homeTeam.id,
     awayTeamId: awayTeam.id,
   }).create()
-  const homeStudent = await StudentFactory.merge({ classroomId: home.id }).create()
-  const awayStudent = await StudentFactory.merge({ classroomId: away.id }).create()
+  const homeStudent = await StudentFactory.merge({
+    classroomId: home.id,
+  }).create()
+  const awayStudent = await StudentFactory.merge({
+    classroomId: away.id,
+  }).create()
 
-  return { bracket, match, home, away, homeTeam, awayTeam, homeStudent, awayStudent }
+  return {
+    bracket,
+    match,
+    home,
+    away,
+    homeTeam,
+    awayTeam,
+    homeStudent,
+    awayStudent,
+  }
 }

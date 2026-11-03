@@ -33,7 +33,9 @@ const IMPLEMENTATIONS = {
     repository: await app.container.make(StudentLucidRepository),
     async classroom() {
       const advisor = await UserFactory.create()
-      const classroom = await ClassroomFactory.merge({ advisorId: advisor.id }).create()
+      const classroom = await ClassroomFactory.merge({
+        advisorId: advisor.id,
+      }).create()
       return { classroomId: classroom.id, advisorId: advisor.id }
     },
     async drawn(student, classroomId) {
@@ -41,7 +43,10 @@ const IMPLEMENTATIONS = {
       const bracket = await BracketFactory.with('sport')
         .merge({ category: classroom.category })
         .create()
-      await EnrollmentFactory.merge({ studentId: student.id, sportId: bracket.sportId }).create()
+      await EnrollmentFactory.merge({
+        studentId: student.id,
+        sportId: bracket.sportId,
+      }).create()
     },
   }),
   memory: async (): Promise<Harness> => {
@@ -65,7 +70,12 @@ const IMPLEMENTATIONS = {
 const NOW = new Date('2026-10-29T12:00:00.000Z')
 
 function newStudent(classroomId: string, name: string): Student {
-  const created = Student.create({ id: randomUUID(), classroomId, name, now: NOW })
+  const created = Student.create({
+    id: randomUUID(),
+    classroomId,
+    name,
+    now: NOW,
+  })
   if (created.isLeft()) throw new Error('invalid student in the arrangement')
 
   return created.value
@@ -100,11 +110,19 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       const denied = await repository.findOwned({
         id: ana.id,
-        actor: { id: stranger.advisorId, role: USER_ROLE.ADVISOR, avatarId: null },
+        actor: {
+          id: stranger.advisorId,
+          role: USER_ROLE.ADVISOR,
+          avatarId: null,
+        },
       })
       const administrator = await repository.findOwned({
         id: ana.id,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
+        actor: {
+          id: randomUUID(),
+          role: USER_ROLE.ADMINISTRATOR,
+          avatarId: null,
+        },
       })
 
       assert.isNull(denied)
@@ -127,7 +145,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(found?.snapshot().name, 'Ana Clara')
     })
 
-    test('isInDrawnSport is only true with an enrollment in a drawn sport', async ({ assert }) => {
+    test('isInDrawnSport is only true with an enrollment in a drawn sport', async ({
+      assert,
+    }) => {
       const { repository, classroom, drawn } = await make()
       const { classroomId } = await classroom()
       const ana = newStudent(classroomId, 'Ana')
@@ -162,10 +182,19 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await repository.save(newStudent(own.classroomId, 'Bia'))
       await repository.save(newStudent(own.classroomId, 'Ana'))
       await repository.save(newStudent(stranger.classroomId, 'Caio'))
-      const actor = { id: own.advisorId, role: USER_ROLE.ADVISOR, avatarId: null }
+      const actor = {
+        id: own.advisorId,
+        role: USER_ROLE.ADVISOR,
+        avatarId: null,
+      }
 
       const mine = await repository.paginate({ page: 1, perPage: 10, actor })
-      const searched = await repository.paginate({ page: 1, perPage: 10, search: 'bi', actor })
+      const searched = await repository.paginate({
+        page: 1,
+        perPage: 10,
+        search: 'bi',
+        actor,
+      })
       const foreignClassroom = await repository.paginate({
         page: 1,
         perPage: 10,
@@ -175,7 +204,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const all = await repository.paginate({
         page: 1,
         perPage: 10,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
+        actor: {
+          id: randomUUID(),
+          role: USER_ROLE.ADMINISTRATOR,
+          avatarId: null,
+        },
       })
 
       assert.deepEqual(

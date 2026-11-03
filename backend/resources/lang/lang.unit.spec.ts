@@ -19,8 +19,12 @@ type Catalog = ReadonlyMap<string, string>
 function catalogOf(locale: string): Catalog {
   const entries = new Map<string, string>()
 
-  for (const file of readdirSync(join(ROOT, locale)).filter((name) => name.endsWith('.json'))) {
-    const content: unknown = JSON.parse(readFileSync(join(ROOT, locale, file), 'utf-8'))
+  for (const file of readdirSync(join(ROOT, locale)).filter((name) =>
+    name.endsWith('.json'),
+  )) {
+    const content: unknown = JSON.parse(
+      readFileSync(join(ROOT, locale, file), 'utf-8'),
+    )
     if (typeof content !== 'object' || content === null) continue
 
     for (const [key, value] of Object.entries(content))
@@ -58,13 +62,17 @@ test.group('resources/lang (unit)', () => {
       assert.deepEqual(extra, [])
     })
 
-    test(`${locale} usa os mesmos placeholders do pt-BR em cada texto`, ({ assert }) => {
+    test(`${locale} usa os mesmos placeholders do pt-BR em cada texto`, ({
+      assert,
+    }) => {
       const divergent = [...reference.entries()]
         .filter(([key, text]) => {
           const translated = catalog.get(key)
           if (translated === undefined) return false
 
-          return placeholdersOf(text).join() !== placeholdersOf(translated).join()
+          return (
+            placeholdersOf(text).join() !== placeholdersOf(translated).join()
+          )
         })
         .map(([key]) => key)
 
@@ -73,9 +81,14 @@ test.group('resources/lang (unit)', () => {
   }
 
   for (const locale of [REFERENCE, ...OTHERS]) {
-    test(`${locale} não tem texto vazio, travessão nem reticência de três pontos`, ({ assert }) => {
+    test(`${locale} não tem texto vazio, travessão nem reticência de três pontos`, ({
+      assert,
+    }) => {
       const offenders = [...catalogOf(locale).entries()]
-        .filter(([, text]) => text.trim() === '' || text.includes('—') || text.includes('...'))
+        .filter(
+          ([, text]) =>
+            text.trim() === '' || text.includes('—') || text.includes('...'),
+        )
         .map(([key]) => key)
 
       assert.deepEqual(offenders, [])

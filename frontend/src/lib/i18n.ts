@@ -2,6 +2,7 @@ import type { LocalizedText } from '@interclasse/shared'
 import { DateTime } from 'luxon'
 
 import { getLocale } from '#/paraglide/runtime'
+import type { MessagePart } from '#/paraglide/runtime'
 
 /**
  * What depends on the current language and is not a message (`i18n.md` §2): record
@@ -73,4 +74,16 @@ export function schoolInputToIso(value: string): string {
   return (
     DateTime.fromISO(value, { zone: SCHOOL_TIME_ZONE }).toUTC().toISO() ?? ''
   )
+}
+
+/**
+ * The plain text of a stretch of `m.x.parts()` (`_doc-lib/paraglide.md#/markup`): the markup
+ * parts carry no text of their own, so only the `text` parts count.
+ */
+export function partsText(parts: MessagePart[]): string {
+  let result = ''
+  for (const part of parts) {
+    if (part.type === 'text') result += part.value
+  }
+  return result
 }

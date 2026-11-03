@@ -56,7 +56,11 @@ export class StorageMemoryRepository extends StorageRepository {
     return [...new Set(ids)].every((id) => {
       const props = this.rows.get(id)
 
-      return props !== undefined && !props.deletedAt && props.status === UPLOAD_STATUS.UPLOADED
+      return (
+        props !== undefined &&
+        !props.deletedAt &&
+        props.status === UPLOAD_STATUS.UPLOADED
+      )
     })
   }
 
@@ -72,7 +76,9 @@ export class StorageMemoryRepository extends StorageRepository {
     this.rows.delete(storage.id)
   }
 
-  async paginate(criteria: StorageListCriteria): Promise<Paginated<StorageFileRead>> {
+  async paginate(
+    criteria: StorageListCriteria,
+  ): Promise<Paginated<StorageFileRead>> {
     const search = criteria.search?.toLowerCase()
     const sign = SIGN[criteria.direction]
     const all = [...this.rows.values()]
@@ -95,9 +101,14 @@ export class StorageMemoryRepository extends StorageRepository {
     }
   }
 
-  private compare(a: StorageProps, b: StorageProps, sort: StorageListCriteria['sort']): number {
+  private compare(
+    a: StorageProps,
+    b: StorageProps,
+    sort: StorageListCriteria['sort'],
+  ): number {
     if (sort === 'size') return a.size - b.size
-    if (sort === 'createdAt') return (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0)
+    if (sort === 'createdAt')
+      return (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0)
 
     return a[sort].localeCompare(b[sort])
   }

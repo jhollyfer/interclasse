@@ -41,21 +41,39 @@ export const REPRESENTATIVE_ACTOR: Actor = {
 export function enrollmentWorld() {
   const classrooms = new ClassroomMemoryRepository()
   const enrollments = new EnrollmentMemoryRepository()
-    .withSport({ id: ENROLLMENT_IDS.sport, name: 'Futsal', minAthletes: 1, maxAthletes: 2 })
+    .withSport({
+      id: ENROLLMENT_IDS.sport,
+      name: 'Futsal',
+      minAthletes: 1,
+      maxAthletes: 2,
+    })
     .withClassroom({
       id: ENROLLMENT_IDS.classroom,
       name: '7º A',
       category: 'F2',
     })
-    .withStudent(ENROLLMENT_IDS.classroom, { id: ENROLLMENT_IDS.ana, name: 'Ana' })
-    .withStudent(ENROLLMENT_IDS.classroom, { id: ENROLLMENT_IDS.bia, name: 'Bia' })
+    .withStudent(ENROLLMENT_IDS.classroom, {
+      id: ENROLLMENT_IDS.ana,
+      name: 'Ana',
+    })
+    .withStudent(ENROLLMENT_IDS.classroom, {
+      id: ENROLLMENT_IDS.bia,
+      name: 'Bia',
+    })
   const removals = new EnrollmentRemovalMemoryRepository()
 
-  return { classrooms, enrollments, removals, unitOfWork: new UnitOfWorkMemory() }
+  return {
+    classrooms,
+    enrollments,
+    removals,
+    unitOfWork: new UnitOfWorkMemory(),
+  }
 }
 
 /** Saves the 7º A classroom linked to the world's advisor and representative. */
-export async function seedWorldClassroom(classrooms: ClassroomMemoryRepository): Promise<void> {
+export async function seedWorldClassroom(
+  classrooms: ClassroomMemoryRepository,
+): Promise<void> {
   await classrooms.save(
     Classroom.restore({
       id: ENROLLMENT_IDS.classroom,

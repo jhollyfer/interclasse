@@ -60,7 +60,13 @@ export const AdministratorUserCreateValidator = vine.create({
  * role through `/account`.
  */
 export const AdministratorUserUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(120)
+    .optional()
+    .use(notNull()),
   email: email().optional().use(notNull()),
   password: password().optional().use(notNull()),
   role: manageableRole().optional().use(notNull()),
@@ -83,8 +89,14 @@ export const AdministratorUserPaginateValidator = vine.create({
   status: activeStatus().optional(),
 })
 
-export type AdministratorUserCreatePayload = Infer<typeof AdministratorUserCreateValidator>
+export type AdministratorUserCreatePayload = Infer<
+  typeof AdministratorUserCreateValidator
+>
 
-export type AdministratorUserUpdatePayload = Infer<typeof AdministratorUserUpdateValidator>
+export type AdministratorUserUpdatePayload = Infer<
+  typeof AdministratorUserUpdateValidator
+>
 
-export type AdministratorUserPaginatePayload = Infer<typeof AdministratorUserPaginateValidator>
+export type AdministratorUserPaginatePayload = Infer<
+  typeof AdministratorUserPaginateValidator
+>

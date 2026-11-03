@@ -18,7 +18,11 @@ import HTTPException from '#exceptions/http.exception'
  * not to confirm the resource exists.
  */
 export default class RoleMiddleware {
-  async handle(context: HttpContext, next: NextFn, roles: ReadonlyArray<UserRole>) {
+  async handle(
+    context: HttpContext,
+    next: NextFn,
+    roles: ReadonlyArray<UserRole>,
+  ) {
     const user = context.auth.user
 
     // `schema.ts` is generated from the database and types `role` as `string`. Widening the list
@@ -27,7 +31,10 @@ export default class RoleMiddleware {
     const allowed: readonly string[] = roles
 
     if (!user || !allowed.includes(user.role)) {
-      throw HTTPException.Forbidden(context.i18n.t('errors.access_denied'), 'ACCESS_DENIED')
+      throw HTTPException.Forbidden(
+        context.i18n.t('errors.access_denied'),
+        'ACCESS_DENIED',
+      )
     }
 
     return next()

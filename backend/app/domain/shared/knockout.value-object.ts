@@ -7,7 +7,10 @@ export type Random = (max: number) => number
 export type Pairing<T> = { readonly home: T; readonly away: T | null }
 
 /** Where the winner goes: the position in the next phase and the side they enter on. */
-export type AdvanceSlot = { readonly position: number; readonly side: 'home' | 'away' }
+export type AdvanceSlot = {
+  readonly position: number
+  readonly side: 'home' | 'away'
+}
 
 /**
  * The pure knockout rules: draw, bracket size, phase and advance
@@ -26,15 +29,18 @@ export class Knockout {
   static readonly MAX_TEAMS = 16
 
   /** The phase by the number of slots it has. */
-  private static readonly PHASE_BY_SIZE: Readonly<Record<number, MatchPhase>> = {
-    2: MATCH_PHASE.FINAL,
-    4: MATCH_PHASE.SEMI,
-    8: MATCH_PHASE.QUARTER,
-    16: MATCH_PHASE.ROUND_OF_16,
-  }
+  private static readonly PHASE_BY_SIZE: Readonly<Record<number, MatchPhase>> =
+    {
+      2: MATCH_PHASE.FINAL,
+      4: MATCH_PHASE.SEMI,
+      8: MATCH_PHASE.QUARTER,
+      16: MATCH_PHASE.ROUND_OF_16,
+    }
 
   /** The next knockout phase. The final has none. */
-  private static readonly NEXT_PHASE: Readonly<Partial<Record<MatchPhase, MatchPhase>>> = {
+  private static readonly NEXT_PHASE: Readonly<
+    Partial<Record<MatchPhase, MatchPhase>>
+  > = {
     [MATCH_PHASE.ROUND_OF_16]: MATCH_PHASE.QUARTER,
     [MATCH_PHASE.QUARTER]: MATCH_PHASE.SEMI,
     [MATCH_PHASE.SEMI]: MATCH_PHASE.FINAL,

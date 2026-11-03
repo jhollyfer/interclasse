@@ -42,10 +42,16 @@ export default class AdministratorUserDeleteUseCase {
       const user = await this.users.findAnyById(id)
 
       if (!user)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       const removable = user.remove()
-      if (removable.isLeft()) return left(UserRefusal.http(removable.value, this.i18n))
+      if (removable.isLeft())
+        return left(UserRefusal.http(removable.value, this.i18n))
 
       await this.users.delete(user)
 

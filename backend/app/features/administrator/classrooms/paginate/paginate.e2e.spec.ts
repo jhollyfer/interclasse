@@ -20,7 +20,11 @@ test.group('classrooms > paginate', (group) => {
   }) => {
     const session = await authenticateAsAdministrator(client)
     const advisor = await UserFactory.create()
-    await ClassroomFactory.merge({ name: '8º B', grade: 8, category: CATEGORY.F2 }).create()
+    await ClassroomFactory.merge({
+      name: '8º B',
+      grade: 8,
+      category: CATEGORY.F2,
+    }).create()
     await ClassroomFactory.merge({
       name: '6º A',
       grade: 6,
@@ -28,7 +32,9 @@ test.group('classrooms > paginate', (group) => {
       advisorId: advisor.id,
     }).create()
 
-    const response = await client.get('/administrator/classrooms').cookies(session)
+    const response = await client
+      .get('/administrator/classrooms')
+      .cookies(session)
 
     response.assertStatus(200)
     assert.equal(body(response).meta.total, 2)
@@ -47,16 +53,33 @@ test.group('classrooms > paginate', (group) => {
     const session = await authenticateAsAdministrator(client)
     const futsal = await createSport(client, session)
     const volleyball = await createSport(client, session, 1, 'Vôlei')
-    const [classroomId] = await enrolledClassrooms(client, session, futsal.id, 1)
+    const [classroomId] = await enrolledClassrooms(
+      client,
+      session,
+      futsal.id,
+      1,
+    )
     // The same student also in volleyball, and a second student who plays nothing.
-    const students = await client.get('/advisor/students').qs({ classroomId }).cookies(session)
+    const students = await client
+      .get('/advisor/students')
+      .qs({ classroomId })
+      .cookies(session)
     await client
       .put('/advisor/enrollments')
       .cookies(session)
-      .json({ classroomId, sportId: volleyball.id, studentIds: [body(students).data[0].id] })
-    await client.post('/advisor/students').cookies(session).json({ classroomId, name: 'Reserva' })
+      .json({
+        classroomId,
+        sportId: volleyball.id,
+        studentIds: [body(students).data[0].id],
+      })
+    await client
+      .post('/advisor/students')
+      .cookies(session)
+      .json({ classroomId, name: 'Reserva' })
 
-    const response = await client.get('/administrator/classrooms').cookies(session)
+    const response = await client
+      .get('/administrator/classrooms')
+      .cookies(session)
 
     response.assertStatus(200)
     assert.deepInclude(body(response).data[0], {
@@ -66,11 +89,26 @@ test.group('classrooms > paginate', (group) => {
     })
   })
 
-  test('`?category` and `?search` narrow the list', async ({ client, assert }) => {
+  test('`?category` and `?search` narrow the list', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    await ClassroomFactory.merge({ name: '4º A', grade: 4, category: CATEGORY.F1 }).create()
-    await ClassroomFactory.merge({ name: '7º A', grade: 7, category: CATEGORY.F2 }).create()
-    await ClassroomFactory.merge({ name: '9º C', grade: 9, category: CATEGORY.F2 }).create()
+    await ClassroomFactory.merge({
+      name: '4º A',
+      grade: 4,
+      category: CATEGORY.F1,
+    }).create()
+    await ClassroomFactory.merge({
+      name: '7º A',
+      grade: 7,
+      category: CATEGORY.F2,
+    }).create()
+    await ClassroomFactory.merge({
+      name: '9º C',
+      grade: 9,
+      category: CATEGORY.F2,
+    }).create()
 
     const byCategory = await client
       .get('/administrator/classrooms')
@@ -83,7 +121,9 @@ test.group('classrooms > paginate', (group) => {
 
     byCategory.assertStatus(200)
     assert.deepEqual(
-      body(byCategory).data.map((classroom: { name: string }) => classroom.name),
+      body(byCategory).data.map(
+        (classroom: { name: string }) => classroom.name,
+      ),
       ['4º A'],
     )
     byName.assertStatus(200)
@@ -95,8 +135,16 @@ test.group('classrooms > paginate', (group) => {
 
   test('`?sort` e `?direction` trocam a ordem', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
-    await ClassroomFactory.merge({ name: 'A', grade: 9, category: CATEGORY.F2 }).create()
-    await ClassroomFactory.merge({ name: 'B', grade: 3, category: CATEGORY.F1 }).create()
+    await ClassroomFactory.merge({
+      name: 'A',
+      grade: 9,
+      category: CATEGORY.F2,
+    }).create()
+    await ClassroomFactory.merge({
+      name: 'B',
+      grade: 3,
+      category: CATEGORY.F1,
+    }).create()
 
     const response = await client
       .get('/administrator/classrooms')
@@ -105,12 +153,17 @@ test.group('classrooms > paginate', (group) => {
 
     response.assertStatus(200)
     assert.deepEqual(
-      body(response).data.map((classroom: { grade: number }) => classroom.grade),
+      body(response).data.map(
+        (classroom: { grade: number }) => classroom.grade,
+      ),
       [9, 3],
     )
   })
 
-  test('category or sort column outside the list responds 422', async ({ client, assert }) => {
+  test('category or sort column outside the list responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const category = await client
@@ -136,7 +189,9 @@ test.group('classrooms > paginate', (group) => {
     anonymous.assertStatus(401)
 
     const { session } = await signInWithFactory(client, 'representative')
-    const response = await client.get('/administrator/classrooms').cookies(session)
+    const response = await client
+      .get('/administrator/classrooms')
+      .cookies(session)
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')

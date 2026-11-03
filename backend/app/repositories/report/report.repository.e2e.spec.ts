@@ -29,11 +29,16 @@ const IMPLEMENTATIONS = {
       grade: 7,
       category: CATEGORY.F2,
     }).create()
-    const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(2)
+    const students = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).createMany(2)
     const sport = await SportFactory.merge({ name: 'Futsal' }).create()
     const [athlete] = students
     if (!athlete) throw new Error('arrangement without a student')
-    await EnrollmentFactory.merge({ studentId: athlete.id, sportId: sport.id }).create()
+    await EnrollmentFactory.merge({
+      studentId: athlete.id,
+      sportId: sport.id,
+    }).create()
 
     return app.container.make(ReportLucidRepository)
   },
@@ -43,7 +48,12 @@ const IMPLEMENTATIONS = {
     const athleteId = randomUUID()
 
     return new ReportMemoryRepository()
-      .withClassroom({ id: classroomId, name: '7º A', grade: 7, category: CATEGORY.F2 })
+      .withClassroom({
+        id: classroomId,
+        name: '7º A',
+        grade: 7,
+        category: CATEGORY.F2,
+      })
       .withStudent(athleteId, classroomId)
       .withStudent(randomUUID(), classroomId)
       .withSport(sportId, 'Futsal')
@@ -55,7 +65,9 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`ReportRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('counts classrooms, students, athletes, enrollments and sports', async ({ assert }) => {
+    test('counts classrooms, students, athletes, enrollments and sports', async ({
+      assert,
+    }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()
@@ -71,7 +83,9 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       })
     })
 
-    test('separates by category, with both categories always present', async ({ assert }) => {
+    test('separates by category, with both categories always present', async ({
+      assert,
+    }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()
@@ -82,12 +96,18 @@ for (const [name, arrange] of Object.entries(IMPLEMENTATIONS)) {
       ])
     })
 
-    test('brings the sport and the classroom with their own totals', async ({ assert }) => {
+    test('brings the sport and the classroom with their own totals', async ({
+      assert,
+    }) => {
       const repository = await arrange()
 
       const report = await repository.summarize()
 
-      assert.deepInclude(report.bySport[0], { name: 'Futsal', athletes: 1, classrooms: 1 })
+      assert.deepInclude(report.bySport[0], {
+        name: 'Futsal',
+        athletes: 1,
+        classrooms: 1,
+      })
       assert.deepInclude(report.classrooms[0], {
         name: '7º A',
         category: CATEGORY.F2,

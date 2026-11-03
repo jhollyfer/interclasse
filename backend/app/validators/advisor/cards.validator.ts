@@ -7,4 +7,6 @@ export const AdvisorCardPaginateValidator = vine.create({
   classroomId: vine.string().uuid(),
 })
 
-export type AdvisorCardPaginatePayload = Infer<typeof AdvisorCardPaginateValidator>
+export type AdvisorCardPaginatePayload = Infer<
+  typeof AdvisorCardPaginateValidator
+>

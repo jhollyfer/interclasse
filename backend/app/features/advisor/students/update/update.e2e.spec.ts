@@ -19,7 +19,9 @@ test.group('students > update', (group) => {
     assert,
   }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
 
     const response = await client
       .put(`/advisor/students/${student.id}`)
@@ -41,7 +43,10 @@ test.group('students > update', (group) => {
   }) => {
     const { classroom } = await signInAsAdvisorOfClassroom(client)
     const other = await signInWithFactory(client)
-    const student = await StudentFactory.merge({ classroomId: classroom.id, name: 'Ana' }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+      name: 'Ana',
+    }).create()
 
     const response = await client
       .put(`/advisor/students/${student.id}`)
@@ -55,7 +60,10 @@ test.group('students > update', (group) => {
     assert.equal(student.name, 'Ana')
   })
 
-  test('nonexistent student responds the same 404', async ({ client, assert }) => {
+  test('nonexistent student responds the same 404', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client
@@ -67,7 +75,10 @@ test.group('students > update', (group) => {
     assert.equal(body(response).code, 'STUDENT_NOT_FOUND')
   })
 
-  test('the administrator fixes a student of any classroom', async ({ client, assert }) => {
+  test('the administrator fixes a student of any classroom', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const student = await StudentFactory.with('classroom').create()
 
@@ -81,9 +92,14 @@ test.group('students > update', (group) => {
     assert.equal(student.name, 'Corrigido')
   })
 
-  test('empty name responds 422 pointing at the field', async ({ client, assert }) => {
+  test('empty name responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
 
     const response = await client
       .put(`/advisor/students/${student.id}`)
@@ -94,11 +110,16 @@ test.group('students > update', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({
+    client,
+    assert,
+  }) => {
     const student = await StudentFactory.with('classroom').create()
     const representative = await signInWithFactory(client, 'representative')
 
-    const anonymous = await client.put(`/advisor/students/${student.id}`).json({ name: 'X' })
+    const anonymous = await client
+      .put(`/advisor/students/${student.id}`)
+      .json({ name: 'X' })
     const denied = await client
       .put(`/advisor/students/${student.id}`)
       .cookies(representative.session)

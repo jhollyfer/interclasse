@@ -19,14 +19,20 @@ import {
 test.group('users > archive', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('archiving twice responds 409 USER_ALREADY_ARCHIVED on the second', async ({ client }) => {
+  test('archiving twice responds 409 USER_ALREADY_ARCHIVED on the second', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
-    const first = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
+    const first = await client
+      .patch(`/administrator/users/${user.id}/archive`)
+      .cookies(session)
     first.assertStatus(204)
 
-    const second = await client.patch(`/administrator/users/${user.id}/archive`).cookies(session)
+    const second = await client
+      .patch(`/administrator/users/${user.id}/archive`)
+      .cookies(session)
     second.assertStatus(409)
     second.assertBodyContains({ code: 'USER_ALREADY_ARCHIVED' })
   })
@@ -58,11 +64,15 @@ test.group('users > archive', (group) => {
 test.group('administrator/users/archive > access and validation', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
-      .patch('/administrator/users/00000000-0000-4000-8000-000000000000/archive')
+      .patch(
+        '/administrator/users/00000000-0000-4000-8000-000000000000/archive',
+      )
       .cookies(advisor)
 
     response.assertStatus(403)
@@ -71,7 +81,9 @@ test.group('administrator/users/archive > access and validation', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.patch('/administrator/users/nao-e-uuid/archive').cookies(admin)
+    const response = await client
+      .patch('/administrator/users/nao-e-uuid/archive')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

@@ -1,7 +1,11 @@
 import { test } from '@japa/runner'
 
 import { COOKIE_TOKEN } from '#config/cookie'
-import { ADMINISTRATOR, authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
+import {
+  ADMINISTRATOR,
+  authenticateAsAdministrator,
+  resetDatabase,
+} from '#tests/http-fixtures'
 import { findUserByEmail } from '#tests/users-fixtures'
 
 /**
@@ -28,7 +32,9 @@ test.group('guards > cookie-access-tokens', (group) => {
     response.assertStatus(401)
   })
 
-  test('a refresh token presented as an access token answers 401', async ({ client }) => {
+  test('a refresh token presented as an access token answers 401', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/account').cookies({
@@ -46,7 +52,9 @@ test.group('guards > cookie-access-tokens', (group) => {
     response.assertStatus(401)
   })
 
-  test('a deactivated account loses access on the next request', async ({ client }) => {
+  test('a deactivated account loses access on the next request', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await findUserByEmail(ADMINISTRATOR.email)
     user.status = 'INACTIVE'

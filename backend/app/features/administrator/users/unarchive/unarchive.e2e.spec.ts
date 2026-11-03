@@ -41,11 +41,16 @@ test.group('users > unarchive', (group) => {
 
     await authenticate(client, user.email, FACTORY_PASSWORD)
 
-    const view = await client.get(`/administrator/users/${user.id}`).cookies(session)
+    const view = await client
+      .get(`/administrator/users/${user.id}`)
+      .cookies(session)
     view.assertStatus(200)
   })
 
-  test('restoring a live user responds 409 USER_NOT_ARCHIVED', async ({ client, assert }) => {
+  test('restoring a live user responds 409 USER_NOT_ARCHIVED', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
@@ -68,10 +73,15 @@ test.group('users > unarchive', (group) => {
     assert.equal(body(response).code, 'USER_NOT_FOUND')
   })
 
-  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const user = await UserFactory.merge({ deletedAt: DateTime.now() }).create()
 
-    const anonymous = await client.patch(`/administrator/users/${user.id}/unarchive`)
+    const anonymous = await client.patch(
+      `/administrator/users/${user.id}/unarchive`,
+    )
     anonymous.assertStatus(401)
 
     const advisor = await authenticateAsAdvisor(client)
@@ -92,7 +102,9 @@ test.group('administrator/users/unarchive > access and validation', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.patch('/administrator/users/nao-e-uuid/unarchive').cookies(admin)
+    const response = await client
+      .patch('/administrator/users/nao-e-uuid/unarchive')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

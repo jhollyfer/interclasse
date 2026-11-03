@@ -14,7 +14,13 @@ describe('MaiyuCredit', () => {
 
     expect(link.getAttribute('href')).toBe('https://maiyu.com.br')
     expect(link.getAttribute('target')).toBe('_blank')
-    expect(link.getAttribute('rel')).toContain('noreferrer')
+    expect(link.getAttribute('rel')).toContain('noopener')
+  })
+
+  it('shows only the credit phrase, with no tagline', () => {
+    const { container } = render(<MaiyuCredit />)
+
+    expect(container.textContent).toBe('Desenvolvido por Maiyu')
   })
 
   it('accepts an extra class on the paragraph', () => {

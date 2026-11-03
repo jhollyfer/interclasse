@@ -1,4 +1,10 @@
-import { vine, notNull, LIST_LIMITS, paginationFields, sortFields } from '#core/validator'
+import {
+  vine,
+  notNull,
+  LIST_LIMITS,
+  paginationFields,
+  sortFields,
+} from '#core/validator'
 import type { Infer } from '#core/validator'
 
 export const SPORT_SORT_COLUMNS = ['name', 'createdAt'] as const
@@ -19,7 +25,13 @@ export const AdministratorSportCreateValidator = vine.create({
 })
 
 export const AdministratorSportUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(60).optional().use(notNull()),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(60)
+    .optional()
+    .use(notNull()),
   minAthletes: athletes().optional().use(notNull()),
   maxAthletes: athletes().optional().use(notNull()),
 })
@@ -29,8 +41,14 @@ export const AdministratorSportPaginateValidator = vine.create({
   ...sortFields(SPORT_SORT_COLUMNS),
 })
 
-export type AdministratorSportCreatePayload = Infer<typeof AdministratorSportCreateValidator>
+export type AdministratorSportCreatePayload = Infer<
+  typeof AdministratorSportCreateValidator
+>
 
-export type AdministratorSportUpdatePayload = Infer<typeof AdministratorSportUpdateValidator>
+export type AdministratorSportUpdatePayload = Infer<
+  typeof AdministratorSportUpdateValidator
+>
 
-export type AdministratorSportPaginatePayload = Infer<typeof AdministratorSportPaginateValidator>
+export type AdministratorSportPaginatePayload = Infer<
+  typeof AdministratorSportPaginateValidator
+>

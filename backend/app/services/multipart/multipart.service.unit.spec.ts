@@ -30,14 +30,21 @@ test.group('services > multipart (unit)', () => {
     for (const part of parts) {
       const url = new URL(part.url)
       assert.equal(url.searchParams.get('uploadId'), 'upload-1')
-      assert.include(url.searchParams.get('X-Amz-SignedHeaders') ?? '', 'content-length')
+      assert.include(
+        url.searchParams.get('X-Amz-SignedHeaders') ?? '',
+        'content-length',
+      )
     }
   })
 
-  test('the single-part upload pins content-type and content-length', async ({ assert }) => {
+  test('the single-part upload pins content-type and content-length', async ({
+    assert,
+  }) => {
     const multipart = await service()
 
-    const url = new URL(await multipart.signSingle('abc.png', 'image/png', 1024))
+    const url = new URL(
+      await multipart.signSingle('abc.png', 'image/png', 1024),
+    )
     const signed = url.searchParams.get('X-Amz-SignedHeaders') ?? ''
 
     assert.include(signed, 'content-type')
@@ -47,7 +54,9 @@ test.group('services > multipart (unit)', () => {
   test('the requested expiry goes into the URL', async ({ assert }) => {
     const multipart = await service()
 
-    const url = new URL(await multipart.signSingle('abc.png', 'image/png', 1024, 120))
+    const url = new URL(
+      await multipart.signSingle('abc.png', 'image/png', 1024, 120),
+    )
 
     assert.equal(url.searchParams.get('X-Amz-Expires'), '120')
   })

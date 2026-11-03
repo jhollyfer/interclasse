@@ -18,6 +18,10 @@ export const AdministratorCardCreateValidator = vine.create({
   note: vine.string().trim().maxLength(200).nullable().optional(),
 })
 
-export type AdministratorCardPaginatePayload = Infer<typeof AdministratorCardPaginateValidator>
+export type AdministratorCardPaginatePayload = Infer<
+  typeof AdministratorCardPaginateValidator
+>
 
-export type AdministratorCardCreatePayload = Infer<typeof AdministratorCardCreateValidator>
+export type AdministratorCardCreatePayload = Infer<
+  typeof AdministratorCardCreateValidator
+>

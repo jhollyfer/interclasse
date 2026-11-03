@@ -23,7 +23,10 @@ const SEPARATOR = ';'
  * ready in `labels`, and the use case is the one that fetches it from i18n.
  */
 export class ReportPresenter {
-  static csv(report: AdministratorReportShowResponse, labels: ReportPresenterLabels): string {
+  static csv(
+    report: AdministratorReportShowResponse,
+    labels: ReportPresenterLabels,
+  ): string {
     const rows = report.classrooms.map((classroom) => [
       classroom.name,
       labels.category(classroom.category),
@@ -47,7 +50,9 @@ export class ReportPresenter {
     // "Conceição" turn into garbage.
     return '\uFEFF'.concat(
       [[...labels.header], ...rows, total]
-        .map((line) => line.map((cell) => ReportPresenter.cell(cell)).join(SEPARATOR))
+        .map((line) =>
+          line.map((cell) => ReportPresenter.cell(cell)).join(SEPARATOR),
+        )
         .join('\r\n'),
     )
   }

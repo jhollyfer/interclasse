@@ -3,7 +3,11 @@ import { DateTime } from 'luxon'
 import { TRASHED_MODE, left, right } from '@interclasse/shared'
 import type { Either, Paginated } from '@interclasse/shared'
 
-import { UserRepository, type UserListCriteria, type UserRead } from './user.repository.ts'
+import {
+  UserRepository,
+  type UserListCriteria,
+  type UserRead,
+} from './user.repository.ts'
 
 import UserModel from '#models/user'
 import { PostgresError } from '#core/postgres-error'
@@ -85,7 +89,8 @@ export class UserLucidRepository extends UserRepository {
 
       return right(undefined)
     } catch (error) {
-      if (PostgresError.isUniqueViolation(error)) return left({ code: 'USER_ALREADY_EXISTS' })
+      if (PostgresError.isUniqueViolation(error))
+        return left({ code: 'USER_ALREADY_EXISTS' })
 
       throw error
     }
@@ -110,8 +115,10 @@ export class UserLucidRepository extends UserRepository {
   async paginate(criteria: UserListCriteria): Promise<Paginated<UserRead>> {
     const query = this.query()
 
-    if (criteria.trashed === undefined) query.withScopes((scopes) => scopes.notDeleted())
-    if (criteria.trashed === TRASHED_MODE.ONLY) query.withScopes((scopes) => scopes.onlyDeleted())
+    if (criteria.trashed === undefined)
+      query.withScopes((scopes) => scopes.notDeleted())
+    if (criteria.trashed === TRASHED_MODE.ONLY)
+      query.withScopes((scopes) => scopes.onlyDeleted())
 
     if (criteria.role) query.where('role', criteria.role)
     if (criteria.status) query.where('status', criteria.status)
@@ -135,7 +142,10 @@ export class UserLucidRepository extends UserRepository {
     return {
       meta: page.getMeta(),
       data: rows.map((row) =>
-        this.toResponse(row, avatars.find((avatar) => avatar.id === row.avatarId) ?? null),
+        this.toResponse(
+          row,
+          avatars.find((avatar) => avatar.id === row.avatarId) ?? null,
+        ),
       ),
     }
   }

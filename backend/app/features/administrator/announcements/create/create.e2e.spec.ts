@@ -8,7 +8,10 @@ import {
 } from '#tests/http-fixtures'
 import { Stored } from '#tests/stored-fixtures'
 
-const payload = { title: 'Troca de horário', body: 'O futsal passa para as 14h.' }
+const payload = {
+  title: 'Troca de horário',
+  body: 'O futsal passa para as 14h.',
+}
 
 test.group('announcements > create', (group) => {
   group.each.setup(() => resetDatabase())
@@ -34,7 +37,10 @@ test.group('announcements > create', (group) => {
     assert.isNotNull(await Stored.announcement(body(response).id))
   })
 
-  test('`pinned: true` publishes the pinned announcement', async ({ client, assert }) => {
+  test('`pinned: true` publishes the pinned announcement', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -46,7 +52,10 @@ test.group('announcements > create', (group) => {
     assert.isTrue(body(response).pinned)
   })
 
-  test('empty title and body respond 422 pointing at the fields', async ({ client, assert }) => {
+  test('empty title and body respond 422 pointing at the fields', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -59,8 +68,13 @@ test.group('announcements > create', (group) => {
     assert.property(body(response).errors, 'body')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
-    const anonymous = await client.post('/administrator/announcements').json(payload)
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
+    const anonymous = await client
+      .post('/administrator/announcements')
+      .json(payload)
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client
       .post('/administrator/announcements')

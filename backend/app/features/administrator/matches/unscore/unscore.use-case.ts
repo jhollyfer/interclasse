@@ -34,18 +34,22 @@ export default class AdministratorMatchUnscoreUseCase {
 
   async execute({ id }: Payload): Promise<Response> {
     try {
-      const undone = await this.unit.run(async (): Promise<Either<HTTPException, null>> => {
-        const bracket = await this.brackets.findByMatchIdForUpdate(id)
-        if (!bracket) return left(this.notFound())
+      const undone = await this.unit.run(
+        async (): Promise<Either<HTTPException, null>> => {
+          const bracket = await this.brackets.findByMatchIdForUpdate(id)
+          if (!bracket) return left(this.notFound())
 
-        const result = bracket.unscore(id, new Date())
-        if (result.isLeft()) return left(MatchRefusal.http(result.value, this.i18n))
+          const result = bracket.unscore(id, new Date())
+          if (result.isLeft())
+            return left(MatchRefusal.http(result.value, this.i18n))
 
-        const saved = await this.brackets.save(bracket)
-        if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
+          const saved = await this.brackets.save(bracket)
+          if (saved.isLeft())
+            return left(BracketRefusal.http(saved.value, this.i18n))
 
-        return right(null)
-      })
+          return right(null)
+        },
+      )
       if (undone.isLeft()) return left(undone.value)
 
       const response = await this.brackets.findMatchResponse(id)
@@ -65,6 +69,9 @@ export default class AdministratorMatchUnscoreUseCase {
   }
 
   private notFound(): HTTPException {
-    return HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND')
+    return HTTPException.NotFound(
+      this.i18n.t('matches.not_found'),
+      'MATCH_NOT_FOUND',
+    )
   }
 }

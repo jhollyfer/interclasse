@@ -24,7 +24,11 @@ export type SportListCriteria = {
 export abstract class SportRepository {
   abstract findById(id: string): Promise<Sport | null>
   /** Another sport, other than `exceptId`, already uses the name or the slug. */
-  abstract existsByNameOrSlug(name: string, slug: string, exceptId?: string): Promise<boolean>
+  abstract existsByNameOrSlug(
+    name: string,
+    slug: string,
+    exceptId?: string,
+  ): Promise<boolean>
   /** The largest number of athletes a classroom has enrolled in this sport. */
   abstract largestRoster(sportId: string): Promise<number>
   /** Has an enrollment or a bracket: deleting would leave both without a sport. */
@@ -33,5 +37,7 @@ export abstract class SportRepository {
   abstract save(sport: Sport): Promise<Either<SportError, void>>
   abstract delete(sport: Sport): Promise<void>
   /** Lightweight read: the response shape straight from the query, without hydrating an entity. */
-  abstract paginate(criteria: SportListCriteria): Promise<Paginated<AdministratorSportShowResponse>>
+  abstract paginate(
+    criteria: SportListCriteria,
+  ): Promise<Paginated<AdministratorSportShowResponse>>
 }

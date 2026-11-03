@@ -9,7 +9,11 @@ import type { HttpContext } from '@adonisjs/core/http'
  * `Content-Disposition: attachment` makes the browser save the file instead of
  * rendering it.
  */
-export function csvDownload(response: HttpContext['response'], filename: string, content: string) {
+export function csvDownload(
+  response: HttpContext['response'],
+  filename: string,
+  content: string,
+) {
   response.header('Content-Type', 'text/csv; charset=utf-8')
   response.header('Content-Disposition', `attachment; filename="${filename}"`)
   response.header('Cache-Control', 'no-store')

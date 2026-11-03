@@ -18,9 +18,11 @@ export default class InitializeBouncerMiddleware {
      * this middleware runs before auth. It is Bouncer's composition root - the
      * only `new Bouncer` in the project (_standards/backend.md §2.1).
      */
-    ctx.bouncer = new Bouncer(() => ctx.actor, abilities, policies).setContainerResolver(
-      ctx.containerResolver,
-    )
+    ctx.bouncer = new Bouncer(
+      () => ctx.actor,
+      abilities,
+      policies,
+    ).setContainerResolver(ctx.containerResolver)
 
     return next()
   }

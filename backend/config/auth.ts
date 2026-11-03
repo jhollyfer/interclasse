@@ -1,5 +1,9 @@
 import { defineConfig } from '@adonisjs/auth'
-import type { InferAuthenticators, InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
+import type {
+  InferAuthenticators,
+  InferAuthEvents,
+  Authenticators,
+} from '@adonisjs/auth/types'
 import type { Actor } from '@interclasse/shared'
 
 import { cookieAccessTokensGuard } from '#guards/cookie-access-tokens.guard'
@@ -27,7 +31,9 @@ export default authConfig
  * guards.
  */
 declare module '@adonisjs/auth/types' {
-  export interface Authenticators extends InferAuthenticators<typeof authConfig> {}
+  export interface Authenticators extends InferAuthenticators<
+    typeof authConfig
+  > {}
 }
 declare module '@adonisjs/core/types' {
   interface EventsList extends InferAuthEvents<Authenticators> {}

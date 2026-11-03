@@ -35,20 +35,33 @@ export default class AdministratorMatchScoreUseCase {
     private readonly i18n: I18n,
   ) {}
 
-  async execute({ id, homeScore, awayScore, winnerTeamId }: Payload): Promise<Response> {
+  async execute({
+    id,
+    homeScore,
+    awayScore,
+    winnerTeamId,
+  }: Payload): Promise<Response> {
     try {
-      const scored = await this.unit.run(async (): Promise<Either<HTTPException, null>> => {
-        const bracket = await this.brackets.findByMatchIdForUpdate(id)
-        if (!bracket) return left(this.notFound())
+      const scored = await this.unit.run(
+        async (): Promise<Either<HTTPException, null>> => {
+          const bracket = await this.brackets.findByMatchIdForUpdate(id)
+          if (!bracket) return left(this.notFound())
 
-        const result = bracket.score(id, { homeScore, awayScore, winnerTeamId }, new Date())
-        if (result.isLeft()) return left(MatchRefusal.http(result.value, this.i18n))
+          const result = bracket.score(
+            id,
+            { homeScore, awayScore, winnerTeamId },
+            new Date(),
+          )
+          if (result.isLeft())
+            return left(MatchRefusal.http(result.value, this.i18n))
 
-        const saved = await this.brackets.save(bracket)
-        if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
+          const saved = await this.brackets.save(bracket)
+          if (saved.isLeft())
+            return left(BracketRefusal.http(saved.value, this.i18n))
 
-        return right(null)
-      })
+          return right(null)
+        },
+      )
       if (scored.isLeft()) return left(scored.value)
 
       const response = await this.brackets.findMatchResponse(id)
@@ -68,6 +81,9 @@ export default class AdministratorMatchScoreUseCase {
   }
 
   private notFound(): HTTPException {
-    return HTTPException.NotFound(this.i18n.t('matches.not_found'), 'MATCH_NOT_FOUND')
+    return HTTPException.NotFound(
+      this.i18n.t('matches.not_found'),
+      'MATCH_NOT_FOUND',
+    )
   }
 }

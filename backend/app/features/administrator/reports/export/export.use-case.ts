@@ -37,7 +37,8 @@ export default class AdministratorReportExportUseCase {
             this.i18n.t('reports.csv.sports'),
           ],
           total: this.i18n.t('reports.csv.total'),
-          totalClassrooms: (count) => this.i18n.t('reports.csv.total_classrooms', { count }),
+          totalClassrooms: (count) =>
+            this.i18n.t('reports.csv.total_classrooms', { count }),
           category: (category) => this.i18n.t(`reports.category.${category}`),
         }),
       )

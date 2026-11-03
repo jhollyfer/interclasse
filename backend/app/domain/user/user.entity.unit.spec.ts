@@ -39,15 +39,21 @@ test.group('User', () => {
     assert.isFalse(archived.canSignIn())
   })
 
-  test('archiving stamps the trash and archiving again is USER_ALREADY_ARCHIVED', ({ assert }) => {
+  test('archiving stamps the trash and archiving again is USER_ALREADY_ARCHIVED', ({
+    assert,
+  }) => {
     const user = advisor()
 
     assert.isTrue(user.archive(LATER).isRight())
     assert.equal(user.snapshot().deletedAt, LATER)
-    assert.deepEqual(user.archive(LATER).value, { code: 'USER_ALREADY_ARCHIVED' })
+    assert.deepEqual(user.archive(LATER).value, {
+      code: 'USER_ALREADY_ARCHIVED',
+    })
   })
 
-  test('restoring clears the trash and only holds for an archived account', ({ assert }) => {
+  test('restoring clears the trash and only holds for an archived account', ({
+    assert,
+  }) => {
     const user = advisor()
 
     assert.deepEqual(user.unarchive(LATER).value, { code: 'USER_NOT_ARCHIVED' })
@@ -69,27 +75,46 @@ test.group('User', () => {
   test('changing e-mail, password, role or deactivating drops the sessions; name does not', ({
     assert,
   }) => {
-    assert.isTrue(advisor().update({ email: 'outra@mail.com' }, LATER).revokesSessions)
-    assert.isTrue(advisor().update({ password: 'Nova@1234' }, LATER).revokesSessions)
-    assert.isTrue(advisor().update({ role: 'ADMINISTRATOR' }, LATER).revokesSessions)
-    assert.isTrue(advisor().update({ status: 'INACTIVE' }, LATER).revokesSessions)
-    assert.isFalse(advisor().update({ name: 'Ana Maria' }, LATER).revokesSessions)
+    assert.isTrue(
+      advisor().update({ email: 'outra@mail.com' }, LATER).revokesSessions,
+    )
+    assert.isTrue(
+      advisor().update({ password: 'Nova@1234' }, LATER).revokesSessions,
+    )
+    assert.isTrue(
+      advisor().update({ role: 'ADMINISTRATOR' }, LATER).revokesSessions,
+    )
+    assert.isTrue(
+      advisor().update({ status: 'INACTIVE' }, LATER).revokesSessions,
+    )
     assert.isFalse(
-      advisor().update({ email: 'ana@mail.com', role: 'ADVISOR' }, LATER).revokesSessions,
+      advisor().update({ name: 'Ana Maria' }, LATER).revokesSessions,
+    )
+    assert.isFalse(
+      advisor().update({ email: 'ana@mail.com', role: 'ADVISOR' }, LATER)
+        .revokesSessions,
     )
   })
 
   test('changing the role warns to release the classrooms', ({ assert }) => {
-    assert.isTrue(advisor().update({ role: 'REPRESENTATIVE' }, LATER).roleChanged)
+    assert.isTrue(
+      advisor().update({ role: 'REPRESENTATIVE' }, LATER).roleChanged,
+    )
     assert.isFalse(advisor().update({ role: 'ADVISOR' }, LATER).roleChanged)
   })
 
-  test('an absent field leaves alone and avatarId null removes the photo', ({ assert }) => {
+  test('an absent field leaves alone and avatarId null removes the photo', ({
+    assert,
+  }) => {
     const user = advisor()
     user.update({ avatarId: 'foto' }, NOW)
 
     user.update({ name: 'Ana Maria' }, LATER)
-    assert.deepInclude(user.snapshot(), { name: 'Ana Maria', avatarId: 'foto', updatedAt: LATER })
+    assert.deepInclude(user.snapshot(), {
+      name: 'Ana Maria',
+      avatarId: 'foto',
+      updatedAt: LATER,
+    })
 
     user.update({ avatarId: null }, LATER)
     assert.isNull(user.snapshot().avatarId)
@@ -116,7 +141,9 @@ test.group('User', () => {
     assert.deepEqual(ok.value, { revokesSessions: true, roleChanged: false })
   })
 
-  test('the account itself without changing the password skips the proof', ({ assert }) => {
+  test('the account itself without changing the password skips the proof', ({
+    assert,
+  }) => {
     const result = advisor().updateOwn(
       { name: 'Ana Maria' },
       { currentConfirmed: false, sameAsCurrent: false },
@@ -148,7 +175,10 @@ test.group('User', () => {
   })
 
   test('the e-mail of a live account is USER_ALREADY_EXISTS', ({ assert }) => {
-    const result = advisor().revive({ name: 'Ana', password: 'Nova@1234', role: 'ADVISOR' }, LATER)
+    const result = advisor().revive(
+      { name: 'Ana', password: 'Nova@1234', role: 'ADVISOR' },
+      LATER,
+    )
 
     assert.deepEqual(result.value, { code: 'USER_ALREADY_EXISTS' })
   })

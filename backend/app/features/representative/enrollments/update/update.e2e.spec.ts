@@ -6,7 +6,10 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
 import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { Stored } from '#tests/stored-fixtures'
-import { drawSport, signInAsRepresentativeOfClassroom } from '#tests/classrooms-fixtures'
+import {
+  drawSport,
+  signInAsRepresentativeOfClassroom,
+} from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -22,9 +25,12 @@ test.group('enrollments > update', (group) => {
     client,
     assert,
   }) => {
-    const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
+    const { session, classroom } =
+      await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.merge({ maxAthletes: 3 }).create()
-    const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(4)
+    const students = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).createMany(4)
     const ids = students.map((student) => student.id)
 
     const within = await client
@@ -53,11 +59,19 @@ test.group('enrollments > update', (group) => {
     client,
     assert,
   }) => {
-    const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
+    const { session, classroom } =
+      await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
-    const enrolledStudent = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    const fresh = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    await EnrollmentFactory.merge({ studentId: enrolledStudent.id, sportId: sport.id }).create()
+    const enrolledStudent = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
+    const fresh = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
+    await EnrollmentFactory.merge({
+      studentId: enrolledStudent.id,
+      sportId: sport.id,
+    }).create()
 
     const response = await client
       .put('/representative/enrollments')
@@ -73,7 +87,10 @@ test.group('enrollments > update', (group) => {
     )
   })
 
-  test('student from another classroom responds 422', async ({ client, assert }) => {
+  test('student from another classroom responds 422', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
     const foreign = await StudentFactory.with('classroom').create()
@@ -101,9 +118,12 @@ test.group('enrollments > update', (group) => {
   })
 
   test('after the draw the list locks: 409', async ({ client, assert }) => {
-    const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
+    const { session, classroom } =
+      await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
     await drawSport(sport, classroom)
 
     const response = await client
@@ -116,7 +136,10 @@ test.group('enrollments > update', (group) => {
     assert.lengthOf(await Stored.enrollmentsOfSport(sport.id), 0)
   })
 
-  test('representative without a linked classroom responds 404', async ({ client, assert }) => {
+  test('representative without a linked classroom responds 404', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInWithFactory(client, 'representative')
     const sport = await SportFactory.create()
 
@@ -133,9 +156,12 @@ test.group('enrollments > update', (group) => {
     client,
     assert,
   }) => {
-    const { session, classroom } = await signInAsRepresentativeOfClassroom(client)
+    const { session, classroom } =
+      await signInAsRepresentativeOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
 
     const response = await client
       .put('/representative/enrollments')
@@ -154,10 +180,18 @@ test.group('enrollments > update', (group) => {
     const admin = await authenticateAsAdministrator(client)
     const payload = { sportId: randomUUID(), studentIds: [] }
 
-    const anonymous = await client.put('/representative/enrollments').json(payload)
+    const anonymous = await client
+      .put('/representative/enrollments')
+      .json(payload)
     const denied = [
-      await client.put('/representative/enrollments').cookies(advisor).json(payload),
-      await client.put('/representative/enrollments').cookies(admin).json(payload),
+      await client
+        .put('/representative/enrollments')
+        .cookies(advisor)
+        .json(payload),
+      await client
+        .put('/representative/enrollments')
+        .cookies(admin)
+        .json(payload),
     ]
 
     anonymous.assertStatus(401)

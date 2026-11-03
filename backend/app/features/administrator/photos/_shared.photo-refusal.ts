@@ -12,9 +12,13 @@ import type { PhotoError } from '#domain/photo/photo.errors'
 export class PhotoRefusal extends RefusalBase {
   private static readonly TABLE = {
     PHOTO_NOT_IMAGE: (_fact, i18n) =>
-      HTTPException.UnprocessableEntity(i18n.t('photos.not_image'), 'PHOTO_NOT_IMAGE', {
-        storageId: i18n.t('photos.not_image_field'),
-      }),
+      HTTPException.UnprocessableEntity(
+        i18n.t('photos.not_image'),
+        'PHOTO_NOT_IMAGE',
+        {
+          storageId: i18n.t('photos.not_image_field'),
+        },
+      ),
   } satisfies RefusalTable<PhotoError>
 
   static http(error: PhotoError, i18n: I18n): HTTPException {

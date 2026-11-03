@@ -2,7 +2,11 @@ import hash from '@adonisjs/core/services/hash'
 import { TRASHED_MODE, left, right } from '@interclasse/shared'
 import type { Either, Paginated, SortDirection } from '@interclasse/shared'
 
-import { UserRepository, type UserListCriteria, type UserRead } from './user.repository.ts'
+import {
+  UserRepository,
+  type UserListCriteria,
+  type UserRead,
+} from './user.repository.ts'
 
 import { User, type UserProps } from '#domain/user/user.entity'
 import type { UserError } from '#domain/user/user.errors'
@@ -57,7 +61,9 @@ export class UserMemoryRepository extends UserRepository {
   }
 
   async existsByEmail(email: string, exceptId?: string): Promise<boolean> {
-    return [...this.rows.values()].some((row) => row.id !== exceptId && row.email === email)
+    return [...this.rows.values()].some(
+      (row) => row.id !== exceptId && row.email === email,
+    )
   }
 
   async save(user: User): Promise<Either<UserError, void>> {
@@ -106,7 +112,9 @@ export class UserMemoryRepository extends UserRepository {
     return {
       meta: page.meta,
       data: await Promise.all(
-        page.data.map(async (row) => this.toResponse(row, await this.avatarOf(row))),
+        page.data.map(async (row) =>
+          this.toResponse(row, await this.avatarOf(row)),
+        ),
       ),
     }
   }
@@ -115,21 +123,31 @@ export class UserMemoryRepository extends UserRepository {
     return User.restore(structuredClone(props))
   }
 
-  private inTrashedMode(row: UserProps, mode: UserListCriteria['trashed']): boolean {
+  private inTrashedMode(
+    row: UserProps,
+    mode: UserListCriteria['trashed'],
+  ): boolean {
     if (mode === undefined) return !row.deletedAt
     if (mode === TRASHED_MODE.ONLY) return Boolean(row.deletedAt)
 
     return true
   }
 
-  private compare(a: UserProps, b: UserProps, sort: UserListCriteria['sort']): number {
-    if (sort === 'createdAt') return a.createdAt.getTime() - b.createdAt.getTime()
+  private compare(
+    a: UserProps,
+    b: UserProps,
+    sort: UserListCriteria['sort'],
+  ): number {
+    if (sort === 'createdAt')
+      return a.createdAt.getTime() - b.createdAt.getTime()
 
     return a[sort].localeCompare(b[sort])
   }
 
   private async avatarOf(props: UserProps): Promise<UserRead['avatar']> {
-    const [avatar] = await this.storages.detailsOf([props.avatarId ?? []].flat())
+    const [avatar] = await this.storages.detailsOf(
+      [props.avatarId ?? []].flat(),
+    )
 
     return avatar ?? null
   }

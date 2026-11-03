@@ -33,7 +33,8 @@ export class Sport {
     readonly maxAthletes: number
     readonly now: Date
   }): Either<SportError, Sport> {
-    if (input.minAthletes > input.maxAthletes) return left({ code: 'SPORT_INVALID_LIMITS' })
+    if (input.minAthletes > input.maxAthletes)
+      return left({ code: 'SPORT_INVALID_LIMITS' })
 
     return right(
       new Sport({
@@ -67,8 +68,14 @@ export class Sport {
     const maxAthletes = changes.maxAthletes ?? this.props.maxAthletes
 
     if (minAthletes > maxAthletes) return left({ code: 'SPORT_INVALID_LIMITS' })
-    if (maxAthletes < this.props.maxAthletes && context.largestRoster > maxAthletes)
-      return left({ code: 'SPORT_ROSTER_ABOVE_LIMIT', largestRoster: context.largestRoster })
+    if (
+      maxAthletes < this.props.maxAthletes &&
+      context.largestRoster > maxAthletes
+    )
+      return left({
+        code: 'SPORT_ROSTER_ABOVE_LIMIT',
+        largestRoster: context.largestRoster,
+      })
 
     if (changes.name !== undefined && changes.name !== this.props.name) {
       this.props.name = changes.name

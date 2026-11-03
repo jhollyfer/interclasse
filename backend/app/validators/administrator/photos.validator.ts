@@ -21,8 +21,14 @@ export const AdministratorPhotoReviewValidator = vine.create({
   status: vine.enum(PHOTO_REVIEW_STATUSES),
 })
 
-export type AdministratorPhotoCreatePayload = Infer<typeof AdministratorPhotoCreateValidator>
+export type AdministratorPhotoCreatePayload = Infer<
+  typeof AdministratorPhotoCreateValidator
+>
 
-export type AdministratorPhotoPaginatePayload = Infer<typeof AdministratorPhotoPaginateValidator>
+export type AdministratorPhotoPaginatePayload = Infer<
+  typeof AdministratorPhotoPaginateValidator
+>
 
-export type AdministratorPhotoReviewPayload = Infer<typeof AdministratorPhotoReviewValidator>
+export type AdministratorPhotoReviewPayload = Infer<
+  typeof AdministratorPhotoReviewValidator
+>

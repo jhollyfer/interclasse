@@ -5,7 +5,10 @@ export default class extends BaseSchema {
 
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
+      table
+        .uuid('id')
+        .primary()
+        .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table.string('name', 60).notNullable().unique()
       // The sport identifier in the public URL (`/standings/futsal`).
       table.string('slug', 255).notNullable().unique()

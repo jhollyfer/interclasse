@@ -63,23 +63,30 @@ test.group('games > classrooms', (group) => {
   })
 })
 
-test.group('administrator/classrooms/create > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/classrooms/create > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('401: without a session', async ({ client }) => {
-    const response = await client.post('/administrator/classrooms')
+    test('401: without a session', async ({ client }) => {
+      const response = await client.post('/administrator/classrooms')
 
-    response.assertStatus(401)
-  })
+      response.assertStatus(401)
+    })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
-    const advisor = await authenticateAsAdvisor(client)
+    test('403: advisor does not reach the organization route', async ({
+      client,
+    }) => {
+      const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.post('/administrator/classrooms').cookies(advisor)
+      const response = await client
+        .post('/administrator/classrooms')
+        .cookies(advisor)
 
-    response.assertStatus(403)
-  })
-})
+      response.assertStatus(403)
+    })
+  },
+)
 
 test.group('administrator/classrooms/create > 422', (group) => {
   group.each.setup(() => resetDatabase())

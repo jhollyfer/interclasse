@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorUserShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorUserShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage.contract'
@@ -27,9 +32,17 @@ export default class AdministratorUserShowUseCase {
       const user = await this.users.detail(id)
 
       if (!user)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
-      return right({ ...user, avatar: await this.bucket.withOptionalUrl(user.avatar) })
+      return right({
+        ...user,
+        avatar: await this.bucket.withOptionalUrl(user.avatar),
+      })
     } catch (error) {
       logger.error({ err: error }, '[administrator/users > show][error]')
 

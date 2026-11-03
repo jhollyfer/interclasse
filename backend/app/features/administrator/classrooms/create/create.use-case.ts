@@ -34,19 +34,32 @@ export default class AdministratorClassroomCreateUseCase {
   async execute(payload: Payload): Promise<Response> {
     try {
       if (await this.classrooms.existsByName(payload.name))
-        return left(ClassroomRefusal.http({ code: 'CLASSROOM_ALREADY_EXISTS' }, this.i18n))
+        return left(
+          ClassroomRefusal.http(
+            { code: 'CLASSROOM_ALREADY_EXISTS' },
+            this.i18n,
+          ),
+        )
 
       const facts = await this.classrooms.peopleFacts(payload)
-      const created = Classroom.create({ id: randomUUID(), ...payload, now: new Date() }, facts)
-      if (created.isLeft()) return left(ClassroomRefusal.http(created.value, this.i18n))
+      const created = Classroom.create(
+        { id: randomUUID(), ...payload, now: new Date() },
+        facts,
+      )
+      if (created.isLeft())
+        return left(ClassroomRefusal.http(created.value, this.i18n))
 
       const saved = await this.classrooms.save(created.value)
-      if (saved.isLeft()) return left(ClassroomRefusal.http(saved.value, this.i18n))
+      if (saved.isLeft())
+        return left(ClassroomRefusal.http(saved.value, this.i18n))
 
       const detail = await this.classrooms.findDetail(created.value.id)
       if (!detail)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return right(detail)

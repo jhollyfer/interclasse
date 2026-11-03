@@ -25,10 +25,14 @@ export const AdministratorBracketPaginateValidator = vine.create({
   status: vine.enum(BRACKET_STATUSES).optional(),
 })
 
-export type AdministratorBracketCreatePayload = Infer<typeof AdministratorBracketCreateValidator>
+export type AdministratorBracketCreatePayload = Infer<
+  typeof AdministratorBracketCreateValidator
+>
 
 export type AdministratorBracketPaginatePayload = Infer<
   typeof AdministratorBracketPaginateValidator
 >
 
-export type AdministratorBracketPreviewPayload = Infer<typeof AdministratorBracketPreviewValidator>
+export type AdministratorBracketPreviewPayload = Infer<
+  typeof AdministratorBracketPreviewValidator
+>

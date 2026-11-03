@@ -14,11 +14,21 @@ const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
 const OWNER = { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null }
 
 async function setup() {
-  const students = MemoryRepositories.students().withClassroom(CLASSROOM, ADVISOR)
-  const ana = Student.create({ id: ID, classroomId: CLASSROOM, name: 'Ana', now: new Date() })
+  const students = MemoryRepositories.students().withClassroom(
+    CLASSROOM,
+    ADVISOR,
+  )
+  const ana = Student.create({
+    id: ID,
+    classroomId: CLASSROOM,
+    name: 'Ana',
+    now: new Date(),
+  })
   if (ana.isLeft()) throw new Error('invalid arrangement')
   await students.save(ana.value)
-  const useCase = await makeWithMemory(AdvisorStudentDeleteUseCase, [[StudentRepository, students]])
+  const useCase = await makeWithMemory(AdvisorStudentDeleteUseCase, [
+    [StudentRepository, students],
+  ])
 
   return { students, useCase }
 }
@@ -41,7 +51,10 @@ test.group('advisor/students > delete (unit)', () => {
 
     const result = await useCase.execute({ id: ID, actor: OWNER })
 
-    assert.deepInclude(result.value, { status: 409, code: 'STUDENT_IN_COMPETITION' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'STUDENT_IN_COMPETITION',
+    })
     assert.isNotNull(await students.findOwned({ id: ID, actor: OWNER }))
   })
 
@@ -63,7 +76,13 @@ test.group('advisor/students > delete (unit)', () => {
       actor: OWNER,
     })
 
-    assert.deepInclude(foreign.value, { status: 404, code: 'STUDENT_NOT_FOUND' })
-    assert.deepInclude(missing.value, { status: 404, code: 'STUDENT_NOT_FOUND' })
+    assert.deepInclude(foreign.value, {
+      status: 404,
+      code: 'STUDENT_NOT_FOUND',
+    })
+    assert.deepInclude(missing.value, {
+      status: 404,
+      code: 'STUDENT_NOT_FOUND',
+    })
   })
 })

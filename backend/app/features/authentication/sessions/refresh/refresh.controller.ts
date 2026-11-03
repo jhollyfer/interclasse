@@ -31,8 +31,16 @@ export default class AuthenticationSessionRefreshController {
     if (result.isLeft()) throw result.value
 
     context.response
-      .cookie(COOKIE_TOKEN.ACCESS, result.value.accessToken, cookieOptions.access)
-      .cookie(COOKIE_TOKEN.REFRESH, result.value.refreshToken, cookieOptions.refresh)
+      .cookie(
+        COOKIE_TOKEN.ACCESS,
+        result.value.accessToken,
+        cookieOptions.access,
+      )
+      .cookie(
+        COOKIE_TOKEN.REFRESH,
+        result.value.refreshToken,
+        cookieOptions.refresh,
+      )
 
     return context.response.noContent()
   }

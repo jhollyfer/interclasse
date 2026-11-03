@@ -14,7 +14,10 @@ import {
 test.group('announcements > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('deletes for good and responds 204 without a body', async ({ client, assert }) => {
+  test('deletes for good and responds 204 without a body', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.apply('pinned').create()
 
@@ -38,10 +41,15 @@ test.group('announcements > delete', (group) => {
     assert.equal(body(response).code, 'ANNOUNCEMENT_NOT_FOUND')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const announcement = await AnnouncementFactory.create()
 
-    const anonymous = await client.delete(`/administrator/announcements/${announcement.id}`)
+    const anonymous = await client.delete(
+      `/administrator/announcements/${announcement.id}`,
+    )
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client
       .delete(`/administrator/announcements/${announcement.id}`)
@@ -54,14 +62,19 @@ test.group('announcements > delete', (group) => {
   })
 })
 
-test.group('administrator/announcements/delete > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/announcements/delete > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('422: id that is not a uuid', async ({ client }) => {
-    const admin = await authenticateAsAdministrator(client)
+    test('422: id that is not a uuid', async ({ client }) => {
+      const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/announcements/nao-e-uuid').cookies(admin)
+      const response = await client
+        .delete('/administrator/announcements/nao-e-uuid')
+        .cookies(admin)
 
-    response.assertStatus(422)
-  })
-})
+      response.assertStatus(422)
+    })
+  },
+)

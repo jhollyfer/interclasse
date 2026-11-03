@@ -1,19 +1,33 @@
 import { test } from '@japa/runner'
 
 import { COOKIE_TOKEN } from '#config/cookie'
-import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 test.group('authentication > refresh', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('refreshes the session and returns a new token pair', async ({ client, assert }) => {
+  test('refreshes the session and returns a new token pair', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.post('/authentication/refresh').cookies(session)
+    const response = await client
+      .post('/authentication/refresh')
+      .cookies(session)
 
     response.assertStatus(204)
-    assert.notEqual(response.cookie(COOKIE_TOKEN.ACCESS)?.value, session[COOKIE_TOKEN.ACCESS])
-    assert.notEqual(response.cookie(COOKIE_TOKEN.REFRESH)?.value, session[COOKIE_TOKEN.REFRESH])
+    assert.notEqual(
+      response.cookie(COOKIE_TOKEN.ACCESS)?.value,
+      session[COOKIE_TOKEN.ACCESS],
+    )
+    assert.notEqual(
+      response.cookie(COOKIE_TOKEN.REFRESH)?.value,
+      session[COOKIE_TOKEN.REFRESH],
+    )
   })
 
   test('without a refresh cookie responds 401', async ({ client }) => {

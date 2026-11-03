@@ -53,7 +53,10 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** The whole path, from zero to `UPLOADED`, for a single-part file. */
-async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
+async function upload(
+  client: ApiClient,
+  session: Session,
+): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -77,7 +80,10 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
 test.group('storages > parts', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lists what was uploaded and signs only what is missing', async ({ client, assert }) => {
+  test('lists what was uploaded and signs only what is missing', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const opened = await open(client, session, {
@@ -92,7 +98,9 @@ test.group('storages > parts', (group) => {
     await put(opened.parts[0].url, FULL_PART)
     await put(opened.parts[1].url, FULL_PART)
 
-    const response = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
+    const response = await client
+      .get(`/storages/${opened.storage.id}/parts`)
+      .cookies(session)
 
     response.assertStatus(200)
 
@@ -122,20 +130,29 @@ test.group('storages > parts', (group) => {
       size: PART_SIZE + SMALL.byteLength,
     })
 
-    const response = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
+    const response = await client
+      .get(`/storages/${opened.storage.id}/parts`)
+      .cookies(session)
 
     await put(body(response).parts[0].url, FULL_PART)
 
-    const after = await client.get(`/storages/${opened.storage.id}/parts`).cookies(session)
+    const after = await client
+      .get(`/storages/${opened.storage.id}/parts`)
+      .cookies(session)
 
     assert.lengthOf(body(after).uploaded, 1)
   })
 
-  test('an already confirmed file responds with empty lists', async ({ client, assert }) => {
+  test('an already confirmed file responds with empty lists', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    const response = await client.get(`/storages/${storage.id}/parts`).cookies(session)
+    const response = await client
+      .get(`/storages/${storage.id}/parts`)
+      .cookies(session)
 
     response.assertStatus(200)
     assert.isEmpty(body(response).parts)
@@ -148,7 +165,9 @@ test.group('storages > parts > acesso e identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
   test('without a session responds 401', async ({ client }) => {
-    const response = await client.get(`/storages/00000000-0000-4000-8000-000000000000/parts`)
+    const response = await client.get(
+      `/storages/00000000-0000-4000-8000-000000000000/parts`,
+    )
 
     response.assertStatus(401)
   })
@@ -164,7 +183,10 @@ test.group('storages > parts > acesso e identificador', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/storages/x/parts').cookies(session)

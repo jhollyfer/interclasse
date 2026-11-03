@@ -15,17 +15,29 @@ import {
 test.group('brackets > preview', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('counts the enrolled of each classroom and says who enters', async ({ client, assert }) => {
+  test('counts the enrolled of each classroom and says who enters', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const sport = await SportFactory.merge({ minAthletes: 2, maxAthletes: 5 }).create()
+    const sport = await SportFactory.merge({
+      minAthletes: 2,
+      maxAthletes: 5,
+    }).create()
     const [full, empty] = await ClassroomFactory.merge({
       grade: 4,
       category: ClassroomEntity.categoryOf(4),
     }).createMany(2)
-    if (!full || !empty) throw new Error('factory created fewer classrooms than requested')
-    const students = await StudentFactory.merge({ classroomId: full.id }).createMany(2)
+    if (!full || !empty)
+      throw new Error('factory created fewer classrooms than requested')
+    const students = await StudentFactory.merge({
+      classroomId: full.id,
+    }).createMany(2)
     for (const student of students)
-      await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
+      await EnrollmentFactory.merge({
+        studentId: student.id,
+        sportId: sport.id,
+      }).create()
     await StudentFactory.merge({ classroomId: empty.id }).create()
 
     const response = await client
@@ -37,10 +49,12 @@ test.group('brackets > preview', (group) => {
     assert.equal(body(response).minAthletes, 2)
     assert.isFalse(body(response).drawn)
     const byId = Object.fromEntries(
-      body(response).classrooms.map((row: { id: string; athletes: number; eligible: boolean }) => [
-        row.id,
-        { athletes: row.athletes, eligible: row.eligible },
-      ]),
+      body(response).classrooms.map(
+        (row: { id: string; athletes: number; eligible: boolean }) => [
+          row.id,
+          { athletes: row.athletes, eligible: row.eligible },
+        ],
+      ),
     )
     assert.deepEqual(byId, {
       [full.id]: { athletes: 2, eligible: true },
@@ -49,23 +63,30 @@ test.group('brackets > preview', (group) => {
   })
 })
 
-test.group('administrator/brackets/preview > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/brackets/preview > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('401: without a session', async ({ client }) => {
-    const response = await client.get('/administrator/brackets/preview')
+    test('401: without a session', async ({ client }) => {
+      const response = await client.get('/administrator/brackets/preview')
 
-    response.assertStatus(401)
-  })
+      response.assertStatus(401)
+    })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
-    const advisor = await authenticateAsAdvisor(client)
+    test('403: advisor does not reach the organization route', async ({
+      client,
+    }) => {
+      const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.get('/administrator/brackets/preview').cookies(advisor)
+      const response = await client
+        .get('/administrator/brackets/preview')
+        .cookies(advisor)
 
-    response.assertStatus(403)
-  })
-})
+      response.assertStatus(403)
+    })
+  },
+)
 
 test.group('administrator/brackets/preview > 422', (group) => {
   group.each.setup(() => resetDatabase())
@@ -76,7 +97,9 @@ test.group('administrator/brackets/preview > 422', (group) => {
   }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/brackets/preview?sportId=x').cookies(admin)
+    const response = await client
+      .get('/administrator/brackets/preview?sportId=x')
+      .cookies(admin)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'sportId')

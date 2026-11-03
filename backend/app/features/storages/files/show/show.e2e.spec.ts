@@ -2,7 +2,11 @@ import { test } from '@japa/runner'
 import { UPLOAD_STATUS } from '@interclasse/shared'
 
 import { storageRow } from '#tests/storages-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 /**
  * The file as a neutral, shared record: it does not belong to the
@@ -25,7 +29,9 @@ test.group('storages > detalhe', (group) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await storageRow()
 
-    const response = await client.get(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .get(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(200)
     assert.equal(body(response).id, storage.id)
@@ -40,7 +46,9 @@ test.group('storages > detalhe', (group) => {
 
     // The detail screen is where one discovers that an upload was left half-done.
     // What requires `UPLOADED` is the attachment, not the read.
-    const response = await client.get(`/storages/${storage.id}`).cookies(session)
+    const response = await client
+      .get(`/storages/${storage.id}`)
+      .cookies(session)
 
     response.assertStatus(200)
     assert.equal(body(response).status, 'PENDING')
@@ -57,7 +65,10 @@ test.group('storages > detalhe', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/storages/nao-e-uuid').cookies(session)

@@ -14,7 +14,10 @@ import {
 test.group('brackets > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the newest comes first, with the sport and the pagination', async ({ client, assert }) => {
+  test('the newest comes first, with the sport and the pagination', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const oldest = await BracketFactory.with('sport')
       .merge({ createdAt: DateTime.now().minus({ days: 1 }) })
@@ -33,7 +36,10 @@ test.group('brackets > paginate', (group) => {
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('?sportId, ?category and ?status narrow the list', async ({ client, assert }) => {
+  test('?sportId, ?category and ?status narrow the list', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
     const target = await BracketFactory.merge({
@@ -47,10 +53,15 @@ test.group('brackets > paginate', (group) => {
       sportId: sport.id,
       category: CATEGORY.F1,
     }).create()
-    const otherSport = await BracketFactory.with('sport').merge({ category: CATEGORY.F2 }).create()
+    const otherSport = await BracketFactory.with('sport')
+      .merge({ category: CATEGORY.F2 })
+      .create()
 
     const ids = async (qs: Record<string, string>) => {
-      const response = await client.get('/administrator/brackets').qs(qs).cookies(admin)
+      const response = await client
+        .get('/administrator/brackets')
+        .qs(qs)
+        .cookies(admin)
       response.assertStatus(200)
 
       return body(response)
@@ -58,9 +69,17 @@ test.group('brackets > paginate', (group) => {
         .sort()
     }
 
-    assert.deepEqual(await ids({ sportId: sport.id }), [target.id, otherCategory.id].sort())
-    assert.deepEqual(await ids({ category: CATEGORY.F2 }), [target.id, otherSport.id].sort())
-    assert.deepEqual(await ids({ status: BRACKET_STATUS.FINISHED }), [target.id])
+    assert.deepEqual(
+      await ids({ sportId: sport.id }),
+      [target.id, otherCategory.id].sort(),
+    )
+    assert.deepEqual(
+      await ids({ category: CATEGORY.F2 }),
+      [target.id, otherSport.id].sort(),
+    )
+    assert.deepEqual(await ids({ status: BRACKET_STATUS.FINISHED }), [
+      target.id,
+    ])
   })
 
   test('?status outside the list responds 422 pointing at the field', async ({
@@ -70,17 +89,24 @@ test.group('brackets > paginate', (group) => {
     const admin = await authenticateAsAdministrator(client)
 
     // In the URL, not in `.qs()`: the Tuyau registry types the value by the closed list.
-    const response = await client.get('/administrator/brackets?status=ARQUIVADA').cookies(admin)
+    const response = await client
+      .get('/administrator/brackets?status=ARQUIVADA')
+      .cookies(admin)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'status')
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const anonymous = await client.get('/administrator/brackets')
-    const advisorSession = await client.get('/administrator/brackets').cookies(advisor)
+    const advisorSession = await client
+      .get('/administrator/brackets')
+      .cookies(advisor)
 
     anonymous.assertStatus(401)
     advisorSession.assertStatus(403)

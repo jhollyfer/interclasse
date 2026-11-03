@@ -6,14 +6,19 @@ import type HTTPException from '#exceptions/http.exception'
 type Fact = { readonly code: string }
 
 /** Each fact of the type, keyed by its own `code`. */
-type FactsByCode<TFact extends Fact> = { [TCode in TFact['code']]: Extract<TFact, { code: TCode }> }
+type FactsByCode<TFact extends Fact> = {
+  [TCode in TFact['code']]: Extract<TFact, { code: TCode }>
+}
 
 /**
  * The translation table of a fact type: one entry per `code`, and the
  * compiler rejects a new fact without a translation (`satisfies` at the call site).
  */
 export type RefusalTable<TFact extends Fact> = {
-  [TCode in TFact['code']]: (fact: FactsByCode<TFact>[TCode], i18n: I18n) => HTTPException
+  [TCode in TFact['code']]: (
+    fact: FactsByCode<TFact>[TCode],
+    i18n: I18n,
+  ) => HTTPException
 }
 
 /**
@@ -29,7 +34,10 @@ export abstract class RefusalBase {
     fact: FactsByCode<TFact>[TCode],
     i18n: I18n,
   ): HTTPException {
-    const entry: (fact: FactsByCode<TFact>[TCode], i18n: I18n) => HTTPException = table[code]
+    const entry: (
+      fact: FactsByCode<TFact>[TCode],
+      i18n: I18n,
+    ) => HTTPException = table[code]
 
     return entry(fact, i18n)
   }

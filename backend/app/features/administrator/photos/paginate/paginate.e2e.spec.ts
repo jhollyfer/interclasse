@@ -19,8 +19,14 @@ test.group('administrator/photos > paginate', (group) => {
     const advisor = await authenticateAsAdvisor(client)
     const first = await StorageFactory.create()
     const second = await StorageFactory.create()
-    await client.post('/administrator/photos').cookies(admin).json({ storageId: first.id })
-    await client.post('/advisor/photos').cookies(advisor).json({ storageId: second.id })
+    await client
+      .post('/administrator/photos')
+      .cookies(admin)
+      .json({ storageId: first.id })
+    await client
+      .post('/advisor/photos')
+      .cookies(advisor)
+      .json({ storageId: second.id })
 
     const all = await client.get('/administrator/photos').cookies(admin)
     const pending = await client
@@ -41,7 +47,9 @@ test.group('administrator/photos > paginate', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not read the organization queue', async ({ client }) => {
+  test('403: advisor does not read the organization queue', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/photos').cookies(advisor)
@@ -52,7 +60,10 @@ test.group('administrator/photos > paginate', (group) => {
   test('422: status outside the enum', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/photos').qs({ status: 'XYZ' }).cookies(admin)
+    const response = await client
+      .get('/administrator/photos')
+      .qs({ status: 'XYZ' })
+      .cookies(admin)
 
     response.assertStatus(422)
   })

@@ -12,14 +12,18 @@ export class PostgresError {
 
   static isUniqueViolation(error: unknown): boolean {
     return (
-      error instanceof Error && 'code' in error && error.code === PostgresError.UNIQUE_VIOLATION
+      error instanceof Error &&
+      'code' in error &&
+      error.code === PostgresError.UNIQUE_VIOLATION
     )
   }
 
   /** The name of the violated `unique`, when Postgres reports it. */
   static violatedConstraint(error: unknown): string | undefined {
-    if (!PostgresError.isUniqueViolation(error) || !(error instanceof Error)) return undefined
-    if (!('constraint' in error) || typeof error.constraint !== 'string') return undefined
+    if (!PostgresError.isUniqueViolation(error) || !(error instanceof Error))
+      return undefined
+    if (!('constraint' in error) || typeof error.constraint !== 'string')
+      return undefined
 
     return error.constraint
   }

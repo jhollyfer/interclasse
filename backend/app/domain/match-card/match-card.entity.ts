@@ -38,11 +38,14 @@ export class MatchCard {
 
   /** Enters the card. The id and the clock come from outside: the domain does no I/O. */
   static launch(input: LaunchInput): Either<MatchCardError, MatchCard> {
-    if (!input.homeTeamId || !input.awayTeamId) return left({ code: 'MATCH_TEAMS_PENDING' })
+    if (!input.homeTeamId || !input.awayTeamId)
+      return left({ code: 'MATCH_TEAMS_PENDING' })
 
     const playing =
-      input.studentTeamId === input.homeTeamId || input.studentTeamId === input.awayTeamId
-    if (!input.studentTeamId || !playing) return left({ code: 'STUDENT_NOT_IN_MATCH' })
+      input.studentTeamId === input.homeTeamId ||
+      input.studentTeamId === input.awayTeamId
+    if (!input.studentTeamId || !playing)
+      return left({ code: 'STUDENT_NOT_IN_MATCH' })
 
     return right(
       new MatchCard({

@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, type AdvisorPhotoShowResponse, type Either, type Merge } from '@interclasse/shared'
+import {
+  left,
+  type AdvisorPhotoShowResponse,
+  type Either,
+  type Merge,
+} from '@interclasse/shared'
 
 import { PhotoSubmissionBase } from '#features/_shared.photo-submission.base'
 import { PhotoRepository } from '#repositories/photo/photo.repository'
@@ -10,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import { StorageContract } from '#services/storage/storage.contract'
 import type { AdvisorPhotoCreatePayload } from '#validators/advisor/photos.validator'
 
-type Payload = Merge<AdvisorPhotoCreatePayload, { actor: { readonly id: string } }>
+type Payload = Merge<
+  AdvisorPhotoCreatePayload,
+  { actor: { readonly id: string } }
+>
 type Response = Either<HTTPException, AdvisorPhotoShowResponse>
 
 /**

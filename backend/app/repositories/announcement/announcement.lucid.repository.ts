@@ -1,8 +1,14 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import type { AdministratorAnnouncementShowResponse, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorAnnouncementShowResponse,
+  Paginated,
+} from '@interclasse/shared'
 
-import { AnnouncementRepository, type AnnouncementListCriteria } from './announcement.repository.ts'
+import {
+  AnnouncementRepository,
+  type AnnouncementListCriteria,
+} from './announcement.repository.ts'
 
 import AnnouncementModel from '#models/announcement'
 import { Announcement } from '#domain/announcement/announcement.entity'
@@ -15,7 +21,9 @@ export class AnnouncementLucidRepository extends AnnouncementRepository {
   }
 
   async findById(id: string): Promise<Announcement | null> {
-    const row = await AnnouncementModel.query({ client: this.transaction.client() })
+    const row = await AnnouncementModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .first()
     if (!row) return null
@@ -71,7 +79,9 @@ export class AnnouncementLucidRepository extends AnnouncementRepository {
     })
   }
 
-  private toResponse(row: AnnouncementModel): AdministratorAnnouncementShowResponse {
+  private toResponse(
+    row: AnnouncementModel,
+  ): AdministratorAnnouncementShowResponse {
     return {
       id: row.id,
       title: row.title,

@@ -12,7 +12,12 @@ const ID = '6a4f2e1d-0c9b-4a8f-8e7d-6c5b4a3f2e1d'
 async function setup() {
   const announcements = MemoryRepositories.announcements()
   await announcements.save(
-    Announcement.create({ id: ID, title: 'Adiado', body: 'Às 15h', now: new Date() }),
+    Announcement.create({
+      id: ID,
+      title: 'Adiado',
+      body: 'Às 15h',
+      now: new Date(),
+    }),
   )
   const useCase = await makeWithMemory(AdministratorAnnouncementShowUseCase, [
     [AnnouncementRepository, announcements],
@@ -34,8 +39,13 @@ test.group('administrator/announcements > show (unit)', () => {
   test('nonexistent is 404 ANNOUNCEMENT_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000' })
+    const result = await useCase.execute({
+      id: '00000000-0000-4000-8000-000000000000',
+    })
 
-    assert.deepInclude(result.value, { status: 404, code: 'ANNOUNCEMENT_NOT_FOUND' })
+    assert.deepInclude(result.value, {
+      status: 404,
+      code: 'ANNOUNCEMENT_NOT_FOUND',
+    })
   })
 })

@@ -1,4 +1,11 @@
-import { CATEGORY, GRADES, left, right, type Category, type Either } from '@interclasse/shared'
+import {
+  CATEGORY,
+  GRADES,
+  left,
+  right,
+  type Category,
+  type Either,
+} from '@interclasse/shared'
 
 import type { ClassroomError } from './classroom.errors.ts'
 
@@ -29,7 +36,10 @@ type ClassroomChanges = ClassroomLinks & {
  * the link (without it, a representative named as advisor would gain the
  * student registry of the whole classroom); `taken` is an account already linked to another classroom.
  */
-export type ClassroomLinkFacts = { readonly exists: boolean; readonly taken: boolean }
+export type ClassroomLinkFacts = {
+  readonly exists: boolean
+  readonly taken: boolean
+}
 
 export type ClassroomPeopleFacts = {
   readonly advisor?: ClassroomLinkFacts
@@ -69,11 +79,15 @@ export class Classroom {
     },
     facts: ClassroomPeopleFacts,
   ): Either<ClassroomError, Classroom> {
-    if (!Classroom.gradeInRange(input.grade)) return left({ code: 'CLASSROOM_INVALID_GRADE' })
+    if (!Classroom.gradeInRange(input.grade))
+      return left({ code: 'CLASSROOM_INVALID_GRADE' })
 
     const advisorId = input.advisorId ?? null
     const representativeId = input.representativeId ?? null
-    const refused = Classroom.refusePeople({ advisorId, representativeId }, facts)
+    const refused = Classroom.refusePeople(
+      { advisorId, representativeId },
+      facts,
+    )
     if (refused) return left(refused)
 
     return right(
@@ -110,9 +124,13 @@ export class Classroom {
     },
   ): Either<ClassroomError, Classroom> {
     const grade = changes.grade ?? this.props.grade
-    if (!Classroom.gradeInRange(grade)) return left({ code: 'CLASSROOM_INVALID_GRADE' })
+    if (!Classroom.gradeInRange(grade))
+      return left({ code: 'CLASSROOM_INVALID_GRADE' })
 
-    const refused = Classroom.refusePeople(this.changedLinks(changes), context.facts)
+    const refused = Classroom.refusePeople(
+      this.changedLinks(changes),
+      context.facts,
+    )
     if (refused) return left(refused)
 
     // Changing category with the classroom in a bracket would leave it playing against the
@@ -124,7 +142,8 @@ export class Classroom {
     this.props.name = changes.name ?? this.props.name
     this.props.grade = grade
     this.props.category = category
-    if (changes.advisorId !== undefined) this.props.advisorId = changes.advisorId
+    if (changes.advisorId !== undefined)
+      this.props.advisorId = changes.advisorId
     if (changes.representativeId !== undefined)
       this.props.representativeId = changes.representativeId
     this.props.updatedAt = context.now
@@ -133,7 +152,9 @@ export class Classroom {
   }
 
   /** Deleting with the classroom in a drawn bracket refuses; without a team, it allows. */
-  remove(context: { readonly inCompetition: boolean }): Either<ClassroomError, Classroom> {
+  remove(context: {
+    readonly inCompetition: boolean
+  }): Either<ClassroomError, Classroom> {
     if (context.inCompetition) return left({ code: 'CLASSROOM_IN_COMPETITION' })
 
     return right(this)
@@ -152,12 +173,18 @@ export class Classroom {
   }
 
   /** The new links to check: the ones that change to an account, and not to `null`. */
-  changedLinks(changes: ClassroomLinks): { advisorId?: string; representativeId?: string } {
+  changedLinks(changes: ClassroomLinks): {
+    advisorId?: string
+    representativeId?: string
+  } {
     const links: { advisorId?: string; representativeId?: string } = {}
 
     if (changes.advisorId && changes.advisorId !== this.props.advisorId)
       links.advisorId = changes.advisorId
-    if (changes.representativeId && changes.representativeId !== this.props.representativeId)
+    if (
+      changes.representativeId &&
+      changes.representativeId !== this.props.representativeId
+    )
       links.representativeId = changes.representativeId
 
     return links

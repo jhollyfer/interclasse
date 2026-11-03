@@ -25,7 +25,9 @@ function launch(overrides: {
 }
 
 test.group('MatchCard', () => {
-  test("enters the card with the team of the athlete's classroom", ({ assert }) => {
+  test("enters the card with the team of the athlete's classroom", ({
+    assert,
+  }) => {
     const card = launch({ studentTeamId: 'away' })
 
     assert.isTrue(card.isRight())
@@ -41,19 +43,32 @@ test.group('MatchCard', () => {
   })
 
   test('a match without both teams is MATCH_TEAMS_PENDING', ({ assert }) => {
-    assert.deepEqual(launch({ awayTeamId: null }).value, { code: 'MATCH_TEAMS_PENDING' })
-    assert.deepEqual(launch({ homeTeamId: null }).value, { code: 'MATCH_TEAMS_PENDING' })
+    assert.deepEqual(launch({ awayTeamId: null }).value, {
+      code: 'MATCH_TEAMS_PENDING',
+    })
+    assert.deepEqual(launch({ homeTeamId: null }).value, {
+      code: 'MATCH_TEAMS_PENDING',
+    })
   })
 
-  test('an athlete from outside the match is STUDENT_NOT_IN_MATCH', ({ assert }) => {
-    assert.deepEqual(launch({ studentTeamId: null }).value, { code: 'STUDENT_NOT_IN_MATCH' })
-    assert.deepEqual(launch({ studentTeamId: 'outro' }).value, { code: 'STUDENT_NOT_IN_MATCH' })
+  test('an athlete from outside the match is STUDENT_NOT_IN_MATCH', ({
+    assert,
+  }) => {
+    assert.deepEqual(launch({ studentTeamId: null }).value, {
+      code: 'STUDENT_NOT_IN_MATCH',
+    })
+    assert.deepEqual(launch({ studentTeamId: 'outro' }).value, {
+      code: 'STUDENT_NOT_IN_MATCH',
+    })
   })
 
   test('restore returns the same card the snapshot kept', ({ assert }) => {
     const card = launch({})
     if (card.isLeft()) throw new Error('invalid card in the arrangement')
 
-    assert.deepEqual(MatchCard.restore(card.value.snapshot()).snapshot(), card.value.snapshot())
+    assert.deepEqual(
+      MatchCard.restore(card.value.snapshot()).snapshot(),
+      card.value.snapshot(),
+    )
   })
 })

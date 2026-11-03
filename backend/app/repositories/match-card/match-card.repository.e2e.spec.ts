@@ -9,7 +9,10 @@ import { MatchCardMemoryRepository } from './match-card.memory.repository.ts'
 import type { MatchCardRepository } from './match-card.repository.ts'
 
 import { MatchCard } from '#domain/match-card/match-card.entity'
-import { BracketArrangements, type BracketHarness } from '#tests/bracket-harness-fixtures'
+import {
+  BracketArrangements,
+  type BracketHarness,
+} from '#tests/bracket-harness-fixtures'
 import { resetDatabase } from '#tests/http-fixtures'
 
 /**
@@ -21,7 +24,11 @@ type Harness = {
   readonly bracket: BracketHarness
   readonly cards: MatchCardRepository
   /** The students the card only reads, arranged the way each implementation does. */
-  arrangeStudent(student: { id: string; name: string; classroomId: string }): void
+  arrangeStudent(student: {
+    id: string
+    name: string
+    classroomId: string
+  }): void
 }
 
 const IMPLEMENTATIONS = {
@@ -38,7 +45,11 @@ const IMPLEMENTATIONS = {
       bracket,
       cards,
       arrangeStudent: (student) => {
-        cards.withStudent({ ...student, createdAt: BracketArrangements.NOW, updatedAt: null })
+        cards.withStudent({
+          ...student,
+          createdAt: BracketArrangements.NOW,
+          updatedAt: null,
+        })
       },
     }
   },
@@ -46,16 +57,25 @@ const IMPLEMENTATIONS = {
 
 /** A drawn bracket of 4 classrooms, and a card of the student of the home classroom of the first semifinal. */
 async function launched(harness: Harness, createdAt = BracketArrangements.NOW) {
-  const drawn = await BracketArrangements.drawn(harness.bracket, ['8º A', '8º B', '8º C', '8º D'])
+  const drawn = await BracketArrangements.drawn(harness.bracket, [
+    '8º A',
+    '8º B',
+    '8º C',
+    '8º D',
+  ])
   for (const student of drawn.students) harness.arrangeStudent(student)
 
   const semi = drawn.bracket
     .snapshot()
-    .matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)
+    .matches.find(
+      (match) => match.phase === MATCH_PHASE.SEMI && match.position === 0,
+    )
   const student = drawn.students.find(
     (candidate) =>
       candidate.classroomId ===
-      drawn.bracket.snapshot().teams.find((team) => team.id === semi?.homeTeamId)?.classroomId,
+      drawn.bracket
+        .snapshot()
+        .teams.find((team) => team.id === semi?.homeTeamId)?.classroomId,
   )
   if (!semi || !student) throw new Error('incomplete arrangement')
 
@@ -91,21 +111,32 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await harness.cards.findById(randomUUID()))
     })
 
-    test("findStudentClassroom finds the student's classroom", async ({ assert }) => {
+    test("findStudentClassroom finds the student's classroom", async ({
+      assert,
+    }) => {
       const harness = await make()
       const { student } = await launched(harness)
 
-      assert.equal(await harness.cards.findStudentClassroom(student.id), student.classroomId)
+      assert.equal(
+        await harness.cards.findStudentClassroom(student.id),
+        student.classroomId,
+      )
       assert.isNull(await harness.cards.findStudentClassroom(randomUUID()))
     })
 
-    test('findResponse brings the student, the team and the match', async ({ assert }) => {
+    test('findResponse brings the student, the team and the match', async ({
+      assert,
+    }) => {
       const harness = await make()
       const { card, student, semi } = await launched(harness)
 
       const response = await harness.cards.findResponse(card.id)
 
-      assert.deepInclude(response, { id: card.id, color: CARD_COLOR.YELLOW, note: 'Falta dura' })
+      assert.deepInclude(response, {
+        id: card.id,
+        color: CARD_COLOR.YELLOW,
+        note: 'Falta dura',
+      })
       assert.equal(response?.student.name, student.name)
       assert.equal(response?.team.id, semi.homeTeamId)
       assert.equal(response?.match.id, semi.id)
@@ -117,7 +148,10 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert,
     }) => {
       const harness = await make()
-      const first = await launched(harness, new Date('2026-10-29T12:00:00.000Z'))
+      const first = await launched(
+        harness,
+        new Date('2026-10-29T12:00:00.000Z'),
+      )
 
       const all = await harness.cards.paginate({ page: 1, perPage: 10 })
       const byStudent = await harness.cards.paginate({
@@ -133,7 +167,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const otherClassroom = await harness.cards.paginate({
         page: 1,
         perPage: 10,
-        classroomId: first.classrooms.find((c) => c.id !== first.student.classroomId)?.id,
+        classroomId: first.classrooms.find(
+          (c) => c.id !== first.student.classroomId,
+        )?.id,
       })
       const otherMatch = await harness.cards.paginate({
         page: 1,
@@ -150,7 +186,10 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
     test('paginate sorts newest first', async ({ assert }) => {
       const harness = await make()
-      const { semi, student } = await launched(harness, new Date('2026-10-29T12:00:00Z'))
+      const { semi, student } = await launched(
+        harness,
+        new Date('2026-10-29T12:00:00Z'),
+      )
       const newer = MatchCard.launch({
         id: randomUUID(),
         matchId: semi.id,

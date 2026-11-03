@@ -26,7 +26,8 @@ const config: IConfiguration = {
     },
     {
       name: 'domain-no-infra',
-      comment: 'domain/ imports core and shared; never a model, repository, service or HTTP.',
+      comment:
+        'domain/ imports core and shared; never a model, repository, service or HTTP.',
       severity: 'error',
       from: { path: '^app/domain/' },
       to: {
@@ -35,7 +36,8 @@ const config: IConfiguration = {
     },
     {
       name: 'repositories-no-rules',
-      comment: 'repositories/ imports domain, models and core; never business rules or HTTP.',
+      comment:
+        'repositories/ imports domain, models and core; never business rules or HTTP.',
       severity: 'error',
       from: { path: '^app/repositories/' },
       to: { path: '^app/(services|policies|middleware|features|exceptions)/' },
@@ -67,7 +69,8 @@ const config: IConfiguration = {
     },
     {
       name: 'services-no-rules',
-      comment: 'services/ imports core and shared; never business rules or features/.',
+      comment:
+        'services/ imports core and shared; never business rules or features/.',
       severity: 'error',
       from: { path: '^app/services/' },
       to: {
@@ -76,7 +79,8 @@ const config: IConfiguration = {
     },
     {
       name: 'policies-no-database',
-      comment: 'policies/ imports core and domain; never queries the database on its own.',
+      comment:
+        'policies/ imports core and domain; never queries the database on its own.',
       severity: 'error',
       from: { path: '^app/policies/' },
       to: { path: '^app/(repositories|models|services|middleware|features)/' },
@@ -90,7 +94,8 @@ const config: IConfiguration = {
     },
     {
       name: 'features-no-implementation',
-      comment: 'features/ uses the contract; never a model or a concrete implementation.',
+      comment:
+        'features/ uses the contract; never a model or a concrete implementation.',
       severity: 'error',
       from: { path: '^app/features/' },
       to: {
@@ -103,10 +108,14 @@ const config: IConfiguration = {
     },
     {
       name: 'features-no-other-feature',
-      comment: 'A feature does not import another; what is common goes up to _shared.',
+      comment:
+        'A feature does not import another; what is common goes up to _shared.',
       severity: 'error',
       from: { path: '^app/features/([^/]+)/' },
-      to: { path: '^app/features/', pathNot: ['^app/features/$1/', '/_shared[./]'] },
+      to: {
+        path: '^app/features/',
+        pathNot: ['^app/features/$1/', '/_shared[./]'],
+      },
     },
   ],
   options: {

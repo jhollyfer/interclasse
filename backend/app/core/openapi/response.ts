@@ -58,7 +58,8 @@ export const RESPONSES: Record<string, FeatureResponse> = {
   'administrator/cards/create': AdministratorCardCreateResponse,
   'administrator/classrooms': AdministratorClassroomShowResponse,
   'administrator/classrooms/paginate': AdministratorClassroomPaginateResponse,
-  'administrator/enrollment-removals': AdministratorEnrollmentRemovalShowResponse,
+  'administrator/enrollment-removals':
+    AdministratorEnrollmentRemovalShowResponse,
   'administrator/matches': AdministratorMatchPaginateResponse,
   'administrator/matches/athletes': AdministratorMatchAthletesResponse,
   'administrator/matches/score': AdministratorMatchScoreResponse,

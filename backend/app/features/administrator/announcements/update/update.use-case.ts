@@ -32,7 +32,10 @@ export default class AdministratorAnnouncementUpdateUseCase {
       const announcement = await this.announcements.findById(id)
       if (!announcement)
         return left(
-          HTTPException.NotFound(this.i18n.t('announcements.not_found'), 'ANNOUNCEMENT_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('announcements.not_found'),
+            'ANNOUNCEMENT_NOT_FOUND',
+          ),
         )
 
       announcement.edit(changes, new Date())
@@ -40,7 +43,10 @@ export default class AdministratorAnnouncementUpdateUseCase {
 
       return right(AnnouncementPresenter.show(announcement))
     } catch (error) {
-      logger.error({ err: error }, '[administrator/announcements > update][error]')
+      logger.error(
+        { err: error },
+        '[administrator/announcements > update][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

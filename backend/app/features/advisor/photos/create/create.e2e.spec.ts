@@ -1,7 +1,12 @@
 import { test } from '@japa/runner'
 
 import { StorageFactory } from '#database/factories/storage.factory'
-import { authenticateAsAdvisor, body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
+import {
+  authenticateAsAdvisor,
+  body,
+  resetDatabase,
+  signInWithFactory,
+} from '#tests/http-fixtures'
 
 const NOT_FOUND_ID = '00000000-0000-4000-8000-000000000000'
 
@@ -24,7 +29,9 @@ test.group('advisor/photos > create', (group) => {
   test('401: without a session', async ({ client }) => {
     const image = await StorageFactory.create()
 
-    const response = await client.post('/advisor/photos').json({ storageId: image.id })
+    const response = await client
+      .post('/advisor/photos')
+      .json({ storageId: image.id })
 
     response.assertStatus(401)
   })
@@ -44,7 +51,10 @@ test.group('advisor/photos > create', (group) => {
   test('422: without storageId', async ({ client, assert }) => {
     const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.post('/advisor/photos').cookies(advisor).json({})
+    const response = await client
+      .post('/advisor/photos')
+      .cookies(advisor)
+      .json({})
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'storageId')

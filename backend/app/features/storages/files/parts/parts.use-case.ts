@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type StoragesFileUploadResponse } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Either,
+  type StoragesFileUploadResponse,
+} from '@interclasse/shared'
 
 import { FilePresenter } from '../files.presenter.ts'
 
@@ -17,7 +22,11 @@ import {
   type PresignedPart,
   type UploadedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
+import {
+  countParts,
+  pendingParts,
+  sizedParts,
+} from '#features/storages/_shared.parts'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
@@ -54,7 +63,12 @@ export default class StoragesFilePartsUseCase {
       const storage = await this.storages.findById(payload.id)
 
       if (!storage)
-        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('files.not_found'),
+            'STORAGE_NOT_FOUND',
+          ),
+        )
 
       const file = storage.snapshot()
       const partSize = file.partSize ?? PART_SIZE
@@ -84,7 +98,10 @@ export default class StoragesFilePartsUseCase {
         uploaded: uploaded.map((part) => part.partNumber),
         batch: PRESIGNED_BATCH,
       })
-      const parts = await this.sign(storage, sizedParts(missing, file.size, partSize))
+      const parts = await this.sign(
+        storage,
+        sizedParts(missing, file.size, partSize),
+      )
 
       return right(
         FilePresenter.upload({
@@ -124,7 +141,13 @@ export default class StoragesFilePartsUseCase {
     try {
       const metadata = await this.bucket.metadata(path)
 
-      return [{ partNumber: 1, size: metadata.contentLength, etag: metadata.etag ?? '' }]
+      return [
+        {
+          partNumber: 1,
+          size: metadata.contentLength,
+          etag: metadata.etag ?? '',
+        },
+      ]
     } catch {
       // The object does not yet exist in the bucket: nothing sent, nothing to resume.
       return []
@@ -142,6 +165,11 @@ export default class StoragesFilePartsUseCase {
 
     if (uploadId) return this.multipart.signParts(path, uploadId, missing)
 
-    return [{ partNumber: 1, url: await this.multipart.signSingle(path, mimetype, size) }]
+    return [
+      {
+        partNumber: 1,
+        url: await this.multipart.signSingle(path, mimetype, size),
+      },
+    ]
   }
 }

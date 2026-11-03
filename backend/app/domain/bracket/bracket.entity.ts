@@ -13,7 +13,11 @@ import {
 
 import type { BracketError, MatchError } from './bracket.errors.ts'
 
-import { Knockout, type Pairing, type Random } from '#domain/shared/knockout.value-object'
+import {
+  Knockout,
+  type Pairing,
+  type Random,
+} from '#domain/shared/knockout.value-object'
 
 /** The team is the classroom inside the competition. */
 export type TeamProps = {
@@ -134,18 +138,25 @@ export class Bracket {
    * what happened on the court, irreversibly.
    */
   ensureDeletable(): Either<BracketError, Bracket> {
-    if (this.props.matches.some((match) => match.status === MATCH_STATUS.FINISHED))
+    if (
+      this.props.matches.some((match) => match.status === MATCH_STATUS.FINISHED)
+    )
       return left({ code: 'BRACKET_HAS_RESULTS' })
 
     return right(this)
   }
 
   /** Date, time and venue. Absent means "leave alone"; `null` unschedules. */
-  schedule(matchId: string, changes: ScheduleChanges, now: Date): Either<MatchError, Bracket> {
+  schedule(
+    matchId: string,
+    changes: ScheduleChanges,
+    now: Date,
+  ): Either<MatchError, Bracket> {
     const match = this.matchOf(matchId)
     if (!match) return left({ code: 'MATCH_NOT_FOUND' })
 
-    if (changes.scheduledAt !== undefined) match.scheduledAt = changes.scheduledAt
+    if (changes.scheduledAt !== undefined)
+      match.scheduledAt = changes.scheduledAt
     if (changes.location !== undefined) match.location = changes.location
     match.updatedAt = now
 
@@ -156,11 +167,16 @@ export class Bracket {
    * The score, and what it moves: the winner advances to the next match, and the
    * final closes the bracket. A tie only with the penalty winner.
    */
-  score(matchId: string, input: ScoreInput, now: Date): Either<MatchError, Bracket> {
+  score(
+    matchId: string,
+    input: ScoreInput,
+    now: Date,
+  ): Either<MatchError, Bracket> {
     const match = this.matchOf(matchId)
     if (!match) return left({ code: 'MATCH_NOT_FOUND' })
 
-    if (!match.homeTeamId || !match.awayTeamId) return left({ code: 'MATCH_TEAMS_PENDING' })
+    if (!match.homeTeamId || !match.awayTeamId)
+      return left({ code: 'MATCH_TEAMS_PENDING' })
 
     const winner = Bracket.winnerOf(match, input)
     if (!winner) return left({ code: 'MATCH_WINNER_REQUIRED' })
@@ -205,7 +221,8 @@ export class Bracket {
     const match = this.matchOf(matchId)
     if (!match) return left({ code: 'MATCH_NOT_FOUND' })
 
-    if (match.status !== MATCH_STATUS.FINISHED) return left({ code: 'MATCH_NOT_PLAYED' })
+    if (match.status !== MATCH_STATUS.FINISHED)
+      return left({ code: 'MATCH_NOT_PLAYED' })
 
     const next = this.nextOf(match)
     if (next && next.status === MATCH_STATUS.FINISHED)
@@ -213,8 +230,10 @@ export class Bracket {
 
     if (next) {
       const { side } = Knockout.advanceSlot(match.position)
-      if (side === 'home' && next.homeTeamId === match.winnerTeamId) next.homeTeamId = null
-      if (side === 'away' && next.awayTeamId === match.winnerTeamId) next.awayTeamId = null
+      if (side === 'home' && next.homeTeamId === match.winnerTeamId)
+        next.homeTeamId = null
+      if (side === 'away' && next.awayTeamId === match.winnerTeamId)
+        next.awayTeamId = null
       next.updatedAt = now
     }
 
@@ -248,7 +267,8 @@ export class Bracket {
     return {
       homeTeamId: match.homeTeamId,
       awayTeamId: match.awayTeamId,
-      classroomTeamId: playing.find((team) => team.classroomId === classroomId)?.id ?? null,
+      classroomTeamId:
+        playing.find((team) => team.classroomId === classroomId)?.id ?? null,
     }
   }
 
@@ -256,7 +276,9 @@ export class Bracket {
   champion(): string | null {
     if (this.props.status !== BRACKET_STATUS.FINISHED) return null
 
-    const final = this.props.matches.find((match) => match.phase === MATCH_PHASE.FINAL)
+    const final = this.props.matches.find(
+      (match) => match.phase === MATCH_PHASE.FINAL,
+    )
 
     return final?.winnerTeamId ?? null
   }
@@ -284,20 +306,28 @@ export class Bracket {
 
     const { position } = Knockout.advanceSlot(match.position)
 
-    return this.props.matches.find((other) => other.phase === phase && other.position === position)
+    return this.props.matches.find(
+      (other) => other.phase === phase && other.position === position,
+    )
   }
 
   /** The score decides; a tie only with the penalty winner, and it must be one of the two. */
   private static winnerOf(match: MatchProps, input: ScoreInput): string | null {
     if (input.homeScore > input.awayScore) return match.homeTeamId
     if (input.awayScore > input.homeScore) return match.awayTeamId
-    if (input.winnerTeamId === match.homeTeamId || input.winnerTeamId === match.awayTeamId)
+    if (
+      input.winnerTeamId === match.homeTeamId ||
+      input.winnerTeamId === match.awayTeamId
+    )
       return input.winnerTeamId ?? null
 
     return null
   }
 
-  private static teamsOf(pairings: ReadonlyArray<Pairing<string>>, input: DrawInput): TeamProps[] {
+  private static teamsOf(
+    pairings: ReadonlyArray<Pairing<string>>,
+    input: DrawInput,
+  ): TeamProps[] {
     const classroomIds = pairings.flatMap((pairing) => {
       if (pairing.away) return [pairing.home, pairing.away]
 
@@ -381,7 +411,10 @@ export class Bracket {
 
   private static emptyMatch(
     input: DrawInput,
-    place: Pick<MatchProps, 'phase' | 'round' | 'position' | 'homeTeamId' | 'awayTeamId'>,
+    place: Pick<
+      MatchProps,
+      'phase' | 'round' | 'position' | 'homeTeamId' | 'awayTeamId'
+    >,
   ): MatchProps {
     return {
       id: input.newId(),

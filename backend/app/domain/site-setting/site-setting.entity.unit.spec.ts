@@ -28,12 +28,22 @@ test.group('SiteSetting', () => {
 
   test('absent leaves alone and null erases', ({ assert }) => {
     const setting = empty()
-    setting.update({ organizer: 'Professores', edition: 3 }, { regulation: null, now: LATER })
+    setting.update(
+      { organizer: 'Professores', edition: 3 },
+      { regulation: null, now: LATER },
+    )
 
-    const result = setting.update({ organizer: null }, { regulation: null, now: LATER })
+    const result = setting.update(
+      { organizer: null },
+      { regulation: null, now: LATER },
+    )
 
     assert.isTrue(result.isRight())
-    assert.deepInclude(setting.snapshot(), { organizer: null, edition: 3, updatedAt: LATER })
+    assert.deepInclude(setting.snapshot(), {
+      organizer: null,
+      edition: 3,
+      updatedAt: LATER,
+    })
   })
 
   test('accepts the rulebook as a PDF', ({ assert }) => {
@@ -51,13 +61,18 @@ test.group('SiteSetting', () => {
   test('refuses a regulation that was not found', ({ assert }) => {
     const setting = empty()
 
-    const result = setting.update({ regulationId: FILE_ID }, { regulation: null, now: LATER })
+    const result = setting.update(
+      { regulationId: FILE_ID },
+      { regulation: null, now: LATER },
+    )
 
     assert.deepEqual(result.value, { code: 'STORAGE_NOT_FOUND' })
     assert.isNull(setting.snapshot().regulationId)
   })
 
-  test('refuses a regulation that is not a PDF and writes nothing', ({ assert }) => {
+  test('refuses a regulation that is not a PDF and writes nothing', ({
+    assert,
+  }) => {
     const setting = empty()
 
     const result = setting.update(
@@ -66,17 +81,25 @@ test.group('SiteSetting', () => {
     )
 
     assert.deepEqual(result.value, { code: 'REGULATION_NOT_PDF' })
-    assert.deepInclude(setting.snapshot(), { regulationId: null, edition: null })
+    assert.deepInclude(setting.snapshot(), {
+      regulationId: null,
+      edition: null,
+    })
   })
 
-  test('removing the regulation with null does not check a file', ({ assert }) => {
+  test('removing the regulation with null does not check a file', ({
+    assert,
+  }) => {
     const setting = empty()
     setting.update(
       { regulationId: FILE_ID },
       { regulation: { mimetype: 'application/pdf' }, now: LATER },
     )
 
-    const result = setting.update({ regulationId: null }, { regulation: null, now: LATER })
+    const result = setting.update(
+      { regulationId: null },
+      { regulation: null, now: LATER },
+    )
 
     assert.isTrue(result.isRight())
     assert.isNull(setting.snapshot().regulationId)

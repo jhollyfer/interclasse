@@ -36,7 +36,12 @@ export default class AccountProfileShowUseCase {
       const profile = await this.users.detail(actor.id)
 
       if (!profile)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       return right({
         ...profile,

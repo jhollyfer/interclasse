@@ -11,7 +11,10 @@ export default class extends BaseSchema {
 
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
+      table
+        .uuid('id')
+        .primary()
+        .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       // `RESTRICT`: the file only leaves the storage after the photo - deleting it first
       // would leave a hole in the carousel.
       table
@@ -30,7 +33,12 @@ export default class extends BaseSchema {
         .inTable('users')
         .onDelete('SET NULL')
         .index()
-      table.uuid('reviewed_by_id').nullable().references('id').inTable('users').onDelete('SET NULL')
+      table
+        .uuid('reviewed_by_id')
+        .nullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('SET NULL')
       table.timestamp('reviewed_at').nullable()
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

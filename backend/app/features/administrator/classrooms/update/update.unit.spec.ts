@@ -60,17 +60,29 @@ test.group('administrator/classrooms > update (unit)', () => {
   test('nonexistent classroom is 404', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ id: '00000000-0000-4000-8000-000000000000', name: 'X' })
+    const result = await useCase.execute({
+      id: '00000000-0000-4000-8000-000000000000',
+      name: 'X',
+    })
 
-    assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
+    assert.deepInclude(result.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
   })
 
-  test('renames and returns the classroom with the links', async ({ assert }) => {
+  test('renames and returns the classroom with the links', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ id: ID, name: '7º B' })
 
-    assert.deepInclude(result.value, { name: '7º B', grade: 7, advisorId: ADVISOR })
+    assert.deepInclude(result.value, {
+      name: '7º B',
+      grade: 7,
+      advisorId: ADVISOR,
+    })
   })
 
   test('keeping its own name is not a conflict', async ({ assert }) => {
@@ -81,13 +93,18 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('name of another classroom is 409 CLASSROOM_ALREADY_EXISTS', async ({ assert }) => {
+  test('name of another classroom is 409 CLASSROOM_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { classrooms, useCase } = await setup()
     await born(classrooms, OTHER, '8º A', 8)
 
     const result = await useCase.execute({ id: ID, name: '8º A' })
 
-    assert.deepInclude(result.value, { status: 409, code: 'CLASSROOM_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'CLASSROOM_ALREADY_EXISTS',
+    })
   })
 
   test('mudar o ano recalcula a categoria', async ({ assert }) => {
@@ -106,11 +123,16 @@ test.group('administrator/classrooms > update (unit)', () => {
 
     const result = await useCase.execute({ id: ID, grade: 4 })
 
-    assert.deepInclude(result.value, { status: 409, code: 'CLASSROOM_IN_COMPETITION' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'CLASSROOM_IN_COMPETITION',
+    })
     assert.isTrue(result.isLeft() && Boolean(result.value.errors?.grade))
   })
 
-  test('drawn classroom changes year within the category', async ({ assert }) => {
+  test('drawn classroom changes year within the category', async ({
+    assert,
+  }) => {
     const { classrooms, useCase } = await setup()
     classrooms.markInCompetition(ID)
 
@@ -119,7 +141,9 @@ test.group('administrator/classrooms > update (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({ assert }) => {
+  test('advisor of another classroom is 409 ADVISOR_TAKEN', async ({
+    assert,
+  }) => {
     const { classrooms, useCase } = await setup()
     await born(classrooms, OTHER, '8º A', 8, SECOND_ADVISOR)
 

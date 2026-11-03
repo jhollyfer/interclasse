@@ -31,9 +31,13 @@ async function scored(
 }
 
 test.group('administrator/matches > unscore (unit)', () => {
-  test('removes the score and the winner from the next slot', async ({ assert }) => {
+  test('removes the score and the winner from the next slot', async ({
+    assert,
+  }) => {
     const { brackets, useCase, bracket } = await setup()
-    const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)
+    const semi = bracket
+      .snapshot()
+      .matches.find((match) => match.phase === MATCH_PHASE.SEMI)
     await scored(brackets, bracket.id, semi?.id ?? '')
 
     const result = await useCase.execute({ id: semi?.id ?? '' })
@@ -46,7 +50,9 @@ test.group('administrator/matches > unscore (unit)', () => {
       winnerTeamId: null,
     })
     const saved = await brackets.findById(bracket.id)
-    const final = saved?.snapshot().matches.find((match) => match.phase === MATCH_PHASE.FINAL)
+    const final = saved
+      ?.snapshot()
+      .matches.find((match) => match.phase === MATCH_PHASE.FINAL)
     assert.isNull(final?.homeTeamId)
   })
 
@@ -64,14 +70,18 @@ test.group('administrator/matches > unscore (unit)', () => {
   test('nonexistent match is 404 MATCH_NOT_FOUND', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91' })
+    const result = await useCase.execute({
+      id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91',
+    })
 
     assert.deepInclude(result.value, { status: 404, code: 'MATCH_NOT_FOUND' })
   })
 
   test('match without a score is 409 MATCH_NOT_PLAYED', async ({ assert }) => {
     const { useCase, bracket } = await setup()
-    const semi = bracket.snapshot().matches.find((match) => match.phase === MATCH_PHASE.SEMI)
+    const semi = bracket
+      .snapshot()
+      .matches.find((match) => match.phase === MATCH_PHASE.SEMI)
 
     const result = await useCase.execute({ id: semi?.id ?? '' })
 
@@ -83,8 +93,12 @@ test.group('administrator/matches > unscore (unit)', () => {
   }) => {
     const { brackets, useCase, bracket } = await setup()
     const matches = bracket.snapshot().matches
-    const first = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)
-    const second = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 1)
+    const first = matches.find(
+      (match) => match.phase === MATCH_PHASE.SEMI && match.position === 0,
+    )
+    const second = matches.find(
+      (match) => match.phase === MATCH_PHASE.SEMI && match.position === 1,
+    )
     const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
     await scored(brackets, bracket.id, first?.id ?? '')
     await scored(brackets, bracket.id, second?.id ?? '')
@@ -94,7 +108,9 @@ test.group('administrator/matches > unscore (unit)', () => {
 
     assert.deepInclude(result.value, { status: 409, code: 'NEXT_MATCH_PLAYED' })
     const saved = await brackets.findById(bracket.id)
-    const kept = saved?.snapshot().matches.find((match) => match.id === first?.id)
+    const kept = saved
+      ?.snapshot()
+      .matches.find((match) => match.id === first?.id)
     assert.equal(kept?.status, MATCH_STATUS.FINISHED)
   })
 })

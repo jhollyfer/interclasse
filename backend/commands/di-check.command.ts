@@ -26,7 +26,10 @@ export default class DiCheck extends BaseCommand {
 
   static override options: CommandOptions = { startApp: true }
 
-  private async classesIn(directory: string, suffix: string): Promise<string[]> {
+  private async classesIn(
+    directory: string,
+    suffix: string,
+  ): Promise<string[]> {
     const dirPath = join(this.app.appRoot.pathname, 'app', directory)
 
     // Recursive: a service lives in `services/<name>/<name>.service.ts`
@@ -73,6 +76,8 @@ export default class DiCheck extends BaseCommand {
       return
     }
 
-    this.logger.success(`di:check: ${targets.length} classes built through the container.`)
+    this.logger.success(
+      `di:check: ${targets.length} classes built through the container.`,
+    )
   }
 }

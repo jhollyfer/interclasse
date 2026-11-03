@@ -37,7 +37,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`AnnouncementRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('save and findById return the same announcement', async ({ assert }) => {
+    test('save and findById return the same announcement', async ({
+      assert,
+    }) => {
       const repository = await make()
       const announcementRow = announcement({
         id: '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a91',
@@ -50,7 +52,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(found?.snapshot(), announcementRow.snapshot())
     })
 
-    test('save of an existing announcement updates instead of duplicating', async ({ assert }) => {
+    test('save of an existing announcement updates instead of duplicating', async ({
+      assert,
+    }) => {
       const repository = await make()
       const announcementRow = announcement({
         id: '0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d',
@@ -58,7 +62,10 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       })
       await repository.save(announcementRow)
 
-      announcementRow.edit({ title: 'Depois', pinned: true }, new Date('2026-10-30T12:00:00.000Z'))
+      announcementRow.edit(
+        { title: 'Depois', pinned: true },
+        new Date('2026-10-30T12:00:00.000Z'),
+      )
       await repository.save(announcementRow)
       const page = await repository.paginate({
         page: 1,
@@ -75,7 +82,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
     test('findById of a nonexistent id is null', async ({ assert }) => {
       const repository = await make()
 
-      assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.isNull(
+        await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'),
+      )
     })
 
     test('paginate with pinned first and then newest', async ({ assert }) => {
@@ -117,16 +126,27 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       )
     })
 
-    test('paginate searches by title and sorts by the requested column', async ({ assert }) => {
+    test('paginate searches by title and sorts by the requested column', async ({
+      assert,
+    }) => {
       const repository = await make()
       await repository.save(
-        announcement({ id: '5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d', title: 'Jogo da final' }),
+        announcement({
+          id: '5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d',
+          title: 'Jogo da final',
+        }),
       )
       await repository.save(
-        announcement({ id: '6b7c8d9e-0f1a-4b2c-9d3e-4f5a6b7c8d9e', title: 'Jogo adiado' }),
+        announcement({
+          id: '6b7c8d9e-0f1a-4b2c-9d3e-4f5a6b7c8d9e',
+          title: 'Jogo adiado',
+        }),
       )
       await repository.save(
-        announcement({ id: '7c8d9e0f-1a2b-4c3d-8e4f-5a6b7c8d9e0f', title: 'Lanche liberado' }),
+        announcement({
+          id: '7c8d9e0f-1a2b-4c3d-8e4f-5a6b7c8d9e0f',
+          title: 'Lanche liberado',
+        }),
       )
 
       const page = await repository.paginate({

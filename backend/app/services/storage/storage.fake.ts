@@ -4,7 +4,9 @@ import {
   type StorageMetadata,
 } from '#services/storage/storage.contract'
 
-const PNG_HEAD = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+const PNG_HEAD = new Uint8Array([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+])
 
 /**
  * The in-memory bucket, for the unit test. It honors the same contract as
@@ -21,7 +23,11 @@ export class StorageFake extends StorageContract {
    * Test arrangement: the object the client uploaded. Without `head`, the content is a
    * PNG, the type of the test files.
    */
-  put(path: string, metadata: StorageMetadata, head: Uint8Array = PNG_HEAD): this {
+  put(
+    path: string,
+    metadata: StorageMetadata,
+    head: Uint8Array = PNG_HEAD,
+  ): this {
     this.objects.set(path, metadata)
     this.heads.set(path, head)
     return this

@@ -141,7 +141,8 @@ const tags: TagRule[] = [
   {
     prefix: '/administrator/matches',
     name: 'Panel · Matches',
-    description: 'The schedule and the score. Matches are born from the draw, never by hand.',
+    description:
+      'The schedule and the score. Matches are born from the draw, never by hand.',
     singular: 'match',
     plural: 'matches',
   },
@@ -155,7 +156,8 @@ const tags: TagRule[] = [
   {
     prefix: '/administrator/enrollment-removals',
     name: 'Panel · Athlete removals',
-    description: 'The notice for each athlete the advisor removed from a sport, with the reason.',
+    description:
+      'The notice for each athlete the advisor removed from a sport, with the reason.',
     singular: 'removal notice',
     plural: 'removal notices',
   },

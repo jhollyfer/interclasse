@@ -23,7 +23,14 @@ import {
  */
 
 /** One read route of each administrative panel resource. */
-const PANEL = ['classrooms', 'sports', 'announcements', 'brackets', 'matches', 'users']
+const PANEL = [
+  'classrooms',
+  'sports',
+  'announcements',
+  'brackets',
+  'matches',
+  'users',
+]
 
 const NEW_USER = {
   name: 'Pessoa da matriz',
@@ -43,14 +50,18 @@ test.group('roles > without a session', (group) => {
   })
 
   for (const resource of PANEL) {
-    test(`/administrator/${resource} answers 401, and not 403`, async ({ client }) => {
+    test(`/administrator/${resource} answers 401, and not 403`, async ({
+      client,
+    }) => {
       const response = await client.get(`/administrator/${resource}`)
 
       response.assertStatus(401)
     })
   }
 
-  test('the advisor area and the representative area answer 401', async ({ client }) => {
+  test('the advisor area and the representative area answer 401', async ({
+    client,
+  }) => {
     const advisor = await client.get('/advisor/classrooms')
     const representative = await client.get('/representative/enrollments')
 
@@ -71,10 +82,15 @@ test.group('roles > the advisor does not reach the panel', (group) => {
   group.each.setup(() => resetDatabase())
 
   for (const resource of PANEL) {
-    test(`/administrator/${resource} answers 403 to the advisor`, async ({ client, assert }) => {
+    test(`/administrator/${resource} answers 403 to the advisor`, async ({
+      client,
+      assert,
+    }) => {
       const session = await authenticateAsAdvisor(client)
 
-      const response = await client.get(`/administrator/${resource}`).cookies(session)
+      const response = await client
+        .get(`/administrator/${resource}`)
+        .cookies(session)
 
       response.assertStatus(403)
       assert.equal(body(response).code, 'ACCESS_DENIED')
@@ -84,7 +100,10 @@ test.group('roles > the advisor does not reach the panel', (group) => {
   test('nor does it create an account', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
-    const response = await client.post('/administrator/users').cookies(session).json(NEW_USER)
+    const response = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(NEW_USER)
 
     response.assertStatus(403)
   })
@@ -92,49 +111,67 @@ test.group('roles > the advisor does not reach the panel', (group) => {
   test('and does not enter the representative area', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
-    const response = await client.get('/representative/enrollments').cookies(session)
+    const response = await client
+      .get('/representative/enrollments')
+      .cookies(session)
 
     response.assertStatus(403)
   })
 })
 
-test.group('roles > the representative only reaches their own enrollments', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'roles > the representative only reaches their own enrollments',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('panel and advisor area answer 403', async ({ client }) => {
-    const { session } = await signInWithFactory(client, 'representative')
+    test('panel and advisor area answer 403', async ({ client }) => {
+      const { session } = await signInWithFactory(client, 'representative')
 
-    const panel = await client.get('/administrator/classrooms').cookies(session)
-    const advisor = await client.get('/advisor/students').cookies(session)
+      const panel = await client
+        .get('/administrator/classrooms')
+        .cookies(session)
+      const advisor = await client.get('/advisor/students').cookies(session)
 
-    panel.assertStatus(403)
-    advisor.assertStatus(403)
-  })
+      panel.assertStatus(403)
+      advisor.assertStatus(403)
+    })
 
-  test('without a linked classroom, the enrollments answer 404', async ({ client, assert }) => {
-    const { session } = await signInWithFactory(client, 'representative')
+    test('without a linked classroom, the enrollments answer 404', async ({
+      client,
+      assert,
+    }) => {
+      const { session } = await signInWithFactory(client, 'representative')
 
-    const response = await client.get('/representative/enrollments').cookies(session)
+      const response = await client
+        .get('/representative/enrollments')
+        .cookies(session)
 
-    response.assertStatus(404)
-    assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
-  })
-})
+      response.assertStatus(404)
+      assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
+    })
+  },
+)
 
 test.group('roles > the administrator passes everywhere', (group) => {
   group.each.setup(() => resetDatabase())
 
   for (const resource of PANEL) {
-    test(`/administrator/${resource} answers 200 to the administrator`, async ({ client }) => {
+    test(`/administrator/${resource} answers 200 to the administrator`, async ({
+      client,
+    }) => {
       const session = await authenticateAsAdministrator(client)
 
-      const response = await client.get(`/administrator/${resource}`).cookies(session)
+      const response = await client
+        .get(`/administrator/${resource}`)
+        .cookies(session)
 
       response.assertStatus(200)
     })
   }
 
-  test('and covers for the missing advisor in their area', async ({ client }) => {
+  test('and covers for the missing advisor in their area', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/advisor/classrooms').cookies(session)
@@ -142,26 +179,39 @@ test.group('roles > the administrator passes everywhere', (group) => {
     response.assertStatus(200)
   })
 
-  test('the administrator goes through users from start to end', async ({ client }) => {
+  test('the administrator goes through users from start to end', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const created = await client.post('/administrator/users').cookies(session).json(NEW_USER)
+    const created = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(NEW_USER)
     created.assertStatus(201)
 
     const id = body(created).id
 
-    const archived = await client.patch(`/administrator/users/${id}/archive`).cookies(session)
+    const archived = await client
+      .patch(`/administrator/users/${id}/archive`)
+      .cookies(session)
     archived.assertStatus(204)
 
-    const deleted = await client.delete(`/administrator/users/${id}`).cookies(session)
+    const deleted = await client
+      .delete(`/administrator/users/${id}`)
+      .cookies(session)
     deleted.assertStatus(204)
   })
 
-  test('and archives another administrator, who is not their own account', async ({ client }) => {
+  test('and archives another administrator, who is not their own account', async ({
+    client,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const other = await UserFactory.apply('administrator').create()
 
-    const response = await client.patch(`/administrator/users/${other.id}/archive`).cookies(session)
+    const response = await client
+      .patch(`/administrator/users/${other.id}/archive`)
+      .cookies(session)
 
     response.assertStatus(204)
   })

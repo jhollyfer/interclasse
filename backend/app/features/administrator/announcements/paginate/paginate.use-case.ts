@@ -16,7 +16,10 @@ import { recentFirst } from '#features/_shared.sort'
 import type { AdministratorAnnouncementPaginatePayload } from '#validators/administrator/announcements.validator'
 
 type Payload = AdministratorAnnouncementPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorAnnouncementShowResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorAnnouncementShowResponse>
+>
 
 @inject()
 export default class AdministratorAnnouncementPaginateUseCase {
@@ -42,7 +45,10 @@ export default class AdministratorAnnouncementPaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[administrator/announcements > paginate][error]')
+      logger.error(
+        { err: error },
+        '[administrator/announcements > paginate][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

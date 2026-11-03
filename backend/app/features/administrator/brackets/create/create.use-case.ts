@@ -86,9 +86,15 @@ export default class AdministratorBracketCreateUseCase {
         ),
       )
 
-    const existing = await this.brackets.findBySportAndCategory(sport.id, payload.category)
+    const existing = await this.brackets.findBySportAndCategory(
+      sport.id,
+      payload.category,
+    )
     if (existing)
-      return right({ bracket: BracketPresenter.created(existing, sport), created: false })
+      return right({
+        bracket: BracketPresenter.created(existing, sport),
+        created: false,
+      })
 
     const drawn = Bracket.draw({
       id: randomUUID(),
@@ -109,13 +115,19 @@ export default class AdministratorBracketCreateUseCase {
     const saved = await this.brackets.save(drawn.value)
     if (saved.isLeft()) return left(BracketRefusal.http(saved.value, this.i18n))
 
-    return right({ bracket: BracketPresenter.created(drawn.value, sport), created: true })
+    return right({
+      bracket: BracketPresenter.created(drawn.value, sport),
+      created: true,
+    })
   }
 
   /** The bracket that the concurrent draw saved first. */
   private async existing(payload: Payload): Promise<Drawn | null> {
     const sport = await this.brackets.findSport(payload.sportId)
-    const bracket = await this.brackets.findBySportAndCategory(payload.sportId, payload.category)
+    const bracket = await this.brackets.findBySportAndCategory(
+      payload.sportId,
+      payload.category,
+    )
     if (!sport || !bracket) return null
 
     return { bracket: BracketPresenter.created(bracket, sport), created: false }

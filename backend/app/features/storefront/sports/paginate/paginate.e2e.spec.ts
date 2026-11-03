@@ -27,8 +27,14 @@ test.group('sports > paginate (site)', (group) => {
     assert.equal(body(response).meta.perPage, 20)
   })
 
-  test('each item carries the slug and the athlete limits', async ({ client, assert }) => {
-    const sport = await SportFactory.merge({ minAthletes: 5, maxAthletes: 12 }).create()
+  test('each item carries the slug and the athlete limits', async ({
+    client,
+    assert,
+  }) => {
+    const sport = await SportFactory.merge({
+      minAthletes: 5,
+      maxAthletes: 12,
+    }).create()
 
     const response = await client.get('/storefront/sports')
 
@@ -43,7 +49,9 @@ test.group('sports > paginate (site)', (group) => {
     const futsal = await SportFactory.merge({ name: 'Futsal' }).create()
     await SportFactory.merge({ name: 'Vôlei' }).create()
 
-    const response = await client.get('/storefront/sports').qs({ search: 'fut' })
+    const response = await client
+      .get('/storefront/sports')
+      .qs({ search: 'fut' })
 
     response.assertStatus(200)
     assert.lengthOf(body(response).data, 1)

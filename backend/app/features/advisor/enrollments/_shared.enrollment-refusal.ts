@@ -17,7 +17,11 @@ export class EnrollmentRefusal extends RefusalBase {
       HTTPException.UnprocessableEntity(
         i18n.t('enrollments.limit_exceeded'),
         'ENROLLMENT_LIMIT_EXCEEDED',
-        { studentIds: i18n.t('enrollments.limit_exceeded_field', { max: fact.maxAthletes }) },
+        {
+          studentIds: i18n.t('enrollments.limit_exceeded_field', {
+            max: fact.maxAthletes,
+          }),
+        },
       ),
     ENROLLMENT_STUDENT_NOT_IN_CLASSROOM: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
@@ -41,7 +45,12 @@ export class EnrollmentRefusal extends RefusalBase {
   } satisfies RefusalTable<EnrollmentError>
 
   static http(error: EnrollmentError, i18n: I18n): HTTPException {
-    return EnrollmentRefusal.translate(EnrollmentRefusal.TABLE, error.code, error, i18n)
+    return EnrollmentRefusal.translate(
+      EnrollmentRefusal.TABLE,
+      error.code,
+      error,
+      i18n,
+    )
   }
 
   /** The sport of the list does not exist: not a list rule, a dangling reference. */

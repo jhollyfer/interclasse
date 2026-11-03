@@ -16,7 +16,12 @@ async function setup() {
   ] as const
   for (const [index, [name, grade]] of grades.entries()) {
     const created = Classroom.create(
-      { id: `00000000-0000-4000-8000-00000000000${index}`, name, grade, now: new Date() },
+      {
+        id: `00000000-0000-4000-8000-00000000000${index}`,
+        name,
+        grade,
+        now: new Date(),
+      },
       {},
     )
     if (created.isLeft()) throw new Error('invalid arrangement')
@@ -37,11 +42,10 @@ test.group('administrator/classrooms > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.name), [
-      '4º A',
-      '9º A',
-      '9º B',
-    ])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.name),
+      ['4º A', '9º A', '9º B'],
+    )
     assert.equal(result.isRight() && result.value.meta.perPage, 20)
     if (result.isLeft()) throw new Error('list refused')
     assert.deepInclude(result.value.data[0] ?? {}, {
@@ -54,10 +58,17 @@ test.group('administrator/classrooms > paginate (unit)', () => {
   test('?category, ?search, ?sort e ?direction', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const f2 = await useCase.execute({ category: 'F2', sort: 'name', direction: 'desc' })
+    const f2 = await useCase.execute({
+      category: 'F2',
+      sort: 'name',
+      direction: 'desc',
+    })
     const searched = await useCase.execute({ search: '4º' })
 
-    assert.deepEqual(f2.isRight() && f2.value.data.map((item) => item.name), ['9º B', '9º A'])
+    assert.deepEqual(f2.isRight() && f2.value.data.map((item) => item.name), [
+      '9º B',
+      '9º A',
+    ])
     assert.equal(searched.isRight() && searched.value.meta.total, 1)
   })
 })

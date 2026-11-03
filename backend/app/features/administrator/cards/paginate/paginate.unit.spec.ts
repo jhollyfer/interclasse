@@ -18,7 +18,9 @@ async function setup() {
     AdministratorCardPaginateUseCase,
     BracketUnitFixtures.cardBindings(brackets, cards),
   )
-  const semi = drawn.bracket.snapshot().matches.find((m) => m.phase === MATCH_PHASE.SEMI)
+  const semi = drawn.bracket
+    .snapshot()
+    .matches.find((m) => m.phase === MATCH_PHASE.SEMI)
   const launched = MatchCard.launch({
     id: randomUUID(),
     matchId: semi?.id ?? '',
@@ -37,7 +39,9 @@ async function setup() {
 }
 
 test.group('administrator/cards > paginate (unit)', () => {
-  test('lists the cards with the athlete, the team and the match', async ({ assert }) => {
+  test('lists the cards with the athlete, the team and the match', async ({
+    assert,
+  }) => {
     const { useCase, card, student } = await setup()
 
     const result = await useCase.execute({})

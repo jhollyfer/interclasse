@@ -16,7 +16,9 @@ export class DatabaseGuard {
   /** Throws if the URL does not point to a `_test` database. */
   static assertTestDatabase(url: string | undefined): void {
     if (!url)
-      throw new Error('DATABASE_URL missing: the suite does not know which database to run on.')
+      throw new Error(
+        'DATABASE_URL missing: the suite does not know which database to run on.',
+      )
 
     const name = DatabaseGuard.databaseName(url)
 

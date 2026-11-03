@@ -69,7 +69,8 @@ export class CookieAccessTokensGuard implements GuardContract<GuardUser> {
     // The refresh token comes out of the same provider and is valid by the same
     // verification: without checking the `name`, presenting it as an access token
     // would give a session with the refresh's lifetime.
-    if (!accessToken || accessToken.name !== COOKIE_TOKEN.ACCESS) throw this.#authenticationFailed()
+    if (!accessToken || accessToken.name !== COOKIE_TOKEN.ACCESS)
+      throw this.#authenticationFailed()
 
     // The filter was only on sign-in, and the token lives a day: archiving or
     // deactivating someone did not kick them out, only stopped them from signing in again.

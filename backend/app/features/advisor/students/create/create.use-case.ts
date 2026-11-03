@@ -36,14 +36,25 @@ export default class AdvisorStudentCreateUseCase {
     try {
       // `404` also for another advisor's classroom: saying `403` would confirm
       // that it exists. The scope goes into the query (`findOwned`).
-      const classroom = await this.classrooms.findOwned({ id: payload.classroomId, actor })
+      const classroom = await this.classrooms.findOwned({
+        id: payload.classroomId,
+        actor,
+      })
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
-      const created = Student.create({ id: randomUUID(), ...payload, now: new Date() })
-      if (created.isLeft()) return left(StudentRefusal.http(created.value, this.i18n))
+      const created = Student.create({
+        id: randomUUID(),
+        ...payload,
+        now: new Date(),
+      })
+      if (created.isLeft())
+        return left(StudentRefusal.http(created.value, this.i18n))
 
       await this.students.save(created.value)
 

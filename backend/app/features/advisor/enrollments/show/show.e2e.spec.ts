@@ -27,8 +27,13 @@ test.group('enrollments > show', (group) => {
   }) => {
     const { session, classroom } = await signInAsAdvisorOfClassroom(client)
     const sport = await SportFactory.create()
-    const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
-    await EnrollmentFactory.merge({ studentId: student.id, sportId: sport.id }).create()
+    const student = await StudentFactory.merge({
+      classroomId: classroom.id,
+    }).create()
+    await EnrollmentFactory.merge({
+      studentId: student.id,
+      sportId: sport.id,
+    }).create()
     // A student from another classroom does not enter the matrix.
     await StudentFactory.with('classroom').create()
 
@@ -74,10 +79,12 @@ test.group('enrollments > show', (group) => {
 
     response.assertStatus(200)
     const state = Object.fromEntries(
-      body(response).sports.map((sport: { id: string; drawn: boolean; locked: boolean }) => [
-        sport.id,
-        { drawn: sport.drawn, locked: sport.locked },
-      ]),
+      body(response).sports.map(
+        (sport: { id: string; drawn: boolean; locked: boolean }) => [
+          sport.id,
+          { drawn: sport.drawn, locked: sport.locked },
+        ],
+      ),
     )
     assert.deepEqual(state, {
       [drawn.id]: { drawn: true, locked: false },
@@ -85,7 +92,10 @@ test.group('enrollments > show', (group) => {
     })
   })
 
-  test('classroom of another advisor or nonexistent responds 404', async ({ client, assert }) => {
+  test('classroom of another advisor or nonexistent responds 404', async ({
+    client,
+    assert,
+  }) => {
     const { classroom } = await signInAsAdvisorOfClassroom(client)
     const other = await signInWithFactory(client)
 
@@ -104,7 +114,10 @@ test.group('enrollments > show', (group) => {
     }
   })
 
-  test('the administrator opens the matrix of any classroom', async ({ client, assert }) => {
+  test('the administrator opens the matrix of any classroom', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const classroom = await classroomWithStudents(2)
 
@@ -117,7 +130,10 @@ test.group('enrollments > show', (group) => {
     assert.lengthOf(body(response).students, 2)
   })
 
-  test('without ?classroomId responds 422 pointing at the field', async ({ client, assert }) => {
+  test('without ?classroomId responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInAsAdvisorOfClassroom(client)
 
     const response = await client.get('/advisor/enrollments').cookies(session)
@@ -126,11 +142,16 @@ test.group('enrollments > show', (group) => {
     assert.property(body(response).errors, 'classroomId')
   })
 
-  test('without a session is 401, and the representative gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the representative gets 403', async ({
+    client,
+    assert,
+  }) => {
     const classroom = await ClassroomFactory.create()
     const representative = await signInWithFactory(client, 'representative')
 
-    const anonymous = await client.get('/advisor/enrollments').qs({ classroomId: classroom.id })
+    const anonymous = await client
+      .get('/advisor/enrollments')
+      .qs({ classroomId: classroom.id })
     const denied = await client
       .get('/advisor/enrollments')
       .qs({ classroomId: classroom.id })

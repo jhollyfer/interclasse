@@ -8,7 +8,10 @@ import type { MatchCardError } from '#domain/match-card/match-card.errors'
 export class CardRefusal extends RefusalBase {
   private static readonly TABLE = {
     MATCH_TEAMS_PENDING: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('cards.teams_pending'), 'MATCH_TEAMS_PENDING'),
+      HTTPException.Conflict(
+        i18n.t('cards.teams_pending'),
+        'MATCH_TEAMS_PENDING',
+      ),
     STUDENT_NOT_IN_MATCH: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
         i18n.t('cards.student_not_in_match'),

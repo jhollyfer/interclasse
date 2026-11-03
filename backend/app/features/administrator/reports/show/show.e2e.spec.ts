@@ -20,7 +20,11 @@ test.group('reports > show', (group) => {
     const sport = await createSport(client, admin)
     await enrolledClassrooms(client, admin, sport.id, 2)
     // A Fundamental 1 classroom with nobody enrolled.
-    await ClassroomFactory.merge({ name: '3º Z', grade: 3, category: 'F1' }).create()
+    await ClassroomFactory.merge({
+      name: '3º Z',
+      grade: 3,
+      category: 'F1',
+    }).create()
 
     const response = await client.get('/administrator/reports').cookies(admin)
 
@@ -32,9 +36,14 @@ test.group('reports > show', (group) => {
       enrollments: 2,
       sports: 1,
     })
-    const f2 = body(response).byCategory.find((row: { category: string }) => row.category === 'F2')
+    const f2 = body(response).byCategory.find(
+      (row: { category: string }) => row.category === 'F2',
+    )
     assert.deepInclude(f2, { classrooms: 2, athletes: 2 })
-    assert.deepInclude(body(response).bySport[0], { athletes: 2, classrooms: 2 })
+    assert.deepInclude(body(response).bySport[0], {
+      athletes: 2,
+      classrooms: 2,
+    })
     assert.lengthOf(body(response).classrooms, 3)
   })
 
@@ -43,9 +52,15 @@ test.group('reports > show', (group) => {
     assert,
   }) => {
     const admin = await authenticateAsAdministrator(client)
-    await ClassroomFactory.merge({ name: '=1+1', grade: 7, category: 'F2' }).create()
+    await ClassroomFactory.merge({
+      name: '=1+1',
+      grade: 7,
+      category: 'F2',
+    }).create()
 
-    const response = await client.get('/administrator/reports/csv').cookies(admin)
+    const response = await client
+      .get('/administrator/reports/csv')
+      .cookies(admin)
 
     response.assertStatus(200)
     assert.include(response.header('content-type'), 'text/csv')

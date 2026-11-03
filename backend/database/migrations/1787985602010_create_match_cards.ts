@@ -12,7 +12,10 @@ export default class extends BaseSchema {
 
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
+      table
+        .uuid('id')
+        .primary()
+        .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table
         .uuid('match_id')
         .notNullable()
@@ -20,7 +23,12 @@ export default class extends BaseSchema {
         .inTable('matches')
         .onDelete('CASCADE')
         .index()
-      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
+      table
+        .uuid('team_id')
+        .notNullable()
+        .references('id')
+        .inTable('teams')
+        .onDelete('CASCADE')
       table
         .uuid('student_id')
         .notNullable()

@@ -4,7 +4,10 @@ import StoragesFileCreateUseCase from './create.use-case.ts'
 
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { StorageContract } from '#services/storage/storage.contract'
-import { MultipartContract, PART_SIZE } from '#services/multipart/multipart.contract'
+import {
+  MultipartContract,
+  PART_SIZE,
+} from '#services/multipart/multipart.contract'
 import { makeWithMemory } from '#tests/container-fixtures'
 import { rightOf, storageDoubles } from '#tests/storages-unit-fixtures'
 
@@ -20,7 +23,9 @@ async function setup() {
 }
 
 test.group('storages/files > create (unit)', () => {
-  test('a single-part file is born PENDING with one URL and no uploadId', async ({ assert }) => {
+  test('a single-part file is born PENDING with one URL and no uploadId', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
 
     const result = await useCase.execute({
@@ -69,7 +74,10 @@ test.group('storages/files > create (unit)', () => {
       size: PART_SIZE * 2,
     })
 
-    assert.deepInclude(result.value, { status: 500, code: 'STORAGES_FILE_CREATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'STORAGES_FILE_CREATE_ERROR',
+    })
     assert.lengthOf(multipart.aborted, 1)
   })
 })

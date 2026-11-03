@@ -4,7 +4,10 @@ import { test } from '@japa/runner'
 
 import { ClassroomFactory } from '#database/factories/classroom.factory'
 import { Stored } from '#tests/stored-fixtures'
-import { drawnClassroom, classroomWithStudents } from '#tests/classrooms-fixtures'
+import {
+  drawnClassroom,
+  classroomWithStudents,
+} from '#tests/classrooms-fixtures'
 import {
   authenticateAsAdministrator,
   authenticateAsAdvisor,
@@ -15,7 +18,10 @@ import {
 test.group('classrooms > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('deletes the classroom and its students go along', async ({ client, assert }) => {
+  test('deletes the classroom and its students go along', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await classroomWithStudents(2)
 
@@ -39,7 +45,10 @@ test.group('classrooms > delete', (group) => {
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('classroom in a drawn bracket responds 409 and stays', async ({ client, assert }) => {
+  test('classroom in a drawn bracket responds 409 and stays', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await drawnClassroom()
 
@@ -52,10 +61,15 @@ test.group('classrooms > delete', (group) => {
     assert.isNotNull(await Stored.classroom(classroom.id))
   })
 
-  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const classroom = await ClassroomFactory.create()
 
-    const anonymous = await client.delete(`/administrator/classrooms/${classroom.id}`)
+    const anonymous = await client.delete(
+      `/administrator/classrooms/${classroom.id}`,
+    )
     anonymous.assertStatus(401)
 
     const advisor = await authenticateAsAdvisor(client)
@@ -68,14 +82,19 @@ test.group('classrooms > delete', (group) => {
   })
 })
 
-test.group('administrator/classrooms/delete > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/classrooms/delete > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('422: id that is not a uuid', async ({ client }) => {
-    const admin = await authenticateAsAdministrator(client)
+    test('422: id that is not a uuid', async ({ client }) => {
+      const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/classrooms/nao-e-uuid').cookies(admin)
+      const response = await client
+        .delete('/administrator/classrooms/nao-e-uuid')
+        .cookies(admin)
 
-    response.assertStatus(422)
-  })
-})
+      response.assertStatus(422)
+    })
+  },
+)

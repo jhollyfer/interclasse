@@ -25,7 +25,12 @@ test.group('cards > create', (group) => {
     const response = await client
       .post('/administrator/cards')
       .cookies(session)
-      .json({ matchId: match.id, studentId: awayStudent.id, color: 'YELLOW', note: 'Falta dura' })
+      .json({
+        matchId: match.id,
+        studentId: awayStudent.id,
+        color: 'YELLOW',
+        note: 'Falta dura',
+      })
 
     response.assertStatus(201)
     assert.equal(body(response).teamId, awayTeam.id)

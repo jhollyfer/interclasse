@@ -7,7 +7,10 @@ import {
   type Paginated,
 } from '@interclasse/shared'
 
-import { StudentRepository, type StudentListCriteria } from './student.repository.ts'
+import {
+  StudentRepository,
+  type StudentListCriteria,
+} from './student.repository.ts'
 
 import BracketModel from '#models/bracket'
 import ClassroomModel from '#models/classroom'
@@ -26,7 +29,9 @@ export class StudentLucidRepository extends StudentRepository {
     readonly id: string
     readonly actor: Actor
   }): Promise<Student | null> {
-    const query = StudentModel.query({ client: this.transaction.client() }).where('id', criteria.id)
+    const query = StudentModel.query({
+      client: this.transaction.client(),
+    }).where('id', criteria.id)
     this.scope(query, criteria.actor)
 
     const row = await query.first()
@@ -71,19 +76,28 @@ export class StudentLucidRepository extends StudentRepository {
   }
 
   async delete(student: Student): Promise<void> {
-    await StudentModel.query({ client: this.transaction.client() }).where('id', student.id).delete()
+    await StudentModel.query({ client: this.transaction.client() })
+      .where('id', student.id)
+      .delete()
   }
 
-  async paginate(criteria: StudentListCriteria): Promise<Paginated<AdvisorStudentShowResponse>> {
+  async paginate(
+    criteria: StudentListCriteria,
+  ): Promise<Paginated<AdvisorStudentShowResponse>> {
     const query = StudentModel.query({ client: this.transaction.client() })
     this.scope(query, criteria.actor)
 
     if (criteria.classroomId) query.where('classroomId', criteria.classroomId)
     if (criteria.search) query.whereILike('name', `%${criteria.search}%`)
 
-    const page = await query.orderBy('name', 'asc').paginate(criteria.page, criteria.perPage)
+    const page = await query
+      .orderBy('name', 'asc')
+      .paginate(criteria.page, criteria.perPage)
 
-    return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
+    return {
+      meta: page.getMeta(),
+      data: page.all().map((row) => this.toResponse(row)),
+    }
   }
 
   /**
@@ -91,7 +105,10 @@ export class StudentLucidRepository extends StudentRepository {
    * classroom answers empty instead of confirming it exists. Whoever is not an
    * administrator reaches only the classroom they advise (fail-closed, `backend.md` §4.6).
    */
-  private scope(query: ReturnType<typeof StudentModel.query>, actor: Actor): void {
+  private scope(
+    query: ReturnType<typeof StudentModel.query>,
+    actor: Actor,
+  ): void {
     if (actor.role === USER_ROLE.ADMINISTRATOR) return
 
     query.whereIn(

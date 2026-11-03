@@ -57,16 +57,20 @@ test.group('messages > validation provider', () => {
   test('no message escaped in English', ({ assert }) => {
     // `{{ field }}` is the VineJS marker, not displayed text - it goes out before the
     // search, otherwise every message that names the field would be accused of being English.
-    const suspect = Object.entries(RULE_MESSAGES['pt-BR']).filter(([, message]) =>
-      /\b(the|must|field|should|at least|at most|invalid|value)\b/i.test(
-        message.replace(/\{\{.*?\}\}/g, ''),
-      ),
+    const suspect = Object.entries(RULE_MESSAGES['pt-BR']).filter(
+      ([, message]) =>
+        /\b(the|must|field|should|at least|at most|invalid|value)\b/i.test(
+          message.replace(/\{\{.*?\}\}/g, ''),
+        ),
     )
 
     assert.deepEqual(suspect, [])
   })
 
-  test('the 422 of a real route comes out entirely in Portuguese', async ({ client, assert }) => {
+  test('the 422 of a real route comes out entirely in Portuguese', async ({
+    client,
+    assert,
+  }) => {
     // The two tests above read the map; this one reads the response. It is what proves the
     // `SimpleMessagesProvider` was actually installed - a correct map that
     // nobody registered would pass the other two.
@@ -76,10 +80,15 @@ test.group('messages > validation provider', () => {
 
     response.assertStatus(422)
 
-    assert.deepEqual(body(response).errors, { email: 'Informe um e-mail válido' })
+    assert.deepEqual(body(response).errors, {
+      email: 'Informe um e-mail válido',
+    })
   })
 
-  test('the 422 comes out in the Accept-Language language', async ({ client, assert }) => {
+  test('the 422 comes out in the Accept-Language language', async ({
+    client,
+    assert,
+  }) => {
     const english = await client
       .post('/authentication/sign-in')
       .header('accept-language', 'en-US,en;q=0.9')
@@ -90,6 +99,8 @@ test.group('messages > validation provider', () => {
       .json({ email: 'nao-e-email', password: 'Qualquer1!' })
 
     assert.deepEqual(body(english).errors, { email: 'Enter a valid email' })
-    assert.deepEqual(body(spanish).errors, { email: 'Ingresa un correo electrónico válido' })
+    assert.deepEqual(body(spanish).errors, {
+      email: 'Ingresa un correo electrónico válido',
+    })
   })
 })

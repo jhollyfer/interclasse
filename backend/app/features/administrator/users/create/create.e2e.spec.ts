@@ -39,7 +39,10 @@ test.group('administrator > users > create', (group) => {
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.post('/administrator/users').cookies(session).json(payload)
+    const response = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(payload)
 
     response.assertStatus(201)
     assert.equal(body(response).role, USER_ROLE.ADVISOR)
@@ -48,10 +51,16 @@ test.group('administrator > users > create', (group) => {
     assert.notProperty(body(response), 'password')
   })
 
-  test('the password is saved hashed and works to sign in', async ({ client, assert }) => {
+  test('the password is saved hashed and works to sign in', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const created = await client.post('/administrator/users').cookies(session).json(payload)
+    const created = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(payload)
     created.assertStatus(201)
 
     // The `withAuthFinder` mixin hashes on save: saving the plain text would leave the
@@ -66,7 +75,10 @@ test.group('administrator > users > create', (group) => {
     input.assertStatus(204)
   })
 
-  test('email of a live account responds 409 pointing at the field', async ({ client, assert }) => {
+  test('email of a live account responds 409 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -90,7 +102,10 @@ test.group('administrator > users > create', (group) => {
       deletedAt: DateTime.now(),
     }).create()
 
-    const response = await client.post('/administrator/users').cookies(session).json(payload)
+    const response = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(payload)
 
     response.assertStatus(201)
     // Same row: `email` is a global `UNIQUE` and removal is logical, so
@@ -98,11 +113,17 @@ test.group('administrator > users > create', (group) => {
     assert.equal(body(response).id, archived.id)
     assert.isNull(body(response).deletedAt)
 
-    const [{ count }] = await db.from('users').where('email', payload.email).count('* as count')
+    const [{ count }] = await db
+      .from('users')
+      .where('email', payload.email)
+      .count('* as count')
     assert.equal(Number(count), 1)
   })
 
-  test('weak password responds 422 pointing at the field', async ({ client, assert }) => {
+  test('weak password responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client
@@ -114,12 +135,18 @@ test.group('administrator > users > create', (group) => {
     assert.property(body(response).errors, 'password')
   })
 
-  test('missing role responds 422: the role is always explicit', async ({ client, assert }) => {
+  test('missing role responds 422: the role is always explicit', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const { role: _noRole, ...noRole } = payload
 
-    const response = await client.post('/administrator/users').cookies(session).json(noRole)
+    const response = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(noRole)
 
     response.assertStatus(422)
     // `backend-old` fell back to ADMINISTRATOR by omission, and a forgotten creation path
@@ -142,7 +169,10 @@ test.group('administrator > users > create', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
     assert.property(body(response).errors, 'avatarId')
 
-    const [{ count }] = await db.from('users').where('email', payload.email).count('* as count')
+    const [{ count }] = await db
+      .from('users')
+      .where('email', payload.email)
+      .count('* as count')
     assert.equal(Number(count), 0)
   })
 })
@@ -156,7 +186,9 @@ test.group('administrator/users/create > access and validation', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.post('/administrator/users').cookies(advisor)

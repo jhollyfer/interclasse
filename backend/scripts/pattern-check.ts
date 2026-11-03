@@ -45,7 +45,14 @@ const REQUIRED_DIRECTORIES = [
   'app/policies',
 ]
 
-const IGNORED = new Set(['node_modules', 'build', '.adonisjs', 'tmp', '.git', 'coverage'])
+const IGNORED = new Set([
+  'node_modules',
+  'build',
+  '.adonisjs',
+  'tmp',
+  '.git',
+  'coverage',
+])
 
 async function tsFiles(dir: string): Promise<string[]> {
   const found: string[] = []
@@ -74,8 +81,13 @@ async function tsFiles(dir: string): Promise<string[]> {
  * example inside a JSDoc - and this project has many - would become a violation.
  */
 function withoutComments(source: string): string {
-  const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, (chunk) => chunk.replace(/[^\n]/g, ' '))
-  return withoutBlocks.replace(/(^|[^:])\/\/.*$/gm, (_match, prefix: string) => prefix)
+  const withoutBlocks = source.replace(/\/\*[\s\S]*?\*\//g, (chunk) =>
+    chunk.replace(/[^\n]/g, ' '),
+  )
+  return withoutBlocks.replace(
+    /(^|[^:])\/\/.*$/gm,
+    (_match, prefix: string) => prefix,
+  )
 }
 
 function lineOf(source: string, index: number): number {
@@ -114,7 +126,8 @@ function pascal(segment: string): string {
 function singular(segment: string): string {
   if (segment.endsWith('ies')) return `${segment.slice(0, -3)}y`
   if (/(sses|shes|ches)$/.test(segment)) return segment.slice(0, -2)
-  if (segment.endsWith('s') && !segment.endsWith('ss')) return segment.slice(0, -1)
+  if (segment.endsWith('s') && !segment.endsWith('ss'))
+    return segment.slice(0, -1)
   return segment
 }
 
@@ -131,7 +144,10 @@ function derivedNames(relativePath: string, suffix: string): string[] {
   // The action folder repeats the verb and does not enter the class name:
   // `administrator/users/archive/archive.controller.ts` -> `AdministratorUserArchiveController`.
   const folder = parts[parts.length - 2]
-  const file = basename(relativePath).replace(/\.(controller|use-case)\.ts$/, '')
+  const file = basename(relativePath).replace(
+    /\.(controller|use-case)\.ts$/,
+    '',
+  )
   let dirs = parts.slice(0, -1)
   if (folder === file) dirs = parts.slice(0, -2)
   if (dirs.length === 0) return []
@@ -146,7 +162,12 @@ function derivedNames(relativePath: string, suffix: string): string[] {
     })
     .join('')
 
-  return [...new Set([`${literal}${verb}${suffix}`, `${withSingular}${verb}${suffix}`])]
+  return [
+    ...new Set([
+      `${literal}${verb}${suffix}`,
+      `${withSingular}${verb}${suffix}`,
+    ]),
+  ]
 }
 
 type Rule = {
@@ -183,9 +204,11 @@ const RULES: Rule[] = [
     section: '4.4',
     // The configured `vine` (pt-BR messages, date transform) comes from
     // `#core/validator`; importing the lib directly skips that configuration.
-    scope: /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
+    scope:
+      /^(?!app\/core\/validator\.ts$)(?:app|start|database|commands|tests)\//,
     pattern: /from\s+'@vinejs\/vine'/,
-    message: 'import `vine` (and `Infer`) from `#core/validator`, never from `@vinejs/vine`',
+    message:
+      'import `vine` (and `Infer`) from `#core/validator`, never from `@vinejs/vine`',
   },
   {
     name: 'validator-outside-resource',
@@ -264,7 +287,8 @@ const RULES: Rule[] = [
     // pure function, and importing it couples the service to no feature. What the
     // rule refuses is depending on a module - `#features/administrator/...`.
     pattern: /from\s+'#features\/(?!_shared\.)/,
-    message: '`app/services/` does not import from a features module (only from `_shared.<theme>`)',
+    message:
+      '`app/services/` does not import from a features module (only from `_shared.<theme>`)',
   },
 ]
 
@@ -361,15 +385,22 @@ function checkActionFolder(relativePath: string): Finding[] {
  * `administrator/users` -, or the module when it is the resource itself
  * (`account`, `storages`).
  */
-function checkCrossFeatureImport(relativePath: string, source: string): Finding[] {
+function checkCrossFeatureImport(
+  relativePath: string,
+  source: string,
+): Finding[] {
   if (!relativePath.startsWith('app/features/')) return []
   const parts = relativePath.slice('app/features/'.length).split('/')
   if (parts.length < 2) return []
 
   let owner = parts.slice(0, -1)
   const folder = owner[owner.length - 1]
-  const file = basename(relativePath).replace(/\.(controller|use-case|validator|spec)\.ts$/, '')
-  if (folder === file && !relativePath.endsWith('.validator.ts')) owner = owner.slice(0, -1)
+  const file = basename(relativePath).replace(
+    /\.(controller|use-case|validator|spec)\.ts$/,
+    '',
+  )
+  if (folder === file && !relativePath.endsWith('.validator.ts'))
+    owner = owner.slice(0, -1)
   const prefix = `${owner.join('/')}/`
 
   const findings: Finding[] = []
@@ -395,7 +426,9 @@ function checkCrossFeatureImport(relativePath: string, source: string): Finding[
  * (_standards/backend.md §3 and §4.4).
  */
 function checkValidatorName(relativePath: string, source: string): Finding[] {
-  const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(relativePath)
+  const match = /^app\/features\/.*\/([a-z-]+)\/\1\.validator\.ts$/.exec(
+    relativePath,
+  )
   if (match === null) return []
   const resource = pascal(singular(match[1] ?? ''))
   const clean = withoutComments(source)
@@ -420,7 +453,9 @@ function checkValidatorName(relativePath: string, source: string): Finding[] {
  * `app/validators/<module>/<resource>.validator.ts`, with the same
  * `*Validator` names. Without the `shared/` next to it, the rule does not run.
  */
-async function checkValidatorParity(sources: Map<string, string>): Promise<Finding[]> {
+async function checkValidatorParity(
+  sources: Map<string, string>,
+): Promise<Finding[]> {
   const sharedRoot = resolve(ROOT, '../shared/src/validators')
   if (!(await exists(sharedRoot))) return []
 
@@ -443,7 +478,9 @@ async function checkValidatorParity(sources: Map<string, string>): Promise<Findi
       })
       continue
     }
-    for (const exported of sharedSource.matchAll(/export\s+const\s+(\w+Validator)\b/g)) {
+    for (const exported of sharedSource.matchAll(
+      /export\s+const\s+(\w+Validator)\b/g,
+    )) {
       const name = exported[1] ?? ''
       if (new RegExp(`export\\s+const\\s+${name}\\b`).test(backSource)) continue
       findings.push({
@@ -485,7 +522,9 @@ function checkModelName(relativePath: string): Finding[] {
  * a real key.
  */
 async function checkEnv(files: string[]): Promise<Finding[]> {
-  const schema = await readFile(join(ROOT, 'start/env.ts'), 'utf8').catch(() => '')
+  const schema = await readFile(join(ROOT, 'start/env.ts'), 'utf8').catch(
+    () => '',
+  )
   if (schema === '') return []
   const cleanSchema = withoutComments(schema)
 
@@ -563,7 +602,9 @@ async function checkDirectories(): Promise<Finding[]> {
 function pathPattern(glob: string): RegExp {
   const body = glob
     .split('**/')
-    .map((chunk) => chunk.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*'))
+    .map((chunk) =>
+      chunk.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*'),
+    )
     .join('(?:.*/)?')
   return new RegExp(`^${body}$`)
 }
@@ -580,7 +621,9 @@ function pathPattern(glob: string): RegExp {
  * the ruler believes it. That is how `Bouncer` stayed years in the list describing
  * a call that no use case made.
  */
-async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[]> {
+async function checkNewAllowlist(
+  sources: Map<string, string>,
+): Promise<Finding[]> {
   const findings: Finding[] = []
 
   for (const entry of CONFIG.newAllowlist) {
@@ -622,10 +665,13 @@ async function checkNewAllowlist(sources: Map<string, string>): Promise<Finding[
  * `softDeleteExempt` in the config, and are always the same situation: a query over a
  * generic `LucidModel`, a type where a named scope does not exist.
  */
-async function checkSoftDelete(sources: Map<string, string>): Promise<Finding[]> {
+async function checkSoftDelete(
+  sources: Map<string, string>,
+): Promise<Finding[]> {
   const exempt = new Set(CONFIG.softDeleteExempt)
   const findings: Finding[] = []
-  const pattern = /where(?:Not)?Null\(\s*'(?:\w+\.)?(?:deletedAt|deleted_at)'\s*\)/
+  const pattern =
+    /where(?:Not)?Null\(\s*'(?:\w+\.)?(?:deletedAt|deleted_at)'\s*\)/
 
   for (const [relativePath, source] of sources) {
     if (relativePath.startsWith('app/models/')) continue
@@ -749,7 +795,10 @@ function singularCode(resource: string): string {
  * always with the module.
  */
 function checkUseCaseNames(relativePath: string, source: string): Finding[] {
-  const match = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/\3\.use-case\.ts$/.exec(relativePath)
+  const match =
+    /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/\3\.use-case\.ts$/.exec(
+      relativePath,
+    )
   if (match === null) return []
 
   const [, module = '', resource = '', action = ''] = match
@@ -758,7 +807,9 @@ function checkUseCaseNames(relativePath: string, source: string): Finding[] {
   const code = `${module.toUpperCase()}_${singularCode(resource)}_${action.toUpperCase().replaceAll('-', '_')}_ERROR`
   const findings: Finding[] = []
 
-  for (const found of clean.matchAll(/'(\[[^\]']*> [^\]']*\](?:\[[a-z]+\])*)'/g)) {
+  for (const found of clean.matchAll(
+    /'(\[[^\]']*> [^\]']*\](?:\[[a-z]+\])*)'/g,
+  )) {
     if ((found[1] ?? '').startsWith(tag)) continue
     findings.push({
       file: relativePath,
@@ -846,7 +897,10 @@ function checkBouncerRequired(sources: Map<string, string>): Finding[] {
  * An action does not import another by relative path (section 1.3): what the two
  * use goes up to `_shared.<theme>`, to the resource presenter or to the domain.
  */
-function checkRelativeImportBetweenActions(relativePath: string, source: string): Finding[] {
+function checkRelativeImportBetweenActions(
+  relativePath: string,
+  source: string,
+): Finding[] {
   const own = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(relativePath)
   if (own === null) return []
 
@@ -856,9 +910,12 @@ function checkRelativeImportBetweenActions(relativePath: string, source: string)
 
   for (const found of clean.matchAll(/from\s+'(\.\.?\/[^']+)'/g)) {
     const target = join(fromDir, found[1] ?? '')
-    const theirs = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/[^/]+$/.exec(target)
+    const theirs = /^app\/features\/([^/]+)\/([^/]+)\/([^/]+)\/[^/]+$/.exec(
+      target,
+    )
     if (theirs === null) continue
-    if (theirs[1] === own[1] && theirs[2] === own[2] && theirs[3] === own[3]) continue
+    if (theirs[1] === own[1] && theirs[2] === own[2] && theirs[3] === own[3])
+      continue
     if ((theirs[3] ?? '').startsWith('_shared.')) continue
 
     findings.push({
@@ -901,14 +958,21 @@ async function checkRoute(files: string[]): Promise<Finding[]> {
     if (inside === undefined) continue
 
     const parts = inside.split('/')
-    const verb = pascal((parts[parts.length - 1] ?? '').replace('.controller.ts', ''))
-    const key = ['controllers', ...parts.slice(0, -1).map(camel), verb].join('.')
+    const verb = pascal(
+      (parts[parts.length - 1] ?? '').replace('.controller.ts', ''),
+    )
+    const key = ['controllers', ...parts.slice(0, -1).map(camel), verb].join(
+      '.',
+    )
 
     // An identifier boundary, and not `includes`: `controllers.account.profile.Show`
     // would match inside `controllers.account.profile.ShowX`, and the rule would give green for
     // a controller that no route reaches. It is what the sensor caught in the
     // first version of this function.
-    const reference = new RegExp(`${key.replace(/\./g, '\\.')}(?![A-Za-z0-9_])`)
+    // Prettier may break the member chain after any segment, so each dot admits whitespace.
+    const reference = new RegExp(
+      `${key.replace(/\./g, '\\s*\\.\\s*')}(?![A-Za-z0-9_])`,
+    )
 
     if (reference.test(routes)) continue
 
@@ -932,14 +996,21 @@ function report(findings: Finding[]): void {
 
   const bySection = new Map<string, Finding[]>()
   for (const finding of findings) {
-    bySection.set(finding.section, [...(bySection.get(finding.section) ?? []), finding])
+    bySection.set(finding.section, [
+      ...(bySection.get(finding.section) ?? []),
+      finding,
+    ])
   }
 
   console.log(`pattern:check: ${findings.length} violations\n`)
-  for (const [section, group] of [...bySection].sort((x, y) => y[1].length - x[1].length)) {
+  for (const [section, group] of [...bySection].sort(
+    (x, y) => y[1].length - x[1].length,
+  )) {
     console.log(`  _standards/backend.md ${section} (${group.length})`)
     for (const finding of group) {
-      console.log(`    ${finding.file}:${finding.line}  [${finding.rule}] ${finding.message}`)
+      console.log(
+        `    ${finding.file}:${finding.line}  [${finding.rule}] ${finding.message}`,
+      )
     }
   }
 }

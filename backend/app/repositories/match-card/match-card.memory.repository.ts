@@ -1,4 +1,7 @@
-import type { AdministratorCardPaginateResponse, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorCardPaginateResponse,
+  Paginated,
+} from '@interclasse/shared'
 
 import {
   MatchCardRepository,
@@ -6,7 +9,10 @@ import {
   type CardStudent,
 } from './match-card.repository.ts'
 
-import { MatchCard, type MatchCardProps } from '#domain/match-card/match-card.entity'
+import {
+  MatchCard,
+  type MatchCardProps,
+} from '#domain/match-card/match-card.entity'
 import { MemoryPagination } from '#core/memory-pagination'
 import type { BracketRepository } from '#repositories/bracket/bracket.repository'
 
@@ -56,13 +62,19 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
     for (const card of this.rows.values()) {
       if (criteria.matchId && card.matchId !== criteria.matchId) continue
       if (criteria.studentId && card.studentId !== criteria.studentId) continue
-      if (criteria.classroomId && !(await this.playsFor(card, criteria.classroomId))) continue
+      if (
+        criteria.classroomId &&
+        !(await this.playsFor(card, criteria.classroomId))
+      )
+        continue
 
       matching.push(card)
     }
 
     const responses: AdministratorCardPaginateResponse[] = []
-    for (const card of matching.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())) {
+    for (const card of matching.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    )) {
       const response = await this.findResponse(card.id)
       if (response) responses.push(response)
     }
@@ -70,7 +82,9 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
     return MemoryPagination.slice(responses, criteria.page, criteria.perPage)
   }
 
-  async findResponse(id: string): Promise<AdministratorCardPaginateResponse | null> {
+  async findResponse(
+    id: string,
+  ): Promise<AdministratorCardPaginateResponse | null> {
     const card = this.rows.get(id)
     const student = card && this.students.get(card.studentId)
     if (!card || !student) return null
@@ -82,9 +96,14 @@ export class MatchCardMemoryRepository extends MatchCardRepository {
   }
 
   /** The card's team belongs to the requested classroom. */
-  private async playsFor(card: MatchCardProps, classroomId: string): Promise<boolean> {
+  private async playsFor(
+    card: MatchCardProps,
+    classroomId: string,
+  ): Promise<boolean> {
     const bracket = await this.brackets.findByMatchId(card.matchId)
-    const team = bracket?.snapshot().teams.find((candidate) => candidate.id === card.teamId)
+    const team = bracket
+      ?.snapshot()
+      .teams.find((candidate) => candidate.id === card.teamId)
 
     return team?.classroomId === classroomId
   }

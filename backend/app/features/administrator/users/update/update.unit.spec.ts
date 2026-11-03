@@ -9,7 +9,12 @@ import { UserRepository } from '#repositories/user/user.repository'
 import { ClassroomRepository } from '#repositories/classroom/classroom.repository'
 import { SessionRepository } from '#repositories/session/session.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { identityDoubles, OTHER_ID, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
+import {
+  identityDoubles,
+  OTHER_ID,
+  seedUser,
+  USER_ID,
+} from '#tests/identity-unit-fixtures'
 import { rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
 
 async function setup() {
@@ -32,18 +37,24 @@ test.group('administrator/users > update (unit)', () => {
     const { users, sessions, classrooms, useCase } = await setup()
     await seedUser(users)
 
-    const updated = rightOf(await useCase.execute({ id: USER_ID, name: 'Ana Maria' }))
+    const updated = rightOf(
+      await useCase.execute({ id: USER_ID, name: 'Ana Maria' }),
+    )
 
     assert.deepInclude(updated, { name: 'Ana Maria', email: 'ana@mail.com' })
     assert.deepEqual(sessions.revokedAll, [])
     assert.deepEqual(classrooms.detachedAccounts, [])
   })
 
-  test('changing the role drops the sessions and releases the classrooms', async ({ assert }) => {
+  test('changing the role drops the sessions and releases the classrooms', async ({
+    assert,
+  }) => {
     const { users, sessions, classrooms, useCase } = await setup()
     await seedUser(users)
 
-    const updated = rightOf(await useCase.execute({ id: USER_ID, role: 'REPRESENTATIVE' }))
+    const updated = rightOf(
+      await useCase.execute({ id: USER_ID, role: 'REPRESENTATIVE' }),
+    )
 
     assert.equal(updated.role, 'REPRESENTATIVE')
     assert.deepEqual(sessions.revokedAll, [USER_ID])
@@ -76,14 +87,21 @@ test.group('administrator/users > update (unit)', () => {
     const { users, storages, useCase } = await setup()
     await storages.save(uploadedFile())
     await seedUser(users)
-    await useCase.execute({ id: USER_ID, avatarId: '8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d' })
+    await useCase.execute({
+      id: USER_ID,
+      avatarId: '8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d',
+    })
 
-    const updated = rightOf(await useCase.execute({ id: USER_ID, avatarId: null }))
+    const updated = rightOf(
+      await useCase.execute({ id: USER_ID, avatarId: null }),
+    )
 
     assert.isNull(updated.avatar)
   })
 
-  test('nonexistent or archived account is 404 USER_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent or archived account is 404 USER_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { archived: true })
 
@@ -97,11 +115,21 @@ test.group('administrator/users > update (unit)', () => {
   }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
-    await seedUser(users, { id: OTHER_ID, email: 'outra@mail.com', archived: true })
+    await seedUser(users, {
+      id: OTHER_ID,
+      email: 'outra@mail.com',
+      archived: true,
+    })
 
-    const result = await useCase.execute({ id: USER_ID, email: 'outra@mail.com' })
+    const result = await useCase.execute({
+      id: USER_ID,
+      email: 'outra@mail.com',
+    })
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
   test('the same email again is not a conflict', async ({ assert }) => {
@@ -113,7 +141,9 @@ test.group('administrator/users > update (unit)', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('nonexistent avatar is 422 STORAGE_NOT_FOUND and nothing is saved', async ({ assert }) => {
+  test('nonexistent avatar is 422 STORAGE_NOT_FOUND and nothing is saved', async ({
+    assert,
+  }) => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
@@ -138,10 +168,15 @@ test.group('administrator/users > update (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
-  test('repository failure is 500 ADMINISTRATOR_USER_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_UPDATE_ERROR', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {
@@ -150,6 +185,9 @@ test.group('administrator/users > update (unit)', () => {
 
     const result = await useCase.execute({ id: USER_ID, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_UPDATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADMINISTRATOR_USER_UPDATE_ERROR',
+    })
   })
 })

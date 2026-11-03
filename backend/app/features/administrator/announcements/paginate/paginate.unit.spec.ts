@@ -26,9 +26,10 @@ async function setup() {
       now: new Date('2026-10-29T12:00:00Z'),
     }),
   )
-  const useCase = await makeWithMemory(AdministratorAnnouncementPaginateUseCase, [
-    [AnnouncementRepository, announcements],
-  ])
+  const useCase = await makeWithMemory(
+    AdministratorAnnouncementPaginateUseCase,
+    [[AnnouncementRepository, announcements]],
+  )
 
   return { useCase }
 }
@@ -39,28 +40,37 @@ test.group('administrator/announcements > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.title), [
-      'Fixado antigo',
-      'Recente',
-    ])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.title),
+      ['Fixado antigo', 'Recente'],
+    )
   })
 
-  test('with a requested order, the pinned one does not go in front', async ({ assert }) => {
+  test('with a requested order, the pinned one does not go in front', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ sort: 'title', direction: 'desc' })
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.title), [
-      'Recente',
-      'Fixado antigo',
-    ])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.title),
+      ['Recente', 'Fixado antigo'],
+    )
   })
 
   test('search by title', async ({ assert }) => {
     const { useCase } = await setup()
 
-    const result = await useCase.execute({ sort: 'createdAt', direction: 'desc', search: 'rec' })
+    const result = await useCase.execute({
+      sort: 'createdAt',
+      direction: 'desc',
+      search: 'rec',
+    })
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.title), ['Recente'])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.title),
+      ['Recente'],
+    )
   })
 })

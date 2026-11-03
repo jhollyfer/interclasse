@@ -1,7 +1,13 @@
 import { type I18n } from '@adonisjs/i18n'
-import type { AdministratorPhotoShowResponse, Paginated } from '@interclasse/shared'
+import type {
+  AdministratorPhotoShowResponse,
+  Paginated,
+} from '@interclasse/shared'
 
-import type { PhotoRead, PhotoRepository } from '#repositories/photo/photo.repository'
+import type {
+  PhotoRead,
+  PhotoRepository,
+} from '#repositories/photo/photo.repository'
 import type { StorageContract } from '#services/storage/storage.contract'
 
 /**
@@ -17,7 +23,9 @@ export abstract class PhotoReadBase {
     protected readonly i18n: I18n,
   ) {}
 
-  protected async signed(photo: PhotoRead): Promise<AdministratorPhotoShowResponse> {
+  protected async signed(
+    photo: PhotoRead,
+  ): Promise<AdministratorPhotoShowResponse> {
     return { ...photo, storage: await this.bucket.withUrl(photo.storage) }
   }
 

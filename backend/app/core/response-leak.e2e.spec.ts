@@ -22,7 +22,9 @@ const FORBIDDEN_KEYS =
 /** Every forbidden-key path in a JSON tree. */
 function forbiddenPaths(value: unknown, path = '$'): string[] {
   if (Array.isArray(value))
-    return value.flatMap((item, index) => forbiddenPaths(item, `${path}[${index}]`))
+    return value.flatMap((item, index) =>
+      forbiddenPaths(item, `${path}[${index}]`),
+    )
   if (typeof value !== 'object' || value === null) return []
 
   return Object.entries(value).flatMap(([key, child]) => {
@@ -63,13 +65,21 @@ test.group('responses > leak (e2e)', (group) => {
       const response = await client.get(path).cookies(session)
       response.assertStatus(200)
 
-      assert.deepEqual(forbiddenPaths(body(response)), [], `${path}: forbidden key in the response`)
+      assert.deepEqual(
+        forbiddenPaths(body(response)),
+        [],
+        `${path}: forbidden key in the response`,
+      )
       assert.notInclude(
         response.text(),
         FACTORY_PASSWORD,
         `${path}: password value in the response`,
       )
-      assert.notInclude(response.text(), ADMINISTRATOR.password, `${path}: administrator password`)
+      assert.notInclude(
+        response.text(),
+        ADMINISTRATOR.password,
+        `${path}: administrator password`,
+      )
     }
   })
 
@@ -79,13 +89,16 @@ test.group('responses > leak (e2e)', (group) => {
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const created = await client.post('/administrator/users').cookies(session).json({
-      name: 'Nova Conta',
-      email: 'nova@mail.com',
-      role: USER_ROLE.ADVISOR,
-      password: 'Senha1234!',
-      passwordConfirmation: 'Senha1234!',
-    })
+    const created = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json({
+        name: 'Nova Conta',
+        email: 'nova@mail.com',
+        role: USER_ROLE.ADVISOR,
+        password: 'Senha1234!',
+        passwordConfirmation: 'Senha1234!',
+      })
     created.assertStatus(201)
     const updated = await client
       .put(`/administrator/users/${body(created).id}`)
@@ -100,7 +113,10 @@ test.group('responses > leak (e2e)', (group) => {
   })
 
   test('the scan sees a forbidden key at any level', ({ assert }) => {
-    const leaked = forbiddenPaths({ data: [{ advisor: { password: 'x' } }], token: 'y' })
+    const leaked = forbiddenPaths({
+      data: [{ advisor: { password: 'x' } }],
+      token: 'y',
+    })
 
     assert.deepEqual(leaked, ['$.data[0].advisor.password', '$.token'])
   })

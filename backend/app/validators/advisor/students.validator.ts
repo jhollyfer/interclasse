@@ -16,8 +16,14 @@ export const AdvisorStudentUpdateValidator = vine.create({
   name: vine.string().trim().minLength(1).maxLength(120),
 })
 
-export type AdvisorStudentPaginatePayload = Infer<typeof AdvisorStudentPaginateValidator>
+export type AdvisorStudentPaginatePayload = Infer<
+  typeof AdvisorStudentPaginateValidator
+>
 
-export type AdvisorStudentCreatePayload = Infer<typeof AdvisorStudentCreateValidator>
+export type AdvisorStudentCreatePayload = Infer<
+  typeof AdvisorStudentCreateValidator
+>
 
-export type AdvisorStudentUpdatePayload = Infer<typeof AdvisorStudentUpdateValidator>
+export type AdvisorStudentUpdatePayload = Infer<
+  typeof AdvisorStudentUpdateValidator
+>

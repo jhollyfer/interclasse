@@ -14,7 +14,9 @@ export default class AdministratorEnrollmentRemovalAcknowledgeController {
       'Marks the notice as read. Repeating does not change the date of the first acknowledgement.',
   })
 
-  constructor(private readonly useCase: AdministratorEnrollmentRemovalAcknowledgeUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorEnrollmentRemovalAcknowledgeUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(IdentifierValidator, {

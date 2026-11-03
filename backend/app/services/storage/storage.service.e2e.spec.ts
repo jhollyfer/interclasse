@@ -68,7 +68,10 @@ test.group('services > storage > bucket real', (group) => {
     const response = await fetch(url)
 
     assert.equal(response.status, 200)
-    assert.include(response.headers.get('content-disposition') ?? '', "filename*=UTF-8''")
+    assert.include(
+      response.headers.get('content-disposition') ?? '',
+      "filename*=UTF-8''",
+    )
   })
 
   test('discard deletes the binary from the bucket', async ({ assert }) => {

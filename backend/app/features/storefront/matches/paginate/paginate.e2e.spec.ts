@@ -4,16 +4,25 @@ import { MATCH_STATUS } from '@interclasse/shared'
 
 import { Stored } from '#tests/stored-fixtures'
 import { drawnBracket, scheduledMatch } from '#tests/brackets-fixtures'
-import { authenticateAsAdministrator, body, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  body,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 test.group('storefront matches > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the site lists the matches without a session', async ({ client, assert }) => {
+  test('the site lists the matches without a session', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     await drawnBracket(client, admin, 3)
 
-    const response = await client.get('/storefront/matches').qs({ status: 'SCHEDULED' })
+    const response = await client
+      .get('/storefront/matches')
+      .qs({ status: 'SCHEDULED' })
 
     response.assertStatus(200)
     // 3 classrooms: a real semifinal and the final, which already has the bye team
@@ -22,7 +31,10 @@ test.group('storefront matches > paginate', (group) => {
     assert.isString(body(response).data[0].homeTeam.classroom.name)
     // Advisor and representative accounts do not show on the anonymous site.
     assert.notProperty(body(response).data[0].homeTeam.classroom, 'advisorId')
-    assert.notProperty(body(response).data[0].homeTeam.classroom, 'representativeId')
+    assert.notProperty(
+      body(response).data[0].homeTeam.classroom,
+      'representativeId',
+    )
   })
 
   test('?classroomId lists only the classroom matches, as home or away', async ({
@@ -40,10 +52,16 @@ test.group('storefront matches > paginate', (group) => {
     // Bracket of 4: the classroom plays only its semifinal; the final has no teams yet.
     assert.lengthOf(body(response).data, 1)
     const [match] = body(response).data
-    assert.include([match.homeTeam.classroom.id, match.awayTeam.classroom.id], classroomId)
+    assert.include(
+      [match.homeTeam.classroom.id, match.awayTeam.classroom.id],
+      classroomId,
+    )
   })
 
-  test('?status=FINISHED lists the most recent result first', async ({ client, assert }) => {
+  test('?status=FINISHED lists the most recent result first', async ({
+    client,
+    assert,
+  }) => {
     const older = await scheduledMatch()
     const recent = await scheduledMatch()
     // The schedule would put the scheduled one first; a result is read by its last update.
@@ -58,7 +76,9 @@ test.group('storefront matches > paginate', (group) => {
     // and two writes in the same millisecond would leave the order to chance.
     await Stored.touchMatch(older.match.id, DateTime.now().minus({ hours: 1 }))
 
-    const response = await client.get('/storefront/matches').qs({ status: MATCH_STATUS.FINISHED })
+    const response = await client
+      .get('/storefront/matches')
+      .qs({ status: MATCH_STATUS.FINISHED })
 
     response.assertStatus(200)
     assert.deepEqual(
@@ -67,7 +87,10 @@ test.group('storefront matches > paginate', (group) => {
     )
   })
 
-  test('without a status filter, the order is the schedule one', async ({ client, assert }) => {
+  test('without a status filter, the order is the schedule one', async ({
+    client,
+    assert,
+  }) => {
     const noTime = await scheduledMatch()
     const scheduled = await scheduledMatch()
     scheduled.match.scheduledAt = DateTime.now().plus({ days: 1 })
@@ -80,7 +103,10 @@ test.group('storefront matches > paginate', (group) => {
       body(response).data.map((match: { id: string }) => match.id),
       [scheduled.match.id, noTime.match.id],
     )
-    assert.equal(body(response).data[0].bracket.sport.id, scheduled.bracket.sportId)
+    assert.equal(
+      body(response).data[0].bracket.sport.id,
+      scheduled.bracket.sportId,
+    )
   })
 
   test('?status outside the list responds 422 pointing at the field', async ({

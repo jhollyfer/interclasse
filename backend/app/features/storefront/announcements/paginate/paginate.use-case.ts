@@ -16,7 +16,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { PaginationPayload } from '#core/validator'
 
 type Payload = PaginationPayload
-type Response = Either<HTTPException, Paginated<StorefrontAnnouncementShowResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<StorefrontAnnouncementShowResponse>
+>
 
 /** The site announcements: pinned first, then newest to oldest. */
 @inject()
@@ -39,7 +42,10 @@ export default class StorefrontAnnouncementPaginateUseCase {
         }),
       )
     } catch (error) {
-      logger.error({ err: error }, '[storefront/announcements > paginate][error]')
+      logger.error(
+        { err: error },
+        '[storefront/announcements > paginate][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

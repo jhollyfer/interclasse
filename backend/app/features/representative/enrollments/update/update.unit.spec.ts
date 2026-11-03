@@ -15,7 +15,10 @@ import {
 } from '#tests/enrollments-unit-fixtures'
 import { rightOf } from '#tests/storages-unit-fixtures'
 
-const KEY = { classroomId: ENROLLMENT_IDS.classroom, sportId: ENROLLMENT_IDS.sport }
+const KEY = {
+  classroomId: ENROLLMENT_IDS.classroom,
+  sportId: ENROLLMENT_IDS.sport,
+}
 
 async function setup() {
   const world = enrollmentWorld()
@@ -60,12 +63,17 @@ test.group('representative/enrollments > update (unit)', () => {
       actor: REPRESENTATIVE_ACTOR,
     })
 
-    assert.deepInclude(result.value, { status: 403, code: 'ENROLLMENT_REMOVAL_FORBIDDEN' })
+    assert.deepInclude(result.value, {
+      status: 403,
+      code: 'ENROLLMENT_REMOVAL_FORBIDDEN',
+    })
     const stored = await enrollments.findForUpdate(KEY)
     assert.deepEqual(stored.snapshot().studentIds, [ENROLLMENT_IDS.ana])
   })
 
-  test('an already drawn sport is 409 ENROLLMENT_LOCKED', async ({ assert }) => {
+  test('an already drawn sport is 409 ENROLLMENT_LOCKED', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
     enrollments.markDrawn('F2', ENROLLMENT_IDS.sport)
 
@@ -78,7 +86,9 @@ test.group('representative/enrollments > update (unit)', () => {
     assert.deepInclude(result.value, { status: 409, code: 'ENROLLMENT_LOCKED' })
   })
 
-  test('without a linked classroom is 404 CLASSROOM_NOT_FOUND', async ({ assert }) => {
+  test('without a linked classroom is 404 CLASSROOM_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
@@ -87,10 +97,15 @@ test.group('representative/enrollments > update (unit)', () => {
       actor: { ...REPRESENTATIVE_ACTOR, id: ENROLLMENT_IDS.otherAdvisor },
     })
 
-    assert.deepInclude(result.value, { status: 404, code: 'CLASSROOM_NOT_FOUND' })
+    assert.deepInclude(result.value, {
+      status: 404,
+      code: 'CLASSROOM_NOT_FOUND',
+    })
   })
 
-  test('repository failure is 500 REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 REPRESENTATIVE_ENROLLMENT_UPDATE_ERROR', async ({
+    assert,
+  }) => {
     const { enrollments, useCase } = await setup()
     enrollments.findSport = async () => {
       throw new Error('database down')

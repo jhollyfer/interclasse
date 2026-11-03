@@ -15,7 +15,12 @@ import { SportFactory } from '#database/factories/sport.factory'
 import { StudentFactory } from '#database/factories/student.factory'
 import { UserFactory } from '#database/factories/user.factory'
 
-type World = { classroomId: string; sportId: string; studentId: string; actorId: string }
+type World = {
+  classroomId: string
+  sportId: string
+  studentId: string
+  actorId: string
+}
 
 /**
  * What each implementation needs for the test to arrange the notice's world: classroom,
@@ -36,7 +41,9 @@ const IMPLEMENTATIONS = {
     async world() {
       const classroom = await ClassroomFactory.create()
       const sport = await SportFactory.create()
-      const student = await StudentFactory.merge({ classroomId: classroom.id }).create()
+      const student = await StudentFactory.merge({
+        classroomId: classroom.id,
+      }).create()
       const actor = await UserFactory.create()
 
       return {
@@ -97,7 +104,11 @@ const IMPLEMENTATIONS = {
   },
 } satisfies Record<string, () => Promise<Harness>>
 
-function removal(world: World, at: Date, role: 'ADVISOR' | 'ADMINISTRATOR' = USER_ROLE.ADVISOR) {
+function removal(
+  world: World,
+  at: Date,
+  role: 'ADVISOR' | 'ADMINISTRATOR' = USER_ROLE.ADVISOR,
+) {
   return EnrollmentRemoval.record({
     id: randomUUID(),
     classroomId: world.classroomId,
@@ -126,7 +137,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findById(randomUUID()))
     })
 
-    test("saveAll saves all the swap's notices; an empty list does nothing", async ({ assert }) => {
+    test("saveAll saves all the swap's notices; an empty list does nothing", async ({
+      assert,
+    }) => {
       const { repository, world } = await make()
       const data = await world()
       const first = removal(data, NOW)
@@ -139,7 +152,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(await repository.findById(second.id))
     })
 
-    test('save of an existing notice saves the acknowledgement', async ({ assert }) => {
+    test('save of an existing notice saves the acknowledgement', async ({
+      assert,
+    }) => {
       const { repository, world } = await make()
       const saved = removal(await world(), NOW)
       await repository.save(saved)
@@ -151,7 +166,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(found?.snapshot().acknowledgedAt)
     })
 
-    test('findDetail brings classroom, sport and who removed', async ({ assert }) => {
+    test('findDetail brings classroom, sport and who removed', async ({
+      assert,
+    }) => {
       const { repository, world } = await make()
       const data = await world()
       const saved = removal(data, NOW)
@@ -166,18 +183,37 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findDetail(randomUUID()))
     })
 
-    test('paginate: pending first, then newest to oldest, with filters', async ({ assert }) => {
+    test('paginate: pending first, then newest to oldest, with filters', async ({
+      assert,
+    }) => {
       const { repository, world } = await make()
       const data = await world()
-      const readOld = removal(data, new Date('2026-10-01T12:00:00Z'), USER_ROLE.ADMINISTRATOR)
+      const readOld = removal(
+        data,
+        new Date('2026-10-01T12:00:00Z'),
+        USER_ROLE.ADMINISTRATOR,
+      )
       const pendingOld = removal(data, new Date('2026-10-02T12:00:00Z'))
       const pendingNew = removal(data, new Date('2026-10-03T12:00:00Z'))
-      for (const item of [readOld, pendingOld, pendingNew]) await repository.save(item)
+      for (const item of [readOld, pendingOld, pendingNew])
+        await repository.save(item)
 
       const all = await repository.paginate({ page: 1, perPage: 10 })
-      const pending = await repository.paginate({ page: 1, perPage: 10, pending: true })
-      const read = await repository.paginate({ page: 1, perPage: 10, pending: false })
-      const other = await repository.paginate({ page: 1, perPage: 10, classroomId: randomUUID() })
+      const pending = await repository.paginate({
+        page: 1,
+        perPage: 10,
+        pending: true,
+      })
+      const read = await repository.paginate({
+        page: 1,
+        perPage: 10,
+        pending: false,
+      })
+      const other = await repository.paginate({
+        page: 1,
+        perPage: 10,
+        classroomId: randomUUID(),
+      })
 
       assert.deepEqual(
         all.data.map((item) => item.id),

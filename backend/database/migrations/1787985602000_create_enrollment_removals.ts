@@ -15,7 +15,10 @@ export default class extends BaseSchema {
 
   override async up(): Promise<void> {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
+      table
+        .uuid('id')
+        .primary()
+        .defaultTo(this.db.knexRawQuery('uuid_generate_v4()'))
       table
         .uuid('classroom_id')
         .notNullable()
@@ -23,12 +26,27 @@ export default class extends BaseSchema {
         .inTable('classrooms')
         .onDelete('CASCADE')
         .index()
-      table.uuid('sport_id').notNullable().references('id').inTable('sports').onDelete('CASCADE')
-      table.uuid('student_id').nullable().references('id').inTable('students').onDelete('SET NULL')
+      table
+        .uuid('sport_id')
+        .notNullable()
+        .references('id')
+        .inTable('sports')
+        .onDelete('CASCADE')
+      table
+        .uuid('student_id')
+        .nullable()
+        .references('id')
+        .inTable('students')
+        .onDelete('SET NULL')
       table.string('student_name', 120).notNullable()
       table.text('reason').notNullable()
       // Who removed them. Null when the account was deleted afterwards.
-      table.uuid('actor_id').nullable().references('id').inTable('users').onDelete('SET NULL')
+      table
+        .uuid('actor_id')
+        .nullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('SET NULL')
       // When the administrator acknowledged it. Null means a pending notice.
       table.timestamp('acknowledged_at').nullable()
       table.timestamp('created_at').notNullable()

@@ -38,13 +38,25 @@ export default class AdvisorEnrollmentUpdateUseCase extends EnrollmentReplaceBas
     super(enrollments, removals, unit, i18n)
   }
 
-  async execute({ classroomId, sportId, studentIds, reason, actor }: Payload): Promise<Response> {
+  async execute({
+    classroomId,
+    sportId,
+    studentIds,
+    reason,
+    actor,
+  }: Payload): Promise<Response> {
     try {
       // `404` also for another advisor's classroom: the scope goes into the query.
-      const classroom = await this.classrooms.findOwned({ id: classroomId, actor })
+      const classroom = await this.classrooms.findOwned({
+        id: classroomId,
+        actor,
+      })
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return await this.replace({

@@ -25,7 +25,11 @@ export default class TournamentSeeder extends BaseSeeder {
     ]
 
     for (const sport of sports) {
-      const slug = string.slug(sport.name, { lower: true, trim: true, strict: true })
+      const slug = string.slug(sport.name, {
+        lower: true,
+        trim: true,
+        strict: true,
+      })
       await Sport.updateOrCreate({ slug }, { ...sport, slug })
     }
 

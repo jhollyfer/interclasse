@@ -9,4 +9,6 @@ export const AdvisorClassroomPaginateValidator = vine.create({
   ...paginationFields(),
 })
 
-export type AdvisorClassroomPaginatePayload = Infer<typeof AdvisorClassroomPaginateValidator>
+export type AdvisorClassroomPaginatePayload = Infer<
+  typeof AdvisorClassroomPaginateValidator
+>

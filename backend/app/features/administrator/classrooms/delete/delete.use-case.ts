@@ -29,13 +29,17 @@ export default class AdministratorClassroomDeleteUseCase {
       const classroom = await this.classrooms.findById(id)
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       const removable = classroom.remove({
         inCompetition: await this.classrooms.isInCompetition(id),
       })
-      if (removable.isLeft()) return left(ClassroomRefusal.http(removable.value, this.i18n))
+      if (removable.isLeft())
+        return left(ClassroomRefusal.http(removable.value, this.i18n))
 
       await this.classrooms.delete(classroom)
 

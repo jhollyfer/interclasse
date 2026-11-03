@@ -6,8 +6,16 @@ import AdministratorUserCreateUseCase from './create.use-case.ts'
 import { StorageRepository } from '#repositories/storage/storage.repository'
 import { UserRepository } from '#repositories/user/user.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { identityDoubles, seedUser, USER_ID } from '#tests/identity-unit-fixtures'
-import { pendingFile, rightOf, uploadedFile } from '#tests/storages-unit-fixtures'
+import {
+  identityDoubles,
+  seedUser,
+  USER_ID,
+} from '#tests/identity-unit-fixtures'
+import {
+  pendingFile,
+  rightOf,
+  uploadedFile,
+} from '#tests/storages-unit-fixtures'
 
 async function setup() {
   const doubles = identityDoubles()
@@ -45,18 +53,25 @@ test.group('administrator/users > create (unit)', () => {
     assert.notProperty(created, 'password')
   })
 
-  test('returns the nested photo when the avatar is confirmed', async ({ assert }) => {
+  test('returns the nested photo when the avatar is confirmed', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
     await storages.save(uploadedFile())
 
     const created = rightOf(
-      await useCase.execute({ ...NEW_USER, avatarId: '8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d' }),
+      await useCase.execute({
+        ...NEW_USER,
+        avatarId: '8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d',
+      }),
     )
 
     assert.equal(created.avatar?.originalName, 'capa.png')
   })
 
-  test('nonexistent or still PENDING avatar is 422 STORAGE_NOT_FOUND', async ({ assert }) => {
+  test('nonexistent or still PENDING avatar is 422 STORAGE_NOT_FOUND', async ({
+    assert,
+  }) => {
     const { storages, useCase } = await setup()
     await storages.save(pendingFile())
 
@@ -69,17 +84,28 @@ test.group('administrator/users > create (unit)', () => {
       avatarId: '8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d',
     })
 
-    assert.deepInclude(missing.value, { status: 422, code: 'STORAGE_NOT_FOUND' })
-    assert.deepInclude(pending.value, { status: 422, code: 'STORAGE_NOT_FOUND' })
+    assert.deepInclude(missing.value, {
+      status: 422,
+      code: 'STORAGE_NOT_FOUND',
+    })
+    assert.deepInclude(pending.value, {
+      status: 422,
+      code: 'STORAGE_NOT_FOUND',
+    })
   })
 
-  test('email of a live account is 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('email of a live account is 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users, { email: 'bia@mail.com' })
 
     const result = await useCase.execute(NEW_USER)
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
   test('email of an archived account reactivates the row and preserves the id', async ({
@@ -88,9 +114,15 @@ test.group('administrator/users > create (unit)', () => {
     const { users, useCase } = await setup()
     await seedUser(users, { email: 'bia@mail.com', archived: true })
 
-    const created = rightOf(await useCase.execute({ ...NEW_USER, role: 'ADMINISTRATOR' }))
+    const created = rightOf(
+      await useCase.execute({ ...NEW_USER, role: 'ADMINISTRATOR' }),
+    )
 
-    assert.deepInclude(created, { id: USER_ID, role: 'ADMINISTRATOR', deletedAt: null })
+    assert.deepInclude(created, {
+      id: USER_ID,
+      role: 'ADMINISTRATOR',
+      deletedAt: null,
+    })
   })
 
   test('the race on the database unique (repository fact) is also 409 USER_ALREADY_EXISTS', async ({
@@ -101,10 +133,15 @@ test.group('administrator/users > create (unit)', () => {
 
     const result = await useCase.execute(NEW_USER)
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
-  test('repository failure is 500 ADMINISTRATOR_USER_CREATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_USER_CREATE_ERROR', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     users.save = async () => {
       throw new Error('database down')
@@ -112,6 +149,9 @@ test.group('administrator/users > create (unit)', () => {
 
     const result = await useCase.execute(NEW_USER)
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_USER_CREATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADMINISTRATOR_USER_CREATE_ERROR',
+    })
   })
 })

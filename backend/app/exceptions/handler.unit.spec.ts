@@ -14,19 +14,36 @@ async function run(error: unknown) {
 
   await handler.handle(error, context)
 
-  return { status: context.response.getStatus(), body: context.response.getBody() }
+  return {
+    status: context.response.getStatus(),
+    body: context.response.getBody(),
+  }
 }
 
 test.group('exceptions > handler (unit)', () => {
-  test("the guard's 401 uses the HTTPException factory code", async ({ assert }) => {
-    const result = await run(new authErrors.E_UNAUTHORIZED_ACCESS('x', { guardDriverName: 'api' }))
+  test("the guard's 401 uses the HTTPException factory code", async ({
+    assert,
+  }) => {
+    const result = await run(
+      new authErrors.E_UNAUTHORIZED_ACCESS('x', { guardDriverName: 'api' }),
+    )
 
     assert.equal(result.status, 401)
-    assert.deepInclude(result.body, { status: 401, code: 'AUTHENTICATION_REQUIRED' })
+    assert.deepInclude(result.body, {
+      status: 401,
+      code: 'AUTHENTICATION_REQUIRED',
+    })
   })
 
-  test("the limiter's 429 becomes the envelope with a stable code", async ({ assert }) => {
-    const response = new LimiterResponse({ limit: 5, remaining: 0, consumed: 5, availableIn: 600 })
+  test("the limiter's 429 becomes the envelope with a stable code", async ({
+    assert,
+  }) => {
+    const response = new LimiterResponse({
+      limit: 5,
+      remaining: 0,
+      consumed: 5,
+      availableIn: 600,
+    })
     const result = await run(new limiterErrors.E_TOO_MANY_REQUESTS(response))
 
     assert.equal(result.status, 429)
@@ -44,9 +61,14 @@ test.group('exceptions > handler (unit)', () => {
   })
 
   test('HTTPException keeps its own message and code', async ({ assert }) => {
-    const result = await run(HTTPException.Conflict('já existe', 'ALREADY_EXISTS'))
+    const result = await run(
+      HTTPException.Conflict('já existe', 'ALREADY_EXISTS'),
+    )
 
     assert.equal(result.status, 409)
-    assert.deepInclude(result.body, { message: 'já existe', code: 'ALREADY_EXISTS' })
+    assert.deepInclude(result.body, {
+      message: 'já existe',
+      code: 'ALREADY_EXISTS',
+    })
   })
 })

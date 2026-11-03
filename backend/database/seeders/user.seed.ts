@@ -19,7 +19,9 @@ export default class extends BaseSeeder {
     const password = env.get('SEED_OWNER_PASSWORD')
 
     if (!password) {
-      console.info('[owner] SEED_OWNER_PASSWORD missing; administrator seed skipped.')
+      console.info(
+        '[owner] SEED_OWNER_PASSWORD missing; administrator seed skipped.',
+      )
       return
     }
 

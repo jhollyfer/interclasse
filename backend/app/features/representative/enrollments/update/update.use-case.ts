@@ -42,7 +42,10 @@ export default class RepresentativeEnrollmentUpdateUseCase extends EnrollmentRep
       const classroom = await this.classrooms.findOfRepresentative(actor.id)
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.none_linked'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.none_linked'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return await this.replace({
@@ -54,7 +57,10 @@ export default class RepresentativeEnrollmentUpdateUseCase extends EnrollmentRep
         lockAfterDraw: true,
       })
     } catch (error) {
-      logger.error({ err: error }, '[representative/enrollments > update][error]')
+      logger.error(
+        { err: error },
+        '[representative/enrollments > update][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

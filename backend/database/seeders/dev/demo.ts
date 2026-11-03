@@ -1,7 +1,13 @@
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
-import { ACTIVE_STATUS, CATEGORY, MATCH_PHASE, USER_ROLE, type Category } from '@interclasse/shared'
+import {
+  ACTIVE_STATUS,
+  CATEGORY,
+  MATCH_PHASE,
+  USER_ROLE,
+  type Category,
+} from '@interclasse/shared'
 
 import env from '#start/env'
 import Announcement from '#models/announcement'
@@ -79,7 +85,11 @@ export default class extends BaseSeeder {
     const classrooms = await Classroom.query().orderBy('grade').orderBy('name')
 
     for (const [index, classroom] of classrooms.entries()) {
-      const representative = await this.representative(classroom, index, password)
+      const representative = await this.representative(
+        classroom,
+        index,
+        password,
+      )
       // One advisor per classroom (unique index): classrooms beyond the number of
       // teachers stay "No advisor", as the real school does
       // while the organization has not named them all.
@@ -228,7 +238,9 @@ export default class extends BaseSeeder {
         )
       }
 
-      await Student.createMany([...names].map((name) => ({ name, classroomId: classroom.id })))
+      await Student.createMany(
+        [...names].map((name) => ({ name, classroomId: classroom.id })),
+      )
     }
   }
 
@@ -241,11 +253,14 @@ export default class extends BaseSeeder {
     const sports = await Sport.query().orderBy('name')
 
     for (const [index, classroom] of classrooms.entries()) {
-      const students = await Student.query().where('classroomId', classroom.id).orderBy('name')
+      const students = await Student.query()
+        .where('classroomId', classroom.id)
+        .orderBy('name')
 
       for (const [offset, sport] of sports.entries()) {
         let size = sport.maxAthletes
-        if ((index + offset) % 9 === 0) size = Math.max(0, sport.minAthletes - 1)
+        if ((index + offset) % 9 === 0)
+          size = Math.max(0, sport.minAthletes - 1)
 
         const athletes = students
           .slice((offset * 3) % students.length)
@@ -253,7 +268,10 @@ export default class extends BaseSeeder {
           .slice(0, Math.min(size, students.length))
 
         for (const student of athletes) {
-          await Enrollment.firstOrCreate({ studentId: student.id, sportId: sport.id })
+          await Enrollment.firstOrCreate({
+            studentId: student.id,
+            sportId: sport.id,
+          })
         }
       }
     }
@@ -306,7 +324,10 @@ export default class extends BaseSeeder {
 
     for (const item of plan) {
       const target = await sport(item.slug)
-      const created = await draw.execute({ sportId: target.id, category: item.category })
+      const created = await draw.execute({
+        sportId: target.id,
+        category: item.category,
+      })
       if (created.isLeft()) throw created.value
       // A bracket that already existed (seed run again): its match was already built.
       if (!created.value.created) continue
@@ -367,12 +388,16 @@ export default class extends BaseSeeder {
       if (matches.length === 0) continue
 
       let played = matches
-      if (first && stage === 'first') played = matches.slice(0, Math.ceil(matches.length / 2))
+      if (first && stage === 'first')
+        played = matches.slice(0, Math.ceil(matches.length / 2))
 
       for (const [index, match] of played.entries()) {
         // One in every three matches ties and goes to penalties.
-        let payload: { homeScore: number; awayScore: number; winnerTeamId?: string } =
-          this.result(index)
+        let payload: {
+          homeScore: number
+          awayScore: number
+          winnerTeamId?: string
+        } = this.result(index)
         if (payload.homeScore === payload.awayScore)
           payload = { ...payload, winnerTeamId: match.awayTeamId ?? undefined }
 
@@ -402,7 +427,9 @@ export default class extends BaseSeeder {
     let day = startDay
 
     for (const match of matches) {
-      const [hour, minute] = (hours[slot % hours.length] ?? '00:00').split(':').map(Number)
+      const [hour, minute] = (hours[slot % hours.length] ?? '00:00')
+        .split(':')
+        .map(Number)
       match.scheduledAt = DateTime.fromObject(
         { year: 2026, month: 12, day: 1 + (day % 12), hour, minute },
         { zone: 'America/Manaus' },

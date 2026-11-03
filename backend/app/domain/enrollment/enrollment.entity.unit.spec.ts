@@ -2,12 +2,19 @@ import { test } from '@japa/runner'
 
 import { Enrollment, type EnrollmentWriter } from './enrollment.entity.ts'
 
-const ADVISOR = { role: 'advisor', reason: 'Mudou de turno' } satisfies EnrollmentWriter
+const ADVISOR = {
+  role: 'advisor',
+  reason: 'Mudou de turno',
+} satisfies EnrollmentWriter
 const REPRESENTATIVE = { role: 'representative' } satisfies EnrollmentWriter
 const CLASSROOM = ['a', 'b', 'c']
 
 function roster(studentIds: string[]): Enrollment {
-  return Enrollment.restore({ classroomId: 'classroom', sportId: 'sport', studentIds })
+  return Enrollment.restore({
+    classroomId: 'classroom',
+    sportId: 'sport',
+    studentIds,
+  })
 }
 
 function context(overrides: { maxAthletes?: number; drawn?: boolean } = {}) {
@@ -22,7 +29,10 @@ test.group('Enrollment', () => {
   test('replaces the whole list and returns who left', ({ assert }) => {
     const enrollment = roster(['a', 'b'])
 
-    const result = enrollment.replace({ studentIds: ['b', 'c'], writer: ADVISOR }, context())
+    const result = enrollment.replace(
+      { studentIds: ['b', 'c'], writer: ADVISOR },
+      context(),
+    )
 
     assert.deepEqual(result.value, { removedStudentIds: ['a'] })
     assert.deepEqual(enrollment.snapshot().studentIds, ['b', 'c'])
@@ -34,10 +44,15 @@ test.group('Enrollment', () => {
       context({ maxAthletes: 1 }),
     )
 
-    assert.deepEqual(result.value, { code: 'ENROLLMENT_LIMIT_EXCEEDED', maxAthletes: 1 })
+    assert.deepEqual(result.value, {
+      code: 'ENROLLMENT_LIMIT_EXCEEDED',
+      maxAthletes: 1,
+    })
   })
 
-  test('the maximum counts equally: a list at the limit passes', ({ assert }) => {
+  test('the maximum counts equally: a list at the limit passes', ({
+    assert,
+  }) => {
     const result = roster([]).replace(
       { studentIds: ['a', 'b'], writer: ADVISOR },
       context({ maxAthletes: 2 }),
@@ -51,9 +66,14 @@ test.group('Enrollment', () => {
   }) => {
     const enrollment = roster(['a'])
 
-    const result = enrollment.replace({ studentIds: ['a', 'alheio'], writer: ADVISOR }, context())
+    const result = enrollment.replace(
+      { studentIds: ['a', 'alheio'], writer: ADVISOR },
+      context(),
+    )
 
-    assert.deepEqual(result.value, { code: 'ENROLLMENT_STUDENT_NOT_IN_CLASSROOM' })
+    assert.deepEqual(result.value, {
+      code: 'ENROLLMENT_STUDENT_NOT_IN_CLASSROOM',
+    })
     assert.deepEqual(enrollment.snapshot().studentIds, ['a'])
   })
 
@@ -89,10 +109,15 @@ test.group('Enrollment', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('removing an athlete without a reason is ENROLLMENT_REASON_REQUIRED', ({ assert }) => {
+  test('removing an athlete without a reason is ENROLLMENT_REASON_REQUIRED', ({
+    assert,
+  }) => {
     const enrollment = roster(['a'])
 
-    const result = enrollment.replace({ studentIds: [], writer: { role: 'advisor' } }, context())
+    const result = enrollment.replace(
+      { studentIds: [], writer: { role: 'advisor' } },
+      context(),
+    )
 
     assert.deepEqual(result.value, { code: 'ENROLLMENT_REASON_REQUIRED' })
     assert.deepEqual(enrollment.snapshot().studentIds, ['a'])
@@ -107,12 +132,17 @@ test.group('Enrollment', () => {
     assert.isTrue(result.isRight())
   })
 
-  test('refusals follow the screen order: limit before foreign student', ({ assert }) => {
+  test('refusals follow the screen order: limit before foreign student', ({
+    assert,
+  }) => {
     const result = roster([]).replace(
       { studentIds: ['x', 'y'], writer: REPRESENTATIVE },
       context({ maxAthletes: 1, drawn: true }),
     )
 
-    assert.deepEqual(result.value, { code: 'ENROLLMENT_LIMIT_EXCEEDED', maxAthletes: 1 })
+    assert.deepEqual(result.value, {
+      code: 'ENROLLMENT_LIMIT_EXCEEDED',
+      maxAthletes: 1,
+    })
   })
 })

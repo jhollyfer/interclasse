@@ -13,7 +13,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
 type Payload = IdentifierPayload
-type Response = Either<HTTPException, AdministratorEnrollmentRemovalShowResponse>
+type Response = Either<
+  HTTPException,
+  AdministratorEnrollmentRemovalShowResponse
+>
 
 /**
  * The administrator acknowledgement. Idempotent: acknowledging again keeps the date of the
@@ -38,7 +41,8 @@ export default class AdministratorEnrollmentRemovalAcknowledgeUseCase {
           ),
         )
 
-      if (removal.acknowledge(new Date()).isRight()) await this.removals.save(removal)
+      if (removal.acknowledge(new Date()).isRight())
+        await this.removals.save(removal)
 
       const detail = await this.removals.findDetail(id)
       if (!detail)
@@ -51,7 +55,10 @@ export default class AdministratorEnrollmentRemovalAcknowledgeUseCase {
 
       return right(detail)
     } catch (error) {
-      logger.error({ err: error }, '[administrator/enrollment-removals > acknowledge][error]')
+      logger.error(
+        { err: error },
+        '[administrator/enrollment-removals > acknowledge][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

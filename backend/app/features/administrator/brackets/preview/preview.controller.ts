@@ -18,9 +18,12 @@ export default class AdministratorBracketPreviewController {
   constructor(private readonly useCase: AdministratorBracketPreviewUseCase) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorBracketPreviewValidator, {
-      data: context.request.qs(),
-    })
+    const payload = await context.request.validateUsing(
+      AdministratorBracketPreviewValidator,
+      {
+        data: context.request.qs(),
+      },
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

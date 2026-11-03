@@ -15,7 +15,9 @@ export default class AdministratorEnrollmentRemovalPaginateController {
       '`?pending=true` brings only those not yet acknowledged.',
   })
 
-  constructor(private readonly useCase: AdministratorEnrollmentRemovalPaginateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorEnrollmentRemovalPaginateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(

@@ -9,7 +9,9 @@ import { EnrollmentFactory } from '#database/factories/enrollment.factory'
  */
 export async function enrollRoster(sport: Sport, total: number) {
   const classroom = await ClassroomFactory.create()
-  const students = await StudentFactory.merge({ classroomId: classroom.id }).createMany(total)
+  const students = await StudentFactory.merge({
+    classroomId: classroom.id,
+  }).createMany(total)
 
   return EnrollmentFactory.merge(
     students.map((student) => ({ studentId: student.id, sportId: sport.id })),

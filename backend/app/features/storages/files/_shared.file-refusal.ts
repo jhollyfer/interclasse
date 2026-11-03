@@ -8,16 +8,26 @@ import type { StorageError } from '#domain/storage/storage.errors'
 export class FileRefusal extends RefusalBase {
   private static readonly TABLE = {
     STORAGE_SIZE_MISMATCH: (fact, i18n) =>
-      HTTPException.UnprocessableEntity(i18n.t('files.incomplete'), 'STORAGE_SIZE_MISMATCH', {
-        size: i18n.t('files.size_mismatch_field', {
-          received: String(fact.received),
-          declared: String(fact.declared),
-        }),
-      }),
+      HTTPException.UnprocessableEntity(
+        i18n.t('files.incomplete'),
+        'STORAGE_SIZE_MISMATCH',
+        {
+          size: i18n.t('files.size_mismatch_field', {
+            received: String(fact.received),
+            declared: String(fact.declared),
+          }),
+        },
+      ),
     STORAGE_CONTENT_MISMATCH: (fact, i18n) =>
-      HTTPException.UnprocessableEntity(i18n.t('files.incomplete'), 'STORAGE_CONTENT_MISMATCH', {
-        mimetype: i18n.t('files.content_mismatch_field', { mimetype: fact.mimetype }),
-      }),
+      HTTPException.UnprocessableEntity(
+        i18n.t('files.incomplete'),
+        'STORAGE_CONTENT_MISMATCH',
+        {
+          mimetype: i18n.t('files.content_mismatch_field', {
+            mimetype: fact.mimetype,
+          }),
+        },
+      ),
     STORAGE_IN_USE: (fact, i18n) =>
       HTTPException.Conflict(i18n.t('files.in_use'), 'STORAGE_IN_USE', {
         id: i18n.t('files.in_use_field', { places: fact.usedBy.join(', ') }),
@@ -34,8 +44,12 @@ export class FileRefusal extends RefusalBase {
    * id was the payload. It holds for every resource that attaches a file.
    */
   static attachmentNotFound(field: string, i18n: I18n): HTTPException {
-    return HTTPException.UnprocessableEntity(i18n.t('files.not_found'), 'STORAGE_NOT_FOUND', {
-      [field]: i18n.t('files.not_found'),
-    })
+    return HTTPException.UnprocessableEntity(
+      i18n.t('files.not_found'),
+      'STORAGE_NOT_FOUND',
+      {
+        [field]: i18n.t('files.not_found'),
+      },
+    )
   }
 }

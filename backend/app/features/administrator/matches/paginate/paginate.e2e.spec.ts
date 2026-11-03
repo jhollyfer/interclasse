@@ -82,21 +82,31 @@ test.group('matches > paginate', (group) => {
     assert.equal(body(byStatus).data[0].id, other.match.id)
   })
 
-  test('?phase outside the list responds 422 pointing at the field', async ({ client, assert }) => {
+  test('?phase outside the list responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
     // In the URL, not in `.qs()`: the Tuyau registry types the value by the closed list.
-    const response = await client.get('/administrator/matches?phase=OITAVAS').cookies(admin)
+    const response = await client
+      .get('/administrator/matches?phase=OITAVAS')
+      .cookies(admin)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'phase')
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const anonymous = await client.get('/administrator/matches')
-    const advisorSession = await client.get('/administrator/matches').cookies(advisor)
+    const advisorSession = await client
+      .get('/administrator/matches')
+      .cookies(advisor)
 
     anonymous.assertStatus(401)
     advisorSession.assertStatus(403)

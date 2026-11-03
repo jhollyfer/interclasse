@@ -49,7 +49,10 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** The whole path, from zero to `UPLOADED`, for a single-part file. */
-async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
+async function upload(
+  client: ApiClient,
+  session: Session,
+): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -80,7 +83,9 @@ test.group('storages > download', (group) => {
     // With the bucket private, this route is the only path to the binary. Open,
     // it issued a signed URL for any uuid without a session - the back
     // door the closing of the bucket left open.
-    const response = await client.get(`/storages/${storage.id}/download`).redirects(0)
+    const response = await client
+      .get(`/storages/${storage.id}/download`)
+      .redirects(0)
 
     response.assertStatus(401)
   })
@@ -111,7 +116,9 @@ test.group('storages > download', (group) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    const response = await client.get(`/storages/${storage.id}/download`).cookies(session)
+    const response = await client
+      .get(`/storages/${storage.id}/download`)
+      .cookies(session)
 
     response.assertStatus(200)
 
@@ -169,7 +176,9 @@ test.group('storages > contentDisposition', () => {
     assert.include(header, "filename*=UTF-8''Relat%C3%B3rio%20Anual.pdf")
   })
 
-  test('neutralizes quotes, which would escape the header', async ({ assert }) => {
+  test('neutralizes quotes, which would escape the header', async ({
+    assert,
+  }) => {
     const service = await app.container.make(StorageContract)
 
     const header = service.contentDisposition('nota "final".pdf')
@@ -181,7 +190,10 @@ test.group('storages > contentDisposition', () => {
 test.group('storages > download > identificador', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
     const response = await client.get('/storages/x/download').cookies(session)

@@ -21,7 +21,9 @@ test.group('brackets > show', (group) => {
     const admin = await authenticateAsAdministrator(client)
     const { sport, bracket } = await drawnBracket(client, admin, 4)
 
-    const response = await client.get(`/administrator/brackets/${bracket.id}`).cookies(admin)
+    const response = await client
+      .get(`/administrator/brackets/${bracket.id}`)
+      .cookies(admin)
 
     response.assertStatus(200)
     assert.equal(body(response).id, bracket.id)
@@ -39,25 +41,38 @@ test.group('brackets > show', (group) => {
     assert.isNull(semi.homeScore)
   })
 
-  test('bracket that does not exist responds 404', async ({ client, assert }) => {
+  test('bracket that does not exist responds 404', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.get(`/administrator/brackets/${randomUUID()}`).cookies(admin)
+    const response = await client
+      .get(`/administrator/brackets/${randomUUID()}`)
+      .cookies(admin)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'BRACKET_NOT_FOUND')
   })
 
-  test('id outside the uuid format responds 422', async ({ client, assert }) => {
+  test('id outside the uuid format responds 422', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/brackets/nao-e-uuid').cookies(admin)
+    const response = await client
+      .get('/administrator/brackets/nao-e-uuid')
+      .cookies(admin)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/brackets/${randomUUID()}`
 

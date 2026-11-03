@@ -35,6 +35,9 @@ export function memoryAuthor(role: UserRole = USER_ROLE.ADVISOR) {
 }
 
 /** The in-memory repository already holding the file and the uploader. */
-export function memoryPhotos(storage: StorageRow, author: ReturnType<typeof memoryAuthor>) {
+export function memoryPhotos(
+  storage: StorageRow,
+  author: ReturnType<typeof memoryAuthor>,
+) {
   return new PhotoMemoryRepository().withStorage(storage).withAuthor(author)
 }

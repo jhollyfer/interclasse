@@ -14,7 +14,13 @@ import type { Infer } from '#core/validator'
  * would invite someone to try.
  */
 export const AccountProfileUpdateValidator = vine.create({
-  name: vine.string().trim().minLength(1).maxLength(120).optional().use(notNull()),
+  name: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(120)
+    .optional()
+    .use(notNull()),
   email: email().optional().use(notNull()),
   password: password().optional().use(notNull()),
   /**
@@ -34,11 +40,17 @@ export const AccountProfileUpdateValidator = vine.create({
    * not saved. The ceiling of 32 is the same as the policy's, because it is the largest value
    * the application may already have saved.
    */
-  currentPassword: vine.string().maxLength(32).optional().requiredIfExists('password'),
+  currentPassword: vine
+    .string()
+    .maxLength(32)
+    .optional()
+    .requiredIfExists('password'),
   // `nullable` is what lets the photo be removed without replacing it. The uuid only guarantees the
   // format; that the file exists is checked in the use case, otherwise the foreign
   // key violation would blow up as a 500 instead of a 422.
   avatarId: vine.string().uuid().nullable().optional(),
 })
 
-export type AccountProfileUpdatePayload = Infer<typeof AccountProfileUpdateValidator>
+export type AccountProfileUpdatePayload = Infer<
+  typeof AccountProfileUpdateValidator
+>

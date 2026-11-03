@@ -73,7 +73,10 @@ async function born(
   links: { advisorId?: string; representativeId?: string } = {},
 ): Promise<Classroom> {
   const facts = await repository.peopleFacts(links)
-  const created = Classroom.create({ id: randomUUID(), name, grade, ...links, now: NOW }, facts)
+  const created = Classroom.create(
+    { id: randomUUID(), name, grade, ...links, now: NOW },
+    facts,
+  )
   if (created.isLeft()) throw new Error('invalid classroom in the arrangement')
   await repository.save(created.value)
 
@@ -96,13 +99,20 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
     test('findById of a nonexistent id is null', async ({ assert }) => {
       const { repository } = await make()
 
-      assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.isNull(
+        await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'),
+      )
     })
 
-    test('save of an existing classroom updates instead of duplicating', async ({ assert }) => {
+    test('save of an existing classroom updates instead of duplicating', async ({
+      assert,
+    }) => {
       const { repository } = await make()
       const classroom = await born(repository, '7º A', 7)
-      classroom.update({ name: '7º B' }, { facts: {}, inCompetition: false, now: NOW })
+      classroom.update(
+        { name: '7º B' },
+        { facts: {}, inCompetition: false, now: NOW },
+      )
 
       await repository.save(classroom)
 
@@ -120,14 +130,26 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const own = await born(repository, '7º A', 7, { advisorId })
       const foreign = await born(repository, '8º A', 8)
       const advisor = { id: advisorId, role: USER_ROLE.ADVISOR, avatarId: null }
-      const administrator = { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null }
+      const administrator = {
+        id: randomUUID(),
+        role: USER_ROLE.ADMINISTRATOR,
+        avatarId: null,
+      }
 
-      assert.isNotNull(await repository.findOwned({ id: own.id, actor: advisor }))
-      assert.isNull(await repository.findOwned({ id: foreign.id, actor: advisor }))
-      assert.isNotNull(await repository.findOwned({ id: foreign.id, actor: administrator }))
+      assert.isNotNull(
+        await repository.findOwned({ id: own.id, actor: advisor }),
+      )
+      assert.isNull(
+        await repository.findOwned({ id: foreign.id, actor: advisor }),
+      )
+      assert.isNotNull(
+        await repository.findOwned({ id: foreign.id, actor: administrator }),
+      )
     })
 
-    test("findOfRepresentative finds the account's classroom", async ({ assert }) => {
+    test("findOfRepresentative finds the account's classroom", async ({
+      assert,
+    }) => {
       const { repository, account } = await make()
       const representativeId = await account(USER_ROLE.REPRESENTATIVE)
       const own = await born(repository, '7º A', 7, { representativeId })
@@ -135,7 +157,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const found = await repository.findOfRepresentative(representativeId)
 
       assert.equal(found?.id, own.id)
-      assert.isNull(await repository.findOfRepresentative(await account(USER_ROLE.REPRESENTATIVE)))
+      assert.isNull(
+        await repository.findOfRepresentative(
+          await account(USER_ROLE.REPRESENTATIVE),
+        ),
+      )
     })
 
     test('existsByName finds by name, except itself', async ({ assert }) => {
@@ -155,7 +181,10 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const representativeId = await account(USER_ROLE.REPRESENTATIVE)
       const own = await born(repository, '7º A', 7, { advisorId })
 
-      const facts = await repository.peopleFacts({ advisorId, representativeId: advisorId })
+      const facts = await repository.peopleFacts({
+        advisorId,
+        representativeId: advisorId,
+      })
       const free = await repository.peopleFacts({ representativeId })
       const ignoringOwn = await repository.peopleFacts({ advisorId }, own.id)
 
@@ -166,7 +195,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(await repository.peopleFacts({}), {})
     })
 
-    test('isInCompetition is only true with a team in a bracket', async ({ assert }) => {
+    test('isInCompetition is only true with a team in a bracket', async ({
+      assert,
+    }) => {
       const { repository, compete } = await make()
       const classroom = await born(repository, '7º A', 7)
 
@@ -184,7 +215,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await repository.findById(classroom.id))
     })
 
-    test("detachAccount undoes the account's two links and only its own", async ({ assert }) => {
+    test("detachAccount undoes the account's two links and only its own", async ({
+      assert,
+    }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       const other = await account(USER_ROLE.ADVISOR)
@@ -199,7 +232,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(untouched?.snapshot().advisorId, other)
     })
 
-    test('findDetail brings the advisor and the representative nested', async ({ assert }) => {
+    test('findDetail brings the advisor and the representative nested', async ({
+      assert,
+    }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       const classroom = await born(repository, '7º A', 7, { advisorId })
@@ -208,7 +243,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       assert.equal(detail?.advisor?.id, advisorId)
       assert.isNull(detail?.representative)
-      assert.isNull(await repository.findDetail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.isNull(
+        await repository.findDetail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'),
+      )
     })
 
     test('paginate filters by category and name, sorts and brings the totals', async ({
@@ -231,11 +268,17 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         f2.data.map((item) => item.name),
         ['9º B', '9º A'],
       )
-      assert.deepInclude(f2.data[0], { studentsCount: 0, athletesCount: 0, sportsCount: 0 })
+      assert.deepInclude(f2.data[0], {
+        studentsCount: 0,
+        athletesCount: 0,
+        sportsCount: 0,
+      })
       assert.equal(found.meta.total, 1)
     })
 
-    test('paginateOwned: the advisor lists only their own, in name order', async ({ assert }) => {
+    test('paginateOwned: the advisor lists only their own, in name order', async ({
+      assert,
+    }) => {
       const { repository, account } = await make()
       const advisorId = await account(USER_ROLE.ADVISOR)
       await born(repository, '9º A', 9, { advisorId })
@@ -249,7 +292,11 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       const all = await repository.paginateOwned({
         page: 1,
         perPage: 10,
-        actor: { id: randomUUID(), role: USER_ROLE.ADMINISTRATOR, avatarId: null },
+        actor: {
+          id: randomUUID(),
+          role: USER_ROLE.ADMINISTRATOR,
+          avatarId: null,
+        },
       })
 
       assert.deepEqual(

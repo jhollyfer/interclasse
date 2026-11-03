@@ -36,7 +36,9 @@ test.group('account/profile > update (unit)', () => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
-    const profile = rightOf(await useCase.execute({ actor: ACTOR, name: 'Ana Maria' }))
+    const profile = rightOf(
+      await useCase.execute({ actor: ACTOR, name: 'Ana Maria' }),
+    )
 
     assert.equal(profile.name, 'Ana Maria')
     assert.deepEqual(sessions.revokedAll, [])
@@ -67,7 +69,9 @@ test.group('account/profile > update (unit)', () => {
     assert.deepEqual(sessions.revokedAll, [USER_ID])
   })
 
-  test('wrong or missing current password is 422 CURRENT_PASSWORD_INVALID', async ({ assert }) => {
+  test('wrong or missing current password is 422 CURRENT_PASSWORD_INVALID', async ({
+    assert,
+  }) => {
     const { users, sessions, useCase } = await setup()
     await seedUser(users)
 
@@ -76,10 +80,19 @@ test.group('account/profile > update (unit)', () => {
       password: 'Nova@12345',
       currentPassword: 'Errada@123',
     })
-    const absent = await useCase.execute({ actor: ACTOR, password: 'Nova@12345' })
+    const absent = await useCase.execute({
+      actor: ACTOR,
+      password: 'Nova@12345',
+    })
 
-    assert.deepInclude(wrong.value, { status: 422, code: 'CURRENT_PASSWORD_INVALID' })
-    assert.deepInclude(absent.value, { status: 422, code: 'CURRENT_PASSWORD_INVALID' })
+    assert.deepInclude(wrong.value, {
+      status: 422,
+      code: 'CURRENT_PASSWORD_INVALID',
+    })
+    assert.deepInclude(absent.value, {
+      status: 422,
+      code: 'CURRENT_PASSWORD_INVALID',
+    })
     assert.deepEqual(sessions.revokedAll, [])
   })
 
@@ -95,17 +108,28 @@ test.group('account/profile > update (unit)', () => {
       currentPassword: PASSWORD,
     })
 
-    assert.deepInclude(result.value, { status: 422, code: 'PASSWORD_SAME_AS_CURRENT' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'PASSWORD_SAME_AS_CURRENT',
+    })
   })
 
-  test('email of another account is 409 USER_ALREADY_EXISTS', async ({ assert }) => {
+  test('email of another account is 409 USER_ALREADY_EXISTS', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     await seedUser(users, { id: OTHER_ID, email: 'outra@mail.com' })
 
-    const result = await useCase.execute({ actor: ACTOR, email: 'outra@mail.com' })
+    const result = await useCase.execute({
+      actor: ACTOR,
+      email: 'outra@mail.com',
+    })
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
   test('still PENDING avatar is 422 STORAGE_NOT_FOUND', async ({ assert }) => {
@@ -130,10 +154,15 @@ test.group('account/profile > update (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 409, code: 'USER_ALREADY_EXISTS' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'USER_ALREADY_EXISTS',
+    })
   })
 
-  test('repository failure is 500 ACCOUNT_PROFILE_UPDATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ACCOUNT_PROFILE_UPDATE_ERROR', async ({
+    assert,
+  }) => {
     const { users, useCase } = await setup()
     await seedUser(users)
     users.save = async () => {
@@ -142,6 +171,9 @@ test.group('account/profile > update (unit)', () => {
 
     const result = await useCase.execute({ actor: ACTOR, name: 'x' })
 
-    assert.deepInclude(result.value, { status: 500, code: 'ACCOUNT_PROFILE_UPDATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ACCOUNT_PROFILE_UPDATE_ERROR',
+    })
   })
 })

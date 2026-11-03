@@ -35,12 +35,17 @@ async function setup() {
 }
 
 test.group('advisor/students > paginate (unit)', () => {
-  test('lists only the advisor students, in alphabetical order, with meta', async ({ assert }) => {
+  test('lists only the advisor students, in alphabetical order, with meta', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({ actor: ACTOR })
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.name), ['Ana', 'Bia'])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.name),
+      ['Ana', 'Bia'],
+    )
     assert.equal(result.isRight() && result.value.meta.perPage, 20)
   })
 
@@ -54,7 +59,9 @@ test.group('advisor/students > paginate (unit)', () => {
     assert.equal(result.isRight() && result.value.meta.total, 0)
   })
 
-  test('the administrator sees all of them, and the search narrows', async ({ assert }) => {
+  test('the administrator sees all of them, and the search narrows', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
     const actor = { id: ADVISOR, role: USER_ROLE.ADMINISTRATOR, avatarId: null }
 

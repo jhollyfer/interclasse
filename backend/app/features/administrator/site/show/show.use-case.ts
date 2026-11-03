@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorSiteShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorSiteShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { SiteSettingRepository } from '#repositories/site-setting/site-setting.repository'
 import HTTPException from '#exceptions/http.exception'

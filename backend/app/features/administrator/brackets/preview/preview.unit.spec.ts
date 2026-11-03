@@ -18,14 +18,26 @@ async function setup() {
 }
 
 test.group('administrator/brackets > preview (unit)', () => {
-  test('counts the athletes of each classroom and marks who enters', async ({ assert }) => {
+  test('counts the athletes of each classroom and marks who enters', async ({
+    assert,
+  }) => {
     const { brackets, useCase } = await setup()
-    const { sport, classrooms } = await BracketUnitFixtures.enrolled(brackets, ['8º A', '8º B'])
+    const { sport, classrooms } = await BracketUnitFixtures.enrolled(brackets, [
+      '8º A',
+      '8º B',
+    ])
 
-    const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const result = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     if (result.isLeft()) throw new Error('preview should exist')
-    assert.deepInclude(result.value, { minAthletes: 1, maxTeams: 16, drawn: false })
+    assert.deepInclude(result.value, {
+      minAthletes: 1,
+      maxTeams: 16,
+      drawn: false,
+    })
     assert.sameMembers(
       result.value.classrooms.map((classroom) => classroom.id),
       classrooms.map((classroom) => classroom.id),
@@ -36,7 +48,10 @@ test.group('administrator/brackets > preview (unit)', () => {
     const { brackets, useCase } = await setup()
     const { sport } = await BracketUnitFixtures.drawn(brackets)
 
-    const result = await useCase.execute({ sportId: sport.id, category: CATEGORY.F2 })
+    const result = await useCase.execute({
+      sportId: sport.id,
+      category: CATEGORY.F2,
+    })
 
     assert.isTrue(result.isRight() && result.value.drawn)
   })

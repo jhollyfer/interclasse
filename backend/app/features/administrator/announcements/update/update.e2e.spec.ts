@@ -14,7 +14,10 @@ import {
 test.group('announcements > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('partial payload does not erase the missing field', async ({ client, assert }) => {
+  test('partial payload does not erase the missing field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -30,7 +33,10 @@ test.group('announcements > update', (group) => {
     assert.isFalse(body(response).pinned)
   })
 
-  test('pinning and unpinning changes only the highlight', async ({ client, assert }) => {
+  test('pinning and unpinning changes only the highlight', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -62,7 +68,10 @@ test.group('announcements > update', (group) => {
     assert.equal(body(response).code, 'ANNOUNCEMENT_NOT_FOUND')
   })
 
-  test('title above 160 characters responds 422 and does not save', async ({ client, assert }) => {
+  test('title above 160 characters responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const announcement = await AnnouncementFactory.create()
 
@@ -100,7 +109,10 @@ test.group('announcements > update', (group) => {
     assert.equal(stored.title, announcement.title)
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const announcement = await AnnouncementFactory.create()
 
     const anonymous = await client

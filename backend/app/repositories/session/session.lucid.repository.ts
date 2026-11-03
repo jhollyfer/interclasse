@@ -66,11 +66,18 @@ export class SessionLucidRepository extends SessionRepository {
    * role change, archiving) - two writes, one transaction (_standards/backend.md §4.2).
    */
   async revokeAll(userId: string): Promise<void> {
-    await this.transaction.client().from(SESSION_TABLE).where('tokenable_id', userId).delete()
+    await this.transaction
+      .client()
+      .from(SESSION_TABLE)
+      .where('tokenable_id', userId)
+      .delete()
   }
 
   async revoke(userId: string, identifier: string): Promise<boolean> {
-    const deleted = await User.accessTokens.delete(this.tokenable(userId), identifier)
+    const deleted = await User.accessTokens.delete(
+      this.tokenable(userId),
+      identifier,
+    )
 
     return deleted !== 0
   }
@@ -82,7 +89,10 @@ export class SessionLucidRepository extends SessionRepository {
 
       if (!token || token.name !== COOKIE_TOKEN.REFRESH) return null
 
-      return { userId: String(token.tokenableId), identifier: String(token.identifier) }
+      return {
+        userId: String(token.tokenableId),
+        identifier: String(token.identifier),
+      }
     } catch (error) {
       logger.debug({ err: error }, '[session > readRefresh] unreadable token')
 

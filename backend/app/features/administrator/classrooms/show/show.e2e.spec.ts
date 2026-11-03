@@ -26,7 +26,9 @@ test.group('classrooms > show', (group) => {
       representativeId: representative.id,
     }).create()
 
-    const response = await client.get(`/administrator/classrooms/${classroom.id}`).cookies(session)
+    const response = await client
+      .get(`/administrator/classrooms/${classroom.id}`)
+      .cookies(session)
 
     response.assertStatus(200)
     assert.equal(body(response).id, classroom.id)
@@ -41,29 +43,43 @@ test.group('classrooms > show', (group) => {
   test('nonexistent classroom responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.get(`/administrator/classrooms/${randomUUID()}`).cookies(session)
+    const response = await client
+      .get(`/administrator/classrooms/${randomUUID()}`)
+      .cookies(session)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CLASSROOM_NOT_FOUND')
   })
 
-  test('identifier that is not a uuid responds 422 on the field', async ({ client, assert }) => {
+  test('identifier that is not a uuid responds 422 on the field', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/classrooms/nao-e-uuid').cookies(session)
+    const response = await client
+      .get('/administrator/classrooms/nao-e-uuid')
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')
   })
 
-  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const classroom = await ClassroomFactory.create()
 
-    const anonymous = await client.get(`/administrator/classrooms/${classroom.id}`)
+    const anonymous = await client.get(
+      `/administrator/classrooms/${classroom.id}`,
+    )
     anonymous.assertStatus(401)
 
     const advisor = await authenticateAsAdvisor(client)
-    const response = await client.get(`/administrator/classrooms/${classroom.id}`).cookies(advisor)
+    const response = await client
+      .get(`/administrator/classrooms/${classroom.id}`)
+      .cookies(advisor)
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')

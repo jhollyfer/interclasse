@@ -12,12 +12,26 @@ import {
 test.group('cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lists the cards and filters by classroom', async ({ client, assert }) => {
+  test('lists the cards and filters by classroom', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } = await matchWithTeams()
+    const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } =
+      await matchWithTeams()
     await MatchCardFactory.merge([
-      { matchId: match.id, teamId: homeTeam.id, studentId: homeStudent.id, color: 'YELLOW' },
-      { matchId: match.id, teamId: awayTeam.id, studentId: awayStudent.id, color: 'RED' },
+      {
+        matchId: match.id,
+        teamId: homeTeam.id,
+        studentId: homeStudent.id,
+        color: 'YELLOW',
+      },
+      {
+        matchId: match.id,
+        teamId: awayTeam.id,
+        studentId: awayStudent.id,
+        color: 'RED',
+      },
     ]).createMany(2)
 
     const all = await client.get('/administrator/cards').cookies(session)
@@ -44,7 +58,9 @@ test.group('administrator/cards/paginate > access and validation', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client.get('/administrator/cards').cookies(advisor)

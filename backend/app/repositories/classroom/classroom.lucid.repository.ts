@@ -48,7 +48,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   }
 
   async findById(id: string): Promise<Classroom | null> {
-    const row = await ClassroomModel.query({ client: this.transaction.client() })
+    const row = await ClassroomModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .first()
     if (!row) return null
@@ -60,13 +62,13 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     readonly id: string
     readonly actor: Actor
   }): Promise<Classroom | null> {
-    const query = ClassroomModel.query({ client: this.transaction.client() }).where(
-      'id',
-      criteria.id,
-    )
+    const query = ClassroomModel.query({
+      client: this.transaction.client(),
+    }).where('id', criteria.id)
     // Whoever is not an administrator reaches only the classroom they advise: a new role without a
     // link sees nothing (fail-closed, `backend.md` §4.6).
-    if (criteria.actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', criteria.actor.id)
+    if (criteria.actor.role !== USER_ROLE.ADMINISTRATOR)
+      query.where('advisorId', criteria.actor.id)
 
     const row = await query.first()
     if (!row) return null
@@ -75,7 +77,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   }
 
   async findOfRepresentative(accountId: string): Promise<Classroom | null> {
-    const row = await ClassroomModel.query({ client: this.transaction.client() })
+    const row = await ClassroomModel.query({
+      client: this.transaction.client(),
+    })
       .where('representativeId', accountId)
       .first()
     if (!row) return null
@@ -83,8 +87,12 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     return this.toEntity(row)
   }
 
-  async findDetail(id: string): Promise<AdministratorClassroomShowResponse | null> {
-    const row = await ClassroomModel.query({ client: this.transaction.client() })
+  async findDetail(
+    id: string,
+  ): Promise<AdministratorClassroomShowResponse | null> {
+    const row = await ClassroomModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .preload('advisor')
       .preload('representative')
@@ -95,7 +103,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   }
 
   async existsByName(name: string, exceptId?: string): Promise<boolean> {
-    const query = ClassroomModel.query({ client: this.transaction.client() }).where('name', name)
+    const query = ClassroomModel.query({
+      client: this.transaction.client(),
+    }).where('name', name)
     if (exceptId) query.whereNot('id', exceptId)
 
     return Boolean(await query.first())
@@ -105,7 +115,10 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     links: ClassroomLinks,
     exceptClassroomId?: string,
   ): Promise<ClassroomPeopleFacts> {
-    const facts: { advisor?: ClassroomLinkFacts; representative?: ClassroomLinkFacts } = {}
+    const facts: {
+      advisor?: ClassroomLinkFacts
+      representative?: ClassroomLinkFacts
+    } = {}
 
     if (links.advisorId)
       facts.advisor = await this.linkFacts(
@@ -179,7 +192,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
   async detachAccount(accountId: string): Promise<void> {
     const client = this.transaction.client()
 
-    await ClassroomModel.query({ client }).where('advisorId', accountId).update({ advisorId: null })
+    await ClassroomModel.query({ client })
+      .where('advisorId', accountId)
+      .update({ advisorId: null })
     await ClassroomModel.query({ client })
       .where('representativeId', accountId)
       .update({ representativeId: null })
@@ -218,7 +233,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
    * enrollments: Lucid only computes aggregates by relation, and the classroom does not declare the
    * inverse so the model does not import the student's (`domain.md` §8, `no-circular`).
    */
-  private async totalsOf(classroomIds: ReadonlyArray<string>): Promise<ClassroomTotals> {
+  private async totalsOf(
+    classroomIds: ReadonlyArray<string>,
+  ): Promise<ClassroomTotals> {
     const client = this.transaction.client()
     const students = await StudentModel.query({ client })
       .whereIn('classroomId', [...classroomIds])
@@ -234,12 +251,20 @@ export class ClassroomLucidRepository extends ClassroomRepository {
       .groupBy('students.classroom_id')
 
     return {
-      students: new Map(students.map((row) => [row.classroomId, Number(row.$extras.total)])),
+      students: new Map(
+        students.map((row) => [row.classroomId, Number(row.$extras.total)]),
+      ),
       athletes: new Map(
-        enrolled.map((row) => [row.$extras.classroom_id, Number(row.$extras.athletes)]),
+        enrolled.map((row) => [
+          row.$extras.classroom_id,
+          Number(row.$extras.athletes),
+        ]),
       ),
       sports: new Map(
-        enrolled.map((row) => [row.$extras.classroom_id, Number(row.$extras.sports)]),
+        enrolled.map((row) => [
+          row.$extras.classroom_id,
+          Number(row.$extras.sports),
+        ]),
       ),
     }
   }
@@ -253,12 +278,18 @@ export class ClassroomLucidRepository extends ClassroomRepository {
       .preload('advisor')
       .preload('representative')
 
-    if (criteria.actor.role !== USER_ROLE.ADMINISTRATOR) query.where('advisorId', criteria.actor.id)
+    if (criteria.actor.role !== USER_ROLE.ADMINISTRATOR)
+      query.where('advisorId', criteria.actor.id)
     if (criteria.search) query.whereILike('name', `%${criteria.search}%`)
 
-    const page = await query.orderBy('name', 'asc').paginate(criteria.page, criteria.perPage)
+    const page = await query
+      .orderBy('name', 'asc')
+      .paginate(criteria.page, criteria.perPage)
 
-    return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
+    return {
+      meta: page.getMeta(),
+      data: page.all().map((row) => this.toResponse(row)),
+    }
   }
 
   /** A live account with the link's role, and whether another classroom already has it. */
@@ -309,7 +340,9 @@ export class ClassroomLucidRepository extends ClassroomRepository {
     }
   }
 
-  private toPerson(row: UserModel | null | undefined): AdministratorClassroomPersonResponse | null {
+  private toPerson(
+    row: UserModel | null | undefined,
+  ): AdministratorClassroomPersonResponse | null {
     if (!row) return null
 
     return {

@@ -14,7 +14,10 @@ import {
 test.group('enrollment-removals > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('lists the notices and narrows to the pending ones', async ({ client, assert }) => {
+  test('lists the notices and narrows to the pending ones', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const classroom = await ClassroomFactory.create()
     const sport = await SportFactory.create()
@@ -34,7 +37,9 @@ test.group('enrollment-removals > paginate', (group) => {
       },
     ]).createMany(2)
 
-    const all = await client.get('/administrator/enrollment-removals').cookies(session)
+    const all = await client
+      .get('/administrator/enrollment-removals')
+      .cookies(session)
     const pending = await client
       .get('/administrator/enrollment-removals')
       .qs({ pending: true })
@@ -51,21 +56,26 @@ test.group('enrollment-removals > paginate', (group) => {
   test('advisor responds 403', async ({ client }) => {
     const session = await authenticateAsAdvisor(client)
 
-    const response = await client.get('/administrator/enrollment-removals').cookies(session)
+    const response = await client
+      .get('/administrator/enrollment-removals')
+      .cookies(session)
 
     response.assertStatus(403)
   })
 })
 
-test.group('administrator/enrollment-removals/paginate > access and validation', (group) => {
-  group.each.setup(() => resetDatabase())
+test.group(
+  'administrator/enrollment-removals/paginate > access and validation',
+  (group) => {
+    group.each.setup(() => resetDatabase())
 
-  test('401: without a session', async ({ client }) => {
-    const response = await client.get('/administrator/enrollment-removals')
+    test('401: without a session', async ({ client }) => {
+      const response = await client.get('/administrator/enrollment-removals')
 
-    response.assertStatus(401)
-  })
-})
+      response.assertStatus(401)
+    })
+  },
+)
 
 test.group('administrator/enrollment-removals/paginate > 422', (group) => {
   group.each.setup(() => resetDatabase())

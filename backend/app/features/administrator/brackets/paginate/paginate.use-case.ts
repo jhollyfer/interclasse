@@ -15,7 +15,10 @@ import HTTPException from '#exceptions/http.exception'
 import type { AdministratorBracketPaginatePayload } from '#validators/administrator/brackets.validator'
 
 type Payload = AdministratorBracketPaginatePayload
-type Response = Either<HTTPException, Paginated<AdministratorBracketPaginateResponse>>
+type Response = Either<
+  HTTPException,
+  Paginated<AdministratorBracketPaginateResponse>
+>
 
 /** The drawn brackets, from newest to oldest. */
 @inject()

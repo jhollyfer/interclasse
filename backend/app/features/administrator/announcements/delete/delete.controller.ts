@@ -9,10 +9,13 @@ import { IdentifierValidator } from '#core/validator'
 @inject()
 export default class AdministratorAnnouncementDeleteController {
   static docs = defineDocs({
-    description: '**Irreversible**: the announcement disappears from the site right away.',
+    description:
+      '**Irreversible**: the announcement disappears from the site right away.',
   })
 
-  constructor(private readonly useCase: AdministratorAnnouncementDeleteUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorAnnouncementDeleteUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(IdentifierValidator, {

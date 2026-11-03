@@ -15,9 +15,15 @@ import {
 test.group('sports > update', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('changing the name changes the slug and keeps the rest', async ({ client, assert }) => {
+  test('changing the name changes the slug and keeps the rest', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const sport = await SportFactory.merge({ minAthletes: 2, maxAthletes: 8 }).create()
+    const sport = await SportFactory.merge({
+      minAthletes: 2,
+      maxAthletes: 8,
+    }).create()
 
     const response = await client
       .put(`/administrator/sports/${sport.id}`)
@@ -73,9 +79,15 @@ test.group('sports > update', (group) => {
     assert.property(body(response).errors, 'name')
   })
 
-  test('the partial limit is checked against the saved value', async ({ client, assert }) => {
+  test('the partial limit is checked against the saved value', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const sport = await SportFactory.merge({ minAthletes: 5, maxAthletes: 10 }).create()
+    const sport = await SportFactory.merge({
+      minAthletes: 5,
+      maxAthletes: 10,
+    }).create()
 
     // Only the maximum comes in the payload; the saved minimum of 5 ends up above it.
     const response = await client
@@ -90,9 +102,15 @@ test.group('sports > update', (group) => {
     assert.equal(stored.maxAthletes, 10)
   })
 
-  test('maximum below an already enrolled list responds 409', async ({ client, assert }) => {
+  test('maximum below an already enrolled list responds 409', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const sport = await SportFactory.merge({ minAthletes: 1, maxAthletes: 10 }).create()
+    const sport = await SportFactory.merge({
+      minAthletes: 1,
+      maxAthletes: 10,
+    }).create()
     await enrollRoster(sport, 5)
 
     const below = await client
@@ -111,10 +129,15 @@ test.group('sports > update', (group) => {
     assert.equal(body(exact).maxAthletes, 5)
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const sport = await SportFactory.create()
 
-    const anonymous = await client.put(`/administrator/sports/${sport.id}`).json({ name: 'X' })
+    const anonymous = await client
+      .put(`/administrator/sports/${sport.id}`)
+      .json({ name: 'X' })
     const advisor = await authenticateAsAdvisor(client)
     const forbidden = await client
       .put(`/administrator/sports/${sport.id}`)
@@ -126,7 +149,10 @@ test.group('sports > update', (group) => {
     assert.equal(body(forbidden).code, 'ACCESS_DENIED')
   })
 
-  test('empty name or null limit responds 422 and does not save', async ({ client, assert }) => {
+  test('empty name or null limit responds 422 and does not save', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const sport = await SportFactory.create()
 

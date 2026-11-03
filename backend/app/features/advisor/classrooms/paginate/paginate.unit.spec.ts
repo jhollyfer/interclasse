@@ -24,7 +24,12 @@ async function setup() {
     FREE,
   )
   const foreign = Classroom.create(
-    { id: '00000000-0000-4000-8000-000000000002', name: '8º A', grade: 8, now: new Date() },
+    {
+      id: '00000000-0000-4000-8000-000000000002',
+      name: '8º A',
+      grade: 8,
+      now: new Date(),
+    },
     {},
   )
   if (own.isLeft() || foreign.isLeft()) throw new Error('invalid arrangement')
@@ -38,14 +43,19 @@ async function setup() {
 }
 
 test.group('advisor/classrooms > paginate (unit)', () => {
-  test('the advisor sees only the classroom they advise', async ({ assert }) => {
+  test('the advisor sees only the classroom they advise', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({
       actor: { id: ADVISOR, role: USER_ROLE.ADVISOR, avatarId: null },
     })
 
-    assert.deepEqual(result.isRight() && result.value.data.map((item) => item.name), ['9º A'])
+    assert.deepEqual(
+      result.isRight() && result.value.data.map((item) => item.name),
+      ['9º A'],
+    )
   })
 
   test('the administrator sees all of them, by name, and the search narrows', async ({
@@ -57,7 +67,10 @@ test.group('advisor/classrooms > paginate (unit)', () => {
     const all = await useCase.execute({ actor })
     const searched = await useCase.execute({ actor, search: '8º' })
 
-    assert.deepEqual(all.isRight() && all.value.data.map((item) => item.name), ['8º A', '9º A'])
+    assert.deepEqual(all.isRight() && all.value.data.map((item) => item.name), [
+      '8º A',
+      '9º A',
+    ])
     assert.equal(searched.isRight() && searched.value.meta.total, 1)
   })
 

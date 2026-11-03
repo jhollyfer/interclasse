@@ -1,4 +1,10 @@
-import { USER_ROLE, left, right, type Either, type UserRole } from '@interclasse/shared'
+import {
+  USER_ROLE,
+  left,
+  right,
+  type Either,
+  type UserRole,
+} from '@interclasse/shared'
 
 import type { EnrollmentRemovalError } from './enrollment-removal.errors.ts'
 
@@ -63,7 +69,8 @@ export class EnrollmentRemoval {
 
   /** The administrator's acknowledgement. Repeating it does not change the first date. */
   acknowledge(at: Date): Either<EnrollmentRemovalError, EnrollmentRemoval> {
-    if (this.props.acknowledgedAt) return left({ code: 'ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED' })
+    if (this.props.acknowledgedAt)
+      return left({ code: 'ENROLLMENT_REMOVAL_ALREADY_ACKNOWLEDGED' })
 
     this.props.acknowledgedAt = at
     this.props.updatedAt = at

@@ -8,13 +8,21 @@ import type { SiteSettingError } from '#domain/site-setting/site-setting.errors'
 export class SiteRefusal extends RefusalBase {
   private static readonly TABLE = {
     STORAGE_NOT_FOUND: (_fact, i18n) =>
-      HTTPException.UnprocessableEntity(i18n.t('site.regulation_not_found'), 'STORAGE_NOT_FOUND', {
-        regulationId: i18n.t('site.regulation_not_found'),
-      }),
+      HTTPException.UnprocessableEntity(
+        i18n.t('site.regulation_not_found'),
+        'STORAGE_NOT_FOUND',
+        {
+          regulationId: i18n.t('site.regulation_not_found'),
+        },
+      ),
     REGULATION_NOT_PDF: (_fact, i18n) =>
-      HTTPException.UnprocessableEntity(i18n.t('site.regulation_not_pdf'), 'REGULATION_NOT_PDF', {
-        regulationId: i18n.t('site.regulation_not_pdf_field'),
-      }),
+      HTTPException.UnprocessableEntity(
+        i18n.t('site.regulation_not_pdf'),
+        'REGULATION_NOT_PDF',
+        {
+          regulationId: i18n.t('site.regulation_not_pdf_field'),
+        },
+      ),
   } satisfies RefusalTable<SiteSettingError>
 
   static http(error: SiteSettingError, i18n: I18n): HTTPException {

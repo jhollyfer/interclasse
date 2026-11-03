@@ -60,9 +60,14 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       await users.save(ana)
       const found = await users.findById(ana.id)
 
-      assert.deepEqual({ ...found?.snapshot(), password: '' }, { ...ana.snapshot(), password: '' })
+      assert.deepEqual(
+        { ...found?.snapshot(), password: '' },
+        { ...ana.snapshot(), password: '' },
+      )
       assert.notEqual(found?.snapshot().password, 'Senha@123')
-      assert.isTrue(await hash.verify(found?.snapshot().password ?? '', 'Senha@123'))
+      assert.isTrue(
+        await hash.verify(found?.snapshot().password ?? '', 'Senha@123'),
+      )
       assert.isNull(await users.findById(BIA))
     })
 
@@ -120,7 +125,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNotNull(await users.findAnyById(ANA))
     })
 
-    test('findByEmail and existsByEmail also see the archived account', async ({ assert }) => {
+    test('findByEmail and existsByEmail also see the archived account', async ({
+      assert,
+    }) => {
       const { users } = await make()
       const ana = account(ANA, 'Ana', 'ana@t.dev')
       ana.archive(NOW)

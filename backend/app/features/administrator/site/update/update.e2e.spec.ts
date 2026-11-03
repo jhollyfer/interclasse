@@ -21,13 +21,16 @@ test.group('site > update', (group) => {
       originalName: 'regulamento.pdf',
     }).create()
 
-    const response = await client.put('/administrator/site').cookies(session).json({
-      about: 'Os jogos interclasse do CMEI.',
-      edition: 2,
-      firstEditionYear: 2025,
-      schoolInstagram: 'cmei_cosmejean',
-      regulationId: pdf.id,
-    })
+    const response = await client
+      .put('/administrator/site')
+      .cookies(session)
+      .json({
+        about: 'Os jogos interclasse do CMEI.',
+        edition: 2,
+        firstEditionYear: 2025,
+        schoolInstagram: 'cmei_cosmejean',
+        regulationId: pdf.id,
+      })
 
     response.assertStatus(200)
     assert.equal(body(response).edition, 2)
@@ -43,7 +46,10 @@ test.group('site > update', (group) => {
     assert.notProperty(body(site).regulation, 'path')
   })
 
-  test('regulation that is not a PDF responds 422', async ({ client, assert }) => {
+  test('regulation that is not a PDF responds 422', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const image = await StorageFactory.create()
 
@@ -56,7 +62,10 @@ test.group('site > update', (group) => {
     assert.equal(body(response).code, 'REGULATION_NOT_PDF')
   })
 
-  test('null erases the field and missing does not touch', async ({ client, assert }) => {
+  test('null erases the field and missing does not touch', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     await client
       .put('/administrator/site')
@@ -76,7 +85,10 @@ test.group('site > update', (group) => {
   test('without an administrator account is 403', async ({ client }) => {
     const advisor = await authenticateAsAdvisor(client)
 
-    const response = await client.put('/administrator/site').cookies(advisor).json({ edition: 1 })
+    const response = await client
+      .put('/administrator/site')
+      .cookies(advisor)
+      .json({ edition: 1 })
 
     response.assertStatus(403)
   })

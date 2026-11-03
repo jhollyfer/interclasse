@@ -1,6 +1,9 @@
 import { test } from '@japa/runner'
 
-import { authenticateAsAdministrator, resetDatabase } from '#tests/http-fixtures'
+import {
+  authenticateAsAdministrator,
+  resetDatabase,
+} from '#tests/http-fixtures'
 
 /**
  * Signing out must hold on the server, not just on screen.
@@ -16,12 +19,16 @@ test.group('authentication > sign-out', (group) => {
   test('sign-out invalidates the running session', async ({ client }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const signOut = await client.post('/authentication/sign-out').cookies(session)
+    const signOut = await client
+      .post('/authentication/sign-out')
+      .cookies(session)
 
     signOut.assertStatus(204)
 
     // The same access cookie, now without the row that backed it.
-    const duplicate = await client.post('/authentication/sign-out').cookies(session)
+    const duplicate = await client
+      .post('/authentication/sign-out')
+      .cookies(session)
 
     duplicate.assertStatus(401)
   })

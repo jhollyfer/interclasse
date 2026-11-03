@@ -51,12 +51,18 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
       const found = await repository.findById(cover.id)
       assert.deepEqual(found?.snapshot(), cover.snapshot())
-      assert.isNull(await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.isNull(
+        await repository.findById('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'),
+      )
     })
 
     test('saving again updates the same file', async ({ assert }) => {
       const repository = await make()
-      const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a92', 'cover.png', false)
+      const cover = file(
+        '4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a92',
+        'cover.png',
+        false,
+      )
       await repository.save(cover)
 
       cover.complete({ contentLength: 1024, head: PNG_HEAD }, NOW)
@@ -66,19 +72,29 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.equal(updated?.snapshot().status, 'UPLOADED')
     })
 
-    test('detail brings the record in the response shape, without the url', async ({ assert }) => {
+    test('detail brings the record in the response shape, without the url', async ({
+      assert,
+    }) => {
       const repository = await make()
       const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a93', 'cover.png')
       await repository.save(cover)
 
       const detail = await repository.detail(cover.id)
 
-      assert.deepInclude(detail, { id: cover.id, originalName: 'cover.png', status: 'UPLOADED' })
+      assert.deepInclude(detail, {
+        id: cover.id,
+        originalName: 'cover.png',
+        status: 'UPLOADED',
+      })
       assert.notProperty(detail, 'url')
-      assert.isNull(await repository.detail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'))
+      assert.isNull(
+        await repository.detail('0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f'),
+      )
     })
 
-    test('detailsOf brings only the live files of the ids', async ({ assert }) => {
+    test('detailsOf brings only the live files of the ids', async ({
+      assert,
+    }) => {
       const repository = await make()
       const cover = file('4b6f2c1e-3f2a-4c8e-9a1b-0f6d2e7c8a94', 'cover.png')
       await repository.save(cover)
@@ -96,24 +112,42 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.deepEqual(await repository.detailsOf([]), [])
     })
 
-    test('areAttachable only accepts a confirmed and existing file', async ({ assert }) => {
+    test('areAttachable only accepts a confirmed and existing file', async ({
+      assert,
+    }) => {
       const repository = await make()
       const ok = file('7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c11', 'ok.png')
-      const pending = file('7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c12', 'pendente.png', false)
+      const pending = file(
+        '7e1d3c2b-1a0f-4e9d-8c7b-6a5f4e3d2c12',
+        'pendente.png',
+        false,
+      )
       await repository.save(ok)
       await repository.save(pending)
 
       assert.isTrue(await repository.areAttachable([ok.id, ok.id]))
       assert.isTrue(await repository.areAttachable([]))
       assert.isFalse(await repository.areAttachable([ok.id, pending.id]))
-      assert.isFalse(await repository.areAttachable(['0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f']))
+      assert.isFalse(
+        await repository.areAttachable([
+          '0c1f9d1e-8b7a-4c3d-9e2f-1a2b3c4d5e6f',
+        ]),
+      )
     })
 
-    test('paginate searches, filters by status and sorts', async ({ assert }) => {
+    test('paginate searches, filters by status and sorts', async ({
+      assert,
+    }) => {
       const repository = await make()
-      await repository.save(file('1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b61', 'zeta.png'))
-      await repository.save(file('2e3d4c5b-6a7f-4e9d-8c1b-2a3f4e5d6c72', 'alfa.png'))
-      await repository.save(file('3f4e5d6c-7b8a-4f0e-9d2c-3b4a5f6e7d83', 'beta.png', false))
+      await repository.save(
+        file('1d2c3b4a-5f6e-4d8c-9b0a-1f2e3d4c5b61', 'zeta.png'),
+      )
+      await repository.save(
+        file('2e3d4c5b-6a7f-4e9d-8c1b-2a3f4e5d6c72', 'alfa.png'),
+      )
+      await repository.save(
+        file('3f4e5d6c-7b8a-4f0e-9d2c-3b4a5f6e7d83', 'beta.png', false),
+      )
 
       const page = await repository.paginate({
         page: 1,

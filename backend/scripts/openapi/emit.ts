@@ -116,7 +116,9 @@ function controllerFile(handler: unknown): string | undefined {
   return controllerPath(expression, app.makePath('.'))
 }
 
-async function resolveDocs(handler: unknown): Promise<OperationDocs | undefined> {
+async function resolveDocs(
+  handler: unknown,
+): Promise<OperationDocs | undefined> {
   if (typeof handler !== 'object' || handler === null) return undefined
   if (!('reference' in handler)) return undefined
 
@@ -266,13 +268,16 @@ const ACTION_SUMMARY: Record<string, (rule: TagRule) => string> = {
 const FIXED_SUMMARY: Record<string, string> = {
   'sign-in': 'Sign in',
   'sign-out': 'Sign out',
-  'refresh': 'Renew the session',
-  'complete': 'Confirm the upload',
-  'parts': 'Resume the upload',
-  'download': 'Download the file',
+  refresh: 'Renew the session',
+  complete: 'Confirm the upload',
+  parts: 'Resume the upload',
+  download: 'Download the file',
 }
 
-function deriveSummary(action: string, rule: TagRule | undefined): string | undefined {
+function deriveSummary(
+  action: string,
+  rule: TagRule | undefined,
+): string | undefined {
   const override = ACTION_OVERRIDES[action]
   if (override !== undefined) return override
 
@@ -317,7 +322,9 @@ function toRoles(args: unknown): string[] {
  * must pass, so who can call is the intersection of the lists, not the
  * last one.
  */
-async function readProtection(middleware: Iterable<MiddlewareEntry>): Promise<Protection> {
+async function readProtection(
+  middleware: Iterable<MiddlewareEntry>,
+): Promise<Protection> {
   const protection: Protection = { authenticated: false, roles: [] }
 
   let allowed: string[] | undefined
@@ -435,7 +442,11 @@ async function buildContract(
   // the ternary made is the same the `if` right below already made again.
   if (!intro?.directory) return contract
 
-  const schema = loadResponseSchema(intro.directory, app.makePath('.'), intro.action)
+  const schema = loadResponseSchema(
+    intro.directory,
+    app.makePath('.'),
+    intro.action,
+  )
 
   if (!schema) return contract
 
@@ -505,7 +516,9 @@ function buildSuccessResponses(
         description,
         content: {
           'application/json': {
-            schema: VineSchema.paginatedSchema({ $ref: `#/components/schemas/${itemName}` }),
+            schema: VineSchema.paginatedSchema({
+              $ref: `#/components/schemas/${itemName}`,
+            }),
           },
         },
       }
@@ -514,10 +527,17 @@ function buildSuccessResponses(
 
     const name = `${prefix}Response${status}`
     const derived = bodySchema(body, context, warnings)
-    components[name] = VineSchema.mergeSchema(derived, contract.overrides?.responses?.[status])
+    components[name] = VineSchema.mergeSchema(
+      derived,
+      contract.overrides?.responses?.[status],
+    )
     responses[rawStatus] = {
       description,
-      content: { 'application/json': { schema: { $ref: `#/components/schemas/${name}` } } },
+      content: {
+        'application/json': {
+          schema: { $ref: `#/components/schemas/${name}` },
+        },
+      },
     }
   }
 
@@ -543,8 +563,10 @@ function buildErrorResponses(
     codes.set(status, current)
   }
 
-  if (protection.authenticated) add(401, AUTOMATIC_CODES.unauthenticated, 'Unauthorized')
-  if (protection.roles.length > 0) add(403, AUTOMATIC_CODES.forbidden, 'Acesso negado')
+  if (protection.authenticated)
+    add(401, AUTOMATIC_CODES.unauthenticated, 'Unauthorized')
+  if (protection.roles.length > 0)
+    add(403, AUTOMATIC_CODES.forbidden, 'Acesso negado')
   if (contract.body || contract.query || contract.params) {
     add(422, AUTOMATIC_CODES.validation, 'Invalid data')
   }
@@ -557,7 +579,10 @@ function buildErrorResponses(
 
   const responses: Record<string, OpenAPIResponse> = {}
 
-  for (const [status, found] of [...codes.entries()].sort(function ([left], [right]) {
+  for (const [status, found] of [...codes.entries()].sort(function (
+    [left],
+    [right],
+  ) {
     return left - right
   })) {
     const declared = [...found.keys()]
@@ -573,7 +598,11 @@ function buildErrorResponses(
     const messages = [...found.values()].filter(Boolean)
     if (!description && messages.length > 0) description = messages.join(' · ')
 
-    responses[String(status)] = errorResponse(status, `#/components/schemas/${name}`, description)
+    responses[String(status)] = errorResponse(
+      status,
+      `#/components/schemas/${name}`,
+      description,
+    )
   }
 
   return responses
@@ -594,7 +623,11 @@ function buildParameters(
   const declared = new Map<string, OpenAPIParameter>()
 
   if (contract.params) {
-    const schema = VineSchema.toSchema(contract.params, `${operationId} (parameters)`, warnings)
+    const schema = VineSchema.toSchema(
+      contract.params,
+      `${operationId} (parameters)`,
+      warnings,
+    )
 
     for (const parameter of VineSchema.toParameters(schema, 'path')) {
       declared.set(parameter.name, parameter)
@@ -609,11 +642,20 @@ function buildParameters(
       continue
     }
 
-    parameters.push({ name, in: 'path', required: true, schema: { type: 'string' } })
+    parameters.push({
+      name,
+      in: 'path',
+      required: true,
+      schema: { type: 'string' },
+    })
   }
 
   if (contract.query) {
-    const schema = VineSchema.toSchema(contract.query, `${operationId} (query)`, warnings)
+    const schema = VineSchema.toSchema(
+      contract.query,
+      `${operationId} (query)`,
+      warnings,
+    )
     parameters.push(...VineSchema.toParameters(schema, 'query'))
   }
 
@@ -657,25 +699,41 @@ function buildOperation(
   // line less here, and without the field that line hides in a description.
   if (protection.roles.length > 0) operation['x-roles'] = protection.roles
 
-  const parameters = buildParameters(contract, pathParams, operationId, warnings)
+  const parameters = buildParameters(
+    contract,
+    pathParams,
+    operationId,
+    warnings,
+  )
 
   if (parameters.length > 0) operation.parameters = parameters
 
   if (contract.body) {
     const name = `${pascalize(operationId)}Body`
-    const derived = VineSchema.toSchema(contract.body, `${operationId} (payload)`, warnings)
+    const derived = VineSchema.toSchema(
+      contract.body,
+      `${operationId} (payload)`,
+      warnings,
+    )
     const patched = VineSchema.applyFieldPatches(derived, FIELD_PATCHES)
     const schema = VineSchema.mergeSchema(patched, contract.overrides?.body)
     components[name] = schema
     operation.requestBody = {
       required: true,
       content: {
-        [requestContentType(schema)]: { schema: { $ref: `#/components/schemas/${name}` } },
+        [requestContentType(schema)]: {
+          schema: { $ref: `#/components/schemas/${name}` },
+        },
       },
     }
   }
 
-  operation.responses = buildSuccessResponses(contract, operationId, components, warnings)
+  operation.responses = buildSuccessResponses(
+    contract,
+    operationId,
+    components,
+    warnings,
+  )
 
   if (Object.keys(operation.responses).length === 0) {
     const status = impliedSuccess(method)
@@ -690,7 +748,10 @@ function buildOperation(
     )
   }
 
-  Object.assign(operation.responses, buildErrorResponses(contract, protection, components))
+  Object.assign(
+    operation.responses,
+    buildErrorResponses(contract, protection, components),
+  )
 
   return operation
 }
@@ -702,7 +763,9 @@ function buildOperation(
 export async function buildDocument(): Promise<BuildResult> {
   router.commit()
 
-  const components: Components = { PaginationMeta: VineSchema.PAGINATION_META_SCHEMA }
+  const components: Components = {
+    PaginationMeta: VineSchema.PAGINATION_META_SCHEMA,
+  }
 
   const paths: Record<string, Record<string, OpenAPIOperation>> = {}
   const warnings: string[] = []
@@ -720,7 +783,8 @@ export async function buildDocument(): Promise<BuildResult> {
     // raw Adonis pattern. Without the second, a wildcard route would only leave the
     // document if the config wrote `/uploads/{*}`, which is the output form,
     // not the one a person writes.
-    if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern)) continue
+    if (openapi.ignore.includes(path) || openapi.ignore.includes(route.pattern))
+      continue
 
     // `HEAD` is generated by the framework from each `GET`; documenting it would only
     // duplicate every read operation.
@@ -785,7 +849,11 @@ export async function buildDocument(): Promise<BuildResult> {
       paths: sortPaths(paths),
       components: {
         securitySchemes: {
-          [SECURITY_SCHEME]: { type: 'apiKey', in: 'cookie', name: SECURITY_COOKIE },
+          [SECURITY_SCHEME]: {
+            type: 'apiKey',
+            in: 'cookie',
+            name: SECURITY_COOKIE,
+          },
         },
         schemas: sortKeys(components),
       },

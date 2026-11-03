@@ -18,7 +18,9 @@ import env from '#start/env'
  * `*` - the browser does not send a cookie to a wildcard origin. So either the
  * frontend origin is listed, or there is no session between the two.
  */
-export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGINS') ?? '')
+export const corsOrigins: ReadonlyArray<string> = (
+  env.get('CORS_ORIGINS') ?? ''
+)
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean)
@@ -29,7 +31,9 @@ export const corsOrigins: ReadonlyArray<string> = (env.get('CORS_ORIGINS') ?? ''
  * stops instead of waiting for the first user (_standards/backend.md §4.10).
  */
 if (app.inProduction && corsOrigins.length === 0) {
-  throw new Error('CORS_ORIGINS is required in production: list the frontend origins')
+  throw new Error(
+    'CORS_ORIGINS is required in production: list the frontend origins',
+  )
 }
 
 /**

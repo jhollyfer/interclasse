@@ -39,18 +39,33 @@ export default class AdministratorClassroomUpdateUseCase {
         classroom.renamesTo(changes.name) &&
         (await this.classrooms.existsByName(changes.name, id))
       )
-        return left(ClassroomRefusal.http({ code: 'CLASSROOM_ALREADY_EXISTS' }, this.i18n))
+        return left(
+          ClassroomRefusal.http(
+            { code: 'CLASSROOM_ALREADY_EXISTS' },
+            this.i18n,
+          ),
+        )
 
-      const facts = await this.classrooms.peopleFacts(classroom.changedLinks(changes), id)
+      const facts = await this.classrooms.peopleFacts(
+        classroom.changedLinks(changes),
+        id,
+      )
       // Only worth asking about the draw when the year would take the classroom to another category.
       const inCompetition =
-        classroom.changesCategoryWith(changes.grade) && (await this.classrooms.isInCompetition(id))
+        classroom.changesCategoryWith(changes.grade) &&
+        (await this.classrooms.isInCompetition(id))
 
-      const updated = classroom.update(changes, { facts, inCompetition, now: new Date() })
-      if (updated.isLeft()) return left(ClassroomRefusal.http(updated.value, this.i18n))
+      const updated = classroom.update(changes, {
+        facts,
+        inCompetition,
+        now: new Date(),
+      })
+      if (updated.isLeft())
+        return left(ClassroomRefusal.http(updated.value, this.i18n))
 
       const saved = await this.classrooms.save(classroom)
-      if (saved.isLeft()) return left(ClassroomRefusal.http(saved.value, this.i18n))
+      if (saved.isLeft())
+        return left(ClassroomRefusal.http(saved.value, this.i18n))
 
       const detail = await this.classrooms.findDetail(id)
       if (!detail) return left(this.notFound())
@@ -69,6 +84,9 @@ export default class AdministratorClassroomUpdateUseCase {
   }
 
   private notFound(): HTTPException {
-    return HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND')
+    return HTTPException.NotFound(
+      this.i18n.t('classrooms.not_found'),
+      'CLASSROOM_NOT_FOUND',
+    )
   }
 }

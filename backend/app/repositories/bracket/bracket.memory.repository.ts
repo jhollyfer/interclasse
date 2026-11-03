@@ -18,7 +18,11 @@ import {
   type MatchListCriteria,
 } from './bracket.repository.ts'
 
-import { Bracket, type BracketProps, type MatchProps } from '#domain/bracket/bracket.entity'
+import {
+  Bracket,
+  type BracketProps,
+  type MatchProps,
+} from '#domain/bracket/bracket.entity'
 import type { BracketError } from '#domain/bracket/bracket.errors'
 import { Knockout } from '#domain/shared/knockout.value-object'
 import { MemoryPagination } from '#core/memory-pagination'
@@ -68,7 +72,10 @@ export class BracketMemoryRepository extends BracketRepository {
   }
 
   /** Test arrangement: a student of the classroom, enrolled or not in the sports. */
-  withStudent(student: StudentView, enrolledIn: ReadonlyArray<string> = []): this {
+  withStudent(
+    student: StudentView,
+    enrolledIn: ReadonlyArray<string> = [],
+  ): this {
     this.students.set(student.id, student)
     for (const sportId of enrolledIn) {
       const enrolled = this.enrollments.get(sportId) ?? new Set<string>()
@@ -96,7 +103,10 @@ export class BracketMemoryRepository extends BracketRepository {
     return this.findByMatchId(matchId)
   }
 
-  async findBySportAndCategory(sportId: string, category: Category): Promise<Bracket | null> {
+  async findBySportAndCategory(
+    sportId: string,
+    category: Category,
+  ): Promise<Bracket | null> {
     const props = [...this.rows.values()].find(
       (row) => row.sportId === sportId && row.category === category,
     )
@@ -105,11 +115,15 @@ export class BracketMemoryRepository extends BracketRepository {
     return Bracket.restore(structuredClone(props))
   }
 
-  async findSport(sportId: string): Promise<AdministratorSportShowResponse | null> {
+  async findSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null> {
     return this.sports.get(sportId) ?? null
   }
 
-  async lockSport(sportId: string): Promise<AdministratorSportShowResponse | null> {
+  async lockSport(
+    sportId: string,
+  ): Promise<AdministratorSportShowResponse | null> {
     return this.findSport(sportId)
   }
 
@@ -120,12 +134,16 @@ export class BracketMemoryRepository extends BracketRepository {
   ): Promise<string[]> {
     return [...this.classrooms.values()]
       .filter((classroom) => classroom.category === category)
-      .filter((classroom) => this.athletesOf(classroom.id, sportId) >= minAthletes)
+      .filter(
+        (classroom) => this.athletesOf(classroom.id, sportId) >= minAthletes,
+      )
       .map((classroom) => classroom.id)
       .filter((id) => this.athletesOf(id, sportId) > 0)
   }
 
-  async classroomNames(classroomIds: ReadonlyArray<string>): Promise<Map<string, string>> {
+  async classroomNames(
+    classroomIds: ReadonlyArray<string>,
+  ): Promise<Map<string, string>> {
     const names = new Map<string, string>()
     for (const id of classroomIds) {
       const classroom = this.classrooms.get(id)
@@ -204,14 +222,20 @@ export class BracketMemoryRepository extends BracketRepository {
       .filter((row) => !criteria.sportId || row.sportId === criteria.sportId)
       .filter((row) => !criteria.category || row.category === criteria.category)
       .flatMap((row) => row.matches.map((match) => ({ bracket: row, match })))
-      .filter(({ match }) => match.homeTeamId !== null && match.awayTeamId !== null)
+      .filter(
+        ({ match }) => match.homeTeamId !== null && match.awayTeamId !== null,
+      )
       .filter(({ match }) => !criteria.phase || match.phase === criteria.phase)
-      .filter(({ match }) => !criteria.status || match.status === criteria.status)
+      .filter(
+        ({ match }) => !criteria.status || match.status === criteria.status,
+      )
       .filter(
         ({ bracket, match }) =>
           !criteria.classroomId ||
-          this.classroomOfTeam(bracket, match.homeTeamId) === criteria.classroomId ||
-          this.classroomOfTeam(bracket, match.awayTeamId) === criteria.classroomId,
+          this.classroomOfTeam(bracket, match.homeTeamId) ===
+            criteria.classroomId ||
+          this.classroomOfTeam(bracket, match.awayTeamId) ===
+            criteria.classroomId,
       )
       .sort((a, b) => this.compareMatches(a.match, b.match, criteria))
       .flatMap(({ bracket, match }) => this.toPaginateItems(bracket, match))
@@ -226,7 +250,9 @@ export class BracketMemoryRepository extends BracketRepository {
 
     for (const matchId of matchIds) {
       const bracket = this.ownerOf(matchId)
-      const match = bracket?.matches.find((candidate) => candidate.id === matchId)
+      const match = bracket?.matches.find(
+        (candidate) => candidate.id === matchId,
+      )
       const sport = bracket && this.sports.get(bracket.sportId)
       if (!bracket || !match || !sport) continue
 
@@ -241,7 +267,9 @@ export class BracketMemoryRepository extends BracketRepository {
     return responses
   }
 
-  async matchAthletes(matchId: string): Promise<AdministratorMatchAthletesResponse | null> {
+  async matchAthletes(
+    matchId: string,
+  ): Promise<AdministratorMatchAthletesResponse | null> {
     const bracket = this.ownerOf(matchId)
     const match = bracket?.matches.find((candidate) => candidate.id === matchId)
     if (!bracket || !match) return null
@@ -270,36 +298,55 @@ export class BracketMemoryRepository extends BracketRepository {
   }
 
   private ownerOf(matchId: string): BracketProps | undefined {
-    return [...this.rows.values()].find((row) => row.matches.some((match) => match.id === matchId))
+    return [...this.rows.values()].find((row) =>
+      row.matches.some((match) => match.id === matchId),
+    )
   }
 
   private athletesOf(classroomId: string, sportId: string): number {
     const enrolled = this.enrollments.get(sportId) ?? new Set<string>()
 
     return [...this.students.values()].filter(
-      (student) => student.classroomId === classroomId && enrolled.has(student.id),
+      (student) =>
+        student.classroomId === classroomId && enrolled.has(student.id),
     ).length
   }
 
-  private classroomOfTeam(bracket: BracketProps, teamId: string | null): string | undefined {
+  private classroomOfTeam(
+    bracket: BracketProps,
+    teamId: string | null,
+  ): string | undefined {
     return bracket.teams.find((team) => team.id === teamId)?.classroomId
   }
 
-  private compareBrackets(a: BracketProps, b: BracketProps, criteria: BracketListCriteria): number {
-    if (criteria.order === 'newest') return b.createdAt.getTime() - a.createdAt.getTime()
+  private compareBrackets(
+    a: BracketProps,
+    b: BracketProps,
+    criteria: BracketListCriteria,
+  ): number {
+    if (criteria.order === 'newest')
+      return b.createdAt.getTime() - a.createdAt.getTime()
 
-    const nameOf = (row: BracketProps): string => this.sports.get(row.sportId)?.name ?? ''
+    const nameOf = (row: BracketProps): string =>
+      this.sports.get(row.sportId)?.name ?? ''
 
-    return nameOf(a).localeCompare(nameOf(b)) || a.category.localeCompare(b.category)
+    return (
+      nameOf(a).localeCompare(nameOf(b)) || a.category.localeCompare(b.category)
+    )
   }
 
   /** The ones scheduled by time (unscheduled last), then the round and the position. */
-  private compareMatches(a: MatchProps, b: MatchProps, criteria: MatchListCriteria): number {
+  private compareMatches(
+    a: MatchProps,
+    b: MatchProps,
+    criteria: MatchListCriteria,
+  ): number {
     if (criteria.order === 'recent-results')
       return (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0)
 
     const never = Number.POSITIVE_INFINITY
-    const when = (a.scheduledAt?.getTime() ?? never) - (b.scheduledAt?.getTime() ?? never)
+    const when =
+      (a.scheduledAt?.getTime() ?? never) - (b.scheduledAt?.getTime() ?? never)
     if (Number.isNaN(when)) return a.round - b.round || a.position - b.position
 
     return when || a.round - b.round || a.position - b.position
@@ -320,7 +367,9 @@ export class BracketMemoryRepository extends BracketRepository {
     }
   }
 
-  private toListItems(bracket: BracketProps): AdministratorBracketPaginateResponse[] {
+  private toListItems(
+    bracket: BracketProps,
+  ): AdministratorBracketPaginateResponse[] {
     const sport = this.sports.get(bracket.sportId)
     if (!sport) return []
 

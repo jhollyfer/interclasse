@@ -85,7 +85,9 @@ const REPORTERS = {
             }
 
             if (test.isSkipped) {
-              console.log(`ok ${count} - ${title} # SKIP ${test.skipReason ?? ''}`.trimEnd())
+              console.log(
+                `ok ${count} - ${title} # SKIP ${test.skipReason ?? ''}`.trimEnd(),
+              )
               return
             }
 

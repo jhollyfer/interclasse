@@ -18,12 +18,15 @@ async function setup() {
     BracketUnitFixtures.cardBindings(brackets, cards),
   )
   const matches = drawn.bracket.snapshot().matches
-  const semi = matches.find((match) => match.phase === MATCH_PHASE.SEMI && match.position === 0)
+  const semi = matches.find(
+    (match) => match.phase === MATCH_PHASE.SEMI && match.position === 0,
+  )
   const final = matches.find((match) => match.phase === MATCH_PHASE.FINAL)
   const teams = drawn.bracket.snapshot().teams
   const playing = drawn.students.find(
     (student) =>
-      teams.find((team) => team.id === semi?.homeTeamId)?.classroomId === student.classroomId,
+      teams.find((team) => team.id === semi?.homeTeamId)?.classroomId ===
+      student.classroomId,
   )
   const outsider = drawn.students.find(
     (student) =>
@@ -31,13 +34,16 @@ async function setup() {
         teams.find((team) => team.classroomId === student.classroomId)?.id,
       ),
   )
-  if (!semi || !final || !playing || !outsider) throw new Error('arranjo incompleto')
+  if (!semi || !final || !playing || !outsider)
+    throw new Error('arranjo incompleto')
 
   return { cards, useCase, semi, final, playing, outsider }
 }
 
 test.group('administrator/cards > create (unit)', () => {
-  test('records the card with the team of the athlete classroom', async ({ assert }) => {
+  test('records the card with the team of the athlete classroom', async ({
+    assert,
+  }) => {
     const { cards, useCase, semi, playing } = await setup()
 
     const result = await useCase.execute({
@@ -71,7 +77,9 @@ test.group('administrator/cards > create (unit)', () => {
     assert.deepInclude(result.value, { status: 422, code: 'MATCH_NOT_FOUND' })
   })
 
-  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({ assert }) => {
+  test('match without both teams is 409 MATCH_TEAMS_PENDING', async ({
+    assert,
+  }) => {
     const { useCase, final, playing } = await setup()
 
     const result = await useCase.execute({
@@ -80,7 +88,10 @@ test.group('administrator/cards > create (unit)', () => {
       color: CARD_COLOR.YELLOW,
     })
 
-    assert.deepInclude(result.value, { status: 409, code: 'MATCH_TEAMS_PENDING' })
+    assert.deepInclude(result.value, {
+      status: 409,
+      code: 'MATCH_TEAMS_PENDING',
+    })
   })
 
   test('athlete from outside the match is 422 STUDENT_NOT_IN_MATCH and does not save', async ({
@@ -94,12 +105,17 @@ test.group('administrator/cards > create (unit)', () => {
       color: CARD_COLOR.YELLOW,
     })
 
-    assert.deepInclude(result.value, { status: 422, code: 'STUDENT_NOT_IN_MATCH' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'STUDENT_NOT_IN_MATCH',
+    })
     const page = await cards.paginate({ page: 1, perPage: 10 })
     assert.equal(page.meta.total, 0)
   })
 
-  test('nonexistent athlete is 422 STUDENT_NOT_IN_MATCH', async ({ assert }) => {
+  test('nonexistent athlete is 422 STUDENT_NOT_IN_MATCH', async ({
+    assert,
+  }) => {
     const { useCase, semi } = await setup()
 
     const result = await useCase.execute({
@@ -108,6 +124,9 @@ test.group('administrator/cards > create (unit)', () => {
       color: CARD_COLOR.YELLOW,
     })
 
-    assert.deepInclude(result.value, { status: 422, code: 'STUDENT_NOT_IN_MATCH' })
+    assert.deepInclude(result.value, {
+      status: 422,
+      code: 'STUDENT_NOT_IN_MATCH',
+    })
   })
 })

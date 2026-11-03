@@ -70,7 +70,10 @@ export const FIELD_PATCHES: Record<string, FieldPatch> = {
     },
     companion: {
       name: 'passwordConfirmation',
-      schema: { type: 'string', description: 'Exact repetition of `password`.' },
+      schema: {
+        type: 'string',
+        description: 'Exact repetition of `password`.',
+      },
       followsRequired: true,
     },
   },

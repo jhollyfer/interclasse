@@ -58,7 +58,8 @@ export type FeatureResponse = DocumentedValidator | z.ZodType
  * no body at all. Without this, both would be documented as the `Storage`
  * resource, which is not what they answer.
  */
-export type ResponseBody = DocumentedValidator | PaginatedResponse | z.ZodType | 'no-content'
+export type ResponseBody =
+  DocumentedValidator | PaginatedResponse | z.ZodType | 'no-content'
 
 /**
  * The public contract of an operation, declared as `static docs` in the
@@ -120,20 +121,20 @@ export type DocumentedController = {
 // ---------------------------------------------------------------------------
 
 export type OpenAPIOperation = {
-  'operationId': string
-  'summary': string
-  'description'?: string
-  'tags': string[]
-  'deprecated'?: boolean
-  'security'?: Array<Record<string, string[]>>
+  operationId: string
+  summary: string
+  description?: string
+  tags: string[]
+  deprecated?: boolean
+  security?: Array<Record<string, string[]>>
   /** The roles the middleware chain requires. Read by `authz:check`. */
   'x-roles'?: string[]
-  'parameters'?: OpenAPIParameter[]
-  'requestBody'?: {
+  parameters?: OpenAPIParameter[]
+  requestBody?: {
     required: boolean
     content: Record<string, { schema: SchemaObject }>
   }
-  'responses': Record<string, OpenAPIResponse>
+  responses: Record<string, OpenAPIResponse>
 }
 
 export type OpenAPIParameter = {

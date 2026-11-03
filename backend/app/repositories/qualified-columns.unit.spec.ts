@@ -20,8 +20,8 @@ type Finding = { readonly file: string; readonly column: string }
 
 /** The Lucid repositories, one per folder. */
 function lucidRepositories(): string[] {
-  return readdirSync(DIRECTORY, { recursive: true, encoding: 'utf-8' }).filter((file) =>
-    file.endsWith('.lucid.repository.ts'),
+  return readdirSync(DIRECTORY, { recursive: true, encoding: 'utf-8' }).filter(
+    (file) => file.endsWith('.lucid.repository.ts'),
   )
 }
 
@@ -46,7 +46,9 @@ function joinChains(source: string): string[] {
 
 /** Aliases declared in the chain itself (`count('x as total')`): sorting by alias is unambiguous. */
 function aliasesOf(chain: string): ReadonlySet<string> {
-  return new Set([...chain.matchAll(/\bas\s+(\w+)'/g)].map((match) => match[1] ?? ''))
+  return new Set(
+    [...chain.matchAll(/\bas\s+(\w+)'/g)].map((match) => match[1] ?? ''),
+  )
 }
 
 function unqualifiedColumns(file: string): Finding[] {
@@ -58,15 +60,22 @@ function unqualifiedColumns(file: string): Finding[] {
     return [...chain.matchAll(COLUMN_CALL)]
       .map((match) => match[1] ?? '')
       .filter(
-        (column) => !column.includes('.') && !NOT_A_COLUMN.test(column) && !aliases.has(column),
+        (column) =>
+          !column.includes('.') &&
+          !NOT_A_COLUMN.test(column) &&
+          !aliases.has(column),
       )
       .map((column) => ({ file, column }))
   })
 }
 
 test.group('repositories > qualified column (unit)', () => {
-  test('a query with join only uses columns qualified by the table', ({ assert }) => {
-    const findings = lucidRepositories().flatMap((file) => unqualifiedColumns(file))
+  test('a query with join only uses columns qualified by the table', ({
+    assert,
+  }) => {
+    const findings = lucidRepositories().flatMap((file) =>
+      unqualifiedColumns(file),
+    )
 
     assert.deepEqual(findings, [])
   })

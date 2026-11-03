@@ -26,7 +26,9 @@ async function setup() {
 }
 
 test.group('administrator/reports > show (unit)', () => {
-  test('counts in total, by category, by sport and by classroom', async ({ assert }) => {
+  test('counts in total, by category, by sport and by classroom', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute()
@@ -41,7 +43,10 @@ test.group('administrator/reports > show (unit)', () => {
       matchesPlayed: 1,
       matchesScheduled: 2,
     })
-    assert.deepInclude(result.value.byCategory[1], { category: CATEGORY.F2, athletes: 1 })
+    assert.deepInclude(result.value.byCategory[1], {
+      category: CATEGORY.F2,
+      athletes: 1,
+    })
     assert.deepInclude(result.value.bySport[0], { athletes: 1, classrooms: 1 })
     // In year order: the 3rd before the 7th.
     assert.deepEqual(

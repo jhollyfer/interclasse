@@ -27,7 +27,10 @@ export default class AdministratorClassroomShowUseCase {
       const classroom = await this.classrooms.findDetail(id)
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.not_found'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.not_found'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return right(classroom)

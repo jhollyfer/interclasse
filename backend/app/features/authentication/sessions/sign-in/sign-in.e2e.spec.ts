@@ -14,8 +14,13 @@ import { ADMINISTRATOR, body, resetDatabase } from '#tests/http-fixtures'
 test.group('authentication > sign-in', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('correct credential responds 204 with both cookies', async ({ client, assert }) => {
-    const response = await client.post('/authentication/sign-in').json(ADMINISTRATOR)
+  test('correct credential responds 204 with both cookies', async ({
+    client,
+    assert,
+  }) => {
+    const response = await client
+      .post('/authentication/sign-in')
+      .json(ADMINISTRATOR)
 
     response.assertStatus(204)
 

@@ -9,6 +9,9 @@ import { SportFactory } from '#database/factories/sport.factory'
  * matches belong to the draw, and the spec that needs them draws through the route.
  */
 export const BracketFactory = factory
-  .define(Bracket, () => ({ category: CATEGORY.F1, status: BRACKET_STATUS.KNOCKOUT }))
+  .define(Bracket, () => ({
+    category: CATEGORY.F1,
+    status: BRACKET_STATUS.KNOCKOUT,
+  }))
   .relation('sport', () => SportFactory)
   .build()

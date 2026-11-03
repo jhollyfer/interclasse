@@ -41,7 +41,9 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
 
   async isDrawn(key: EnrollmentKey): Promise<boolean> {
     const client = this.transaction.client()
-    const classroom = await ClassroomModel.query({ client }).where('id', key.classroomId).first()
+    const classroom = await ClassroomModel.query({ client })
+      .where('id', key.classroomId)
+      .first()
     if (!classroom) return false
 
     const bracket = await BracketModel.query({ client })
@@ -54,7 +56,10 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
 
   async findForUpdate(key: EnrollmentKey): Promise<Enrollment> {
     const client = this.transaction.client()
-    await SportModel.query({ client }).where('id', key.sportId).forUpdate().first()
+    await SportModel.query({ client })
+      .where('id', key.sportId)
+      .forUpdate()
+      .first()
 
     const rows = await EnrollmentModel.query({ client })
       .where('sportId', key.sportId)
@@ -95,8 +100,12 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
 
     const [sports, students, drawn] = await Promise.all([
       SportModel.query({ client }).orderBy('name', 'asc'),
-      StudentModel.query({ client }).where('classroomId', classroom.id).orderBy('name', 'asc'),
-      BracketModel.query({ client }).where('category', classroom.category).select('sportId'),
+      StudentModel.query({ client })
+        .where('classroomId', classroom.id)
+        .orderBy('name', 'asc'),
+      BracketModel.query({ client })
+        .where('category', classroom.category)
+        .select('sportId'),
     ])
     const enrollments = await EnrollmentModel.query({ client }).whereIn(
       'studentId',
@@ -106,7 +115,11 @@ export class EnrollmentLucidRepository extends EnrollmentRepository {
     const locked = new Set(drawn.map((bracket) => bracket.sportId))
 
     return {
-      classroom: { id: classroom.id, name: classroom.name, category: classroom.category },
+      classroom: {
+        id: classroom.id,
+        name: classroom.name,
+        category: classroom.category,
+      },
       sports: sports.map((sport) => ({
         id: sport.id,
         name: sport.name,

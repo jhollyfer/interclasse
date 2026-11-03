@@ -13,11 +13,19 @@ import {
 test.group('sports > show', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('returns the sport with the athlete limits', async ({ client, assert }) => {
+  test('returns the sport with the athlete limits', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
-    const sport = await SportFactory.merge({ minAthletes: 3, maxAthletes: 9 }).create()
+    const sport = await SportFactory.merge({
+      minAthletes: 3,
+      maxAthletes: 9,
+    }).create()
 
-    const response = await client.get(`/administrator/sports/${sport.id}`).cookies(session)
+    const response = await client
+      .get(`/administrator/sports/${sport.id}`)
+      .cookies(session)
 
     response.assertStatus(200)
     assert.equal(body(response).id, sport.id)
@@ -30,7 +38,9 @@ test.group('sports > show', (group) => {
   test('nonexistent sport responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.get(`/administrator/sports/${randomUUID()}`).cookies(session)
+    const response = await client
+      .get(`/administrator/sports/${randomUUID()}`)
+      .cookies(session)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'SPORT_NOT_FOUND')
@@ -39,18 +49,25 @@ test.group('sports > show', (group) => {
   test('id that is not a uuid responds 422', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.get('/administrator/sports/futsal').cookies(session)
+    const response = await client
+      .get('/administrator/sports/futsal')
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')
   })
 
-  test('without a session responds 401 and advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401 and advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const sport = await SportFactory.create()
 
     const anonymous = await client.get(`/administrator/sports/${sport.id}`)
     const advisor = await authenticateAsAdvisor(client)
-    const forbidden = await client.get(`/administrator/sports/${sport.id}`).cookies(advisor)
+    const forbidden = await client
+      .get(`/administrator/sports/${sport.id}`)
+      .cookies(advisor)
 
     anonymous.assertStatus(401)
     forbidden.assertStatus(403)

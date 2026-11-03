@@ -20,15 +20,26 @@ export class ClassroomRefusal extends RefusalBase {
         { grade: i18n.t('classrooms.invalid_grade_field') },
       ),
     CLASSROOM_CATEGORY_LOCKED: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('classrooms.in_competition'), 'CLASSROOM_IN_COMPETITION', {
-        grade: i18n.t('classrooms.category_locked_field'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('classrooms.in_competition'),
+        'CLASSROOM_IN_COMPETITION',
+        {
+          grade: i18n.t('classrooms.category_locked_field'),
+        },
+      ),
     CLASSROOM_IN_COMPETITION: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('classrooms.in_competition'), 'CLASSROOM_IN_COMPETITION'),
+      HTTPException.Conflict(
+        i18n.t('classrooms.in_competition'),
+        'CLASSROOM_IN_COMPETITION',
+      ),
     CLASSROOM_ALREADY_EXISTS: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('classrooms.already_exists'), 'CLASSROOM_ALREADY_EXISTS', {
-        name: i18n.t('classrooms.name_taken'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('classrooms.already_exists'),
+        'CLASSROOM_ALREADY_EXISTS',
+        {
+          name: i18n.t('classrooms.name_taken'),
+        },
+      ),
     ADVISOR_NOT_FOUND: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
         i18n.t('classrooms.advisor_not_found'),
@@ -36,22 +47,37 @@ export class ClassroomRefusal extends RefusalBase {
         { advisorId: i18n.t('classrooms.advisor_not_found_field') },
       ),
     ADVISOR_TAKEN: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('classrooms.advisor_taken'), 'ADVISOR_TAKEN', {
-        advisorId: i18n.t('classrooms.advisor_taken_field'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('classrooms.advisor_taken'),
+        'ADVISOR_TAKEN',
+        {
+          advisorId: i18n.t('classrooms.advisor_taken_field'),
+        },
+      ),
     REPRESENTATIVE_NOT_FOUND: (_fact, i18n) =>
       HTTPException.UnprocessableEntity(
         i18n.t('classrooms.representative_not_found'),
         'REPRESENTATIVE_NOT_FOUND',
-        { representativeId: i18n.t('classrooms.representative_not_found_field') },
+        {
+          representativeId: i18n.t('classrooms.representative_not_found_field'),
+        },
       ),
     REPRESENTATIVE_TAKEN: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('classrooms.representative_taken'), 'REPRESENTATIVE_TAKEN', {
-        representativeId: i18n.t('classrooms.representative_taken_field'),
-      }),
+      HTTPException.Conflict(
+        i18n.t('classrooms.representative_taken'),
+        'REPRESENTATIVE_TAKEN',
+        {
+          representativeId: i18n.t('classrooms.representative_taken_field'),
+        },
+      ),
   } satisfies RefusalTable<ClassroomError>
 
   static http(error: ClassroomError, i18n: I18n): HTTPException {
-    return ClassroomRefusal.translate(ClassroomRefusal.TABLE, error.code, error, i18n)
+    return ClassroomRefusal.translate(
+      ClassroomRefusal.TABLE,
+      error.code,
+      error,
+      i18n,
+    )
   }
 }

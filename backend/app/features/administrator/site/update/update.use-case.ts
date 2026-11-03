@@ -1,7 +1,12 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorSiteShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorSiteShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { SiteRefusal } from '../_shared.site-refusal.ts'
 
@@ -31,10 +36,13 @@ export default class AdministratorSiteUpdateUseCase {
       const setting = await this.settings.current()
       let regulation: RegulationFile | null = null
       if (setting.replacesRegulation(payload.regulationId))
-        regulation = await this.settings.findRegulationFile(payload.regulationId)
+        regulation = await this.settings.findRegulationFile(
+          payload.regulationId,
+        )
 
       const updated = setting.update(payload, { regulation, now: new Date() })
-      if (updated.isLeft()) return left(SiteRefusal.http(updated.value, this.i18n))
+      if (updated.isLeft())
+        return left(SiteRefusal.http(updated.value, this.i18n))
 
       await this.settings.save(setting)
 

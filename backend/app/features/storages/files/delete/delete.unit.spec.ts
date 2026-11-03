@@ -6,7 +6,12 @@ import { StorageRepository } from '#repositories/storage/storage.repository'
 import { StorageContract } from '#services/storage/storage.contract'
 import { MultipartContract } from '#services/multipart/multipart.contract'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { FILE_ID, pendingFile, storageDoubles, uploadedFile } from '#tests/storages-unit-fixtures'
+import {
+  FILE_ID,
+  pendingFile,
+  storageDoubles,
+  uploadedFile,
+} from '#tests/storages-unit-fixtures'
 
 async function setup() {
   const doubles = storageDoubles()
@@ -31,7 +36,9 @@ test.group('storages/files > delete (unit)', () => {
     assert.isNull(await storages.findById(FILE_ID))
   })
 
-  test('file in use is 409 STORAGE_IN_USE and nothing is deleted', async ({ assert }) => {
+  test('file in use is 409 STORAGE_IN_USE and nothing is deleted', async ({
+    assert,
+  }) => {
     const { storages, bucket, useCase } = await setup()
     await storages.save(uploadedFile())
     storages.markUsed(FILE_ID, ['avatar de usuário'])

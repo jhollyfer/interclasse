@@ -1,13 +1,23 @@
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { USER_ROLE, left, right, type Either, type Merge, type UserRole } from '@interclasse/shared'
+import {
+  USER_ROLE,
+  left,
+  right,
+  type Either,
+  type Merge,
+  type UserRole,
+} from '@interclasse/shared'
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import HTTPException from '#exceptions/http.exception'
 import type { IdentifierPayload } from '#core/validator'
 
-type Payload = Merge<IdentifierPayload, { actor: { readonly id: string; readonly role: UserRole } }>
+type Payload = Merge<
+  IdentifierPayload,
+  { actor: { readonly id: string; readonly role: UserRole } }
+>
 type Response = Either<HTTPException, null>
 
 /**
@@ -27,9 +37,15 @@ export default class AdvisorPhotoDeleteUseCase {
       // Ownership goes into the search criteria: a foreign photo returns `null`, just like
       // one that does not exist.
       let photo = await this.photos.findOwned(id, actor.id)
-      if (!photo && actor.role === USER_ROLE.ADMINISTRATOR) photo = await this.photos.findById(id)
+      if (!photo && actor.role === USER_ROLE.ADMINISTRATOR)
+        photo = await this.photos.findById(id)
       if (!photo)
-        return left(HTTPException.NotFound(this.i18n.t('photos.not_found'), 'PHOTO_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('photos.not_found'),
+            'PHOTO_NOT_FOUND',
+          ),
+        )
 
       await this.photos.delete(photo)
 

@@ -4,18 +4,27 @@ import type {
   StorefrontSiteShowResponse,
 } from '@interclasse/shared'
 
-import type { RegulationFile, SiteSetting } from '#domain/site-setting/site-setting.entity'
+import type {
+  RegulationFile,
+  SiteSetting,
+} from '#domain/site-setting/site-setting.entity'
 
 /**
  * The configuration in the panel response shape, with the regulation without the `url`:
  * signing belongs to the use case, through the bucket contract (`_standards/architecture.md` §2).
  */
-export type SiteSettingRead = Omit<AdministratorSiteShowResponse, 'regulation'> & {
+export type SiteSettingRead = Omit<
+  AdministratorSiteShowResponse,
+  'regulation'
+> & {
   readonly regulation: Omit<AdministratorSiteRegulationResponse, 'url'> | null
 }
 
 /** The anonymous site slice, with the regulation `path` in place of the `url`. */
-export type PublicSiteSettingRead = Omit<StorefrontSiteShowResponse, 'regulation'> & {
+export type PublicSiteSettingRead = Omit<
+  StorefrontSiteShowResponse,
+  'regulation'
+> & {
   readonly regulation: {
     readonly path: string
     readonly originalName: string

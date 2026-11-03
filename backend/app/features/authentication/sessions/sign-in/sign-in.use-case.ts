@@ -6,7 +6,10 @@ import { left, right, type Either } from '@interclasse/shared'
 
 import HTTPException from '#exceptions/http.exception'
 import { UserRepository } from '#repositories/user/user.repository'
-import { SessionRepository, type SessionTokens } from '#repositories/session/session.repository'
+import {
+  SessionRepository,
+  type SessionTokens,
+} from '#repositories/session/session.repository'
 import type { AuthenticationSessionSignInPayload } from '#validators/authentication/sessions.validator'
 
 type Payload = AuthenticationSessionSignInPayload
@@ -42,9 +45,13 @@ export default class AuthenticationSessionSignInUseCase {
         return left(this.invalidCredentials())
       }
 
-      const passwordMatches = await hash.verify(user.snapshot().password, payload.password)
+      const passwordMatches = await hash.verify(
+        user.snapshot().password,
+        payload.password,
+      )
 
-      if (!passwordMatches || !user.canSignIn()) return left(this.invalidCredentials())
+      if (!passwordMatches || !user.canSignIn())
+        return left(this.invalidCredentials())
 
       const tokens = await this.sessions.issue(user.id)
       if (!tokens)

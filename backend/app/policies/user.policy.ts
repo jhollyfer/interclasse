@@ -46,30 +46,35 @@ export default class UserPolicy extends BasePolicy {
     if (actor.id !== target.id) return true
     if (changes.role === undefined && changes.status === undefined) return true
 
-    return AuthorizationResponse.deny(this.i18n.t('users.self_access_forbidden'), 403).t(
-      'SELF_ACCESS_FORBIDDEN',
-    )
+    return AuthorizationResponse.deny(
+      this.i18n.t('users.self_access_forbidden'),
+      403,
+    ).t('SELF_ACCESS_FORBIDDEN')
   }
 
   archive(actor: Actor, target: User | null): AuthorizerResponse {
     if (!target) return this.notFound()
     if (actor.id !== target.id) return true
 
-    return AuthorizationResponse.deny(this.i18n.t('users.self_archive_forbidden'), 403).t(
-      'SELF_ARCHIVE_FORBIDDEN',
-    )
+    return AuthorizationResponse.deny(
+      this.i18n.t('users.self_archive_forbidden'),
+      403,
+    ).t('SELF_ARCHIVE_FORBIDDEN')
   }
 
   delete(actor: Actor, target: User | null): AuthorizerResponse {
     if (!target) return this.notFound()
     if (actor.id !== target.id) return true
 
-    return AuthorizationResponse.deny(this.i18n.t('users.self_delete_forbidden'), 403).t(
-      'SELF_DELETE_FORBIDDEN',
-    )
+    return AuthorizationResponse.deny(
+      this.i18n.t('users.self_delete_forbidden'),
+      403,
+    ).t('SELF_DELETE_FORBIDDEN')
   }
 
   private notFound(): AuthorizerResponse {
-    return AuthorizationResponse.deny(this.i18n.t('users.not_found'), 404).t('USER_NOT_FOUND')
+    return AuthorizationResponse.deny(this.i18n.t('users.not_found'), 404).t(
+      'USER_NOT_FOUND',
+    )
   }
 }

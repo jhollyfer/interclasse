@@ -11,11 +11,19 @@ import { body } from '#tests/http-fixtures'
  * is asserted is the response header, not the body.
  */
 test.group('cors > allowlist', () => {
-  test('an origin in the allowlist receives the header', async ({ client, assert }) => {
-    const response = await client.get('/health-check').header('origin', 'http://localhost:5173')
+  test('an origin in the allowlist receives the header', async ({
+    client,
+    assert,
+  }) => {
+    const response = await client
+      .get('/health-check')
+      .header('origin', 'http://localhost:5173')
 
     response.assertStatus(200)
-    assert.equal(response.header('access-control-allow-origin'), 'http://localhost:5173')
+    assert.equal(
+      response.header('access-control-allow-origin'),
+      'http://localhost:5173',
+    )
     // With credentials the browser only accepts a named origin, never `*`: without this
     // header the session cookie is not sent on the cross-origin request.
     assert.equal(response.header('access-control-allow-credentials'), 'true')
@@ -25,7 +33,9 @@ test.group('cors > allowlist', () => {
     client,
     assert,
   }) => {
-    const response = await client.get('/health-check').header('origin', 'http://intruso.example')
+    const response = await client
+      .get('/health-check')
+      .header('origin', 'http://intruso.example')
 
     // The request itself goes through - CORS is the browser's decision, and the server
     // merely stops authorizing. Without the header, the browser discards the
@@ -50,7 +60,10 @@ test.group('cors > allowlist', () => {
  * request, so nothing else would fail on its removal.
  */
 test.group('cors > cross-origin writes', () => {
-  test('an origin outside the allowlist is refused with 403', async ({ client, assert }) => {
+  test('an origin outside the allowlist is refused with 403', async ({
+    client,
+    assert,
+  }) => {
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://intruso.example')
@@ -62,7 +75,10 @@ test.group('cors > cross-origin writes', () => {
     assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('an origin in the allowlist passes the barrier', async ({ client, assert }) => {
+  test('an origin in the allowlist passes the barrier', async ({
+    client,
+    assert,
+  }) => {
     const response = await client
       .post('/authentication/sign-in')
       .header('origin', 'http://localhost:5173')
@@ -75,7 +91,10 @@ test.group('cors > cross-origin writes', () => {
     assert.notEqual(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('JSON from an origin outside the allowlist is also refused', async ({ client, assert }) => {
+  test('JSON from an origin outside the allowlist is also refused', async ({
+    client,
+    assert,
+  }) => {
     // The barrier does not look at `Content-Type`: `text/plain` and an empty POST also cross
     // sites without preflight (_standards/backend.md §4.10).
     const response = await client
@@ -87,7 +106,10 @@ test.group('cors > cross-origin writes', () => {
     assert.equal(body(response).code, 'ORIGIN_NOT_ALLOWED')
   })
 
-  test('text/plain from an origin outside the allowlist is refused', async ({ client, assert }) => {
+  test('text/plain from an origin outside the allowlist is refused', async ({
+    client,
+    assert,
+  }) => {
     const response = await client
       .post('/authentication/sign-out')
       .header('origin', 'http://intruso.example')

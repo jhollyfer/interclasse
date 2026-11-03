@@ -32,6 +32,9 @@ export default class DocumentationMiddleware {
   }
 
   private notFound(context: HttpContext) {
-    return HTTPException.NotFound(context.i18n.t('errors.not_found'), 'RESOURCE_NOT_FOUND')
+    return HTTPException.NotFound(
+      context.i18n.t('errors.not_found'),
+      'RESOURCE_NOT_FOUND',
+    )
   }
 }

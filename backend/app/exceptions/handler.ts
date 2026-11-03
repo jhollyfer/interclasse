@@ -49,7 +49,9 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     }
 
     if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS) {
-      const exception = HTTPException.Unauthorized(this.translate(ctx, 'errors.unauthorized'))
+      const exception = HTTPException.Unauthorized(
+        this.translate(ctx, 'errors.unauthorized'),
+      )
 
       return this.send(ctx, exception.toResponse())
     }
@@ -61,7 +63,8 @@ export default class HttpExceptionHandler extends ExceptionHandler {
      */
     if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
       return this.send(ctx, {
-        message: error.response.message ?? this.translate(ctx, 'errors.access_denied'),
+        message:
+          error.response.message ?? this.translate(ctx, 'errors.access_denied'),
         status: error.response.status ?? 403,
         code: error.response.translation?.identifier ?? 'ACCESS_DENIED',
       })
@@ -72,7 +75,9 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     }
 
     if (this.isServerError(error)) {
-      const exception = HTTPException.InternalServerError(this.translate(ctx, 'errors.internal'))
+      const exception = HTTPException.InternalServerError(
+        this.translate(ctx, 'errors.internal'),
+      )
 
       return this.send(ctx, exception.toResponse())
     }
@@ -112,7 +117,9 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       '[security > rate_limited] attempt ceiling exceeded',
     )
 
-    const exception = HTTPException.TooManyRequests(this.translate(ctx, 'errors.too_many_requests'))
+    const exception = HTTPException.TooManyRequests(
+      this.translate(ctx, 'errors.too_many_requests'),
+    )
 
     ctx.response
       .header('X-RateLimit-Limit', String(error.response.limit))
@@ -128,7 +135,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * uses. The first message of each field wins: the screen shows one
    * error per field, and the first is that of the outermost rule.
    */
-  private validationPayload(messages: unknown, ctx: HttpContext): HTTPExceptionPayload {
+  private validationPayload(
+    messages: unknown,
+    ctx: HttpContext,
+  ): HTTPExceptionPayload {
     return HTTPException.UnprocessableEntity(
       this.translate(ctx, 'errors.validation'),
       'VALIDATION_ERROR',

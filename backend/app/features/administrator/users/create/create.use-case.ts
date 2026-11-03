@@ -3,7 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type AdministratorUserShowResponse, type Either } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type AdministratorUserShowResponse,
+  type Either,
+} from '@interclasse/shared'
 
 import { User } from '#domain/user/user.entity'
 import HTTPException from '#exceptions/http.exception'
@@ -39,7 +44,10 @@ export default class AdministratorUserCreateUseCase {
       // The photo is checked **before** any write: `avatar_id` is a foreign
       // key, and without this a nonexistent uuid would blow the constraint and
       // become a `500` instead of a `422` pointing at the field.
-      if (payload.avatarId && !(await this.storages.areAttachable([payload.avatarId])))
+      if (
+        payload.avatarId &&
+        !(await this.storages.areAttachable([payload.avatarId]))
+      )
         return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
       // Searches **without** filtering archived: the `unique` on `email` holds for the
@@ -53,7 +61,8 @@ export default class AdministratorUserCreateUseCase {
 
       if (existing) {
         const revived = existing.revive(payload, now)
-        if (revived.isLeft()) return left(UserRefusal.http(revived.value, this.i18n))
+        if (revived.isLeft())
+          return left(UserRefusal.http(revived.value, this.i18n))
 
         user = revived.value
       }
@@ -65,7 +74,12 @@ export default class AdministratorUserCreateUseCase {
       // was not given, and the photo comes with the URL.
       const detail = await this.users.detail(user.id)
       if (!detail)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       return right({
         ...detail,

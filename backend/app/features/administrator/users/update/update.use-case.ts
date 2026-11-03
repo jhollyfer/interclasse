@@ -53,7 +53,12 @@ export default class AdministratorUserUpdateUseCase {
       const user = await this.users.findById(id)
 
       if (!user)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       // Without filtering archived: the email `unique` holds for the whole table,
       // so without this check the save would blow the constraint and become a `500`.
@@ -62,9 +67,14 @@ export default class AdministratorUserUpdateUseCase {
         changes.email !== user.snapshot().email &&
         (await this.users.existsByEmail(changes.email, id))
       )
-        return left(UserRefusal.http({ code: 'USER_ALREADY_EXISTS' }, this.i18n))
+        return left(
+          UserRefusal.http({ code: 'USER_ALREADY_EXISTS' }, this.i18n),
+        )
 
-      if (changes.avatarId && !(await this.storages.areAttachable([changes.avatarId])))
+      if (
+        changes.avatarId &&
+        !(await this.storages.areAttachable([changes.avatarId]))
+      )
         return left(FileRefusal.attachmentNotFound('avatarId', this.i18n))
 
       // Changing email or password, changing the role and deactivating the account drop the
@@ -76,22 +86,30 @@ export default class AdministratorUserUpdateUseCase {
       // failure of one would leave the account changed with a session or classroom of the old role.
       // The email check above does not close the race: `save` returns the
       // same fact when the database `unique` loses it (_standards/backend.md §4.4).
-      const written = await this.unitOfWork.run(async (): Promise<Either<HTTPException, null>> => {
-        const saved = await this.users.save(user)
-        if (saved.isLeft()) return left(UserRefusal.http(saved.value, this.i18n))
+      const written = await this.unitOfWork.run(
+        async (): Promise<Either<HTTPException, null>> => {
+          const saved = await this.users.save(user)
+          if (saved.isLeft())
+            return left(UserRefusal.http(saved.value, this.i18n))
 
-        if (effects.revokesSessions) await this.sessions.revokeAll(id)
-        if (effects.roleChanged) await this.classrooms.detachAccount(id)
+          if (effects.revokesSessions) await this.sessions.revokeAll(id)
+          if (effects.roleChanged) await this.classrooms.detachAccount(id)
 
-        return right(null)
-      })
+          return right(null)
+        },
+      )
       if (written.isLeft()) return left(written.value)
 
       // Reload before responding: whoever just edited receives the row as
       // it ended up in the database, with `updated_at` and the new photo.
       const detail = await this.users.detail(id)
       if (!detail)
-        return left(HTTPException.NotFound(this.i18n.t('users.not_found'), 'USER_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('users.not_found'),
+            'USER_NOT_FOUND',
+          ),
+        )
 
       return right({
         ...detail,

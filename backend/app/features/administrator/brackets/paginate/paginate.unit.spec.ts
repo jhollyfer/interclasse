@@ -26,7 +26,10 @@ test.group('administrator/brackets > paginate (unit)', () => {
 
     assert.isTrue(result.isRight())
     assert.equal(result.isRight() && result.value.meta.total, 1)
-    assert.equal(result.isRight() && result.value.data[0]?.sport.name, sport.name)
+    assert.equal(
+      result.isRight() && result.value.data[0]?.sport.name,
+      sport.name,
+    )
   })
 
   test('filters by status', async ({ assert }) => {

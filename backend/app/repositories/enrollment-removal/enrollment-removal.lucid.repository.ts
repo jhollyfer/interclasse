@@ -33,7 +33,9 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
   }
 
   async findById(id: string): Promise<EnrollmentRemoval | null> {
-    const row = await EnrollmentRemovalModel.query({ client: this.transaction.client() })
+    const row = await EnrollmentRemovalModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .first()
     if (!row) return null
@@ -44,9 +46,13 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
   async save(removal: EnrollmentRemoval): Promise<void> {
     const { id, ...columns } = removal.snapshot()
 
-    await EnrollmentRemovalModel.updateOrCreate({ id }, this.toColumns(columns), {
-      client: this.transaction.client(),
-    })
+    await EnrollmentRemovalModel.updateOrCreate(
+      { id },
+      this.toColumns(columns),
+      {
+        client: this.transaction.client(),
+      },
+    )
   }
 
   async saveAll(removals: EnrollmentRemoval[]): Promise<void> {
@@ -62,8 +68,12 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
     )
   }
 
-  async findDetail(id: string): Promise<AdministratorEnrollmentRemovalShowResponse | null> {
-    const row = await EnrollmentRemovalModel.query({ client: this.transaction.client() })
+  async findDetail(
+    id: string,
+  ): Promise<AdministratorEnrollmentRemovalShowResponse | null> {
+    const row = await EnrollmentRemovalModel.query({
+      client: this.transaction.client(),
+    })
       .where('id', id)
       .preload('classroom')
       .preload('sport')
@@ -77,7 +87,9 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
   async paginate(
     criteria: EnrollmentRemovalListCriteria,
   ): Promise<Paginated<AdministratorEnrollmentRemovalShowResponse>> {
-    const query = EnrollmentRemovalModel.query({ client: this.transaction.client() })
+    const query = EnrollmentRemovalModel.query({
+      client: this.transaction.client(),
+    })
       .preload('classroom')
       .preload('sport')
       .preload('actor')
@@ -91,7 +103,10 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
       .orderBy('createdAt', 'desc')
       .paginate(criteria.page, criteria.perPage)
 
-    return { meta: page.getMeta(), data: page.all().map((row) => this.toResponse(row)) }
+    return {
+      meta: page.getMeta(),
+      data: page.all().map((row) => this.toResponse(row)),
+    }
   }
 
   private toEntity(row: EnrollmentRemovalModel): EnrollmentRemoval {
@@ -118,7 +133,9 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
     }
   }
 
-  private toResponse(row: EnrollmentRemovalModel): AdministratorEnrollmentRemovalShowResponse {
+  private toResponse(
+    row: EnrollmentRemovalModel,
+  ): AdministratorEnrollmentRemovalShowResponse {
     return {
       id: row.id,
       classroomId: row.classroomId,
@@ -167,7 +184,9 @@ export class EnrollmentRemovalLucidRepository extends EnrollmentRemovalRepositor
     }
   }
 
-  private toPerson(row: UserModel | null | undefined): AdministratorClassroomPersonResponse | null {
+  private toPerson(
+    row: UserModel | null | undefined,
+  ): AdministratorClassroomPersonResponse | null {
     if (!row) return null
 
     return {

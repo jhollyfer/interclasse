@@ -8,14 +8,28 @@ import { body, resetDatabase, signInWithFactory } from '#tests/http-fixtures'
 test.group('advisor cards > paginate', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the advisor sees the cards of their own classroom', async ({ client, assert }) => {
+  test('the advisor sees the cards of their own classroom', async ({
+    client,
+    assert,
+  }) => {
     const { user, session } = await signInWithFactory(client)
-    const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } = await matchWithTeams()
+    const { match, home, homeTeam, awayTeam, homeStudent, awayStudent } =
+      await matchWithTeams()
     home.advisorId = user.id
     await home.save()
     await MatchCardFactory.merge([
-      { matchId: match.id, teamId: homeTeam.id, studentId: homeStudent.id, color: 'RED' },
-      { matchId: match.id, teamId: awayTeam.id, studentId: awayStudent.id, color: 'YELLOW' },
+      {
+        matchId: match.id,
+        teamId: homeTeam.id,
+        studentId: homeStudent.id,
+        color: 'RED',
+      },
+      {
+        matchId: match.id,
+        teamId: awayTeam.id,
+        studentId: awayStudent.id,
+        color: 'YELLOW',
+      },
     ]).createMany(2)
 
     const response = await client
@@ -64,7 +78,10 @@ test.group('advisor/cards/paginate > access and validation', (group) => {
     const { session } = await signInWithFactory(client)
 
     const missing = await client.get('/advisor/cards').cookies(session)
-    const malformed = await client.get('/advisor/cards').qs({ classroomId: 'x' }).cookies(session)
+    const malformed = await client
+      .get('/advisor/cards')
+      .qs({ classroomId: 'x' })
+      .cookies(session)
 
     missing.assertStatus(422)
     malformed.assertStatus(422)

@@ -9,10 +9,13 @@ import { PaginationValidator } from '#core/validator'
 @inject()
 export default class StorefrontAnnouncementPaginateController {
   static docs = defineDocs({
-    description: 'The games announcements: pinned first, then newest to oldest.',
+    description:
+      'The games announcements: pinned first, then newest to oldest.',
   })
 
-  constructor(private readonly useCase: StorefrontAnnouncementPaginateUseCase) {}
+  constructor(
+    private readonly useCase: StorefrontAnnouncementPaginateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
     const payload = await context.request.validateUsing(PaginationValidator, {

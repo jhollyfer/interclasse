@@ -30,13 +30,20 @@ export default class AdministratorAnnouncementCreateUseCase {
 
   async execute(payload: Payload): Promise<Response> {
     try {
-      const announcement = Announcement.create({ id: randomUUID(), ...payload, now: new Date() })
+      const announcement = Announcement.create({
+        id: randomUUID(),
+        ...payload,
+        now: new Date(),
+      })
 
       await this.announcements.save(announcement)
 
       return right(AnnouncementPresenter.show(announcement))
     } catch (error) {
-      logger.error({ err: error }, '[administrator/announcements > create][error]')
+      logger.error(
+        { err: error },
+        '[administrator/announcements > create][error]',
+      )
 
       return left(
         HTTPException.InternalServerError(

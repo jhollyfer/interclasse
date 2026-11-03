@@ -27,20 +27,23 @@ test.group('administrator/matches > paginate (unit)', () => {
     if (result.isLeft()) throw new Error('list should have come')
     // Two semifinals; the final does not have an opponent yet.
     assert.equal(result.value.meta.total, 2)
-    assert.isTrue(result.value.data.every((match) => match.phase === MATCH_PHASE.SEMI))
+    assert.isTrue(
+      result.value.data.every((match) => match.phase === MATCH_PHASE.SEMI),
+    )
   })
 
-  test('shows the classroom with only id, name and category', async ({ assert }) => {
+  test('shows the classroom with only id, name and category', async ({
+    assert,
+  }) => {
     const { useCase } = await setup()
 
     const result = await useCase.execute({})
 
     if (result.isLeft()) throw new Error('list should have come')
-    assert.deepEqual(Object.keys(result.value.data[0]?.homeTeam.classroom ?? {}).sort(), [
-      'category',
-      'id',
-      'name',
-    ])
+    assert.deepEqual(
+      Object.keys(result.value.data[0]?.homeTeam.classroom ?? {}).sort(),
+      ['category', 'id', 'name'],
+    )
   })
 
   test('filters by classroom', async ({ assert }) => {

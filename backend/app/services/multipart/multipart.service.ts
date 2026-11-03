@@ -78,7 +78,11 @@ export default class MultipartService extends MultipartContract {
    */
   async initiate(key: string, contentType: string): Promise<string> {
     const response = await this.client.send(
-      new CreateMultipartUploadCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
+      new CreateMultipartUploadCommand({
+        Bucket: bucket,
+        Key: key,
+        ContentType: contentType,
+      }),
     )
 
     // S3 always returns `UploadId` on a successful `CreateMultipartUpload`; the
@@ -226,7 +230,11 @@ export default class MultipartService extends MultipartContract {
    */
   async abort(key: string, uploadId: string): Promise<void> {
     await this.client.send(
-      new AbortMultipartUploadCommand({ Bucket: bucket, Key: key, UploadId: uploadId }),
+      new AbortMultipartUploadCommand({
+        Bucket: bucket,
+        Key: key,
+        UploadId: uploadId,
+      }),
     )
   }
 }

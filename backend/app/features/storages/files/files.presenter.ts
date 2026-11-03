@@ -1,7 +1,10 @@
 import type { StoragesFileUploadResponse } from '@interclasse/shared'
 
 import type { Storage } from '#domain/storage/storage.entity'
-import type { PresignedPart, UploadedPart } from '#services/multipart/multipart.contract'
+import type {
+  PresignedPart,
+  UploadedPart,
+} from '#services/multipart/multipart.contract'
 
 /** What the client needs to upload the file, before becoming a response. */
 export type FileUploadPlan = {

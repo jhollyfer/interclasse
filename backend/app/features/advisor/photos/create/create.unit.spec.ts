@@ -5,19 +5,27 @@ import AdvisorPhotoCreateUseCase from './create.use-case.ts'
 
 import { PhotoRepository } from '#repositories/photo/photo.repository'
 import { makeWithMemory } from '#tests/container-fixtures'
-import { memoryAuthor, memoryPhotos, memoryStorage } from '#tests/photos-fixtures'
+import {
+  memoryAuthor,
+  memoryPhotos,
+  memoryStorage,
+} from '#tests/photos-fixtures'
 
 async function setup(mimetype = 'image/png') {
   const storage = memoryStorage({ mimetype })
   const actor = memoryAuthor()
   const photos = memoryPhotos(storage, actor)
-  const useCase = await makeWithMemory(AdvisorPhotoCreateUseCase, [[PhotoRepository, photos]])
+  const useCase = await makeWithMemory(AdvisorPhotoCreateUseCase, [
+    [PhotoRepository, photos],
+  ])
 
   return { storage, actor, useCase }
 }
 
 test.group('advisor/photos > create (unit)', () => {
-  test('the advisor photo is born pending and without review', async ({ assert }) => {
+  test('the advisor photo is born pending and without review', async ({
+    assert,
+  }) => {
     const { storage, actor, useCase } = await setup()
 
     const result = await useCase.execute({ storageId: storage.id, actor })
@@ -30,7 +38,9 @@ test.group('advisor/photos > create (unit)', () => {
     })
   })
 
-  test('a file that is not an image is 422 PHOTO_NOT_IMAGE', async ({ assert }) => {
+  test('a file that is not an image is 422 PHOTO_NOT_IMAGE', async ({
+    assert,
+  }) => {
     const { storage, actor, useCase } = await setup('audio/mpeg')
 
     const result = await useCase.execute({ storageId: storage.id, actor })

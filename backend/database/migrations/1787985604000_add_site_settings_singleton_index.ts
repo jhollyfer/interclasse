@@ -14,7 +14,9 @@ export default class extends BaseSchema {
   protected tableName = 'site_settings'
 
   override async up(): Promise<void> {
-    this.schema.raw('CREATE UNIQUE INDEX site_settings_singleton ON site_settings ((true))')
+    this.schema.raw(
+      'CREATE UNIQUE INDEX site_settings_singleton ON site_settings ((true))',
+    )
   }
 
   override async down(): Promise<void> {

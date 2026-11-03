@@ -59,7 +59,9 @@ for await (const file of glob('app/validators/**/*.validator.ts', {
   modules.push(await import(pathToFileURL(app.makePath(file)).href))
 }
 
-const validators = modules.flatMap((mod) => Object.values(mod)).filter(isValidator)
+const validators = modules
+  .flatMap((mod) => Object.values(mod))
+  .filter(isValidator)
 
 test.group('validator > sweep', () => {
   // Without this guard, a glob that matches nothing would leave the audits below
@@ -73,8 +75,10 @@ test.group('validator > sweep', () => {
 function strings(schema: unknown, prefix = ''): Array<[string, unknown]> {
   const found: Array<[string, unknown]> = []
 
-  for (const each of branch(schema, 'anyOf')) found.push(...strings(each, prefix))
-  for (const each of branch(schema, 'items')) found.push(...strings(each, `${prefix}[]`))
+  for (const each of branch(schema, 'anyOf'))
+    found.push(...strings(each, prefix))
+  for (const each of branch(schema, 'items'))
+    found.push(...strings(each, `${prefix}[]`))
 
   for (const properties of branch(schema, 'properties')) {
     if (typeof properties !== 'object' || properties === null) continue
@@ -109,7 +113,9 @@ test.group('validator > text ceilings', () => {
       .filter(([, node]) => {
         if (typeof node !== 'object' || node === null) return false
 
-        return !['maxLength', 'format', 'pattern', 'enum'].some((key) => key in node)
+        return !['maxLength', 'format', 'pattern', 'enum'].some(
+          (key) => key in node,
+        )
       })
       .map(([path]) => path)
 
@@ -159,7 +165,9 @@ const SEM_CAMPO_NO_SCHEMA = ['passwordConfirmation']
  * exactly why the enforcement needs to be automatic.
  */
 test.group('validator > labels', () => {
-  test('every validator field has a name in the three languages', ({ assert }) => {
+  test('every validator field has a name in the three languages', ({
+    assert,
+  }) => {
     // The raw name serves as the VineJS fallback, so it is enough for the last segment to have
     // a label - `parts.etag` falls to `etag` if the full path is not
     // listed. Both count, and the full path wins when it exists.
@@ -177,7 +185,9 @@ test.group('validator > labels', () => {
   test('no label is left for a field that no longer exists', ({ assert }) => {
     // The opposite of the test above: a label for a field that already left the validator does not
     // warn that it is dead, and keeps being copied to the next resource.
-    const leaves = new Set([...fields].map((path) => path.slice(path.lastIndexOf('.') + 1)))
+    const leaves = new Set(
+      [...fields].map((path) => path.slice(path.lastIndexOf('.') + 1)),
+    )
 
     const orphans = Object.keys(FIELD_LABELS).filter((key) => {
       if (SEM_CAMPO_NO_SCHEMA.includes(key)) return false

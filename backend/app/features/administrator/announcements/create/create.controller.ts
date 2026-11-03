@@ -13,10 +13,14 @@ export default class AdministratorAnnouncementCreateController {
       'Publishes right away: the announcement shows on the site as soon as it is created.',
   })
 
-  constructor(private readonly useCase: AdministratorAnnouncementCreateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorAnnouncementCreateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorAnnouncementCreateValidator)
+    const payload = await context.request.validateUsing(
+      AdministratorAnnouncementCreateValidator,
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.created(result.value)

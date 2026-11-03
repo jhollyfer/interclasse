@@ -25,7 +25,9 @@ test.group('cards > delete', (group) => {
       color: 'YELLOW',
     }).create()
 
-    const response = await client.delete(`/administrator/cards/${card.id}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/cards/${card.id}`)
+      .cookies(session)
 
     response.assertStatus(204)
     assert.isNull(await Stored.card(card.id))
@@ -34,7 +36,9 @@ test.group('cards > delete', (group) => {
   test('nonexistent card responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.delete(`/administrator/cards/${randomUUID()}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/cards/${randomUUID()}`)
+      .cookies(session)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'CARD_NOT_FOUND')
@@ -52,7 +56,9 @@ test.group('administrator/cards/delete > access and validation', (group) => {
     response.assertStatus(401)
   })
 
-  test('403: advisor does not reach the organization route', async ({ client }) => {
+  test('403: advisor does not reach the organization route', async ({
+    client,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
 
     const response = await client
@@ -65,7 +71,9 @@ test.group('administrator/cards/delete > access and validation', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/cards/nao-e-uuid').cookies(admin)
+    const response = await client
+      .delete('/administrator/cards/nao-e-uuid')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

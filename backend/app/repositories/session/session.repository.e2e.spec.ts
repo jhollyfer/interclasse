@@ -21,7 +21,10 @@ const IMPLEMENTATIONS = {
   lucid: async (): Promise<Pair> => {
     const user = await UserFactory.create()
 
-    return { sessions: await app.container.make(SessionLucidRepository), userId: user.id }
+    return {
+      sessions: await app.container.make(SessionLucidRepository),
+      userId: user.id,
+    }
   },
   memory: async (): Promise<Pair> => ({
     sessions: new SessionMemoryRepository(),
@@ -33,7 +36,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   test.group(`SessionRepository (${name})`, (group) => {
     group.each.setup(() => resetDatabase())
 
-    test('the issued refresh token is read back with its owner', async ({ assert }) => {
+    test('the issued refresh token is read back with its owner', async ({
+      assert,
+    }) => {
       const { sessions, userId } = await make()
 
       const issued = await sessions.issue(userId)
@@ -49,7 +54,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await sessions.readRefresh('lixo'))
     })
 
-    test('revoke deletes the token once; the second returns false', async ({ assert }) => {
+    test('revoke deletes the token once; the second returns false', async ({
+      assert,
+    }) => {
       const { sessions, userId } = await make()
       const issued = await sessions.issue(userId)
       const refreshToken = issued?.refreshToken ?? ''
@@ -60,7 +67,9 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
       assert.isNull(await sessions.readRefresh(refreshToken))
     })
 
-    test("revokeAll drops all the account's sessions and only its own", async ({ assert }) => {
+    test("revokeAll drops all the account's sessions and only its own", async ({
+      assert,
+    }) => {
       const { sessions, userId } = await make()
       const stranger = await UserFactory.create()
       const mine = await sessions.issue(userId)

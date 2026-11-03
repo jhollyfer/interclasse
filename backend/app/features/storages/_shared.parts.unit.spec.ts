@@ -3,7 +3,9 @@ import { test } from '@japa/runner'
 import { partSizeOf, sizedParts } from './_shared.parts.ts'
 
 test.group('storages/_shared > partes (unit)', () => {
-  test('every part has the full size, except the last, which takes the rest', ({ assert }) => {
+  test('every part has the full size, except the last, which takes the rest', ({
+    assert,
+  }) => {
     assert.equal(partSizeOf(25, 10, 1), 10)
     assert.equal(partSizeOf(25, 10, 2), 10)
     assert.equal(partSizeOf(25, 10, 3), 5)

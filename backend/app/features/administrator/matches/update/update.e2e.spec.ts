@@ -24,7 +24,10 @@ test.group('matches > update', (group) => {
     const response = await client
       .put(`/administrator/matches/${match.id}`)
       .cookies(admin)
-      .json({ scheduledAt: '2026-11-03T14:30:00-03:00', location: 'Quadra coberta' })
+      .json({
+        scheduledAt: '2026-11-03T14:30:00-03:00',
+        location: 'Quadra coberta',
+      })
 
     response.assertStatus(200)
     assert.equal(body(response).location, 'Quadra coberta')
@@ -37,7 +40,10 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).bracket.sport.id, bracket.sportId)
   })
 
-  test('null unschedules, and the missing field stays as it was', async ({ client, assert }) => {
+  test('null unschedules, and the missing field stays as it was', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
     match.merge({ scheduledAt: DateTime.now(), location: 'Ginásio' })
@@ -53,7 +59,10 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).location, 'Ginásio')
   })
 
-  test('invalid date and too long place respond 422', async ({ client, assert }) => {
+  test('invalid date and too long place respond 422', async ({
+    client,
+    assert,
+  }) => {
     const admin = await authenticateAsAdministrator(client)
     const { match } = await scheduledMatch()
 
@@ -106,12 +115,18 @@ test.group('matches > update', (group) => {
     assert.equal(body(response).code, 'MATCH_NOT_FOUND')
   })
 
-  test('without a session is 401, and the advisor gets 403', async ({ client, assert }) => {
+  test('without a session is 401, and the advisor gets 403', async ({
+    client,
+    assert,
+  }) => {
     const advisor = await authenticateAsAdvisor(client)
     const url = `/administrator/matches/${randomUUID()}`
 
     const anonymous = await client.put(url).json({ location: 'Quadra' })
-    const advisorSession = await client.put(url).cookies(advisor).json({ location: 'Quadra' })
+    const advisorSession = await client
+      .put(url)
+      .cookies(advisor)
+      .json({ location: 'Quadra' })
 
     anonymous.assertStatus(401)
     advisorSession.assertStatus(403)

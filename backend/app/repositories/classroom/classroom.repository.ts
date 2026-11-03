@@ -50,7 +50,9 @@ export abstract class ClassroomRepository {
   /** The classroom the account represents, which is only one. */
   abstract findOfRepresentative(accountId: string): Promise<Classroom | null>
   /** Lightweight read: the classroom with advisor and representative, straight from the query. */
-  abstract findDetail(id: string): Promise<AdministratorClassroomShowResponse | null>
+  abstract findDetail(
+    id: string,
+  ): Promise<AdministratorClassroomShowResponse | null>
   /** Another classroom, other than `exceptId`, already uses the name. */
   abstract existsByName(name: string, exceptId?: string): Promise<boolean>
   /** The facts of each given account; an account absent from the criteria has no fact. */

@@ -18,7 +18,8 @@ function seeded(seed: number) {
   }
 }
 
-const teams = (total: number) => Array.from({ length: total }, (_, index) => `T${index + 1}`)
+const teams = (total: number) =>
+  Array.from({ length: total }, (_, index) => `T${index + 1}`)
 
 test.group('tournament > draw', () => {
   test('the shuffle neither loses nor repeats anyone', ({ assert }) => {
@@ -29,7 +30,9 @@ test.group('tournament > draw', () => {
     assert.notDeepEqual(shuffled, times)
   })
 
-  test('the bracket is the smallest power of two that fits everyone', ({ assert }) => {
+  test('the bracket is the smallest power of two that fits everyone', ({
+    assert,
+  }) => {
     assert.equal(Knockout.sizeFor(2), 2)
     assert.equal(Knockout.sizeFor(3), 4)
     assert.equal(Knockout.sizeFor(8), 8)
@@ -42,7 +45,9 @@ test.group('tournament > draw', () => {
       assert,
     }) => {
       const pairings = Knockout.pair(teams(total), seeded(total))
-      const presentes = pairings.flatMap((c) => [c.home, c.away]).filter((time) => time !== null)
+      const presentes = pairings
+        .flatMap((c) => [c.home, c.away])
+        .filter((time) => time !== null)
       const byes = pairings.filter((c) => c.away === null).length
 
       assert.lengthOf(pairings, Knockout.sizeFor(total) / 2)
@@ -63,7 +68,9 @@ test.group('tournament > knockout', () => {
     assert.isUndefined(Knockout.nextPhase(MATCH_PHASE.FINAL))
   })
 
-  test('the winner of the even position goes as home, the odd one as away', ({ assert }) => {
+  test('the winner of the even position goes as home, the odd one as away', ({
+    assert,
+  }) => {
     assert.deepEqual(Knockout.advanceSlot(0), { position: 0, side: 'home' })
     assert.deepEqual(Knockout.advanceSlot(1), { position: 0, side: 'away' })
     assert.deepEqual(Knockout.advanceSlot(2), { position: 1, side: 'home' })

@@ -58,7 +58,8 @@ export class PhotoLucidRepository extends PhotoRepository {
   }
 
   async save(photo: Photo): Promise<void> {
-    const { id, createdAt, updatedAt, reviewedAt, ...columns } = photo.snapshot()
+    const { id, createdAt, updatedAt, reviewedAt, ...columns } =
+      photo.snapshot()
 
     await PhotoModel.updateOrCreate(
       { id },
@@ -73,7 +74,9 @@ export class PhotoLucidRepository extends PhotoRepository {
   }
 
   async delete(photo: Photo): Promise<void> {
-    await PhotoModel.query({ client: this.transaction.client() }).where('id', photo.id).delete()
+    await PhotoModel.query({ client: this.transaction.client() })
+      .where('id', photo.id)
+      .delete()
   }
 
   async show(id: string): Promise<PhotoRead | null> {
@@ -94,7 +97,9 @@ export class PhotoLucidRepository extends PhotoRepository {
     if (criteria.status) query.where('status', criteria.status)
     if (criteria.authorId) query.where('authorId', criteria.authorId)
 
-    const page = await query.orderBy('createdAt', 'desc').paginate(criteria.page, criteria.perPage)
+    const page = await query
+      .orderBy('createdAt', 'desc')
+      .paginate(criteria.page, criteria.perPage)
 
     return {
       meta: page.getMeta(),
@@ -166,10 +171,17 @@ export class PhotoLucidRepository extends PhotoRepository {
     }
   }
 
-  private toAuthor(author: UserModel | null): AdministratorPhotoShowResponse['author'] {
+  private toAuthor(
+    author: UserModel | null,
+  ): AdministratorPhotoShowResponse['author'] {
     if (!author) return null
 
-    return { id: author.id, name: author.name, email: author.email, role: author.role }
+    return {
+      id: author.id,
+      name: author.name,
+      email: author.email,
+      role: author.role,
+    }
   }
 
   private iso(date: DateTime): string {

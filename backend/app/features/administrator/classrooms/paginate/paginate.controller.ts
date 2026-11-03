@@ -17,12 +17,17 @@ export default class AdministratorClassroomPaginateController {
       `\`?sort\` accepts ${CLASSROOM_SORT_COLUMNS.join(', ')}. Default: ordered by name.`,
   })
 
-  constructor(private readonly useCase: AdministratorClassroomPaginateUseCase) {}
+  constructor(
+    private readonly useCase: AdministratorClassroomPaginateUseCase,
+  ) {}
 
   async handle(context: HttpContext) {
-    const payload = await context.request.validateUsing(AdministratorClassroomPaginateValidator, {
-      data: context.request.qs(),
-    })
+    const payload = await context.request.validateUsing(
+      AdministratorClassroomPaginateValidator,
+      {
+        data: context.request.qs(),
+      },
+    )
     const result = await this.useCase.execute(payload)
     if (result.isLeft()) throw result.value
     return context.response.ok(result.value)

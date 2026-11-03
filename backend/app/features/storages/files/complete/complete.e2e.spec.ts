@@ -55,7 +55,10 @@ async function put(url: string, content: Uint8Array): Promise<string> {
 }
 
 /** The whole path, from zero to `UPLOADED`, for a single-part file. */
-async function upload(client: ApiClient, session: Session): Promise<ResponseBody> {
+async function upload(
+  client: ApiClient,
+  session: Session,
+): Promise<ResponseBody> {
   const opened = await open(client, session, {
     fileName: 'capa.png',
     mimetype: 'image/png',
@@ -79,7 +82,10 @@ async function upload(client: ApiClient, session: Session): Promise<ResponseBody
 test.group('storages > complete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('confirms the upload and the file becomes UPLOADED', async ({ client, assert }) => {
+  test('confirms the upload and the file becomes UPLOADED', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
@@ -156,11 +162,17 @@ test.group('storages > complete', (group) => {
     assert.isFalse(await drive.use().exists(opened.storage.path))
   })
 
-  test('confirming twice returns the same record', async ({ client, assert }) => {
+  test('confirming twice returns the same record', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const storage = await upload(client, session)
 
-    const again = await client.post(`/storages/${storage.id}/complete`).cookies(session).json({})
+    const again = await client
+      .post(`/storages/${storage.id}/complete`)
+      .cookies(session)
+      .json({})
 
     again.assertStatus(200)
     assert.equal(body(again).id, storage.id)
@@ -191,10 +203,16 @@ test.group('storages > complete > acesso e identificador', (group) => {
     assert.equal(body(response).code, 'STORAGE_NOT_FOUND')
   })
 
-  test('malformed id responds 422 instead of a Postgres 500', async ({ client, assert }) => {
+  test('malformed id responds 422 instead of a Postgres 500', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.post('/storages/x/complete').cookies(session).json({})
+    const response = await client
+      .post('/storages/x/complete')
+      .cookies(session)
+      .json({})
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'id')

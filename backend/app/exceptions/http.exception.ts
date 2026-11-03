@@ -105,7 +105,10 @@ export default class HTTPException extends Exception {
   }
 
   /** The resource existed and no longer does, which is different from never having existed. */
-  static Gone(message = 'Recurso não está mais disponível', code = 'RESOURCE_GONE'): HTTPException {
+  static Gone(
+    message = 'Recurso não está mais disponível',
+    code = 'RESOURCE_GONE',
+  ): HTTPException {
     return new HTTPException({ message, status: 410, code })
   }
 
@@ -140,7 +143,10 @@ export default class HTTPException extends Exception {
   }
 
   /** The resource is in use by another operation and does not accept a write now. */
-  static Locked(message = 'Recurso bloqueado', code = 'RESOURCE_LOCKED'): HTTPException {
+  static Locked(
+    message = 'Recurso bloqueado',
+    code = 'RESOURCE_LOCKED',
+  ): HTTPException {
     return new HTTPException({ message, status: 423, code })
   }
 

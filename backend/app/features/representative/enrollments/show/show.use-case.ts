@@ -29,13 +29,22 @@ export default class RepresentativeEnrollmentShowUseCase {
       const classroom = await this.classrooms.findOfRepresentative(actor.id)
       if (!classroom)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.none_linked'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.none_linked'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
-      const board = await this.enrollments.board({ classroomId: classroom.id, lockAfterDraw: true })
+      const board = await this.enrollments.board({
+        classroomId: classroom.id,
+        lockAfterDraw: true,
+      })
       if (!board)
         return left(
-          HTTPException.NotFound(this.i18n.t('classrooms.none_linked'), 'CLASSROOM_NOT_FOUND'),
+          HTTPException.NotFound(
+            this.i18n.t('classrooms.none_linked'),
+            'CLASSROOM_NOT_FOUND',
+          ),
         )
 
       return right(board)

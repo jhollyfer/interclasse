@@ -45,7 +45,9 @@ test.group('administrator/sports > paginate (unit)', () => {
     )
   })
 
-  test('repository failure is 500 ADMINISTRATOR_SPORT_PAGINATE_ERROR', async ({ assert }) => {
+  test('repository failure is 500 ADMINISTRATOR_SPORT_PAGINATE_ERROR', async ({
+    assert,
+  }) => {
     const { sports, useCase } = await setup()
     sports.paginate = async () => {
       throw new Error('database down')
@@ -53,6 +55,9 @@ test.group('administrator/sports > paginate (unit)', () => {
 
     const result = await useCase.execute({})
 
-    assert.deepInclude(result.value, { status: 500, code: 'ADMINISTRATOR_SPORT_PAGINATE_ERROR' })
+    assert.deepInclude(result.value, {
+      status: 500,
+      code: 'ADMINISTRATOR_SPORT_PAGINATE_ERROR',
+    })
   })
 })

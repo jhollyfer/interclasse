@@ -25,12 +25,23 @@ export class BracketRefusal extends RefusalBase {
         'TOO_MANY_TEAMS',
       ),
     BRACKET_HAS_RESULTS: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('brackets.has_results'), 'BRACKET_HAS_RESULTS'),
+      HTTPException.Conflict(
+        i18n.t('brackets.has_results'),
+        'BRACKET_HAS_RESULTS',
+      ),
     BRACKET_ALREADY_EXISTS: (_fact, i18n) =>
-      HTTPException.Conflict(i18n.t('brackets.already_exists'), 'BRACKET_ALREADY_EXISTS'),
+      HTTPException.Conflict(
+        i18n.t('brackets.already_exists'),
+        'BRACKET_ALREADY_EXISTS',
+      ),
   } satisfies RefusalTable<BracketError>
 
   static http(error: BracketError, i18n: I18n): HTTPException {
-    return BracketRefusal.translate(BracketRefusal.TABLE, error.code, error, i18n)
+    return BracketRefusal.translate(
+      BracketRefusal.TABLE,
+      error.code,
+      error,
+      i18n,
+    )
   }
 }

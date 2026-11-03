@@ -14,6 +14,8 @@ export default class DocumentationReferenceShowController {
   async handle(context: HttpContext) {
     const result = await this.useCase.execute()
     if (result.isLeft()) throw result.value
-    return context.response.header('content-type', 'text/html').send(result.value)
+    return context.response
+      .header('content-type', 'text/html')
+      .send(result.value)
   }
 }

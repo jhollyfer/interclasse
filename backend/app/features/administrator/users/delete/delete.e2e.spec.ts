@@ -33,11 +33,16 @@ const payload = {
 test.group('users > delete', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('deleting without archiving responds 409', async ({ client, assert }) => {
+  test('deleting without archiving responds 409', async ({
+    client,
+    assert,
+  }) => {
     const session = await authenticateAsAdministrator(client)
     const user = await UserFactory.create()
 
-    const response = await client.delete(`/administrator/users/${user.id}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/users/${user.id}`)
+      .cookies(session)
 
     response.assertStatus(409)
     assert.equal(body(response).code, 'USER_NOT_ARCHIVED')
@@ -61,7 +66,9 @@ test.group('users > delete', (group) => {
       .cookies(session)
     archiveResponse.assertStatus(204)
 
-    const response = await client.delete(`/administrator/users/${user.id}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/users/${user.id}`)
+      .cookies(session)
 
     response.assertStatus(204)
     assert.isNull(await Stored.user(user.id))
@@ -78,7 +85,9 @@ test.group('users > delete', (group) => {
   test('nonexistent user responds 404', async ({ client, assert }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const response = await client.delete(`/administrator/users/${randomUUID()}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/users/${randomUUID()}`)
+      .cookies(session)
 
     response.assertStatus(404)
     assert.equal(body(response).code, 'USER_NOT_FOUND')
@@ -91,7 +100,9 @@ test.group('users > delete', (group) => {
     const session = await authenticateAsAdministrator(client)
     const self = await Stored.userByEmailOrFail(ADMINISTRATOR.email)
 
-    const response = await client.delete(`/administrator/users/${self.id}`).cookies(session)
+    const response = await client
+      .delete(`/administrator/users/${self.id}`)
+      .cookies(session)
 
     // 403 and not 409: the rule that protects is the own account one, not the record state.
     response.assertStatus(403)
@@ -99,14 +110,19 @@ test.group('users > delete', (group) => {
     assert.isNotNull(await Stored.user(self.id))
   })
 
-  test('without a session responds 401, advisor responds 403', async ({ client, assert }) => {
+  test('without a session responds 401, advisor responds 403', async ({
+    client,
+    assert,
+  }) => {
     const user = await UserFactory.merge({ deletedAt: DateTime.now() }).create()
 
     const anonymous = await client.delete(`/administrator/users/${user.id}`)
     anonymous.assertStatus(401)
 
     const advisor = await authenticateAsAdvisor(client)
-    const response = await client.delete(`/administrator/users/${user.id}`).cookies(advisor)
+    const response = await client
+      .delete(`/administrator/users/${user.id}`)
+      .cookies(advisor)
 
     response.assertStatus(403)
     assert.equal(body(response).code, 'ACCESS_DENIED')
@@ -119,30 +135,44 @@ test.group('users > delete', (group) => {
   }) => {
     const session = await authenticateAsAdministrator(client)
 
-    const created = await client.post('/administrator/users').cookies(session).json(payload)
+    const created = await client
+      .post('/administrator/users')
+      .cookies(session)
+      .json(payload)
     created.assertStatus(201)
 
     const id = body(created).id
 
-    const archived = await client.patch(`/administrator/users/${id}/archive`).cookies(session)
+    const archived = await client
+      .patch(`/administrator/users/${id}/archive`)
+      .cookies(session)
     archived.assertStatus(204)
 
     // Out of the default listings, inside `?trashed=only`.
-    const trash = await client.get('/administrator/users').qs({ trashed: 'only' }).cookies(session)
+    const trash = await client
+      .get('/administrator/users')
+      .qs({ trashed: 'only' })
+      .cookies(session)
 
     trash.assertStatus(200)
     assert.lengthOf(body(trash).data, 1)
 
-    const restored = await client.patch(`/administrator/users/${id}/unarchive`).cookies(session)
+    const restored = await client
+      .patch(`/administrator/users/${id}/unarchive`)
+      .cookies(session)
     restored.assertStatus(204)
 
     const view = await client.get(`/administrator/users/${id}`).cookies(session)
     view.assertStatus(200)
 
-    const again = await client.patch(`/administrator/users/${id}/archive`).cookies(session)
+    const again = await client
+      .patch(`/administrator/users/${id}/archive`)
+      .cookies(session)
     again.assertStatus(204)
 
-    const deleted = await client.delete(`/administrator/users/${id}`).cookies(session)
+    const deleted = await client
+      .delete(`/administrator/users/${id}`)
+      .cookies(session)
     deleted.assertStatus(204)
 
     assert.isNull(await Stored.user(id))
@@ -155,7 +185,9 @@ test.group('administrator/users/delete > access and validation', (group) => {
   test('422: id that is not a uuid', async ({ client }) => {
     const admin = await authenticateAsAdministrator(client)
 
-    const response = await client.delete('/administrator/users/nao-e-uuid').cookies(admin)
+    const response = await client
+      .delete('/administrator/users/nao-e-uuid')
+      .cookies(admin)
 
     response.assertStatus(422)
   })

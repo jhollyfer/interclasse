@@ -12,7 +12,10 @@ import {
 test.group('classrooms > paginate (advisor)', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('the advisor sees only the classroom they advise', async ({ client, assert }) => {
+  test('the advisor sees only the classroom they advise', async ({
+    client,
+    assert,
+  }) => {
     const { user, session } = await signInWithFactory(client)
     await ClassroomFactory.merge({ name: '9º B', advisorId: user.id }).create()
     await ClassroomFactory.merge({ name: '7º A' }).create()
@@ -55,14 +58,23 @@ test.group('classrooms > paginate (advisor)', (group) => {
     assert.lengthOf(body(response).data, 2)
   })
 
-  test('`?search` filters by name within the scope', async ({ client, assert }) => {
+  test('`?search` filters by name within the scope', async ({
+    client,
+    assert,
+  }) => {
     const { user, session } = await signInWithFactory(client)
     await ClassroomFactory.merge({ name: '6º B', advisorId: user.id }).create()
     // Matches the search, but belongs to another advisor: scope applies before the filter.
     await ClassroomFactory.merge({ name: '7º B' }).create()
 
-    const matching = await client.get('/advisor/classrooms').qs({ search: 'B' }).cookies(session)
-    const nothing = await client.get('/advisor/classrooms').qs({ search: 'A' }).cookies(session)
+    const matching = await client
+      .get('/advisor/classrooms')
+      .qs({ search: 'B' })
+      .cookies(session)
+    const nothing = await client
+      .get('/advisor/classrooms')
+      .qs({ search: 'A' })
+      .cookies(session)
 
     matching.assertStatus(200)
     assert.deepEqual(
@@ -90,10 +102,16 @@ test.group('classrooms > paginate (advisor)', (group) => {
 test.group('advisor/classrooms/paginate > 422', (group) => {
   group.each.setup(() => resetDatabase())
 
-  test('malformed page responds 422 pointing at the field', async ({ client, assert }) => {
+  test('malformed page responds 422 pointing at the field', async ({
+    client,
+    assert,
+  }) => {
     const { session } = await signInWithFactory(client)
 
-    const response = await client.get('/advisor/classrooms').qs({ page: 'x' }).cookies(session)
+    const response = await client
+      .get('/advisor/classrooms')
+      .qs({ page: 'x' })
+      .cookies(session)
 
     response.assertStatus(422)
     assert.property(body(response).errors, 'page')

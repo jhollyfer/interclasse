@@ -43,7 +43,10 @@ export class MultipartFake extends MultipartContract {
     return `https://bucket.test/${key}?single`
   }
 
-  async listParts(_key: string, uploadId: string): Promise<Array<UploadedPart>> {
+  async listParts(
+    _key: string,
+    uploadId: string,
+  ): Promise<Array<UploadedPart>> {
     return this.uploaded.get(uploadId) ?? []
   }
 

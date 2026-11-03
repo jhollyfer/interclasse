@@ -3,7 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 import { I18n } from '@adonisjs/i18n'
 import logger from '@adonisjs/core/services/logger'
-import { left, right, type Either, type StoragesFileUploadResponse } from '@interclasse/shared'
+import {
+  left,
+  right,
+  type Either,
+  type StoragesFileUploadResponse,
+} from '@interclasse/shared'
 
 import { FilePresenter } from '../files.presenter.ts'
 
@@ -17,7 +22,11 @@ import {
   PRESIGNED_BATCH,
   type PresignedPart,
 } from '#services/multipart/multipart.contract'
-import { countParts, pendingParts, sizedParts } from '#features/storages/_shared.parts'
+import {
+  countParts,
+  pendingParts,
+  sizedParts,
+} from '#features/storages/_shared.parts'
 import type { StoragesFileCreatePayload } from '#validators/storages/files.validator'
 
 type Payload = StoragesFileCreatePayload
@@ -64,7 +73,11 @@ export default class StoragesFileCreateUseCase {
         parts = [
           {
             partNumber: 1,
-            url: await this.multipart.signSingle(key, payload.mimetype, payload.size),
+            url: await this.multipart.signSingle(
+              key,
+              payload.mimetype,
+              payload.size,
+            ),
           },
         ]
       }

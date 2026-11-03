@@ -9,7 +9,8 @@ import type { Sport } from '#domain/sport/sport.entity'
  */
 export class SportPresenter {
   static show(sport: Sport): AdministratorSportShowResponse {
-    const { id, name, slug, minAthletes, maxAthletes, createdAt, updatedAt } = sport.snapshot()
+    const { id, name, slug, minAthletes, maxAthletes, createdAt, updatedAt } =
+      sport.snapshot()
 
     return {
       id,

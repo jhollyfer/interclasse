@@ -44,11 +44,18 @@ export default class StoragesFileDownloadUseCase {
       const storage = await this.storages.findById(payload.id)
 
       if (!storage)
-        return left(HTTPException.NotFound(this.i18n.t('files.not_found'), 'STORAGE_NOT_FOUND'))
+        return left(
+          HTTPException.NotFound(
+            this.i18n.t('files.not_found'),
+            'STORAGE_NOT_FOUND',
+          ),
+        )
 
       const { path, mimetype, originalName } = storage.snapshot()
 
-      return right(await this.bucket.signedDownload({ path, mimetype, originalName }))
+      return right(
+        await this.bucket.signedDownload({ path, mimetype, originalName }),
+      )
     } catch (error) {
       logger.error({ err: error }, '[storages/files > download][error]')
 

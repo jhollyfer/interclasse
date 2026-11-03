@@ -25,7 +25,10 @@ export class LimiterKey {
    * ceiling only exists after `auth()`, and inventing a key would put
    * all anonymous users in a single bucket.
    */
-  static user(scope: string, user: { readonly id: string } | undefined): string | null {
+  static user(
+    scope: string,
+    user: { readonly id: string } | undefined,
+  ): string | null {
     if (!user) return null
 
     return `${scope}:${user.id}`
@@ -68,16 +71,23 @@ export const signInThrottle = limiter.define('signIn', function () {
  * who forgot their own password runs into, and locking them out by mistake is the abuse
  * it could cause itself.
  */
-export const signInAccountThrottle = limiter.define('signInAccount', function (context) {
-  // Normalized before the validator, because the limit runs before it.
-  const key = LimiterKey.account(context.request.input('email'))
+export const signInAccountThrottle = limiter.define(
+  'signInAccount',
+  function (context) {
+    // Normalized before the validator, because the limit runs before it.
+    const key = LimiterKey.account(context.request.input('email'))
 
-  // Inventing a key for the malformed body would put every invalid request in a
-  // single bucket, and twenty of them would lock out the login of someone who did nothing.
-  if (!key) return null
+    // Inventing a key for the malformed body would put every invalid request in a
+    // single bucket, and twenty of them would lock out the login of someone who did nothing.
+    if (!key) return null
 
-  return limiter.allowRequests(20).every('1 hour').blockFor('10 mins').usingKey(key)
-})
+    return limiter
+      .allowRequests(20)
+      .every('1 hour')
+      .blockFor('10 mins')
+      .usingKey(key)
+  },
+)
 
 /**
  * Session renewal, by IP. It stays outside `auth()` and writes a cookie: the refresh
@@ -107,22 +117,32 @@ export const uploadThrottle = limiter.define('upload', function (context) {
  * E-mail and password change (`PUT /account`), per user: it requires the current
  * password, and without a ceiling the route serves as a password oracle for whoever stole a session.
  */
-export const accountUpdateThrottle = limiter.define('accountUpdate', function (context) {
-  const key = LimiterKey.user('account-update', context.auth.user)
+export const accountUpdateThrottle = limiter.define(
+  'accountUpdate',
+  function (context) {
+    const key = LimiterKey.user('account-update', context.auth.user)
 
-  if (!key) return null
+    if (!key) return null
 
-  return limiter.allowRequests(10).every('1 hour').blockFor('10 mins').usingKey(key)
-})
+    return limiter
+      .allowRequests(10)
+      .every('1 hour')
+      .blockFor('10 mins')
+      .usingKey(key)
+  },
+)
 
 /**
  * The report export, per user: it builds the whole file on every request
  * (expensive route, _standards/backend.md §4.10).
  */
-export const reportExportThrottle = limiter.define('reportExport', function (context) {
-  const key = LimiterKey.user('report-export', context.auth.user)
+export const reportExportThrottle = limiter.define(
+  'reportExport',
+  function (context) {
+    const key = LimiterKey.user('report-export', context.auth.user)
 
-  if (!key) return null
+    if (!key) return null
 
-  return limiter.allowRequests(20).every('1 hour').usingKey(key)
-})
+    return limiter.allowRequests(20).every('1 hour').usingKey(key)
+  },
+)

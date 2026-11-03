@@ -26,10 +26,12 @@ import { dirname, join, resolve } from 'node:path'
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..')
 const DOCUMENT = join(ROOT, 'openapi.json')
 // `AUTHZ_BASELINE` swaps the file only so the script spec can prove the refusal without touching the real baseline.
-const BASELINE = process.env.AUTHZ_BASELINE ?? join(ROOT, 'app/core/openapi/authz-baseline.json')
+const BASELINE =
+  process.env.AUTHZ_BASELINE ??
+  join(ROOT, 'app/core/openapi/authz-baseline.json')
 
 type Operation = {
-  'security'?: Array<Record<string, string[]>>
+  security?: Array<Record<string, string[]>>
   'x-roles'?: string[]
 }
 
@@ -42,7 +44,8 @@ function protectionOf(operation: Operation): string {
   const roles = operation['x-roles'] ?? []
   if (roles.length > 0) return [...roles].sort().join(', ')
 
-  if (operation.security && operation.security.length > 0) return 'authenticated'
+  if (operation.security && operation.security.length > 0)
+    return 'authenticated'
 
   return 'anonymous'
 }
@@ -60,7 +63,10 @@ async function current(): Promise<Record<string, string>> {
   return map
 }
 
-function report(baseline: Record<string, string>, now: Record<string, string>): number {
+function report(
+  baseline: Record<string, string>,
+  now: Record<string, string>,
+): number {
   const routes = new Set([...Object.keys(baseline), ...Object.keys(now)])
   const added: string[] = []
   const removed: string[] = []
@@ -92,7 +98,9 @@ function report(baseline: Record<string, string>, now: Record<string, string>): 
 
   console.log(`authz:check: ${total} changes in the authorization chain\n`)
   for (const line of [...added, ...removed, ...changed]) console.log(line)
-  console.log('\n  Intentional? Run `pnpm authz:check -- --write` and commit the baseline with it.')
+  console.log(
+    '\n  Intentional? Run `pnpm authz:check -- --write` and commit the baseline with it.',
+  )
 
   return total
 }
@@ -103,14 +111,18 @@ async function main(): Promise<void> {
 
   if (flags.has('--write')) {
     await writeFile(BASELINE, `${JSON.stringify(now, null, 2)}\n`, 'utf8')
-    console.log(`authz:check --write: ${Object.keys(now).length} routes written.`)
+    console.log(
+      `authz:check --write: ${Object.keys(now).length} routes written.`,
+    )
     return
   }
 
   const raw = await readFile(BASELINE, 'utf8').catch(() => '')
 
   if (raw === '') {
-    console.error('authz:check: baseline missing. Run once with `--write` and commit it.')
+    console.error(
+      'authz:check: baseline missing. Run once with `--write` and commit it.',
+    )
     process.exitCode = 1
     return
   }
