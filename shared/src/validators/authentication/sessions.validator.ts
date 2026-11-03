@@ -9,7 +9,8 @@ import { emailField, z } from '../../validator.js'
  */
 export const AuthenticationSessionSignInValidator = z.object({
   email: emailField(),
-  password: z.string().max(128),
+  // `min(1)`: an empty password never reaches the server (the message is the house "Preencha este campo").
+  password: z.string().min(1).max(128),
 })
 
 export type AuthenticationSessionSignInPayload = z.infer<

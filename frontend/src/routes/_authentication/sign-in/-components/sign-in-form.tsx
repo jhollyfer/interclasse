@@ -132,7 +132,6 @@ export function SignInForm(): React.JSX.Element {
                 <InputPassword
                   {...field}
                   {...control}
-                  placeholder="••••••••"
                   autoComplete="current-password"
                 />
               )}

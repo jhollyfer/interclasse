@@ -19,6 +19,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 ### Corrigido
 
 - Endereço que não existe (`/admin`, `/teams`, `/nao-existe`) responde 404 de verdade, e não mais 200 com a tela de erro; a tela continua com o menu e o rodapé do site.
+- Login com a senha em branco acusa "Preencha este campo" na hora, sem enviar nada ao servidor; o campo de senha não traz mais os pontinhos de exemplo (pareciam senha digitada) e o texto de apoio dos campos ficou mais escuro, com contraste melhor.
 
 ### Alterado
 
