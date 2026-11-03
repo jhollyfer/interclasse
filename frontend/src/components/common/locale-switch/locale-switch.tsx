@@ -27,22 +27,43 @@ const LOCALE_NAMES = {
  * the same page in the other language - the URL is the source of truth -, and the rest
  * (API message, validation, `<html lang>`) follows from it.
  */
+/**
+ * `visibleLabel`: the code (PT-BR) shows at every width. The compact header leaves it to the
+ * icon below `sm`; the phone's menu panel has room, and an icon alone does not say what it does.
+ */
+const TRIGGER_SIZE: Record<string, string> = {
+  true: 'min-h-11 px-3 py-1',
+  false: 'size-11 sm:size-auto sm:px-2 sm:py-1',
+}
+
+const CODE_VISIBILITY: Record<string, string> = {
+  true: '',
+  false: 'max-sm:sr-only',
+}
+
 export function LocaleSwitch({
   className,
-}: Readonly<{ className?: string }>): React.JSX.Element {
+  visibleLabel = false,
+}: Readonly<{
+  className?: string
+  visibleLabel?: boolean
+}>): React.JSX.Element {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
           // Below `sm` only the icon shows, in a 44px target; the accessible name stays.
-          'flex size-11 items-center justify-center gap-1.5 rounded-full text-xs font-semibold uppercase sm:size-auto sm:px-2 sm:py-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50',
+          'flex items-center justify-center gap-1.5 rounded-full text-xs font-semibold uppercase transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50',
+          TRIGGER_SIZE[String(visibleLabel)],
           className,
         )}
       >
         {/* Accessible name from the content, with the visible text inside: WCAG 2.5.3. */}
         <span className="sr-only">{m.locale_switch_label()}</span>
         <TranslateIcon aria-hidden="true" className="size-4" />
-        <span className="max-sm:sr-only">{getLocale()}</span>
+        <span className={CODE_VISIBILITY[String(visibleLabel)]}>
+          {getLocale()}
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuGroup>

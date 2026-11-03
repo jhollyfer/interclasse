@@ -80,7 +80,7 @@ export function MatchesPage(): React.JSX.Element {
 
       {data?.data.length === 0 && <Empty>{m.public_games_empty()}</Empty>}
 
-      <Agenda matches={data?.data ?? []} />
+      <Agenda matches={data?.data ?? []} headingLevel="h2" />
 
       <Pager meta={data?.meta} />
     </Section>

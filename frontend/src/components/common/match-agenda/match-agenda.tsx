@@ -113,16 +113,21 @@ export function MatchRow({
 /** The whole agenda, day by day. */
 export function Agenda({
   matches,
+  headingLevel = 'h3',
 }: Readonly<{
   matches: ReadonlyArray<AdministratorMatchPaginateResponse>
+  /** `h2` where the only heading above is the page's `h1`. */
+  headingLevel?: 'h2' | 'h3'
 }>): React.JSX.Element {
+  const Heading = headingLevel
+
   return (
     <div className="flex flex-col gap-6">
       {groupByDay(matches).map((day) => (
         <section key={day.key} aria-label={day.label}>
-          <h3 className="text-primary border-b pb-2 text-sm font-semibold first-letter:uppercase">
+          <Heading className="text-primary border-b pb-2 text-sm font-semibold first-letter:uppercase">
             {day.label}
-          </h3>
+          </Heading>
           <ul className="divide-border/60 divide-y">
             {day.matches.map((match) => (
               <MatchRow key={match.id} match={match} />

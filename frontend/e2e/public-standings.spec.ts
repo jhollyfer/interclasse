@@ -71,7 +71,7 @@ test.describe('public standings', () => {
     await waitForHydration(page)
 
     await expect(
-      page.getByRole('heading', { level: 3, name: /·/ }),
+      page.getByRole('heading', { level: 2, name: /·/ }),
     ).toBeVisible()
 
     await page.getByRole('link', { name: 'Voltar ao início' }).click()

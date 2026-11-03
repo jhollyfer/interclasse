@@ -27,6 +27,8 @@ type StandingsExplorerProps = Readonly<{
   /** The open bracket. When absent, opens the first of the first drawn category. */
   selected?: string
   onSelect: (id: string) => void
+  /** `h2` where the only heading above is the page's `h1`. */
+  headingLevel?: 'h2' | 'h3'
 }>
 
 /**
@@ -41,6 +43,7 @@ export function StandingsExplorer({
   brackets,
   selected,
   onSelect,
+  headingLevel = 'h3',
 }: StandingsExplorerProps): React.JSX.Element {
   const categories = CATEGORIES.filter((category) =>
     brackets.some((bracket) => bracket.category === category),
@@ -102,13 +105,21 @@ export function StandingsExplorer({
         ))}
       </div>
 
-      <StandingsBracket id={current.id} />
+      <StandingsBracket id={current.id} headingLevel={headingLevel} />
     </div>
   )
 }
 
 /** The open bracket. Changing bracket shows the skeleton, not the previous bracket. */
-function StandingsBracket({ id }: Readonly<{ id: string }>): React.JSX.Element {
+function StandingsBracket({
+  id,
+  headingLevel,
+}: Readonly<{
+  id: string
+  headingLevel: 'h2' | 'h3'
+}>): React.JSX.Element {
+  const Heading = headingLevel
+
   const {
     data: bracket,
     isPending,
@@ -123,12 +134,12 @@ function StandingsBracket({ id }: Readonly<{ id: string }>): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-3" aria-live="polite">
-      <h3 className="font-display text-3xl font-extrabold uppercase italic">
+      <Heading className="font-display text-3xl font-extrabold uppercase italic">
         {m.public_standings_bracket_title({
           sport: bracket.sport.name,
           category: CATEGORY_LABELS[bracket.category] ?? bracket.category,
         })}
-      </h3>
+      </Heading>
       {champion && (
         <p className="bg-accent text-accent-foreground flex items-center gap-3 rounded-lg p-4 text-lg font-extrabold uppercase italic">
           <TrophyIcon className="size-7" weight="fill" />

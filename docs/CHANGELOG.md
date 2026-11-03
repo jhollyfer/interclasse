@@ -20,6 +20,8 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 - Endereço que não existe (`/admin`, `/teams`, `/nao-existe`) responde 404 de verdade, e não mais 200 com a tela de erro; a tela continua com o menu e o rodapé do site.
 - "Sobre" não aparece no menu, no rodapé nem no mapa do site enquanto a organização não escreveu a apresentação dos jogos; o endereço `/about` continua abrindo, com o aviso de que ainda não há texto.
+- Menu do celular mostra o idioma ("PT-BR") ao lado do ícone, em vez de só o ícone.
+- Leitores de tela: nas páginas de jogos, classificação, chave e avisos os títulos seguem a ordem (1, 2, 3), sem pular nível, e a barra lateral do painel é uma região de navegação nomeada.
 - Login com a senha em branco acusa "Preencha este campo" na hora, sem enviar nada ao servidor; o campo de senha não traz mais os pontinhos de exemplo (pareciam senha digitada) e o texto de apoio dos campos ficou mais escuro, com contraste melhor.
 
 ### Alterado

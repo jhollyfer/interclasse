@@ -18,6 +18,7 @@ export function StandingsPage(): React.JSX.Element {
         <SectionTitle level="h1">{m.public_nav_standings()}</SectionTitle>
       </SectionHeader>
       <StandingsExplorer
+        headingLevel="h2"
         brackets={data?.data ?? []}
         selected={bracketId}
         onSelect={setBracketId}

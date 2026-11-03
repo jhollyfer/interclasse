@@ -8,13 +8,21 @@ import { m } from '#/paraglide/messages'
 
 import { Empty } from './section'
 
+/**
+ * `headingLevel`: the title is an `h3` under a section's `h2` (home), and an `h2` on the
+ * page whose only heading above is the `h1` - skipping a level breaks the screen-reader outline.
+ */
 export function AnnouncementList({
   announcements,
+  headingLevel = 'h3',
 }: Readonly<{
   announcements: ReadonlyArray<AdministratorAnnouncementShowResponse>
+  headingLevel?: 'h2' | 'h3'
 }>): React.JSX.Element {
   if (announcements.length === 0)
     return <Empty>{m.public_announcements_empty()}</Empty>
+
+  const Heading = headingLevel
 
   return (
     <ul className="grid gap-3">
@@ -33,7 +41,7 @@ export function AnnouncementList({
               {m.public_announcements_pinned()}
             </p>
           )}
-          <h3 className="font-semibold">{announcement.title}</h3>
+          <Heading className="font-semibold">{announcement.title}</Heading>
           <p className="text-muted-foreground mt-1 whitespace-pre-line">
             {announcement.body}
           </p>

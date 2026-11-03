@@ -33,6 +33,7 @@ export function BracketPage(): React.JSX.Element {
         <SectionMore to="/">{m.common_back_home()}</SectionMore>
       </SectionHeader>
       <StandingsExplorer
+        headingLevel="h2"
         brackets={data?.data ?? []}
         selected={id}
         onSelect={(next) =>

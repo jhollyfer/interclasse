@@ -244,7 +244,8 @@ function Sidebar({
   if (state === 'collapsed') collapsedKind = collapsible
 
   return (
-    <div
+    <aside
+      aria-label={m.common_ui_sidebar_title()}
       className="group peer hidden text-sidebar-foreground md:block"
       data-state={state}
       data-collapsible={collapsedKind}
@@ -290,7 +291,7 @@ function Sidebar({
           {children}
         </div>
       </div>
-    </div>
+    </aside>
   )
 }
 
