@@ -27,6 +27,7 @@
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm openapi:check && pnpm pattern:check && pnpm authz:check && pnpm test:unit",
     "sync:check": "node --import @poppinss/ts-exec scripts/sync-check.ts",
     "pattern:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts",
+    "validators:check": "node --import @poppinss/ts-exec scripts/pattern-check.ts --only=validators",
     "authz:check": "node --import @poppinss/ts-exec scripts/authz-check.ts",
     "depcruise": "depcruise app --config scripts/depcruise.config.ts",
     "di:check": "node ace di:check"

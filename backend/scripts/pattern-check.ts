@@ -16,6 +16,7 @@
  * Usage:
  *   node --import @poppinss/ts-exec scripts/pattern-check.ts            # fails
  *   node --import @poppinss/ts-exec scripts/pattern-check.ts --report   # only measures
+ *   node --import @poppinss/ts-exec scripts/pattern-check.ts --only=validators   # VineJS x Zod parity only (`validators:check`)
  */
 
 import { access, readdir, readFile } from 'node:fs/promises'
@@ -1018,7 +1019,9 @@ function report(findings: Finding[]): void {
 async function main(): Promise<void> {
   const flags = new Set(process.argv.slice(2))
   const files = await tsFiles(ROOT)
-  const findings: Finding[] = [...(await checkDirectories())]
+  const onlyValidators = flags.has('--only=validators')
+  const findings: Finding[] = []
+  if (!onlyValidators) findings.push(...(await checkDirectories()))
 
   const sources = new Map<string, string>()
 
@@ -1027,6 +1030,7 @@ async function main(): Promise<void> {
     if (relativePath.startsWith('scripts/')) continue
     const source = await readFile(file, 'utf8')
     sources.set(relativePath, withoutComments(source))
+    if (onlyValidators) continue
     findings.push(...applyRules(relativePath, source))
     findings.push(...checkClassName(relativePath, source))
     findings.push(...checkModelName(relativePath))
@@ -1037,6 +1041,14 @@ async function main(): Promise<void> {
     findings.push(...checkUseCaseNames(relativePath, source))
     findings.push(...checkActorName(relativePath, source))
     findings.push(...checkRelativeImportBetweenActions(relativePath, source))
+  }
+
+  if (onlyValidators) {
+    findings.push(...(await checkValidatorParity(sources)))
+    report(findings)
+    if (findings.length > 0) process.exitCode = 1
+
+    return
   }
 
   findings.push(...(await checkEnv(files)))
