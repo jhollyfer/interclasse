@@ -7,7 +7,7 @@
 
 | Atualizado | Fase atual                                   | Progresso | Status                                           |
 | ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| 2026-11-03 | Fase 11: teste do site no ar e polimento    | 83%       | 5 de 6 feitas; 11.6 depende do Coolify |
+| 2026-11-03 | Fase 11: teste do site no ar e polimento    | 90%       | 9 de 10 feitas; 11.6 depende do Coolify |
 
 ## Já feito
 
@@ -16,7 +16,7 @@
 
 ## Parou em
 
-Fase 11 (`TASKS.md`): 404 real no curinga público (`beforeLoad` com `notFound()`), "Sobre" fora do menu, do rodapé e do sitemap enquanto vazio (`lib/site-about.ts`), login com senha obrigatória no `shared`, `--muted-foreground` claro a 0,44, títulos em ordem (`headingLevel`), `<aside>` na barra lateral do painel e idioma visível no menu do celular. Verificado em navegador (Chromium, 1280 e 390) por papel: todas as rotas do administrador, do conselheiro e do representante carregam sem erro de rede nem de console, e o axe fecha limpo no site e no painel. O botão de 44x16 sem nome do achado (e) é o do TanStack Devtools, que só existe no `pnpm dev`. Prints em `.screenshots/` (fora do git). O E2E de `photos` precisa de MinIO e não roda sem Docker. A Fase 10 segue com PR aberto.
+Atualização de 03/11: kit `components/ui` completo (sem `chart`), tema claro/escuro/sistema em site, login e painel, responsivo revisado em 768 e 1440 (o dono quer responsivo em todos os tamanhos, não "cara de app"). CI da `main` verde até `26820db` com deploy; `validators:check` e `format:check` entraram no backend. Fase 11 (`TASKS.md`): 404 real no curinga público (`beforeLoad` com `notFound()`), "Sobre" fora do menu, do rodapé e do sitemap enquanto vazio (`lib/site-about.ts`), login com senha obrigatória no `shared`, `--muted-foreground` claro a 0,44, títulos em ordem (`headingLevel`), `<aside>` na barra lateral do painel e idioma visível no menu do celular. Verificado em navegador (Chromium, 1280 e 390) por papel: todas as rotas do administrador, do conselheiro e do representante carregam sem erro de rede nem de console, e o axe fecha limpo no site e no painel. O botão de 44x16 sem nome do achado (e) é o do TanStack Devtools, que só existe no `pnpm dev`. Prints em `.screenshots/` (fora do git). O E2E de `photos` precisa de MinIO e não roda sem Docker. A Fase 10 segue com PR aberto.
 
 ## Próximos passos
 

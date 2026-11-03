@@ -18,7 +18,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Adicionado
 
-- O tema claro/escuro pode ser trocado em qualquer tela: o botão agora também está no cabeçalho do site (inclusive no menu do celular) e na tela de entrada.
+- O tema pode ser escolhido em qualquer tela (claro, escuro ou o do sistema): o seletor agora também está no cabeçalho do site (inclusive no menu do celular) e na tela de entrada.
 - Componentes de interface novos para as telas (calendário, seleção, interruptor, grupo de opções, barra de progresso, paleta de comandos, gaveta, entre outros).
 
 ### Corrigido

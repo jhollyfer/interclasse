@@ -142,15 +142,16 @@ function storageStateOf(visitor: Visitor): string | undefined {
 }
 
 /**
- * Light at every width, and dark only on the phone: rolling sideways and
- * target size do not depend on the theme, contrast does not depend on the
- * width, so the dark pass costs one width and not three. Without the theme
+ * Light at every width, and dark at the narrowest and the widest: rolling sideways and
+ * target size do not depend on the theme, and the dark pass at both ends covers the
+ * two layouts that change most (phone and desktop). Without the theme
  * cookie the app follows `prefers-color-scheme`, which `colorScheme` emulates
  * (_doc-lib/playwright.md#docs/emulation).
  */
 const PASSES = [
   ...WIDTHS.map((width) => ({ width, colorScheme: 'light' }) as const),
   { width: PHONE, colorScheme: 'dark' } as const,
+  { width: 1280, colorScheme: 'dark' } as const,
 ]
 
 for (const { width, colorScheme } of PASSES) {
