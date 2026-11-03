@@ -5,6 +5,11 @@ name: Build Frontend
 # same reusable keeps a single gate for the PR and the deploy.
 on:
   workflow_call:
+    secrets:
+      VITE_API_URL:
+        required: false
+      VITE_SITE_URL:
+        required: false
     inputs:
       e2e:
         description: roda o Playwright; a main passa false, o PR já provou o mesmo código
@@ -20,3 +25,6 @@ jobs:
     with:
       publish: true
       e2e: ${{ inputs.e2e }}
+    secrets:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}

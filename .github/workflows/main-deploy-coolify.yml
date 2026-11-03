@@ -4,8 +4,8 @@ name: Deploy to Coolify
 # (`_standards/tooling.md` §8.3, `DECISIONS.md` #272): a UUID copied from another project
 # would redeploy the other project's application, and the site host in place of the panel
 # answers the route with the app's 404 HTML. The smoke test reads the public addresses from
-# the repository variables `VITE_API_URL` and `VITE_SITE_URL`, the same the build put in the
-# bundle.
+# the repository secrets `VITE_API_URL` and `VITE_SITE_URL`, the same the build put in the
+# bundle (`DECISIONS.md` #283).
 on:
   workflow_call:
     secrets:
@@ -19,6 +19,12 @@ on:
         required: true
       COOLIFY_APP_UUID:
         description: UUID da aplicação do frontend
+        required: true
+      VITE_API_URL:
+        description: endereço público da API (o smoke test chama /health-check nele)
+        required: true
+      VITE_SITE_URL:
+        description: endereço público do site (o smoke test lê /revision.txt nele)
         required: true
 
 permissions:
@@ -92,13 +98,13 @@ jobs:
       # 15 s up to two minutes, printing the type and the first bytes of a wrong answer.
       - name: Smoke test
         env:
-          API_URL: ${{ vars.VITE_API_URL }}
-          SITE_URL: ${{ vars.VITE_SITE_URL }}
+          API_URL: ${{ secrets.VITE_API_URL }}
+          SITE_URL: ${{ secrets.VITE_SITE_URL }}
           REVISION: ${{ github.sha }}
         run: |
           set -uo pipefail
           [ -n "$API_URL" ] && [ -n "$SITE_URL" ] \
-            || { echo "variáveis VITE_API_URL e VITE_SITE_URL do repositório são obrigatórias" >&2; exit 1; }
+            || { echo "secrets VITE_API_URL e VITE_SITE_URL do repositório são obrigatórios" >&2; exit 1; }
           body="$RUNNER_TEMP/smoke-body.txt"
           for attempt in $(seq 1 8); do
             api=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' "${API_URL%/}/health-check" || true)

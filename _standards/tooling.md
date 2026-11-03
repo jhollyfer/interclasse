@@ -793,8 +793,8 @@ interativo, e validado rodando lint num arquivo e um teste.
 nome do projeto (`name` do `package.json` da raiz) como `__PROJECT__`. O `sync-to-project.mjs` grava em
 `.github/workflows/` e o `--check` reprova divergência (`workflow-diverge:`): workflow não se edita no
 projeto, muda aqui (`DECISIONS.md` #279). O que varia por projeto fica fora do YAML: secrets do §8.3,
-variáveis de Actions `VITE_API_URL` e `VITE_SITE_URL` (sem barra final, lidas pelo build de produção e
-pelo smoke test) e o `backend/.env.test`.
+inclusive `VITE_API_URL` e `VITE_SITE_URL` (sem barra final, lidos pelo build de produção e pelo
+smoke test, `DECISIONS.md` #283) e o `backend/.env.test`.
 
 O mesmo vale para **código** que tem de ser igual em todo projeto da stack: mora em
 `_templates/code/<caminho>`, o sync grava em `<caminho>` no projeto e o `--check` reprova divergência
@@ -899,6 +899,25 @@ push): o merge entra com o E2E já provado, e repeti-lo atrasa o deploy em uns d
   vira header quebrado), reprova com o nome do secret vazio e com `COOLIFY_URL` que traga caminho
   (`/api`), antes do `curl`, e monta o endpoint como `${COOLIFY_URL%/}/api/v1/deploy`. URL ou UUID escrito no YAML é desvio: o host do site no lugar
   do painel responde a rota com o HTML de 404 do app, e o deploy nunca chega ao Coolify.
+- **Endereços públicos em secrets de Actions, criados antes do primeiro push na `main`.** O build
+  de produção embute `VITE_API_URL` e `VITE_SITE_URL` no bundle e o smoke test as lê. Ficam junto
+  dos demais valores do deploy, na aba **Secrets** do repositório (Settings, Secrets and
+  variables, Actions, Secrets), com estes nomes:
+
+  | Secret | Valor |
+  |---|---|
+  | `VITE_API_URL` | `https://` + endereço público da API, sem barra no fim |
+  | `VITE_SITE_URL` | `https://` + endereço público do site, sem barra no fim |
+
+  O `main.yml` repassa os dois ao `main-build-frontend.yml` (que os passa ao
+  `main-check-frontend.yml`) e ao `main-deploy-coolify.yml`; o PR não os usa e builda com os
+  endereços locais. O passo "Endereços de produção" reprova secret vazio, sem `https` ou com
+  barra final, antes do build; reprovando, o deploy não roda (o `deploy-to-coolify` espera o
+  build e as duas imagens). Os valores de produção de cada projeto moram no `docs/ENV.md` dele, e
+  o repositório nunca os escreve no YAML. Não existem em *Variables*: o workflow lê só
+  `secrets.`, e um valor criado na aba errada chega vazio. Workflow novo vindo do sync num projeto
+  que ainda não tem os secrets fica vermelho na primeira `main`: o sync avisa disso ao gravar os
+  workflows.
 - O disparo é assíncrono, então o job termina num **smoke test**: a API responde `200` em
   `/health-check`, e o app serve `/revision.txt` com corpo **igual a `GITHUB_SHA`**. Conferência pelo
   corpo, nunca pelo status: o catch-all de SSR responde `200` com HTML para arquivo ausente.

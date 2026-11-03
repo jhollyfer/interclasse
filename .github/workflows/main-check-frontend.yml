@@ -5,11 +5,19 @@ name: Check Frontend
 # deploy's (`_standards/tooling.md` §7, §8.1). The Playwright job runs only on the PR
 # (`e2e: false` on the push, `DECISIONS.md` #273).
 #
-# Repository variables (Settings, Secrets and variables, Actions, Variables), public by
-# definition because they enter the browser bundle: `VITE_API_URL` and `VITE_SITE_URL`, the
-# production addresses, without a trailing slash. Only the published build reads them.
+# Repository secrets (Settings, Secrets and variables, Actions, Secrets): `VITE_API_URL` and
+# `VITE_SITE_URL`, the production addresses, without a trailing slash. They enter the browser
+# bundle, but they live with the other deploy values, in secrets (`DECISIONS.md` #283). Only
+# the published build reads them.
 on:
   workflow_call:
+    secrets:
+      VITE_API_URL:
+        description: endereço público da API, https e sem barra no fim (só o build publicado lê)
+        required: false
+      VITE_SITE_URL:
+        description: endereço público do site, https e sem barra no fim (só o build publicado lê)
+        required: false
     inputs:
       publish:
         description: carimba o revision.txt, builda com os endereços de produção e publica o .output como artifact
@@ -87,15 +95,15 @@ jobs:
       - name: Endereços de produção
         if: ${{ inputs.publish }}
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
         run: |
           for name in VITE_API_URL VITE_SITE_URL; do
             value="${!name}"
             case "$value" in
-              https://*/) echo "variável $name sem barra no fim: $value" >&2; exit 1 ;;
+              https://*/) echo "secret $name sem barra no fim: $value" >&2; exit 1 ;;
               https://?*) ;;
-              *) echo "variável $name do repositório vazia ou sem https: '$value'" >&2; exit 1 ;;
+              *) echo "secret $name do repositório vazio ou sem https: '$value'" >&2; exit 1 ;;
             esac
           done
 
@@ -104,8 +112,8 @@ jobs:
       - name: Build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-          VITE_API_URL: ${{ inputs.publish && vars.VITE_API_URL || 'http://localhost:3333' }}
-          VITE_SITE_URL: ${{ inputs.publish && vars.VITE_SITE_URL || 'http://localhost:3000' }}
+          VITE_API_URL: ${{ inputs.publish && secrets.VITE_API_URL || 'http://localhost:3333' }}
+          VITE_SITE_URL: ${{ inputs.publish && secrets.VITE_SITE_URL || 'http://localhost:3000' }}
         run: pnpm --filter ./frontend --fail-if-no-match build
 
       # The Router plugin rewrites `routeTree.gen.ts` in the build. A generated tree that came

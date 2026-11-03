@@ -23,6 +23,9 @@ jobs:
     uses: ./.github/workflows/main-build-frontend.yml
     with:
       e2e: false
+    secrets:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
 
   docker-backend:
     needs: check-backend
@@ -48,3 +51,5 @@ jobs:
       COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
       COOLIFY_API_UUID: ${{ secrets.COOLIFY_API_UUID }}
       COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
