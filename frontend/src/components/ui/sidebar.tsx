@@ -316,7 +316,7 @@ function SidebarTrigger({
       {...props}
     >
       <SidebarIcon />
-      <span className="sr-only">Alternar barra lateral</span>
+      <span className="sr-only">{m.common_ui_sidebar_toggle()}</span>
     </Button>
   )
 }

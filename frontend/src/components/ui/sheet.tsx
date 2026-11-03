@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { cn } from '#/lib/cn'
+import { m } from '#/paraglide/messages'
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -69,7 +70,7 @@ function SheetContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Fechar</span>
+            <span className="sr-only">{m.common_ui_close()}</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>

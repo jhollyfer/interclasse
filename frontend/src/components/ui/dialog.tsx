@@ -6,6 +6,7 @@ import * as React from 'react'
 
 import { Button } from '#/components/ui/button'
 import { cn } from '#/lib/cn'
+import { m } from '#/paraglide/messages'
 
 // house: generic on the payload, for the typed `handle` and function children
 function Dialog<TPayload = unknown>({
@@ -75,7 +76,7 @@ function DialogContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Fechar</span>
+            <span className="sr-only">{m.common_ui_close()}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -113,7 +114,7 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close render={<Button variant="outline" />}>
-          Close
+          {m.common_ui_close()}
         </DialogPrimitive.Close>
       )}
     </div>

@@ -1,12 +1,22 @@
+import { ListIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { cva } from 'class-variance-authority'
-import type { VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'
 import { ThemeToggle } from '#/components/common/theme-toggle'
+import { Button, buttonVariants } from '#/components/ui/button'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '#/components/ui/sheet'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
@@ -15,61 +25,26 @@ import { AUTHENTICATION, visibleNavigation } from './menu'
 import type { MenuItem } from './menu'
 
 /**
- * The pill for each destination: in the top strip (`bar`) or in the phone panel
- * (`panel`). A style variant of the link itself, via `cva`, and not a
- * boolean structure prop.
+ * The pill for each destination in the top strip. The phone menu is the kit's `Sheet` and
+ * styles its own links; what is left here is what only the dark strip needs.
  */
-const navigationLinkVariants = cva(
-  'font-medium transition-colors duration-200 motion-reduce:transition-none',
-  {
-    variants: {
-      variant: {
-        bar: 'rounded-full px-4 py-1.5 text-sm',
-        panel: 'block rounded-lg px-4 py-3 text-base',
-      },
-    },
-    defaultVariants: { variant: 'bar' },
-  },
-)
-
-type NavigationLinkVariant = NonNullable<
-  VariantProps<typeof navigationLinkVariants>['variant']
->
+const NAVIGATION_PILL =
+  'font-medium transition-colors duration-200 motion-reduce:transition-none rounded-full px-4 py-1.5 text-sm'
 
 /**
  * The active item is the brand amber, and the inactive one is the faded light ink over
  * the night green. It is not `text-foreground`: this strip does not invert with the theme -
  * it is dark in both -, so the ink is the strip's token.
  */
-const ACTIVE = {
-  bar: 'bg-brand text-brand-ink font-semibold',
-  panel: 'text-brand font-semibold',
-} satisfies Record<NavigationLinkVariant, string>
+const ACTIVE_PILL = 'bg-brand text-brand-ink font-semibold'
 
-const INACTIVE = {
-  bar: 'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground',
-  panel:
-    'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/5 hover:text-brand-ink-foreground',
-} satisfies Record<NavigationLinkVariant, string>
+const INACTIVE_PILL =
+  'text-brand-ink-foreground/70 hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground'
 
-/** The menu panel: open it takes up height, closed it leaves the focus flow. */
-const MENU_PANEL: Record<string, string> = {
-  true: 'py-6',
-  false: 'invisible',
-}
-
-/** A navigation destination, in the top strip or in the phone panel. */
-type NavigationLinkProps = Readonly<{
-  item: MenuItem
-  variant?: NavigationLinkVariant
-  onNavigate?: () => void
-}>
-
+/** A navigation destination in the top strip. */
 function NavigationLink({
   item,
-  variant = 'bar',
-  onNavigate,
-}: NavigationLinkProps): React.JSX.Element {
+}: Readonly<{ item: MenuItem }>): React.JSX.Element {
   return (
     <Link
       data-slot="public-header-link"
@@ -80,10 +55,9 @@ function NavigationLink({
       // `inactiveProps` and not `className`: the Router adds `className` to
       // `activeProps`, and the two colors together left white text over the
       // yellow on the active item.
-      className={navigationLinkVariants({ variant })}
-      activeProps={{ className: ACTIVE[variant] }}
-      inactiveProps={{ className: INACTIVE[variant] }}
-      onClick={onNavigate}
+      className={NAVIGATION_PILL}
+      activeProps={{ className: ACTIVE_PILL }}
+      inactiveProps={{ className: INACTIVE_PILL }}
     >
       {item.label()}
     </Link>
@@ -113,16 +87,8 @@ function NavigationLink({
  * `styles.css` reaches both.
  */
 export function Header(): React.JSX.Element {
-  const [open, setOpen] = React.useState(false)
   const { data: site } = useQuery(storefrontSiteQueryOptions())
   const navigation = visibleNavigation(site)
-
-  let menuLabel = m.public_menu_open()
-  if (open) menuLabel = m.public_menu_close()
-
-  function close(): void {
-    setOpen(false)
-  }
 
   return (
     <header
@@ -148,7 +114,7 @@ export function Header(): React.JSX.Element {
           <Link
             to={AUTHENTICATION.to}
             className={cn(
-              navigationLinkVariants({ variant: 'bar' }),
+              NAVIGATION_PILL,
               'ml-2 bg-brand font-semibold text-brand-ink active:scale-press',
             )}
           >
@@ -159,68 +125,73 @@ export function Header(): React.JSX.Element {
         </nav>
 
         {/*
-          The hamburger that becomes an X. The three bars are `<span>`s with `transform`:
-          the top one rotates and drops, the middle one shrinks until it vanishes, the bottom one rotates and
-          rises. `origin-center` so the two diagonals cross in the middle.
+          The phone menu is the kit's `Sheet` (sheet-pattern): the focus trap, Esc and the
+          return of focus come from the primitive. The navigation links close it through
+          `SheetClose`, and not by an `onClick` that closes by hand.
         */}
-        <button
-          type="button"
-          data-slot="public-header-toggle"
-          data-open={open || undefined}
-          aria-expanded={open}
-          aria-label={menuLabel}
-          onClick={() => setOpen((previous) => !previous)}
-          className="group -mr-2 flex size-11 flex-col items-center justify-center gap-menu-bar text-brand-ink-foreground md:hidden"
-        >
-          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:translate-y-menu-bar-shift group-data-open:rotate-45 motion-reduce:transition-none" />
-          <span className="block h-px w-5 origin-center bg-current transition-transform duration-200 group-data-open:scale-x-0 motion-reduce:transition-none" />
-          <span className="block h-px w-5 origin-center bg-current transition-transform duration-250 group-data-open:-translate-y-menu-bar-shift group-data-open:-rotate-45 motion-reduce:transition-none" />
-        </button>
-      </div>
-
-      {/*
-        The mobile panel. `grid-rows-collapsed` to `grid-rows-expanded` animates the height without anyone
-        having to measure it - it is the CSS trick that replaces the
-        `height: auto` that a transition does not know how to animate. `invisible` when closed
-        because zero height with `overflow-hidden` still leaves the link focusable.
-      */}
-      <div
-        data-slot="public-header-mobile"
-        data-open={open || undefined}
-        className="grid grid-rows-collapsed overflow-hidden border-brand-ink-foreground/10 opacity-0 transition-reveal duration-300 data-open:grid-rows-expanded data-open:border-t data-open:opacity-100 motion-reduce:transition-none md:hidden"
-        aria-hidden={!open}
-      >
-        <nav
-          className={cn(
-            'container mx-auto flex min-h-0 flex-col gap-1 px-4',
-            MENU_PANEL[String(open)],
-          )}
-        >
-          {navigation.map((item) => (
-            <NavigationLink
-              key={item.to}
-              item={item}
-              variant="panel"
-              onNavigate={close}
-            />
-          ))}
-
-          <Link
-            to={AUTHENTICATION.to}
-            onClick={close}
-            className={cn(
-              navigationLinkVariants({ variant: 'panel' }),
-              'mt-3 rounded-full bg-brand text-center font-semibold text-brand-ink active:scale-press',
-            )}
-          >
-            {AUTHENTICATION.label()}
-          </Link>
-          <LocaleSwitch
-            visibleLabel
-            className="mt-2 self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10"
+        <Sheet>
+          <SheetTrigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                data-slot="public-header-toggle"
+                aria-label={m.public_menu_open()}
+                className="-mr-2 text-brand-ink-foreground hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground md:hidden"
+              >
+                <ListIcon aria-hidden />
+              </Button>
+            }
           />
-          <ThemeToggle className="self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground" />
-        </nav>
+          <SheetContent side="right" className="w-72">
+            <SheetHeader>
+              <SheetTitle>{m.public_menu_title()}</SheetTitle>
+              <SheetDescription className="sr-only">
+                {m.public_menu_description()}
+              </SheetDescription>
+            </SheetHeader>
+            <nav
+              data-slot="public-header-mobile"
+              className="flex flex-col gap-1 px-4"
+            >
+              {navigation.map((item) => (
+                <SheetClose
+                  key={item.to}
+                  render={
+                    <Link
+                      to={item.to}
+                      activeOptions={{ exact: item.to === '/' }}
+                      className={buttonVariants({
+                        variant: 'ghost',
+                        className: 'justify-start',
+                      })}
+                      activeProps={{ className: 'bg-muted font-semibold' }}
+                    />
+                  }
+                >
+                  {item.label()}
+                </SheetClose>
+              ))}
+              <SheetClose
+                render={
+                  <Link
+                    to={AUTHENTICATION.to}
+                    className={buttonVariants({
+                      className: 'mt-3 justify-center',
+                    })}
+                  />
+                }
+              >
+                {AUTHENTICATION.label()}
+              </SheetClose>
+            </nav>
+            <SheetFooter className="flex-row items-center justify-start gap-1">
+              <LocaleSwitch visibleLabel />
+              <ThemeToggle />
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   )

@@ -4,11 +4,12 @@ import { CaretRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
 import * as React from 'react'
 
 import { cn } from '#/lib/cn'
+import { m } from '#/paraglide/messages'
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
     <nav
-      aria-label="breadcrumb"
+      aria-label={m.common_ui_breadcrumb()}
       data-slot="breadcrumb"
       className={cn(className)}
       {...props}
@@ -106,7 +107,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <DotsThreeIcon />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{m.common_ui_more()}</span>
     </span>
   )
 }
