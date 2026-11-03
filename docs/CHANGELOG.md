@@ -16,6 +16,10 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
 - `SESSION_DRIVER` deixa de existir.
 
+### Corrigido
+
+- Endereço que não existe (`/admin`, `/teams`, `/nao-existe`) responde 404 de verdade, e não mais 200 com a tela de erro; a tela continua com o menu e o rodapé do site.
+
 ### Alterado
 
 - Chaves de ambiente no catálogo da casa: a conta do primeiro administrador volta a ser `SEED_OWNER_EMAIL` e `SEED_OWNER_PASSWORD` (o nome `SEED_ADMINISTRATOR_*` deixa de existir); o seed do administrador e o da demonstração ligam quando a senha tem valor, em qualquer ambiente, e sem ela são pulados com uma linha de log. As contas de demonstração passam a ser `advisor@example.com`, `advisor-2@example.com` e `representative@example.com`, entre outras.

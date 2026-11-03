@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { NotFoundPage } from '#/components/common/not-found-page'
 import { pageHead } from '#/lib/page-head'
@@ -26,6 +26,13 @@ import { m } from '#/paraglide/messages'
  * wrong URL with a success response.
  */
 export const Route = createFileRoute('/_public/$')({
+  beforeLoad: () => {
+    throw notFound()
+  },
+  // The catch-all matches every unknown address, so the route "exists" and the
+  // router would answer 200. `notFound()` is what turns the match into a real
+  // 404 (status and `notFoundComponent`), see
+  // _doc-lib/tanstack-router.md#guide/not-found-errors.
   head: ({ match }) =>
     pageHead({
       title: m.common_not_found_title(),
@@ -35,5 +42,5 @@ export const Route = createFileRoute('/_public/$')({
   // `min-h` smaller than the default: inside the shell the screen shares the height with the
   // header and footer, and `min-h-dvh` would push the footer out of the
   // first fold.
-  component: () => <NotFoundPage className="min-h-stage-sm" />,
+  notFoundComponent: () => <NotFoundPage className="min-h-stage-sm" />,
 })
