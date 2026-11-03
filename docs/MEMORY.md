@@ -20,6 +20,7 @@ Atualização de 03/11: kit `components/ui` completo (sem `chart`), tema claro/e
 
 ## Próximos passos
 
+00. Testar o envio de foto de ponta a ponta em produção quando o host do R2 estiver liberado para o ambiente de testes (o upload usa `interclass.<id>.r2.cloudflarestorage.com`, com o bucket no subdomínio). O limite de entrada (5 por minuto, bloqueio de 10 min por IP) atrapalha teste automatizado em sequência: espaçar os logins.
 0. Definir `SITE_ENV=production` nas variáveis do site no Coolify: sem ela o `robots.txt` responde `Disallow: /` e o site sai dos buscadores (o código e o `ENV.md` já dizem isso; 11.6). Com a API de pé o `sitemap.xml` lista as páginas e as chaves.
 1. No GitHub, criar os secrets `COOLIFY_URL` (base do painel, sem caminho), `COOLIFY_API_UUID` e `COOLIFY_APP_UUID` (o `COOLIFY_TOKEN` já existe) **antes** do merge: o deploy reprova com o nome do secret vazio.
 2. No Coolify: trocar `SEED_ADMINISTRATOR_*` por `SEED_OWNER_*` na API e `VITE_STORAGE_URL` por `STORAGE_PUBLIC_URL` (runtime, no site). Sem `STORAGE_PUBLIC_URL` o CSP bloqueia o upload.
