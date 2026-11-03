@@ -195,6 +195,16 @@
               }
             }
           },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -3338,6 +3348,16 @@
               }
             }
           },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -5920,6 +5940,16 @@
               }
             }
           },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -5961,6 +5991,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
                 }
               }
             }
@@ -6388,6 +6428,16 @@
               }
             }
           },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -6632,6 +6682,16 @@
               }
             }
           },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Erro interno do servidor",
             "content": {
@@ -6787,6 +6847,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error422ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error429TooManyRequests"
                 }
               }
             }
@@ -19671,6 +19741,40 @@
           "status",
           "code",
           "errors"
+        ]
+      },
+      "Error429TooManyRequests": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message in Portuguese, displayable to the user."
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              429
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Machine identifier of the failure.",
+            "enum": [
+              "TOO_MANY_REQUESTS"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Message per field, when the failure is attributable to payload fields."
+          }
+        },
+        "required": [
+          "message",
+          "status",
+          "code"
         ]
       },
       "Error500AccountProfileShowError": {

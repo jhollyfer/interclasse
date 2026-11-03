@@ -24,6 +24,7 @@ const DESCRIPTIONS: Record<number, string> = {
   404: 'Resource not found',
   409: 'Conflict with the current state',
   422: 'Payload rejected by validation',
+  429: 'Too many attempts',
   500: 'Internal server error',
 }
 
@@ -120,6 +121,8 @@ export const AUTOMATIC_CODES = {
   forbidden: 'ACCESS_DENIED',
   /** `HttpExceptionHandler` translates VineJS's `E_VALIDATION_ERROR`. */
   validation: 'VALIDATION_ERROR',
+  /** `HttpExceptionHandler` translates the limiter's `E_TOO_MANY_REQUESTS`. */
+  rateLimited: 'TOO_MANY_REQUESTS',
 } as const
 
 export function forbiddenDescription(roles: string[]): string {

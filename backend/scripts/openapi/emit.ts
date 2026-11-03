@@ -299,6 +299,8 @@ function deriveSummary(
 type Protection = {
   authenticated: boolean
   roles: string[]
+  /** A limiter (`start/limiter.ts`) sits on the route: the 429 is part of the contract. */
+  throttled: boolean
 }
 
 /** What `route.middleware.all()` returns, without repeating the framework union. */
@@ -325,7 +327,11 @@ function toRoles(args: unknown): string[] {
 async function readProtection(
   middleware: Iterable<MiddlewareEntry>,
 ): Promise<Protection> {
-  const protection: Protection = { authenticated: false, roles: [] }
+  const protection: Protection = {
+    authenticated: false,
+    roles: [],
+    throttled: false,
+  }
 
   let allowed: string[] | undefined
 
@@ -333,6 +339,9 @@ async function readProtection(
     const info = await middlewareInfo(entry)
 
     if (info.type === 'global') continue
+    // The limiters are closures named `<what>Throttle` by `limiter.define`.
+    if (info.type === 'closure' && info.name.endsWith('Throttle'))
+      protection.throttled = true
     if (info.name === 'auth') protection.authenticated = true
     if (info.name !== 'role') continue
     if (!('args' in info)) continue
@@ -570,6 +579,9 @@ function buildErrorResponses(
   if (contract.body || contract.query || contract.params) {
     add(422, AUTOMATIC_CODES.validation, 'Invalid data')
   }
+
+  if (protection.throttled)
+    add(429, AUTOMATIC_CODES.rateLimited, 'Too many requests')
 
   add(500)
 

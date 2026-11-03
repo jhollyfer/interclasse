@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { test } from '@japa/runner'
@@ -54,5 +55,28 @@ test.group('scripts > openapi > introspect (unit)', () => {
 
     assert.isString(conflict?.message)
     assert.notInclude(conflict?.message ?? '', 'sports.')
+  })
+
+  test('the committed openapi.json describes the 429 of every route behind a limiter', async ({
+    assert,
+  }) => {
+    const document = JSON.parse(
+      await readFile(join(import.meta.dirname, '../../openapi.json'), 'utf8'),
+    )
+    const throttled = [
+      ['/authentication/sign-in', 'post'],
+      ['/authentication/refresh', 'post'],
+      ['/account', 'put'],
+      ['/storages', 'post'],
+      ['/administrator/reports/csv', 'get'],
+    ] as const
+
+    for (const [path, method] of throttled) {
+      assert.property(
+        document.paths[path][method].responses,
+        '429',
+        `${method.toUpperCase()} ${path} is behind a limiter and does not document the 429`,
+      )
+    }
   })
 })
