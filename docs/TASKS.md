@@ -157,7 +157,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 |---|---|---|---|---|
 | 10.1 | Chaves de ambiente no catálogo (`backend.md` §6.2): `SEED_OWNER_*`, seed ligado pela chave, `STORAGE_PUBLIC_URL` em runtime, `E2E_OWNER_*` + `E2E_DEMO_PASSWORD`, `E2E_BASE_URL`, secrets do deploy `COOLIFY_*` | Alta | Feita | branch `chore/env-catalogo-padrao`. `SEED_OWNER_*` e seed ligado pela chave (dono e demonstração sem `static environment`), `.env.example` dos dois apps no modelo, CSP montado por requisição em `src/server.ts` com `STORAGE_PUBLIC_URL`, `VITE_UPLOAD_MAX_SIZE` no `env.ts`, E2E em `E2E_OWNER_*` + `E2E_DEMO_PASSWORD` + `E2E_BASE_URL`, secrets `COOLIFY_*`. Não rodado aqui: E2E (sem Docker) |
 
-## Fase 11 · Teste no site no ar e polimento (5/6)
+## Fase 11 · Teste no site no ar e polimento (7/8)
 
 Achados do teste do site publicado e da passada de navegador (1280 e 390) por perfil; cada item confirmado no código antes de corrigir.
 
@@ -169,6 +169,8 @@ Achados do teste do site publicado e da passada de navegador (1280 e 390) por pe
 | 11.4 | Menu do celular: idioma com rótulo visível | Média | Feita | o botão de 44x16 sem nome era o do TanStack Devtools (só existe no dev) |
 | 11.5 | Acessibilidade: ordem dos títulos nas páginas públicas, `<aside>` na barra lateral do painel | Média | Feita | axe limpo no site e no painel |
 | 11.6 | `robots.txt` e mapa do site em produção | Alta | Bloqueada | confirmado no código e rodando com API de pé (mapa com as chaves); o código só libera com `SITE_ENV=production` (já em `ENV.md`); definir a variável no Coolify é do Jhollyfer. Com a API de pé o mapa lista as chaves |
+| 11.7 | Kit `components/ui` completo (shadcn/Base UI): accordion, aspect-ratio, calendar, carousel, collapsible, command, context-menu, drawer, hover-card, input-otp, item, kbd, menubar, navigation-menu, popover, progress, radio-group, resizable, scroll-area, select, slider, switch, toggle, toggle-group | Média | Feita | adaptados à lint da casa (sem ternário nem `as`, textos por i18n); de fora: `chart` (depende de `dangerouslySetInnerHTML` e `as`; entra quando houver gráfico) e as peças de chat/IA. Em uso: `Progress` no envio de arquivos, `ToggleGroup` na classificação, `Button` no carrossel de fotos |
+| 11.8 | Tema claro e escuro em todo o site: seletor também no cabeçalho público (desktop e celular) e no login | Alta | Feita | `ThemeToggle` subiu para `components/common/theme-toggle` (3 áreas usam), com teste; contraste conferido pelo axe nos dois temas |
 
 ## Fase N · Ideias (fora do escopo atual)
 

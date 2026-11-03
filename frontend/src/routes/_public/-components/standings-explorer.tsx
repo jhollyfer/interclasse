@@ -10,8 +10,8 @@ import type * as React from 'react'
 import { BracketTree } from '#/components/common/bracket-tree'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
 import { storefrontBracketQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
-import { cn } from '#/lib/cn'
 import {
   BRACKET_STATUS_LABELS,
   CATEGORY_LABELS,
@@ -81,29 +81,30 @@ export function StandingsExplorer({
         </TabsList>
       </Tabs>
 
-      <div
-        role="group"
+      <ToggleGroup
         aria-label={m.public_standings_sport_label()}
-        className="flex flex-wrap gap-2"
+        variant="outline"
+        value={[current.id]}
+        // Always one open bracket: pressing the one that is already open does not clear it.
+        onValueChange={(value: Array<string>) => {
+          const next = value.at(0)
+          if (next) onSelect(next)
+        }}
+        className="flex-wrap"
       >
         {inCategory.map((bracket) => (
-          <button
+          <ToggleGroupItem
             key={bracket.id}
-            type="button"
-            aria-pressed={bracket.id === current.id}
-            onClick={() => onSelect(bracket.id)}
-            className={cn(
-              'hover:border-primary hover:text-primary flex flex-col items-start rounded-md border px-4 py-2 text-left transition-colors active:scale-press motion-reduce:transition-none',
-              'aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground',
-            )}
+            value={bracket.id}
+            className="active:scale-press hover:border-primary hover:text-primary h-auto flex-col items-start px-4 py-2 text-left aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground"
           >
             <span className="font-semibold">{bracket.sport.name}</span>
             <span className="text-xs">
               {BRACKET_STATUS_LABELS[bracket.status]}
             </span>
-          </button>
+          </ToggleGroupItem>
         ))}
-      </div>
+      </ToggleGroup>
 
       <StandingsBracket id={current.id} headingLevel={headingLevel} />
     </div>

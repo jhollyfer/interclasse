@@ -16,6 +16,11 @@ Mudanças de Interclasse que quem usa percebe. Formato
 - Limite por usuário em upload, troca de conta e exportação do relatório; limite por IP na renovação da sessão.
 - `SESSION_DRIVER` deixa de existir.
 
+### Adicionado
+
+- O tema claro/escuro pode ser trocado em qualquer tela: o botão agora também está no cabeçalho do site (inclusive no menu do celular) e na tela de entrada.
+- Componentes de interface novos para as telas (calendário, seleção, interruptor, grupo de opções, barra de progresso, paleta de comandos, gaveta, entre outros).
+
 ### Corrigido
 
 - Endereço que não existe (`/admin`, `/teams`, `/nao-existe`) responde 404 de verdade, e não mais 200 com a tela de erro; a tela continua com o menu e o rodapé do site.

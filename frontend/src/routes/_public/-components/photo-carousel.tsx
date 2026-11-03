@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import * as React from 'react'
 
 import { Picture } from '#/components/common/picture'
+import { Button } from '#/components/ui/button'
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
@@ -63,22 +64,26 @@ export function PhotoCarousel(): React.JSX.Element | null {
       <SectionHeader>
         <SectionTitle>{m.public_photos_title()}</SectionTitle>
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             aria-label={m.public_photos_previous()}
             onClick={() => step(-1)}
-            className="hover:border-primary rounded-full border p-2"
+            className="rounded-full"
           >
-            <CaretLeftIcon />
-          </button>
-          <button
+            <CaretLeftIcon aria-hidden />
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             aria-label={m.public_photos_next()}
             onClick={() => step(1)}
-            className="hover:border-primary rounded-full border p-2"
+            className="rounded-full"
           >
-            <CaretRightIcon />
-          </button>
+            <CaretRightIcon aria-hidden />
+          </Button>
         </div>
       </SectionHeader>
       <ul

@@ -3,6 +3,7 @@ import { UploadSimpleIcon, XIcon } from '@phosphor-icons/react'
 import type * as React from 'react'
 
 import { Button } from '#/components/ui/button'
+import { Progress } from '#/components/ui/progress'
 import { Spinner } from '#/components/ui/spinner'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
@@ -89,12 +90,7 @@ export function MultiFileUploadList({
               {STATUS_TEXTS[item.status](item.name, item.percent)}
             </span>
             {item.status === 'uploading' && (
-              <progress
-                className="h-1 w-full"
-                max={100}
-                value={item.percent}
-                aria-label={item.name}
-              />
+              <Progress value={item.percent} aria-label={item.name} />
             )}
           </div>
           <Button
