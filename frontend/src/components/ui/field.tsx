@@ -2,8 +2,8 @@ import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 
-import { Label } from '#/components/ui/label.tsx'
-import { Separator } from '#/components/ui/separator.tsx'
+import { Label } from '#/components/ui/label'
+import { Separator } from '#/components/ui/separator'
 import { cn } from '#/lib/cn'
 
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {

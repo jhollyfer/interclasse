@@ -3,7 +3,7 @@ import { useRender } from '@base-ui/react/use-render'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
 
-import { Separator } from '#/components/ui/separator.tsx'
+import { Separator } from '#/components/ui/separator'
 import { cn } from '#/lib/cn'
 
 const buttonGroupVariants = cva(

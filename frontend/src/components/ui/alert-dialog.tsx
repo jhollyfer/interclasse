@@ -1,7 +1,7 @@
 import { AlertDialog as AlertDialogPrimitive } from '@base-ui/react/alert-dialog'
 import * as React from 'react'
 
-import { Button } from '#/components/ui/button.tsx'
+import { Button } from '#/components/ui/button'
 import { cn } from '#/lib/cn'
 
 // house: generic on the payload, for the typed `handle` and function children

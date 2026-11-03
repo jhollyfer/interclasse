@@ -2,13 +2,13 @@ import { Combobox as ComboboxPrimitive } from '@base-ui/react'
 import { CaretDownIcon, XIcon, CheckIcon } from '@phosphor-icons/react'
 import * as React from 'react'
 
-import { Button } from '#/components/ui/button.tsx'
+import { Button } from '#/components/ui/button'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from '#/components/ui/input-group.tsx'
+} from '#/components/ui/input-group'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
