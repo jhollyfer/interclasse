@@ -7,7 +7,7 @@
 
 | Atualizado | Fase atual                                   | Progresso | Status                                           |
 | ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| 2026-11-02 | Fase 10: chaves de ambiente no catálogo      | 100%      | Feita na branch, falta CI e merge |
+| 2026-11-03 | Fase 11: teste do site no ar e polimento    | 83%       | 5 de 6 feitas; 11.6 depende do Coolify |
 
 ## Já feito
 
@@ -16,10 +16,11 @@
 
 ## Parou em
 
-Fase 10 (chaves de ambiente no catálogo da régua, `DECISIONS.md` #276) feita na branch `chore/env-catalogo-padrao`, com PR aberto e sem merge. `SEED_OWNER_*` no lugar de `SEED_ADMINISTRATOR_*`; os seeds do administrador e da demonstração ligam pela presença da senha, em qualquer ambiente; contas de demonstração `advisor@example.com`, `advisor-2@example.com`, `representative@example.com`. O E2E lê só `E2E_BASE_URL`, `E2E_API_URL`, `E2E_OWNER_*` e `E2E_DEMO_PASSWORD`. O CSP sai de `src/server.ts`, com `STORAGE_PUBLIC_URL` lida por requisição (substitui `VITE_STORAGE_URL`). O deploy lê os secrets `COOLIFY_URL`, `COOLIFY_TOKEN`, `COOLIFY_API_UUID` e `COOLIFY_APP_UUID`. O E2E (Playwright) não rodou nesta sessão por falta de Docker; o job do CI é a prova.
+Fase 11 (`TASKS.md`): 404 real no curinga público (`beforeLoad` com `notFound()`), "Sobre" fora do menu, do rodapé e do sitemap enquanto vazio (`lib/site-about.ts`), login com senha obrigatória no `shared`, `--muted-foreground` claro a 0,44, títulos em ordem (`headingLevel`), `<aside>` na barra lateral do painel e idioma visível no menu do celular. Verificado em navegador (Chromium, 1280 e 390) por papel: todas as rotas do administrador, do conselheiro e do representante carregam sem erro de rede nem de console, e o axe fecha limpo no site e no painel. O botão de 44x16 sem nome do achado (e) é o do TanStack Devtools, que só existe no `pnpm dev`. Prints em `.screenshots/` (fora do git). O E2E de `photos` precisa de MinIO e não roda sem Docker. A Fase 10 segue com PR aberto.
 
 ## Próximos passos
 
+0. Definir `SITE_ENV=production` nas variáveis do site no Coolify: sem ela o `robots.txt` responde `Disallow: /` e o site sai dos buscadores (o código e o `ENV.md` já dizem isso; 11.6). Com a API de pé o `sitemap.xml` lista as páginas e as chaves.
 1. No GitHub, criar os secrets `COOLIFY_URL` (base do painel, sem caminho), `COOLIFY_API_UUID` e `COOLIFY_APP_UUID` (o `COOLIFY_TOKEN` já existe) **antes** do merge: o deploy reprova com o nome do secret vazio.
 2. No Coolify: trocar `SEED_ADMINISTRATOR_*` por `SEED_OWNER_*` na API e `VITE_STORAGE_URL` por `STORAGE_PUBLIC_URL` (runtime, no site). Sem `STORAGE_PUBLIC_URL` o CSP bloqueia o upload.
 3. Deploy: a API responde 503 no Coolify desde o #25. Abrir os logs do container da API no último deploy e conferir as variáveis (`CORS_ORIGINS`, `TRUSTED_PROXIES`, `DATABASE_URL`, `STORAGE_*`, `APP_KEY`), o *Post-deployment* (`node ace migration:run --force`) e o healthcheck.
