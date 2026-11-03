@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '#/components/ui/tooltip'
+import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -23,7 +24,9 @@ import { m } from '#/paraglide/messages'
  * which icon appears is the `dark` class on `<html>`, which the `ThemeProvider`
  * script resolves before hydration.
  */
-export function ThemeToggle(): React.JSX.Element {
+export function ThemeToggle({
+  className,
+}: Readonly<{ className?: string }>): React.JSX.Element {
   const { setTheme } = useTheme('ThemeToggle')
 
   function toggle(): void {
@@ -46,7 +49,7 @@ export function ThemeToggle(): React.JSX.Element {
             size="icon"
             onClick={toggle}
             aria-label={m.panel_toggle_theme()}
-            className="relative overflow-hidden"
+            className={cn('relative overflow-hidden', className)}
           >
             <SunIcon
               weight="fill"

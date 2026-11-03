@@ -6,6 +6,7 @@ import * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'
+import { ThemeToggle } from '#/components/common/theme-toggle'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
@@ -154,6 +155,7 @@ export function Header(): React.JSX.Element {
             {AUTHENTICATION.label()}
           </Link>
           <LocaleSwitch className="ml-1 text-brand-ink-foreground hover:bg-brand-ink-foreground/10" />
+          <ThemeToggle className="text-brand-ink-foreground hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground" />
         </nav>
 
         {/*
@@ -217,6 +219,7 @@ export function Header(): React.JSX.Element {
             visibleLabel
             className="mt-2 self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10"
           />
+          <ThemeToggle className="self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10 hover:text-brand-ink-foreground" />
         </nav>
       </div>
     </header>

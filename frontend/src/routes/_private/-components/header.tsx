@@ -3,6 +3,7 @@ import { getRouteApi, Link, useMatches } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { LocaleSwitch } from '#/components/common/locale-switch'
+import { ThemeToggle } from '#/components/common/theme-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import {
   Breadcrumb,
@@ -34,7 +35,6 @@ import {
   SignOutConfirmFooter,
   SignOutConfirmHeader,
 } from './sign-out-confirm'
-import { ThemeToggle } from './theme-toggle'
 
 const route = getRouteApi('/_private')
 

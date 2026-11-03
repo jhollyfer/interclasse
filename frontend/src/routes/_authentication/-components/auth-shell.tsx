@@ -3,7 +3,9 @@ import { Link } from '@tanstack/react-router'
 import type * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
+import { LocaleSwitch } from '#/components/common/locale-switch'
 import { MaiyuCredit } from '#/components/common/maiyu-credit'
+import { ThemeToggle } from '#/components/common/theme-toggle'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
@@ -167,8 +169,13 @@ function AuthShellContent({
       >
         {children}
       </div>
-      <footer className="text-muted-foreground mt-auto px-4 py-4 text-xs sm:px-6 [&_a]:text-foreground">
+      <footer className="text-muted-foreground mt-auto flex items-center justify-between gap-4 px-4 py-4 text-xs sm:px-6 [&_a]:text-foreground">
         <MaiyuCredit />
+        {/* The theme and the language are chosen before signing in too: the dashboard header is not reached yet. */}
+        <div className="flex items-center gap-1 text-foreground">
+          <LocaleSwitch visibleLabel />
+          <ThemeToggle />
+        </div>
       </footer>
     </main>
   )
