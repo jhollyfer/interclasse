@@ -1,5 +1,8 @@
 name: Docker Frontend
 
+# Image built from the workspace root (`_standards/tooling.md` §8.2), packaging the `.output`
+# of the build job (`main-build-frontend.yml`). Tags `latest` and the commit SHA: the SHA tag
+# is what makes rollback a redeploy, not a rebuild.
 on:
   workflow_call:
     secrets:
@@ -17,13 +20,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      # O `.dockerignore` da raiz reabre só `frontend/.output`, que é o que o
-      # Dockerfile copia do artifact.
+      # The ready `.output`, already with the stamped `revision.txt`, comes from the build
+      # job. The root `.dockerignore` reopens only `frontend/.output`, and
+      # `frontend/Dockerfile-production` copies `frontend/.output/` (the context is the root).
       - name: Download artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:

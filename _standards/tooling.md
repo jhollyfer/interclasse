@@ -511,7 +511,9 @@ export default {
 
 **Sem ponto e vírgula** *(opinião da casa)*, porque é o default do `@adonisjs/prettier-config`:
 adotar o config de uma lib oficial reduz a chance de o próximo projeto divergir. Um
-`prettier.config.js` por app, igual nos três. Projeto que ainda está com `semi: true` migra na
+`prettier.config.js` por app, igual nos três e em todo projeto: mora em `_templates/code/<app>/` e o
+sync cobra (`code-diverge:`, `DECISIONS.md` #280). O `@adonisjs/prettier-config` não entra: ele traz
+`printWidth: 100`, e o mesmo arquivo sairia formatado diferente em cada projeto. Projeto que ainda está com `semi: true` migra na
 próxima reformatação em massa (`MIGRATIONS.md`), não num commit avulso. O CI roda
 `prettier --check` (§7).
 
@@ -564,7 +566,7 @@ não basta: ferramenta de agente injeta o trailer por padrão.
    esac
    ```
 
-3. **CI no PR** (`main-check-*.yml`, passo antes do lint):
+3. **CI no PR** (job `repository` do `ci.yml`, que roda até em PR só de texto, §7):
    `git log --format='%an <%ae>%n%B' "origin/<base>..${{ github.event.pull_request.head.sha }}"` (por
    `env:`, nunca interpolado no `run:`) e o mesmo `grep`; achou trailer de agente ou autor diferente,
    o job falha. Até o head do PR, não até o `HEAD`: no `pull_request` o `HEAD` é o merge sintético que
@@ -786,6 +788,18 @@ interativo, e validado rodando lint num arquivo e um teste.
 ├── main-docker-frontend.yml  # workflow_call
 └── main-deploy-coolify.yml   # workflow_call
 ```
+
+**Os nove arquivos são iguais em todo projeto da stack** e moram em `_templates/workflows/`, com o
+nome do projeto (`name` do `package.json` da raiz) como `__PROJECT__`. O `sync-to-project.mjs` grava em
+`.github/workflows/` e o `--check` reprova divergência (`workflow-diverge:`): workflow não se edita no
+projeto, muda aqui (`DECISIONS.md` #279). O que varia por projeto fica fora do YAML: secrets do §8.3,
+variáveis de Actions `VITE_API_URL` e `VITE_SITE_URL` (sem barra final, lidas pelo build de produção e
+pelo smoke test) e o `backend/.env.test`.
+
+O mesmo vale para **código** que tem de ser igual em todo projeto da stack: mora em
+`_templates/code/<caminho>`, o sync grava em `<caminho>` no projeto e o `--check` reprova divergência
+(`code-diverge:`). Só o arquivo que existe ali é cobrado; o resto do projeto continua dele. Bug achado
+num projeto num arquivo desses se corrige aqui e volta para todos (`DECISIONS.md` #280).
 
 `main.yml`: `check-backend` ∥ `build-frontend` → `docker-backend` ∥ `docker-frontend` → `deploy`.
 O deploy espera as **duas** imagens: implantar o frontend contra uma API que não passou é publicar

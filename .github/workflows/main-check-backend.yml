@@ -1,8 +1,13 @@
 name: Check Backend
 
-# Reutilizável: o PR (`ci.yml`) e o push em `main` (`main.yml`) chamam este
-# mesmo arquivo, para o PR não passar por uma régua diferente da do deploy
-# (_standards/tooling.md §7, §8.1). O `shared/` roda antes do backend.
+# Reusable: the PR (`ci.yml`) and the push to main (`main.yml`) call this same file, so the
+# PR does not go through a different gate from the deploy's (`_standards/tooling.md` §7,
+# §8.1). `shared/` is checked before the backend.
+#
+# Per-project values are read from `backend/.env.test` (versioned), never written here:
+# database user, password and name, bucket, storage credential and port. The Postgres service
+# listens on 5432 in the runner, and the E2E jobs point `DATABASE_URL` at it keeping the rest
+# of the `.env.test` URL (user, password, database).
 on:
   workflow_call:
 
@@ -11,37 +16,17 @@ permissions:
 
 jobs:
   check:
-    name: Shared e Backend - check, unitário e build
+    name: Shared e Backend - Guard-rails, Unit & Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # O histórico inteiro: o passo de autor lê `origin/<base>..HEAD`.
-          fetch-depth: 0
           persist-credentials: false
 
-      # Autor único e sem marca de agente (tooling.md §6, camada 3). Pega o
-      # commit feito com `--no-verify` ou numa máquina sem o hook. Lê até o
-      # head do PR, não até o HEAD: no `pull_request` o HEAD é o merge sintético
-      # que o GitHub assina com o e-mail noreply do autor do PR.
-      - name: Autor e trailer dos commits
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          commits=$(git log --format='%an <%ae>%n%B' "origin/${BASE_REF}..${HEAD_SHA}")
-          if printf '%s\n' "$commits" | grep -qiE '^(co-authored-by|claude-session):|generated with|noreply@anthropic\.com|anthropic\.com/claude'; then
-            echo "trailer ou marca de agente em commit do PR" >&2
-            exit 1
-          fi
-          if git log --format='%ae' "origin/${BASE_REF}..${HEAD_SHA}" | grep -qvx 'jhollyfer.fr@gmail.com'; then
-            echo "autor de commit diferente do dono do repositório" >&2
-            exit 1
-          fi
-
+      # pnpm at the version of `devEngines.packageManager` and Node through `runtime`,
+      # without `actions/setup-node` (_doc-lib/pnpm.md#continuous-integration, `DECISIONS.md` #249).
       - name: Setup pnpm e Node
         uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
@@ -52,12 +37,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # O backend importa o `dist/` do `@interclasse/shared`.
-      - name: Build shared
-        run: pnpm --filter ./shared --fail-if-no-match run build
+      # `shared/` has its own gate, and the backend imports its `dist/`: check and unit come
+      # before any backend step, and the build before everything that resolves the package.
+      - name: Shared - Check
+        run: pnpm --filter ./shared --fail-if-no-match check
 
-      - name: Check shared
-        run: pnpm --filter ./shared --fail-if-no-match check && pnpm --filter ./shared --fail-if-no-match test:unit
+      - name: Shared - Unit
+        run: pnpm --filter ./shared --fail-if-no-match test:unit
+
+      - name: Shared - Build
+        run: pnpm --filter ./shared --fail-if-no-match build
 
       - name: Lint
         run: pnpm --filter ./backend --fail-if-no-match lint
@@ -65,70 +54,104 @@ jobs:
       - name: Typecheck
         run: pnpm --filter ./backend --fail-if-no-match typecheck
 
-      - name: Guard-rails do padrão
-        run: pnpm --filter ./backend --fail-if-no-match pattern:check && pnpm --filter ./backend --fail-if-no-match authz:check
+      - name: Prettier
+        run: pnpm --filter ./backend --fail-if-no-match format:check
 
-      # Direção das camadas e ciclo (domain.md §8).
-      - name: Camadas
+      - name: Guard-rails do padrão
+        run: |
+          pnpm --filter ./backend --fail-if-no-match pattern:check
+          pnpm --filter ./backend --fail-if-no-match authz:check
+
+      # Layer direction and cycles (`domain.md` §8). It runs after `pattern:check`, which
+      # demands the tree and the names; this one demands the graph.
+      - name: Direção das camadas
         run: pnpm --filter ./backend --fail-if-no-match depcruise
 
-      # `openapi.json` é artefato commitado. O `env` é do passo, e não do job:
-      # o comando boota a aplicação e o boot valida `start/env.ts`. Estes valores
-      # existem só para o schema passar; no job inteiro venceriam o `.env.test`
-      # dos passos seguintes, porque variável de processo tem precedência sobre
-      # arquivo.
-      - name: Check OpenAPI document
-        working-directory: ./backend
+      # The VineJS validator and its Zod pair in `shared/` (`backend.md` §4, `DECISIONS.md`
+      # #241). The import reads `start/env.ts`, so the step carries the placeholders below.
+      #
+      # The `env` blocks belong to the step, and not to the job: these values exist only so the
+      # schema of `start/env.ts` passes, and on the whole job they would win over the
+      # `.env.test` of the E2E, because a process variable takes precedence over a file
+      # (`_standards/tooling.md` §7). None of them works outside this job.
+      - name: Paridade VineJS × Zod
         env:
           NODE_ENV: development
           PORT: '3333'
           HOST: 0.0.0.0
+          TZ: UTC
           LOG_LEVEL: info
-          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
           APP_SERVER_URL: http://localhost:3333
+          CORS_ORIGINS: http://localhost:3000
+          TRUSTED_PROXIES: loopback
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
           UPLOAD_MAX_SIZE: '1073741824'
-          STORAGE_KEY: ci-placeholder
-          STORAGE_SECRET: ci-placeholder
-          STORAGE_BUCKET: ci-placeholder
-          STORAGE_ENDPOINT: http://localhost:9004
-        run: pnpm openapi:check
+          STORAGE_KEY: ci
+          STORAGE_SECRET: ci
+          STORAGE_BUCKET: ci
+          STORAGE_ENDPOINT: http://localhost:9000
+        run: pnpm --filter ./backend --fail-if-no-match validators:check
 
-      - name: Test unit
-        working-directory: ./backend
+      # `openapi.json` is a committed artifact (`openapi:generate --check --strict`): this step
+      # fails whoever touched a route, a validator or a `docs` block and did not regenerate it.
+      - name: OpenAPI
+        env:
+          NODE_ENV: development
+          PORT: '3333'
+          HOST: 0.0.0.0
+          TZ: UTC
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
+          APP_SERVER_URL: http://localhost:3333
+          CORS_ORIGINS: http://localhost:3000
+          TRUSTED_PROXIES: loopback
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          UPLOAD_MAX_SIZE: '1073741824'
+          STORAGE_KEY: ci
+          STORAGE_SECRET: ci
+          STORAGE_BUCKET: ci
+          STORAGE_ENDPOINT: http://localhost:9000
+        run: pnpm --filter ./backend --fail-if-no-match openapi:check
+
+      # The Japa runner boots the application for the unit suite too: only the variables
+      # that `.env.test` does not bring go in.
+      - name: Unit
         env:
           PORT: '3333'
           HOST: 0.0.0.0
+          TZ: UTC
           LOG_LEVEL: info
-          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
           APP_SERVER_URL: http://localhost:3333
-        run: pnpm test:unit
+        run: pnpm --filter ./backend --fail-if-no-match test:unit
 
-      # Typecheck de dev e build de produção usam configs diferentes o bastante
-      # para um passar e o outro falhar (`node ace build`).
+      # Dev typecheck and production build (`node ace build`) use configs different enough
+      # for one to pass and the other to fail.
       - name: Build
-        working-directory: ./backend
         env:
           NODE_ENV: development
           PORT: '3333'
           HOST: 0.0.0.0
+          TZ: UTC
           LOG_LEVEL: info
-          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
           APP_SERVER_URL: http://localhost:3333
+          CORS_ORIGINS: http://localhost:3000
+          TRUSTED_PROXIES: loopback
           DATABASE_URL: postgres://ci:ci@localhost:5432/ci
           UPLOAD_MAX_SIZE: '1073741824'
-          STORAGE_KEY: ci-placeholder
-          STORAGE_SECRET: ci-placeholder
-          STORAGE_BUCKET: ci-placeholder
-          STORAGE_ENDPOINT: http://localhost:9004
-        run: pnpm run build
+          STORAGE_KEY: ci
+          STORAGE_SECRET: ci
+          STORAGE_BUCKET: ci
+          STORAGE_ENDPOINT: http://localhost:9000
+        run: pnpm --filter ./backend --fail-if-no-match build
 
-  # A suíte inteira em matriz de shards (`tooling.md` §10.6, `DECISIONS.md` #253):
-  # o Japa divide por arquivo (`--shard=atual/total`, _doc-lib/japa.md#docs/filtering-tests,
-  # https://japa.dev/docs/filtering-tests) e roda os testes em série, então cada
-  # shard tem o próprio job, o próprio Postgres e o próprio MinIO. O Japa não
-  # junta relatório de shards (não há `merge-reports`): cada job mostra o seu, e
-  # a falha de qualquer um reprova o workflow.
+  # The whole API suite in a matrix of shards (`_standards/tooling.md` §10.6, `DECISIONS.md`
+  # #253), in parallel with `check`: Japa splits by file (`--shard=current/total`,
+  # _doc-lib/japa.md#docs/filtering-tests) and runs the tests serially, so each shard has its
+  # own job, its own Postgres and its own MinIO. Japa has no `merge-reports`: each job shows
+  # its own report, and a failure in any of them fails the workflow.
   e2e:
     name: Backend - E2E ${{ matrix.shard }}
     runs-on: ubuntu-latest
@@ -139,8 +162,8 @@ jobs:
       matrix:
         shard: ['1/3', '2/3', '3/3']
 
-    # A porta e o nome do banco vêm de `backend/.env.test`, que é versionado:
-    # 5434 no host e `interclasse_test`.
+    # User, password and database are the ones of `backend/.env.test`
+    # (`postgres://interclasse:interclasse@.../interclasse_test`).
     services:
       database:
         image: postgres:18-alpine
@@ -149,7 +172,7 @@ jobs:
           POSTGRES_PASSWORD: interclasse
           POSTGRES_DB: interclasse_test
         ports:
-          - '5434:5432'
+          - '5432:5432'
         options: >-
           --health-cmd "pg_isready -U interclasse -d interclasse_test"
           --health-interval 5s
@@ -157,7 +180,7 @@ jobs:
           --health-retries 10
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -172,85 +195,99 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # O backend importa o `dist/` do `@interclasse/shared`.
-      - name: Build shared
-        run: pnpm --filter ./shared --fail-if-no-match run build
+      # The backend imports `@interclasse/shared`'s `dist/`.
+      - name: Shared - Build
+        run: pnpm --filter ./shared --fail-if-no-match build
 
-      # O MinIO não sobe como `services:` porque precisa de `command`. A imagem
-      # é compilada de `backend/infra/minio/Dockerfile` (a `minio/minio` saiu do
-      # Docker Hub), com cache da camada de build (tooling.md §8.4).
-      - name: Setup Buildx
+      # The local port of `.env.test` exists so the project does not collide with another one
+      # on the developer's machine; in the runner the service is on 5432. Only the port
+      # changes: user, password and database stay the file's.
+      - name: Banco do job no DATABASE_URL
+        run: |
+          url=$(grep -E '^DATABASE_URL=' backend/.env.test | tail -n 1 | cut -d= -f2-)
+          [ -n "$url" ] || { echo "DATABASE_URL ausente em backend/.env.test" >&2; exit 1; }
+          echo "DATABASE_URL=$(printf '%s' "$url" | sed -E 's#@[^/@]+/#@localhost:5432/#')" >> "$GITHUB_ENV"
+
+      # MinIO does not come up as `services:` because it needs a `command`. The image is the
+      # house test one, compiled from source (`backend/infra/minio/Dockerfile`), with the build
+      # layer cached (`_standards/tooling.md` §7, §8.4).
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      - name: Build MinIO
+      - name: Build da imagem do MinIO de teste
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: backend/infra/minio
           load: true
           push: false
-          tags: interclasse-minio-test:2025-10-15
-          cache-from: type=gha,scope=minio
-          cache-to: type=gha,mode=max,scope=minio
+          tags: interclasse-minio-test:ci
+          cache-from: type=gha,scope=minio-test
+          cache-to: type=gha,mode=max,scope=minio-test
 
+      # Endpoint, credential and bucket come from `.env.test`, so the suite talks to exactly
+      # what the file says. `minio-setup.sh` creates `<bucket>` and `<bucket>-test`, closed,
+      # and a minimal-scope user; the endpoint goes both as argument and as
+      # `STORAGE_ENDPOINT`, the two forms the setup scripts of the house accept. The wait is
+      # for the state (the bucket exists and answers), not for `sleep`.
       - name: Start MinIO
         env:
           MINIO_ROOT_USER: ci-minio-root
           MINIO_ROOT_PASSWORD: ci-minio-root-secret
         run: |
+          envtest() { grep -E "^$1=" backend/.env.test | tail -n 1 | cut -d= -f2-; }
+          STORAGE_ENDPOINT=$(envtest STORAGE_ENDPOINT)
+          STORAGE_KEY=$(envtest STORAGE_KEY)
+          STORAGE_SECRET=$(envtest STORAGE_SECRET)
+          test_bucket=$(envtest STORAGE_BUCKET)
+          STORAGE_BUCKET="${test_bucket%-test}"
+          port="${STORAGE_ENDPOINT##*:}"
+          port="${port%%/*}"
+          export STORAGE_ENDPOINT STORAGE_KEY STORAGE_SECRET STORAGE_BUCKET
+
           docker run -d --name minio --network host \
             -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
-            -e MINIO_API_CORS_ALLOW_ORIGIN='http://localhost:5173,http://localhost:4173' \
-            interclasse-minio-test:2025-10-15 server /data --address ":9004" --console-address ":9003"
+            interclasse-minio-test:ci server /data --address ":${port}" --console-address ":$((port + 1))"
 
-      # A espera é pelo estado: o setup roda até o bucket de teste existir e
-      # responder, e não por `sleep` (tooling.md §7, passo 7).
-      - name: Setup MinIO e espera pelo bucket
-        env:
-          STORAGE_ENDPOINT: http://localhost:9004
-          MINIO_ROOT_USER: ci-minio-root
-          MINIO_ROOT_PASSWORD: ci-minio-root-secret
-          STORAGE_KEY: interclasse
-          STORAGE_SECRET: interclasse-secret
-          STORAGE_BUCKET: interclasse
-        run: |
           for _ in $(seq 1 30); do
             if docker run --rm --network host \
               -e STORAGE_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
               -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
               -v "$PWD/backend/infra/minio:/setup:ro" \
-              --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
-              -c 'sh /setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}-test"'; then
+              --entrypoint /bin/sh interclasse-minio-test:ci \
+              -c 'sh /setup/minio-setup.sh "$STORAGE_ENDPOINT" && mc ls "local/${STORAGE_BUCKET}-test"'; then
               exit 0
             fi
             sleep 2
           done
+          docker logs minio >&2
           echo "o bucket de teste não ficou disponível" >&2
           exit 1
 
-      # A suíte fala com o Postgres e com o MinIO de verdade. Só entram aqui as
-      # variáveis que `.env.test` não traz.
-      - name: Test e2e
+      # The suite talks to the real Postgres and MinIO. Only the variables that `.env.test`
+      # does not bring go in here.
+      - name: E2E
         working-directory: ./backend
         env:
           PORT: '3333'
           HOST: 0.0.0.0
+          TZ: UTC
           LOG_LEVEL: info
-          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
           APP_SERVER_URL: http://localhost:3333
           SHARD: ${{ matrix.shard }}
         run: pnpm test:e2e --shard="${SHARD}"
 
-      # Depois da suíte, no mesmo job: `di:check` boota a aplicação, e aqui o
-      # banco e o bucket já estão de pé. `NODE_ENV: test` faz o Adonis carregar
-      # o `.env.test`.
+      # Builds every service, repository and policy through the container; it stays in a job
+      # that already has the database and bucket up, once (`backend.md` §10). `NODE_ENV: test`
+      # makes the boot read `.env.test`; without it `node ace` looks for a `.env` CI does not have.
       - name: Injeção de dependência
-        if: matrix.shard == '1/3'
-        working-directory: ./backend
+        if: ${{ matrix.shard == '1/3' }}
         env:
           NODE_ENV: test
           PORT: '3333'
           HOST: 0.0.0.0
+          TZ: UTC
           LOG_LEVEL: info
-          APP_KEY: ci-placeholder-sem-uso-fora-deste-job
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
           APP_SERVER_URL: http://localhost:3333
-        run: pnpm di:check
+        run: pnpm --filter ./backend --fail-if-no-match di:check

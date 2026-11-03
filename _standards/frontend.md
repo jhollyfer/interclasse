@@ -738,6 +738,7 @@ não reescreve (`architecture.md` §1, princípio 9); peça nova nasce compound 
 | `components/common/option-combobox/` | combobox de opções (+ `toOptions`) | combobox local e paginado |
 | `components/common/input-password/` | senha com mostrar/ocultar | formulário de sessão |
 | `components/common/picture/` | imagem com dimensão, `alt` e carregamento por posição | §9.6 |
+| `components/common/maiyu-credit/` | crédito do rodapé: logo da Maiyu (`src/assets/maiyu.png`) + "Desenvolvido por Maiyu", com `Maiyu` em link para `https://maiyu.com.br` | abaixo |
 | `components/common/image-field/`, `multi-file-upload/` | campo que sobe o arquivo na escolha | registra no `uploading-context` |
 | `components/common/rich-editor/` | editor de texto rico, carregado sob demanda (§9.4); grava o JSON do Tiptap | _doc-lib/tiptap.md |
 | `components/common/rich-text/` | leitura de conteúdo rico (JSON do editor ou Markdown de fora via `MarkdownManager.parse`) por `renderToReactElement` do `@tiptap/static-renderer`, sem editor e sem `innerHTML` | _doc-lib/tiptap.md#api/utilities/static-renderer |
@@ -751,6 +752,13 @@ não reescreve (`architecture.md` §1, princípio 9); peça nova nasce compound 
 | `lib/local-store.ts` | `localStorage` versionado e validado | §2 |
 | `lib/bulk.ts` | ação em massa sem endpoint dedicado | abaixo |
 | `lib/chunking.ts`, `upload-transport.ts`, `upload-resume.ts` | upload em partes, retomável | arquivo grande sem refazer do zero |
+
+**Crédito no rodapé** *(opinião da casa, `DECISIONS.md` #277)*: todo rodapé (o do site público e, onde
+existir, o do painel e o da tela de sessão) mostra só `<MaiyuCredit />`, igual em todo projeto: a logo
+decorativa (`alt=""`, 20 px, por `Picture`) e a frase "Desenvolvido por Maiyu" (mensagem
+`common_maiyu_credit`, `{#link}Maiyu{/link}` no catálogo de cada idioma), link com `target="_blank"` e
+`rel="noopener noreferrer"`. Sem slogan, ano, "todos os direitos" ou outra frase de autoria; a cor vem
+de quem usa (`className`). Montar o crédito à mão na tela é desvio.
 
 **Link em conteúdo rico**: `href` só `https:`, `http:` e `mailto:`, conferido no validator do backend ao
 gravar o JSON. O React 19 bloqueia `javascript:`, mas não `data:` (skill `security-audit`, CLIENT-SIDE.md).

@@ -84,6 +84,7 @@ backend/
 │   │   ├── response.ts              # envelope { message, status, code, errors? }, Paginated<T>
 │   │   ├── translation.ts           # Adonis: Translation.t(chave, variáveis) com o idioma da requisição (i18n.md §3)
 │   │   ├── same-site.ts             # valor de sameSite do cookie de sessão, decidido no boot (backend.md §4.10)
+│   │   ├── trusted-proxies.ts       # TRUSTED_PROXIES em lista, validado no boot; igual em todo projeto (_templates/code/, DECISIONS #280)
 │   │   ├── transaction-context.ts   # AsyncLocalStorage da transação, lido por 2+ repositories (domain.md §6)
 │   │   ├── validator.ts             # Fastify: reexporta o z de shared/ + regras só do backend; Adonis: o vine do backend (arquivo)
 │   │   ├── validator.unit.spec.ts   # meta-spec dos validators (backend.md §4.4)
@@ -96,7 +97,7 @@ backend/
 │   │   │   └── <entidade>.unit.spec.ts
 │   │   └── shared/<nome>.value-object.ts  # value object só do backend (Money, Slug com unicidade…)
 │   ├── repositories/
-│   │   ├── shared/<nome>.ts               # só o que importa model e serve a 2+ repositories (Adonis: lucid-mapping.ts); sem model, vai para core/
+│   │   ├── shared/<nome>.ts               # serve a 2+ repositories e importa model ou faz I/O de persistência (Adonis: lucid-mapping.ts; driver: conexão, coleção com escopo); helper puro vai para core/ (DECISIONS #278)
 │   │   ├── unit-of-work/{unit-of-work.ts, unit-of-work.lucid.ts, unit-of-work.memory.ts}   # domain.md §6
 │   │   └── <entidade>/
 │   │       ├── <entidade>.repository.ts            # contrato: abstract class, métodos por intenção
@@ -246,7 +247,7 @@ Arquivo que não é código de camada também tem casa. O que não está aqui ne
 |---|---|---|
 | `.editorconfig` | raiz do repositório, um só | vale para os três pacotes; nenhum pacote tem o seu |
 | `.gitleaks.toml` | raiz, só se o projeto usa `gitleaks` (`tooling.md` §7) | allowlist com o motivo de cada entrada |
-| `.prettierignore` | um por pacote (`backend/`, `frontend/`, `shared/`) | só gerados e saída de build: o `.gitignore` da raiz não alcança o pacote onde o Prettier roda. Página do Prettier sobre `.prettierignore` não conferida |
+| `.prettierignore` | um por pacote (`backend/`, `frontend/`, `shared/`) | só gerados e saída de build: o `.gitignore` da raiz não alcança o pacote onde o Prettier roda. No frontend entra `project.inlang/.lix`: o `inlang check` recria o README dele no CI e o `format:check` reprova. Página do Prettier sobre `.prettierignore` não conferida |
 | `tsconfig.depcruise.json` | raiz do backend, só quando o alias do app não resolve pelo `tsConfig` | estende `tsconfig.json` e repete o alias em `paths`; o `tsConfig` do dependency-cruiser só lê `compilerOptions` (_doc-lib/dependency-cruiser.md#doc/options-reference.md). Com o alias no campo `imports` do `package.json` (Fastify), o `tsConfig` apontando para o `tsconfig.json` e as `conditionNames` do `enhancedResolveOptions` já resolvem: o arquivo não existe, para o alias não ficar em dois lugares (`DECISIONS.md` #263) |
 | `scripts/depcruise.config.ts` | `backend/scripts/` | `depcruise app --config scripts/depcruise.config.ts` (_doc-lib/dependency-cruiser.md#doc/cli.md) |
 | `backend/infra/<serviço>/` | Dockerfile e script do serviço de teste local; CORS e política de provedor em `infra/<provedor>-<tema>.json` | nunca produção (`tooling.md` §8.3) |

@@ -11,12 +11,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# `check-backend` ∥ `build-frontend` → `docker-backend` ∥ `docker-frontend` → `deploy`
+# (`_standards/tooling.md` §8.1).
 jobs:
   check-backend:
     uses: ./.github/workflows/main-check-backend.yml
 
+  # Playwright runs only on the PR: the merge enters with the E2E already proved, and
+  # repeating it delays the deploy (`_standards/tooling.md` §8.1, `DECISIONS.md` #273).
   build-frontend:
     uses: ./.github/workflows/main-build-frontend.yml
+    with:
+      e2e: false
 
   docker-backend:
     needs: check-backend
@@ -32,8 +38,8 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  # Depois das duas imagens no Docker Hub, e não antes: implantar o frontend
-  # contra uma API que falhou o build é publicar meia versão.
+  # After the two images are on Docker Hub, and not before: deploying the frontend
+  # against an API whose build failed is publishing half a version.
   deploy-to-coolify:
     needs: [docker-backend, docker-frontend]
     uses: ./.github/workflows/main-deploy-coolify.yml

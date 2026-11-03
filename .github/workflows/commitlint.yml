@@ -1,11 +1,13 @@
 name: Commitlint
 
-# Conventional Commits em pt-BR, cobrado também fora do hook local: quem usa
-# `--no-verify` passa direto pelo `commit-msg` (_standards/tooling.md §6, §7).
-# Workflow próprio para uma mensagem inválida não esperar nem bloquear a suíte.
+# Conventional Commits, also enforced outside the local hook: `--no-verify` skips the
+# `commit-msg` hook (`_standards/tooling.md` §6, §7). A workflow of its own, so an invalid
+# message neither waits for nor blocks the suite.
 on:
+  # `edited` because the PR title is validated here: a corrected title must
+  # pass the standard again, and a push alone is not enough.
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -16,12 +18,13 @@ concurrency:
 
 jobs:
   commitlint:
+    name: Commits, título e branch do PR
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # O histórico inteiro: sem ele o `--from` do PR não resolve.
+          # The whole history: without it the PR's `--from` does not resolve.
           fetch-depth: 0
           persist-credentials: false
 
@@ -35,13 +38,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # A versão da devDependency, lendo o `.commitlintrc.json` do repositório.
+      # The version is the root devDependency's (`pnpm exec`), the same as the local
+      # hook's, reading the repository's `.commitlintrc.json` (`_standards/tooling.md` §7).
       - name: Commits do PR
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
 
+      # Title and branch in the convention and without an agent name
+      # (`_standards/tooling.md` §6, `DECISIONS.md` #244).
       - name: Título e branch do PR
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -51,6 +57,5 @@ jobs:
           printf '%s\n' "$PR_BRANCH" | grep -qE '^(feat|fix|refactor|docs|test|chore|ci|build|perf|style|revert)/[a-z0-9][a-z0-9-]*$' \
             || { echo "branch fora do padrão <tipo>/<escopo>-<assunto>: $PR_BRANCH" >&2; exit 1; }
           if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -qiE 'claude|anthropic|codex|cursor'; then
-            echo "nome de agente no título ou na branch do PR" >&2
-            exit 1
+            echo "nome de agente no título ou na branch do PR" >&2; exit 1
           fi

@@ -1,10 +1,10 @@
-import adonis from '@adonisjs/prettier-config'
+//  @ts-check
 
-/**
- * O `@adonisjs/prettier-config`, com a vírgula final em toda lista
- * (_standards/tooling.md §5): `semi: false` e `singleQuote` já vêm dele.
- */
-export default {
-  ...adonis,
+/** @type {import('prettier').Config} */
+const config = {
+  semi: false,
+  singleQuote: true,
   trailingComma: 'all',
 }
+
+export default config

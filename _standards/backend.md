@@ -1292,6 +1292,12 @@ nome e significado vêm daqui.
 | `APP_CLIENT_URL` | api | só com app e API em sites diferentes | não | origem pública do web; decide o `sameSite` do cookie (§4.10) |
 | `TRUSTED_PROXIES` | api | em produção atrás de proxy | não | proxies cujo `X-Forwarded-For` vale; lista de endereços, CIDR e `loopback`, `linklocal`, `uniquelocal`; ausente vale `loopback`; nunca `true` |
 
+O leitor é um só, `app/core/trusted-proxies.ts`, igual em todo projeto e levado pelo sync de
+`_templates/code/` (`DECISIONS.md` #280): o `proxy-addr` não divide string por vírgula, e entregar
+`loopback,uniquelocal` cru ao `trustProxy` derruba o boot com `invalid IP address` (o 503 do aporta em
+2026-11-03). O `start/env.ts` valida com `TrustedProxies.validate` e o `config/app.ts` usa
+`TrustedProxies.compile(env.get('TRUSTED_PROXIES'))`; string crua no `trustProxy` é desvio.
+
 `TRUSTED_PROXIES=uniquelocal` é o valor da casa para a rede interna do Coolify/Traefik: cobre as
 faixas privadas (10/8, 172.16/12, 192.168/16, fc00::/7) sem listar a rede de cada servidor. Com a
 **Cloudflare** na frente do Traefik, o `X-Forwarded-For` chega com o IP da Cloudflare no meio da
@@ -1342,6 +1348,14 @@ para funcionar (bairros, categorias) não tem chave e roda sempre. Conteúdo de 
 partida de mentira) é parte da demonstração e liga com `SEED_DEMO_PASSWORD`; conta extra de exemplo
 não reusa `SEED_OWNER_PASSWORD`. O mesmo vale para todo recurso do catálogo: valor presente liga,
 ausente desliga (`DECISIONS.md` #276).
+
+**Forma da demonstração.** Um seeder só, `database/seeders/dev/demo.ts`, idempotente (`updateOrCreate`
+pela chave natural), que roda no `node ace db:seed` e pelo atalho `pnpm db:seed:demo`. Uma conta por
+papel do `USER_ROLE` do `shared/`, fora o dono, com e-mail `<papel em minúsculo>@example.com`
+(`advisor@example.com`); segunda conta do mesmo papel `<papel>-2@example.com`. A lista de e-mails mora
+em `shared/src/records/demo-accounts.ts` (`DEMO_ACCOUNTS`), lida pelo seeder e pelo
+`frontend/e2e/support/env.ts`; não se repete. O conteúdo de exemplo cobre toda tela de todo papel
+(cada status de cada recurso) e é reconhecível como exemplo.
 
 `OWNER` aqui é "dono da instalação", o primeiro administrador, e o nome não muda com o papel que o
 projeto der a ele. As contas de demonstração (um usuário por papel, para testar e mostrar cada perfil)

@@ -1,20 +1,35 @@
 name: Check Frontend
 
-# Reutilizável: o PR (`ci.yml`) e o push em `main` (`main-build-frontend.yml`)
-# chamam este mesmo arquivo (_standards/tooling.md §7, §8.1).
+# The same gate on the PR (`ci.yml`) and on the push to main (`main-build-frontend.yml`, which
+# calls this one with `publish: true`): the PR does not go through a different gate from the
+# deploy's (`_standards/tooling.md` §7, §8.1). The Playwright job runs only on the PR
+# (`e2e: false` on the push, `DECISIONS.md` #273).
+#
+# Repository variables (Settings, Secrets and variables, Actions, Variables), public by
+# definition because they enter the browser bundle: `VITE_API_URL` and `VITE_SITE_URL`, the
+# production addresses, without a trailing slash. Only the published build reads them.
 on:
   workflow_call:
+    inputs:
+      publish:
+        description: carimba o revision.txt, builda com os endereços de produção e publica o .output como artifact
+        type: boolean
+        default: false
+      e2e:
+        description: roda o Playwright (só no PR; o push na main já entra com o PR provado)
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 jobs:
   check:
-    name: Frontend - check, testes e build
+    name: Frontend - Lint, Typecheck, Unit & Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -29,54 +44,120 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # O frontend importa o `dist/` do `@interclasse/shared`.
-      - name: Build shared
-        run: pnpm --filter ./shared --fail-if-no-match run build
+      # The frontend imports `@interclasse/shared`'s `dist/`: the build comes before any step
+      # that resolves the package (type-aware lint, typecheck, Vitest). Its check and unit run
+      # in `main-check-backend.yml`, which every caller of this file also calls.
+      - name: Shared - Build
+        run: pnpm --filter ./shared --fail-if-no-match build
 
-      # As mensagens do Paraglide compiladas antes de tudo que lê tipo: a saída
-      # (`src/paraglide/`) não é versionada (_standards/i18n.md §2). O compilador
-      # baixa os plugins do jsDelivr (`project.inlang/settings.json`).
-      - name: Compile messages
-        run: pnpm --filter ./frontend --fail-if-no-match i18n:compile
-
-      # Tradução, variável e plural faltando; mensagem sem uso (i18n.md §4).
-      - name: Check messages
-        run: pnpm --filter ./frontend --fail-if-no-match i18n:check
+      # The Paraglide output (`src/paraglide/`) is not versioned: lint, typecheck and Vitest
+      # import from it, so it compiles first. The compiler downloads the plugins pinned in
+      # `project.inlang/settings.json` from jsDelivr. The inlang `check` fails a missing
+      # translation, variable or plural and an unused message (`_standards/i18n.md` §4).
+      - name: i18n
+        run: |
+          pnpm --filter ./frontend --fail-if-no-match i18n:compile
+          pnpm --filter ./frontend --fail-if-no-match i18n:check
 
       - name: Lint
         run: pnpm --filter ./frontend --fail-if-no-match lint
 
-      # `vite build` apaga tipo sem checar nada; o `tsc --noEmit` inclui `e2e/`.
+      # `vite build` erases types without checking anything; the `tsc --noEmit` includes `e2e/`
+      # (_doc-lib/playwright.md#docs/test-typescript).
       - name: Typecheck
         run: pnpm --filter ./frontend --fail-if-no-match typecheck
 
       - name: Prettier
         run: pnpm --filter ./frontend --fail-if-no-match format:check
 
-      - name: Test unit
+      - name: Unit
         run: pnpm --filter ./frontend --fail-if-no-match test:unit
 
+      # The stamp comes before the build: Nitro serves `public/` through a manifest frozen at
+      # build, and a file written afterwards falls into the SSR catch-all
+      # (_doc-lib/nitro.md#docs/assets). The deploy checks this body against the SHA.
+      - name: Carimbo de revisão
+        if: ${{ inputs.publish }}
+        env:
+          REVISION: ${{ github.sha }}
+        run: printf '%s' "$REVISION" > frontend/public/revision.txt
+
+      # The published build refuses to package an app that talks to `localhost` or to plain
+      # http (`_standards/frontend.md`, "Endereço da API sem default de rede").
+      - name: Endereços de produção
+        if: ${{ inputs.publish }}
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+        run: |
+          for name in VITE_API_URL VITE_SITE_URL; do
+            value="${!name}"
+            case "$value" in
+              https://*/) echo "variável $name sem barra no fim: $value" >&2; exit 1 ;;
+              https://?*) ;;
+              *) echo "variável $name do repositório vazia ou sem https: '$value'" >&2; exit 1 ;;
+            esac
+          done
+
+      # `VITE_*` enters the bundle at BUILD time and is public by definition. The PR build
+      # (not published) points at the local addresses, as the E2E job does.
       - name: Build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-        run: pnpm --filter ./frontend --fail-if-no-match run build
+          VITE_API_URL: ${{ inputs.publish && vars.VITE_API_URL || 'http://localhost:3333' }}
+          VITE_SITE_URL: ${{ inputs.publish && vars.VITE_SITE_URL || 'http://localhost:3000' }}
+        run: pnpm --filter ./frontend --fail-if-no-match build
 
-      # `routeTree.gen.ts` é artefato commitado: o build o regenera, e diferença
-      # é arquivo desatualizado (tooling.md §9).
-      - name: routeTree.gen.ts em dia
+      # The Router plugin rewrites `routeTree.gen.ts` in the build. A generated tree that came
+      # out different from the committed one fails (`_standards/tooling.md` §9).
+      - name: routeTree.gen.ts atualizado
         run: git diff --exit-code -- frontend/src/routeTree.gen.ts
 
+      - name: revision.txt no manifesto do Nitro
+        if: ${{ inputs.publish }}
+        run: |
+          if ! grep -q '"/revision.txt"' frontend/.output/server/index.mjs; then
+            echo 'revision.txt não está no manifesto de assets do Nitro: o carimbo precisa vir antes do build, em public/.' >&2
+            exit 1
+          fi
+
+      # It uploads before the cycle check, and not after: when the guard below fails, the
+      # `.output/` is precisely what one needs to open to find the guilty read. The job fails
+      # anyway, and no image comes out of it (`docker-frontend` needs this job).
+      - name: Upload artifact
+        if: ${{ inputs.publish }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-build
+          retention-days: 1
+          include-hidden-files: true
+          path: frontend/.output/
+
+      # What is refused is not the cycle (the router comes out in two chunks that re-export
+      # each other, and that is inert), it is the early read of a binding that comes from a
+      # chunk in a cycle: it passes the build green and only breaks on the first SSR.
       - name: Ciclos de chunk
         run: pnpm --filter ./frontend --fail-if-no-match check-cycles
 
-  # Playwright num job próprio, depois do build, com o backend em container: a
-  # imagem do próprio commit, o banco e o MinIO como no job do backend
-  # (tooling.md §7, passo 8).
+  # The E2E against the real backend, in a job of its own and IN PARALLEL with `check` (no
+  # `needs`: the job does its own build), one job and one database per viewport project
+  # (`_standards/tooling.md` §7 step 8, `DECISIONS.md` #273). `--project` pulls the `setup` and
+  # teardown through `dependencies` (_doc-lib/playwright.md#docs/test-projects).
+  # `frontend/e2e/playwright.config.ts` brings up the two servers through `webServer`: the
+  # backend by `node ace serve` (port 3333) and the frontend by the build
+  # (`node .output/server/index.mjs`, port 3000), as in production.
   e2e:
-    name: Frontend - E2E (Playwright)
-    needs: check
+    name: Frontend - E2E (${{ matrix.project }})
+    if: ${{ inputs.e2e }}
     runs-on: ubuntu-latest
+    # Above the config's `globalTimeout`: a job killed by the provider generates no report,
+    # and the runner's ceiling is what closes the run with the artifact.
     timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [mobile, tablet, desktop]
 
     services:
       database:
@@ -86,7 +167,7 @@ jobs:
           POSTGRES_PASSWORD: interclasse
           POSTGRES_DB: interclasse
         ports:
-          - '5434:5432'
+          - '5432:5432'
         options: >-
           --health-cmd "pg_isready -U interclasse -d interclasse"
           --health-interval 5s
@@ -94,7 +175,7 @@ jobs:
           --health-retries 10
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -109,141 +190,144 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build shared
-        run: pnpm --filter ./shared --fail-if-no-match run build
+      # No password in the repository (`_standards/tooling.md` §7, `backend.md` §6.2): the owner's
+      # and the demo accounts' passwords are born here, per run, masked in the log, and only
+      # the steps that need them receive them. The suffix satisfies `Rule.password()`.
+      - name: Credenciais do E2E
+        id: credential
+        run: |
+          owner="$(openssl rand -hex 12)aA1!"
+          demo="$(openssl rand -hex 12)aA1!"
+          echo "::add-mask::$owner"
+          echo "::add-mask::$demo"
+          echo "owner=$owner" >> "$GITHUB_OUTPUT"
+          echo "demo=$demo" >> "$GITHUB_OUTPUT"
 
-      - name: Compile messages
-        run: pnpm --filter ./frontend --fail-if-no-match i18n:compile
-
-      - name: Setup Buildx
+      # The same MinIO as the backend job: the house test image, closed buckets, a
+      # minimal-scope user and the wait for the state, not for a fixed `sleep`.
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      - name: Build MinIO
+      - name: Build da imagem do MinIO de teste
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: backend/infra/minio
           load: true
           push: false
-          tags: interclasse-minio-test:2025-10-15
-          cache-from: type=gha,scope=minio
-          cache-to: type=gha,mode=max,scope=minio
-
-      # A API da própria revisão, a mesma imagem que vai para produção.
-      - name: Build API
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          context: .
-          file: backend/Dockerfile-production
-          load: true
-          push: false
-          tags: interclasse-api:e2e
-          cache-from: type=gha,scope=backend
-          cache-to: type=gha,mode=max,scope=backend
+          tags: interclasse-minio-test:ci
+          cache-from: type=gha,scope=minio-test
 
       - name: Start MinIO
         env:
           MINIO_ROOT_USER: ci-minio-root
           MINIO_ROOT_PASSWORD: ci-minio-root-secret
-        run: |
-          docker run -d --name minio --network host \
-            -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
-            -e MINIO_API_CORS_ALLOW_ORIGIN='http://localhost:3010' \
-            interclasse-minio-test:2025-10-15 server /data --address ":9004" --console-address ":9003"
-
-      - name: Setup MinIO e espera pelo bucket
-        env:
-          STORAGE_ENDPOINT: http://localhost:9004
-          MINIO_ROOT_USER: ci-minio-root
-          MINIO_ROOT_PASSWORD: ci-minio-root-secret
+          STORAGE_ENDPOINT: http://127.0.0.1:9000
           STORAGE_KEY: interclasse
           STORAGE_SECRET: interclasse-secret
           STORAGE_BUCKET: interclasse
         run: |
+          docker run -d --name minio --network host \
+            -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
+            interclasse-minio-test:ci server /data --address ":9000" --console-address ":9001"
+
           for _ in $(seq 1 30); do
             if docker run --rm --network host \
               -e STORAGE_ENDPOINT -e MINIO_ROOT_USER -e MINIO_ROOT_PASSWORD \
               -e STORAGE_KEY -e STORAGE_SECRET -e STORAGE_BUCKET \
               -v "$PWD/backend/infra/minio:/setup:ro" \
-              --entrypoint /bin/sh interclasse-minio-test:2025-10-15 \
-              -c 'sh /setup/minio-setup.sh && mc ls "local/${STORAGE_BUCKET}"'; then
+              --entrypoint /bin/sh interclasse-minio-test:ci \
+              -c 'sh /setup/minio-setup.sh "$STORAGE_ENDPOINT" && mc ls "local/${STORAGE_BUCKET}"'; then
               exit 0
             fi
             sleep 2
           done
+          docker logs minio >&2
           echo "o bucket não ficou disponível" >&2
           exit 1
 
-      # Migrations, seed do administrador e demonstração (contas dos papéis do E2E),
-      # depois a API de pé. Valores só de teste; nenhum serve fora deste job.
-      # A imagem roda em `production`, como no deploy: em `development` o logger
-      # do Adonis carrega o `pino-pretty`, que é dependência de dev e não está
-      # na imagem. A demonstração depende de `SEED_DEMO_PASSWORD`, não do ambiente, mas
-      # o seed roda pelo workspace, que tem as dependências de dev.
-      - name: Sobe a API
-        env:
-          SEED_OWNER_PASSWORD: Ci-Owner-1!
-          SEED_DEMO_PASSWORD: Ci-Demo-1!
-        run: |
-          cat > "$RUNNER_TEMP/api.env" <<ENV
-          NODE_ENV=production
-          PORT=3333
-          HOST=0.0.0.0
-          LOG_LEVEL=info
-          APP_KEY=ci-placeholder-sem-uso-fora-deste-job
-          APP_SERVER_URL=http://localhost:3333
-          CORS_ORIGINS=http://localhost:3010
-          DATABASE_URL=postgres://interclasse:interclasse@localhost:5434/interclasse
-          UPLOAD_MAX_SIZE=1073741824
-          STORAGE_KEY=interclasse
-          STORAGE_SECRET=interclasse-secret
-          STORAGE_BUCKET=interclasse
-          STORAGE_ENDPOINT=http://localhost:9004
-          STORAGE_FORCE_PATH_STYLE=true
-          SEED_OWNER_EMAIL=administrator@mail.com
-          SEED_OWNER_PASSWORD=${SEED_OWNER_PASSWORD}
-          SEED_DEMO_PASSWORD=${SEED_DEMO_PASSWORD}
-          ENV
-          docker run --rm --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e node ace migration:run --force
-          (
-            cd backend
-            set -a
-            . "$RUNNER_TEMP/api.env"
-            set +a
-            export NODE_ENV=development
-            node ace db:seed
-            node ace db:seed --files database/seeders/dev/demo.ts
-          )
-          docker run -d --name api --network host --env-file "$RUNNER_TEMP/api.env" interclasse-api:e2e
-          for _ in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:3333/health-check; then
-              exit 0
-            fi
-            sleep 2
-          done
-          docker logs api >&2
-          echo "a API não respondeu em /health-check" >&2
-          exit 1
+      - name: Shared - Build
+        run: pnpm --filter ./shared --fail-if-no-match build
 
-      # Sem cache de navegador: a doc do Playwright não o recomenda.
-      - name: Install Playwright
+      # `node ace` validates `start/env.ts` on boot, and CI has no `.env`: the environment
+      # comes from the step, not from the job (`_standards/tooling.md` §7). Each seed is
+      # switched on by its key having a value (`backend.md` §6.2): the owner and the demo
+      # (one account per role, `<role>@example.com`, sharing `SEED_DEMO_PASSWORD`).
+      - name: Banco - Migrations e seed
+        working-directory: ./backend
+        env:
+          NODE_ENV: development
+          HOST: 0.0.0.0
+          PORT: '3333'
+          TZ: UTC
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
+          APP_SERVER_URL: http://localhost:3333
+          CORS_ORIGINS: http://localhost:3000
+          TRUSTED_PROXIES: loopback
+          DATABASE_URL: postgres://interclasse:interclasse@localhost:5432/interclasse
+          UPLOAD_MAX_SIZE: '1073741824'
+          STORAGE_KEY: interclasse
+          STORAGE_SECRET: interclasse-secret
+          STORAGE_BUCKET: interclasse
+          STORAGE_ENDPOINT: http://localhost:9000
+          STORAGE_FORCE_PATH_STYLE: 'true'
+          SEED_OWNER_EMAIL: administrator@example.com
+          SEED_OWNER_PASSWORD: ${{ steps.credential.outputs.owner }}
+          SEED_DEMO_PASSWORD: ${{ steps.credential.outputs.demo }}
+        run: |
+          node ace migration:run --force
+          node ace db:seed
+
+      # The API address enters the bundle at build time; here it points to the job's local
+      # backend, not to production.
+      - name: Frontend - Build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          VITE_API_URL: http://localhost:3333
+          VITE_SITE_URL: http://localhost:3000
+        run: |
+          pnpm --filter ./frontend --fail-if-no-match i18n:compile
+          pnpm --filter ./frontend --fail-if-no-match build
+
+      # No browser cache: the docs do not recommend it (_doc-lib/playwright.md#docs/ci).
+      - name: Playwright - Chromium
         run: pnpm --filter ./frontend --fail-if-no-match exec playwright install --with-deps chromium
 
-      # Credenciais só de teste, as mesmas do seed acima; nenhuma tem default no
-      # código (tooling.md §7). As contas de conselheiro e representante vêm da demonstração (`E2E_DEMO_PASSWORD`).
-      - name: Test e2e
+      # Playwright brings up the backend (`node ace serve`) inside this step, so the backend
+      # environment is repeated here: it belongs to the steps that boot it. `--workers=1`, as
+      # the docs recommend for hosted runners; parallelism comes from the matrix.
+      - name: E2E
         env:
-          E2E_BASE_URL: http://localhost:3010
+          HOST: 0.0.0.0
+          PORT: '3333'
+          TZ: UTC
+          LOG_LEVEL: info
+          APP_KEY: ci-placeholder-sem-uso-fora-deste-passo
+          APP_SERVER_URL: http://localhost:3333
+          CORS_ORIGINS: http://localhost:3000
+          TRUSTED_PROXIES: loopback
+          DATABASE_URL: postgres://interclasse:interclasse@localhost:5432/interclasse
+          UPLOAD_MAX_SIZE: '1073741824'
+          STORAGE_KEY: interclasse
+          STORAGE_SECRET: interclasse-secret
+          STORAGE_BUCKET: interclasse
+          STORAGE_ENDPOINT: http://localhost:9000
+          STORAGE_FORCE_PATH_STYLE: 'true'
+          E2E_BASE_URL: http://localhost:3000
           E2E_API_URL: http://localhost:3333
-          E2E_OWNER_EMAIL: administrator@mail.com
-          E2E_OWNER_PASSWORD: Ci-Owner-1!
-          E2E_DEMO_PASSWORD: Ci-Demo-1!
-        run: pnpm --filter ./frontend --fail-if-no-match run test:e2e --workers=1 --add-reporter=github
+          E2E_OWNER_EMAIL: administrator@example.com
+          E2E_OWNER_PASSWORD: ${{ steps.credential.outputs.owner }}
+          E2E_DEMO_PASSWORD: ${{ steps.credential.outputs.demo }}
+          PROJECT: ${{ matrix.project }}
+        run: pnpm --filter ./frontend --fail-if-no-match exec playwright test --config e2e/playwright.config.ts --project="$PROJECT" --workers=1 --add-reporter=github
 
+      # `!cancelled()`: the report also arrives when the test fails
+      # (_doc-lib/playwright.md#docs/ci-intro).
       - name: Relatório do Playwright
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: frontend/playwright-report/
           retention-days: 7
           if-no-files-found: ignore

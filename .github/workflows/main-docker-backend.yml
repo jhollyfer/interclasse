@@ -1,5 +1,8 @@
 name: Docker Backend
 
+# Image built from the workspace root (`_standards/tooling.md` §8.2): with the context in the
+# app folder Docker sees neither the single lockfile nor `shared/`. Tags `latest` and the
+# commit SHA: the SHA tag is what makes rollback a redeploy, not a rebuild.
 on:
   workflow_call:
     secrets:
@@ -17,11 +20,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # The backend Dockerfile compiles inside the image: the arm64 variant gets its own
+      # native binaries instead of the runner's amd64 ones.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
@@ -34,18 +39,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # O Dockerfile do backend compila lá dentro: a variante arm64 recebe o
-      # binário nativo dela em vez do binário amd64 do runner.
       - name: Build and push
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
-          # A raiz: a imagem precisa do `shared/` e do lockfile único
-          # (_standards/tooling.md §8.2).
           context: .
           file: backend/Dockerfile-production
           push: true
           platforms: linux/amd64,linux/arm64
-          # `latest` e o SHA: a tag do commit faz do rollback um redeploy.
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-api:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/interclasse-api:${{ github.sha }}
