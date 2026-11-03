@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type * as React from 'react'
 import { toast } from 'sonner'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { EnrollmentBoard } from '#/components/common/enrollment-board'
 import {
   PageHeader,
@@ -9,6 +10,7 @@ import {
   PageHeaderTitle,
 } from '#/components/common/page-shell'
 import { Button } from '#/components/ui/button'
+import { Empty, EmptyContent, EmptyDescription } from '#/components/ui/empty'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { HTTPStatus } from '#/integrations/tanstack-query/http'
@@ -55,19 +57,17 @@ export function AthletesPage(): React.JSX.Element {
 
       {/* Only the 404 means "no classroom"; the rest is a network or server failure. */}
       {error?.status === HTTPStatus.NOT_FOUND && (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-          {m.representative_no_class()}
-        </p>
+        <EmptyNote>{m.representative_no_class()}</EmptyNote>
       )}
       {error && error.status !== HTTPStatus.NOT_FOUND && (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-6 text-center">
-          <p className="text-muted-foreground">
-            {m.representative_load_error()}
-          </p>
-          <Button variant="outline" onClick={() => void refetch()}>
-            {m.common_retry()}
-          </Button>
-        </div>
+        <Empty className="rounded-lg border border-dashed">
+          <EmptyDescription>{m.representative_load_error()}</EmptyDescription>
+          <EmptyContent>
+            <Button variant="outline" onClick={() => void refetch()}>
+              {m.common_retry()}
+            </Button>
+          </EmptyContent>
+        </Empty>
       )}
 
       {board && (

@@ -157,7 +157,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 |---|---|---|---|---|
 | 10.1 | Chaves de ambiente no catálogo (`backend.md` §6.2): `SEED_OWNER_*`, seed ligado pela chave, `STORAGE_PUBLIC_URL` em runtime, `E2E_OWNER_*` + `E2E_DEMO_PASSWORD`, `E2E_BASE_URL`, secrets do deploy `COOLIFY_*` | Alta | Feita | branch `chore/env-catalogo-padrao`. `SEED_OWNER_*` e seed ligado pela chave (dono e demonstração sem `static environment`), `.env.example` dos dois apps no modelo, CSP montado por requisição em `src/server.ts` com `STORAGE_PUBLIC_URL`, `VITE_UPLOAD_MAX_SIZE` no `env.ts`, E2E em `E2E_OWNER_*` + `E2E_DEMO_PASSWORD` + `E2E_BASE_URL`, secrets `COOLIFY_*`. Não rodado aqui: E2E (sem Docker) |
 
-## Fase 11 · Teste no site no ar e polimento (9/10)
+## Fase 11 · Teste no site no ar e polimento (10/11)
 
 Achados do teste do site publicado e da passada de navegador (1280 e 390) por perfil; cada item confirmado no código antes de corrigir.
 
@@ -173,6 +173,7 @@ Achados do teste do site publicado e da passada de navegador (1280 e 390) por pe
 | 11.8 | Tema claro e escuro em todo o site: seletor também no cabeçalho público (desktop e celular) e no login | Alta | Feita | `ThemeToggle` subiu para `components/common/theme-toggle` (3 áreas usam), com teste; contraste conferido pelo axe nos dois temas |
 | 11.9 | Tema com três estados (claro, escuro, sistema) em menu acessível no site, no login e no painel | Alta | Feita | cookie lido no loader da raiz, sem flash; `ThemeToggle` virou menu de opções, com teste |
 | 11.10 | Revisão responsiva em 360, 768 e 1440 (site e painel), sem tela só de celular esticada | Alta | Feita | grade de 3 colunas, tabela densa e painel em duas colunas no desktop; sem texto "mobile first" nos docs; `responsive.spec` passa a cobrir o escuro também em 1280 |
+| 11.11 | Telas só com componentes do kit shadcn/Base UI: menu do celular em `Sheet`, quadro de inscrição em `Collapsible` + `Label`, avisos "vazio" em `EmptyNote` (sobre `Empty`), cartões em `Card`, aviso do painel em `Alert`, `<input type=file>` em `Input`, textos fixos do kit (`Fechar`, `More`, `Loading`...) por chave i18n | Alta | Feita | de fora, por ora: painel de próximo jogo (`next-match`), caixas da chave (`bracket-tree`), lista de `card-list` e o editor de texto, que ainda usam classes próprias sobre o tema da casa |
 
 ## Fase N · Ideias (fora do escopo atual)
 

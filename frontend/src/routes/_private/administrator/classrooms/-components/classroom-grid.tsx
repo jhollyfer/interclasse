@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi, Link } from '@tanstack/react-router'
 import type * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import {
   PageHeader,
   PageHeaderActions,
@@ -91,18 +92,16 @@ export function ClassroomGrid(): React.JSX.Element {
       {isPending && <Skeleton className="h-48 w-full" />}
 
       {isError && (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
+        <EmptyNote>
           {m.admin_classrooms_load_error()}{' '}
           <Button variant="link" onClick={() => void refetch()}>
             {m.admin_common_retry()}
           </Button>
-        </p>
+        </EmptyNote>
       )}
 
       {data?.data.length === 0 && (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-          {m.admin_classrooms_empty()}
-        </p>
+        <EmptyNote>{m.admin_classrooms_empty()}</EmptyNote>
       )}
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

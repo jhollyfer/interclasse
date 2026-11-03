@@ -3,6 +3,7 @@ import { CheckIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -10,6 +11,7 @@ import {
 } from '#/components/common/page-shell'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
+import { Card } from '#/components/ui/card'
 import { Skeleton } from '#/components/ui/skeleton'
 import { queryKeys } from '#/hooks/tanstack-query/_query-keys'
 import { useInvalidate } from '#/integrations/tanstack-query/invalidate'
@@ -44,9 +46,7 @@ export function RemovalsPage(): React.JSX.Element {
 
       {isPending && <Skeleton className="h-24 w-full" />}
       {!isPending && removals.length === 0 && (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          {m.admin_removals_empty()}
-        </p>
+        <EmptyNote>{m.admin_removals_empty()}</EmptyNote>
       )}
 
       <ul className="flex flex-col gap-3">
@@ -73,49 +73,51 @@ function RemovalItem({
   const open = !removal.acknowledgedAt
 
   return (
-    <li
-      className={cn(
-        'bg-card flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-start',
-        open && 'border-primary',
-      )}
-    >
-      <div className="flex flex-1 flex-col gap-1 text-sm">
-        <span className="font-medium">
-          {m.admin_removals_item({
-            student: removal.studentName,
-            sport: removal.sport.name,
-          })}
-          <span className="text-muted-foreground font-normal">
-            {` · ${removal.classroom.name}`}
+    <li>
+      <Card
+        className={cn(
+          'flex-col gap-2 px-4 py-4 sm:flex-row sm:items-start',
+          open && 'ring-primary',
+        )}
+      >
+        <div className="flex flex-1 flex-col gap-1 text-sm">
+          <span className="font-medium">
+            {m.admin_removals_item({
+              student: removal.studentName,
+              sport: removal.sport.name,
+            })}
+            <span className="text-muted-foreground font-normal">
+              {` · ${removal.classroom.name}`}
+            </span>
           </span>
-        </span>
-        <p className="bg-muted rounded-md px-3 py-2">{removal.reason}</p>
-        <span className="text-muted-foreground text-xs">
-          {removal.actor &&
-            m.admin_removals_by_actor({
-              actor: removal.actor.name,
-              date: formatDate(removal.createdAt),
-            })}
-          {!removal.actor &&
-            m.admin_removals_by_deleted({
-              date: formatDate(removal.createdAt),
-            })}
-        </span>
-      </div>
-      {open && (
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={acknowledge.isPending}
-          onClick={() => acknowledge.mutate(removal.id)}
-        >
-          <CheckIcon />
-          {m.admin_common_acknowledged()}
-        </Button>
-      )}
-      {!open && (
-        <Badge variant="neutral">{m.admin_common_acknowledged()}</Badge>
-      )}
+          <p className="bg-muted rounded-md px-3 py-2">{removal.reason}</p>
+          <span className="text-muted-foreground text-xs">
+            {removal.actor &&
+              m.admin_removals_by_actor({
+                actor: removal.actor.name,
+                date: formatDate(removal.createdAt),
+              })}
+            {!removal.actor &&
+              m.admin_removals_by_deleted({
+                date: formatDate(removal.createdAt),
+              })}
+          </span>
+        </div>
+        {open && (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={acknowledge.isPending}
+            onClick={() => acknowledge.mutate(removal.id)}
+          >
+            <CheckIcon />
+            {m.admin_common_acknowledged()}
+          </Button>
+        )}
+        {!open && (
+          <Badge variant="neutral">{m.admin_common_acknowledged()}</Badge>
+        )}
+      </Card>
     </li>
   )
 }

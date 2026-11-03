@@ -5,6 +5,7 @@ import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import type * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { cn } from '#/lib/cn'
 
 /**
@@ -89,12 +90,5 @@ export function SectionMore({
 export function Empty({
   children,
 }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
-  return (
-    <p
-      data-slot="section-empty"
-      className="text-muted-foreground rounded-lg border border-dashed p-6 text-center"
-    >
-      {children}
-    </p>
-  )
+  return <EmptyNote>{children}</EmptyNote>
 }

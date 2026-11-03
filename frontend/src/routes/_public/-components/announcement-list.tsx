@@ -2,6 +2,7 @@ import type { AdministratorAnnouncementShowResponse } from '@interclasse/shared'
 import { PushPinIcon } from '@phosphor-icons/react'
 import type * as React from 'react'
 
+import { Card } from '#/components/ui/card'
 import { cn } from '#/lib/cn'
 import { formatWhen } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
@@ -27,27 +28,27 @@ export function AnnouncementList({
   return (
     <ul className="grid gap-3">
       {announcements.map((announcement) => (
-        <li
-          key={announcement.id}
-          className={cn(
-            'rounded-lg border p-4',
-            announcement.pinned && 'border-primary bg-primary/5',
-            !announcement.pinned && 'bg-card',
-          )}
-        >
-          {announcement.pinned && (
-            <p className="text-primary mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase">
-              <PushPinIcon weight="fill" aria-hidden />
-              {m.public_announcements_pinned()}
+        <li key={announcement.id}>
+          <Card
+            className={cn(
+              'gap-0 px-4 py-4 text-base',
+              announcement.pinned && 'bg-primary/5 ring-primary',
+            )}
+          >
+            {announcement.pinned && (
+              <p className="text-primary mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase">
+                <PushPinIcon weight="fill" aria-hidden />
+                {m.public_announcements_pinned()}
+              </p>
+            )}
+            <Heading className="font-semibold">{announcement.title}</Heading>
+            <p className="text-muted-foreground mt-1 whitespace-pre-line">
+              {announcement.body}
             </p>
-          )}
-          <Heading className="font-semibold">{announcement.title}</Heading>
-          <p className="text-muted-foreground mt-1 whitespace-pre-line">
-            {announcement.body}
-          </p>
-          <p className="text-muted-foreground mt-2 text-xs">
-            {formatWhen(announcement.createdAt)}
-          </p>
+            <p className="text-muted-foreground mt-2 text-xs">
+              {formatWhen(announcement.createdAt)}
+            </p>
+          </Card>
         </li>
       ))}
     </ul>

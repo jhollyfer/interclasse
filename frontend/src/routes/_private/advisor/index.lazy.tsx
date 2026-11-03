@@ -1,5 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { PageHeader, PageHeaderTitle } from '#/components/common/page-shell'
 import { m } from '#/paraglide/messages'
 
@@ -14,9 +15,7 @@ function NoClassroom(): React.JSX.Element {
       <PageHeader>
         <PageHeaderTitle>{m.advisor_title()}</PageHeaderTitle>
       </PageHeader>
-      <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        {m.advisor_no_class()}
-      </p>
+      <EmptyNote>{m.advisor_no_class()}</EmptyNote>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { toast } from 'sonner'
 
 import { useRegisterUpload } from '#/components/common/uploading-context'
+import { Input } from '#/components/ui/input'
 import { useAbortOnUnmount } from '#/hooks/use-abort-on-unmount'
 import { useMultipartUpload } from '#/hooks/use-multipart-upload'
 import { useStorageDeleteMutation } from '#/integrations/tanstack-query/mutations/storages'
@@ -144,7 +145,7 @@ export function MultiFileUpload({
 
       {/* The native `<input type="file">` cannot be styled: it stays hidden behind
           the visible button (`MultiFileUploadTrigger`), as in `ImageField`. */}
-      <input
+      <Input
         ref={inputRef}
         type="file"
         multiple

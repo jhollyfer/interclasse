@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { useRegisterUpload } from '#/components/common/uploading-context'
 import { Field } from '#/components/ui/field'
+import { Input } from '#/components/ui/input'
 import { useAbortOnUnmount } from '#/hooks/use-abort-on-unmount'
 import {
   useStorageCreateMutation,
@@ -171,7 +172,7 @@ export function ImageField({
 
           It stays in `ImageField` and not in a part of its own: it is plumbing, not
           markup, and no screen has a reason to omit or reposition it. */}
-      <input
+      <Input
         ref={inputRef}
         type="file"
         accept={accept.join(',')}

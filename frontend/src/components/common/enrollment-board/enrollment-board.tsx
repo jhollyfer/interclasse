@@ -2,9 +2,16 @@ import type { AdvisorEnrollmentShowResponse } from '@interclasse/shared'
 import { CaretDownIcon, LockSimpleIcon } from '@phosphor-icons/react'
 import * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '#/components/ui/collapsible'
+import { Label } from '#/components/ui/label'
 import { m } from '#/paraglide/messages'
 
 type EnrollmentBoardProps = Readonly<{
@@ -42,19 +49,11 @@ export function EnrollmentBoard({
   canRemove = true,
 }: EnrollmentBoardProps): React.JSX.Element {
   if (board.students.length === 0) {
-    return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        {m.common_enrollment_no_students()}
-      </p>
-    )
+    return <EmptyNote>{m.common_enrollment_no_students()}</EmptyNote>
   }
 
   if (board.sports.length === 0) {
-    return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        {m.common_enrollment_no_sports()}
-      </p>
-    )
+    return <EmptyNote>{m.common_enrollment_no_sports()}</EmptyNote>
   }
 
   return (
@@ -87,7 +86,7 @@ const SAVE_VARIANT: Record<string, 'default' | 'outline'> = {
 }
 
 /**
- * One sport, as a native `<details>`: with 20 students and 4 sports the page was 80 checkboxes
+ * One sport, as a `Collapsible` of the kit: with 20 students and 4 sports the page was 80 checkboxes
  * long, so only the first sport opens and the others fold into one line each. The element keeps
  * the keyboard, the state and the screen-reader role of a disclosure without a line of script
  * (`<details>`/`<summary>`, WHATWG HTML), and, unlike a conditional render, keeps what was
@@ -141,11 +140,11 @@ function SportBlock({
   const saveVariant = SAVE_VARIANT[String(dirty && !over)]
 
   return (
-    <details
-      open={defaultOpen}
-      className="group/sport bg-card ring-foreground/10 overflow-hidden rounded-lg ring-1"
+    <Collapsible
+      defaultOpen={defaultOpen}
+      className="bg-card ring-foreground/10 overflow-hidden rounded-lg ring-1"
     >
-      <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 select-none focus-visible:ring-ring/30 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset">
+      <CollapsibleTrigger className="group/trigger flex min-h-11 w-full cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 text-left select-none focus-visible:ring-ring/30 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset">
         <span className="flex-1 text-sm font-medium">{sport.name}</span>
         {sport.locked && (
           <Badge variant="neutral">
@@ -165,70 +164,73 @@ function SportBlock({
             max: sport.maxAthletes,
           })}
         </Badge>
-        <CaretDownIcon className="text-muted-foreground transition-transform group-open/sport:rotate-180 motion-reduce:transition-none" />
-      </summary>
-      <ul className="grid border-t sm:grid-cols-2">
-        {students.map((student) => (
-          <li key={student.id}>
-            {/* Locked, whoever was not enrolled looks faded: with the same color as
+        <CaretDownIcon className="text-muted-foreground transition-transform group-data-panel-open/trigger:rotate-180 motion-reduce:transition-none" />
+      </CollapsibleTrigger>
+      {/* `keepMounted`: closing the block keeps what was ticked and not yet saved. */}
+      <CollapsibleContent keepMounted>
+        <ul className="grid border-t sm:grid-cols-2">
+          {students.map((student) => (
+            <li key={student.id}>
+              {/* Locked, whoever was not enrolled looks faded: with the same color as
                 everything else, the drawn list looked editable. The whole row is the
                 target (44px), not only the 16px square. */}
-            <label className="hover:bg-muted/50 flex min-h-11 items-center gap-3 px-4 text-sm has-data-disabled:cursor-not-allowed has-data-disabled:not-has-data-checked:text-muted-foreground">
-              <Checkbox
-                checked={selected.has(student.id)}
-                disabled={
-                  sport.locked || (!canRemove && initial.has(student.id))
-                }
-                onCheckedChange={(checked) =>
-                  toggle(student.id, checked === true)
-                }
-              />
-              {student.name}
-            </label>
-          </li>
-        ))}
-      </ul>
-      {!sport.locked && (
-        // Sticky at the foot of the scroll: with 20 students the button used to end
-        // up a screen away from the ticks.
-        <div className="bg-card sticky bottom-0 z-sticky flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            {over && (
-              <p role="alert" className="text-destructive text-xs">
-                {m.common_enrollment_over({
-                  count: selected.size - sport.maxAthletes,
-                })}
-              </p>
-            )}
-            {under && (
-              <p className="text-muted-foreground text-xs">
-                {m.common_enrollment_under()}
-              </p>
-            )}
-          </div>
-          {/* The kit fades a disabled button to 50%; on the dark card that left
+              <Label className="hover:bg-muted/50 flex min-h-11 items-center gap-3 px-4 text-sm has-data-disabled:cursor-not-allowed has-data-disabled:not-has-data-checked:text-muted-foreground">
+                <Checkbox
+                  checked={selected.has(student.id)}
+                  disabled={
+                    sport.locked || (!canRemove && initial.has(student.id))
+                  }
+                  onCheckedChange={(checked) =>
+                    toggle(student.id, checked === true)
+                  }
+                />
+                {student.name}
+              </Label>
+            </li>
+          ))}
+        </ul>
+        {!sport.locked && (
+          // Sticky at the foot of the scroll: with 20 students the button used to end
+          // up a screen away from the ticks.
+          <div className="bg-card sticky bottom-0 z-sticky flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              {over && (
+                <p role="alert" className="text-destructive text-xs">
+                  {m.common_enrollment_over({
+                    count: selected.size - sport.maxAthletes,
+                  })}
+                </p>
+              )}
+              {under && (
+                <p className="text-muted-foreground text-xs">
+                  {m.common_enrollment_under()}
+                </p>
+              )}
+            </div>
+            {/* The kit fades a disabled button to 50%; on the dark card that left
               the outline Save barely legible. 70% still reads as off. */}
-          <Button
-            className="disabled:opacity-70 sm:shrink-0"
-            variant={saveVariant}
-            disabled={!dirty || over || isSaving}
-            onClick={() =>
-              onSave(
-                sport.id,
-                [...selected],
-                students
-                  .filter(
-                    (student) =>
-                      initial.has(student.id) && !selected.has(student.id),
-                  )
-                  .map((student) => student.name),
-              )
-            }
-          >
-            {m.common_enrollment_save({ name: sport.name })}
-          </Button>
-        </div>
-      )}
-    </details>
+            <Button
+              className="disabled:opacity-70 sm:shrink-0"
+              variant={saveVariant}
+              disabled={!dirty || over || isSaving}
+              onClick={() =>
+                onSave(
+                  sport.id,
+                  [...selected],
+                  students
+                    .filter(
+                      (student) =>
+                        initial.has(student.id) && !selected.has(student.id),
+                    )
+                    .map((student) => student.name),
+                )
+              }
+            >
+              {m.common_enrollment_save({ name: sport.name })}
+            </Button>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

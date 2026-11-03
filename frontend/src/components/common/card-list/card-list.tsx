@@ -2,6 +2,7 @@ import type { AdministratorCardPaginateResponse } from '@interclasse/shared'
 import { TrashIcon } from '@phosphor-icons/react'
 import type * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { cn } from '#/lib/cn'
@@ -40,12 +41,7 @@ export function CardList({
 }: CardListProps): React.JSX.Element {
   if (isPending) return <Skeleton className="h-24 w-full" />
 
-  if (cards.length === 0)
-    return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-        {empty}
-      </p>
-    )
+  if (cards.length === 0) return <EmptyNote>{empty}</EmptyNote>
 
   return (
     <ul className="divide-y rounded-lg border">

@@ -164,11 +164,14 @@ describe('EnrollmentBoard', () => {
       />,
     )
 
-    expect(screen.getAllByRole('button', { name: /^Salvar / }).length).toBe(2)
+    // `hidden`: the closed block keeps its content mounted, out of the accessibility tree.
+    expect(
+      screen.getAllByRole('button', { name: /^Salvar /, hidden: true }).length,
+    ).toBe(2)
   })
 
   it('opens only the first sport, so the page does not stack every list', () => {
-    const { container } = render(
+    render(
       <EnrollmentBoard
         board={board({
           sports: [FUTSAL, { ...FUTSAL, id: 'volei', name: 'Vôlei' }],
@@ -177,10 +180,10 @@ describe('EnrollmentBoard', () => {
       />,
     )
 
-    const blocks = container.querySelectorAll('details')
+    const futsal = screen.getByRole('button', { name: /^Futsal/ })
+    const volei = screen.getByRole('button', { name: /^Vôlei/ })
 
-    expect(blocks.length).toBe(2)
-    expect(blocks[0]?.open).toBe(true)
-    expect(blocks[1]?.open).toBe(false)
+    expect(futsal.getAttribute('aria-expanded')).toBe('true')
+    expect(volei.getAttribute('aria-expanded')).toBe('false')
   })
 })

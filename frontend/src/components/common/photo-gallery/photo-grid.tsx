@@ -1,6 +1,7 @@
 import type { AdministratorPhotoShowResponse } from '@interclasse/shared'
 import type * as React from 'react'
 
+import { EmptyNote } from '#/components/common/empty-note'
 import { Picture } from '#/components/common/picture'
 import { Badge } from '#/components/ui/badge'
 import { Card, CardContent } from '#/components/ui/card'
@@ -32,12 +33,7 @@ export function PhotoGrid({
 }: PhotoGridProps): React.JSX.Element {
   if (isPending) return <Skeleton className="h-48 w-full" />
 
-  if (photos.length === 0)
-    return (
-      <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
-        {empty}
-      </p>
-    )
+  if (photos.length === 0) return <EmptyNote>{empty}</EmptyNote>
 
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

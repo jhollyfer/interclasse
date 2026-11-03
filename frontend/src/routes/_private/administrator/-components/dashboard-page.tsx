@@ -15,6 +15,7 @@ import {
   PageHeaderDescription,
   PageHeaderTitle,
 } from '#/components/common/page-shell'
+import { Alert, AlertAction, AlertDescription } from '#/components/ui/alert'
 import { Badge } from '#/components/ui/badge'
 import { Button, buttonVariants } from '#/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
@@ -71,18 +72,20 @@ export function DashboardPage(): React.JSX.Element {
       </PageHeader>
 
       {pendingRemovals > 0 && (
-        <Link
-          to="/administrator/removals"
-          className="border-primary bg-primary/10 flex items-center gap-3 rounded-lg border p-4 text-sm"
-        >
-          <WarningCircleIcon className="text-primary size-6" weight="fill" />
-          <span className="flex-1">
+        <Alert className="border-primary bg-primary/10">
+          <WarningCircleIcon className="text-primary" weight="fill" />
+          <AlertDescription>
             {m.admin_dashboard_removals_notice({ count: pendingRemovals })}
-          </span>
-          <span className="font-medium underline">
-            {m.admin_dashboard_removals_link()}
-          </span>
-        </Link>
+          </AlertDescription>
+          <AlertAction>
+            <Link
+              to="/administrator/removals"
+              className="font-medium underline"
+            >
+              {m.admin_dashboard_removals_link()}
+            </Link>
+          </AlertAction>
+        </Alert>
       )}
 
       <div className="grid gap-4 lg:grid-cols-dashboard">

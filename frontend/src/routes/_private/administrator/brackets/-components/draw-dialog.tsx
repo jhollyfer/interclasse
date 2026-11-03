@@ -13,6 +13,7 @@ import * as React from 'react'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import { Button } from '#/components/ui/button'
+import { Card } from '#/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -183,7 +184,7 @@ function DrawPreview({
   const out = data.classrooms.filter((row) => !row.eligible)
 
   return (
-    <div className="grid gap-2 rounded-lg border p-3 text-sm">
+    <Card size="sm" className="gap-2 px-3 text-sm">
       {data.drawn && (
         <p className="text-destructive">
           {m.admin_brackets_preview_already_drawn()}
@@ -213,6 +214,6 @@ function DrawPreview({
           {m.admin_brackets_preview_not_enough()}
         </p>
       )}
-    </div>
+    </Card>
   )
 }
