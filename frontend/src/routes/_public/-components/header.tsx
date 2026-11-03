@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { cva } from 'class-variance-authority'
 import type { VariantProps } from 'class-variance-authority'
@@ -5,10 +6,11 @@ import * as React from 'react'
 
 import { BrandMark } from '#/components/common/brand-mark'
 import { LocaleSwitch } from '#/components/common/locale-switch'
+import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { cn } from '#/lib/cn'
 import { m } from '#/paraglide/messages'
 
-import { AUTHENTICATION, NAVIGATION } from './menu'
+import { AUTHENTICATION, visibleNavigation } from './menu'
 import type { MenuItem } from './menu'
 
 /**
@@ -111,6 +113,8 @@ function NavigationLink({
  */
 export function Header(): React.JSX.Element {
   const [open, setOpen] = React.useState(false)
+  const { data: site } = useQuery(storefrontSiteQueryOptions())
+  const navigation = visibleNavigation(site)
 
   let menuLabel = m.public_menu_open()
   if (open) menuLabel = m.public_menu_close()
@@ -136,7 +140,7 @@ export function Header(): React.JSX.Element {
           data-slot="public-header-navigation"
           className="hidden items-center gap-1 rounded-full border border-brand-ink-foreground/10 bg-brand-ink-foreground/5 px-2 py-1.5 md:flex"
         >
-          {NAVIGATION.map((item) => (
+          {navigation.map((item) => (
             <NavigationLink key={item.to} item={item} />
           ))}
 
@@ -190,7 +194,7 @@ export function Header(): React.JSX.Element {
             MENU_PANEL[String(open)],
           )}
         >
-          {NAVIGATION.map((item) => (
+          {navigation.map((item) => (
             <NavigationLink
               key={item.to}
               item={item}
@@ -209,7 +213,10 @@ export function Header(): React.JSX.Element {
           >
             {AUTHENTICATION.label()}
           </Link>
-          <LocaleSwitch className="mt-2 self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10" />
+          <LocaleSwitch
+            visibleLabel
+            className="mt-2 self-start text-brand-ink-foreground hover:bg-brand-ink-foreground/10"
+          />
         </nav>
       </div>
     </header>

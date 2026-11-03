@@ -164,7 +164,7 @@ Achados do teste do site publicado e da passada de navegador (1280 e 390) por pe
 | # | Tarefa | Prioridade | Status | Notas |
 |---|---|---|---|---|
 | 11.1 | Endereço que não existe responde 404 de verdade (`/admin`, `/teams`, `/register`, `/brackets`) | Alta | Feita | o curinga `$` casava e respondia 200; agora `beforeLoad` lança `notFound()` e a tela vive em `notFoundComponent`, ainda dentro do cabeçalho e do rodapé (`_doc-lib/tanstack-router.md#guide/not-found-errors`) |
-| 11.2 | "Sobre" some do menu, do rodapé e do mapa do site enquanto a organização não escreveu nada | Alta | A fazer | `hasAboutContent` em `lib/site-about.ts` |
+| 11.2 | "Sobre" some do menu, do rodapé e do mapa do site enquanto a organização não escreveu nada | Alta | Feita | `hasAboutContent` em `lib/site-about.ts` |
 | 11.3 | Login: senha vazia não envia; placeholder da senha e contraste do da e-mail | Alta | Feita | `min(1)` no validator do `shared`; `--muted-foreground` claro a 0,44 |
 | 11.4 | Menu do celular: idioma com rótulo visível | Média | A fazer | o botão de 44x16 sem nome era o do TanStack Devtools (só existe no dev) |
 | 11.5 | Acessibilidade: ordem dos títulos nas páginas públicas, `<aside>` na barra lateral do painel | Média | A fazer | axe limpo no site e no painel |

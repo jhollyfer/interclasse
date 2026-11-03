@@ -7,6 +7,7 @@ import type * as React from 'react'
 import logo512 from '#/assets/logo-512.png'
 import { Picture } from '#/components/common/picture'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import { hasAboutContent } from '#/lib/site-about'
 import { m } from '#/paraglide/messages'
 
 import { RegulationLink } from '../../-components/regulation-link'
@@ -60,7 +61,7 @@ function AboutContent({
 }: Readonly<{ site?: StorefrontSiteShowResponse }>): React.JSX.Element {
   const { currentYear } = route.useLoaderData()
 
-  if (!site || (!site.about && !site.organizer && !site.edition))
+  if (!site || !hasAboutContent(site))
     return <Empty>{m.public_about_empty()}</Empty>
 
   const paragraphs = (site.about ?? '')

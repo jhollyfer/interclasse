@@ -1,7 +1,11 @@
 import { QueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
-import { storefrontBracketsQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
+import {
+  storefrontBracketsQueryOptions,
+  storefrontSiteQueryOptions,
+} from '#/integrations/tanstack-query/queries/storefront'
+import { hasAboutContent } from '#/lib/site-about'
 import {
   SITEMAP_STATIC_ENTRIES,
   bracketEntries,
@@ -22,12 +26,25 @@ export const Route = createFileRoute('/sitemap.xml')({
   server: {
     handlers: {
       GET: async () => {
-        const entries: Array<SitemapEntry> = [...SITEMAP_STATIC_ENTRIES]
+        const client = new QueryClient()
+        // "Sobre" only enters the map once the organization has written it: the page
+        // is empty (and out of the menu) until then. Without an answer from the API it stays out.
+        let showAbout = false
+        try {
+          showAbout = hasAboutContent(
+            await client.query(storefrontSiteQueryOptions()),
+          )
+        } catch {
+          // API down: the fixed pages still go out below.
+        }
+        const entries: Array<SitemapEntry> = SITEMAP_STATIC_ENTRIES.filter(
+          (entry) => showAbout || entry.pathname !== '/about',
+        )
 
         try {
           // All brackets at once, like the public listing: five
           // sports x two categories fit in 100.
-          const brackets = await new QueryClient().query(
+          const brackets = await client.query(
             storefrontBracketsQueryOptions({ perPage: 100 }),
           )
           entries.push(...bracketEntries(brackets.data))

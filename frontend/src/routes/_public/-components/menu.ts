@@ -1,5 +1,7 @@
+import type { StorefrontSiteShowResponse } from '@interclasse/shared'
 import { linkOptions } from '@tanstack/react-router'
 
+import { hasAboutContent } from '#/lib/site-about'
 import { m } from '#/paraglide/messages'
 
 /**
@@ -48,3 +50,12 @@ export const NAVIGATION: ReadonlyArray<MenuItem> = [
 
 /** The dashboard door. It stays outside `NAVIGATION`: it is an action, not a reading destination. */
 export const AUTHENTICATION = SIGN_IN
+
+/** `NAVIGATION` without the destinations that have nothing to show yet. */
+export function visibleNavigation(
+  site?: StorefrontSiteShowResponse,
+): ReadonlyArray<MenuItem> {
+  if (hasAboutContent(site)) return NAVIGATION
+
+  return NAVIGATION.filter((item) => item.to !== ABOUT.to)
+}

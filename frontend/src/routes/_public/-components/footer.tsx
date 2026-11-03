@@ -8,7 +8,7 @@ import { MaiyuCredit } from '#/components/common/maiyu-credit'
 import { storefrontSiteQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
-import { NAVIGATION } from './menu'
+import { visibleNavigation } from './menu'
 import { RegulationLink } from './regulation-link'
 
 /** A link to an Instagram profile, with the `@` on display. */
@@ -53,7 +53,7 @@ export function Footer(): React.JSX.Element {
           className="flex flex-col text-sm"
           aria-label={m.public_footer_nav_label()}
         >
-          {NAVIGATION.map((item) => (
+          {visibleNavigation(site).map((item) => (
             <Link
               key={item.to}
               to={item.to}
