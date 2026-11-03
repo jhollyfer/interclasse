@@ -107,20 +107,17 @@ export function UserDetail(): React.JSX.Element {
       <PageShellHeader>
         <PageHeader>
           <PageHeaderBack to="/administrator/users" />
-          <PageHeaderTitle>
-            {user.name}
-            <PageHeaderBadges>
-              <Badge variant={USER_ROLE_VARIANTS[user.role]}>{role}</Badge>
-              <Badge variant={ACTIVE_STATUS_VARIANTS[user.status]}>
-                {status}
-              </Badge>
-              {user.deletedAt && (
-                <Badge variant="outline">
-                  {m.admin_users_archived_badge()}
-                </Badge>
-              )}
-            </PageHeaderBadges>
-          </PageHeaderTitle>
+          <PageHeaderTitle>{user.name}</PageHeaderTitle>
+          {/* Outside the `h1`: the role and the status are not part of the screen's name. */}
+          <PageHeaderBadges className="col-start-2">
+            <Badge variant={USER_ROLE_VARIANTS[user.role]}>{role}</Badge>
+            <Badge variant={ACTIVE_STATUS_VARIANTS[user.status]}>
+              {status}
+            </Badge>
+            {user.deletedAt && (
+              <Badge variant="outline">{m.admin_users_archived_badge()}</Badge>
+            )}
+          </PageHeaderBadges>
           <PageHeaderDescription>{user.email}</PageHeaderDescription>
           <PageHeaderActions>
             <Button

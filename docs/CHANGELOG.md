@@ -29,6 +29,9 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Corrigido
 
+- Na tela de um usuário do painel, o título agora é só o nome; o papel e a situação ("Professor conselheiro", "Ativo") ficam logo abaixo e deixam de ser lidos como parte do título pelos leitores de tela.
+- O contrato da API (`openapi.json`) passa a descrever a resposta 429 das rotas com limite de tentativas (entrar, renovar sessão, enviar arquivo, trocar a conta e exportar o relatório).
+
 - Endereço que não existe (`/admin`, `/teams`, `/nao-existe`) responde 404 de verdade, e não mais 200 com a tela de erro; a tela continua com o menu e o rodapé do site.
 - "Sobre" não aparece no menu, no rodapé nem no mapa do site enquanto a organização não escreveu a apresentação dos jogos; o endereço `/about` continua abrindo, com o aviso de que ainda não há texto.
 - Menu do celular mostra o idioma ("PT-BR") ao lado do ícone, em vez de só o ícone.
