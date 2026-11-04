@@ -7,6 +7,11 @@ import type * as React from 'react'
 
 import { EmptyNote } from '#/components/common/empty-note'
 import {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateTitle,
+} from '#/components/common/empty-state'
+import {
   PageHeader,
   PageHeaderActions,
   PageHeaderDescription,
@@ -101,7 +106,19 @@ export function ClassroomGrid(): React.JSX.Element {
       )}
 
       {data?.data.length === 0 && (
-        <EmptyNote>{m.admin_classrooms_empty()}</EmptyNote>
+        <EmptyState reason="empty">
+          <EmptyStateTitle>{m.admin_classrooms_empty()}</EmptyStateTitle>
+          <EmptyStateActions>
+            <Button
+              render={
+                <Link to="/administrator/classrooms/new">
+                  <PlusIcon />
+                  {m.admin_classrooms_create()}
+                </Link>
+              }
+            />
+          </EmptyStateActions>
+        </EmptyState>
       )}
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

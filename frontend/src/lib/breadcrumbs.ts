@@ -86,9 +86,9 @@ function segments(path: string): Array<string> {
 
 /** What the router calls a match, reduced to what the trail needs. */
 export type BreadcrumbMatch = {
-  /** With the parameters still to fill in: `/administrator/testimonials/$id`. */
+  /** With the parameters still to fill in: `/administrator/classrooms/$id`. */
   fullPath: string
-  /** With the parameters filled in: `/administrator/testimonials/abc-123`. */
+  /** With the parameters filled in: `/administrator/classrooms/abc-123`. */
   pathname: string
 }
 

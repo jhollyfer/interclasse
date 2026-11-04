@@ -1,5 +1,5 @@
 import type { AdministratorMatchPaginateResponse } from '@interclasse/shared'
-import { CATEGORIES, MATCH_STATUSES } from '@interclasse/shared'
+import { CATEGORIES, MATCH_PHASES, MATCH_STATUSES } from '@interclasse/shared'
 import {
   ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
@@ -25,6 +25,7 @@ import {
 import type { MatchRef } from '#/components/common/match-dialogs'
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
 import { RowActions } from '#/components/common/row-actions'
+import { SportCombobox } from '#/components/common/sport-combobox'
 import {
   Table,
   TableActions,
@@ -196,7 +197,10 @@ export function MatchesTable(): React.JSX.Element {
     ),
   })
 
-  function filter(key: 'category' | 'status', value: string) {
+  function filter(
+    key: 'sportId' | 'category' | 'phase' | 'status',
+    value: string,
+  ) {
     void navigate({
       to: '/administrator/matches',
       search: { ...search, [key]: value || undefined, page: undefined },
@@ -227,6 +231,14 @@ export function MatchesTable(): React.JSX.Element {
       </TableHeader>
 
       <TableToolbar>
+        <SportCombobox
+          aria-label={m.admin_common_sport()}
+          className="w-full sm:w-48"
+          clearable
+          placeholder={m.admin_matches_all_sports()}
+          value={search.sportId}
+          onChange={(value) => filter('sportId', value)}
+        />
         <OptionCombobox
           aria-label={m.admin_common_category()}
           className="w-full sm:w-44"
@@ -236,6 +248,17 @@ export function MatchesTable(): React.JSX.Element {
           options={toOptions(['', ...CATEGORIES], {
             ...CATEGORY_LABELS,
             '': m.admin_matches_all_categories(),
+          })}
+        />
+        <OptionCombobox
+          aria-label={m.admin_common_phase()}
+          className="w-full sm:w-44"
+          clearable
+          value={search.phase ?? ''}
+          onValueChange={(value) => filter('phase', value)}
+          options={toOptions(['', ...MATCH_PHASES], {
+            ...MATCH_PHASE_LABELS,
+            '': m.admin_matches_all_phases(),
           })}
         />
         <OptionCombobox

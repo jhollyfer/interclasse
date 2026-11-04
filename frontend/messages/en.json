@@ -564,6 +564,8 @@
   "admin_matches_set_up": "Set up matches (draw a bracket)",
   "admin_matches_all_categories": "All categories",
   "admin_matches_all_statuses": "All statuses",
+  "admin_matches_all_sports": "All sports",
+  "admin_matches_all_phases": "All phases",
   "admin_matches_empty_title": "No matches",
   "admin_matches_empty_description": "Matches come from each bracket's draw: draw a sport in a category and the matches show up here. The winner moves on to the next round on its own.",
   "admin_matches_go_to_brackets": "Go to brackets",

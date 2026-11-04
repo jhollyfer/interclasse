@@ -6,17 +6,25 @@ import { useSportsReadPaginatedInfinite } from '#/hooks/use-sports-read-paginate
 import { sportQueryOptions } from '#/integrations/tanstack-query/queries/administrator'
 
 type SportComboboxProps = Readonly<{
-  id: string
-  'aria-invalid': boolean
+  id?: string
+  'aria-invalid'?: boolean
+  'aria-label'?: string
+  className?: string
+  /** Shows the clearing ×: on in the list filter, off in the required form field. */
+  clearable?: boolean
+  placeholder?: string
   value: string | undefined
   onChange: (value: string) => void
-  onBlur: () => void
+  onBlur?: () => void
 }>
 
 /**
  * The sports as options, with server search (`frontend.md` §2.1): 20
  * per page and "Carregar mais" at the end. The already chosen sport enters the
  * list even outside the loaded page, read through the detail.
+ *
+ * In `common/` because two screens choose a sport: the draw form and the
+ * match list filter.
  */
 export function SportCombobox({
   value,

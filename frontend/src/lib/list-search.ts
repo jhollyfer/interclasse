@@ -112,8 +112,8 @@ export function validateListSearch(
 
 /**
  * The listings that add a filter of their own to the default set - `?status` on
- * testimonials and users, `?mimetype` on the file library,
- * `?category` on news. The extra is always text: uuid and enum arrive as a
+ * users and photos, `?category` on classrooms, `?sportId` and `?phase` on
+ * matches. The extra is always text: uuid and enum arrive as a
  * string in the URL, and whoever refuses an invalid value is the API, with 422 pointing at
  * the field.
  */
@@ -174,9 +174,8 @@ export type StorefrontSearch = Omit<ListSearch, 'trashed'>
  * characters and the refusal of `direction` without `sort` hold equally on both
  * surfaces, and duplicating them would guarantee that one of them aged on its own.
  *
- * `sort` and `direction` stay: `/storefront/notices` and `/storefront/events`
- * declare their own sortable columns, and the chosen order is a URL filter
- * like any other.
+ * `sort` and `direction` stay: a public listing that declares its own sortable
+ * columns keeps the chosen order as a URL filter like any other.
  */
 export function validateStorefrontSearch(
   search: Record<string, unknown>,

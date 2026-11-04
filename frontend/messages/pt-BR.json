@@ -550,6 +550,8 @@
   "admin_matches_set_up": "Lançar jogos (sortear chave)",
   "admin_matches_all_categories": "Toda categoria",
   "admin_matches_all_statuses": "Toda situação",
+  "admin_matches_all_sports": "Toda modalidade",
+  "admin_matches_all_phases": "Toda fase",
   "admin_matches_empty_title": "Nenhuma partida",
   "admin_matches_empty_description": "As partidas vêm do sorteio de cada chave: sorteie a modalidade numa categoria e os jogos aparecem aqui. Quem vence avança sozinho para a fase seguinte.",
   "admin_matches_go_to_brackets": "Ir para as chaves",

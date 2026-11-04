@@ -550,6 +550,8 @@
   "admin_matches_set_up": "Crear partidos (sortear llave)",
   "admin_matches_all_categories": "Todas las categorías",
   "admin_matches_all_statuses": "Todas las situaciones",
+  "admin_matches_all_sports": "Todas las modalidades",
+  "admin_matches_all_phases": "Todas las fases",
   "admin_matches_empty_title": "Ningún partido",
   "admin_matches_empty_description": "Los partidos salen del sorteo de cada llave: sortea la modalidad en una categoría y los partidos aparecen aquí. Quien gana avanza solo a la fase siguiente.",
   "admin_matches_go_to_brackets": "Ir a las llaves",

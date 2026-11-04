@@ -12,6 +12,7 @@ import { useNavigate } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { OptionCombobox, toOptions } from '#/components/common/option-combobox'
+import { SportCombobox } from '#/components/common/sport-combobox'
 import { Button } from '#/components/ui/button'
 import { Card } from '#/components/ui/card'
 import {
@@ -36,8 +37,6 @@ import { createDialogHandle } from '#/lib/dialog-handle'
 import type { DialogHandle } from '#/lib/dialog-handle'
 import { CATEGORY_LABELS } from '#/lib/labels'
 import { m } from '#/paraglide/messages'
-
-import { SportCombobox } from './sport-combobox'
 
 const FIELDS = ['sportId', 'category'] as const
 
