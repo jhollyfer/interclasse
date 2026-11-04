@@ -34,6 +34,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Corrigido
 
+- O carrossel de fotos da home recebe foco e rola pelas setas do teclado.
 - Na tela de um usuário do painel, o título agora é só o nome; o papel e a situação ("Professor conselheiro", "Ativo") ficam logo abaixo e deixam de ser lidos como parte do título pelos leitores de tela.
 - O contrato da API (`openapi.json`) passa a descrever a resposta 429 das rotas com limite de tentativas (entrar, renovar sessão, enviar arquivo, trocar a conta e exportar o relatório).
 

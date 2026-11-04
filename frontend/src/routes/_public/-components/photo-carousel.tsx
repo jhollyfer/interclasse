@@ -89,7 +89,9 @@ export function PhotoCarousel(): React.JSX.Element | null {
       <ul
         ref={track}
         aria-label={m.public_photos_title()}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2"
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region needs keyboard focus (axe scrollable-region-focusable, WCAG 2.1.1)
+        tabIndex={0}
+        className="focus-visible:ring-ring/30 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-lg pb-2 outline-none focus-visible:ring-2"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocus={() => setPaused(true)}
