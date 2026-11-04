@@ -126,6 +126,9 @@ export default defineConfig({
     // `/openapi.json`. Without this entry the production build does not copy it, and the route
     // answers 500 on the built server - but works in development.
     { pattern: 'openapi.json', reloadServer: false },
+    // The demonstration photos (`database/seeders/dev/demo.ts`): the seed reads them
+    // from disk, and the demonstration also runs on the built server.
+    { pattern: 'database/data/demo-photos/*.jpg', reloadServer: false },
     {
       pattern: 'resources/lang/**/*.{json,yaml,yml}',
       reloadServer: false,

@@ -1,10 +1,15 @@
+import { readFile } from 'node:fs/promises'
+
 import app from '@adonisjs/core/services/app'
+import drive from '@adonisjs/drive/services/main'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
 import {
   ACTIVE_STATUS,
   CATEGORY,
   MATCH_PHASE,
+  PHOTO_STATUS,
+  UPLOAD_STATUS,
   USER_ROLE,
   type Category,
 } from '@interclasse/shared'
@@ -15,10 +20,14 @@ import Bracket from '#models/bracket'
 import Classroom from '#models/classroom'
 import Enrollment from '#models/enrollment'
 import Match from '#models/match'
+import Photo from '#models/photo'
 import Sport from '#models/sport'
+import Storage from '#models/storage'
 import Student from '#models/student'
 import User from '#models/user'
+import { DEMO_PHOTOS } from '#database/data/demo-photos'
 import TournamentSeeder from '#database/seeders/tournament.seed'
+import { StorageContract } from '#services/storage/storage.contract'
 import AdministratorBracketCreateUseCase from '#features/administrator/brackets/create/create.use-case'
 import AdministratorMatchScoreUseCase from '#features/administrator/matches/score/score.use-case'
 
@@ -104,6 +113,7 @@ export default class extends BaseSeeder {
     await this.students(classrooms)
     await this.enrollments(classrooms)
     await this.announcements()
+    await this.photos(advisors)
     await this.championship()
   }
 
@@ -302,6 +312,59 @@ export default class extends BaseSeeder {
         pinned: false,
       },
     ])
+  }
+
+  /**
+   * The carousel photos (`database/data/demo-photos.ts`), sent by the advisors in turn.
+   *
+   * The binary goes to the bucket here, with `put` (_doc-lib/flydrive.md#disk_api,
+   * https://flydrive.dev/docs/disk_api), and the row is born `UPLOADED`: the presigned
+   * multipart is the browser's path, and the seeder has no browser. The key comes
+   * from the `StorageContract`, the same rule as a real upload.
+   */
+  private async photos(advisors: User[]): Promise<void> {
+    if (await Photo.query().first()) return
+
+    const storage = await app.container.make(StorageContract)
+    const reviewer = await User.query()
+      .where('role', USER_ROLE.ADMINISTRATOR)
+      .first()
+    const mimetype = 'image/jpeg'
+
+    for (const [index, photo] of DEMO_PHOTOS.entries()) {
+      const contents = await readFile(
+        app.makePath('database/data/demo-photos', photo.file),
+      )
+      const key = storage.key(mimetype)
+      await drive.use().put(key, contents, { contentType: mimetype })
+
+      const file = await Storage.create({
+        filename: key,
+        path: key,
+        originalName: photo.file,
+        mimetype,
+        size: contents.byteLength,
+        status: UPLOAD_STATUS.UPLOADED,
+        uploadId: null,
+        partSize: null,
+      })
+
+      let reviewedById: string | null = null
+      let reviewedAt: DateTime | null = null
+      if (photo.status !== PHOTO_STATUS.PENDING) {
+        reviewedById = reviewer?.id ?? null
+        reviewedAt = DateTime.now()
+      }
+
+      await Photo.create({
+        storageId: file.id,
+        caption: photo.caption,
+        status: photo.status,
+        authorId: advisors.at(index % advisors.length)?.id ?? null,
+        reviewedById,
+        reviewedAt,
+      })
+    }
   }
 
   /**

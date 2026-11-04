@@ -18,6 +18,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Adicionado
 
+- A demonstração (`pnpm db:seed:demo`) traz fotos de exemplo no carrossel: bolas, quadras, rede e troféu, sem nenhuma pessoa, com fotos aprovadas, uma pendente e uma recusada.
 - O tema pode ser escolhido em qualquer tela (claro, escuro ou o do sistema): o seletor agora também está no cabeçalho do site (inclusive no menu do celular) e na tela de entrada.
 - Componentes de interface novos para as telas (calendário, seleção, interruptor, grupo de opções, barra de progresso, paleta de comandos, gaveta, entre outros).
 

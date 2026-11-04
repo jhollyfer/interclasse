@@ -16,6 +16,8 @@
 
 ## Parou em
 
+Atualização de 04/11: o seed de demonstração ganhou 8 fotos de exemplo no carrossel (sem rosto, CC0/domínio público, `backend/database/data/demo-photos/`), conferido com Postgres local e S3 do moto; falta rodar contra o MinIO do `docker-compose.yml`.
+
 Atualização de 03/11: kit `components/ui` completo (sem `chart`), tema claro/escuro/sistema em site, login e painel, responsivo revisado em 768 e 1440 (o dono quer responsivo em todos os tamanhos, não "cara de app"). CI da `main` verde até `26820db` com deploy; `validators:check` e `format:check` entraram no backend. Fase 11 (`TASKS.md`): 404 real no curinga público (`beforeLoad` com `notFound()`), "Sobre" fora do menu, do rodapé e do sitemap enquanto vazio (`lib/site-about.ts`), login com senha obrigatória no `shared`, `--muted-foreground` claro a 0,44, títulos em ordem (`headingLevel`), `<aside>` na barra lateral do painel e idioma visível no menu do celular. Verificado em navegador (Chromium, 1280 e 390) por papel: todas as rotas do administrador, do conselheiro e do representante carregam sem erro de rede nem de console, e o axe fecha limpo no site e no painel. O botão de 44x16 sem nome do achado (e) é o do TanStack Devtools, que só existe no `pnpm dev`. Prints em `.screenshots/` (fora do git). O E2E de `photos` precisa de MinIO e não roda sem Docker. A Fase 10 segue com PR aberto.
 
 ## Próximos passos
@@ -47,6 +49,7 @@ Atualização de 03/11: kit `components/ui` completo (sem `chart`), tema claro/e
 | 2026-10-29 | Índice único de conselheiro entrou com só as specs da feature rodadas; duas specs de `advisor/classrooms` que davam duas turmas ao mesmo conselheiro só quebraram depois | Mudança de regra de dado (índice, unique, enum) roda a suíte inteira antes do commit, não só a spec da feature        | backend, migration e regra de domínio |
 | 2026-10-29 | `DropdownMenuLabel` sem `DropdownMenuGroup` no menu da conta: abrir o menu lançava e virava a página de erro 500 (já tinha acontecido no `table-column-toggle`)          | Todo `DropdownMenuLabel` (`Menu.GroupLabel`) dentro de `DropdownMenuGroup`; reproduzir no navegador antes de teorizar | frontend, qualquer menu do Base UI    |
 | 2026-10-31 | Upload verificado só contra o moto, que aceita qualquer assinatura: a parte assinada com `content-type` e o PUT sem `Content-Type` passaram local e quebraram no MinIO do CI | Teste de upload roda contra o MinIO da release do CI (`backend/infra/minio/`), nunca contra fake de S3 | backend e frontend, upload |
+| 2026-11-04 | Fotos do seed de demonstração escolhidas com pessoas em cena (rosto fora de foco, mas visível); o dono pediu imagem sem rosto | Imagem de exemplo, ilustração ou seed não mostra rosto de pessoa: só objeto, lugar e equipamento | backend e frontend, seed e conteúdo |
 
 ## Problemas conhecidos
 
