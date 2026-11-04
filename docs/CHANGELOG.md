@@ -24,6 +24,7 @@ Mudanças de Interclasse que quem usa percebe. Formato
 
 ### Alterado (interface)
 
+- O endereço antigo `/administrator/profile` não leva mais ao perfil: o perfil fica só em `/profile`.
 - O menu do site no celular passa a abrir como painel lateral, com o mesmo conteúdo (páginas, entrar, idioma e tema), e fecha sozinho ao escolher uma página.
 - Avisos de "nada por aqui", cartões de aviso e de remoção, o aviso de remoções do painel e o quadro de inscrição de atletas usam os componentes padrão da interface, sem mudar o que aparece.
 - Botões e avisos internos que só tinham texto em português ("Fechar", "Carregando", "Mais páginas") agora seguem o idioma escolhido.

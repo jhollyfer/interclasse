@@ -19,14 +19,3 @@ test('when the administrator opens the account menu, reaches the profile without
   await expect(page.getByText(email).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Editar perfil' })).toBeVisible()
 })
-
-test('when the old profile address is opened, redirects to /profile', async ({
-  administrator: { page },
-}) => {
-  await page.goto('/administrator/profile')
-  await waitForHydration(page)
-
-  await expect(page).toHaveURL(/\/profile\/?$/)
-  await expect(page.getByText('Algo quebrou aqui')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Editar perfil' })).toBeVisible()
-})
