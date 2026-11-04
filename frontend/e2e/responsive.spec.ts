@@ -27,6 +27,7 @@ const PUBLIC_ROUTES = [
   '/standings',
   '/matches',
   '/announcements',
+  '/photos',
   '/about',
   '/sign-in',
 ] as const

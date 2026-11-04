@@ -31,6 +31,7 @@ import { Route as PrivateRepresentativeIndexRouteImport } from './routes/_privat
 import { Route as PublicAboutIndexRouteImport } from './routes/_public/about/index'
 import { Route as PublicAnnouncementsIndexRouteImport } from './routes/_public/announcements/index'
 import { Route as PublicMatchesIndexRouteImport } from './routes/_public/matches/index'
+import { Route as PublicPhotosIndexRouteImport } from './routes/_public/photos/index'
 import { Route as PublicStandingsIndexRouteImport } from './routes/_public/standings/index'
 import { Route as PrivateAdministratorAnnouncementsIndexRouteImport } from './routes/_private/administrator/announcements/index'
 import { Route as PrivateAdministratorBracketsIndexRouteImport } from './routes/_private/administrator/brackets/index'
@@ -186,6 +187,13 @@ const PublicMatchesIndexRoute = PublicMatchesIndexRouteImport.update({
   getParentRoute: () => PublicLayoutRoute,
 } as any).lazy(() =>
   import('./routes/_public/matches/index.lazy').then((d) => d.Route),
+)
+const PublicPhotosIndexRoute = PublicPhotosIndexRouteImport.update({
+  id: '/photos/',
+  path: '/photos/',
+  getParentRoute: () => PublicLayoutRoute,
+} as any).lazy(() =>
+  import('./routes/_public/photos/index.lazy').then((d) => d.Route),
 )
 const PublicStandingsIndexRoute = PublicStandingsIndexRouteImport.update({
   id: '/standings/',
@@ -465,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/about/': typeof PublicAboutIndexRoute
   '/announcements/': typeof PublicAnnouncementsIndexRoute
   '/matches/': typeof PublicMatchesIndexRoute
+  '/photos/': typeof PublicPhotosIndexRoute
   '/standings/': typeof PublicStandingsIndexRoute
   '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
@@ -508,6 +517,7 @@ export interface FileRoutesByTo {
   '/about': typeof PublicAboutIndexRoute
   '/announcements': typeof PublicAnnouncementsIndexRoute
   '/matches': typeof PublicMatchesIndexRoute
+  '/photos': typeof PublicPhotosIndexRoute
   '/standings': typeof PublicStandingsIndexRoute
   '/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
@@ -558,6 +568,7 @@ export interface FileRoutesById {
   '/_public/about/': typeof PublicAboutIndexRoute
   '/_public/announcements/': typeof PublicAnnouncementsIndexRoute
   '/_public/matches/': typeof PublicMatchesIndexRoute
+  '/_public/photos/': typeof PublicPhotosIndexRoute
   '/_public/standings/': typeof PublicStandingsIndexRoute
   '/_private/administrator/announcements/new': typeof PrivateAdministratorAnnouncementsNewLazyRoute
   '/_private/administrator/classrooms/new': typeof PrivateAdministratorClassroomsNewLazyRoute
@@ -606,6 +617,7 @@ export interface FileRouteTypes {
     | '/about/'
     | '/announcements/'
     | '/matches/'
+    | '/photos/'
     | '/standings/'
     | '/administrator/announcements/new'
     | '/administrator/classrooms/new'
@@ -649,6 +661,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/announcements'
     | '/matches'
+    | '/photos'
     | '/standings'
     | '/administrator/announcements/new'
     | '/administrator/classrooms/new'
@@ -698,6 +711,7 @@ export interface FileRouteTypes {
     | '/_public/about/'
     | '/_public/announcements/'
     | '/_public/matches/'
+    | '/_public/photos/'
     | '/_public/standings/'
     | '/_private/administrator/announcements/new'
     | '/_private/administrator/classrooms/new'
@@ -876,6 +890,13 @@ declare module '@tanstack/react-router' {
       path: '/matches'
       fullPath: '/matches/'
       preLoaderRoute: typeof PublicMatchesIndexRouteImport
+      parentRoute: typeof PublicLayoutRoute
+    }
+    '/_public/photos/': {
+      id: '/_public/photos/'
+      path: '/photos'
+      fullPath: '/photos/'
+      preLoaderRoute: typeof PublicPhotosIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
     '/_public/standings/': {
@@ -1213,6 +1234,7 @@ interface PublicLayoutRouteChildren {
   PublicAboutIndexRoute: typeof PublicAboutIndexRoute
   PublicAnnouncementsIndexRoute: typeof PublicAnnouncementsIndexRoute
   PublicMatchesIndexRoute: typeof PublicMatchesIndexRoute
+  PublicPhotosIndexRoute: typeof PublicPhotosIndexRoute
   PublicStandingsIndexRoute: typeof PublicStandingsIndexRoute
   PublicStandingsIdIndexRoute: typeof PublicStandingsIdIndexRoute
 }
@@ -1223,6 +1245,7 @@ const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
   PublicAboutIndexRoute: PublicAboutIndexRoute,
   PublicAnnouncementsIndexRoute: PublicAnnouncementsIndexRoute,
   PublicMatchesIndexRoute: PublicMatchesIndexRoute,
+  PublicPhotosIndexRoute: PublicPhotosIndexRoute,
   PublicStandingsIndexRoute: PublicStandingsIndexRoute,
   PublicStandingsIdIndexRoute: PublicStandingsIdIndexRoute,
 }

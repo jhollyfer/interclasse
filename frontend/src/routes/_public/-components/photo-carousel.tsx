@@ -2,12 +2,12 @@ import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import * as React from 'react'
 
-import { Picture } from '#/components/common/picture'
 import { Button } from '#/components/ui/button'
 import { storefrontPhotosQueryOptions } from '#/integrations/tanstack-query/queries/storefront'
 import { m } from '#/paraglide/messages'
 
 import { HOME_PHOTOS } from '../index'
+import { PhotoFigure } from './photo-figure'
 import { Section, SectionHeader, SectionTitle } from './section'
 
 /** How long each photo stays on screen before moving on by itself. */
@@ -100,21 +100,7 @@ export function PhotoCarousel(): React.JSX.Element | null {
             key={photo.id}
             className="w-full shrink-0 snap-start sm:w-carousel-half lg:w-carousel-third"
           >
-            <figure className="overflow-hidden rounded-lg border">
-              <Picture
-                src={photo.url}
-                alt={photo.caption ?? m.public_photos_alt_fallback()}
-                className="aspect-photo w-full object-cover"
-                width={800}
-                height={600}
-                placement="fold"
-              />
-              {photo.caption && (
-                <figcaption className="text-muted-foreground p-3 text-sm">
-                  {photo.caption}
-                </figcaption>
-              )}
-            </figure>
+            <PhotoFigure photo={photo} />
           </li>
         ))}
       </ul>

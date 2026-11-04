@@ -49,7 +49,7 @@ O produto vem do site anterior dos jogos, cuja identidade visual (verde de campo
 | 7 | Sorteio das chaves de mata-mata por modalidade e categoria; excluir chave | organização | `USER-FLOWS.md#sortear-uma-chave` |
 | 8 | Partidas: agenda, placar, desfazer placar, e cartões amarelos e vermelhos | organização | `USER-FLOWS.md#lançar-o-placar` |
 | 9 | Avisos publicados no site | organização | `USER-FLOWS.md#publicar-um-aviso` |
-| 10 | Site público: início, jogos, classificação em abas, avisos, Sobre | público | `USER-FLOWS.md#consultar-o-site-público` |
+| 10 | Site público: início, jogos, classificação em abas, avisos, fotos, Sobre | público | `USER-FLOWS.md#consultar-o-site-público` |
 | 11 | Página Sobre, regulamento em PDF e Instagram editáveis | organização | `USER-FLOWS.md#editar-o-site` |
 | 12 | Carrossel de fotos: o conselheiro envia, a organização aprova ou recusa | conselheiro, organização | `USER-FLOWS.md#enviar-e-aprovar-fotos` |
 | 13 | Relatórios de turmas, alunos e atletas, com exportação em CSV | organização | `USER-FLOWS.md#baixar-o-relatório` |
@@ -57,7 +57,7 @@ O produto vem do site anterior dos jogos, cuja identidade visual (verde de campo
 
 ## 5. Fica de fora (nesta versão)
 
-- Galeria de fotos completa e páginas de edições anteriores do site antigo: o carrossel de fotos aprovadas substitui a galeria.
+- Páginas de edições anteriores do site antigo. As fotos aprovadas aparecem no carrossel da home e na página `/photos`.
 - Cadastro público de conta e recuperação de senha: as contas são criadas pela organização.
 - Fases de grupos e pontos corridos: o formato é só mata-mata, do sorteio à final, com folga para as turmas que sobram.
 - Aplicativo de celular: o site é responsivo.

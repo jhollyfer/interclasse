@@ -25,6 +25,8 @@ const ANNOUNCEMENTS = linkOptions({
   label: m.public_nav_announcements,
 })
 
+const PHOTOS = linkOptions({ to: '/photos', label: m.public_nav_photos })
+
 const ABOUT = linkOptions({ to: '/about', label: m.public_nav_about })
 
 const SIGN_IN = linkOptions({
@@ -37,6 +39,7 @@ export type MenuItem =
   | typeof GAMES
   | typeof STANDINGS
   | typeof ANNOUNCEMENTS
+  | typeof PHOTOS
   | typeof ABOUT
   | typeof SIGN_IN
 
@@ -45,6 +48,7 @@ export const NAVIGATION: ReadonlyArray<MenuItem> = [
   GAMES,
   STANDINGS,
   ANNOUNCEMENTS,
+  PHOTOS,
   ABOUT,
 ]
 

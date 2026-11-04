@@ -57,6 +57,7 @@ describe('SITEMAP_STATIC_ENTRIES', () => {
       '/matches',
       '/standings',
       '/announcements',
+      '/photos',
       '/about',
     ])
   })

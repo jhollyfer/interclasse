@@ -21,6 +21,7 @@ export const SITEMAP_STATIC_ENTRIES = [
   { pathname: '/matches' },
   { pathname: '/standings' },
   { pathname: '/announcements' },
+  { pathname: '/photos' },
   { pathname: '/about' },
 ] as const satisfies ReadonlyArray<SitemapEntry>
 

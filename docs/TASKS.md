@@ -157,7 +157,7 @@ Pedido do dono, 01/11: todos os perfis do celular ao desktop, nenhuma tela gené
 |---|---|---|---|---|
 | 10.1 | Chaves de ambiente no catálogo (`backend.md` §6.2): `SEED_OWNER_*`, seed ligado pela chave, `STORAGE_PUBLIC_URL` em runtime, `E2E_OWNER_*` + `E2E_DEMO_PASSWORD`, `E2E_BASE_URL`, secrets do deploy `COOLIFY_*` | Alta | Feita | branch `chore/env-catalogo-padrao`. `SEED_OWNER_*` e seed ligado pela chave (dono e demonstração sem `static environment`), `.env.example` dos dois apps no modelo, CSP montado por requisição em `src/server.ts` com `STORAGE_PUBLIC_URL`, `VITE_UPLOAD_MAX_SIZE` no `env.ts`, E2E em `E2E_OWNER_*` + `E2E_DEMO_PASSWORD` + `E2E_BASE_URL`, secrets `COOLIFY_*`. Não rodado aqui: E2E (sem Docker) |
 
-## Fase 11 · Teste no site no ar e polimento (14/15)
+## Fase 11 · Teste no site no ar e polimento (15/16)
 
 Achados do teste do site publicado e da passada de navegador (1280 e 390) por perfil; cada item confirmado no código antes de corrigir.
 
@@ -178,6 +178,7 @@ Achados do teste do site publicado e da passada de navegador (1280 e 390) por pe
 | 11.13 | Fotos de exemplo no seed de demonstração: carrossel com fotos reais, sem rosto, nos três status | Média | Feita | 8 fotos CC0/domínio público do Flickr achadas pelo Openverse, em `backend/database/data/demo-photos/` com crédito em `demo-photos.ts`; o seed grava no bucket por `put` e cria a linha `UPLOADED`; `metaFiles` leva os `.jpg` ao build. Conferido com Postgres local e S3 do moto (não MinIO); a pasta de binário em `database/data/` não está na árvore da régua (não coberto) |
 | 11.14 | Rotas só em inglês e sem redirect de endereço antigo | Média | Feita | backend e frontend já estavam em inglês (conferido segmento a segmento); saiu o redirect `/administrator/profile` → `/profile`, herança do `frontend-old`, e o E2E dele |
 | 11.15 | Lacunas entre `USER-FLOWS`/PRD e o código | Média | Feita | auditoria fluxo a fluxo: as 14 funcionalidades do MVP existem; corrigido o estado vazio de Turmas sem "Nova turma" e a lista de partidas sem filtro de modalidade e fase (o `-search.ts` já aceitava); `SportCombobox` subiu para `components/common`. Sem tela de propósito: `GET /storages` (biblioteca de arquivos) e `GET /storages/:id/download`, fora de todo fluxo |
+| 11.16 | Página pública de fotos (`/photos`) no menu, no rodapé e no mapa do site | Alta | Feita | pedido do Jhollyfer (04/11), tira a galeria do "fica de fora" do PRD; usa `GET /storefront/photos` paginado; o quadro da foto (`PhotoFigure`) é o mesmo do carrossel |
 
 ## Fase N · Ideias (fora do escopo atual)
 
